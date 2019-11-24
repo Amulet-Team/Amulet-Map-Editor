@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import wx
+import traceback
 
 import amulet
 from amulet import world_interface
 import amulet_nbt as nbt
+import PyMCTranslate
 
 
 class WorldSelectionDialog(wx.Frame):
@@ -46,7 +48,8 @@ class WorldEditDialog(wx.Frame):
     def __init__(self, parent, world_path):
         try:
             self._world = world_interface.load_world(world_path)
-        except:
+        except Exception as e:
+            traceback.print_exc()
             parent.Show(True)
             return
         wx.Frame.__init__(self, parent, title=world_path, size=(500, 450))
@@ -103,7 +106,4 @@ class WorldEditDialog(wx.Frame):
 if __name__ == '__main__':
     app = wx.App(False)
     frame = WorldSelectionDialog(None, "Amulet Map Editor Alpha")
-    if __debug__:
-        import wx.lib.inspection
-        wx.lib.inspection.InspectionTool().Show()
     app.MainLoop()
