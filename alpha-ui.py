@@ -1,15 +1,6 @@
 from __future__ import annotations
 
-import sys
 import wx
-
-
-# TODO: remove this when bundled
-import os
-amulet_dir = r'C:\Users\james_000\Documents\GitHub\Amulet-Map-Editor'
-if os.path.isdir(amulet_dir):
-    sys.path.insert(1, amulet_dir)
-    sys.path.insert(1, os.path.join(amulet_dir, r'venv\Lib\site-packages'))
 
 import amulet
 from amulet import world_interface
