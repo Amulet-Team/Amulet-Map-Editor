@@ -25,7 +25,7 @@ class _MainWindow(wx.Frame):
 
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
-                          size=wx.Size(500, 370), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+                          size=wx.Size(500, 400), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
 
@@ -116,12 +116,14 @@ class _MainWindow(wx.Frame):
         convert_panel_sizer.Add(self.convert_button, wx.GBPosition(2, 11), wx.GBSpan(1, 1), wx.ALL | wx.EXPAND, 5)
 
         self.close_button = wx.Button(self.converter_panel, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0)
-        convert_panel_sizer.Add(self.close_button, wx.GBPosition(2, 12), wx.GBSpan(1, 1), wx.ALL, 5)
+        convert_panel_sizer.Add(self.close_button, wx.GBPosition(2, 12), wx.GBSpan(1, 1), wx.ALL | wx.EXPAND, 5)
 
         self.converter_progress = wx.Gauge(self.converter_panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize,
                                            wx.GA_HORIZONTAL)
         self.converter_progress.SetValue(0)
-        convert_panel_sizer.Add(self.converter_progress, wx.GBPosition(2, 0), wx.GBSpan(1, 8), wx.ALL | wx.EXPAND, 5)
+        convert_panel_sizer.Add(self.converter_progress, wx.GBPosition(2, 0), wx.GBSpan(1, 8), wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+
+        convert_panel_sizer.AddGrowableRow(2)
 
         self.converter_panel.SetSizer(convert_panel_sizer)
         self.converter_panel.Layout()
@@ -142,9 +144,22 @@ class _MainWindow(wx.Frame):
 
         modify_panel_sizer.Add(self.modify_world_note, wx.GBPosition(0, 0), wx.GBSpan(1, 2), wx.ALL, 5)
 
-        self.run_operation_cb = wx.CheckBox(self.modify_panel, wx.ID_ANY, u"Run Fill Operation", wx.DefaultPosition,
+        self.run_operation_cb = wx.CheckBox(self.modify_panel, wx.ID_ANY, u"Run Operation", wx.DefaultPosition,
                                             wx.DefaultSize, 0)
-        modify_panel_sizer.Add(self.run_operation_cb, wx.GBPosition(1, 0), wx.GBSpan(1, 2), wx.ALL, 5)
+        modify_panel_sizer.Add(self.run_operation_cb, wx.GBPosition(1, 0), wx.GBSpan(1, 1), wx.ALL, 5)
+
+        self.operation_label = wx.StaticText(self.modify_panel, wx.ID_ANY, u"Operation:", wx.DefaultPosition,
+                                             wx.DefaultSize, 0)
+        self.operation_label.Wrap(-1)
+
+        modify_panel_sizer.Add(self.operation_label, wx.GBPosition(1, 1), wx.GBSpan(1, 1),
+                               wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 5)
+
+        operation_chooserChoices = [u"Replace", u"Fill"]
+        self.operation_chooser = wx.Choice(self.modify_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
+                                           operation_chooserChoices, 0)
+        self.operation_chooser.SetSelection(0)
+        modify_panel_sizer.Add(self.operation_chooser, wx.GBPosition(1, 2), wx.GBSpan(1, 1), wx.ALL, 5)
 
         # region Coordinate panel
 
@@ -198,23 +213,41 @@ class _MainWindow(wx.Frame):
 
         # endregion
 
-        # region Blockstate chooser
-        blockstate_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # region (Fill/Original) Blockstate chooser
+        self.blockstate_sizer_1 = blockstate_sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
 
         self.fill_block_label = wx.StaticText(self.modify_panel, wx.ID_ANY, u"Fill Block:", wx.DefaultPosition,
                                               wx.DefaultSize, 0)
         self.fill_block_label.Wrap(-1)
 
-        blockstate_sizer.Add(self.fill_block_label, 0, wx.ALL, 5)
+        blockstate_sizer_1.Add(self.fill_block_label, 0, wx.ALL, 5)
 
         self.fill_blockstate_field = wx.TextCtrl(self.modify_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
                                                  wx.DefaultSize, 0)
         self.fill_blockstate_field.SetMinSize(wx.Size(380, -1))
 
-        blockstate_sizer.Add(self.fill_blockstate_field, 0, wx.ALL | wx.EXPAND | wx.RIGHT, 5)
+        blockstate_sizer_1.Add(self.fill_blockstate_field, 0, wx.ALL | wx.EXPAND | wx.RIGHT, 5)
 
-        modify_panel_sizer.Add(blockstate_sizer, wx.GBPosition(9, 0), wx.GBSpan(1, 3), wx.EXPAND, 5)
+        modify_panel_sizer.Add(blockstate_sizer_1, wx.GBPosition(9, 0), wx.GBSpan(1, 3), wx.EXPAND, 5)
 
+        # endregion
+
+        # region Replacement Blockstate chooser
+        self.blockstate_sizer_2 = blockstate_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.replace_block_label = wx.StaticText(self.modify_panel, wx.ID_ANY, u"Replacement Block:",
+                                                 wx.DefaultPosition, wx.DefaultSize, 0)
+        self.replace_block_label.Wrap(-1)
+
+        blockstate_sizer_2.Add(self.replace_block_label, 0, wx.ALL, 5)
+
+        self.replace_blockstate_field = wx.TextCtrl(self.modify_panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
+                                                    wx.DefaultSize, 0)
+        self.replace_blockstate_field.SetMinSize(wx.Size(326, -1))
+
+        blockstate_sizer_2.Add(self.replace_blockstate_field, 0, wx.ALL | wx.EXPAND | wx.RIGHT, 5)
+
+        modify_panel_sizer.Add(blockstate_sizer_2, wx.GBPosition(10, 0), wx.GBSpan(1, 3), wx.EXPAND, 5)
         # endregion
 
         # region Platform/Version specifier
@@ -274,6 +307,7 @@ class _MainWindow(wx.Frame):
         self.select_output_button.Bind(wx.EVT_BUTTON, self.select_output_buttonOnButtonClick)
         self.convert_button.Bind(wx.EVT_BUTTON, self.convert_buttonOnButtonClick)
         self.close_button.Bind(wx.EVT_BUTTON, self.close_buttonOnButtonClick)
+        self.operation_chooser.Bind(wx.EVT_CHOICE, self.operation_chooserOnChoice)
         self.platform_choice.Bind(wx.EVT_CHOICE, self.platform_choiceOnChoice)
         self.version_choice.Bind(wx.EVT_CHOICE, self.version_choiceOnChoice)
 
@@ -291,6 +325,9 @@ class _MainWindow(wx.Frame):
         event.Skip()
 
     def close_buttonOnButtonClick(self, event):
+        event.Skip()
+
+    def operation_chooserOnChoice(self, event):
         event.Skip()
 
     def platform_choiceOnChoice(self, event):
@@ -321,6 +358,18 @@ class MainWindow(_MainWindow):
 
     def close_buttonOnButtonClick(self, event):
         self.Close()
+
+    def operation_chooserOnChoice(self, event):
+        op = event.GetString().lower()
+
+        if op == "replace":
+            self.blockstate_sizer_2.ShowItems(show=True)
+            self.fill_block_label.SetLabelText("Original Block:")
+            self.blockstate_sizer_1.Layout()
+        elif op == "fill":
+            self.blockstate_sizer_2.ShowItems(show=False)
+            self.fill_block_label.SetLabelText("Fill Block:")
+            self.blockstate_sizer_1.Layout()
 
     def platform_choiceOnChoice(self, event):
         self.selected_platform = selected_platform = event.GetString()
