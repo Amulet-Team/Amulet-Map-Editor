@@ -13,57 +13,8 @@ In order to run the Amulet Editor from source, you will need to install the foll
 - wxpython
 - [Amulet-Core](https://github.com/Amulet-Team/Amulet-Core)
 
-The steps below will install everything needed for Amulet (Instructions for installing Python 3.7 provided when available)
-
-__Note: Make sure to install the `venv` module if it does not come pre-installed with python__
-
-1. Clone the project using `git clone https://github.com/Amulet-Team/Amulet-Map-Editor`
-2. Change the working directory to be the directory created when cloning (Ex: `cd Amulet-Editor`)
-3. Set up a python virtual environment (run the following commands for your OS in your terminal/command prompt)
-   1. __Windows__
-      1. Create the virtual environment: `python -m venv ENV`
-      2. Activate the environment: `.\ENV\scripts\activate.bat`
-   2. __OS X__
-      1. Create the virtual environment: `python3.7 -m venv ENV`
-         - Depending on how you installed python 3.7, this might instead be: `py -3.7 -m venv ENV`
-      2. Activate the environment: `source /ENV/bin/activate`
-   3. __Linux__
-      1. Install python 3.7 if it's not already installed (run the following commands in your terminal of choice. These are for Debain based distros, use your distros package manager or refer to [#54 (comment)](https://github.com/Amulet-Team/Amulet-Core/issues/54#issuecomment-523046836) if you need to build Python 3.7 from source)
-         1. `sudo apt-get update` (Optional)
-         2. `sudo apt-get install python-3.7`
-         3. Verify that python 3.7 was successfully installed: `python3.7 --version`
-      2. Set up a python virtual environment (also run the following commands in the terminal)
-         1. Create the virtual environment: `python3.7 -m venv ENV`
-         2. Activate the environment: `source /ENV/bin/activate`
-4. Install the requirements using `pip install -r requirements.txt`
-5. To format your files automatically before committing changes, use `pre-commit install`
-
-### For Development
-Follow all of the step above for running from source, then install the following packages:
-- [Black](https://github.com/ambv/black) (Required for formatting)
-  - Must be ran before pushing a Pull Request
-- Sphinx
-- [sphinx-autodoc-typehints](https://github.com/agronholm/sphinx-autodoc-typehints)
-- [sphinx_rtd_theme](https://github.com/rtfd/sphinx_rtd_theme)
-
-Shortcut: `pip install -r requirements-dev.txt` (This also installs the requirements required for running from source)
 
 For information about contributing to this project, please see the contribution section [below](#contributing)
-
-## Running the program
-
-### Command-line
-To run the program in command line mode, run the following command in your operating system's console:
-`Amulet_Map_Editor --command-line`
-
-## Documentation
-
-Our online documentation can be found here: https://amulet-map-editor.readthedocs.io/en/latest/
-
-### Building the Documentation
-To build the documentation locally, run the following command: `make html` and then navigate to the
-generated directory `docs_build/html` in your favorite web browser
-
 
 ## Contributing
 
