@@ -739,6 +739,9 @@ class MainWindow(_MainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
+        self.input_world_path = None
+        self.output_world_path = None
+
         self.selected_platform = None
 
         self.translation_manager = PyMCTranslate.new_translation_manager()
@@ -747,14 +750,95 @@ class MainWindow(_MainWindow):
 
         self.Show()
 
+    def convert_buttonOnButtonClick(self, event):
+        if self.input_world_path is None:
+            dialog = wx.MessageDialog(self, "You must select an input world", "Converter Error", style=wx.ICON_WARNING | wx.OK | wx.CENTER)
+            dialog.ShowModal()
+            dialog.Destroy()
+            return
+
+        if self.output_world_path is None:
+            dialog = wx.MessageDialog(self, "You must select an output world", "Converter Error", style=wx.ICON_WARNING | wx.OK | wx.CENTER)
+            dialog.ShowModal()
+            dialog.Destroy()
+            return
+
+        input_world = amulet.load_world(self.input_world_path)
+        self.converter_progress.SetValue(20)
+        output_world_wrapper = amulet.load_format(self.output_world_path)
+        self.converter_progress.SetValue(40)
+
+        if self.run_operation_cb.GetValue():
+            operation_name = self.operation_chooser.GetStringSelection().lower()
+
+            operation_args = None
+            if operation_name == 'fill':
+                operation_args = [
+                    amulet.selection.SelectionBox(
+                        [
+                            amulet.selection.SubBox(
+                                (
+                                    self.start_x.GetValue(),
+                                    self.start_y.GetValue(),
+                                    self.start_z.GetValue()
+                                ),
+                                (
+                                    self.end_x.GetValue(),
+                                    self.end_y.GetValue(),
+                                    self.end_z.GetValue()
+                                )
+                            )
+                        ]
+                    ),
+                    amulet.Block(self.fill_blockstate_field.GetValue())
+                ]
+            elif operation_name == 'replace':
+                operation_args = [
+                    amulet.selection.SelectionBox(
+                        [
+                            amulet.selection.SubBox(
+                                (
+                                    self.start_x.GetValue(),
+                                    self.start_y.GetValue(),
+                                    self.start_z.GetValue()
+                                ),
+                                (
+                                    self.end_x.GetValue(),
+                                    self.end_y.GetValue(),
+                                    self.end_z.GetValue()
+                                )
+                            )
+                        ]
+                    ),
+                    [
+                        amulet.Block(self.fill_blockstate_field.GetValue()),
+                    ],
+                    [
+                        amulet.Block(self.replace_blockstate_field.GetValue()),
+                    ]]
+
+            self.converter_progress.SetValue(50)
+            input_world.run_operation_from_operation_name(operation_name, *operation_args)
+            self.converter_progress.SetValue(60)
+
+        self.converter_progress.SetValue(70)
+        input_world.save(output_world_wrapper)
+        input_world.close()
+        output_world_wrapper.close()
+        self.converter_progress.SetValue(100)
+
+        finished_dialog = wx.MessageDialog(self, "World conversion has completed", "Conversion Finished", style= wx.ICON_INFORMATION | wx.CENTER | wx.OK)
+        finished_dialog.ShowModal()
+        finished_dialog.Destroy()
+
     def select_input_buttonOnButtonClick(self, event):
         self.choose_and_set_world(
-            ("input_world_path", "in_world_path_label", "in_world_format_label")
+            ("input_world_path", "in_world_path_label", "in_world_format_label"), event
         )
 
     def select_output_buttonOnButtonClick(self, event):
         self.choose_and_set_world(
-            ("output_world_path", "out_world_path_label", "out_world_format_label")
+            ("output_world_path", "out_world_path_label", "out_world_format_label"), event
         )
 
     def close_buttonOnButtonClick(self, event):
@@ -793,14 +877,14 @@ class MainWindow(_MainWindow):
             )
         )
 
-    def choose_and_set_world(self, fields):
+    def choose_and_set_world(self, fields, event):
         world_path_field, path_label_field, format_label_field = (
             fields[0],
             fields[1],
             fields[2],
         )
 
-        world_path = self.choose_world()
+        world_path = self.choose_world(event)
         _format, version = amulet.world_interface.load_format(
             world_path
         )._max_world_version()
@@ -828,7 +912,7 @@ class MainWindow(_MainWindow):
             )
         )
 
-    def choose_world(self):
+    def choose_world(self, event):
         dir_dialog = wx.DirDialog(
             None,
             "Choose world directory",
