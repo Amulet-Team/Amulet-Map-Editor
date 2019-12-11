@@ -4,26 +4,6 @@ from OpenGL.GL import *
 import sys
 from amulet_renderer.render_chunk import RenderChunk
 
-vertex_shader = """
-# version 330
-in layout(location = 0) vec3 positions;
-in layout(location = 1) vec3 colors;
-out vec3 newColor;
-void main(){
-    gl_Position = vec4(positions, 1.0);
-    newColor = colors;
-}
-"""
-
-fragment_shader = """
-# version 330
-in vec3 newColor;
-out vec4 outColor;
-void main(){
-    outColor = vec4(newColor, 1.0);
-}
-"""
-
 
 class World3dCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: 'World3DPanel'):
