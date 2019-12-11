@@ -34,6 +34,12 @@ class World3DPanel(wx.Panel):
         super().__init__(parent)
         self.canvas = World3dCanvas(self)
 
+        self.Bind(wx.EVT_SIZE, self.OnResize)
+
+    def OnResize(self, event):
+        self.canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
+        event.Skip()
+
 
 if __name__ == "__main__":
     class MainFrame(wx.Frame):
