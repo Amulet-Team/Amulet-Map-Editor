@@ -2,17 +2,20 @@ import wx
 from wx import glcanvas
 from OpenGL.GL import *
 import sys
-from amulet_renderer.render_chunk import RenderChunk
+from amulet_renderer.render_world import RenderWorld, RenderChunk
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from amulet.api.world import World
 
 
 class World3dCanvas(glcanvas.GLCanvas):
-    def __init__(self, parent: 'World3DPanel'):
+    def __init__(self, parent: 'World3DPanel', world: 'World'):
         self.world_panel = parent
         super().__init__(parent, -1, size=parent.parent_frame.GetClientSize())
         self.context = glcanvas.GLContext(self)
         self.SetCurrent(self.context)
-
-        model = RenderChunk()
+        glClearColor(0.5, 0.5, 0.5, 1.0)
+        self.render_world = RenderWorld(world)
 
         self.Bind(wx.EVT_PAINT, self.OnDraw)
         self.world_panel.Bind(wx.EVT_SIZE, self.OnResize)
@@ -24,15 +27,15 @@ class World3dCanvas(glcanvas.GLCanvas):
 
     def OnDraw(self, event):
         glClear(GL_COLOR_BUFFER_BIT)
-        glDrawArrays(GL_TRIANGLES, 0, 3)
+        self.render_world.draw()
         self.SwapBuffers()
 
 
 class World3DPanel(wx.Panel):
-    def __init__(self, parent: 'MainFrame'):
+    def __init__(self, parent: 'MainFrame', world: 'World'):
         self.parent_frame = parent
         super().__init__(parent)
-        self.canvas = World3dCanvas(self)
+        self.canvas = World3dCanvas(self, world)
 
         self.Bind(wx.EVT_SIZE, self.OnResize)
 
@@ -50,7 +53,11 @@ if __name__ == "__main__":
             self.SetMinSize(self.size)
             self.Bind(wx.EVT_CLOSE, self.on_close)
 
-            self.panel = World3DPanel(self)
+            world_path = sys.argv[1]
+            import amulet.world_interface
+            world = amulet.world_interface.load_world(world_path)
+
+            self.panel = World3DPanel(self, world)
 
         def on_close(self, event):
             self.Destroy()
@@ -62,7 +69,6 @@ if __name__ == "__main__":
             frame = MainFrame()
             frame.Show()
             return True
-
 
     app = App()
     app.MainLoop()
