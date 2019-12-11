@@ -6,6 +6,7 @@
 ##
 ## File has been manually edited, but care should be taken when modifying the _MainWindow class
 ###########################################################################
+import traceback
 
 import wx
 import wx.xrc
@@ -885,16 +886,19 @@ class MainWindow(_MainWindow):
         )
 
         world_path = self.choose_world(event)
-        _format, version = amulet.world_interface.load_format(
+        if world_path is None:
+            return
+        _format = amulet.world_interface.load_format(
             world_path
-        )._max_world_version()
+        )
 
         try:
-            version_obj = self.translation_manager.get_version(_format, version)
+            version_obj = _format.translation_manager.get_version(_format, _format.max_world_version())
         except (AssertionError, amulet.api.errors.LoaderNoneMatched) as e:
+            traceback.print_exc()
             dialog = wx.MessageDialog(
                 self,
-                f'Couldn\'t find a valid loader for "{world_path}"',
+                f'Couldn\'t find a valid loader for "{world_path}"\n\nStacktrace:\n' + traceback.format_exc(),
                 style=wx.OK_DEFAULT | wx.ICON_ERROR,
             )
             dialog.ShowModal()
