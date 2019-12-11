@@ -82,7 +82,6 @@ class World3DPanel(wx.Panel):
         self.parent_frame = parent
         super().__init__(parent)
         self.canvas = World3dCanvas(self)
-        sizer = wx.BoxSizer(wx.BOTH)
 
 
 if __name__ == "__main__":
