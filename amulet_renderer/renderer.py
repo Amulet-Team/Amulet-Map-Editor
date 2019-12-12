@@ -1,6 +1,7 @@
 import wx
 from wx import glcanvas
 from OpenGL.GL import *
+from OpenGL.GLU import *
 import sys
 from amulet_renderer.render_world import RenderWorld, RenderChunk
 from typing import TYPE_CHECKING
@@ -15,6 +16,9 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.context = glcanvas.GLContext(self)
         self.SetCurrent(self.context)
         glClearColor(0.5, 0.5, 0.5, 1.0)
+        glEnable(GL_DEPTH_TEST)
+        glDepthFunc(GL_LESS)
+
         self.render_world = RenderWorld(world)
 
         self.timer = wx.Timer(self)
@@ -23,11 +27,20 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.world_panel.Bind(wx.EVT_SIZE, self.OnResize)
 
     def OnResize(self, event):
-        size = event.GetSize()
-        glViewport(0, 0, size[0], size[1])
+        width, height = event.GetSize()
+        glViewport(0, 0, width, height)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluPerspective(90, width / height, .1, 1000)
+        glMatrixMode(GL_MODELVIEW)
 
     def OnDraw(self, event):
-        glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glLoadIdentity()
+        glRotatef(45, 1, 0, 0)
+        glRotatef(45, 0, 1, 0)
+        glTranslatef(0, 100, 0)
+
         self.render_world.draw()
         self.SwapBuffers()
 
