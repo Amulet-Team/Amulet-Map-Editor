@@ -17,12 +17,13 @@ class World3dCanvas(glcanvas.GLCanvas):
         glClearColor(0.5, 0.5, 0.5, 1.0)
         self.render_world = RenderWorld(world)
 
-        self.Bind(wx.EVT_PAINT, self.OnDraw)
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnDraw, self.timer)
+        self.timer.Start(33)
         self.world_panel.Bind(wx.EVT_SIZE, self.OnResize)
 
     def OnResize(self, event):
         size = event.GetSize()
-        print(size)
         glViewport(0, 0, size[0], size[1])
 
     def OnDraw(self, event):
