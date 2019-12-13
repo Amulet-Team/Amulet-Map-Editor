@@ -9,6 +9,21 @@ if TYPE_CHECKING:
     from amulet.api.world import World
 
 
+key_map = {
+    'jump': wx.WXK_SPACE,
+    'shift': wx.WXK_SHIFT,
+    'forwards': 87,
+    'backwards': 83,
+    'left': 65,
+    'right': 68,
+
+    'look_left': 74,
+    'look_right': 76,
+    'look_up': 73,
+    'look_down': 75,
+}
+
+
 class World3dCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: 'World3DPanel', world: 'World'):
         self.world_panel = parent
@@ -25,6 +40,37 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.Bind(wx.EVT_TIMER, self.OnDraw, self.timer)
         self.timer.Start(33)
         self.world_panel.Bind(wx.EVT_SIZE, self.OnResize)
+
+        self.Bind(wx.EVT_KEY_DOWN, self.on_key_press)
+
+    def on_key_press(self, event):
+        key = event.GetKeyCode()
+        print(key)
+        if key == key_map['jump']:
+            self.render_world.camera_location[1] += 1
+        elif key == key_map['shift']:
+            self.render_world.camera_location[1] -= 1
+        elif key == key_map['forwards']:
+            self.render_world.camera_location[2] -= 1
+        elif key == key_map['backwards']:
+            self.render_world.camera_location[2] += 1
+        elif key == key_map['left']:
+            self.render_world.camera_location[0] -= 1
+        elif key == key_map['right']:
+            self.render_world.camera_location[0] += 1
+
+        elif key == key_map['look_left']:
+            self.render_world.camera_rotation[1] -= 1
+        elif key == key_map['look_right']:
+            self.render_world.camera_rotation[1] += 1
+        elif key == key_map['look_up']:
+            self.render_world.camera_rotation[0] -= 1
+            if self.render_world.camera_rotation[0] < -90:
+                self.render_world.camera_rotation[0] = -90
+        elif key == key_map['look_down']:
+            self.render_world.camera_rotation[0] += 1
+            if self.render_world.camera_rotation[0] > 90:
+                self.render_world.camera_rotation[0] = 90
 
     def OnResize(self, event):
         width, height = event.GetSize()
