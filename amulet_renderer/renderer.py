@@ -29,19 +29,11 @@ class World3dCanvas(glcanvas.GLCanvas):
     def OnResize(self, event):
         width, height = event.GetSize()
         glViewport(0, 0, width, height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(90, width / height, .1, 1000)
-        glMatrixMode(GL_MODELVIEW)
+        self.render_world.projection[1] = width/height
 
     def OnDraw(self, event):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
-        glRotatef(45, 1, 0, 0)
-        glRotatef(45, 0, 1, 0)
-        glTranslatef(0, 100, 0)
-
-        self.render_world.draw()
+        self.render_world.draw(self.render_world.transformation_matrix)
         self.SwapBuffers()
 
 

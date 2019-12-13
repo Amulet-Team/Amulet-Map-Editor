@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Dict, Tuple, Generator
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet.api.chunk import Chunk
-import random
+import math
 import itertools
 
 from amulet_renderer import shaders
@@ -13,12 +13,72 @@ from amulet_renderer import shaders
 class RenderWorld:
     def __init__(self, world: 'World'):
         self.world = world
-        self.camera_location = (0, 0, 0)
+        self.projection = [45.0, 4/3, 0.1, 1000.0]
+        self.camera_location = [1, 0, 0]
+        self.camera_rotation = [0, 0]
         self.render_distance = 1
         self._loaded_render_chunks: Dict[Tuple[int, int], 'RenderChunk'] = {}
         self.shaders = {
             'render_chunk': shaders.load_shader('render_chunk')
         }
+
+    @property
+    def transformation_matrix(self) -> numpy.ndarray:
+        fovy, aspect, z_near, z_far = self.projection
+        f = 1/math.tan(fovy/2)
+
+        # camera translation
+        transformation_matrix = numpy.eye(4, dtype=numpy.float64)
+        transformation_matrix[3, :3] = self.camera_location
+
+        # rotations
+
+        theta = math.radians(self.camera_rotation[0])
+        c = math.cos(theta)
+        s = math.sin(theta)
+
+        x_rot = numpy.array(
+            [
+                [1, 0, 0, 0],
+                [0, c, s, 0],
+                [0, -s, c, 0],
+                [0, 0, 0, 1]
+            ],
+            dtype=numpy.float64
+        )
+
+        transformation_matrix = numpy.matmul(transformation_matrix, x_rot)
+
+        theta = math.radians(self.camera_rotation[1])
+        c = math.cos(theta)
+        s = math.sin(theta)
+
+        y_rot = numpy.array(
+            [
+                [c, 0, -s, 0],
+                [0, 1, 0, 0],
+                [s, 0, c, 0],
+                [0, 0, 0, 1]
+            ],
+            dtype=numpy.float64
+        )
+
+        transformation_matrix = numpy.matmul(transformation_matrix, y_rot)
+
+        # camera projection
+        projection = numpy.array(
+            [
+                [f/aspect, 0, 0, 0],
+                [0, f, 0, 0],
+                [0, 0, (z_far+z_near)/(z_near-z_far), -1],
+                [0, 0, (2*z_far*z_near)/(z_near-z_far), 0]
+            ],
+            dtype=numpy.float64
+        )
+
+        transformation_matrix = numpy.matmul(transformation_matrix, projection)
+
+        return transformation_matrix
 
     def _get_render_chunk(self, chunk_coords: Tuple[int, int]) -> 'RenderChunk':
         if not chunk_coords in self._loaded_render_chunks:
@@ -36,13 +96,13 @@ class RenderWorld:
         for chunk in sorted(chunks, key=lambda c: (c[0]-x)**2 + (c[1]-x)**2):
             yield chunk
 
-    def draw(self):
+    def draw(self, transformation_matrix):
         # draw all chunks within render distance
         load_chunks = []
         for chunk_coords in self.chunk_coords():
             if chunk_coords in self._loaded_render_chunks:
                 chunk = self._loaded_render_chunks[chunk_coords]
-                chunk.draw()
+                chunk.draw(transformation_matrix)
             else:
                 load_chunks.append(chunk_coords)
 
@@ -89,8 +149,11 @@ class RenderChunk:
         glEnableVertexAttribArray(1)
         glBindVertexArray(0)
 
-    def draw(self):
-        glUseProgram(self.render_world.shaders['render_chunk'])
+    def draw(self, transformation_matrix: numpy.ndarray):
+        shader = self.render_world.shaders['render_chunk']
+        glUseProgram(shader)
+        trm_mat_loc = glGetUniformLocation(shader, "transformation_matrix")
+        glUniformMatrix4fv(trm_mat_loc, 1, GL_FALSE, transformation_matrix.astype(numpy.float32))
         glBindVertexArray(self.vao)
         glDrawArrays(GL_TRIANGLES, 0, 3)
 
