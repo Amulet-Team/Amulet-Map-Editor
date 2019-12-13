@@ -1,12 +1,13 @@
 import wx
 from wx import glcanvas
 from OpenGL.GL import *
-from OpenGL.GLU import *
 import sys
+
 from amulet_renderer.render_world import RenderWorld, RenderChunk
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from amulet.api.world import World
+import minecraft_model_reader
 
 
 key_map = {
@@ -32,9 +33,13 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.SetCurrent(self.context)
         glClearColor(0.5, 0.5, 0.5, 1.0)
         glEnable(GL_DEPTH_TEST)
+        # glDisable(GL_CULL_FACE)
         glDepthFunc(GL_LESS)
 
-        self.render_world = RenderWorld(world)
+        resource_packs = [minecraft_model_reader.JavaRP(rp) for rp in sys.argv[2:]]
+        resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
+
+        self.render_world = RenderWorld(world, resource_pack)
 
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnDraw, self.timer)

@@ -5,5 +5,5 @@ out vec3 newColor;
 uniform mat4 transformation_matrix;
 void main(){
     gl_Position = transformation_matrix * vec4(positions, 1.0);
-    newColor = colors;
+    newColor = vec3(1.0, 0.0, 0.0);
 }
