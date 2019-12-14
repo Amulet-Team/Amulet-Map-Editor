@@ -18,19 +18,22 @@ class RenderWorld:
     def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
         self.world = world
         self.projection = [45.0, 4/3, 0.1, 1000.0]
-        self.camera_location = [1, 0, 0]
-        self.camera_rotation = [0, 0]
-        self.render_distance = 10
+        self.camera_location = [1, 300, 0]
+        self.camera_rotation = [90, 0]
+        self.render_distance = 20
         self._loaded_render_chunks: Dict[Tuple[int, int], Union['RenderChunk', None]] = {}
         self.shaders = {
             'render_chunk': shaders.load_shader('render_chunk')
         }
         self.resource_pack = resource_pack
         self.block_models = []
+        self._texture_bounds = {}
         self.resource_pack_translator = self.world.world_wrapper.translation_manager.get_sub_version('java', (1, 13, 2), force_blockstate=True)
+        self._texture_atlas = None
+        self.texture_atlas = glGenTextures(1)
         self._create_atlas()
 
-    def _create_atlas(self, size=2):
+    def _create_atlas(self, size=128):
         print(f'Trying to pack textures into atlas size {size}')
         try:
             filename = str(hash(tuple(self.resource_pack.pack_paths)))
@@ -58,11 +61,28 @@ class RenderWorld:
                 atlas.pack(texture)
 
             # Write atlas and map file
-            atlas.write(f'{filename}.{ext}', 'RGBA')
-            with open(filename + '.map', 'wb') as f:
-                textureatlas.BinaryTextureAtlasMap(atlas).write(f)
+            # atlas.write(f'{filename}.{ext}', 'RGBA')
+            self._texture_atlas = numpy.array(list(atlas.generate('RGBA').getdata()), numpy.uint8).ravel()
+
+            glBindTexture(GL_TEXTURE_2D, self.texture_atlas)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlas.width, atlas.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, self._texture_atlas)
+
+            texture_bounds = atlas.to_dict()
+            self._texture_bounds = {tex_id: texture_bounds[texture_path] for tex_id, texture_path in self.resource_pack.textures.items()}
+            # with open(filename + '.json', 'w') as f:
+            #     json.dump(texture_bounds, f)
         except textureatlas.AtlasTooSmall:
             self._create_atlas(size=size*2)
+
+    def get_texture_bounds(self, texture):
+        if texture not in self._texture_bounds:
+            texture = ('minecraft', 'missing_no')
+        return self._texture_bounds[texture]
 
     def get_model(self, pallete_index: int):
         if len(self.world.palette) > len(self.block_models):
@@ -263,50 +283,49 @@ class RenderChunk:
 
                 # the vertices in model space
                 verts = model.verts[cull_dir]
+                faces = model.faces[cull_dir].reshape((-1, 3))
+
                 # duplicate the vertices for each block
                 vert_list_ = numpy.tile(verts, (block_count, 1))
                 # offset the model verts to chunk space TODO: there might be a better way to do this
                 for axis in range(3):
                     vert_list_[:, axis::3] += block_offsets[:, axis].reshape((-1, 1))
 
+                texture_bounds = numpy.zeros((verts.size//3, 4), dtype=numpy.float64)
+                for texture_index, vert_indexes in zip(model.texture_index[cull_dir], faces):
+                    tex_bounds = self.render_world.get_texture_bounds(
+                        model.textures[texture_index]
+                    )
+
+                    for vert_index in vert_indexes:
+                        texture_bounds[vert_index, :] = tex_bounds
+
+
+
                 vert_table = numpy.hstack((
                     vert_list_.reshape((-1, 3)),
                     numpy.tile(
                         model.texture_coords[cull_dir].reshape((-1, 2)),
+                        (block_count, 1)
+                    ),
+                    numpy.tile(
+                        texture_bounds,
                         (block_count, 1)
                     )
                 )).astype(numpy.float32)
                 chunk_verts.append(vert_table)
                 for _ in range(block_count):
                     chunk_faces.append(
-                        model.faces[cull_dir].reshape((-1, 3)) + vert_offset
+                        faces + vert_offset
                     )
                     vert_offset += verts.size // 3
 
         if len(chunk_faces) == 0:
-            self.chunk_verts = numpy.zeros((0, 5), dtype=numpy.float32)
+            self.chunk_verts = numpy.zeros((0, 9), dtype=numpy.float32)
             self.chunk_faces = numpy.zeros((0, 3), dtype=numpy.uint32)
         else:
             self.chunk_verts = numpy.concatenate(chunk_verts, 0).ravel()
             self.chunk_faces = numpy.concatenate(chunk_faces, 0).ravel()
-
-
-                # texture = model.texture_index[cull_dir]
-                # TODO: not all faces in the same model have the same texture
-                # cur_texture = model.textures[texture[0]]
-                # if not self.render_world.texture_exists(cur_texture):
-                #     self.queue.put(("texture", (self.cx, self.cz), self.render_id, cur_texture))
-                #     self.render_world.queued_textures.append(cur_texture)
-                # self.queue.put((
-                #     "vertices",
-                #     (self.cx, self.cz),
-                #     self.render_id,
-                #     cur_texture,
-                #     vert_list_,
-                #     block_count,
-                #     model.texture_coords[cull_dir][0::2],
-                #     model.texture_coords[cull_dir][1::2]
-                # ))
 
     def create_geometry(self):
         glBindVertexArray(self.vao)
@@ -314,18 +333,20 @@ class RenderChunk:
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
         glBufferData(GL_ARRAY_BUFFER, self.chunk_verts.size * 4, self.chunk_verts, GL_STATIC_DRAW)
         # vertex attribute pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
         glEnableVertexAttribArray(0)
         # texture coords attribute pointers
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
         glEnableVertexAttribArray(1)
+        # texture coords attribute pointers
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(20))
+        glEnableVertexAttribArray(2)
 
         ivbo = glGenBuffers(1)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ivbo)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.chunk_faces.size * 4, self.chunk_faces, GL_STATIC_DRAW)
 
         glBindVertexArray(0)
-
 
     def create_geometry_(self):
         # geometry will include
@@ -346,7 +367,6 @@ class RenderChunk:
         glBindVertexArray(self.vao)
         vbo = glGenBuffers(1)
 
-
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
         glBufferData(GL_ARRAY_BUFFER, len(triangle) * 4, triangle, GL_STATIC_DRAW)
 
@@ -360,7 +380,12 @@ class RenderChunk:
 
     def draw(self, transformation_matrix: numpy.ndarray):
         shader = self.render_world.shaders['render_chunk']
+
         glUseProgram(shader)
+
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.render_world.texture_atlas)
+        glUniform1i(glGetUniformLocation(shader, 'image'), 0)
 
         chunk_translation = numpy.eye(4, dtype=numpy.float64)
         chunk_translation[3, [0, 2]] = numpy.array(self.coords) * 16
