@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet.api.chunk import Chunk
 import minecraft_model_reader
+from amulet_renderer import textureatlas
 
 
 class RenderWorld:
@@ -27,6 +28,41 @@ class RenderWorld:
         self.resource_pack = resource_pack
         self.block_models = []
         self.resource_pack_translator = self.world.world_wrapper.translation_manager.get_sub_version('java', (1, 13, 2), force_blockstate=True)
+        self._create_atlas()
+
+    def _create_atlas(self, size=2):
+        print(f'Trying to pack textures into atlas size {size}')
+        try:
+            filename = str(hash(tuple(self.resource_pack.pack_paths)))
+            ext = 'png'
+
+            # Parse texture names
+            textures = []
+            for texture in self.resource_pack.textures.values():
+                # Look for a texture name
+                name, frames = texture, [texture]
+
+                # Build frame objects
+                frames = [textureatlas.Frame(f) for f in frames]
+
+                # Add frames to texture object list
+                textures.append(textureatlas.Texture(name, frames))
+
+            # Sort textures by perimeter size in non-increasing order
+            textures = sorted(textures, key=lambda i: i.frames[0].perimeter, reverse=True)
+
+            # Create the atlas and pack textures in
+            atlas = textureatlas.TextureAtlas(size, size)
+
+            for texture in textures:
+                atlas.pack(texture)
+
+            # Write atlas and map file
+            atlas.write(f'{filename}.{ext}', 'RGBA')
+            with open(filename + '.map', 'wb') as f:
+                textureatlas.BinaryTextureAtlasMap(atlas).write(f)
+        except textureatlas.AtlasTooSmall:
+            self._create_atlas(size=size*2)
 
     def get_model(self, pallete_index: int):
         if len(self.world.palette) > len(self.block_models):
