@@ -24,6 +24,7 @@
 
 from PIL import Image
 import struct
+from typing import Dict, Tuple, List
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
 Atlas. A companion file (.map), is created that defines where each texture is
@@ -190,7 +191,7 @@ class TextureAtlas(PackRegion):
         self._textures = []
 
     @property
-    def textures(self):
+    def textures(self) -> List[Texture]:
         return self._textures
 
     def pack(self, texture):
@@ -200,12 +201,27 @@ class TextureAtlas(PackRegion):
             if not super(TextureAtlas, self).pack(frame):
                 raise AtlasTooSmall('Failed to pack frame %s' % frame.filename)
 
-    def write(self, filename, mode):
+    def to_dict(self) -> Dict[str, Tuple[int, int, int, int]]:
+        return {
+            tex.name: (
+                tex.frames[0].x/self.width,
+                tex.frames[0].y/self.height,
+                (tex.frames[0].x+tex.frames[0].width)/self.width,
+                (tex.frames[0].y+tex.frames[0].height)/self.height
+            ) for tex in self.textures
+        }
+
+    def generate(self, mode):
         """Generates the final texture atlas."""
         out = Image.new(mode, (self.width, self.height))
         for t in self._textures:
             for f in t.frames:
                 f.draw(out)
+        return out
+
+    def write(self, filename, mode):
+        """Generates and saves the final texture atlas."""
+        out = self.generate(mode)
         out.save(filename)
 
 
@@ -218,119 +234,3 @@ class TextureAtlasMap(object):
     def write(self, fd):
         """Writes the texture atlas map file into file object fd."""
         raise Exception('Not Implemented')
-
-
-class BinaryTextureAtlasMap(TextureAtlasMap):
-    """Binary Texture Atlas Map file generator.
-
-    The binary atlas map is composed of four sections. The first section is the
-    header. The second section contains the details of each texture (name,
-    number of frames, etc.). The third section contains all null-terminated
-    strings referenced by other sections. The fourth section contains the
-    coordinates and dimensions of all texture frames.
-
-    HEADER FORMAT
-
-    Offset Size Description
-    ------ ---- -----------
-    0      4    Magic ('TEXA' = 0x41584554)
-    4      4    Texture Atlas Width
-    8      4    Texture Atlas Height
-    12     4    Number of Textures
-    16     4    Texture Section Offset
-    20     4    Texture Section Size
-    24     4    String Section Offset
-    28     4    String Section Size
-    32     4    Frame Section Offset
-    36     4    Frame Section Size
-
-    TEXTURE FORMAT
-
-    Offset Size Description
-    ------ ---- -----------
-    0      4    Offset to Texture Name in String Section
-    4      4    Number of Frames
-    8      4    Offset to first Frame
-
-    FRAME FORMAT
-
-    Offset Size Description
-    ------ ---- -----------
-    0      4    X-Coordinate of Frame
-    4      4    Y-Coordinate of Frame
-    8      4    Frame Width
-    12     4    Frame Height
-    """
-
-    def __init__(self, atlas):
-        super(BinaryTextureAtlasMap, self).__init__(atlas)
-
-    def write(self, fd):
-        """Writes the binary texture atlas map file into file object fd."""
-        # Calculate offset and size of each section
-        hdr_fmt = 'IIIIIIIII'
-        hdr_fmt_len = struct.calcsize(hdr_fmt)
-        hdr_section_len = hdr_fmt_len+4  # Header + Magic
-
-        tex_fmt = 'III'
-        tex_fmt_len = struct.calcsize(tex_fmt)
-        tex_section_off = hdr_section_len
-        tex_section_len = len(self._atlas.textures)*tex_fmt_len
-
-        str_section_off = tex_section_off+tex_section_len
-        str_section_len = sum(map(lambda t_: len(t_.name)+1, self._atlas.textures))
-
-        frm_fmt = 'IIII'
-        frm_fmt_len = struct.calcsize(frm_fmt)
-        frm_section_off = str_section_off + str_section_len
-        frm_section_len = sum(map(lambda t_: len(t_.frames), self._atlas.textures))
-        frm_section_len *= frm_fmt_len
-
-        # Write Header
-        fd.write(b'TEXA')
-        fd.write(
-            struct.pack(
-                hdr_fmt,
-                self._atlas.width,
-                self._atlas.height,
-                len(self._atlas.textures),
-                tex_section_off,
-                tex_section_len,
-                str_section_off,
-                str_section_len,
-                frm_section_off,
-                frm_section_len
-            )
-        )
-
-        # Write Texture Section
-        str_offset = 0
-        frm_offset = 0
-        for t in self._atlas.textures:
-            fd.write(
-                struct.pack(
-                    tex_fmt,
-                    str_offset,
-                    len(t.frames),
-                    frm_offset
-                )
-            )
-            str_offset += len(t.name) + 1  # +1 for sentinel byte
-            frm_offset += len(t.frames)*frm_fmt_len
-
-        # Write String Section
-        for t in self._atlas.textures:
-            fd.write((t.name + '\x00').encode('utf-8'))
-
-        # Write Frame Section
-        for t in self._atlas.textures:
-            for f in t.frames:
-                fd.write(
-                    struct.pack(
-                        frm_fmt,
-                        f.x,
-                        f.y,
-                        f.width,
-                        f.height
-                    )
-                )
