@@ -247,8 +247,12 @@ class RenderChunk:
                     )
                     vert_offset += verts.size // 3
 
-        self.chunk_verts = numpy.concatenate(chunk_verts, 0).ravel()
-        self.chunk_faces = numpy.concatenate(chunk_faces, 0).ravel()
+        if len(chunk_faces) == 0:
+            self.chunk_verts = numpy.zeros((0, 5), dtype=numpy.float32)
+            self.chunk_faces = numpy.zeros((0, 3), dtype=numpy.uint32)
+        else:
+            self.chunk_verts = numpy.concatenate(chunk_verts, 0).ravel()
+            self.chunk_faces = numpy.concatenate(chunk_faces, 0).ravel()
 
 
                 # texture = model.texture_index[cull_dir]
