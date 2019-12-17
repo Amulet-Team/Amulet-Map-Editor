@@ -893,7 +893,7 @@ class MainWindow(_MainWindow):
         )
 
         try:
-            version_obj = _format.translation_manager.get_version(_format, _format.max_world_version())
+            version_obj = _format.translation_manager.get_version(_format.platform, _format.max_world_version())
         except (AssertionError, amulet.api.errors.LoaderNoneMatched) as e:
             traceback.print_exc()
             dialog = wx.MessageDialog(
