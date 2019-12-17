@@ -36,7 +36,8 @@ class _MainWindow(wx.Frame):
             | wx.MINIMIZE_BOX
             | wx.SYSTEM_MENU
             | wx.TAB_TRAVERSAL
-            | wx.CLIP_CHILDREN,
+            | wx.CLIP_CHILDREN
+            | wx.RESIZE_BORDER,
         )
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
