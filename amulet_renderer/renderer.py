@@ -46,33 +46,33 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.timer.Start(33)
         self.world_panel.Bind(wx.EVT_SIZE, self.OnResize)
 
-        self.Bind(wx.EVT_KEY_DOWN, self.on_key_press)
+        self.Bind(wx.EVT_CHAR, self.on_key_press)
 
     def on_key_press(self, event):
         key = event.GetKeyCode()
-        print(key)
+        print(f'Key:{key}')
         if key == key_map['jump']:
             self.render_world.camera_location[1] += 1
-        elif key == key_map['shift']:
+        if key == key_map['shift']:
             self.render_world.camera_location[1] -= 1
-        elif key == key_map['forwards']:
+        if key == key_map['forwards']:
             self.render_world.camera_location[2] -= 1
-        elif key == key_map['backwards']:
+        if key == key_map['backwards']:
             self.render_world.camera_location[2] += 1
-        elif key == key_map['left']:
+        if key == key_map['left']:
             self.render_world.camera_location[0] -= 1
-        elif key == key_map['right']:
+        if key == key_map['right']:
             self.render_world.camera_location[0] += 1
 
-        elif key == key_map['look_left']:
+        if key == key_map['look_left']:
             self.render_world.camera_rotation[1] -= 1
-        elif key == key_map['look_right']:
+        if key == key_map['look_right']:
             self.render_world.camera_rotation[1] += 1
-        elif key == key_map['look_up']:
+        if key == key_map['look_up']:
             self.render_world.camera_rotation[0] -= 1
             if self.render_world.camera_rotation[0] < -90:
                 self.render_world.camera_rotation[0] = -90
-        elif key == key_map['look_down']:
+        if key == key_map['look_down']:
             self.render_world.camera_rotation[0] += 1
             if self.render_world.camera_rotation[0] > 90:
                 self.render_world.camera_rotation[0] = 90
