@@ -28,6 +28,7 @@ key_map = {
 class World3dCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: 'World3DPanel', world: 'World'):
         self.world_panel = parent
+        self.keys_pressed = set()
         super().__init__(parent, -1, size=parent.parent_frame.GetClientSize())
         self.context = glcanvas.GLContext(self)
         self.SetCurrent(self.context)
@@ -41,41 +42,55 @@ class World3dCanvas(glcanvas.GLCanvas):
 
         self.render_world = RenderWorld(world, resource_pack)
 
-        self.timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.OnDraw, self.timer)
-        self.timer.Start(33)
+        self.draw_timer = wx.Timer(self)
+        self.input_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnDraw, self.draw_timer)
+        self.Bind(wx.EVT_TIMER, self.do_input_commands, self.input_timer)
+        self.draw_timer.Start(33)
+        self.input_timer.Start(33)
         self.world_panel.Bind(wx.EVT_SIZE, self.OnResize)
 
-        self.Bind(wx.EVT_CHAR, self.on_key_press)
+        self.Bind(wx.EVT_KEY_DOWN, self.on_key_press)
+        self.Bind(wx.EVT_KEY_UP, self.on_key_release)
 
-    def on_key_press(self, event):
-        key = event.GetKeyCode()
-        print(f'Key:{key}')
-        if key == key_map['jump']:
+    def do_input_commands(self, event):
+        if key_map['jump'] in self.keys_pressed:
             self.render_world.camera_location[1] += 1
-        if key == key_map['shift']:
+        if key_map['shift'] in self.keys_pressed:
             self.render_world.camera_location[1] -= 1
-        if key == key_map['forwards']:
+        if key_map['forwards'] in self.keys_pressed:
             self.render_world.camera_location[2] -= 1
-        if key == key_map['backwards']:
+        if key_map['backwards'] in self.keys_pressed:
             self.render_world.camera_location[2] += 1
-        if key == key_map['left']:
+        if key_map['left'] in self.keys_pressed:
             self.render_world.camera_location[0] -= 1
-        if key == key_map['right']:
+        if key_map['right'] in self.keys_pressed:
             self.render_world.camera_location[0] += 1
 
-        if key == key_map['look_left']:
+        if key_map['look_left'] in self.keys_pressed:
             self.render_world.camera_rotation[1] -= 1
-        if key == key_map['look_right']:
+        if key_map['look_right'] in self.keys_pressed:
             self.render_world.camera_rotation[1] += 1
-        if key == key_map['look_up']:
+        if key_map['look_up'] in self.keys_pressed:
             self.render_world.camera_rotation[0] -= 1
             if self.render_world.camera_rotation[0] < -90:
                 self.render_world.camera_rotation[0] = -90
-        if key == key_map['look_down']:
+        if key_map['look_down'] in self.keys_pressed:
             self.render_world.camera_rotation[0] += 1
             if self.render_world.camera_rotation[0] > 90:
                 self.render_world.camera_rotation[0] = 90
+
+    def on_key_release(self, event):
+        key = event.GetUnicodeKey()
+        if key == wx.WXK_NONE:
+            key = event.GetKeyCode()
+        self.keys_pressed.remove(key)
+
+    def on_key_press(self, event):
+        key = event.GetUnicodeKey()
+        if key == wx.WXK_NONE:
+            key = event.GetKeyCode()
+        self.keys_pressed.add(key)
 
     def OnResize(self, event):
         width, height = event.GetSize()
