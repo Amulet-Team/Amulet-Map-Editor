@@ -886,7 +886,11 @@ class MainWindow(_MainWindow):
             fields[2],
         )
 
-        world_path = self.choose_world(event)
+        previous_world_path = getattr(self, world_path_field)
+        if not previous_world_path:
+            previous_world_path = ''
+
+        world_path = self.choose_world(previous_world_path, event)
         if world_path is None:
             return
         _format = amulet.world_interface.load_format(
@@ -917,11 +921,11 @@ class MainWindow(_MainWindow):
             )
         )
 
-    def choose_world(self, event):
+    def choose_world(self, default_path, event):
         dir_dialog = wx.DirDialog(
             None,
             "Choose world directory",
-            "",
+            default_path,
             wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST,
         )
         try:
