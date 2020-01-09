@@ -824,7 +824,12 @@ class MainWindow(_MainWindow):
             self.converter_progress.SetValue(60)
 
         self.converter_progress.SetValue(70)
-        input_world.save(output_world_wrapper)
+
+        def progress_update(index, count):
+            self.converter_progress.SetValue(int(100 * index / count))
+            self.Update()
+
+        input_world.save(output_world_wrapper, progress_update)
         input_world.close()
         output_world_wrapper.close()
         self.converter_progress.SetValue(100)
