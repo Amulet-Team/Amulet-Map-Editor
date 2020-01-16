@@ -108,7 +108,7 @@ class WorldDirectoryUI(wx.CollapsiblePane):
 
     def eval_layout(self, evt):
         self.Layout()
-        self.parent.Layout()
+        self.parent.FitInside()
 
 
 class WorldSelectUI(wx_util.SimpleScrollablePanel):
