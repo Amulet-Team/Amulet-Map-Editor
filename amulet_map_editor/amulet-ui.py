@@ -1,6 +1,7 @@
 import wx
 from amulet_map_editor.amulet_wx.world_select import WorldSelectUI
 from amulet_map_editor import lang
+from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
 
 
 class AmuletMainWindow(wx.Frame):
@@ -21,6 +22,8 @@ class AmuletMainWindow(wx.Frame):
             | wx.RESIZE_BORDER,
         )
 
+        self.open_worlds = []
+
         # self.sizer = wx.BoxSizer(wx.VERTICAL)
         # self.SetSizer(self.sizer)
 
@@ -28,7 +31,10 @@ class AmuletMainWindow(wx.Frame):
             self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0
         )
 
-        self._add_world_tab(WorldSelectUI(self.world_tab_holder), lang.get('main_menu'))
+        self._add_world_tab(
+            WorldSelectUI(self.world_tab_holder, self._open_world),
+            lang.get('main_menu')
+        )
 
         # self.sizer.Add(self.world_tab_holder, 1, wx.EXPAND | wx.ALL, 5)
         # self.Layout()
@@ -36,13 +42,12 @@ class AmuletMainWindow(wx.Frame):
         self.Show()
 
     def _add_world_tab(self, obj, obj_name):
+        # TODO: find a way for the tab to be optionally closeable
         self.world_tab_holder.AddPage(obj, obj_name, True)
 
     def _open_world(self, path):
-
-
-class WorldManagerUI()
-
+        world = WorldManagerUI(self.world_tab_holder, path)
+        self._add_world_tab(world, world.world_name)
 
 
 if __name__ == "__main__":
