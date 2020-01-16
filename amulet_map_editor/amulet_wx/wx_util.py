@@ -44,3 +44,14 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
         self.SetupScrolling()
         self.SetAutoLayout(1)
 
+
+class SimpleNotebook(wx.Notebook):
+    def __init__(self, parent):
+        wx.Notebook.__init__(
+            self,
+            parent,
+            wx.ID_ANY,
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0
+        )
