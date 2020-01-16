@@ -2,7 +2,8 @@ import os
 import json
 
 _default_config = {
-
+    "lang": "english",
+    "extra_world_paths": {}
 }
 
 _config = None
