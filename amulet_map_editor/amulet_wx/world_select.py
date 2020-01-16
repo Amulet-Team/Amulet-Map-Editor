@@ -64,28 +64,32 @@ class WorldUI(wx_util.SimplePanel):
 
 class WorldUIButton(WorldUI):
     # a button that wraps around WorldUI so that WorldUI can be used without the button functionality
-    def __init__(self, parent: 'WorldDirectoryUI', path: str):
+    def __init__(self, parent: 'WorldDirectoryUI', path: str, open_world_callback):
         super(WorldUIButton, self).__init__(
             parent,
             path
         )
-        self.Bind(wx.EVT_LEFT_UP, self._say_hi)
-        self.img.Bind(wx.EVT_LEFT_UP, self._say_hi)
-        self.world_name.Bind(wx.EVT_LEFT_UP, self._say_hi)
+        self.path = path
+        self.open_world_callback = open_world_callback
 
-    def _say_hi(self, evt):
-        print('hi')
+        self.Bind(wx.EVT_LEFT_UP, self._call_callback)
+        self.img.Bind(wx.EVT_LEFT_UP, self._call_callback)
+        self.world_name.Bind(wx.EVT_LEFT_UP, self._call_callback)
+
+    def _call_callback(self, evt):
+        self.open_world_callback(self.path)
 
 
 class WorldDirectoryUI(wx.CollapsiblePane):
     # a drop down list of `WorldUIButton`s for a given directory
-    def __init__(self, parent: 'WorldSelectUI', path: str, group_name: str):
+    def __init__(self, parent: 'WorldSelectUI', path: str, group_name: str, open_world_callback):
         super(WorldDirectoryUI, self).__init__(
             parent,
             wx.ID_ANY,
             group_name
         )
         self.parent = parent
+        self.open_world_callback = open_world_callback
         parent.add_object(self)
         self.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.eval_layout)
 
@@ -102,7 +106,7 @@ class WorldDirectoryUI(wx.CollapsiblePane):
             world_path = os.path.join(path, world)
             if os.path.isdir(world_path):
                 try:
-                    self.worlds.append(WorldUIButton(panel, world_path))
+                    self.worlds.append(WorldUIButton(panel, world_path, self.open_world_callback))
                 except:
                     pass
 
@@ -115,10 +119,11 @@ class WorldSelectUI(wx_util.SimpleScrollablePanel):
     # a frame containing a refresh button for the UI, a sort order for the worlds
     # and a vertical list of `WorldDirectoryUI`s for each directory
     # perhaps also a select directory option
-    def __init__(self, parent):
+    def __init__(self, parent, open_world_callback):
         super(WorldSelectUI, self).__init__(
             parent
         )
+        self.open_world_callback = open_world_callback
 
         self.dirs = {}
         self._reload()
@@ -130,4 +135,4 @@ class WorldSelectUI(wx_util.SimpleScrollablePanel):
         self.dirs.clear()
         for group_name, directory in minecraft_world_paths.items():
             if os.path.isdir(directory):
-                self.dirs[directory] = WorldDirectoryUI(self, directory, group_name)
+                self.dirs[directory] = WorldDirectoryUI(self, directory, group_name, self.open_world_callback)
