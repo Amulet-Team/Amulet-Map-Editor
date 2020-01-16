@@ -1,6 +1,6 @@
 import wx
-from amulet_map_editor.util.world_select import WorldSelectUI
-from amulet_map_editor import config, lang
+from amulet_map_editor.amulet_wx.world_select import WorldSelectUI
+from amulet_map_editor import lang
 
 
 class AmuletMainWindow(wx.Frame):
@@ -37,6 +37,12 @@ class AmuletMainWindow(wx.Frame):
 
     def _add_world_tab(self, obj, obj_name):
         self.world_tab_holder.AddPage(obj, obj_name, True)
+
+    def _open_world(self, path):
+
+
+class WorldManagerUI()
+
 
 
 if __name__ == "__main__":

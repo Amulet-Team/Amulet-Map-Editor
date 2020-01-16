@@ -1,8 +1,8 @@
 import os
 import wx
-from amulet_map_editor import lang, config
+from amulet_map_editor import lang
 import amulet
-from amulet_map_editor.util import wx_util
+from amulet_map_editor.amulet_wx import wx_util
 
 # Windows 	%APPDATA%\.minecraft
 # macOS 	~/Library/Application Support/minecraft
