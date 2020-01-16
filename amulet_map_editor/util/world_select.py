@@ -111,7 +111,7 @@ class WorldDirectoryUI(wx.CollapsiblePane):
         self.parent.Layout()
 
 
-class WorldSelectUI(wx_util.SimplePanel):
+class WorldSelectUI(wx_util.SimpleScrollablePanel):
     # a frame containing a refresh button for the UI, a sort order for the worlds
     # and a vertical list of `WorldDirectoryUI`s for each directory
     # perhaps also a select directory option
