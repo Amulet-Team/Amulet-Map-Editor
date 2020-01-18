@@ -6,11 +6,11 @@ class SimpleSizer:
     def __init__(self, sizer_dir=wx.VERTICAL):
         self.sizer = wx.BoxSizer(sizer_dir)
 
-    def add_object(self, obj):
+    def add_object(self, obj, space=0, options=wx.ALL):
         self.sizer.Add(
             obj,
-            0,
-            wx.ALL,
+            space,
+            options,
             5
         )
 

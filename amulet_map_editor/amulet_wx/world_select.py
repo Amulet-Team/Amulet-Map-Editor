@@ -32,21 +32,26 @@ class WorldUI(wx_util.SimplePanel):
         parent.sizer.Add(
             self,
             0,
-            wx.ALL,
+            wx.ALL | wx.EXPAND,
             5
         )
+
+        self.BackgroundColour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
         img = wx.Image(
             world.world_image_path,
             wx.BITMAP_TYPE_ANY
-        ).ConvertToBitmap()
+        )
+        width = min((img.Width/img.Height)*128, 300)
+
+        img = img.Scale(width, 128, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap()
 
         self.img = wx.StaticBitmap(
             self,
             wx.ID_ANY,
             img,
             (0, 0),
-            (128, 128)
+            (width, 128)
         )
         # self.img.SetScaleMode(2)
         self.sizer.Add(self.img)
@@ -79,6 +84,7 @@ class WorldUIButton(WorldUI):
     def _call_callback(self, evt):
         self.open_world_callback(self.path)
 
+import random
 
 class WorldDirectoryUI(wx.CollapsiblePane):
     # a drop down list of `WorldUIButton`s for a given directory
@@ -90,7 +96,7 @@ class WorldDirectoryUI(wx.CollapsiblePane):
         )
         self.parent = parent
         self.open_world_callback = open_world_callback
-        parent.add_object(self)
+        parent.add_object(self, 0, wx.ALL | wx.EXPAND)
         self.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.eval_layout)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -99,6 +105,7 @@ class WorldDirectoryUI(wx.CollapsiblePane):
         panel = self.GetPane()
         panel.sizer = wx.BoxSizer(wx.VERTICAL)
         panel.SetSizer(panel.sizer)
+        panel.BackgroundColour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
         self.worlds = []
 
