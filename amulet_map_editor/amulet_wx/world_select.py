@@ -54,7 +54,7 @@ class WorldUI(wx_util.SimplePanel):
         self.world_name = wx.StaticText(
             self,
             wx.ID_ANY,
-            world.world_name,
+            f'{world.world_name}\n{path}',
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
@@ -153,7 +153,7 @@ class ScrollableWorldsUI(wx_util.SimpleScrollablePanel):
         for group_name, directory in minecraft_world_paths.items():
             if os.path.isdir(directory):
                 world_list = CollapseableWorldListUI(self, glob.glob(os.path.join(directory, '*')), group_name, self.open_world_callback)
-                self.add_object(world_list, 0, wx.ALL | wx.EXPAND)
+                self.add_object(world_list, 0, wx.EXPAND)
                 self.dirs[directory] = world_list
 
     def OnChildFocus(self, event):
@@ -173,10 +173,10 @@ class WorldSelectUI(wx_util.SimplePanel):
         self.header_open_world = wx.Button(self.header, wx.ID_ANY, label=lang.get('open_world_button'))
         self.header_open_world.Bind(wx.EVT_BUTTON, self._open_world)
         self.header.add_object(self.header_open_world)
-        self.add_object(self.header, 1)
+        self.add_object(self.header, 0, 0)
 
         self.content = ScrollableWorldsUI(self, open_world_callback)
-        self.add_object(self.content, 10, options=wx.ALL | wx.EXPAND)
+        self.add_object(self.content, 1, wx.EXPAND)
 
     def _open_world(self, evt):
         dir_dialog = wx.DirDialog(
@@ -235,7 +235,7 @@ class RecentWorldUI(wx_util.SimplePanel):
         if self._world_list is not None:
             self._world_list.Destroy()
         self._world_list = WorldList(self, recent_worlds, self._open_world_callback)
-        self.add_object(self._world_list, 1, wx.ALL | wx.EXPAND)
+        self.add_object(self._world_list, 1, wx.EXPAND)
         self.Layout()
 
 
@@ -248,7 +248,7 @@ class WorldSelectAndRecentUI(wx_util.SimplePanel):
         self._open_world_callback = open_world_callback
         self.add_object(WorldSelectUI(self, self._update_recent), 2, wx.ALL | wx.EXPAND)
         self._recent_worlds = RecentWorldUI(self, self._update_recent)
-        self.add_object(self._recent_worlds, 1, wx.ALL | wx.EXPAND)
+        self.add_object(self._recent_worlds, 1, wx.EXPAND)
 
     def _update_recent(self, path):
         self._recent_worlds.rebuild(path)
