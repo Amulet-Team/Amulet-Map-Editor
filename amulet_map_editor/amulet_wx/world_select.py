@@ -246,7 +246,7 @@ class WorldSelectAndRecentUI(wx_util.SimplePanel):
             wx.HORIZONTAL
         )
         self._open_world_callback = open_world_callback
-        self.add_object(WorldSelectUI(self, self._update_recent), 2)
+        self.add_object(WorldSelectUI(self, self._update_recent), 2, wx.ALL | wx.EXPAND)
         self._recent_worlds = RecentWorldUI(self, self._update_recent)
         self.add_object(self._recent_worlds, 1, wx.ALL | wx.EXPAND)
 
