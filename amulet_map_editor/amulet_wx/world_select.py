@@ -92,7 +92,7 @@ class WorldList(wx_util.SimplePanel):
             if os.path.isdir(world_path):
                 try:
                     world_button = WorldUIButton(self, world_path, open_world_callback)
-                    self.add_object(world_button, options=wx.ALL | wx.EXPAND)
+                    self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
                     self.worlds.append(world_button)
                 except:
                     pass
@@ -213,6 +213,7 @@ class RecentWorldUI(wx_util.SimplePanel):
             0,
             wx.ALL | wx.ALIGN_CENTER
         )
+
         self._world_list = None
         self.rebuild()
         # self.Bind(wx.EVT_LEFT_UP, self._rebuild_evt)
@@ -231,7 +232,8 @@ class RecentWorldUI(wx_util.SimplePanel):
         if self._world_list is not None:
             self._world_list.Destroy()
         self._world_list = WorldList(self, recent_worlds, self._open_world_callback)
-        self.add_object(self._world_list, 0, wx.ALL | wx.EXPAND)
+        self.add_object(self._world_list, 1, wx.ALL | wx.EXPAND)
+        self.Layout()
 
 
 class WorldSelectAndRecentUI(wx_util.SimplePanel):

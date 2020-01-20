@@ -2,7 +2,6 @@ import wx
 from amulet_map_editor.amulet_wx.world_select import WorldSelectAndRecentUI
 from amulet_map_editor import lang
 from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
-from amulet_map_editor.amulet_wx.main_menu import AmuletMainMenu
 
 import wx.lib.inspection
 
