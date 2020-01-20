@@ -74,7 +74,7 @@ class WorldUIButton(WorldUI):
 
         self.Bind(wx.EVT_LEFT_UP, self._call_callback)
         self.img.Bind(wx.EVT_LEFT_UP, self._call_callback)
-        self.world_name.Bind(wx.EVT_LEFT_UP, self._call_callback)
+        self.world_name.Bind(wx.EVT_LEFT_DOWN, self._call_callback)
 
     def _call_callback(self, evt):
         self.open_world_callback(self.path)
@@ -155,6 +155,9 @@ class ScrollableWorldsUI(wx_util.SimpleScrollablePanel):
                 world_list = CollapseableWorldListUI(self, glob.glob(os.path.join(directory, '*')), group_name, self.open_world_callback)
                 self.add_object(world_list, 0, wx.ALL | wx.EXPAND)
                 self.dirs[directory] = world_list
+
+    def OnChildFocus(self, event):
+        event.Skip()
 
 
 class WorldSelectUI(wx_util.SimplePanel):
