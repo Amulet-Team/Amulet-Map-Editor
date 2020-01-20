@@ -3,7 +3,8 @@ import json
 
 _default_config = {
     "lang": "english",
-    "extra_world_paths": {}
+    "extra_world_paths": {},
+    "recent_worlds": []
 }
 
 _config = None

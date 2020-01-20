@@ -6,7 +6,7 @@ class SimpleSizer:
     def __init__(self, sizer_dir=wx.VERTICAL):
         self.sizer = wx.BoxSizer(sizer_dir)
 
-    def add_object(self, obj, space=0, options=wx.ALL):
+    def add_object(self, obj, space=1, options=wx.ALL):
         self.sizer.Add(
             obj,
             space,
