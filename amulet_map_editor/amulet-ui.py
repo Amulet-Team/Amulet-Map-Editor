@@ -1,6 +1,6 @@
 import wx
 from amulet_map_editor.amulet_wx.world_select import WorldSelectAndRecentUI
-from amulet_map_editor import lang
+from amulet_map_editor import lang, config
 from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
 
 import wx.lib.inspection
@@ -60,3 +60,4 @@ if __name__ == "__main__":
     frame = AmuletMainWindow(None)
     wx.lib.inspection.InspectionTool().Show()
     app.MainLoop()
+    config.save()
