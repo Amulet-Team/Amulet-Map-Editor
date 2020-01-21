@@ -34,7 +34,7 @@ class ConvertExtension(SimplePanel):
         self.footer.add_object(self.convert_button)
         self.convert_button.Bind(wx.EVT_BUTTON, self._convert_event)
 
-        self.out_world = None
+        self.out_world_path = None
 
         self.world_text = wx.StaticText(
             self.footer,
@@ -50,11 +50,13 @@ class ConvertExtension(SimplePanel):
         if path == self.world._directory: # TODO: make a public API for this
             return # TODO: dialogue box?
         try:
-            self.out_world = amulet.load_format(path)
+            out_world = amulet.load_format(path)
+            self.out_world_path = path
+
         except:
             return
         self.world_text.SetLabel(
-            f'Input World: {self.world.world_wrapper.world_name}\nOutput World:{self.out_world.world_name}'
+            f'Input World: {self.world.world_wrapper.world_name}\nOutput World:{out_world.world_name}'
         )
 
     def _update_loading_bar(self, chunk_index, chunk_total):
@@ -66,7 +68,9 @@ class ConvertExtension(SimplePanel):
         # self.world.save(self.out_world, self._update_loading_bar)
 
     def _convert_method(self):
-        self.world.save(self.out_world, self._update_loading_bar)
+        out_world = amulet.load_format(self.out_world_path)
+        self.world.save(out_world, self._update_loading_bar)
+        out_world.close()
         self._update_loading_bar(0, 100)
 
 
