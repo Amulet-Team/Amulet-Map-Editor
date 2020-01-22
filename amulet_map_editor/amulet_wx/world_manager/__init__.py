@@ -22,7 +22,7 @@ class WorldManagerUI(SimpleNotebook):
 
     def _load_extensions(self):
         load()
-        for extension_name, extension in extensions:
+        for extension_name, extension in _extensions:
             self.AddPage(extension(self, self.world), extension_name, True)
 
     def _close_self(self, evt):
@@ -37,17 +37,17 @@ class WorldManagerUI(SimpleNotebook):
 #         )
 
 
-extensions = []
+_extensions = []
 
 
 def load():
-    extensions.clear()
+    _extensions.clear()
     for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__), 'extensions')]):
         # load module and confirm that all required attributes are defined
-        module = importlib.import_module(f'amulet_wx.world_manager.extensions.{name}')
+        module = importlib.import_module(f'amulet_map_editor.amulet_wx.world_manager.extensions.{name}')
         importlib.reload(module)
 
         if hasattr(module, 'export'):
             export = getattr(module, 'export')
             if 'ui' in export and issubclass(export['ui'], wx.Panel):
-                extensions.append([export.get('name', 'missingno'), export['ui']])
+                _extensions.append([export.get('name', 'missingno'), export['ui']])
