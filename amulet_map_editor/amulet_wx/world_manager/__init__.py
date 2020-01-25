@@ -1,7 +1,7 @@
 import wx
 import os
 from amulet_map_editor.amulet_wx.wx_util import SimpleNotebook, SimplePanel
-import amulet
+from amulet import world_interface
 import importlib
 import pkgutil
 
@@ -16,7 +16,7 @@ class WorldManagerUI(SimpleNotebook):
         )
         self.close_world_method = close_world_method
         self.Bind(wx.EVT_MIDDLE_DCLICK, self._close_self)
-        self.world = amulet.load_world(path)
+        self.world = world_interface.load_world(path)
         self.world_name = self.world.world_wrapper.world_name
         self._load_extensions()
 

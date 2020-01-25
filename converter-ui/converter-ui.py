@@ -16,6 +16,7 @@ import sys
 
 # noinspection PyUnresolvedReferences
 import amulet
+from amulet import world_interface
 import PyMCTranslate
 
 WORLD_PATH_LABEL = "World Path: <>"
@@ -765,9 +766,9 @@ class MainWindow(_MainWindow):
             dialog.Destroy()
             return
 
-        input_world = amulet.load_world(self.input_world_path)
+        input_world = world_interface.load_world(self.input_world_path)
         self.converter_progress.SetValue(20)
-        output_world_wrapper = amulet.load_format(self.output_world_path)
+        output_world_wrapper = world_interface.load_format(self.output_world_path)
         self.converter_progress.SetValue(40)
 
         if self.run_operation_cb.GetValue():
