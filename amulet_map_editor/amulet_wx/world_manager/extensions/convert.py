@@ -1,6 +1,6 @@
 from amulet_map_editor.amulet_wx.wx_util import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldSelectAndRecentUI
-import amulet
+from amulet import world_interface
 import wx
 from amulet_map_editor import lang
 from concurrent.futures import ThreadPoolExecutor
@@ -50,7 +50,7 @@ class ConvertExtension(SimplePanel):
         if path == self.world._directory: # TODO: make a public API for this
             return # TODO: dialogue box?
         try:
-            out_world = amulet.load_format(path)
+            out_world = world_interface.load_format(path)
             self.out_world_path = path
 
         except:
@@ -68,7 +68,7 @@ class ConvertExtension(SimplePanel):
         # self.world.save(self.out_world, self._update_loading_bar)
 
     def _convert_method(self):
-        out_world = amulet.load_format(self.out_world_path)
+        out_world = world_interface.load_format(self.out_world_path)
         self.world.save(out_world, self._update_loading_bar)
         out_world.close()
         self._update_loading_bar(0, 100)

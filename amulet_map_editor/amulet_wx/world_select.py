@@ -3,7 +3,7 @@ import wx
 import glob
 from typing import List, Dict
 from amulet_map_editor import lang, config
-import amulet
+from amulet import world_interface
 from amulet_map_editor.amulet_wx import wx_util
 
 # Windows 	%APPDATA%\.minecraft
@@ -29,7 +29,7 @@ class WorldUI(wx_util.SimplePanel):
             wx.HORIZONTAL
         )
 
-        world = amulet.load_format(path)
+        world = world_interface.load_format(path)
 
         self.BackgroundColour = (190, 190, 200)
 
