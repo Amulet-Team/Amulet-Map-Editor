@@ -54,7 +54,11 @@ class WorldUI(wx_util.SimplePanel):
         self.world_name = wx.StaticText(
             self,
             wx.ID_ANY,
-            f'{world.world_name}\n{os.path.join(*os.path.normpath(path).split(os.sep)[-3:])}',
+            '\n'.join([
+                world.world_name,
+                world.game_version_string,
+                os.path.join(*os.path.normpath(path).split(os.sep)[-3:])
+            ]),
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
