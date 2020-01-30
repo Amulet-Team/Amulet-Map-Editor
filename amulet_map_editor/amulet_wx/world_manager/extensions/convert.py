@@ -1,6 +1,8 @@
 from amulet_map_editor.amulet_wx.wx_util import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldSelectAndRecentUI
 from amulet import world_interface
+from amulet.api.world import World
+from amulet.world_interface.formats import Format
 import wx
 from amulet_map_editor import lang
 from concurrent.futures import ThreadPoolExecutor
@@ -9,7 +11,7 @@ thread_pool_executor = ThreadPoolExecutor(max_workers=1)
 
 
 class ConvertExtension(SimplePanel):
-    def __init__(self, container, world):
+    def __init__(self, container, world: World):
         super(ConvertExtension, self).__init__(
             container
         )
@@ -69,6 +71,8 @@ class ConvertExtension(SimplePanel):
 
     def _convert_method(self):
         out_world = world_interface.load_format(self.out_world_path)
+        out_world: Format
+        out_world.open()
         self.world.save(out_world, self._update_loading_bar)
         out_world.close()
         self._update_loading_bar(0, 100)
