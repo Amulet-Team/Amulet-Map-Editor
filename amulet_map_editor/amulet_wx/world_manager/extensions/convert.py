@@ -76,6 +76,9 @@ class ConvertExtension(SimplePanel):
         self.world.save(out_world, self._update_loading_bar)
         out_world.close()
         self._update_loading_bar(0, 100)
+        wx.MessageBox(
+            'World conversion completed'
+        )
 
 
 export = {
