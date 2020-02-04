@@ -8,6 +8,7 @@ from amulet_map_editor import lang
 from concurrent.futures import ThreadPoolExecutor
 
 thread_pool_executor = ThreadPoolExecutor(max_workers=1)
+work_count = 0
 
 
 class ConvertExtension(SimplePanel):
@@ -47,6 +48,7 @@ class ConvertExtension(SimplePanel):
             0,
         )
         self.footer.add_object(self.world_text)
+        self.GetTopLevelParent().Bind(wx.EVT_CLOSE, self.on_close)
 
     def _output_world_callback(self, path):
         if path == self.world.world_path:
@@ -68,8 +70,9 @@ class ConvertExtension(SimplePanel):
         wx.CallAfter(self.loading_bar.SetValue, int(100*chunk_index/chunk_total))
 
     def _convert_event(self, evt):
-        # TODO: put this on a separate thread so that the UI does not freeze but disable UI functionality
         self.convert_button.Disable()
+        global work_count
+        work_count += 1
         thread_pool_executor.submit(self._convert_method)
         # self.world.save(self.out_world, self._update_loading_bar)
 
@@ -84,6 +87,16 @@ class ConvertExtension(SimplePanel):
         wx.MessageBox(
             'World conversion completed'
         )
+        global work_count
+        work_count -= 1
+
+    def on_close(self, evt):
+        if work_count:
+            wx.MessageBox(
+                'There are still worlds being converted. Please let them finish before closing'
+            )
+        else:
+            evt.Skip()
 
 
 export = {
