@@ -49,13 +49,16 @@ class ConvertExtension(SimplePanel):
         self.footer.add_object(self.world_text)
 
     def _output_world_callback(self, path):
-        if path == self.world._directory: # TODO: make a public API for this
-            return # TODO: dialogue box?
+        if path == self.world.world_path:
+            wx.MessageBox(
+                'The input and output worlds must be different'
+            )
+            return
         try:
             out_world = world_interface.load_format(path)
             self.out_world_path = path
 
-        except:
+        except Exception:
             return
         self.world_text.SetLabel(
             f'Input World: {self.world.world_wrapper.world_name}\nOutput World:{out_world.world_name}'
@@ -66,6 +69,7 @@ class ConvertExtension(SimplePanel):
 
     def _convert_event(self, evt):
         # TODO: put this on a separate thread so that the UI does not freeze but disable UI functionality
+        self.convert_button.Disable()
         thread_pool_executor.submit(self._convert_method)
         # self.world.save(self.out_world, self._update_loading_bar)
 
@@ -76,6 +80,7 @@ class ConvertExtension(SimplePanel):
         self.world.save(out_world, self._update_loading_bar)
         out_world.close()
         self._update_loading_bar(0, 100)
+        self.convert_button.Enable()
         wx.MessageBox(
             'World conversion completed'
         )
