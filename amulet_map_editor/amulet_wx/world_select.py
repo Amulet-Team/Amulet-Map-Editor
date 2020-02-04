@@ -134,6 +134,7 @@ class CollapseableWorldListUI(wx.CollapsiblePane):
     def eval_layout(self, evt):
         self.Layout()
         self.parent.FitInside()
+        evt.Skip()
 
 
 class ScrollableWorldsUI(wx_util.SimpleScrollablePanel):

@@ -47,7 +47,7 @@ class ConvertExtension(SimplePanel):
             wx.DefaultSize,
             0,
         )
-        self.footer.add_object(self.world_text)
+        self.footer.add_object(self.world_text, 3)
         self.GetTopLevelParent().Bind(wx.EVT_CLOSE, self.on_close)
 
     def _output_world_callback(self, path):
