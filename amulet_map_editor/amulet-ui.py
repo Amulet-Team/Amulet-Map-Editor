@@ -10,7 +10,7 @@ class AmuletMainWindow(wx.Frame):
             self,
             parent,
             id=wx.ID_ANY,
-            title=wx.EmptyString,
+            title="Amulet Converter V0.1", # TODO: set this dynamically
             pos=wx.DefaultPosition,
             size=wx.Size(560, 400),
             style=wx.CAPTION
