@@ -30,13 +30,6 @@ class WorldManagerUI(SimpleNotebook):
         self.Destroy()
 
 
-# class ExtensionTemplate(SimplePanel):
-#     def __init__(self, container, world):
-#         super(ExtensionTemplate, self).__init__(
-#             container
-#         )
-
-
 _extensions = []
 
 
