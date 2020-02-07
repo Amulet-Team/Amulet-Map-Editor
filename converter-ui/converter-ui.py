@@ -16,6 +16,7 @@ import sys
 
 # noinspection PyUnresolvedReferences
 import amulet
+from amulet import world_interface
 import PyMCTranslate
 
 WORLD_PATH_LABEL = "World Path: <>"
@@ -765,9 +766,9 @@ class MainWindow(_MainWindow):
             dialog.Destroy()
             return
 
-        input_world = amulet.load_world(self.input_world_path)
+        input_world = world_interface.load_world(self.input_world_path)
         self.converter_progress.SetValue(20)
-        output_world_wrapper = amulet.load_format(self.output_world_path)
+        output_world_wrapper = world_interface.load_format(self.output_world_path)
         self.converter_progress.SetValue(40)
 
         if self.run_operation_cb.GetValue():
@@ -824,7 +825,12 @@ class MainWindow(_MainWindow):
             self.converter_progress.SetValue(60)
 
         self.converter_progress.SetValue(70)
-        input_world.save(output_world_wrapper)
+
+        def progress_update(index, count):
+            self.converter_progress.SetValue(int(100 * index / count))
+            self.Update()
+
+        input_world.save(output_world_wrapper, progress_update)
         input_world.close()
         output_world_wrapper.close()
         self.converter_progress.SetValue(100)
@@ -886,7 +892,11 @@ class MainWindow(_MainWindow):
             fields[2],
         )
 
-        world_path = self.choose_world(event)
+        previous_world_path = getattr(self, world_path_field)
+        if not previous_world_path:
+            previous_world_path = ''
+
+        world_path = self.choose_world(previous_world_path, event)
         if world_path is None:
             return
         _format = amulet.world_interface.load_format(
@@ -917,11 +927,11 @@ class MainWindow(_MainWindow):
             )
         )
 
-    def choose_world(self, event):
+    def choose_world(self, default_path, event):
         dir_dialog = wx.DirDialog(
             None,
             "Choose world directory",
-            "",
+            default_path,
             wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST,
         )
         try:

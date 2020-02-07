@@ -1,0 +1,8 @@
+main_menu=Main Menu
+java_platform=Java
+bedrock_platform=Bedrock
+open_world_button=Open other world
+open_world_dialogue=Select a Minecraft world directory
+select_directory_failed=Failed to open directory!
+recent_worlds=Recently Opened Worlds
+convert=Convert

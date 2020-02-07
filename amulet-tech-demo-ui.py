@@ -3,7 +3,6 @@ from __future__ import annotations
 import wx
 import traceback
 
-import amulet
 from amulet import world_interface
 import amulet_nbt as nbt
 import PyMCTranslate
