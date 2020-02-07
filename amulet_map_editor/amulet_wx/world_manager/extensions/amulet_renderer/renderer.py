@@ -2,8 +2,9 @@ import wx
 from wx import glcanvas
 from OpenGL.GL import *
 import sys
+import os
 
-from amulet_renderer.render_world import RenderWorld, RenderChunk
+from .render_world import RenderWorld, RenderChunk
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -37,7 +38,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         # glDisable(GL_CULL_FACE)
         glDepthFunc(GL_LESS)
 
-        resource_packs = [minecraft_model_reader.JavaRP(rp) for rp in sys.argv[2:]]
+        resource_packs = [minecraft_model_reader.JavaRP(rp) for rp in sys.argv[1:] if os.path.isdir(rp)]
         resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
 
         self.render_world = RenderWorld(world, resource_pack)

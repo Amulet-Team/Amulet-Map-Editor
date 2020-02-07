@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING, Dict, Tuple, Generator, Union
 import math
 import itertools
 
-from amulet_renderer import shaders
+from ..amulet_renderer import shaders
 
 from amulet.api.errors import ChunkDoesNotExist
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet.api.chunk import Chunk
 import minecraft_model_reader
-from amulet_renderer import textureatlas
+from ..amulet_renderer import textureatlas
 
 
 class RenderWorld:
@@ -28,7 +28,7 @@ class RenderWorld:
         self.resource_pack = resource_pack
         self.block_models = []
         self._texture_bounds = {}
-        self.resource_pack_translator = self.world.world_wrapper.translation_manager.get_sub_version('java', (1, 13, 2), force_blockstate=True)
+        self.resource_pack_translator = self.world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
         self._texture_atlas = None
         self.texture_atlas = glGenTextures(1)
         self._create_atlas()
@@ -89,7 +89,7 @@ class RenderWorld:
             for block_index in range(len(self.block_models), len(self.world.palette)):
                 self.block_models.append(
                     self.resource_pack.get_model(
-                        self.resource_pack_translator.from_universal(
+                        self.resource_pack_translator.block.from_universal(
                             self.world.palette[block_index]
                         )[0]
                     )
