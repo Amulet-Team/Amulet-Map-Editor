@@ -1,7 +1,7 @@
 import os
 import wx
 import glob
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from amulet_map_editor import lang, config
 from amulet import world_interface
 from amulet_map_editor.amulet_wx import wx_util
@@ -20,6 +20,25 @@ minecraft_world_paths = {
     lang.get('bedrock_platform'): bedrock_dir
 }
 
+world_images = {}
+
+
+def get_world_image(image_path: str) -> Tuple[wx.Image, int]:
+    if image_path not in world_images or world_images[image_path][0] != os.stat(image_path)[8]:
+        img = wx.Image(
+            image_path,
+            wx.BITMAP_TYPE_ANY
+        )
+        width = min((img.Width / img.Height) * 128, 300)
+
+        world_images[image_path] = (
+            os.stat(image_path)[8],
+            img.Scale(width, 128, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(),
+            width
+        )
+
+    return world_images[image_path][1:3]
+
 
 class WorldUI(wx_util.SimplePanel):
     # UI element that holds the world image, name and description
@@ -33,13 +52,7 @@ class WorldUI(wx_util.SimplePanel):
 
         self.BackgroundColour = (190, 190, 200)
 
-        img = wx.Image(
-            world.world_image_path,
-            wx.BITMAP_TYPE_ANY
-        )
-        width = min((img.Width/img.Height)*128, 300)
-
-        img = img.Scale(width, 128, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap()
+        img, width = get_world_image(world.world_image_path)
 
         self.img = wx.StaticBitmap(
             self,
