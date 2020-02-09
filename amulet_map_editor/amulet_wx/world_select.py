@@ -20,10 +20,10 @@ minecraft_world_paths = {
     lang.get('bedrock_platform'): bedrock_dir
 }
 
-world_images = {}
+world_images: Dict[str, Tuple[int, wx.Bitmap, int]] = {}
 
 
-def get_world_image(image_path: str) -> Tuple[wx.Image, int]:
+def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
     if image_path not in world_images or world_images[image_path][0] != os.stat(image_path)[8]:
         img = wx.Image(
             image_path,
@@ -111,8 +111,9 @@ class WorldList(wx_util.SimplePanel):
                     world_button = WorldUIButton(self, world_path, open_world_callback)
                     self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
                     self.worlds.append(world_button)
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
+                    traceback.print_exc()
         self.Layout()
 
 
