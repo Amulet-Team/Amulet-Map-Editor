@@ -1,8 +1,7 @@
 import os
 import wx
 import glob
-import traceback
-from typing import List, Dict, Tuple, Callable, Any
+from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
 from amulet_map_editor.amulet_wx import wx_util
@@ -114,7 +113,6 @@ class WorldList(wx_util.SimplePanel):
                     self.worlds.append(world_button)
                 except Exception as e:
                     print(e)
-                    traceback.print_exc()
         self.Layout()
 
 
