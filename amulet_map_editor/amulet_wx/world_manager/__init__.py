@@ -1,11 +1,26 @@
 import wx
 import os
+from typing import List
 from amulet_map_editor.amulet_wx.wx_util import SimpleNotebook, SimplePanel
 from amulet import world_interface
 import importlib
 import pkgutil
 
 # this is where most of the magic will happen
+
+_extensions: List['BaseWorldTool'] = []
+
+
+def load_extensions():
+    if not _extensions:
+        for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__), 'extensions')]):
+            # load module and confirm that all required attributes are defined
+            module = importlib.import_module(f'amulet_map_editor.amulet_wx.world_manager.extensions.{name}')
+
+            if hasattr(module, 'export'):
+                export = getattr(module, 'export')
+                if 'ui' in export and issubclass(export['ui'], BaseWorldTool):
+                    _extensions.append([export.get('name', 'missingno'), export['ui']])
 
 
 class WorldManagerUI(SimpleNotebook):
@@ -20,7 +35,7 @@ class WorldManagerUI(SimpleNotebook):
         self._load_extensions()
 
     def _load_extensions(self):
-        load()
+        load_extensions()
         for extension_name, extension in _extensions:
             self.AddPage(extension(self, self.world), extension_name, True)
 
@@ -32,17 +47,6 @@ class WorldManagerUI(SimpleNotebook):
         self.world.close()
 
 
-_extensions = []
 
 
-def load():
-    _extensions.clear()
-    for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__), 'extensions')]):
-        # load module and confirm that all required attributes are defined
-        module = importlib.import_module(f'amulet_map_editor.amulet_wx.world_manager.extensions.{name}')
-        importlib.reload(module)
 
-        if hasattr(module, 'export'):
-            export = getattr(module, 'export')
-            if 'ui' in export and issubclass(export['ui'], wx.Panel):
-                _extensions.append([export.get('name', 'missingno'), export['ui']])
