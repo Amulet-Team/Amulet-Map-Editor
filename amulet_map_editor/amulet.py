@@ -1,4 +1,5 @@
 import wx
+from typing import Dict
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
 from amulet_map_editor import lang, config
 from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
@@ -25,10 +26,7 @@ class AmuletMainWindow(wx.Frame):
             | wx.RESIZE_BORDER,
         )
 
-        self.open_worlds = []
-
-        # self.sizer = wx.BoxSizer(wx.VERTICAL)
-        # self.SetSizer(self.sizer)
+        self._open_worlds: Dict[str, WorldManagerUI] = {}
 
         self.world_tab_holder = wx.Notebook(
             self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0
@@ -41,19 +39,44 @@ class AmuletMainWindow(wx.Frame):
             lang.get('main_menu')
         )
 
-        # self.sizer.Add(self.world_tab_holder, 1, wx.EXPAND | wx.ALL, 5)
-        # self.Layout()
-        # self.Centre(wx.BOTH)
+        self.Bind(wx.EVT_CLOSE, self._on_close)
+
         self.Show()
 
     def _add_world_tab(self, obj, obj_name):
         # TODO: find a way for the tab to be optionally closeable
         self.world_tab_holder.AddPage(obj, obj_name, True)
 
-    def _open_world(self, path):
+    def _open_world(self, path: str):
+        """Open a world panel add add it to the notebook"""
         world = WorldManagerUI(self.world_tab_holder, path)
+        self._open_worlds[path] = world
         self._add_world_tab(world, world.world_name)
         self._main_menu.Enable()
+
+    def close_world(self, path: str):
+        """Close a given world and remove it from the notebook"""
+        if path in self._open_worlds:
+            world = self._open_worlds[path]
+            self.world_tab_holder.DeletePage(
+                self.world_tab_holder.FindPage(world)
+            )
+            world.close_world()
+            del self._open_worlds[path]
+
+    def _on_close(self, evt):
+        close = True
+        for path, world in list(self._open_worlds.items()):
+            if world.is_closeable():
+                self.close_world(path)
+            else:
+                close = False
+        if close:
+            evt.Skip()
+        else:
+            wx.MessageBox(
+                'A world is still being used. Please close it first'
+            )
 
 
 class AmuletMainMenu(wx_util.SimplePanel):
