@@ -20,7 +20,7 @@ class ConvertExtension(BaseWorldTool):
         self.world = world
 
         self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
-        self._close_world_button.Bind(wx.EVT_BUTTON, self.GetParent().close_world)
+        self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
         self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
 
         self._input = SimplePanel(self, wx.HORIZONTAL)
@@ -75,8 +75,6 @@ class ConvertExtension(BaseWorldTool):
         self.convert_button.Bind(wx.EVT_BUTTON, self._convert_event)
 
         self.out_world_path = None
-
-        self.GetTopLevelParent().Bind(wx.EVT_CLOSE, self.on_close)
 
     def _show_world_select(self, evt):
         self.Disable()
@@ -138,13 +136,13 @@ class ConvertExtension(BaseWorldTool):
         )
         work_count -= 1
 
-    def on_close(self, evt):
+    def is_closeable(self):
         if work_count:
-            wx.MessageBox(
-                'There are still worlds being converted. Please let them finish before closing'
-            )
-        else:
-            evt.Skip()
+            print(f'World {self.world.world_path} is still being converted. Please let it finish before closing')
+        return work_count == 0
+
+    def _close_world(self, evt):
+        self.GetGrandParent().GetParent().close_world(self.world.world_path)
 
 
 export = {
