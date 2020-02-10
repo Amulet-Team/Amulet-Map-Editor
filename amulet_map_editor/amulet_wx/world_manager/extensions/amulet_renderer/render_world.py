@@ -18,8 +18,11 @@ class RenderWorld:
     def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
         self.world = world
         self.projection = [45.0, 4/3, 0.1, 1000.0]
-        self.camera_location = [1, 300, 0]
+        self.camera_location = [0, 300, 0]
         self.camera_rotation = [90, 0]
+        self.camera_move_speed = 5
+        self.camera_rotate_speed = 2
+
         self.render_distance = 20
         self._loaded_render_chunks: Dict[Tuple[int, int], Union['RenderChunk', None]] = {}
         self.shaders = {
@@ -187,7 +190,7 @@ class RenderWorld:
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
-        x, z = self.camera_location[0] // 16, self.camera_location[2] // 16
+        x, z = int(self.camera_location[0] // 16), int(self.camera_location[2] // 16)
         chunks = itertools.product(
             range(x-self.render_distance, x+self.render_distance),
             range(z-self.render_distance, z+self.render_distance)
