@@ -1,7 +1,8 @@
 import wx
-from amulet_map_editor.amulet_wx.world_select import WorldSelectAndRecentUI
+from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
 from amulet_map_editor import lang, config
 from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
+from amulet_map_editor.amulet_wx import wx_util
 
 
 class AmuletMainWindow(wx.Frame):
@@ -33,8 +34,10 @@ class AmuletMainWindow(wx.Frame):
             self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0
         )
 
+        self._main_menu = AmuletMainMenu(self.world_tab_holder, self._open_world)
+
         self._add_world_tab(
-            WorldSelectAndRecentUI(self.world_tab_holder, self._open_world),
+            self._main_menu,
             lang.get('main_menu')
         )
 
@@ -53,6 +56,34 @@ class AmuletMainWindow(wx.Frame):
     def _open_world(self, path):
         world = WorldManagerUI(self.world_tab_holder, path, self._remove_world_tab)
         self._add_world_tab(world, world.world_name)
+        self._main_menu.Enable()
+
+
+class AmuletMainMenu(wx_util.SimplePanel):
+    def __init__(self, parent, open_world):
+        super(AmuletMainMenu, self).__init__(
+            parent
+        )
+        self._open_world_callback = open_world
+        amulet_converter = wx.StaticText(
+            self,
+            wx.ID_ANY,
+            'Amulet Converter',
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        amulet_converter.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        self.add_object(
+            amulet_converter, 0, wx.ALL|wx.CENTER
+        )
+        self._open_world_button = wx.Button(self, wx.ID_ANY, label='Select World')
+        self._open_world_button.Bind(wx.EVT_BUTTON, self._show_world_select)
+        self.add_object(self._open_world_button, 0, wx.ALL|wx.CENTER)
+
+    def _show_world_select(self, evt):
+        self.Disable()
+        WorldSelectWindow(self._open_world_callback, self.Enable)
 
 
 if __name__ == "__main__":

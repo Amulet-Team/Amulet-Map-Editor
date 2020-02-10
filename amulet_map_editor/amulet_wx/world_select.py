@@ -1,7 +1,7 @@
 import os
 import wx
 import glob
-from typing import List, Dict
+from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
 from amulet_map_editor.amulet_wx import wx_util
@@ -20,6 +20,25 @@ minecraft_world_paths = {
     lang.get('bedrock_platform'): bedrock_dir
 }
 
+world_images: Dict[str, Tuple[int, wx.Bitmap, int]] = {}
+
+
+def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
+    if image_path not in world_images or world_images[image_path][0] != os.stat(image_path)[8]:
+        img = wx.Image(
+            image_path,
+            wx.BITMAP_TYPE_ANY
+        )
+        width = min((img.Width / img.Height) * 128, 300)
+
+        world_images[image_path] = (
+            os.stat(image_path)[8],
+            img.Scale(width, 128, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(),
+            width
+        )
+
+    return world_images[image_path][1:3]
+
 
 class WorldUI(wx_util.SimplePanel):
     # UI element that holds the world image, name and description
@@ -33,13 +52,7 @@ class WorldUI(wx_util.SimplePanel):
 
         self.BackgroundColour = (190, 190, 200)
 
-        img = wx.Image(
-            world.world_image_path,
-            wx.BITMAP_TYPE_ANY
-        )
-        width = min((img.Width/img.Height)*128, 300)
-
-        img = img.Scale(width, 128, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap()
+        img, width = get_world_image(world.world_image_path)
 
         self.img = wx.StaticBitmap(
             self,
@@ -98,8 +111,8 @@ class WorldList(wx_util.SimplePanel):
                     world_button = WorldUIButton(self, world_path, open_world_callback)
                     self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
                     self.worlds.append(world_button)
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
         self.Layout()
 
 
@@ -258,3 +271,39 @@ class WorldSelectAndRecentUI(wx_util.SimplePanel):
     def _update_recent(self, path):
         self._recent_worlds.rebuild(path)
         self._open_world_callback(path)
+
+
+class WorldSelectWindow(wx.Frame):
+    def __init__(self, open_world_callback: Callable[[str], None], close_callback):
+        wx.Frame.__init__(
+            self,
+            None,
+            id=wx.ID_ANY,
+            title="World Select",
+            pos=wx.DefaultPosition,
+            size=wx.Size(560, 400),
+            style=wx.CAPTION
+            | wx.CLOSE_BOX
+            | wx.MAXIMIZE_BOX
+            | wx.MAXIMIZE
+            | wx.SYSTEM_MENU
+            | wx.TAB_TRAVERSAL
+            | wx.CLIP_CHILDREN
+            | wx.RESIZE_BORDER
+        )
+        self.Bind(wx.EVT_CLOSE, self._hide_event)
+
+        self._open_world_callback = open_world_callback
+        self._close_callback = close_callback
+        self.world_select = WorldSelectAndRecentUI(self, self._run_callback)
+        self.Show()
+
+    def _run_callback(self, path):
+        self.Hide()
+        self._open_world_callback(path)
+        self._close_callback()
+        self.Destroy()
+
+    def _hide_event(self, evt):
+        self._close_callback()
+        evt.Skip()

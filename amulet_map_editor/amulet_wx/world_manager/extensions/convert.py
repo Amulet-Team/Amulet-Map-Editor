@@ -1,5 +1,5 @@
 from amulet_map_editor.amulet_wx.wx_util import SimplePanel
-from amulet_map_editor.amulet_wx.world_select import WorldSelectAndRecentUI
+from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
 from amulet import world_interface
 from amulet.api.world import World
 from amulet.world_interface.formats import Format
@@ -17,38 +17,73 @@ class ConvertExtension(SimplePanel):
             container
         )
         self.world = world
-        self.add_object(WorldSelectAndRecentUI(self, self._output_world_callback))
 
-        self.footer = SimplePanel(self, wx.HORIZONTAL)
-        self.add_object(self.footer, 0)
+        self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
+        self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
+        self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
+
+        self._input = SimplePanel(self, wx.HORIZONTAL)
+        self.add_object(self._input, 0, wx.ALL|wx.CENTER)
+        self._input.add_object(
+            wx.StaticText(
+                self._input,
+                wx.ID_ANY,
+                'Input World: ',
+                wx.DefaultPosition,
+                wx.DefaultSize,
+                0,
+            ), 0, wx.ALL|wx.CENTER
+        )
+        self._input.add_object(
+            WorldUI(self._input, self.world.world_path), 0, wx.ALL|wx.CENTER
+        )
+
+        self._output = SimplePanel(self, wx.HORIZONTAL)
+        self.add_object(self._output, 0, wx.ALL | wx.CENTER)
+        self._output.add_object(
+            wx.StaticText(
+                self._output,
+                wx.ID_ANY,
+                'Output World: ',
+                wx.DefaultPosition,
+                wx.DefaultSize,
+                0,
+            ), 0, wx.ALL | wx.CENTER
+        )
+
+        self._select_output_button = wx.Button(self, wx.ID_ANY, label='Select Output World')
+        self._select_output_button.Bind(wx.EVT_BUTTON, self._show_world_select)
+        self.add_object(self._select_output_button, 0, wx.ALL | wx.CENTER)
+
+        self._convert_bar = SimplePanel(self, wx.HORIZONTAL)
+        self.add_object(self._convert_bar, 0, wx.ALL | wx.CENTER)
 
         self.loading_bar = wx.Gauge(
-            self.footer,
+            self._convert_bar,
             wx.ID_ANY,
             100,
             wx.DefaultPosition,
             wx.DefaultSize,
             wx.GA_HORIZONTAL,
         )
-        self.footer.add_object(self.loading_bar, options=wx.ALL | wx.EXPAND)
+        self._convert_bar.add_object(self.loading_bar, options=wx.ALL | wx.EXPAND)
         self.loading_bar.SetValue(0)
 
-        self.convert_button = wx.Button(self.footer, wx.ID_ANY, label=lang.get('convert'))
-        self.footer.add_object(self.convert_button)
+        self.convert_button = wx.Button(self._convert_bar, wx.ID_ANY, label=lang.get('convert'))
+        self._convert_bar.add_object(self.convert_button)
         self.convert_button.Bind(wx.EVT_BUTTON, self._convert_event)
 
         self.out_world_path = None
 
-        self.world_text = wx.StaticText(
-            self.footer,
-            wx.ID_ANY,
-            f'Input World: {self.world.world_wrapper.world_name}\nOutput World:',
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-        )
-        self.footer.add_object(self.world_text, 3)
         self.GetTopLevelParent().Bind(wx.EVT_CLOSE, self.on_close)
+
+    def _close_world(self, evt):
+        self.world.close()
+        self.GetGrandParent().DeletePage(self.GetGrandParent().GetSelection())
+
+    def _show_world_select(self, evt):
+        self.Disable()
+        WorldSelectWindow(self._output_world_callback, self.Enable)
 
     def _output_world_callback(self, path):
         if path == self.world.world_path:
@@ -62,14 +97,26 @@ class ConvertExtension(SimplePanel):
 
         except Exception:
             return
-        self.world_text.SetLabel(
-            f'Input World: {self.world.world_wrapper.world_name}\nOutput World:{out_world.world_name}'
+
+        for child in list(self._output.GetChildren())[1:]:
+            child.Destroy()
+        self._output.add_object(
+            WorldUI(self._output, self.out_world_path), 0
         )
+        self._output.Layout()
+        self._output.Fit()
+        self.Layout()
+        # self.Fit()
 
     def _update_loading_bar(self, chunk_index, chunk_total):
         wx.CallAfter(self.loading_bar.SetValue, int(100*chunk_index/chunk_total))
 
     def _convert_event(self, evt):
+        if self.out_world_path is None:
+            wx.MessageBox(
+                'Select a world before converting'
+            )
+            return
         self.convert_button.Disable()
         global work_count
         work_count += 1
@@ -77,17 +124,21 @@ class ConvertExtension(SimplePanel):
         # self.world.save(self.out_world, self._update_loading_bar)
 
     def _convert_method(self):
-        out_world = world_interface.load_format(self.out_world_path)
-        out_world: Format
-        out_world.open()
-        self.world.save(out_world, self._update_loading_bar)
-        out_world.close()
+        global work_count
+        try:
+            out_world = world_interface.load_format(self.out_world_path)
+            out_world: Format
+            out_world.open()
+            self.world.save(out_world, self._update_loading_bar)
+            out_world.close()
+            message = 'World conversion completed'
+        except Exception as e:
+            message = f'Error during conversion\n{e}'
         self._update_loading_bar(0, 100)
         self.convert_button.Enable()
         wx.MessageBox(
-            'World conversion completed'
+            message
         )
-        global work_count
         work_count -= 1
 
     def on_close(self, evt):
