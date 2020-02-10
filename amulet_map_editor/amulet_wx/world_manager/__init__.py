@@ -2,6 +2,7 @@ import wx
 import os
 from typing import List
 from amulet_map_editor.amulet_wx.wx_util import SimpleNotebook, SimplePanel
+from amulet_map_editor.amulet import AmuletMainWindow
 from amulet import world_interface
 import importlib
 import pkgutil
@@ -40,20 +41,27 @@ class WorldManagerUI(SimpleNotebook):
         self._finished = True
 
     def _load_extensions(self):
+        """Load and create instances of each of the extensions"""
         load_extensions()
         for extension_name, extension in _extensions:
             ext = extension(self, self.world)
             self._extensions.append(ext)
             self.AddPage(ext, extension_name, True)
 
+    def is_closeable(self) -> bool:
+        """Check if all extensions are safe to be closed"""
+        return all(e.is_closeable() for e in self._extensions)
+
     def close_world(self):
-        self.GetParent().DeletePage(self.GetParent().FindPage(self))
+        """Close the world and destroy the UI
+        Check is_closeable before running this"""
         self.Destroy()
         for ext in self._extensions:
             ext.close()
         self.world.close()
 
     def _page_change(self, evt):
+        """Method to fire when the page is changed"""
         if self._finished:
             self._extensions[self._last_extension].disable()
             self._extensions[self.GetSelection()].enable()
@@ -70,6 +78,9 @@ class BaseWorldTool(SimplePanel):
     def disable(self):
         """Run when the panel is hidden/disabled"""
         pass
+
+    def is_closeable(self):
+        return True
 
     def close(self):
         """Run when the world is closed"""
