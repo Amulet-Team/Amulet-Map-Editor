@@ -9,14 +9,12 @@ import pkgutil
 
 
 class WorldManagerUI(SimpleNotebook):
-    def __init__(self, parent, path, close_world_method):
+    def __init__(self, parent, path):
         SimpleNotebook.__init__(
             self,
             parent,
             wx.NB_LEFT
         )
-        self.close_world_method = close_world_method
-        self.Bind(wx.EVT_MIDDLE_DCLICK, self._close_self)
         self.world = world_interface.load_world(path)
         self.world_name = self.world.world_wrapper.world_name
         self._load_extensions()
@@ -26,9 +24,12 @@ class WorldManagerUI(SimpleNotebook):
         for extension_name, extension in _extensions:
             self.AddPage(extension(self, self.world), extension_name, True)
 
-    def _close_self(self, evt):
-        self.close_world_method(self)
+    def close_world(self):
+        self.GetParent().DeletePage(self.GetParent().FindPage(self))
         self.Destroy()
+        for ext in self._extensions:
+            ext.close()
+        self.world.close()
 
 
 _extensions = []

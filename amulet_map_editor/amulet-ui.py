@@ -50,11 +50,8 @@ class AmuletMainWindow(wx.Frame):
         # TODO: find a way for the tab to be optionally closeable
         self.world_tab_holder.AddPage(obj, obj_name, True)
 
-    def _remove_world_tab(self, obj):
-        self.world_tab_holder.RemovePage(obj)
-
     def _open_world(self, path):
-        world = WorldManagerUI(self.world_tab_holder, path, self._remove_world_tab)
+        world = WorldManagerUI(self.world_tab_holder, path)
         self._add_world_tab(world, world.world_name)
         self._main_menu.Enable()
 
