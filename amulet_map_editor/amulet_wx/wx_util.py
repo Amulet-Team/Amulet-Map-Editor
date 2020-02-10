@@ -46,12 +46,12 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
 
 
 class SimpleNotebook(wx.Notebook):
-    def __init__(self, parent):
+    def __init__(self, parent, style=0):
         wx.Notebook.__init__(
             self,
             parent,
             wx.ID_ANY,
             wx.DefaultPosition,
             wx.DefaultSize,
-            0
+            style
         )

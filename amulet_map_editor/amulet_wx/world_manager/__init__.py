@@ -12,7 +12,8 @@ class WorldManagerUI(SimpleNotebook):
     def __init__(self, parent, path, close_world_method):
         SimpleNotebook.__init__(
             self,
-            parent
+            parent,
+            wx.NB_LEFT
         )
         self.close_world_method = close_world_method
         self.Bind(wx.EVT_MIDDLE_DCLICK, self._close_self)
