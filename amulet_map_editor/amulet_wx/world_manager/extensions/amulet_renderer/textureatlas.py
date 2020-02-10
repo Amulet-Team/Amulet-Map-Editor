@@ -150,9 +150,8 @@ class Frame(Packable):
         self._filename = filename
 
         # Determine frame dimensions
-        image = Image.open(filename)
-        width, height = image.size
-        del image
+        self._image = Image.open(filename)
+        width, height = self._image.size
 
         super(Frame, self).__init__(width, height)
 
@@ -162,9 +161,7 @@ class Frame(Packable):
 
     def draw(self, image):
         """Draw this frame into another Image."""
-        i = Image.open(self._filename)
-        image.paste(i, (self.x, self.y))
-        del i
+        image.paste(self._image, (self.x, self.y))
 
 
 class Texture(object):
