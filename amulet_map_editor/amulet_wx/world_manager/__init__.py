@@ -48,5 +48,16 @@ class WorldManagerUI(SimpleNotebook):
 
 
 
+class BaseWorldTool(SimplePanel):
 
+    def enable(self):
+        """Run when the panel is shown/enabled"""
+        pass
 
+    def disable(self):
+        """Run when the panel is hidden/disabled"""
+        pass
+
+    def close(self):
+        """Run when the world is closed"""
+        pass

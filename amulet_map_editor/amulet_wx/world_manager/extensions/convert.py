@@ -1,5 +1,6 @@
 from amulet_map_editor.amulet_wx.wx_util import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
+from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 from amulet import world_interface
 from amulet.api.world import World
 from amulet.world_interface.formats import Format
@@ -11,7 +12,7 @@ thread_pool_executor = ThreadPoolExecutor(max_workers=1)
 work_count = 0
 
 
-class ConvertExtension(SimplePanel):
+class ConvertExtension(BaseWorldTool):
     def __init__(self, container, world: World):
         super(ConvertExtension, self).__init__(
             container
@@ -19,7 +20,7 @@ class ConvertExtension(SimplePanel):
         self.world = world
 
         self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
-        self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
+        self._close_world_button.Bind(wx.EVT_BUTTON, self.GetParent().close_world)
         self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
 
         self._input = SimplePanel(self, wx.HORIZONTAL)
@@ -76,10 +77,6 @@ class ConvertExtension(SimplePanel):
         self.out_world_path = None
 
         self.GetTopLevelParent().Bind(wx.EVT_CLOSE, self.on_close)
-
-    def _close_world(self, evt):
-        self.world.close()
-        self.GetGrandParent().DeletePage(self.GetGrandParent().GetSelection())
 
     def _show_world_select(self, evt):
         self.Disable()

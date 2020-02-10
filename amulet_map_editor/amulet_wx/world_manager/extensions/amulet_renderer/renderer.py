@@ -3,6 +3,7 @@ from wx import glcanvas
 from OpenGL.GL import *
 import sys
 import os
+from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 
 from .render_world import RenderWorld, RenderChunk
 from typing import TYPE_CHECKING
@@ -47,12 +48,22 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.input_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnDraw, self.draw_timer)
         self.Bind(wx.EVT_TIMER, self.do_input_commands, self.input_timer)
-        self.draw_timer.Start(33)
-        self.input_timer.Start(33)
+
         self.world_panel.Bind(wx.EVT_SIZE, self.OnResize)
 
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_press)
         self.Bind(wx.EVT_KEY_UP, self.on_key_release)
+
+    def enable(self):
+        self.draw_timer.Start(33)
+        self.input_timer.Start(33)
+
+    def disable(self):
+        self.draw_timer.Stop()
+        self.input_timer.Stop()
+
+    def close(self):
+        pass
 
     def do_input_commands(self, event):
         if key_map['jump'] in self.keys_pressed:
@@ -104,7 +115,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.SwapBuffers()
 
 
-class World3DPanel(wx.Panel):
+class World3DPanel(BaseWorldTool):
     def __init__(self, parent: 'MainFrame', world: 'World'):
         self.parent_frame = parent
         super().__init__(parent)
@@ -115,6 +126,15 @@ class World3DPanel(wx.Panel):
     def OnResize(self, event):
         self.canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
+
+    def enable(self):
+        self.canvas.enable()
+
+    def disable(self):
+        self.canvas.disable()
+
+    def close(self):
+        self.canvas.close()
 
 
 if __name__ == "__main__":
