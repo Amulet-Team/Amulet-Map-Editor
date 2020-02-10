@@ -54,7 +54,6 @@ class WorldManagerUI(SimpleNotebook):
     def close_world(self):
         """Close the world and destroy the UI
         Check is_closeable before running this"""
-        self.Destroy()
         for ext in self._extensions:
             ext.close()
         self.world.close()

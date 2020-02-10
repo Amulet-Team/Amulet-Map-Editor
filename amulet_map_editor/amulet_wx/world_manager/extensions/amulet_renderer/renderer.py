@@ -124,6 +124,15 @@ class World3DPanel(BaseWorldTool):
         super().__init__(parent)
         self._world = world
         self._canvas = None
+        self._temp = wx.StaticText(
+            self,
+            wx.ID_ANY,
+            'Please wait while the renderer loads',
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
 
         self.Bind(wx.EVT_SIZE, self.OnResize)
 
@@ -134,14 +143,21 @@ class World3DPanel(BaseWorldTool):
 
     def enable(self):
         if self._canvas is None:
+            self.Update()
             self._canvas = World3dCanvas(self, self._world)
+            self._temp.Destroy()
+            self.GetParent().Layout()
+            self.Update()
+        self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
         self._canvas.enable()
 
     def disable(self):
-        self._canvas.disable()
+        if self._canvas is not None:
+            self._canvas.disable()
 
     def close(self):
-        self._canvas.close()
+        if self._canvas is not None:
+            self._canvas.close()
 
 
 if __name__ == "__main__":
