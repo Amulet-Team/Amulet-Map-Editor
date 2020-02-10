@@ -107,7 +107,10 @@ class World3dCanvas(glcanvas.GLCanvas):
     def OnResize(self, event):
         width, height = event.GetSize()
         glViewport(0, 0, width, height)
-        self.render_world.projection[1] = width/height
+        if height > 0:
+            self.render_world.projection[1] = width/height
+        else:
+            self.render_world.projection[1] = 1
 
     def OnDraw(self, event):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -119,22 +122,26 @@ class World3DPanel(BaseWorldTool):
     def __init__(self, parent: 'MainFrame', world: 'World'):
         self.parent_frame = parent
         super().__init__(parent)
-        self.canvas = World3dCanvas(self, world)
+        self._world = world
+        self._canvas = None
 
         self.Bind(wx.EVT_SIZE, self.OnResize)
 
     def OnResize(self, event):
-        self.canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
+        if self._canvas is not None:
+            self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
 
     def enable(self):
-        self.canvas.enable()
+        if self._canvas is None:
+            self._canvas = World3dCanvas(self, self._world)
+        self._canvas.enable()
 
     def disable(self):
-        self.canvas.disable()
+        self._canvas.disable()
 
     def close(self):
-        self.canvas.close()
+        self._canvas.close()
 
 
 if __name__ == "__main__":
