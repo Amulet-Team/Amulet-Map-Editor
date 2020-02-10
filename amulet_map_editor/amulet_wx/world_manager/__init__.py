@@ -30,14 +30,21 @@ class WorldManagerUI(SimpleNotebook):
             parent,
             wx.NB_LEFT
         )
+        self._finished = False
+        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
         self.world = world_interface.load_world(path)
         self.world_name = self.world.world_wrapper.world_name
+        self._extensions: List[BaseWorldTool] = []
+        self._last_extension: int = -1
         self._load_extensions()
+        self._finished = True
 
     def _load_extensions(self):
         load_extensions()
         for extension_name, extension in _extensions:
-            self.AddPage(extension(self, self.world), extension_name, True)
+            ext = extension(self, self.world)
+            self._extensions.append(ext)
+            self.AddPage(ext, extension_name, True)
 
     def close_world(self):
         self.GetParent().DeletePage(self.GetParent().FindPage(self))
@@ -46,6 +53,12 @@ class WorldManagerUI(SimpleNotebook):
             ext.close()
         self.world.close()
 
+    def _page_change(self, evt):
+        if self._finished:
+            self._extensions[self._last_extension].disable()
+            self._extensions[self.GetSelection()].enable()
+        self._last_extension = self.GetSelection()
+        evt.Skip()
 
 
 class BaseWorldTool(SimplePanel):
