@@ -16,24 +16,24 @@ from ..amulet_renderer import textureatlas
 
 class RenderWorld:
     def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
-        self.world = world
-        self.projection = [45.0, 4/3, 0.1, 1000.0]
-        self.camera_location = [0, 300, 0]
-        self.camera_rotation = [90, 0]
-        self.camera_move_speed = 5
-        self.camera_rotate_speed = 2
+        self._world = world
+        self._projection = [45.0, 4 / 3, 0.1, 1000.0]
+        self._camera_location = [0, 300, 0]
+        self._camera_rotation = [90, 0]
+        self._camera_move_speed = 5
+        self._camera_rotate_speed = 2
 
-        self.render_distance = 20
+        self._render_distance = 20
         self._loaded_render_chunks: Dict[Tuple[int, int], Union['RenderChunk', None]] = {}
-        self.shaders = {
+        self._shaders = {
             'render_chunk': shaders.load_shader('render_chunk')
         }
-        self.resource_pack = resource_pack
-        self.block_models = []
+        self._resource_pack = resource_pack
+        self._block_models = []
         self._texture_bounds = {}
-        self.resource_pack_translator = self.world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
+        self._resource_pack_translator = self._world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
         self._texture_atlas = None
-        self.texture_atlas = glGenTextures(1)
+        self._texture_atlas = glGenTextures(1)
         self._create_atlas()
 
     def _create_atlas(self):
@@ -109,25 +109,25 @@ class RenderWorld:
         return self._texture_bounds[texture]
 
     def get_model(self, pallete_index: int):
-        if len(self.world.palette) > len(self.block_models):
-            for block_index in range(len(self.block_models), len(self.world.palette)):
-                self.block_models.append(
-                    self.resource_pack.get_model(
-                        self.resource_pack_translator.block.from_universal(
-                            self.world.palette[block_index]
+        if len(self._world.palette) > len(self._block_models):
+            for block_index in range(len(self._block_models), len(self._world.palette)):
+                self._block_models.append(
+                    self._resource_pack.get_model(
+                        self._resource_pack_translator.block.from_universal(
+                            self._world.palette[block_index]
                         )[0]
                     )
                 )
 
-        return self.block_models[pallete_index]
+        return self._block_models[pallete_index]
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
         transformation_matrix = numpy.eye(4, dtype=numpy.float64)
-        transformation_matrix[3, :3] = numpy.array(self.camera_location) * -1
+        transformation_matrix[3, :3] = numpy.array(self._camera_location) * -1
 
-        theta = math.radians(self.camera_rotation[1])
+        theta = math.radians(self._camera_rotation[1])
         c = math.cos(theta)
         s = math.sin(theta)
 
@@ -144,7 +144,7 @@ class RenderWorld:
         transformation_matrix = numpy.matmul(transformation_matrix, y_rot)
 
         # rotations
-        theta = math.radians(self.camera_rotation[0])
+        theta = math.radians(self._camera_rotation[0])
         c = math.cos(theta)
         s = math.sin(theta)
 
@@ -161,7 +161,7 @@ class RenderWorld:
         transformation_matrix = numpy.matmul(transformation_matrix, x_rot)
 
         # camera projection
-        fovy, aspect, z_near, z_far = self.projection
+        fovy, aspect, z_near, z_far = self._projection
         fovy = math.radians(fovy)
         f = 1 / math.tan(fovy / 2)
         projection = numpy.array(
@@ -181,7 +181,7 @@ class RenderWorld:
     def _get_render_chunk(self, chunk_coords: Tuple[int, int]) -> Union['RenderChunk', None]:
         if chunk_coords not in self._loaded_render_chunks:
             try:
-                chunk = self.world.get_chunk(*chunk_coords)
+                chunk = self._world.get_chunk(*chunk_coords)
             except ChunkDoesNotExist:
                 self._loaded_render_chunks[chunk_coords] = None
             else:
@@ -190,10 +190,10 @@ class RenderWorld:
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
-        x, z = int(self.camera_location[0] // 16), int(self.camera_location[2] // 16)
+        x, z = int(self._camera_location[0] // 16), int(self._camera_location[2] // 16)
         chunks = itertools.product(
-            range(x-self.render_distance, x+self.render_distance),
-            range(z-self.render_distance, z+self.render_distance)
+            range(x - self._render_distance, x + self._render_distance),
+            range(z - self._render_distance, z + self._render_distance)
         )
 
         for chunk in sorted(chunks, key=lambda c: (c[0]-x)**2 + (c[1]-x)**2):
@@ -239,7 +239,7 @@ class RenderChunk:
         return self.coords[1]
 
     def create_lod0(self):
-        world = self.render_world.world
+        world = self.render_world._world
 
         blocks: numpy.ndarray = self.chunk.blocks
         blocks_ = numpy.zeros(blocks.shape + numpy.array((2, 0, 2)), blocks.dtype)
@@ -403,12 +403,12 @@ class RenderChunk:
         glBindVertexArray(0)
 
     def draw(self, transformation_matrix: numpy.ndarray):
-        shader = self.render_world.shaders['render_chunk']
+        shader = self.render_world._shaders['render_chunk']
 
         glUseProgram(shader)
 
         glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self.render_world.texture_atlas)
+        glBindTexture(GL_TEXTURE_2D, self.render_world._texture_atlas)
         glUniform1i(glGetUniformLocation(shader, 'image'), 0)
 
         chunk_translation = numpy.eye(4, dtype=numpy.float64)

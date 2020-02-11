@@ -68,43 +68,43 @@ class World3dCanvas(glcanvas.GLCanvas):
         pass
 
     def _mouse_wheel(self, evt):
-        self.render_world.camera_move_speed += evt.GetWheelRotation()/evt.GetWheelDelta()
-        if self.render_world.camera_move_speed < 0.1:
-            self.render_world.camera_move_speed = 0.1
+        self.render_world._camera_move_speed += evt.GetWheelRotation() / evt.GetWheelDelta()
+        if self.render_world._camera_move_speed < 0.1:
+            self.render_world._camera_move_speed = 0.1
         evt.Skip()
 
     def do_input_commands(self, event):
         if key_map['up'] in self.keys_pressed:
-            self.render_world.camera_location[1] += self.render_world.camera_move_speed
+            self.render_world._camera_location[1] += self.render_world._camera_move_speed
         if key_map['down'] in self.keys_pressed:
-            self.render_world.camera_location[1] -= self.render_world.camera_move_speed
+            self.render_world._camera_location[1] -= self.render_world._camera_move_speed
         if key_map['forwards'] in self.keys_pressed:
-            self.render_world.camera_location[1] -= self.render_world.camera_move_speed * math.sin(math.radians(self.render_world.camera_rotation[0]))
-            self.render_world.camera_location[0] += self.render_world.camera_move_speed * math.cos(math.radians(self.render_world.camera_rotation[0])) * math.sin(math.radians(self.render_world.camera_rotation[1]))
-            self.render_world.camera_location[2] -= self.render_world.camera_move_speed * math.cos(math.radians(self.render_world.camera_rotation[0])) * math.cos(math.radians(self.render_world.camera_rotation[1]))
+            self.render_world._camera_location[1] -= self.render_world._camera_move_speed * math.sin(math.radians(self.render_world._camera_rotation[0]))
+            self.render_world._camera_location[0] += self.render_world._camera_move_speed * math.cos(math.radians(self.render_world._camera_rotation[0])) * math.sin(math.radians(self.render_world._camera_rotation[1]))
+            self.render_world._camera_location[2] -= self.render_world._camera_move_speed * math.cos(math.radians(self.render_world._camera_rotation[0])) * math.cos(math.radians(self.render_world._camera_rotation[1]))
         if key_map['backwards'] in self.keys_pressed:
-            self.render_world.camera_location[1] += self.render_world.camera_move_speed * math.sin(math.radians(self.render_world.camera_rotation[0]))
-            self.render_world.camera_location[0] -= self.render_world.camera_move_speed * math.cos(math.radians(self.render_world.camera_rotation[0])) * math.sin(math.radians(self.render_world.camera_rotation[1]))
-            self.render_world.camera_location[2] += self.render_world.camera_move_speed * math.cos(math.radians(self.render_world.camera_rotation[0])) * math.cos(math.radians(self.render_world.camera_rotation[1]))
+            self.render_world._camera_location[1] += self.render_world._camera_move_speed * math.sin(math.radians(self.render_world._camera_rotation[0]))
+            self.render_world._camera_location[0] -= self.render_world._camera_move_speed * math.cos(math.radians(self.render_world._camera_rotation[0])) * math.sin(math.radians(self.render_world._camera_rotation[1]))
+            self.render_world._camera_location[2] += self.render_world._camera_move_speed * math.cos(math.radians(self.render_world._camera_rotation[0])) * math.cos(math.radians(self.render_world._camera_rotation[1]))
         if key_map['left'] in self.keys_pressed:
-            self.render_world.camera_location[0] -= self.render_world.camera_move_speed * math.cos(math.radians(self.render_world.camera_rotation[1]))
-            self.render_world.camera_location[2] -= self.render_world.camera_move_speed * math.sin(math.radians(self.render_world.camera_rotation[1]))
+            self.render_world._camera_location[0] -= self.render_world._camera_move_speed * math.cos(math.radians(self.render_world._camera_rotation[1]))
+            self.render_world._camera_location[2] -= self.render_world._camera_move_speed * math.sin(math.radians(self.render_world._camera_rotation[1]))
         if key_map['right'] in self.keys_pressed:
-            self.render_world.camera_location[0] += self.render_world.camera_move_speed * math.cos(math.radians(self.render_world.camera_rotation[1]))
-            self.render_world.camera_location[2] += self.render_world.camera_move_speed * math.sin(math.radians(self.render_world.camera_rotation[1]))
+            self.render_world._camera_location[0] += self.render_world._camera_move_speed * math.cos(math.radians(self.render_world._camera_rotation[1]))
+            self.render_world._camera_location[2] += self.render_world._camera_move_speed * math.sin(math.radians(self.render_world._camera_rotation[1]))
 
         if key_map['look_left'] in self.keys_pressed:
-            self.render_world.camera_rotation[1] -= self.render_world.camera_move_speed
+            self.render_world._camera_rotation[1] -= self.render_world._camera_move_speed
         if key_map['look_right'] in self.keys_pressed:
-            self.render_world.camera_rotation[1] += self.render_world.camera_move_speed
+            self.render_world._camera_rotation[1] += self.render_world._camera_move_speed
         if key_map['look_up'] in self.keys_pressed:
-            self.render_world.camera_rotation[0] -= self.render_world.camera_rotate_speed
-            if self.render_world.camera_rotation[0] < -90:
-                self.render_world.camera_rotation[0] = -90
+            self.render_world._camera_rotation[0] -= self.render_world._camera_rotate_speed
+            if self.render_world._camera_rotation[0] < -90:
+                self.render_world._camera_rotation[0] = -90
         if key_map['look_down'] in self.keys_pressed:
-            self.render_world.camera_rotation[0] += self.render_world.camera_rotate_speed
-            if self.render_world.camera_rotation[0] > 90:
-                self.render_world.camera_rotation[0] = 90
+            self.render_world._camera_rotation[0] += self.render_world._camera_rotate_speed
+            if self.render_world._camera_rotation[0] > 90:
+                self.render_world._camera_rotation[0] = 90
 
     def on_key_release(self, event):
         key = event.GetUnicodeKey()
@@ -125,9 +125,9 @@ class World3dCanvas(glcanvas.GLCanvas):
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
         if height > 0:
-            self.render_world.projection[1] = width / height
+            self.render_world._projection[1] = width / height
         else:
-            self.render_world.projection[1] = 1
+            self.render_world._projection[1] = 1
 
     def _on_draw(self, event):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
