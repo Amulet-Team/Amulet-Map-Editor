@@ -52,6 +52,9 @@ class World3dCanvas(glcanvas.GLCanvas):
         self._input_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._process_inputs, self._input_timer)
 
+        self._gc_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
+
         self._world_panel.Bind(wx.EVT_SIZE, self._on_resize)
 
         self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
@@ -61,10 +64,13 @@ class World3dCanvas(glcanvas.GLCanvas):
     def enable(self):
         self._draw_timer.Start(33)
         self._input_timer.Start(33)
+        self._gc_timer.Start(1000)
 
     def disable(self):
         self._draw_timer.Stop()
         self._input_timer.Stop()
+        self._gc_timer.Stop()
+        self._render_world.run_garbage_collector(True)
 
     def close(self):
         self._render_world.close()
@@ -133,6 +139,10 @@ class World3dCanvas(glcanvas.GLCanvas):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw()
         self.SwapBuffers()
+        event.Skip()
+
+    def _gc(self, event):
+        self._render_world.run_garbage_collector()
         event.Skip()
 
 

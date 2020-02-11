@@ -30,7 +30,8 @@ class RenderWorld:
         self._camera_move_speed = 5
         self._camera_rotate_speed = 2
 
-        self._render_distance = 20
+        self._render_distance = 10
+        self._garbage_distance = 20
         self._loaded_render_chunks: Dict[Tuple[int, int], Union['RenderChunk', None]] = {}
         self._shaders = {
             'render_chunk': shaders.load_shader('render_chunk')
@@ -47,7 +48,7 @@ class RenderWorld:
         return True
 
     def close(self):
-        pass
+        self.run_garbage_collector(True)
 
     def _create_atlas(self):
         print('Creating texture atlas')
@@ -103,6 +104,16 @@ class RenderWorld:
     def render_distance(self, val: int):
         assert isinstance(val, int), 'Render distance must be an int'
         self._render_distance = val
+
+    @property
+    def garbage_distance(self) -> int:
+        """The distance outside which chunks should be unloaded"""
+        return self._garbage_distance
+
+    @garbage_distance.setter
+    def garbage_distance(self, val: int):
+        assert isinstance(val, int), 'garbage distance must be an int'
+        self._garbage_distance = val
 
     @property
     def resource_pack(self) -> minecraft_model_reader.JavaRPHandler:
@@ -248,6 +259,16 @@ class RenderWorld:
         # generate chunks
         if load_chunks:
             self._get_render_chunk(load_chunks[0])
+    def run_garbage_collector(self, remove_all=False):
+        camx, camz = self._camera[0]//16, self._camera[2]//16
+        remove = []
+        for (cx, cz), chunk in self._loaded_render_chunks.items():
+            if remove_all or max(abs(cx-camx), abs(cz-camz)) > self.garbage_distance:
+                if chunk is not None:
+                    chunk.delete()
+                    remove.append((cx, cz))
+        for coord in remove:
+            del self._loaded_render_chunks[coord]
 
 
 class RenderChunk:
@@ -425,4 +446,9 @@ class RenderChunk:
 
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, self.chunk_faces.size, GL_UNSIGNED_INT, ctypes.c_void_p(0))
+
+    def delete(self):
+        if self.vao is not None:
+            glDeleteVertexArrays(1, self.vao)
+            self.vao = None
 
