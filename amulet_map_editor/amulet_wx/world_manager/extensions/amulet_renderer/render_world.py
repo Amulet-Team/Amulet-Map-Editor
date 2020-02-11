@@ -212,14 +212,19 @@ class RenderWorld:
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
-        x, z = int(self._camera[0] // 16), int(self._camera[2] // 16)
-        chunks = itertools.product(
-            range(x - self._render_distance, x + self._render_distance),
-            range(z - self._render_distance, z + self._render_distance)
-        )
+        cx, cz = int(self._camera[0]) >> 4, int(self._camera[2]) >> 4
 
-        for chunk in sorted(chunks, key=lambda c: (c[0]-x)**2 + (c[1]-x)**2):
-            yield chunk
+        sign = 1
+        length = 1
+        for _ in range(self.render_distance*2+1):
+            for _ in range(length):
+                yield cx, cz
+                cx += sign
+            for _ in range(length):
+                yield cx, cz
+                cz += sign
+            sign *= -1
+            length += 1
 
     def draw(self, transformation_matrix):
         # draw all chunks within render distance
