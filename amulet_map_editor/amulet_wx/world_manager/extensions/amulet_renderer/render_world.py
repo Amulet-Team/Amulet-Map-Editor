@@ -2,7 +2,7 @@ from OpenGL.GL import *
 import numpy
 from typing import TYPE_CHECKING, Dict, Tuple, Generator, Union
 import math
-import itertools
+from concurrent.futures import ThreadPoolExecutor
 
 from ..amulet_renderer import shaders
 
@@ -22,6 +22,21 @@ def cos(theta: Union[int, float]) -> float:
     return math.cos(math.radians(theta))
 
 
+class ChunkGenerator(ThreadPoolExecutor):
+    def __init__(self):
+        super().__init__(max_workers=1)
+        self._working = False  # the number of chunks being generated
+
+    def _gen_chunk(self, method, chunk):
+        method(chunk)
+        self._working = False
+
+    def submit_chunk(self, method, chunk):
+        if not self._working:
+            self._working = True
+            self.submit(self._gen_chunk, method, chunk)
+
+
 class RenderWorld:
     def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
         self._world = world
@@ -33,6 +48,7 @@ class RenderWorld:
         self._render_distance = 10
         self._garbage_distance = 20
         self._loaded_render_chunks: Dict[Tuple[int, int], Union['RenderChunk', None]] = {}
+        self._chunk_generator = ChunkGenerator()
         self._shaders = {
             'render_chunk': shaders.load_shader('render_chunk')
         }
@@ -246,7 +262,6 @@ class RenderWorld:
     def draw(self):
         transformation_matrix = self.transformation_matrix
         # draw all chunks within render distance
-        load_chunks = []
         for chunk_coords in self.chunk_coords():
             if chunk_coords in self._loaded_render_chunks:
                 chunk = self._loaded_render_chunks[chunk_coords]
@@ -254,11 +269,8 @@ class RenderWorld:
                     continue
                 chunk.draw(transformation_matrix)
             else:
-                load_chunks.append(chunk_coords)
+                self._chunk_generator.submit_chunk(self._get_render_chunk, chunk_coords)
 
-        # generate chunks
-        if load_chunks:
-            self._get_render_chunk(load_chunks[0])
     def run_garbage_collector(self, remove_all=False):
         camx, camz = self._camera[0]//16, self._camera[2]//16
         remove = []
@@ -278,12 +290,16 @@ class RenderChunk:
         self.render_world = render_world
         self.coords = chunk_coords
         self.chunk = chunk
-        self.vao = glGenVertexArrays(1)
+        self.vao = None
         self.chunk_verts: numpy.ndarray = None
         self.chunk_faces: numpy.ndarray = None
-
         self.create_lod0()
-        self.create_geometry()
+
+    def _setup(self):
+        """Set up the opengl data which cannot be set up in another thread"""
+        if self.vao is None:
+            self.vao = glGenVertexArrays(1)
+            self.create_geometry()
 
     @property
     def cx(self):
@@ -428,6 +444,7 @@ class RenderChunk:
         glBindVertexArray(0)
 
     def draw(self, transformation_matrix: numpy.ndarray):
+        self._setup()
         shader = self.render_world._shaders['render_chunk']
 
         glUseProgram(shader)
