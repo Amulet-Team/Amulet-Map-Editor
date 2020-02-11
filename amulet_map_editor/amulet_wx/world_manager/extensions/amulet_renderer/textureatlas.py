@@ -23,8 +23,9 @@
 """Texture Atlas and Map File Generation Utility Classes"""
 
 from PIL import Image
-import struct
-from typing import Dict, Tuple, List
+import numpy
+import math
+from typing import Dict, Tuple, List, Any
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
 Atlas. A companion file (.map), is created that defines where each texture is
@@ -231,3 +232,56 @@ class TextureAtlasMap(object):
     def write(self, fd):
         """Writes the texture atlas map file into file object fd."""
         raise Exception('Not Implemented')
+
+
+def create_atlas(texture_dict: Dict[Any, str]) -> Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]:
+    # Parse texture names
+    textures = []
+    for texture in texture_dict.values():
+        # Look for a texture name
+        name, frames = texture, [texture]
+
+        # Build frame objects
+        frames = [Frame(f) for f in frames]
+
+        # Add frames to texture object list
+        textures.append(Texture(name, frames))
+
+    # Sort textures by perimeter size in non-increasing order
+    textures = sorted(textures, key=lambda i: i.frames[0].perimeter, reverse=True)
+
+    height = 0
+    width = 0
+    pixels = 0
+    for t in textures:
+        for f in t.frames:
+            height = max(f.height, height)
+            width = max(f.width, width)
+            pixels += f.height * f.width
+
+    size = max(
+        height,
+        width,
+        1 << (math.ceil(pixels ** 0.5) - 1).bit_length()
+    )
+
+    atlas_created = False
+    atlas = None
+    while not atlas_created:
+        try:
+            # Create the atlas and pack textures in
+            print(size)
+            atlas = TextureAtlas(size, size)
+
+            for texture in textures:
+                atlas.pack(texture)
+            atlas_created = True
+        except AtlasTooSmall:
+            size *= 2
+
+    texture_atlas = numpy.array(list(atlas.generate('RGBA').getdata()), numpy.uint8).ravel()
+
+    texture_bounds = atlas.to_dict()
+    texture_bounds = {tex_id: texture_bounds[texture_path] for tex_id, texture_path in texture_dict.items()}
+
+    return texture_atlas, texture_bounds, atlas.width, atlas.height

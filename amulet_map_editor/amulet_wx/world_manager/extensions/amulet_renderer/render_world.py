@@ -38,69 +38,20 @@ class RenderWorld:
 
     def _create_atlas(self):
         print('Creating texture atlas')
-        filename = str(hash(tuple(self.resource_pack.pack_paths)))
-        ext = 'png'
+        # filename = str(hash(tuple(self._resource_pack.pack_paths)))
+        # ext = 'png'
 
-        # Parse texture names
-        textures = []
-        for texture in self.resource_pack.textures.values():
-            # Look for a texture name
-            name, frames = texture, [texture]
+        self._texture_atlas, self._texture_bounds, width, height = textureatlas.create_atlas(self._resource_pack.textures)
 
-            # Build frame objects
-            frames = [textureatlas.Frame(f) for f in frames]
 
-            # Add frames to texture object list
-            textures.append(textureatlas.Texture(name, frames))
-
-        # Sort textures by perimeter size in non-increasing order
-        textures = sorted(textures, key=lambda i: i.frames[0].perimeter, reverse=True)
-
-        height = 0
-        width = 0
-        pixels = 0
-        for t in textures:
-            for f in t.frames:
-                height = max(f.height, height)
-                width = max(f.width, width)
-                pixels += f.height * f.width
-
-        size = max(
-            height,
-            width,
-            1 << (math.ceil(pixels**0.5)-1).bit_length()
-        )
-
-        atlas_created = False
-        atlas = None
-        while not atlas_created:
-            try:
-                # Create the atlas and pack textures in
-                print(size)
-                atlas = textureatlas.TextureAtlas(size, size)
-
-                for texture in textures:
-                    atlas.pack(texture)
-                atlas_created = True
-            except textureatlas.AtlasTooSmall:
-                size *= 2
-
-        # Write atlas and map file
-        # atlas.write(f'{filename}.{ext}', 'RGBA')
-        self._texture_atlas = numpy.array(list(atlas.generate('RGBA').getdata()), numpy.uint8).ravel()
-
-        glBindTexture(GL_TEXTURE_2D, self.texture_atlas)
+        glBindTexture(GL_TEXTURE_2D, self._texture_atlas)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlas.width, atlas.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, self._texture_atlas)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, self._texture_atlas)
 
-        texture_bounds = atlas.to_dict()
-        self._texture_bounds = {tex_id: texture_bounds[texture_path] for tex_id, texture_path in self.resource_pack.textures.items()}
-        # with open(filename + '.json', 'w') as f:
-        #     json.dump(texture_bounds, f)
         print('Finished creating texture atlas')
 
     def get_texture_bounds(self, texture):
