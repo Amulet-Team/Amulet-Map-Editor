@@ -14,12 +14,19 @@ import minecraft_model_reader
 from ..amulet_renderer import textureatlas
 
 
+def sin(theta: Union[int, float]) -> float:
+    return math.sin(math.radians(theta))
+
+
+def cos(theta: Union[int, float]) -> float:
+    return math.cos(math.radians(theta))
+
+
 class RenderWorld:
     def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
         self._world = world
         self._projection = [45.0, 4 / 3, 0.1, 1000.0]
-        self._camera_location = [0, 300, 0]
-        self._camera_rotation = [90, 0]
+        self._camera = [0, 300, 0, 90, 0]
         self._camera_move_speed = 5
         self._camera_rotate_speed = 2
 
@@ -53,6 +60,20 @@ class RenderWorld:
 
         print('Finished creating texture atlas')
 
+    def move_camera(self, forward, up, right, pitch, yaw):
+        # self._camera[1] -= self._camera_move_speed *
+        # self._camera[0] += self._camera_move_speed *
+        # self._camera[2] -= self._camera_move_speed *
+
+        self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + cos(self._camera[3]) * sin(self._camera[4]) * forward)
+        self._camera[1] += self._camera_move_speed * (up - sin(self._camera[3]) * forward)
+        self._camera[2] += self._camera_move_speed * (sin(self._camera[4]) * right - cos(self._camera[3]) * cos(self._camera[4]) * forward)
+
+        self._camera[3] += self._camera_rotate_speed * pitch
+        if not -90 <= self._camera[3] <= 90:
+            self._camera[3] = max(min(self._camera[3], 90), -90)
+        self._camera[4] += self._camera_rotate_speed * yaw
+
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:
             texture = ('minecraft', 'missing_no')
@@ -75,9 +96,9 @@ class RenderWorld:
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
         transformation_matrix = numpy.eye(4, dtype=numpy.float64)
-        transformation_matrix[3, :3] = numpy.array(self._camera_location) * -1
+        transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
 
-        theta = math.radians(self._camera_rotation[1])
+        theta = math.radians(self._camera[4])
         c = math.cos(theta)
         s = math.sin(theta)
 
@@ -94,7 +115,7 @@ class RenderWorld:
         transformation_matrix = numpy.matmul(transformation_matrix, y_rot)
 
         # rotations
-        theta = math.radians(self._camera_rotation[0])
+        theta = math.radians(self._camera[3])
         c = math.cos(theta)
         s = math.sin(theta)
 
@@ -140,7 +161,7 @@ class RenderWorld:
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
-        x, z = int(self._camera_location[0] // 16), int(self._camera_location[2] // 16)
+        x, z = int(self._camera[0] // 16), int(self._camera[2] // 16)
         chunks = itertools.product(
             range(x - self._render_distance, x + self._render_distance),
             range(z - self._render_distance, z + self._render_distance)
