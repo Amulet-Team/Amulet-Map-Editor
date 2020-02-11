@@ -25,7 +25,7 @@ def cos(theta: Union[int, float]) -> float:
 class RenderWorld:
     def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
         self._world = world
-        self._projection = [45.0, 4 / 3, 0.1, 1000.0]
+        self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera = [0, 300, 0, 90, 0]
         self._camera_move_speed = 5
         self._camera_rotate_speed = 2
@@ -108,6 +108,22 @@ class RenderWorld:
         raise NotImplementedError
         # TODO: implement a way to reload all chunks with a new resource pack
         # self._resource_pack = val
+
+    @property
+    def fov(self) -> float:
+        return self._projection[0]
+
+    @fov.setter
+    def fov(self, fov: float):
+        self._projection[0] = fov
+
+    @property
+    def aspect_ratio(self) -> float:
+        return self._projection[1]
+
+    @aspect_ratio.setter
+    def aspect_ratio(self, aspect_ratio: float):
+        self._projection[1] = aspect_ratio
 
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:

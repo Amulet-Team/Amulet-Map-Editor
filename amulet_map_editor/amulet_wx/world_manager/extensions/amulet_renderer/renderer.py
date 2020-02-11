@@ -3,7 +3,6 @@ from wx import glcanvas
 from OpenGL.GL import *
 import sys
 import os
-import math
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 
 from .render_world import RenderWorld, RenderChunk
@@ -68,12 +67,12 @@ class World3dCanvas(glcanvas.GLCanvas):
         pass
 
     def _mouse_wheel(self, evt):
-        self.render_world._camera_move_speed += evt.GetWheelRotation() / evt.GetWheelDelta()
-        if self.render_world._camera_move_speed < 0.1:
-            self.render_world._camera_move_speed = 0.1
+        self.render_world.camera_move_speed += evt.GetWheelRotation() / evt.GetWheelDelta()
+        if self.render_world.camera_move_speed < 0.1:
+            self.render_world.camera_move_speed = 0.1
         evt.Skip()
 
-    def do_input_commands(self, event):
+    def do_input_commands(self, evt):
         forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
         if key_map['up'] in self.keys_pressed:
             up += 1
@@ -97,6 +96,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         if key_map['look_down'] in self.keys_pressed:
             pitch += 1
         self.render_world.move_camera(forward, up, right, pitch, yaw)
+        evt.Skip()
 
     def on_key_release(self, event):
         key = event.GetUnicodeKey()
@@ -116,15 +116,17 @@ class World3dCanvas(glcanvas.GLCanvas):
 
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
+        print(width, height)
         if height > 0:
-            self.render_world._projection[1] = width / height
+            self.render_world.aspect_ratio = width / height
         else:
-            self.render_world._projection[1] = 1
+            self.render_world.aspect_ratio = 1
 
     def _on_draw(self, event):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.render_world.draw(self.render_world.transformation_matrix)
         self.SwapBuffers()
+        event.Skip()
 
 
 class World3DPanel(BaseWorldTool):
@@ -143,9 +145,9 @@ class World3DPanel(BaseWorldTool):
         )
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
 
-        self.Bind(wx.EVT_SIZE, self.OnResize)
+        self.Bind(wx.EVT_SIZE, self._on_resize)
 
-    def OnResize(self, event):
+    def _on_resize(self, event):
         if self._canvas is not None:
             self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
