@@ -238,7 +238,7 @@ class RenderWorld:
             except ChunkLoadError:
                 self._loaded_render_chunks[chunk_coords] = None
             else:
-                self._loaded_render_chunks[chunk_coords] = RenderChunk(self, chunk_coords, chunk)  # TODO: get the chunk data from the world
+                self._loaded_render_chunks[chunk_coords] = RenderChunk(self, chunk_coords, chunk)
         return self._loaded_render_chunks[chunk_coords]
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
@@ -260,6 +260,7 @@ class RenderWorld:
     def draw(self):
         transformation_matrix = self.transformation_matrix
         # draw all chunks within render distance
+        gen_chunks = []
         for chunk_coords in self.chunk_coords():
             if chunk_coords in self._loaded_render_chunks:
                 chunk = self._loaded_render_chunks[chunk_coords]
@@ -267,12 +268,15 @@ class RenderWorld:
                     continue
                 chunk.draw(transformation_matrix)
             else:
-                self._chunk_generator.submit_chunk(self._get_render_chunk, chunk_coords)
+                gen_chunks.append(chunk_coords)
+
+        for chunk_coords in gen_chunks:
+            self._chunk_generator.submit_chunk(self._get_render_chunk, chunk_coords)
 
     def run_garbage_collector(self, remove_all=False):
         camx, camz = self._camera[0]//16, self._camera[2]//16
         remove = []
-        for (cx, cz), chunk in self._loaded_render_chunks.items():
+        for (cx, cz), chunk in list(self._loaded_render_chunks.items()):
             if remove_all or max(abs(cx-camx), abs(cz-camz)) > self.garbage_distance:
                 if chunk is not None:
                     chunk.delete()

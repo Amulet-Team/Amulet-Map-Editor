@@ -129,7 +129,6 @@ class World3dCanvas(glcanvas.GLCanvas):
 
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
-        print(width, height)
         if height > 0:
             self._render_world.aspect_ratio = width / height
         else:
