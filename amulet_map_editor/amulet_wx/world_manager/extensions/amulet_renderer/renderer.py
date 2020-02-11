@@ -29,86 +29,93 @@ key_map = {
 
 class World3dCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: 'World3DPanel', world: 'World'):
-        self.world_panel = parent
-        self.keys_pressed = set()
+        self._world_panel = parent
+        self._keys_pressed = set()
         super().__init__(parent, -1, size=parent.parent_frame.GetClientSize())
-        self.context = glcanvas.GLContext(self)
-        self.SetCurrent(self.context)
+        self._context = glcanvas.GLContext(self)
+        self.SetCurrent(self._context)
         glClearColor(0.5, 0.5, 0.5, 1.0)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glDepthFunc(GL_LESS)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         resource_packs = [minecraft_model_reader.JavaRP(rp) for rp in sys.argv[1:] if os.path.isdir(rp)]
         resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
 
-        self.render_world = RenderWorld(world, resource_pack)
+        self._render_world = RenderWorld(world, resource_pack)
 
-        self.draw_timer = wx.Timer(self)
-        self.input_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._on_draw, self.draw_timer)
-        self.Bind(wx.EVT_TIMER, self.do_input_commands, self.input_timer)
+        self._draw_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
 
-        self.world_panel.Bind(wx.EVT_SIZE, self._on_resize)
+        self._input_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self._process_inputs, self._input_timer)
 
-        self.Bind(wx.EVT_KEY_DOWN, self.on_key_press)
-        self.Bind(wx.EVT_KEY_UP, self.on_key_release)
+        self._world_panel.Bind(wx.EVT_SIZE, self._on_resize)
+
+        self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
+        self.Bind(wx.EVT_KEY_UP, self._on_key_release)
         self.Bind(wx.EVT_MOUSEWHEEL, self._mouse_wheel)
 
     def enable(self):
-        self.draw_timer.Start(33)
-        self.input_timer.Start(33)
+        self._draw_timer.Start(33)
+        self._input_timer.Start(33)
 
     def disable(self):
-        self.draw_timer.Stop()
-        self.input_timer.Stop()
+        self._draw_timer.Stop()
+        self._input_timer.Stop()
 
     def close(self):
-        pass
+        self._render_world.close()
+
+    def is_closeable(self):
+        return self._render_world.is_closeable()
 
     def _mouse_wheel(self, evt):
-        self.render_world.camera_move_speed += evt.GetWheelRotation() / evt.GetWheelDelta()
-        if self.render_world.camera_move_speed < 0.1:
-            self.render_world.camera_move_speed = 0.1
+        self._render_world.camera_move_speed += evt.GetWheelRotation() / evt.GetWheelDelta()
+        if self._render_world.camera_move_speed < 0.1:
+            self._render_world.camera_move_speed = 0.1
         evt.Skip()
 
-    def do_input_commands(self, evt):
+    def _process_inputs(self, evt):
         forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
-        if key_map['up'] in self.keys_pressed:
+        if key_map['up'] in self._keys_pressed:
             up += 1
-        if key_map['down'] in self.keys_pressed:
+        if key_map['down'] in self._keys_pressed:
             up -= 1
-        if key_map['forwards'] in self.keys_pressed:
+        if key_map['forwards'] in self._keys_pressed:
             forward += 1
-        if key_map['backwards'] in self.keys_pressed:
+        if key_map['backwards'] in self._keys_pressed:
             forward -= 1
-        if key_map['left'] in self.keys_pressed:
+        if key_map['left'] in self._keys_pressed:
             right -= 1
-        if key_map['right'] in self.keys_pressed:
+        if key_map['right'] in self._keys_pressed:
             right += 1
 
-        if key_map['look_left'] in self.keys_pressed:
+        if key_map['look_left'] in self._keys_pressed:
             yaw -= 1
-        if key_map['look_right'] in self.keys_pressed:
+        if key_map['look_right'] in self._keys_pressed:
             yaw += 1
-        if key_map['look_up'] in self.keys_pressed:
+        if key_map['look_up'] in self._keys_pressed:
             pitch -= 1
-        if key_map['look_down'] in self.keys_pressed:
+        if key_map['look_down'] in self._keys_pressed:
             pitch += 1
-        self.render_world.move_camera(forward, up, right, pitch, yaw)
+        self._render_world.move_camera(forward, up, right, pitch, yaw)
         evt.Skip()
 
-    def on_key_release(self, event):
+    def _on_key_release(self, event):
         key = event.GetUnicodeKey()
         if key == wx.WXK_NONE:
             key = event.GetKeyCode()
-        self.keys_pressed.remove(key)
+        if key in self._keys_pressed:
+            self._keys_pressed.remove(key)
 
-    def on_key_press(self, event):
+    def _on_key_press(self, event):
         key = event.GetUnicodeKey()
         if key == wx.WXK_NONE:
             key = event.GetKeyCode()
-        self.keys_pressed.add(key)
+        self._keys_pressed.add(key)
 
     def _on_resize(self, event):
         width, height = event.GetSize()
@@ -118,13 +125,13 @@ class World3dCanvas(glcanvas.GLCanvas):
         glViewport(0, 0, width, height)
         print(width, height)
         if height > 0:
-            self.render_world.aspect_ratio = width / height
+            self._render_world.aspect_ratio = width / height
         else:
-            self.render_world.aspect_ratio = 1
+            self._render_world.aspect_ratio = 1
 
     def _on_draw(self, event):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self.render_world.draw(self.render_world.transformation_matrix)
+        self._render_world.draw()
         self.SwapBuffers()
         event.Skip()
 
@@ -169,6 +176,11 @@ class World3DPanel(BaseWorldTool):
     def close(self):
         if self._canvas is not None:
             self._canvas.close()
+
+    def is_closeable(self):
+        if self._canvas is not None:
+            return self._canvas.is_closeable()
+        return True
 
 
 if __name__ == "__main__":

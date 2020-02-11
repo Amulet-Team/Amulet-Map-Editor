@@ -43,6 +43,12 @@ class RenderWorld:
         self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
 
+    def is_closeable(self):
+        return True
+
+    def close(self):
+        pass
+
     def _create_atlas(self):
         print('Creating texture atlas')
         # filename = str(hash(tuple(self._resource_pack.pack_paths)))
@@ -226,7 +232,8 @@ class RenderWorld:
             sign *= -1
             length += 1
 
-    def draw(self, transformation_matrix):
+    def draw(self):
+        transformation_matrix = self.transformation_matrix
         # draw all chunks within render distance
         load_chunks = []
         for chunk_coords in self.chunk_coords():
