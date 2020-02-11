@@ -61,10 +61,6 @@ class RenderWorld:
         print('Finished creating texture atlas')
 
     def move_camera(self, forward, up, right, pitch, yaw):
-        # self._camera[1] -= self._camera_move_speed *
-        # self._camera[0] += self._camera_move_speed *
-        # self._camera[2] -= self._camera_move_speed *
-
         self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + cos(self._camera[3]) * sin(self._camera[4]) * forward)
         self._camera[1] += self._camera_move_speed * (up - sin(self._camera[3]) * forward)
         self._camera[2] += self._camera_move_speed * (sin(self._camera[4]) * right - cos(self._camera[3]) * cos(self._camera[4]) * forward)
@@ -73,6 +69,45 @@ class RenderWorld:
         if not -90 <= self._camera[3] <= 90:
             self._camera[3] = max(min(self._camera[3], 90), -90)
         self._camera[4] += self._camera_rotate_speed * yaw
+
+    @property
+    def camera_move_speed(self) -> float:
+        """The speed that the camera moves at"""
+        return self._camera_move_speed
+
+    @camera_move_speed.setter
+    def camera_move_speed(self, val: float):
+        self._camera_move_speed = val
+
+    @property
+    def camera_rotate_speed(self) -> float:
+        """The speed that the camera rotates at"""
+        return self._camera_rotate_speed
+
+    @camera_rotate_speed.setter
+    def camera_rotate_speed(self, val: float):
+        self._camera_rotate_speed = val
+
+    @property
+    def render_distance(self) -> int:
+        """The distance to render chunks around the camera"""
+        return self._render_distance
+
+    @render_distance.setter
+    def render_distance(self, val: int):
+        assert isinstance(val, int), 'Render distance must be an int'
+        self._render_distance = val
+
+    @property
+    def resource_pack(self) -> minecraft_model_reader.JavaRPHandler:
+        """The resource pack being used by the renderer"""
+        return self._resource_pack
+
+    @resource_pack.setter
+    def resource_pack(self, val: minecraft_model_reader.JavaRPHandler):
+        raise NotImplementedError
+        # TODO: implement a way to reload all chunks with a new resource pack
+        # self._resource_pack = val
 
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:
