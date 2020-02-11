@@ -205,7 +205,7 @@ class TextureAtlas(PackRegion):
                 tex.frames[0].x/self.width,
                 tex.frames[0].y/self.height,
                 (tex.frames[0].x+tex.frames[0].width)/self.width,
-                (tex.frames[0].y+tex.frames[0].height)/self.height
+                (tex.frames[0].y+min(tex.frames[0].height, tex.frames[0].width))/self.height
             ) for tex in self.textures
         }
 
