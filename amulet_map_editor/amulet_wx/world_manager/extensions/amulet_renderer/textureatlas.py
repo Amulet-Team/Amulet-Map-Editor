@@ -279,7 +279,7 @@ def create_atlas(texture_dict: Dict[Any, str]) -> Tuple[numpy.ndarray, Dict[Any,
         except AtlasTooSmall:
             size *= 2
 
-    texture_atlas = numpy.array(list(atlas.generate('RGBA').getdata()), numpy.uint8).ravel()
+    texture_atlas = numpy.array(atlas.generate('RGBA'), numpy.uint8).ravel()
 
     texture_bounds = atlas.to_dict()
     texture_bounds = {tex_id: texture_bounds[texture_path] for tex_id, texture_path in texture_dict.items()}
