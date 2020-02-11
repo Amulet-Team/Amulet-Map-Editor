@@ -33,7 +33,7 @@ class RenderWorld:
         self._texture_bounds = {}
         self._resource_pack_translator = self._world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
         self._texture_atlas = None
-        self._texture_atlas = glGenTextures(1)
+        self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
 
     def _create_atlas(self):
@@ -43,8 +43,7 @@ class RenderWorld:
 
         self._texture_atlas, self._texture_bounds, width, height = textureatlas.create_atlas(self._resource_pack.textures)
 
-
-        glBindTexture(GL_TEXTURE_2D, self._texture_atlas)
+        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
@@ -359,7 +358,7 @@ class RenderChunk:
         glUseProgram(shader)
 
         glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self.render_world._texture_atlas)
+        glBindTexture(GL_TEXTURE_2D, self.render_world._gl_texture_atlas)
         glUniform1i(glGetUniformLocation(shader, 'image'), 0)
 
         chunk_translation = numpy.eye(4, dtype=numpy.float64)
