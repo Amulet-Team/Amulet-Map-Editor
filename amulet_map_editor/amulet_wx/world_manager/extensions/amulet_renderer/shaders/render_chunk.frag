@@ -7,11 +7,14 @@ out vec4 outColor;
 uniform sampler2D image;
 
 void main(){
-    outColor = texture(
+    vec4 texColor = texture(
     	image,
     	vec2(
 			mix(fTexOffset.x, fTexOffset.z, mod(fTexCoord.x, 1.0)),
 			mix(fTexOffset.y, fTexOffset.w, 1.0-mod(fTexCoord.y, 1.0))
 		)
 	);
+	if(texColor.a < 0.02)
+        discard;
+	outColor = texColor;
 }
