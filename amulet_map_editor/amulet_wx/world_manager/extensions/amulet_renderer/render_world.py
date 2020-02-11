@@ -394,36 +394,6 @@ class RenderChunk:
 
         glBindVertexArray(0)
 
-    def create_geometry_(self):
-        # geometry will include
-        # vertex coords (in chunk space)
-        # texture coords
-        # perhaps in the future (if face merging is added) a way to specify texture bounds
-        # normals
-
-        # triangle   vertices      colors
-        triangle = [
-            -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
-            -0.5 + 0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
-            -0.5 + 0.0, 0.5, 0.0, 0.0, 0.0, 1.0
-        ]
-
-        triangle = numpy.array(triangle, dtype=numpy.float32)
-
-        glBindVertexArray(self.vao)
-        vbo = glGenBuffers(1)
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo)
-        glBufferData(GL_ARRAY_BUFFER, len(triangle) * 4, triangle, GL_STATIC_DRAW)
-
-        # vertex attribute pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
-        glEnableVertexAttribArray(0)
-        # color attribute pointers
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
-        glEnableVertexAttribArray(1)
-        glBindVertexArray(0)
-
     def draw(self, transformation_matrix: numpy.ndarray):
         shader = self.render_world._shaders['render_chunk']
 
