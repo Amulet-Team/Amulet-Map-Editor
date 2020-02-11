@@ -5,7 +5,7 @@ import sys
 import os
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 
-from .render_world import RenderWorld, RenderChunk
+from .render_world import RenderWorld
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -36,7 +36,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.SetCurrent(self.context)
         glClearColor(0.5, 0.5, 0.5, 1.0)
         glEnable(GL_DEPTH_TEST)
-        # glDisable(GL_CULL_FACE)
+        glEnable(GL_CULL_FACE)
         glDepthFunc(GL_LESS)
 
         resource_packs = [minecraft_model_reader.JavaRP(rp) for rp in sys.argv[1:] if os.path.isdir(rp)]
