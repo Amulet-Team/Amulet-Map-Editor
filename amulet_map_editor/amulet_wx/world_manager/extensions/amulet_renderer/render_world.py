@@ -25,15 +25,16 @@ def cos(theta: Union[int, float]) -> float:
 class ChunkGenerator(ThreadPoolExecutor):
     def __init__(self):
         super().__init__(max_workers=1)
-        self._working = False  # the number of chunks being generated
+        self._count = 0  # the number of chunks being generated
+        self._max_count = 4
 
     def _gen_chunk(self, method, chunk):
         method(chunk)
-        self._working = False
+        self._count -= 1
 
     def submit_chunk(self, method, chunk):
-        if not self._working:
-            self._working = True
+        if self._count < self._max_count:
+            self._count += 1
             self.submit(self._gen_chunk, method, chunk)
 
 
