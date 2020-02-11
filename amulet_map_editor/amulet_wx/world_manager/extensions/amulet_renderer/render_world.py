@@ -54,7 +54,7 @@ class RenderWorld:
             'render_chunk': shaders.load_shader('render_chunk')
         }
         self._resource_pack = resource_pack
-        self._block_models = []
+        self._block_models = {}
         self._texture_bounds = {}
         self._resource_pack_translator = self._world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
         self._texture_atlas = None
@@ -165,15 +165,12 @@ class RenderWorld:
         return self._texture_bounds[texture]
 
     def get_model(self, pallete_index: int):
-        if len(self._world.palette) > len(self._block_models):
-            for block_index in range(len(self._block_models), len(self._world.palette)):
-                self._block_models.append(
-                    self._resource_pack.get_model(
-                        self._resource_pack_translator.block.from_universal(
-                            self._world.palette[block_index]
-                        )[0]
-                    )
-                )
+        if pallete_index not in self._block_models:
+            self._block_models[pallete_index] = self._resource_pack.get_model(
+                self._resource_pack_translator.block.from_universal(
+                    self._world.palette[pallete_index]
+                )[0]
+            )
 
         return self._block_models[pallete_index]
 
