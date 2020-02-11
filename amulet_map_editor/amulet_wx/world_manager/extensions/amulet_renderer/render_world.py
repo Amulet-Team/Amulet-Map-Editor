@@ -6,7 +6,7 @@ import itertools
 
 from ..amulet_renderer import shaders
 
-from amulet.api.errors import ChunkDoesNotExist
+from amulet.api.errors import ChunkLoadError
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet.api.chunk import Chunk
@@ -204,7 +204,7 @@ class RenderWorld:
         if chunk_coords not in self._loaded_render_chunks:
             try:
                 chunk = self._world.get_chunk(*chunk_coords)
-            except ChunkDoesNotExist:
+            except ChunkLoadError:
                 self._loaded_render_chunks[chunk_coords] = None
             else:
                 self._loaded_render_chunks[chunk_coords] = RenderChunk(self, chunk_coords, chunk)  # TODO: get the chunk data from the world
