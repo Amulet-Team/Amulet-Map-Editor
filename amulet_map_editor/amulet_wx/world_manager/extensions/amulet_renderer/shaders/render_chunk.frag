@@ -11,7 +11,7 @@ void main(){
     	image,
     	vec2(
 			mix(fTexOffset.x, fTexOffset.z, mod(fTexCoord.x, 1.0)),
-			mix(fTexOffset.y, fTexOffset.w, mod(fTexCoord.y, 1.0))
+			mix(fTexOffset.y, fTexOffset.w, 1.0-mod(fTexCoord.y, 1.0))
 		)
 	);
 }
