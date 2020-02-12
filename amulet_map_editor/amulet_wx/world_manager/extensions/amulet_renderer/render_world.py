@@ -294,7 +294,7 @@ class RenderChunk:
         self.chunk = chunk
         self.vao = None
         self.chunk_verts: numpy.ndarray = None
-        self.chunk_faces: numpy.ndarray = None
+        self._draw_count = 0
         self.create_lod0()
 
     def _setup(self):
@@ -351,8 +351,6 @@ class RenderChunk:
         show_map = {'up': show_up, 'down': show_down, 'north': show_north, 'south': show_south, 'east': show_east, 'west': show_west}
 
         chunk_verts = []
-        chunk_faces = []
-        vert_offset = 0
 
         for block_temp_id in numpy.unique(blocks):
             # for each unique blockstate in the chunk
@@ -379,50 +377,32 @@ class RenderChunk:
                 block_offsets = block_locations
 
                 # the vertices in model space
-                verts = model.verts[cull_dir]
-                faces = model.faces[cull_dir].reshape((-1, 3))
+                verts = model.verts[cull_dir].reshape((-1, 3))
+                tverts = model.texture_coords[cull_dir].reshape((-1, 2))
+                faces = model.faces[cull_dir]
 
-                # duplicate the vertices for each block
-                vert_list_ = numpy.tile(verts, (block_count, 1))
-                # offset the model verts to chunk space TODO: there might be a better way to do this
-                for axis in range(3):
-                    vert_list_[:, axis::3] += block_offsets[:, axis].reshape((-1, 1))
+                # each slice in the first axis is a new block, each slice in the second is a new vertex
+                vert_table = numpy.zeros((block_count, faces.size, 9), dtype=numpy.float32)
+                vert_table[:, :, :3] = verts[faces] + block_offsets[:, :].reshape((-1, 1, 3))
+                vert_table[:, :, 3:5] = tverts[faces]
 
-                texture_bounds = numpy.zeros((verts.size//3, 4), dtype=numpy.float64)
-                for texture_index, vert_indexes in zip(model.texture_index[cull_dir], faces):
+                vert_index = 0
+                for texture_index in model.texture_index[cull_dir]:
                     tex_bounds = self.render_world.get_texture_bounds(
                         model.textures[texture_index]
                     )
 
-                    for vert_index in vert_indexes:
-                        texture_bounds[vert_index, :] = tex_bounds
+                    vert_table[:, vert_index:vert_index+3, 5:9] = tex_bounds
+                    vert_index += 3
 
+                chunk_verts.append(vert_table.ravel())
 
-
-                vert_table = numpy.hstack((
-                    vert_list_.reshape((-1, 3)),
-                    numpy.tile(
-                        model.texture_coords[cull_dir].reshape((-1, 2)),
-                        (block_count, 1)
-                    ),
-                    numpy.tile(
-                        texture_bounds,
-                        (block_count, 1)
-                    )
-                )).astype(numpy.float32)
-                chunk_verts.append(vert_table)
-                for _ in range(block_count):
-                    chunk_faces.append(
-                        faces + vert_offset
-                    )
-                    vert_offset += verts.size // 3
-
-        if len(chunk_faces) == 0:
+        if len(chunk_verts) == 0:
             self.chunk_verts = numpy.zeros((0, 9), dtype=numpy.float32)
-            self.chunk_faces = numpy.zeros((0, 3), dtype=numpy.uint32)
+            self._draw_count = 0
         else:
             self.chunk_verts = numpy.concatenate(chunk_verts, 0).ravel()
-            self.chunk_faces = numpy.concatenate(chunk_faces, 0).ravel()
+            self._draw_count = int(self.chunk_verts.size // 9)
 
     def create_geometry(self):
         glBindVertexArray(self.vao)
@@ -438,10 +418,6 @@ class RenderChunk:
         # texture coords attribute pointers
         glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(20))
         glEnableVertexAttribArray(2)
-
-        ivbo = glGenBuffers(1)
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ivbo)
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.chunk_faces.size * 4, self.chunk_faces, GL_STATIC_DRAW)
 
         glBindVertexArray(0)
 
@@ -464,7 +440,7 @@ class RenderChunk:
         glUniformMatrix4fv(trm_mat_loc, 1, GL_FALSE, transformation_matrix.astype(numpy.float32))
 
         glBindVertexArray(self.vao)
-        glDrawElements(GL_TRIANGLES, self.chunk_faces.size, GL_UNSIGNED_INT, ctypes.c_void_p(0))
+        glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
 
     def delete(self):
         if self.vao is not None:
