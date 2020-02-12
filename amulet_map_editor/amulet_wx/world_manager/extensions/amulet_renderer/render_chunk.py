@@ -40,7 +40,6 @@ class RenderChunk:
 
     def create_lod0(self):
         print(f'Creating geometry for chunk {self.cx} {self.cz}')
-        world = self.render_world._world
 
         blocks: numpy.ndarray = self.chunk.blocks
         blocks_ = numpy.zeros(blocks.shape + numpy.array((2, 0, 2)), blocks.dtype)
@@ -48,7 +47,7 @@ class RenderChunk:
 
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             try:
-                blocks_temp: numpy.ndarray = world.get_chunk(self.cx + dx, self.cz + dz).blocks
+                blocks_temp: numpy.ndarray = self.render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks
                 if (dx, dz) == (-1, 0):
                     blocks_[0, :, 1:-1] = blocks_temp[-1, :, :]
                 elif (dx, dz) == (1, 0):

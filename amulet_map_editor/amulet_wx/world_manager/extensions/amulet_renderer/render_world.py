@@ -61,6 +61,10 @@ class RenderWorld:
         self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
 
+    @property
+    def world(self) -> 'World':
+        return self._world
+
     def is_closeable(self):
         return True
 
