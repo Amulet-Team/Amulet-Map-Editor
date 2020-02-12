@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 import numpy
-from typing import TYPE_CHECKING, Tuple, Dict
+from typing import TYPE_CHECKING, Tuple, Dict, Union
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError
 if TYPE_CHECKING:
@@ -9,20 +9,21 @@ if TYPE_CHECKING:
 
 
 class RenderChunk:
-    def __init__(self, render_world: 'RenderWorld', chunk_coords: Tuple[int, int], chunk: 'Chunk'):
+    def __init__(self, render_world: 'RenderWorld', chunk_coords: Tuple[int, int], chunk: Union['Chunk', None]):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
         self.render_world = render_world
         self.coords = chunk_coords
         self.chunk_transform = numpy.eye(4, dtype=numpy.float32)
         self.chunk_transform[3, [0, 2]] = numpy.array(self.coords) * 16
-        self.chunk = chunk
+        self._chunk = chunk
         self._shader = None
         self._trm_mat_loc = None
         self.vao = None
-        self.chunk_verts: numpy.ndarray = None
+        self.chunk_verts: numpy.ndarray = numpy.zeros(0)
         self._draw_count = 0
-        self.create_lod0()
+        if self._chunk is not None:
+            self.create_lod0()
 
     def _setup(self):
         """Set up the opengl data which cannot be set up in another thread"""
@@ -41,7 +42,7 @@ class RenderChunk:
     def create_lod0(self):
         print(f'Creating geometry for chunk {self.cx} {self.cz}')
 
-        blocks: numpy.ndarray = self.chunk.blocks
+        blocks: numpy.ndarray = self._chunk.blocks
         blocks_ = numpy.zeros(blocks.shape + numpy.array((2, 0, 2)), blocks.dtype)
         blocks_[1:-1, :, 1:-1] = blocks
 
