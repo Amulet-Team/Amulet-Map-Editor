@@ -82,6 +82,12 @@ class RenderWorld:
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, self._texture_atlas)
 
+        shader = self._shaders['render_chunk']
+        glUseProgram(shader)
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
+        glUniform1i(glGetUniformLocation(shader, 'image'), 0)
+
         print('Finished creating texture atlas')
 
     def move_camera(self, forward, up, right, pitch, yaw):
@@ -177,7 +183,7 @@ class RenderWorld:
     @property
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
-        transformation_matrix = numpy.eye(4, dtype=numpy.float64)
+        transformation_matrix = numpy.eye(4, dtype=numpy.float32)
         transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
 
         theta = math.radians(self._camera[4])
@@ -191,7 +197,7 @@ class RenderWorld:
                 [s, 0, c, 0],
                 [0, 0, 0, 1]
             ],
-            dtype=numpy.float64
+            dtype=numpy.float32
         )
 
         transformation_matrix = numpy.matmul(transformation_matrix, y_rot)
@@ -208,7 +214,7 @@ class RenderWorld:
                 [0, -s, c, 0],
                 [0, 0, 0, 1]
             ],
-            dtype=numpy.float64
+            dtype=numpy.float32
         )
 
         transformation_matrix = numpy.matmul(transformation_matrix, x_rot)
@@ -224,7 +230,7 @@ class RenderWorld:
                 [0, 0, (z_far+z_near)/(z_near-z_far), -1],
                 [0, 0, (2*z_far*z_near)/(z_near-z_far), 0]
             ],
-            dtype=numpy.float64
+            dtype=numpy.float32
         )
 
         transformation_matrix = numpy.matmul(transformation_matrix, projection)
@@ -291,7 +297,11 @@ class RenderChunk:
         # at shader time it is transformed by the players transform
         self.render_world = render_world
         self.coords = chunk_coords
+        self.chunk_transform = numpy.eye(4, dtype=numpy.float32)
+        self.chunk_transform[3, [0, 2]] = numpy.array(self.coords) * 16
         self.chunk = chunk
+        self._shader = None
+        self._trm_mat_loc = None
         self.vao = None
         self.chunk_verts: numpy.ndarray = None
         self._draw_count = 0
@@ -421,24 +431,15 @@ class RenderChunk:
 
         glBindVertexArray(0)
 
+        self._shader = self.render_world._shaders['render_chunk']
+        self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
+        print(f'Finished setting up opengl for chunk {self.cx} {self.cz}')
+
     def draw(self, transformation_matrix: numpy.ndarray):
         self._setup()
-        shader = self.render_world._shaders['render_chunk']
-
-        glUseProgram(shader)
-
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self.render_world._gl_texture_atlas)
-        glUniform1i(glGetUniformLocation(shader, 'image'), 0)
-
-        chunk_translation = numpy.eye(4, dtype=numpy.float64)
-        chunk_translation[3, [0, 2]] = numpy.array(self.coords) * 16
-
-        transformation_matrix = numpy.matmul(chunk_translation, transformation_matrix)
-
-        trm_mat_loc = glGetUniformLocation(shader, "transformation_matrix")
-        glUniformMatrix4fv(trm_mat_loc, 1, GL_FALSE, transformation_matrix.astype(numpy.float32))
-
+        glUseProgram(self._shader)
+        transformation_matrix = numpy.matmul(self.chunk_transform, transformation_matrix)
+        glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
         glBindVertexArray(self.vao)
         glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
 
