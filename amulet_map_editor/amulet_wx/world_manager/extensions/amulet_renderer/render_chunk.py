@@ -3,19 +3,19 @@ import numpy
 from typing import TYPE_CHECKING, Tuple, Dict, Union
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError
+from ..amulet_renderer import shaders
 if TYPE_CHECKING:
     from .render_world import RenderWorld
     from amulet.api.chunk import Chunk
 
 
 class RenderChunk:
-    def __init__(self, render_world: 'RenderWorld', chunk_coords: Tuple[int, int], chunk: Union['Chunk', None]):
+    def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], chunk: Union['Chunk', None]):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
         self.render_world = render_world
+        self._region_size = region_size
         self.coords = chunk_coords
-        self.chunk_transform = numpy.eye(4, dtype=numpy.float32)
-        self.chunk_transform[3, [0, 2]] = numpy.array(self.coords) * 16
         self._chunk = chunk
         self._shader = None
         self._trm_mat_loc = None
@@ -118,7 +118,9 @@ class RenderChunk:
 
                 # each slice in the first axis is a new block, each slice in the second is a new vertex
                 vert_table = numpy.zeros((block_count, faces.size, 9), dtype=numpy.float32)
-                vert_table[:, :, :3] = verts[faces] + block_offsets[:, :].reshape((-1, 1, 3))
+                vert_table[:, :, :3] = verts[faces] + \
+                                       block_offsets[:, :].reshape((-1, 1, 3)) + \
+                                       16 * (numpy.array([self.coords[0], 0, self.coords[1]]) % self._region_size)
                 vert_table[:, :, 3:5] = tverts[faces]
 
                 vert_index = 0
@@ -136,7 +138,7 @@ class RenderChunk:
             self.chunk_verts = numpy.zeros((0, 9), dtype=numpy.float32)
             self._draw_count = 0
         else:
-            self.chunk_verts = numpy.concatenate(chunk_verts, 0).ravel()
+            self.chunk_verts = numpy.concatenate(chunk_verts, 0)
             self._draw_count = int(self.chunk_verts.size // 9)
         print(f'Finished creating geometry for chunk {self.cx} {self.cz}')
 
@@ -158,14 +160,13 @@ class RenderChunk:
 
         glBindVertexArray(0)
 
-        self._shader = self.render_world.shaders['render_chunk']
+        self._shader = shaders.get_shader('render_chunk')
         self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
         print(f'Finished setting up opengl for chunk {self.cx} {self.cz}')
 
     def draw(self, transformation_matrix: numpy.ndarray):
         self._setup()
         glUseProgram(self._shader)
-        transformation_matrix = numpy.matmul(self.chunk_transform, transformation_matrix)
         glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
         glBindVertexArray(self.vao)
         glDrawArrays(GL_TRIANGLES, 0, self._draw_count)

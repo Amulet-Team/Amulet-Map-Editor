@@ -3,6 +3,7 @@ import numpy
 from typing import TYPE_CHECKING, Dict, Tuple, Generator, Union
 import math
 from concurrent.futures import ThreadPoolExecutor
+import time
 
 from ..amulet_renderer import shaders
 
@@ -10,8 +11,10 @@ from amulet.api.errors import ChunkLoadError
 import minecraft_model_reader
 from ..amulet_renderer import textureatlas
 from .render_chunk import RenderChunk
+from .render_region import ChunkManager
 if TYPE_CHECKING:
     from amulet.api.world import World
+    from amulet.api.chunk import Chunk
 
 
 def sin(theta: Union[int, float]) -> float:
@@ -23,19 +26,23 @@ def cos(theta: Union[int, float]) -> float:
 
 
 class ChunkGenerator(ThreadPoolExecutor):
-    def __init__(self):
+    def __init__(self, render_world: 'RenderWorld'):
         super().__init__(max_workers=1)
-        self._count = 0  # the number of chunks being generated
+        self._render_world = render_world
+        self._in_progress = set()  # the number of chunks being generated
         self._max_count = 4
 
-    def _gen_chunk(self, method, chunk):
-        method(chunk)
-        self._count -= 1
+    def _gen_chunk(self, chunk_coords: Tuple[int, int]):
+        self._render_world.create_render_chunk(chunk_coords)
+        self._in_progress.remove(chunk_coords)
 
-    def submit_chunk(self, method, chunk):
-        if self._count < self._max_count:
-            self._count += 1
-            self.submit(self._gen_chunk, method, chunk)
+    def generate_chunk(self, chunk_coords: Tuple[int, int]):
+        if len(self._in_progress) < self._max_count and not self.in_progress(chunk_coords):
+            self._in_progress.add(chunk_coords)
+            self.submit(self._gen_chunk, chunk_coords)
+
+    def in_progress(self, chunk_coords: Tuple[int, int]) -> bool:
+        return chunk_coords in self._in_progress
 
 
 class RenderWorld:
@@ -48,11 +55,8 @@ class RenderWorld:
 
         self._render_distance = 10
         self._garbage_distance = 20
-        self._loaded_render_chunks: Dict[Tuple[int, int], Union[RenderChunk, None]] = {}
-        self._chunk_generator = ChunkGenerator()
-        self.shaders = {
-            'render_chunk': shaders.load_shader('render_chunk')
-        }
+        # self._loaded_render_chunks: Dict[Tuple[int, int], Union[RenderChunk, None]] = {}
+        self._chunk_manager = ChunkManager()
         self._resource_pack = resource_pack
         self._block_models = {}
         self._texture_bounds = {}
@@ -60,6 +64,7 @@ class RenderWorld:
         self._texture_atlas = None
         self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
+        self._chunk_generator = ChunkGenerator(self)
 
     @property
     def world(self) -> 'World':
@@ -86,7 +91,7 @@ class RenderWorld:
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, self._texture_atlas)
 
-        shader = self.shaders['render_chunk']
+        shader = shaders.get_shader('render_chunk')
         glUseProgram(shader)
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
@@ -95,6 +100,8 @@ class RenderWorld:
         print('Finished creating texture atlas')
 
     def move_camera(self, forward, up, right, pitch, yaw):
+        if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
+            return
         self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + cos(self._camera[3]) * sin(self._camera[4]) * forward)
         self._camera[1] += self._camera_move_speed * (up - sin(self._camera[3]) * forward)
         self._camera[2] += self._camera_move_speed * (sin(self._camera[4]) * right - cos(self._camera[3]) * cos(self._camera[4]) * forward)
@@ -241,15 +248,18 @@ class RenderWorld:
 
         return transformation_matrix
 
-    def _get_render_chunk(self, chunk_coords: Tuple[int, int]) -> Union[RenderChunk, None]:
-        if chunk_coords not in self._loaded_render_chunks:
+    def create_render_chunk(self, chunk_coords: Tuple[int, int]):
+        if chunk_coords not in self._chunk_manager:
             try:
                 chunk = self._world.get_chunk(*chunk_coords)
             except ChunkLoadError:
-                self._loaded_render_chunks[chunk_coords] = None
+                self._chunk_manager.add_render_chunk(
+                    RenderChunk(self, self._chunk_manager.region_size, chunk_coords, None)
+                )
             else:
-                self._loaded_render_chunks[chunk_coords] = RenderChunk(self, chunk_coords, chunk)
-        return self._loaded_render_chunks[chunk_coords]
+                self._chunk_manager.add_render_chunk(
+                    RenderChunk(self, self._chunk_manager.region_size, chunk_coords, chunk)
+                )
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
@@ -267,30 +277,46 @@ class RenderWorld:
             sign *= -1
             length += 1
 
-    def draw(self):
-        transformation_matrix = self.transformation_matrix
-        # draw all chunks within render distance
-        gen_chunks = []
-        for chunk_coords in self.chunk_coords():
-            if chunk_coords in self._loaded_render_chunks:
-                chunk = self._loaded_render_chunks[chunk_coords]
-                if chunk is None:
-                    continue
-                chunk.draw(transformation_matrix)
-            else:
-                gen_chunks.append(chunk_coords)
+    # def draw(self):
+    #     transformation_matrix = self.transformation_matrix
+    #     # draw all chunks within render distance
+    #     count = 0
+    #     gen_chunks = []
+    #     t1 = time.time()
+    #     for chunk_coords in self.chunk_coords():
+    #         if chunk_coords in self._loaded_render_chunks:
+    #             chunk = self._loaded_render_chunks[chunk_coords]
+    #             if chunk is None:
+    #                 continue
+    #             chunk.draw(transformation_matrix)
+    #             count += 1
+    #         else:
+    #             gen_chunks.append(chunk_coords)
+    #
+    #     for chunk_coords in gen_chunks:
+    #         self._chunk_generator.submit_chunk(chunk_coords)
+    #     # print(count, time.time()-t1)
 
-        for chunk_coords in gen_chunks:
-            self._chunk_generator.submit_chunk(self._get_render_chunk, chunk_coords)
+    def draw(self):
+        self._chunk_manager.draw(self.transformation_matrix)
+        next_chunk = next(
+            (c for c in self.chunk_coords() if c not in self._chunk_manager and not self._chunk_generator.in_progress(c)),
+            None
+        )
+        if next_chunk is not None:
+            self._chunk_generator.generate_chunk(
+                next_chunk
+            )
 
     def run_garbage_collector(self, remove_all=False):
-        camx, camz = self._camera[0]//16, self._camera[2]//16
-        remove = []
-        for (cx, cz), chunk in list(self._loaded_render_chunks.items()):
-            chunk: RenderChunk
-            if remove_all or max(abs(cx-camx), abs(cz-camz)) > self.garbage_distance:
-                if chunk is not None:
-                    chunk.delete()
-                    remove.append((cx, cz))
-        for coord in remove:
-            del self._loaded_render_chunks[coord]
+        return
+        # camx, camz = self._camera[0]//16, self._camera[2]//16
+        # remove = []
+        # for (cx, cz), chunk in list(self._loaded_render_chunks.items()):
+        #     chunk: RenderChunk
+        #     if remove_all or max(abs(cx-camx), abs(cz-camz)) > self.garbage_distance:
+        #         if chunk is not None:
+        #             chunk.delete()
+        #             remove.append((cx, cz))
+        # for coord in remove:
+        #     del self._loaded_render_chunks[coord]
