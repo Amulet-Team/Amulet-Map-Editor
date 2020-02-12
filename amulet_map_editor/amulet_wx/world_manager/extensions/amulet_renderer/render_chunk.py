@@ -2,14 +2,14 @@ from OpenGL.GL import *
 import numpy
 from typing import TYPE_CHECKING, Tuple, Dict
 import minecraft_model_reader
+from amulet.api.errors import ChunkLoadError
 if TYPE_CHECKING:
     from .render_world import RenderWorld
-    from amulet.api.errors import ChunkLoadError
     from amulet.api.chunk import Chunk
 
 
 class RenderChunk:
-    def __init__(self, render_world: RenderWorld, chunk_coords: Tuple[int, int], chunk: 'Chunk'):
+    def __init__(self, render_world: 'RenderWorld', chunk_coords: Tuple[int, int], chunk: 'Chunk'):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
         self.render_world = render_world

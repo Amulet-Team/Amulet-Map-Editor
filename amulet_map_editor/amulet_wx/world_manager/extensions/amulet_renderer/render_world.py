@@ -7,11 +7,11 @@ from concurrent.futures import ThreadPoolExecutor
 from ..amulet_renderer import shaders
 
 from amulet.api.errors import ChunkLoadError
-if TYPE_CHECKING:
-    from amulet.api.world import World
-    from .render_chunk import RenderChunk
 import minecraft_model_reader
 from ..amulet_renderer import textureatlas
+from .render_chunk import RenderChunk
+if TYPE_CHECKING:
+    from amulet.api.world import World
 
 
 def sin(theta: Union[int, float]) -> float:
@@ -48,7 +48,7 @@ class RenderWorld:
 
         self._render_distance = 10
         self._garbage_distance = 20
-        self._loaded_render_chunks: Dict[Tuple[int, int], Union['RenderChunk', None]] = {}
+        self._loaded_render_chunks: Dict[Tuple[int, int], Union[RenderChunk, None]] = {}
         self._chunk_generator = ChunkGenerator()
         self.shaders = {
             'render_chunk': shaders.load_shader('render_chunk')
@@ -237,7 +237,7 @@ class RenderWorld:
 
         return transformation_matrix
 
-    def _get_render_chunk(self, chunk_coords: Tuple[int, int]) -> Union['RenderChunk', None]:
+    def _get_render_chunk(self, chunk_coords: Tuple[int, int]) -> Union[RenderChunk, None]:
         if chunk_coords not in self._loaded_render_chunks:
             try:
                 chunk = self._world.get_chunk(*chunk_coords)
@@ -283,6 +283,7 @@ class RenderWorld:
         camx, camz = self._camera[0]//16, self._camera[2]//16
         remove = []
         for (cx, cz), chunk in list(self._loaded_render_chunks.items()):
+            chunk: RenderChunk
             if remove_all or max(abs(cx-camx), abs(cz-camz)) > self.garbage_distance:
                 if chunk is not None:
                     chunk.delete()
