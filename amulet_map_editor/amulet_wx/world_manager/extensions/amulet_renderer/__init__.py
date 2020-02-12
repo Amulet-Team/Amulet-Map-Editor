@@ -1,4 +1,4 @@
-from .renderer import World3DPanel
+from .renderer_wx import World3DPanel
 
 export = {
     "name": "3D View",
