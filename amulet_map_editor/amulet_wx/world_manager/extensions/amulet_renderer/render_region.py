@@ -12,7 +12,9 @@ class ChunkManager:
 
     def add_render_chunk(self, render_chunk: RenderChunk):
         region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
-        self._regions.setdefault(region_coords, RenderRegion(*region_coords, self.region_size)).add_render_chunk(render_chunk)
+        if region_coords not in self._regions:
+            self._regions[region_coords] = RenderRegion(*region_coords, self.region_size)
+        self._regions[region_coords].add_render_chunk(render_chunk)
 
     def __contains__(self, chunk_coords: Tuple[int, int]):
         region_coords = self.region_coords(*chunk_coords)
