@@ -81,7 +81,7 @@ class RenderRegion:
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
             verts = numpy.concatenate([chunk.chunk_verts for chunk in self._chunks.values()])
             self._draw_count = verts.size//9
-            glBufferData(GL_ARRAY_BUFFER, self._draw_count, verts, GL_STATIC_DRAW)
+            glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_STATIC_DRAW)
             self._manual_chunks.clear()
 
     def delete(self):
