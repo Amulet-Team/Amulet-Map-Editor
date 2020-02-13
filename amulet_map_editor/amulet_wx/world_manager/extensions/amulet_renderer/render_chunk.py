@@ -25,6 +25,9 @@ class RenderChunk:
         if self._chunk is not None:
             self.create_lod0()
 
+    def __repr__(self):
+        return f'RenderChunk({self.coords[0]}, {self.coords[1]})'
+
     def _setup(self):
         """Set up the opengl data which cannot be set up in another thread"""
         if self.vao is None:
@@ -40,8 +43,6 @@ class RenderChunk:
         return self.coords[1]
 
     def create_lod0(self):
-        print(f'Creating geometry for chunk {self.cx} {self.cz}')
-
         blocks: numpy.ndarray = self._chunk.blocks
         blocks_ = numpy.zeros(blocks.shape + numpy.array((2, 0, 2)), blocks.dtype)
         blocks_[1:-1, :, 1:-1] = blocks
@@ -140,10 +141,8 @@ class RenderChunk:
         else:
             self.chunk_verts = numpy.concatenate(chunk_verts, 0)
             self._draw_count = int(self.chunk_verts.size // 9)
-        print(f'Finished creating geometry for chunk {self.cx} {self.cz}')
 
     def create_geometry(self):
-        print(f'Setting up opengl for chunk {self.cx} {self.cz}')
         glBindVertexArray(self.vao)
         vbo = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
@@ -162,7 +161,6 @@ class RenderChunk:
 
         self._shader = shaders.get_shader('render_chunk')
         self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
-        print(f'Finished setting up opengl for chunk {self.cx} {self.cz}')
 
     def draw(self, transformation_matrix: numpy.ndarray):
         self._setup()

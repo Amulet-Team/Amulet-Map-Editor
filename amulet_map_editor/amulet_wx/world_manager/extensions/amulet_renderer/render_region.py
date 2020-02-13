@@ -22,7 +22,7 @@ class ChunkManager:
         return cx // self.region_size, cz // self.region_size
 
     def draw(self, camera_transform):
-        for region in self._regions.values():
+        for region in list(self._regions.values()):
             region.draw(camera_transform)
 
     def delete(self, region_bounds: Tuple[int, int, int, int]=None):
@@ -35,11 +35,13 @@ class ChunkManager:
             max_rx, max_rz = self.region_coords(*region_bounds[2:])
             delete_regions = []
             for region in self._regions.values():
-                if not (min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz):
+                if min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz:
+                    region.merge()
+                else:
+                    print(f'Removed region {region.rx} {region.rz}')
                     region.delete()
                     delete_regions.append((region.rx, region.rz))
-                else:
-                    region.merge()
+
             for region in delete_regions:
                 del self._regions[region]
 
@@ -59,6 +61,9 @@ class RenderRegion:
 
         self.region_transform = numpy.eye(4, dtype=numpy.float32)
         self.region_transform[3, [0, 2]] = numpy.array([rx, rz]) * region_size * 16
+
+    def __repr__(self):
+        return f'RenderRegion({self.rx}, {self.rz})'
 
     def __contains__(self, item):
         return item in self._chunks
@@ -100,6 +105,8 @@ class RenderRegion:
             verts = numpy.concatenate([chunk.chunk_verts for chunk in self._chunks.values()])
             self._draw_count = verts.size//9
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_STATIC_DRAW)
+            for chunk in self._manual_chunks:
+                chunk.delete()
             self._manual_chunks.clear()
 
     def delete(self):
