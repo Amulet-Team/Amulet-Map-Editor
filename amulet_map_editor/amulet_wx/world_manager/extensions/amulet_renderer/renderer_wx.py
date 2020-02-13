@@ -31,7 +31,7 @@ class World3dCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: 'World3DPanel', world: 'World'):
         self._world_panel = parent
         self._keys_pressed = set()
-        super().__init__(parent, -1, size=parent.parent_frame.GetClientSize())
+        super().__init__(parent, -1, size=parent.GetClientSize())
         self._context = glcanvas.GLContext(self)
         self.SetCurrent(self._context)
         glClearColor(0.5, 0.5, 0.5, 1.0)
@@ -124,8 +124,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self._keys_pressed.add(key)
 
     def _on_resize(self, event):
-        width, height = event.GetSize()
-        self.set_size(width, height)
+        self.set_size(*event.GetSize())
 
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
@@ -133,6 +132,7 @@ class World3dCanvas(glcanvas.GLCanvas):
             self._render_world.aspect_ratio = width / height
         else:
             self._render_world.aspect_ratio = 1
+        self.DoSetSize(0, 0, width, height, 0)  # I don't know if this is how you are supposed to do this
 
     def _on_draw(self, event):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -147,7 +147,6 @@ class World3dCanvas(glcanvas.GLCanvas):
 
 class World3DPanel(BaseWorldTool):
     def __init__(self, parent: 'MainFrame', world: 'World'):
-        self.parent_frame = parent
         super().__init__(parent)
         self._world = world
         self._canvas = None
@@ -160,7 +159,6 @@ class World3DPanel(BaseWorldTool):
             0,
         )
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-
         self.Bind(wx.EVT_SIZE, self._on_resize)
 
     def _on_resize(self, event):
@@ -172,6 +170,7 @@ class World3DPanel(BaseWorldTool):
         if self._canvas is None:
             self.Update()
             self._canvas = World3dCanvas(self, self._world)
+            self.add_object(self._canvas, 0, wx.EXPAND)
             self._temp.Destroy()
             self.GetParent().Layout()
             self.Update()
