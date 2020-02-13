@@ -64,7 +64,7 @@ class World3dCanvas(glcanvas.GLCanvas):
     def enable(self):
         self._draw_timer.Start(33)
         self._input_timer.Start(33)
-        self._gc_timer.Start(5000)
+        self._gc_timer.Start(10000)
 
     def disable(self):
         self._draw_timer.Stop()
