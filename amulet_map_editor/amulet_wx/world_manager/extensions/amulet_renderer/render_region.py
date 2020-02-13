@@ -27,7 +27,7 @@ class ChunkManager:
         for region in list(self._regions.values()):
             region.draw(camera_transform)
 
-    def delete(self, region_bounds: Tuple[int, int, int, int]=None):
+    def delete(self, region_bounds: Tuple[int, int, int, int] = None):
         if region_bounds is None:
             for region in self._regions.values():
                 region.delete()
@@ -82,7 +82,7 @@ class RenderRegion:
             glBindVertexArray(self._vao)
             self._vbo = glGenBuffers(1)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            glBufferData(GL_ARRAY_BUFFER, 0, numpy.array([], dtype=numpy.float32), GL_STATIC_DRAW)
+            glBufferData(GL_ARRAY_BUFFER, 0, numpy.zeros(0, dtype=numpy.float32), GL_DYNAMIC_DRAW)
             # vertex attribute pointers
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
             glEnableVertexAttribArray(0)
@@ -105,8 +105,8 @@ class RenderRegion:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
             verts = numpy.concatenate([chunk.chunk_verts for chunk in self._chunks.values()])
-            self._draw_count = verts.size//9
-            glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_STATIC_DRAW)
+            self._draw_count = int(verts.size//9)
+            glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_DYNAMIC_DRAW)
             for chunk in self._manual_chunks:
                 chunk.delete()
             self._manual_chunks.clear()

@@ -20,7 +20,7 @@ class RenderChunk:
         self._shader = None
         self._trm_mat_loc = None
         self.vao = None
-        self.chunk_verts: numpy.ndarray = numpy.zeros(0)
+        self.chunk_verts: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
         self._draw_count = 0
         if self._chunk is not None:
             self.create_lod0()
@@ -136,7 +136,7 @@ class RenderChunk:
                 chunk_verts.append(vert_table.ravel())
 
         if len(chunk_verts) == 0:
-            self.chunk_verts = numpy.zeros((0, 9), dtype=numpy.float32)
+            self.chunk_verts = numpy.zeros(0, dtype=numpy.float32)
             self._draw_count = 0
         else:
             self.chunk_verts = numpy.concatenate(chunk_verts, 0)
