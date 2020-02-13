@@ -25,6 +25,24 @@ class ChunkManager:
         for region in self._regions.values():
             region.draw(camera_transform)
 
+    def delete(self, region_bounds: Tuple[int, int, int, int]=None):
+        if region_bounds is None:
+            for region in self._regions.values():
+                region.delete()
+            self._regions.clear()
+        else:
+            min_rx, min_rz = self.region_coords(*region_bounds[:2])
+            max_rx, max_rz = self.region_coords(*region_bounds[2:])
+            delete_regions = []
+            for region in self._regions.values():
+                if not (min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz):
+                    region.delete()
+                    delete_regions.append((region.rx, region.rz))
+                else:
+                    region.merge()
+            for region in delete_regions:
+                del self._regions[region]
+
 
 class RenderRegion:
     def __init__(self, rx, rz, region_size):
@@ -91,10 +109,10 @@ class RenderRegion:
             self._vao = None
         for chunk in self._chunks.values():
             chunk.delete()
+        self._chunks.clear()
 
     def draw(self, transformation_matrix: numpy.ndarray):
         self._setup()
-        self.merge()
         glUseProgram(self._shader)
         transformation_matrix = numpy.matmul(self.region_transform, transformation_matrix)
         glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)

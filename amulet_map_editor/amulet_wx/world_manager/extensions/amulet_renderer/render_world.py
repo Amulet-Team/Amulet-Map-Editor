@@ -1,9 +1,8 @@
 from OpenGL.GL import *
 import numpy
-from typing import TYPE_CHECKING, Dict, Tuple, Generator, Union
+from typing import TYPE_CHECKING, Tuple, Generator, Union
 import math
 from concurrent.futures import ThreadPoolExecutor
-import time
 
 from ..amulet_renderer import shaders
 
@@ -14,7 +13,6 @@ from .render_chunk import RenderChunk
 from .render_region import ChunkManager
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from amulet.api.chunk import Chunk
 
 
 def sin(theta: Union[int, float]) -> float:
@@ -309,14 +307,14 @@ class RenderWorld:
             )
 
     def run_garbage_collector(self, remove_all=False):
-        return
-        # camx, camz = self._camera[0]//16, self._camera[2]//16
-        # remove = []
-        # for (cx, cz), chunk in list(self._loaded_render_chunks.items()):
-        #     chunk: RenderChunk
-        #     if remove_all or max(abs(cx-camx), abs(cz-camz)) > self.garbage_distance:
-        #         if chunk is not None:
-        #             chunk.delete()
-        #             remove.append((cx, cz))
-        # for coord in remove:
-        #     del self._loaded_render_chunks[coord]
+        if remove_all:
+            self._chunk_manager.delete()
+        else:
+            self._chunk_manager.delete(
+                (
+                    self._camera[0]//16 - self.garbage_distance,
+                    self._camera[2]//16 - self.garbage_distance,
+                    self._camera[0]//16 + self.garbage_distance,
+                    self._camera[2]//16 + self.garbage_distance
+                )
+            )
