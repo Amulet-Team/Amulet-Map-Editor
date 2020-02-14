@@ -62,20 +62,31 @@ class RenderChunk:
             except ChunkLoadError:
                 continue
 
-        models: Dict[int, minecraft_model_reader.MinecraftMesh] = {
-            block_temp_id: self.render_world.get_model(block_temp_id) for block_temp_id in numpy.unique(blocks_)
-        }
-        is_transparrent = [block_temp_id for block_temp_id, model in models.items() if not model.is_opaque]
-        is_transparrent_array = numpy.isin(blocks_, is_transparrent)
+        unique_blocks = numpy.unique(blocks_)
+        transparent_array = numpy.zeros(blocks_.shape, dtype=numpy.uint8)
+        models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
+        for block_temp_id in unique_blocks:
+            model = models[block_temp_id] = self.render_world.get_model(block_temp_id)
+            transparent_array[blocks_ == block_temp_id] = model.is_transparent
+
+        def get_transparent_array(offset_transparent_array, offset_block_array, block_array=None):
+            if block_array is None:
+                block_array = blocks
+            return numpy.logical_and(
+                offset_transparent_array,  # if the next block is transparent
+                numpy.logical_not(  # but is not the same block with transparency mode 1
+                    (offset_transparent_array == 1) * (block_array == offset_block_array)
+                )
+            )
 
         show_up = numpy.ones(blocks.shape, dtype=numpy.bool)
         show_down = numpy.ones(blocks.shape, dtype=numpy.bool)
-        show_up[:, :-1, :] = is_transparrent_array[1:-1, 1:, 1:-1]
-        show_down[:, 1:, :] = is_transparrent_array[1:-1, :-1, 1:-1]
-        show_north = is_transparrent_array[1:-1, :, :-2]
-        show_south = is_transparrent_array[1:-1, :, 2:]
-        show_east = is_transparrent_array[2:, :, 1:-1]
-        show_west = is_transparrent_array[:-2, :, 1:-1]
+        show_up[:, :-1, :] = get_transparent_array(transparent_array[1:-1, 1:, 1:-1], blocks_[1:-1, 1:, 1:-1], blocks_[1:-1, :-1, 1:-1])
+        show_down[:, 1:, :] = get_transparent_array(transparent_array[1:-1, :-1, 1:-1], blocks_[1:-1, :-1, 1:-1], blocks_[1:-1, 1:, 1:-1])
+        show_north = get_transparent_array(transparent_array[1:-1, :, :-2], blocks_[1:-1, :, :-2])
+        show_south = get_transparent_array(transparent_array[1:-1, :, 2:], blocks_[1:-1, :, 2:])
+        show_east = get_transparent_array(transparent_array[2:, :, 1:-1], blocks_[2:, :, 1:-1])
+        show_west = get_transparent_array(transparent_array[:-2, :, 1:-1], blocks_[:-2, :, 1:-1])
 
         show_map = {
             'up': show_up,
@@ -88,11 +99,13 @@ class RenderChunk:
 
         chunk_verts = []
 
-        for block_temp_id in numpy.unique(blocks):
+        for block_temp_id in unique_blocks:
             # for each unique blockstate in the chunk
             # get the model and the locations of the blocks
             model: minecraft_model_reader.MinecraftMesh = models[block_temp_id]
             all_block_locations = numpy.argwhere(blocks == block_temp_id)
+            if not all_block_locations.size:
+                continue
             where = None
             for cull_dir in model.faces.keys():
                 # iterate through each cull direction
@@ -103,7 +116,7 @@ class RenderChunk:
                     if where is None:
                         where = tuple(all_block_locations.T)
                     block_locations = all_block_locations[show_map[cull_dir][where]]
-                    if len(block_locations) == 0:
+                    if not block_locations.size:
                         continue
                 else:
                     continue
