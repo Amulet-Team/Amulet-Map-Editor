@@ -8,11 +8,13 @@ import os
 import importlib.util
 import amulet
 import PyMCTranslate
+import minecraft_model_reader
 
 AMULET_PATH = amulet.__path__[0]
 PYMCT_PATH = os.path.abspath(os.path.dirname(PyMCTranslate.__file__))
 REAL_PYMCT_PATH = PYMCT_PATH if not os.path.islink(PYMCT_PATH) else os.readlink(PYMCT_PATH)  # I have this linked by a symbolic link
 AMULET_MAP_EDITOR = os.path.abspath(os.path.join('.', 'amulet_map_editor'))
+MINECRAFT_MODEL_READER = os.path.abspath(os.path.dirname(minecraft_model_reader.__file__))
 
 block_cipher = None
 
@@ -24,6 +26,7 @@ hidden.extend(collect_submodules('amulet_wx'))
 datas = [
     (AMULET_PATH, './amulet'),
     (AMULET_MAP_EDITOR, './amulet_map_editor'),
+    (MINECRAFT_MODEL_READER, './minecraft_model_reader'),
  ]
 
 
