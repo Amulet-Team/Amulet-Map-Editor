@@ -5,6 +5,7 @@
 from PyInstaller.utils.hooks import collect_submodules
 
 import os
+import shutil
 import importlib.util
 import amulet
 import PyMCTranslate
@@ -22,6 +23,10 @@ hidden = []
 hidden.extend(collect_submodules('pkg_resources'))
 hidden.extend(collect_submodules('amulet_map_editor'))
 hidden.extend(collect_submodules('amulet_wx'))
+hidden.extend(collect_submodules('wx'))
+hidden.extend(collect_submodules('OpenGL'))
+hidden.extend(collect_submodules('OpenGL.GL'))
+hidden.extend(collect_submodules('OpenGL.GL.shaders'))
 
 datas = [
     (AMULET_PATH, './amulet'),
@@ -92,3 +97,21 @@ coll = COLLECT(exe,
                upx=True,
                upx_exclude=[],
                name='Amulet-Converter')
+
+delete_files = [
+    'minecraft_model_reader/transparrency_cache.json'
+]
+delete_folders = [
+    'amulet_map_editor/world_temp',
+    'minecraft_model_reader/resource_packs/java_vanilla'
+]
+
+for fi in delete_files:
+    fi_path = os.path.join('dist', 'Amulet-Converter', fi)
+    if os.path.isfile(fi_path):
+        os.remove(fi_path)
+
+for fo in delete_folders:
+    fo_path = os.path.join('dist', 'Amulet-Converter', fo)
+    if os.path.isdir(fo_path):
+        shutil.rmtree(fo_path)
