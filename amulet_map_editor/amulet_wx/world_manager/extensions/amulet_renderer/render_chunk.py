@@ -118,7 +118,7 @@ class RenderChunk:
                 faces = model.faces[cull_dir]
 
                 # each slice in the first axis is a new block, each slice in the second is a new vertex
-                vert_table = numpy.zeros((block_count, faces.size, 9), dtype=numpy.float32)
+                vert_table = numpy.zeros((block_count, faces.size, 10), dtype=numpy.float32)
                 vert_table[:, :, :3] = verts[faces] + \
                                        block_offsets[:, :].reshape((-1, 1, 3)) + \
                                        16 * (numpy.array([self.coords[0], 0, self.coords[1]]) % self._region_size)
@@ -133,6 +133,8 @@ class RenderChunk:
                     vert_table[:, vert_index:vert_index+3, 5:9] = tex_bounds
                     vert_index += 3
 
+                vert_table[:, :, 9] = model.tint_verts[cull_dir][faces]
+
                 chunk_verts.append(vert_table.ravel())
 
         if len(chunk_verts) == 0:
@@ -140,7 +142,7 @@ class RenderChunk:
             self._draw_count = 0
         else:
             self.chunk_verts = numpy.concatenate(chunk_verts, 0)
-            self._draw_count = int(self.chunk_verts.size // 9)
+            self._draw_count = int(self.chunk_verts.size // 10)
 
     def create_geometry(self):
         glBindVertexArray(self.vao)
@@ -148,14 +150,17 @@ class RenderChunk:
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
         glBufferData(GL_ARRAY_BUFFER, self.chunk_verts.size * 4, self.chunk_verts, GL_STATIC_DRAW)
         # vertex attribute pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
         glEnableVertexAttribArray(0)
         # texture coords attribute pointers
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(12))
         glEnableVertexAttribArray(1)
         # texture coords attribute pointers
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(20))
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(20))
         glEnableVertexAttribArray(2)
+        # tint value
+        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
+        glEnableVertexAttribArray(3)
 
         glBindVertexArray(0)
 

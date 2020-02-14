@@ -84,14 +84,17 @@ class RenderRegion:
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
             glBufferData(GL_ARRAY_BUFFER, 0, numpy.zeros(0, dtype=numpy.float32), GL_DYNAMIC_DRAW)
             # vertex attribute pointers
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
             glEnableVertexAttribArray(0)
             # texture coords attribute pointers
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(12))
             glEnableVertexAttribArray(1)
             # texture coords attribute pointers
-            glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(20))
+            glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(20))
             glEnableVertexAttribArray(2)
+            # tint value
+            glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
+            glEnableVertexAttribArray(3)
 
             glBindVertexArray(0)
 
@@ -105,7 +108,7 @@ class RenderRegion:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
             verts = numpy.concatenate([chunk.chunk_verts for chunk in self._chunks.values()])
-            self._draw_count = int(verts.size//9)
+            self._draw_count = int(verts.size//10)
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_DYNAMIC_DRAW)
             for chunk in self._manual_chunks:
                 chunk.delete()
