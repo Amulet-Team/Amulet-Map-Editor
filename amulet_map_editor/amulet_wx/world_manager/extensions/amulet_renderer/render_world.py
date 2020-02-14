@@ -2,6 +2,7 @@ from OpenGL.GL import *
 import numpy
 from typing import TYPE_CHECKING, Tuple, Generator, Union
 import math
+import traceback
 from concurrent.futures import ThreadPoolExecutor
 
 from ..amulet_renderer import shaders
@@ -31,7 +32,10 @@ class ChunkGenerator(ThreadPoolExecutor):
         self._max_count = 4
 
     def _gen_chunk(self, chunk_coords: Tuple[int, int]):
-        self._render_world.create_render_chunk(chunk_coords)
+        try:
+            self._render_world.create_render_chunk(chunk_coords)
+        except Exception as e:
+            traceback.print_exc()
         self._in_progress.remove(chunk_coords)
 
     def generate_chunk(self, chunk_coords: Tuple[int, int]):
