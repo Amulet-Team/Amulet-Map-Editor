@@ -282,7 +282,7 @@ def create_atlas(texture_dict: Dict[Any, str]) -> Tuple[numpy.ndarray, Dict[Any,
             log.info(f'Image was too small. Trying with a larger area')
             size *= 2
 
-    log.info('Successfully packed textures into an image of size {size}x{size}')
+    log.info(f'Successfully packed textures into an image of size {size}x{size}')
 
     texture_atlas = numpy.array(atlas.generate('RGBA'), numpy.uint8).ravel()
 
