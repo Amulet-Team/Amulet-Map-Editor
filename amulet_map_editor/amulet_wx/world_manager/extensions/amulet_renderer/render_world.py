@@ -254,6 +254,7 @@ class RenderWorld:
             try:
                 chunk = self._world.get_chunk(*chunk_coords)
             except ChunkLoadError:
+                log.info(f'Error loading chunk {chunk_coords}', exc_info=True)
                 self._chunk_manager.add_render_chunk(
                     RenderChunk(self, self._chunk_manager.region_size, chunk_coords, None)
                 )
