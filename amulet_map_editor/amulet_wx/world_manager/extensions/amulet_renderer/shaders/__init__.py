@@ -18,6 +18,6 @@ def get_shader(shader_name) -> OpenGL.GL.shaders.ShaderProgram:
 
 
 def _load_shader(shader_path, shader_type):
-    with open(shader_path) as f:
+    with open(shader_path, 'rb') as f:
         shader = f.read()
     return OpenGL.GL.shaders.compileShader(shader, shader_type)
