@@ -40,7 +40,6 @@ class ChunkManager:
                 if min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz:
                     region.merge()
                 else:
-                    print(f'Removed region {region.rx} {region.rz}')
                     region.delete()
                     delete_regions.append((region.rx, region.rz))
 

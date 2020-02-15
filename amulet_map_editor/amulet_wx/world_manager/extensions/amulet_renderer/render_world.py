@@ -2,9 +2,9 @@ from OpenGL.GL import *
 import numpy
 from typing import TYPE_CHECKING, Tuple, Generator, Union
 import math
-import traceback
 from concurrent.futures import ThreadPoolExecutor
 
+from amulet_map_editor import log
 from ..amulet_renderer import shaders
 
 from amulet.api.errors import ChunkLoadError
@@ -35,7 +35,7 @@ class ChunkGenerator(ThreadPoolExecutor):
         try:
             self._render_world.create_render_chunk(chunk_coords)
         except Exception as e:
-            traceback.print_exc()
+            log.error(f'Failed generating chunk geometry for chunk {chunk_coords}')
         self._in_progress.remove(chunk_coords)
 
     def generate_chunk(self, chunk_coords: Tuple[int, int]):
@@ -79,7 +79,6 @@ class RenderWorld:
         self.run_garbage_collector(True)
 
     def _create_atlas(self):
-        print('Creating texture atlas')
         # filename = str(hash(tuple(self._resource_pack.pack_paths)))
         # ext = 'png'
 
@@ -99,7 +98,7 @@ class RenderWorld:
         glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
         glUniform1i(glGetUniformLocation(shader, 'image'), 0)
 
-        print('Finished creating texture atlas')
+        log.info('Finished setting up texture atlas in OpenGL')
 
     def move_camera(self, forward, up, right, pitch, yaw):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
@@ -278,26 +277,6 @@ class RenderWorld:
                 cz += sign
             sign *= -1
             length += 1
-
-    # def draw(self):
-    #     transformation_matrix = self.transformation_matrix
-    #     # draw all chunks within render distance
-    #     count = 0
-    #     gen_chunks = []
-    #     t1 = time.time()
-    #     for chunk_coords in self.chunk_coords():
-    #         if chunk_coords in self._loaded_render_chunks:
-    #             chunk = self._loaded_render_chunks[chunk_coords]
-    #             if chunk is None:
-    #                 continue
-    #             chunk.draw(transformation_matrix)
-    #             count += 1
-    #         else:
-    #             gen_chunks.append(chunk_coords)
-    #
-    #     for chunk_coords in gen_chunks:
-    #         self._chunk_generator.submit_chunk(chunk_coords)
-    #     # print(count, time.time()-t1)
 
     def draw(self):
         self._chunk_manager.draw(self.transformation_matrix)

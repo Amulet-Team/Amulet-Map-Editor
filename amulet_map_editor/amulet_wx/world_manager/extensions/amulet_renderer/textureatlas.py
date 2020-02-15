@@ -26,6 +26,7 @@ from PIL import Image
 import numpy
 import math
 from typing import Dict, Tuple, List, Any
+from amulet_map_editor import log
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
 Atlas. A companion file (.map), is created that defines where each texture is
@@ -235,6 +236,7 @@ class TextureAtlasMap(object):
 
 
 def create_atlas(texture_dict: Dict[Any, str]) -> Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]:
+    log.info('Creating texture atlas')
     # Parse texture names
     textures = []
     for texture in texture_dict.values():
@@ -270,18 +272,22 @@ def create_atlas(texture_dict: Dict[Any, str]) -> Tuple[numpy.ndarray, Dict[Any,
     while not atlas_created:
         try:
             # Create the atlas and pack textures in
-            print(size)
+            log.info(f'Trying to pack textures into image of size {size}x{size}')
             atlas = TextureAtlas(size, size)
 
             for texture in textures:
                 atlas.pack(texture)
             atlas_created = True
         except AtlasTooSmall:
+            log.info(f'Image was too small. Trying with a larger area')
             size *= 2
+
+    log.info('Successfully packed textures into an image of size {size}x{size}')
 
     texture_atlas = numpy.array(atlas.generate('RGBA'), numpy.uint8).ravel()
 
     texture_bounds = atlas.to_dict()
     texture_bounds = {tex_id: texture_bounds[texture_path] for tex_id, texture_path in texture_dict.items()}
 
+    log.info('Finished creating texture atlas')
     return texture_atlas, texture_bounds, atlas.width, atlas.height

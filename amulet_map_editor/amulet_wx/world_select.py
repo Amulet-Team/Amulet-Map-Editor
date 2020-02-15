@@ -5,6 +5,7 @@ from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
 from amulet_map_editor.amulet_wx import wx_util
+from amulet_map_editor import log
 
 # Windows 	%APPDATA%\.minecraft
 # macOS 	~/Library/Application Support/minecraft
@@ -112,7 +113,7 @@ class WorldList(wx_util.SimplePanel):
                     self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
                     self.worlds.append(world_button)
                 except Exception as e:
-                    print(e)
+                    log.info(e)
         self.Layout()
 
 
@@ -236,11 +237,6 @@ class RecentWorldUI(wx_util.SimplePanel):
         )
 
         self._world_list = None
-        self.rebuild()
-        # self.Bind(wx.EVT_LEFT_UP, self._rebuild_evt)
-
-    def _rebuild_evt(self, evt):
-        print('hi')
         self.rebuild()
 
     def rebuild(self, new_world: str = None):

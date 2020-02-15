@@ -5,7 +5,7 @@ from amulet import world_interface
 from amulet.api.world import World
 from amulet.world_interface.formats import Format
 import wx
-from amulet_map_editor import lang
+from amulet_map_editor import lang, log
 from concurrent.futures import ThreadPoolExecutor
 
 thread_pool_executor = ThreadPoolExecutor(max_workers=1)
@@ -121,14 +121,17 @@ class ConvertExtension(BaseWorldTool):
     def _convert_method(self):
         global work_count
         try:
+            log.info(f'Converting world {self.world.world_path} to {self.out_world_path.world_path}')
             out_world = world_interface.load_format(self.out_world_path)
             out_world: Format
             out_world.open()
             self.world.save(out_world, self._update_loading_bar)
             out_world.close()
             message = 'World conversion completed'
+            log.info(f'Finished converting world {self.world.world_path} to {self.out_world_path.world_path}')
         except Exception as e:
             message = f'Error during conversion\n{e}'
+            log.error(message, exc_info=True)
         self._update_loading_bar(0, 100)
         self.convert_button.Enable()
         wx.MessageBox(
@@ -138,7 +141,7 @@ class ConvertExtension(BaseWorldTool):
 
     def is_closeable(self):
         if work_count:
-            print(f'World {self.world.world_path} is still being converted. Please let it finish before closing')
+            log.info(f'World {self.world.world_path} is still being converted. Please let it finish before closing')
         return work_count == 0
 
     def _close_world(self, evt):
