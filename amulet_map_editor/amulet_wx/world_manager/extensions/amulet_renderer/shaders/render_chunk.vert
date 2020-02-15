@@ -1,8 +1,8 @@
 # version 330
-in layout(location = 0) vec3 positions;
-in layout(location = 1) vec2 vTexCoord;
-in layout(location = 2) vec4 vTexOffset;
-in layout(location = 3) float vTint;
+layout(location = 0) in vec3 positions;
+layout(location = 1) in vec2 vTexCoord;
+layout(location = 2) in vec4 vTexOffset;
+layout(location = 3) in float vTint;
 
 out vec2 fTexCoord;
 out vec4 fTexOffset;
