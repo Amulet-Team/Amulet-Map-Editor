@@ -6,6 +6,7 @@ from PyInstaller.utils.hooks import collect_submodules
 
 import os
 import shutil
+import glob
 import importlib.util
 import amulet
 import PyMCTranslate
@@ -88,7 +89,8 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True )
+          console=True,
+          icon='icon.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -115,3 +117,6 @@ for fo in delete_folders:
     fo_path = os.path.join('dist', 'Amulet-Converter', fo)
     if os.path.isdir(fo_path):
         shutil.rmtree(fo_path)
+
+for path in glob.iglob('dist/**/__pycache__', recursive=True):
+    shutil.rmtree(path)
