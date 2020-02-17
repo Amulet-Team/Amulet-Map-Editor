@@ -1,5 +1,5 @@
 from OpenGL.GL import *
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Set, Union
 import numpy
 from .render_chunk import RenderChunk
 from ..amulet_renderer import shaders
@@ -9,8 +9,9 @@ class ChunkManager:
     def __init__(self, region_size=16):
         self.region_size = region_size
         self._regions: Dict[Tuple[int, int], RenderRegion] = {}
+        self.does_not_exist: Set[Tuple[int, int]] = set()
 
-    def add_render_chunk(self, render_chunk: RenderChunk):
+    def add_render_chunk(self, render_chunk: Union[RenderChunk, None]):
         region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
         if region_coords not in self._regions:
             self._regions[region_coords] = RenderRegion(*region_coords, self.region_size)
@@ -18,7 +19,7 @@ class ChunkManager:
 
     def __contains__(self, chunk_coords: Tuple[int, int]):
         region_coords = self.region_coords(*chunk_coords)
-        return region_coords in self._regions and chunk_coords in self._regions[region_coords]
+        return chunk_coords in self.does_not_exist or region_coords in self._regions and chunk_coords in self._regions[region_coords]
 
     def region_coords(self, cx, cz):
         return cx // self.region_size, cz // self.region_size

@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from amulet_map_editor import log
 from ..amulet_renderer import shaders
 
-from amulet.api.errors import ChunkLoadError
+from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 import minecraft_model_reader
 from ..amulet_renderer import textureatlas
 from .render_chunk import RenderChunk
@@ -253,6 +253,8 @@ class RenderWorld:
         if chunk_coords not in self._chunk_manager:
             try:
                 chunk = self._world.get_chunk(*chunk_coords)
+            except ChunkDoesNotExist:
+                self._chunk_manager.does_not_exist.add(chunk_coords)
             except ChunkLoadError:
                 log.info(f'Error loading chunk {chunk_coords}', exc_info=True)
                 self._chunk_manager.add_render_chunk(
