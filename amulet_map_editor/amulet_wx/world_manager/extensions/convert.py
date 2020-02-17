@@ -121,14 +121,14 @@ class ConvertExtension(BaseWorldTool):
     def _convert_method(self):
         global work_count
         try:
-            log.info(f'Converting world {self.world.world_path} to {self.out_world_path}')
             out_world = world_interface.load_format(self.out_world_path)
+            log.info(f'Converting world {self.world.world_path} to {out_world.world_path}')
             out_world: Format
             out_world.open()
             self.world.save(out_world, self._update_loading_bar)
             out_world.close()
             message = 'World conversion completed'
-            log.info(f'Finished converting world {self.world.world_path} to {self.out_world_path}')
+            log.info(f'Finished converting world {self.world.world_path} to {out_world.world_path}')
         except Exception as e:
             message = f'Error during conversion\n{e}'
             log.error(message, exc_info=True)
