@@ -3,6 +3,7 @@ import numpy
 from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional
 import math
 from concurrent.futures import ThreadPoolExecutor, Future
+import time
 
 from amulet_map_editor import log
 from ..amulet_renderer import shaders
@@ -56,6 +57,8 @@ class ChunkGenerator(ThreadPoolExecutor):
                     self._render_world.create_render_chunk(next_chunk)
                 except Exception as e:
                     log.error(f'Failed generating chunk geometry for chunk {next_chunk}')
+            else:
+                time.sleep(1/30)
 
 
 class RenderWorld:
