@@ -31,6 +31,7 @@ class ChunkGenerator(ThreadPoolExecutor):
     def __init__(self, render_world: 'RenderWorld'):
         super().__init__(max_workers=1)
         self._render_world = render_world
+        self._region_size = render_world.chunk_manager.region_size
         self._enabled = False
         self._generator: Optional[Future] = None
 
@@ -48,17 +49,28 @@ class ChunkGenerator(ThreadPoolExecutor):
 
     def _generate_chunks(self):
         while self._enabled:
-            next_chunk = next(
+            chunk_coords = next(
                 (c for c in self._render_world.chunk_coords() if c not in self._render_world.chunk_manager),
                 None
             )
-            if next_chunk is not None:
-                try:
-                    self._render_world.create_render_chunk(next_chunk)
-                except Exception as e:
-                    log.error(f'Failed generating chunk geometry for chunk {next_chunk}')
+            if chunk_coords is None:
+                time.sleep(1 / 30)
             else:
-                time.sleep(1/30)
+                chunk = RenderChunk(
+                    self._render_world,
+                    self._region_size,
+                    chunk_coords,
+                    self._render_world.dimension
+                )
+
+                try:
+                    chunk.create_geometry()
+                except Exception as e:
+                    log.error(f'Failed generating chunk geometry for chunk {chunk_coords}')
+
+                self._render_world.chunk_manager.add_render_chunk(
+                    chunk
+                )
 
 
 class RenderWorld:
@@ -66,6 +78,7 @@ class RenderWorld:
         self._world = world
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera = [0, 300, 0, 90, 0]
+        self._dimension = 0
         self._camera_move_speed = 5
         self._camera_rotate_speed = 2
 
@@ -129,14 +142,25 @@ class RenderWorld:
     def move_camera(self, forward, up, right, pitch, yaw):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
             return
-        self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + cos(self._camera[3]) * sin(self._camera[4]) * forward)
-        self._camera[1] += self._camera_move_speed * (up - sin(self._camera[3]) * forward)
-        self._camera[2] += self._camera_move_speed * (sin(self._camera[4]) * right - cos(self._camera[3]) * cos(self._camera[4]) * forward)
+        self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + sin(self._camera[4]) * forward)
+        self._camera[1] += self._camera_move_speed * up
+        self._camera[2] += self._camera_move_speed * (sin(self._camera[4]) * right - cos(self._camera[4]) * forward)
 
         self._camera[3] += self._camera_rotate_speed * pitch
         if not -90 <= self._camera[3] <= 90:
             self._camera[3] = max(min(self._camera[3], 90), -90)
         self._camera[4] += self._camera_rotate_speed * yaw
+
+    @property
+    def dimension(self) -> int:
+        return self._dimension
+
+    @dimension.setter
+    def dimension(self, dimension: int):
+        self._chunk_generator.stop()
+        self._dimension = dimension
+        self._chunk_manager.unload()
+        self._chunk_generator.start()
 
     @property
     def camera_move_speed(self) -> float:
@@ -274,22 +298,6 @@ class RenderWorld:
         transformation_matrix = numpy.matmul(transformation_matrix, projection)
 
         return transformation_matrix
-
-    def create_render_chunk(self, chunk_coords: Tuple[int, int]):
-        if chunk_coords not in self._chunk_manager:
-            try:
-                chunk = self._world.get_chunk(*chunk_coords)
-            except ChunkDoesNotExist:
-                self._chunk_manager.does_not_exist.add(chunk_coords)
-            except ChunkLoadError:
-                log.info(f'Error loading chunk {chunk_coords}', exc_info=True)
-                self._chunk_manager.add_render_chunk(
-                    RenderChunk(self, self._chunk_manager.region_size, chunk_coords, None)
-                )
-            else:
-                self._chunk_manager.add_render_chunk(
-                    RenderChunk(self, self._chunk_manager.region_size, chunk_coords, chunk)
-                )
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""

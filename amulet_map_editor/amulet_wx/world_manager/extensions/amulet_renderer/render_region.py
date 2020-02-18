@@ -15,7 +15,6 @@ class ChunkManager:
         # which causes issues due to dictionaries resizing
         self._chunk_temp: queue.Queue = queue.Queue()
         self._chunk_temp_set = set()
-        self.does_not_exist: Set[Tuple[int, int]] = set()
 
     def add_render_chunk(self, render_chunk: RenderChunk):
         self._chunk_temp.put(render_chunk)
@@ -32,8 +31,7 @@ class ChunkManager:
 
     def __contains__(self, chunk_coords: Tuple[int, int]):
         region_coords = self.region_coords(*chunk_coords)
-        return chunk_coords in self.does_not_exist or \
-            chunk_coords in self._chunk_temp_set or \
+        return chunk_coords in self._chunk_temp_set or \
             region_coords in self._regions and chunk_coords in self._regions[region_coords]
 
     def region_coords(self, cx, cz):
@@ -44,14 +42,17 @@ class ChunkManager:
             region.draw(camera_transform)
         self._merge_chunk_temp()
 
-    def unload(self, region_bounds: Tuple[int, int, int, int] = None):
-        if region_bounds is None:
+    def unload(self, safe_area: Tuple[int, int, int, int] = None):
+        if safe_area is None:
+            for _ in range(self._chunk_temp.qsize()):
+                self._chunk_temp.get()
+            self._chunk_temp_set.clear()
             for region in self._regions.values():
                 region.unload()
             self._regions.clear()
         else:
-            min_rx, min_rz = self.region_coords(*region_bounds[:2])
-            max_rx, max_rz = self.region_coords(*region_bounds[2:])
+            min_rx, min_rz = self.region_coords(*safe_area[:2])
+            max_rx, max_rz = self.region_coords(*safe_area[2:])
             delete_regions = []
             for region in self._regions.values():
                 if min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz:
@@ -123,7 +124,7 @@ class RenderRegion:
         if self._manual_chunks:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            verts = numpy.concatenate([chunk.chunk_verts for chunk in self._chunks.values()])
+            verts = numpy.concatenate([chunk.chunk_lod0 for chunk in self._chunks.values()])
             self._draw_count = int(verts.size//10)
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_DYNAMIC_DRAW)
             for chunk in self._manual_chunks:

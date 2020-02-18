@@ -1,8 +1,8 @@
 from OpenGL.GL import *
 import numpy
-from typing import TYPE_CHECKING, Tuple, Dict, Union
+from typing import TYPE_CHECKING, Tuple, Dict
 import minecraft_model_reader
-from amulet.api.errors import ChunkLoadError
+from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from ..amulet_renderer import shaders
 if TYPE_CHECKING:
     from .render_world import RenderWorld
@@ -10,64 +10,106 @@ if TYPE_CHECKING:
 
 
 class RenderChunk:
-    def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], chunk: Union['Chunk', None]):
+    def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: int):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
-        self.render_world = render_world
+        self._render_world = render_world
         self._region_size = region_size
-        self.coords = chunk_coords
-        self._chunk = chunk
+        self._coords = chunk_coords
+        self._dimension = dimension
         self._shader = None
         self._trm_mat_loc = None
-        self.vao = None
-        self.chunk_verts: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self._vao = None
+        self._rebuild = True
+        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
         self._draw_count = 0
-        if self._chunk is not None:
-            self.create_lod0()
 
     def __repr__(self):
-        return f'RenderChunk({self.coords[0]}, {self.coords[1]})'
+        return f'RenderChunk({self._coords[0]}, {self._coords[1]})'
 
     def _setup(self):
         """Set up the opengl data which cannot be set up in another thread"""
-        if self.vao is None:
-            self.vao = glGenVertexArrays(1)
-            self.create_geometry()
+        if self._vao is None:
+            self._vao = glGenVertexArrays(1)
+        if self._rebuild:
+            self._setup_opengl()
+            self._rebuild = False
 
     @property
-    def cx(self):
-        return self.coords[0]
+    def dimension(self) -> int:
+        return self._dimension
 
     @property
-    def cz(self):
-        return self.coords[1]
+    def cx(self) -> int:
+        return self._coords[0]
 
-    def create_lod0(self):
-        blocks: numpy.ndarray = self._chunk.blocks
-        blocks_ = numpy.zeros(blocks.shape + numpy.array((2, 0, 2)), blocks.dtype)
-        blocks_[1:-1, :, 1:-1] = blocks
+    @property
+    def cz(self) -> int:
+        return self._coords[1]
+
+    @property
+    def coords(self) -> Tuple[int, int]:
+        return self._coords
+
+    @property
+    def chunk(self) -> "Chunk":
+        return self._render_world.world.get_chunk(*self._coords, self._dimension)
+
+    def _get_block_data(self, chunk: "Chunk") -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
+        """Given a Chunk object will return the chunk arrays needed to generate geometry
+        :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks"""
+        blocks: numpy.ndarray = chunk.blocks
+        larger_blocks = numpy.zeros(blocks.shape + numpy.array((2, 0, 2)), blocks.dtype)
+        larger_blocks[1:-1, :, 1:-1] = blocks
 
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             try:
-                blocks_temp: numpy.ndarray = self.render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks
+                blocks_temp: numpy.ndarray = self._render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks
                 if (dx, dz) == (-1, 0):
-                    blocks_[0, :, 1:-1] = blocks_temp[-1, :, :]
+                    larger_blocks[0, :, 1:-1] = blocks_temp[-1, :, :]
                 elif (dx, dz) == (1, 0):
-                    blocks_[-1, :, 1:-1] = blocks_temp[0, :, :]
+                    larger_blocks[-1, :, 1:-1] = blocks_temp[0, :, :]
                 elif (dx, dz) == (0, -1):
-                    blocks_[1:-1, :, 0] = blocks_temp[:, :, -1]
+                    larger_blocks[1:-1, :, 0] = blocks_temp[:, :, -1]
                 elif (dx, dz) == (0, 1):
-                    blocks_[1:-1, :, -1] = blocks_temp[:, :, 0]
+                    larger_blocks[1:-1, :, -1] = blocks_temp[:, :, 0]
 
             except ChunkLoadError:
                 continue
 
-        unique_blocks = numpy.unique(blocks_)
-        transparent_array = numpy.zeros(blocks_.shape, dtype=numpy.uint8)
+        unique_blocks = numpy.unique(larger_blocks)
+        return blocks, larger_blocks, unique_blocks
+
+    def create_geometry(self):
+        try:
+            chunk = self.chunk
+        except ChunkDoesNotExist:
+            self._create_empty_geometry()
+        except ChunkLoadError:
+            # log.info(f'Error loading chunk {chunk_coords}', exc_info=True)
+            self._create_error_geometry()
+        else:
+            blocks, larger_blocks, unique_blocks = self._get_block_data(chunk)
+            self._create_lod0(blocks, larger_blocks, unique_blocks)
+
+    def _create_empty_geometry(self):
+        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self._rebuild = True
+
+    def _create_error_geometry(self):
+        # TODO
+        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self._rebuild = True
+
+    def _create_lod0(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
+        transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
         models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
         for block_temp_id in unique_blocks:
-            model = models[block_temp_id] = self.render_world.get_model(block_temp_id)
-            transparent_array[blocks_ == block_temp_id] = model.is_transparent
+            model = models[block_temp_id] = self._render_world.get_model(block_temp_id)
+            transparent_array[larger_blocks == block_temp_id] = model.is_transparent
 
         def get_transparent_array(offset_transparent_array, offset_block_array, block_array=None):
             if block_array is None:
@@ -81,12 +123,12 @@ class RenderChunk:
 
         show_up = numpy.ones(blocks.shape, dtype=numpy.bool)
         show_down = numpy.ones(blocks.shape, dtype=numpy.bool)
-        show_up[:, :-1, :] = get_transparent_array(transparent_array[1:-1, 1:, 1:-1], blocks_[1:-1, 1:, 1:-1], blocks_[1:-1, :-1, 1:-1])
-        show_down[:, 1:, :] = get_transparent_array(transparent_array[1:-1, :-1, 1:-1], blocks_[1:-1, :-1, 1:-1], blocks_[1:-1, 1:, 1:-1])
-        show_north = get_transparent_array(transparent_array[1:-1, :, :-2], blocks_[1:-1, :, :-2])
-        show_south = get_transparent_array(transparent_array[1:-1, :, 2:], blocks_[1:-1, :, 2:])
-        show_east = get_transparent_array(transparent_array[2:, :, 1:-1], blocks_[2:, :, 1:-1])
-        show_west = get_transparent_array(transparent_array[:-2, :, 1:-1], blocks_[:-2, :, 1:-1])
+        show_up[:, :-1, :] = get_transparent_array(transparent_array[1:-1, 1:, 1:-1], larger_blocks[1:-1, 1:, 1:-1], larger_blocks[1:-1, :-1, 1:-1])
+        show_down[:, 1:, :] = get_transparent_array(transparent_array[1:-1, :-1, 1:-1], larger_blocks[1:-1, :-1, 1:-1], larger_blocks[1:-1, 1:, 1:-1])
+        show_north = get_transparent_array(transparent_array[1:-1, :, :-2], larger_blocks[1:-1, :, :-2])
+        show_south = get_transparent_array(transparent_array[1:-1, :, 2:], larger_blocks[1:-1, :, 2:])
+        show_east = get_transparent_array(transparent_array[2:, :, 1:-1], larger_blocks[2:, :, 1:-1])
+        show_west = get_transparent_array(transparent_array[:-2, :, 1:-1], larger_blocks[:-2, :, 1:-1])
 
         show_map = {
             'up': show_up,
@@ -134,12 +176,12 @@ class RenderChunk:
                 vert_table = numpy.zeros((block_count, faces.size, 10), dtype=numpy.float32)
                 vert_table[:, :, :3] = verts[faces] + \
                                        block_offsets[:, :].reshape((-1, 1, 3)) + \
-                                       16 * (numpy.array([self.coords[0], 0, self.coords[1]]) % self._region_size)
+                                       16 * (numpy.array([self._coords[0], 0, self._coords[1]]) % self._region_size)
                 vert_table[:, :, 3:5] = tverts[faces]
 
                 vert_index = 0
                 for texture_index in model.texture_index[cull_dir]:
-                    tex_bounds = self.render_world.get_texture_bounds(
+                    tex_bounds = self._render_world.get_texture_bounds(
                         model.textures[texture_index]
                     )
 
@@ -150,18 +192,25 @@ class RenderChunk:
 
                 chunk_verts.append(vert_table.ravel())
 
-        if len(chunk_verts) == 0:
-            self.chunk_verts = numpy.zeros(0, dtype=numpy.float32)
-            self._draw_count = 0
+        if chunk_verts:
+            self.chunk_lod0 = numpy.concatenate(chunk_verts, 0)
+            self._draw_count = int(self.chunk_lod0.size // 10)
         else:
-            self.chunk_verts = numpy.concatenate(chunk_verts, 0)
-            self._draw_count = int(self.chunk_verts.size // 10)
+            self.chunk_lod0 = numpy.zeros(0, dtype=numpy.float32)
+            self._draw_count = 0
+        self._rebuild = True
 
-    def create_geometry(self):
-        glBindVertexArray(self.vao)
+    def _create_lod1(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
+        # TODO
+        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self._rebuild = True
+
+    def _setup_opengl(self):
+        glBindVertexArray(self._vao)
         vbo = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
-        glBufferData(GL_ARRAY_BUFFER, self.chunk_verts.size * 4, self.chunk_verts, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, self.chunk_lod0.size * 4, self.chunk_lod0, GL_STATIC_DRAW)
         # vertex attribute pointers
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
         glEnableVertexAttribArray(0)
@@ -184,10 +233,10 @@ class RenderChunk:
         self._setup()
         glUseProgram(self._shader)
         glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
-        glBindVertexArray(self.vao)
+        glBindVertexArray(self._vao)
         glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
 
     def unload(self):
-        if self.vao is not None:
-            glDeleteVertexArrays(1, self.vao)
-            self.vao = None
+        if self._vao is not None:
+            glDeleteVertexArrays(1, self._vao)
+            self._vao = None
