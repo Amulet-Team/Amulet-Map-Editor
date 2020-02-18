@@ -321,12 +321,14 @@ class RenderWorld:
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
             self._chunk_manager.unload()
+            self._world.unload()
         else:
-            self._chunk_manager.unload(
-                (
-                    self._camera[0]//16 - self.garbage_distance,
-                    self._camera[2]//16 - self.garbage_distance,
-                    self._camera[0]//16 + self.garbage_distance,
-                    self._camera[2]//16 + self.garbage_distance
-                )
+            safe_area = (
+                self._dimension,
+                self._camera[0]//16 - self.garbage_distance,
+                self._camera[2]//16 - self.garbage_distance,
+                self._camera[0]//16 + self.garbage_distance,
+                self._camera[2]//16 + self.garbage_distance
             )
+            self._chunk_manager.unload(safe_area[1:])
+            self._world.unload(safe_area)
