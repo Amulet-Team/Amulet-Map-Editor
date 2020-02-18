@@ -14,10 +14,12 @@ class ChunkManager:
         # This is because add_render_chunk can be called from a different thread to draw
         # which causes issues due to dictionaries resizing
         self._chunk_temp: queue.Queue = queue.Queue()
+        self._chunk_temp_set = set()
         self.does_not_exist: Set[Tuple[int, int]] = set()
 
-    def add_render_chunk(self, render_chunk: Union[RenderChunk, None]):
+    def add_render_chunk(self, render_chunk: RenderChunk):
         self._chunk_temp.put(render_chunk)
+        self._chunk_temp_set.add((render_chunk.cx, render_chunk.cz))
 
     def _merge_chunk_temp(self):
         for _ in range(self._chunk_temp.qsize()):
@@ -26,10 +28,13 @@ class ChunkManager:
             if region_coords not in self._regions:
                 self._regions[region_coords] = RenderRegion(*region_coords, self.region_size)
             self._regions[region_coords].add_render_chunk(render_chunk)
+        self._chunk_temp_set.clear()
 
     def __contains__(self, chunk_coords: Tuple[int, int]):
         region_coords = self.region_coords(*chunk_coords)
-        return chunk_coords in self.does_not_exist or region_coords in self._regions and chunk_coords in self._regions[region_coords]
+        return chunk_coords in self.does_not_exist or \
+            chunk_coords in self._chunk_temp_set or \
+            region_coords in self._regions and chunk_coords in self._regions[region_coords]
 
     def region_coords(self, cx, cz):
         return cx // self.region_size, cz // self.region_size
