@@ -1,6 +1,7 @@
 from OpenGL.GL import *
 from typing import Dict, Tuple, Set, Union
 import numpy
+import queue
 from .render_chunk import RenderChunk
 from ..amulet_renderer import shaders
 
@@ -9,13 +10,22 @@ class ChunkManager:
     def __init__(self, region_size=16):
         self.region_size = region_size
         self._regions: Dict[Tuple[int, int], RenderRegion] = {}
+        # added chunks are put in here and then processed on the next call of draw
+        # This is because add_render_chunk can be called from a different thread to draw
+        # which causes issues due to dictionaries resizing
+        self._chunk_temp: queue.Queue = queue.Queue()
         self.does_not_exist: Set[Tuple[int, int]] = set()
 
     def add_render_chunk(self, render_chunk: Union[RenderChunk, None]):
-        region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
-        if region_coords not in self._regions:
-            self._regions[region_coords] = RenderRegion(*region_coords, self.region_size)
-        self._regions[region_coords].add_render_chunk(render_chunk)
+        self._chunk_temp.put(render_chunk)
+
+    def _merge_chunk_temp(self):
+        for _ in range(self._chunk_temp.qsize()):
+            render_chunk = self._chunk_temp.get()
+            region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
+            if region_coords not in self._regions:
+                self._regions[region_coords] = RenderRegion(*region_coords, self.region_size)
+            self._regions[region_coords].add_render_chunk(render_chunk)
 
     def __contains__(self, chunk_coords: Tuple[int, int]):
         region_coords = self.region_coords(*chunk_coords)
@@ -25,8 +35,9 @@ class ChunkManager:
         return cx // self.region_size, cz // self.region_size
 
     def draw(self, camera_transform):
-        for region in list(self._regions.values()):
+        for region in self._regions.values():
             region.draw(camera_transform)
+        self._merge_chunk_temp()
 
     def unload(self, region_bounds: Tuple[int, int, int, int] = None):
         if region_bounds is None:
