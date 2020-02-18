@@ -7,7 +7,8 @@ from ..amulet_renderer import shaders
 
 
 class ChunkManager:
-    def __init__(self, region_size=16):
+    def __init__(self, identifier: str, region_size=16):
+        self.identifier = identifier
         self.region_size = region_size
         self._regions: Dict[Tuple[int, int], RenderRegion] = {}
         # added chunks are put in here and then processed on the next call of draw
@@ -25,7 +26,7 @@ class ChunkManager:
             render_chunk = self._chunk_temp.get()
             region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
             if region_coords not in self._regions:
-                self._regions[region_coords] = RenderRegion(*region_coords, self.region_size)
+                self._regions[region_coords] = RenderRegion(region_coords[0], region_coords[1], self.region_size, self.identifier)
             self._regions[region_coords].add_render_chunk(render_chunk)
         self._chunk_temp_set.clear()
 
@@ -66,8 +67,9 @@ class ChunkManager:
 
 
 class RenderRegion:
-    def __init__(self, rx, rz, region_size):
+    def __init__(self, rx: int, rz: int, region_size: int, identifier: str):
         """A group of RenderChunks to minimise the number of draw calls"""
+        self.identifier = identifier
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
@@ -115,7 +117,7 @@ class RenderRegion:
 
             glBindVertexArray(0)
 
-            self._shader = shaders.get_shader('render_chunk')
+            self._shader = shaders.get_shader(self.identifier, 'render_chunk')
             self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
 
     def merge(self):

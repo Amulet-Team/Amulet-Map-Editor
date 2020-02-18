@@ -226,7 +226,7 @@ class RenderChunk:
 
         glBindVertexArray(0)
 
-        self._shader = shaders.get_shader('render_chunk')
+        self._shader = shaders.get_shader(self._render_world.identifier, 'render_chunk')
         self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
 
     def draw(self, transformation_matrix: numpy.ndarray):

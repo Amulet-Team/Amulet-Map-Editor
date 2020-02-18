@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional
 import math
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
+import uuid
 
 from amulet_map_editor import log
 from ..amulet_renderer import shaders
@@ -72,6 +73,7 @@ class ChunkGenerator(ThreadPoolExecutor):
 
 class RenderWorld:
     def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
+        self.identifier = str(uuid.uuid4())
         self._world = world
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera = [0, 300, 0, 90, 0]
@@ -82,7 +84,7 @@ class RenderWorld:
         self._render_distance = 10
         self._garbage_distance = 20
         # self._loaded_render_chunks: Dict[Tuple[int, int], Union[RenderChunk, None]] = {}
-        self._chunk_manager = ChunkManager()
+        self._chunk_manager = ChunkManager(self.identifier)
         self._resource_pack = resource_pack
         self._block_models = {}
         self._texture_bounds = {}
@@ -128,7 +130,7 @@ class RenderWorld:
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, self._texture_atlas)
 
-        shader = shaders.get_shader('render_chunk')
+        shader = shaders.get_shader(self.identifier, 'render_chunk')
         glUseProgram(shader)
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
