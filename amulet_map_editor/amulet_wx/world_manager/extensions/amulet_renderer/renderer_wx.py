@@ -182,6 +182,7 @@ class World3DPanel(BaseWorldTool):
             self._canvas.disable()
 
     def close(self):
+        self.disable()
         if self._canvas is not None:
             self._canvas.close()
 
