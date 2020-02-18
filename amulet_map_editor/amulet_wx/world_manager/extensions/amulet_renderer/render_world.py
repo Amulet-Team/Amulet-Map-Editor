@@ -8,15 +8,12 @@ import time
 from amulet_map_editor import log
 from ..amulet_renderer import shaders
 
-from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 import minecraft_model_reader
 from ..amulet_renderer import textureatlas
 from .render_chunk import RenderChunk
 from .render_region import ChunkManager
 if TYPE_CHECKING:
     from amulet.api.world import World
-
-import traceback
 
 
 def sin(theta: Union[int, float]) -> float:
@@ -159,7 +156,7 @@ class RenderWorld:
     def dimension(self, dimension: int):
         self._chunk_generator.stop()
         self._dimension = dimension
-        self._chunk_manager.unload()
+        self.run_garbage_collector(True)
         self._chunk_generator.start()
 
     @property
