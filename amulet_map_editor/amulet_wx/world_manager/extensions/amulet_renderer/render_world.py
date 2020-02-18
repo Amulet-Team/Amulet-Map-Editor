@@ -294,9 +294,9 @@ class RenderWorld:
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
-            self._chunk_manager.delete()
+            self._chunk_manager.unload()
         else:
-            self._chunk_manager.delete(
+            self._chunk_manager.unload(
                 (
                     self._camera[0]//16 - self.garbage_distance,
                     self._camera[2]//16 - self.garbage_distance,

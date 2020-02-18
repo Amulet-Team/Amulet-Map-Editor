@@ -28,10 +28,10 @@ class ChunkManager:
         for region in list(self._regions.values()):
             region.draw(camera_transform)
 
-    def delete(self, region_bounds: Tuple[int, int, int, int] = None):
+    def unload(self, region_bounds: Tuple[int, int, int, int] = None):
         if region_bounds is None:
             for region in self._regions.values():
-                region.delete()
+                region.unload()
             self._regions.clear()
         else:
             min_rx, min_rz = self.region_coords(*region_bounds[:2])
@@ -41,7 +41,7 @@ class ChunkManager:
                 if min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz:
                     region.merge()
                 else:
-                    region.delete()
+                    region.unload()
                     delete_regions.append((region.rx, region.rz))
 
             for region in delete_regions:
@@ -111,16 +111,16 @@ class RenderRegion:
             self._draw_count = int(verts.size//10)
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_DYNAMIC_DRAW)
             for chunk in self._manual_chunks:
-                chunk.delete()
+                chunk.unload()
             self._manual_chunks.clear()
 
-    def delete(self):
+    def unload(self):
         """Unload all chunks"""
         if self._vao is not None:
             glDeleteVertexArrays(1, self._vao)
             self._vao = None
         for chunk in self._chunks.values():
-            chunk.delete()
+            chunk.unload()
         self._chunks.clear()
 
     def draw(self, transformation_matrix: numpy.ndarray):

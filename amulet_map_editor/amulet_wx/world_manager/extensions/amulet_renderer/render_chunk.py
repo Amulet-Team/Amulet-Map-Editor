@@ -187,7 +187,7 @@ class RenderChunk:
         glBindVertexArray(self.vao)
         glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
 
-    def delete(self):
+    def unload(self):
         if self.vao is not None:
             glDeleteVertexArrays(1, self.vao)
             self.vao = None
