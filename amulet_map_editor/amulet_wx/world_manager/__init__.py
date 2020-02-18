@@ -60,10 +60,11 @@ class WorldManagerUI(SimpleNotebook):
 
     def _page_change(self, evt):
         """Method to fire when the page is changed"""
-        if self._finished:
-            self._extensions[self._last_extension].disable()
-            self._extensions[self.GetSelection()].enable()
-        self._last_extension = self.GetSelection()
+        if self.GetSelection() != self._last_extension:
+            if self._finished:
+                self._extensions[self._last_extension].disable()
+                self._extensions[self.GetSelection()].enable()
+            self._last_extension = self.GetSelection()
         evt.Skip()
 
 
