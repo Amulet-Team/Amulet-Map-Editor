@@ -1,8 +1,8 @@
 from OpenGL.GL import *
 import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union
+from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional
 import math
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, Future
 
 from amulet_map_editor import log
 from ..amulet_renderer import shaders
@@ -14,6 +14,8 @@ from .render_chunk import RenderChunk
 from .render_region import ChunkManager
 if TYPE_CHECKING:
     from amulet.api.world import World
+
+import traceback
 
 
 def sin(theta: Union[int, float]) -> float:
@@ -28,23 +30,32 @@ class ChunkGenerator(ThreadPoolExecutor):
     def __init__(self, render_world: 'RenderWorld'):
         super().__init__(max_workers=1)
         self._render_world = render_world
-        self._in_progress = set()  # the number of chunks being generated
-        self._max_count = 4
+        self._enabled = False
+        self._generator: Optional[Future] = None
 
-    def _gen_chunk(self, chunk_coords: Tuple[int, int]):
-        try:
-            self._render_world.create_render_chunk(chunk_coords)
-        except Exception as e:
-            log.error(f'Failed generating chunk geometry for chunk {chunk_coords}')
-        self._in_progress.remove(chunk_coords)
+    def start(self):
+        if self._enabled:
+            raise Exception('ChunkGenerator started more than once')
+        else:
+            self._enabled = True
+            self._generator = self.submit(self._generate_chunks)
 
-    def generate_chunk(self, chunk_coords: Tuple[int, int]):
-        if len(self._in_progress) < self._max_count and not self.in_progress(chunk_coords):
-            self._in_progress.add(chunk_coords)
-            self.submit(self._gen_chunk, chunk_coords)
+    def stop(self):
+        if self._enabled:
+            self._enabled = False
+            self._generator.result()
 
-    def in_progress(self, chunk_coords: Tuple[int, int]) -> bool:
-        return chunk_coords in self._in_progress
+    def _generate_chunks(self):
+        while self._enabled:
+            next_chunk = next(
+                (c for c in self._render_world.chunk_coords() if c not in self._render_world.chunk_manager),
+                None
+            )
+            if next_chunk is not None:
+                try:
+                    self._render_world.create_render_chunk(next_chunk)
+                except Exception as e:
+                    log.error(f'Failed generating chunk geometry for chunk {next_chunk}')
 
 
 class RenderWorld:
@@ -72,11 +83,23 @@ class RenderWorld:
     def world(self) -> 'World':
         return self._world
 
+    @property
+    def chunk_manager(self) -> ChunkManager:
+        return self._chunk_manager
+
     def is_closeable(self):
         return True
 
-    def close(self):
+    def enable(self):
+        self._chunk_generator.start()
+
+    def disable(self):
+        self._chunk_generator.stop()
         self.run_garbage_collector(True)
+
+    def close(self):
+        self.disable()
+        glDeleteTextures([self._gl_texture_atlas])
 
     def _create_atlas(self):
         # filename = str(hash(tuple(self._resource_pack.pack_paths)))
@@ -283,14 +306,6 @@ class RenderWorld:
 
     def draw(self):
         self._chunk_manager.draw(self.transformation_matrix)
-        next_chunk = next(
-            (c for c in self.chunk_coords() if c not in self._chunk_manager and not self._chunk_generator.in_progress(c)),
-            None
-        )
-        if next_chunk is not None:
-            self._chunk_generator.generate_chunk(
-                next_chunk
-            )
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:

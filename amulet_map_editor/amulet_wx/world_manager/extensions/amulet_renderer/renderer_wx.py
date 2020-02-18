@@ -62,6 +62,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL, self._mouse_wheel)
 
     def enable(self):
+        self._render_world.enable()
         self._draw_timer.Start(33)
         self._input_timer.Start(33)
         self._gc_timer.Start(10000)
@@ -70,7 +71,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self._draw_timer.Stop()
         self._input_timer.Stop()
         self._gc_timer.Stop()
-        self._render_world.run_garbage_collector(True)
+        self._render_world.disable()
 
     def close(self):
         self._render_world.close()
