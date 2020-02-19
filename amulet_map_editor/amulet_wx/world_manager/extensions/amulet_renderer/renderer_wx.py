@@ -28,10 +28,9 @@ key_map = {
 
 
 class World3dCanvas(glcanvas.GLCanvas):
-    def __init__(self, parent: 'World3DPanel', world: 'World'):
-        self._world_panel = parent
+    def __init__(self, world_panel: 'World3DPanel', world: 'World'):
         self._keys_pressed = set()
-        super().__init__(parent, -1, size=parent.GetClientSize())
+        super().__init__(world_panel, -1, size=world_panel.GetClientSize())
         self._context = glcanvas.GLContext(self)
         self.SetCurrent(self._context)
         glClearColor(0.5, 0.5, 0.5, 1.0)
@@ -55,7 +54,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self._gc_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
 
-        self._world_panel.Bind(wx.EVT_SIZE, self._on_resize)
+        world_panel.Bind(wx.EVT_SIZE, self._on_resize)
 
         self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
         self.Bind(wx.EVT_KEY_UP, self._on_key_release)
