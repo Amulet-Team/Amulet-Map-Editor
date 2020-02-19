@@ -5,6 +5,7 @@ import math
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
 import uuid
+import weakref
 
 from amulet_map_editor import log
 from ..amulet_renderer import shaders
@@ -28,7 +29,7 @@ def cos(theta: Union[int, float]) -> float:
 class ChunkGenerator(ThreadPoolExecutor):
     def __init__(self, render_world: 'RenderWorld'):
         super().__init__(max_workers=1)
-        self._render_world = render_world
+        self._render_world = weakref.ref(render_world)
         self._region_size = render_world.chunk_manager.region_size
         self._enabled = False
         self._generator: Optional[Future] = None
@@ -48,25 +49,25 @@ class ChunkGenerator(ThreadPoolExecutor):
     def _generate_chunks(self):
         while self._enabled:
             chunk_coords = next(
-                (c for c in self._render_world.chunk_coords() if c not in self._render_world.chunk_manager),
+                (c for c in self._render_world().chunk_coords() if c not in self._render_world().chunk_manager),
                 None
             )
             if chunk_coords is None:
                 time.sleep(1 / 30)
             else:
                 chunk = RenderChunk(
-                    self._render_world,
+                    self._render_world(),
                     self._region_size,
                     chunk_coords,
-                    self._render_world.dimension
+                    self._render_world().dimension
                 )
 
                 try:
                     chunk.create_geometry()
                 except Exception as e:
-                    log.error(f'Failed generating chunk geometry for chunk {chunk_coords}')
+                    log.error(f'Failed generating chunk geometry for chunk {chunk_coords}', exc_info=True)
 
-                self._render_world.chunk_manager.add_render_chunk(
+                self._render_world().chunk_manager.add_render_chunk(
                     chunk
                 )
 

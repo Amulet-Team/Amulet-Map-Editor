@@ -1,9 +1,12 @@
 from OpenGL.GL import *
 import numpy
 from typing import TYPE_CHECKING, Tuple, Dict
+import weakref
+
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from ..amulet_renderer import shaders
+
 if TYPE_CHECKING:
     from .render_world import RenderWorld
     from amulet.api.chunk import Chunk
@@ -13,7 +16,7 @@ class RenderChunk:
     def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: int):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
-        self._render_world = render_world
+        self._render_world = weakref.ref(render_world)
         self._region_size = region_size
         self._coords = chunk_coords
         self._dimension = dimension
@@ -54,7 +57,7 @@ class RenderChunk:
 
     @property
     def chunk(self) -> "Chunk":
-        return self._render_world.world.get_chunk(*self._coords, self._dimension)
+        return self._render_world().world.get_chunk(*self._coords, self._dimension)
 
     def _get_block_data(self, chunk: "Chunk") -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
@@ -65,7 +68,7 @@ class RenderChunk:
 
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             try:
-                blocks_temp: numpy.ndarray = self._render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks
+                blocks_temp: numpy.ndarray = self._render_world().world.get_chunk(self.cx + dx, self.cz + dz).blocks
                 if (dx, dz) == (-1, 0):
                     larger_blocks[0, :, 1:-1] = blocks_temp[-1, :, :]
                 elif (dx, dz) == (1, 0):
@@ -108,7 +111,7 @@ class RenderChunk:
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
         models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
         for block_temp_id in unique_blocks:
-            model = models[block_temp_id] = self._render_world.get_model(block_temp_id)
+            model = models[block_temp_id] = self._render_world().get_model(block_temp_id)
             transparent_array[larger_blocks == block_temp_id] = model.is_transparent
 
         def get_transparent_array(offset_transparent_array, offset_block_array, block_array=None):
@@ -181,7 +184,7 @@ class RenderChunk:
 
                 vert_index = 0
                 for texture_index in model.texture_index[cull_dir]:
-                    tex_bounds = self._render_world.get_texture_bounds(
+                    tex_bounds = self._render_world().get_texture_bounds(
                         model.textures[texture_index]
                     )
 
@@ -226,7 +229,7 @@ class RenderChunk:
 
         glBindVertexArray(0)
 
-        self._shader = shaders.get_shader(self._render_world.identifier, 'render_chunk')
+        self._shader = shaders.get_shader(self._render_world().identifier, 'render_chunk')
         self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
 
     def draw(self, transformation_matrix: numpy.ndarray):
