@@ -51,11 +51,18 @@ class ChunkGenerator(ThreadPoolExecutor):
             chunk_coords = next(
                 (
                     c for c in self._render_world().chunk_coords() if
-                    c not in self._render_world().chunk_manager or
                     self._render_world().chunk_manager.render_chunk_needs_rebuild(c)
                 ),
                 None
             )
+            if chunk_coords is None:
+                chunk_coords = next(
+                    (
+                        c for c in self._render_world().chunk_coords() if
+                        c not in self._render_world().chunk_manager
+                    ),
+                    None
+                )
             if chunk_coords is None:
                 time.sleep(1 / 30)
             else:
