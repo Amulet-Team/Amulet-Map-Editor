@@ -24,6 +24,8 @@ class RenderChunk:
         self._region_size = region_size
         self._coords = chunk_coords
         self._dimension = dimension
+        self._chunk_state = 0  # 0 = chunk does not exist, 1 = chunk exists but failed to load, 2 = chunk exists
+        self._changed_time = 0
         self._shader = None
         self._trm_mat_loc = None
         self._vao = None
@@ -63,6 +65,20 @@ class RenderChunk:
     def chunk(self) -> "Chunk":
         return self._render_world().world.get_chunk(*self._coords, self._dimension)
 
+    def needs_rebuild(self):
+        """has the chunk data changed since the last rebuild"""
+        try:
+            chunk = self.chunk
+        except ChunkDoesNotExist:
+            chunk_state = 0
+        except ChunkLoadError:
+            chunk_state = 1
+        else:
+            chunk_state = 2
+            if chunk.changed_time != self._changed_time:
+                return True
+        return chunk_state != self._chunk_state
+
     def _get_block_data(self, chunk: "Chunk") -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
         :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks"""
@@ -93,23 +109,26 @@ class RenderChunk:
             chunk = self.chunk
         except ChunkDoesNotExist:
             self._create_empty_geometry()
+            self._chunk_state = 0
         except ChunkLoadError:
             # log.info(f'Error loading chunk {chunk_coords}', exc_info=True)
             self._create_error_geometry()
+            self._chunk_state = 1
         else:
+            self._changed_time = chunk.changed_time
+            self._chunk_state = 2
             blocks, larger_blocks, unique_blocks = self._get_block_data(chunk)
             self._create_lod0(blocks, larger_blocks, unique_blocks)
+        self._rebuild = True
 
     def _create_empty_geometry(self):
         self.chunk_lod0: numpy.ndarray = new_empty_verts()
         self.chunk_lod1: numpy.ndarray = new_empty_verts()
-        self._rebuild = True
 
     def _create_error_geometry(self):
         # TODO
         self.chunk_lod0: numpy.ndarray = new_empty_verts()
         self.chunk_lod1: numpy.ndarray = new_empty_verts()
-        self._rebuild = True
 
     def _create_lod0(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
@@ -205,13 +224,11 @@ class RenderChunk:
         else:
             self.chunk_lod0 = new_empty_verts()
             self._draw_count = 0
-        self._rebuild = True
 
     def _create_lod1(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         # TODO
         self.chunk_lod0: numpy.ndarray = new_empty_verts()
         self.chunk_lod1: numpy.ndarray = new_empty_verts()
-        self._rebuild = True
 
     def _setup_opengl(self):
         glBindVertexArray(self._vao)

@@ -1,5 +1,5 @@
 from OpenGL.GL import *
-from typing import Dict, Tuple, Set, Union
+from typing import Dict, Tuple, List
 import numpy
 import queue
 from .render_chunk import RenderChunk, new_empty_verts
@@ -18,8 +18,20 @@ class ChunkManager:
         self._chunk_temp_set = set()
 
     def add_render_chunk(self, render_chunk: RenderChunk):
+        """Add a RenderChunk to the database.
+        A call to _merge_chunk_temp from the main thread will be needed for them to be drawn.
+        This is done after the next draw call."""
         self._chunk_temp.put(render_chunk)
-        self._chunk_temp_set.add((render_chunk.cx, render_chunk.cz))
+        chunk_coords = (render_chunk.cx, render_chunk.cz)
+        self._chunk_temp_set.add(chunk_coords)
+
+    def render_chunk_needs_rebuild(self, chunk_coords: Tuple[int, int]) -> bool:
+        return self.render_chunk_in_main_database(chunk_coords) and self.get_render_chunk(chunk_coords).needs_rebuild()
+
+    def get_render_chunk(self, chunk_coords: Tuple[int, int]) -> RenderChunk:
+        """Get a RenderChunk from the database.
+        Might throw a key error if it has not been added to the real database yet."""
+        return self._regions[self.region_coords(*chunk_coords)].get_render_chunk(chunk_coords)
 
     def _merge_chunk_temp(self):
         for _ in range(self._chunk_temp.qsize()):
@@ -31,9 +43,11 @@ class ChunkManager:
         self._chunk_temp_set.clear()
 
     def __contains__(self, chunk_coords: Tuple[int, int]):
+        return chunk_coords in self._chunk_temp_set or self.render_chunk_in_main_database(chunk_coords)
+
+    def render_chunk_in_main_database(self, chunk_coords: Tuple[int, int]) -> bool:
         region_coords = self.region_coords(*chunk_coords)
-        return chunk_coords in self._chunk_temp_set or \
-            region_coords in self._regions and chunk_coords in self._regions[region_coords]
+        return region_coords in self._regions and chunk_coords in self._regions[region_coords]
 
     def region_coords(self, cx, cz):
         return cx // self.region_size, cz // self.region_size
@@ -79,7 +93,8 @@ class RenderRegion:
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
-        self._manual_chunks = []
+        self._merged_chunk_locations: Dict[Tuple[int, int], Tuple[int, int]] = {}
+        self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
         self._shader = None
         self._trm_mat_loc = None
         self._vao = None
@@ -97,8 +112,22 @@ class RenderRegion:
 
     def add_render_chunk(self, render_chunk: RenderChunk):
         """Add a chunk to the region"""
-        self._chunks[(render_chunk.cx, render_chunk.cz)] = render_chunk
-        self._manual_chunks.append(render_chunk)
+        chunk_coords = (render_chunk.cx, render_chunk.cz)
+        self._disable_merged_chunk(chunk_coords)
+        self._chunks[chunk_coords] = render_chunk
+        self._manual_chunks[chunk_coords] = render_chunk
+
+    def get_render_chunk(self, chunk_coords: Tuple[int, int]):
+        return self._chunks[chunk_coords]
+
+    def _disable_merged_chunk(self, chunk_coords: Tuple[int, int]):
+        """Zero out the region of memory in the merged chunks related to a given chunk"""
+        if chunk_coords in self._merged_chunk_locations:
+            print(f'Removing chunk {chunk_coords}')
+            offset, size = self._merged_chunk_locations.pop(chunk_coords)
+            glBindVertexArray(self._vao)
+            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
+            glBufferSubData(GL_ARRAY_BUFFER, offset*4, size*4, numpy.zeros(size, dtype=numpy.float32))
 
     def _setup(self):
         """Set up an empty VAO"""
@@ -132,14 +161,23 @@ class RenderRegion:
         if self._manual_chunks:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            chunk_verts = [chunk.chunk_lod0 for chunk in self._chunks.values()]
-            if chunk_verts:
-                verts = numpy.concatenate(chunk_verts)
+            chunks: List[Tuple[Tuple[int, int], RenderChunk]] = list(self._chunks.items())
+            region_verts = []
+            merged_locations = {}
+            offset = 0
+            for chunk_location, chunk in chunks:
+                region_verts.append(chunk.chunk_lod0)
+                merged_locations[chunk_location] = [offset, chunk.chunk_lod0.size]
+                offset += chunk.chunk_lod0.size
+
+            if region_verts:
+                verts = numpy.concatenate(region_verts)
             else:
                 verts = new_empty_verts()
             self._draw_count = int(verts.size//10)
+            self._merged_chunk_locations = merged_locations
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_DYNAMIC_DRAW)
-            for chunk in self._manual_chunks:
+            for chunk in self._manual_chunks.values():
                 chunk.unload()
             self._manual_chunks.clear()
 
@@ -159,5 +197,5 @@ class RenderRegion:
         glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
         glBindVertexArray(self._vao)
         glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
-        for chunk in self._manual_chunks:
+        for chunk in self._manual_chunks.values():
             chunk.draw(transformation_matrix)
