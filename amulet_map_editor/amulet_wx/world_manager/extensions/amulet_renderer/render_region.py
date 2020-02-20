@@ -2,7 +2,7 @@ from OpenGL.GL import *
 from typing import Dict, Tuple, Set, Union
 import numpy
 import queue
-from .render_chunk import RenderChunk
+from .render_chunk import RenderChunk, new_empty_verts
 from ..amulet_renderer import shaders
 
 
@@ -101,7 +101,7 @@ class RenderRegion:
             glBindVertexArray(self._vao)
             self._vbo = glGenBuffers(1)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            glBufferData(GL_ARRAY_BUFFER, 0, numpy.zeros(0, dtype=numpy.float32), GL_DYNAMIC_DRAW)
+            glBufferData(GL_ARRAY_BUFFER, 0, new_empty_verts(), GL_DYNAMIC_DRAW)
             # vertex attribute pointers
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
             glEnableVertexAttribArray(0)

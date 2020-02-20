@@ -12,6 +12,10 @@ if TYPE_CHECKING:
     from amulet.api.chunk import Chunk
 
 
+def new_empty_verts() -> numpy.ndarray:
+    return numpy.zeros(0, dtype=numpy.float32)
+
+
 class RenderChunk:
     def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: int):
         # the chunk geometry is stored in chunk space (floating point)
@@ -24,8 +28,8 @@ class RenderChunk:
         self._trm_mat_loc = None
         self._vao = None
         self._rebuild = True
-        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
-        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod0: numpy.ndarray = new_empty_verts()
+        self.chunk_lod1: numpy.ndarray = new_empty_verts()
         self._draw_count = 0
 
     def __repr__(self):
@@ -97,14 +101,14 @@ class RenderChunk:
             self._create_lod0(blocks, larger_blocks, unique_blocks)
 
     def _create_empty_geometry(self):
-        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
-        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod0: numpy.ndarray = new_empty_verts()
+        self.chunk_lod1: numpy.ndarray = new_empty_verts()
         self._rebuild = True
 
     def _create_error_geometry(self):
         # TODO
-        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
-        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod0: numpy.ndarray = new_empty_verts()
+        self.chunk_lod1: numpy.ndarray = new_empty_verts()
         self._rebuild = True
 
     def _create_lod0(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
@@ -199,14 +203,14 @@ class RenderChunk:
             self.chunk_lod0 = numpy.concatenate(chunk_verts, 0)
             self._draw_count = int(self.chunk_lod0.size // 10)
         else:
-            self.chunk_lod0 = numpy.zeros(0, dtype=numpy.float32)
+            self.chunk_lod0 = new_empty_verts()
             self._draw_count = 0
         self._rebuild = True
 
     def _create_lod1(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         # TODO
-        self.chunk_lod0: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
-        self.chunk_lod1: numpy.ndarray = numpy.zeros(0, dtype=numpy.float32)
+        self.chunk_lod0: numpy.ndarray = new_empty_verts()
+        self.chunk_lod1: numpy.ndarray = new_empty_verts()
         self._rebuild = True
 
     def _setup_opengl(self):
