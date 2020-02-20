@@ -57,13 +57,19 @@ class ChunkManager:
             delete_regions = []
             for region in self._regions.values():
                 if min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz:
-                    region.merge()
+                    region.rebuild()
                 else:
                     region.unload()
                     delete_regions.append((region.rx, region.rz))
 
             for region in delete_regions:
                 del self._regions[region]
+
+    def rebuild(self):
+        """Force a rebuild of the region geometry from the chunk geometry
+        Useful to force an update rather than wait for the next unload call."""
+        for region in self._regions.values():
+            region.rebuild()
 
 
 class RenderRegion:
@@ -120,13 +126,17 @@ class RenderRegion:
             self._shader = shaders.get_shader(self.identifier, 'render_chunk')
             self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
 
-    def merge(self):
+    def rebuild(self):
         """If there are any chunks that have not been merged recreate the merged vertex table"""
         self._setup()
         if self._manual_chunks:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            verts = numpy.concatenate([chunk.chunk_lod0 for chunk in self._chunks.values()])
+            chunk_verts = [chunk.chunk_lod0 for chunk in self._chunks.values()]
+            if chunk_verts:
+                verts = numpy.concatenate(chunk_verts)
+            else:
+                verts = new_empty_verts()
             self._draw_count = int(verts.size//10)
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_DYNAMIC_DRAW)
             for chunk in self._manual_chunks:
@@ -134,7 +144,7 @@ class RenderRegion:
             self._manual_chunks.clear()
 
     def unload(self):
-        """Unload all chunks"""
+        """Unload all opengl data"""
         if self._vao is not None:
             glDeleteVertexArrays(1, self._vao)
             self._vao = None
