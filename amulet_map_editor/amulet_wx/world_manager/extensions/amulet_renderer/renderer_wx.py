@@ -4,6 +4,8 @@ from OpenGL.GL import *
 import sys
 import os
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
+from amulet_map_editor.amulet_wx.wx_util import SimplePanel
+from amulet.api.block import Block
 
 from .render_world import RenderWorld
 from typing import TYPE_CHECKING
@@ -147,7 +149,7 @@ class World3dCanvas(glcanvas.GLCanvas):
 
 class World3DPanel(BaseWorldTool):
     def __init__(self, parent: 'MainFrame', world: 'World'):
-        super().__init__(parent)
+        super().__init__(parent, wx.HORIZONTAL)
         self._world = world
         self._canvas = None
         self._temp = wx.StaticText(
@@ -158,6 +160,8 @@ class World3DPanel(BaseWorldTool):
             wx.DefaultSize,
             0,
         )
+        self._menu = None
+        self._menu_buttons = []
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self.Bind(wx.EVT_SIZE, self._on_resize)
 
@@ -166,13 +170,62 @@ class World3DPanel(BaseWorldTool):
             self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
 
+    def _set_stone(self, evt):
+        cx, cz = int(self._canvas._render_world._camera[0])>>4, int(self._canvas._render_world._camera[2])>>4
+        y = int(self._canvas._render_world._camera[1])
+        if 0 <= y <= 255:
+            chunk = self._world.get_chunk(cx, cz, self._canvas._render_world._dimension)
+            chunk.blocks[:, y, :] = self._world.palette.get_add_block(
+                Block(
+                    namespace='universal_minecraft',
+                    base_name='stone'
+                )
+            )
+            chunk.changed = True
+            self._world._chunk_history_manager.create_snapshot(self._world._chunk_cache)
+
+    def _undo_event(self, evt):
+        print('undo')
+        self._world.undo()
+
+    def _redo_event(self, evt):
+        print('redo')
+        self._world.redo()
+
+    def _save_event(self, evt):
+        print('save')
+        self._world.save()
+
     def enable(self):
         if self._canvas is None:
             self.Update()
+            self._menu = SimplePanel(self)
+            self.add_object(self._menu, 0, wx.EXPAND)
+
+            for text, operation in [
+                ['undo', self._undo_event],
+                ['redo', self._redo_event],
+                ['save', self._save_event],
+                ['fill_blocks', self._set_stone]
+            ]:
+                button = wx.Button(
+                    self._menu,
+                    wx.ID_ANY,
+                    text,
+                    wx.DefaultPosition,
+                    wx.DefaultSize,
+                    0,
+                )
+                button.Bind(wx.EVT_BUTTON, operation)
+                self._menu.add_object(button, 0)
+                self._menu_buttons.append(
+                    button
+                )
             self._canvas = World3dCanvas(self, self._world)
             self.add_object(self._canvas, 0, wx.EXPAND)
             self._temp.Destroy()
             self.GetParent().Layout()
+            self._menu.Fit()
             self.Update()
         self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
         self._canvas.enable()
