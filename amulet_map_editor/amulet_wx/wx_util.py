@@ -55,3 +55,25 @@ class SimpleNotebook(wx.Notebook):
             wx.DefaultSize,
             style
         )
+
+
+class SimpleText(wx.StaticText):
+    def __init__(self, parent, text):
+        super().__init__(
+            parent,
+            wx.ID_ANY,
+            text,
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0
+        )
+
+
+class SimpleChoice(wx.Choice):
+    def __init__(self, parent, choices=()):
+        super().__init__(
+            parent,
+            choices=choices
+        )
+        if choices:
+            self.SetSelection(0)
