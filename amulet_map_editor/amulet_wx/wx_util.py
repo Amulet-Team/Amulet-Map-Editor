@@ -1,5 +1,6 @@
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
+from typing import Any, Iterable
 
 
 class SimpleSizer:
@@ -77,3 +78,26 @@ class SimpleChoice(wx.Choice):
         )
         if choices:
             self.SetSelection(0)
+
+
+class SimpleChoiceAny(wx.Choice):
+    def __init__(self, parent, sort=True):
+        super().__init__(
+            parent
+        )
+        self._items = ()
+        self._sorted = sort
+
+    def SetItems(self, items: Iterable):
+        """Set items. Does not have to be strings"""
+        if self._sorted:
+            self._items = tuple(sorted(items))
+        else:
+            self._items = tuple(items)
+        super().SetItems([str(v) for v in self._items])
+        self.SetSelection(0)
+
+    def GetAny(self):
+        """Return the value currently selected in the form before it was converted to a string"""
+        return self._items[self.GetSelection()]
+
