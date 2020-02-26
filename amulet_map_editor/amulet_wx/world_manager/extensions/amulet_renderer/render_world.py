@@ -245,10 +245,21 @@ class RenderWorld:
 
     def get_model(self, pallete_index: int):
         if pallete_index not in self._block_models:
+            block = self._world.palette[pallete_index]
+            extra_blocks = tuple()
+            if block.extra_blocks:
+                extra_blocks = tuple(
+                    self._resource_pack_translator.block.from_universal(
+                        block_
+                    )[0] for block_ in block.extra_blocks
+                )
+            block = self._resource_pack_translator.block.from_universal(
+                block.base_block
+            )[0]
+            for block_ in extra_blocks:
+                block += block_
             self._block_models[pallete_index] = self._resource_pack.get_model(
-                self._resource_pack_translator.block.from_universal(
-                    self._world.palette[pallete_index]
-                )[0]
+                block
             )
 
         return self._block_models[pallete_index]
