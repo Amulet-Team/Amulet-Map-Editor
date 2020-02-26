@@ -31,6 +31,7 @@ class RenderChunk:
         self._vao = None
         self._rebuild = True
         self.chunk_lod0: numpy.ndarray = new_empty_verts()
+        self.chunk_lod0_translucent = 0  # the offset into the above from which the faces can be translucent
         self.chunk_lod1: numpy.ndarray = new_empty_verts()
         self._draw_count = 0
 
@@ -166,8 +167,9 @@ class RenderChunk:
         }
 
         chunk_verts = []
+        chunk_verts_translucent = []
 
-        for block_temp_id, model in sorted(models.items(), key=lambda x: x[1].is_transparent == 1):
+        for block_temp_id, model in models.items():
             # for each unique blockstate in the chunk
             # get the model and the locations of the blocks
             model: minecraft_model_reader.MinecraftMesh
@@ -216,14 +218,23 @@ class RenderChunk:
 
                 vert_table[:, :, 9] = model.tint_verts[cull_dir][faces]
 
-                chunk_verts.append(vert_table.ravel())
+                if model.is_transparent == 1:
+                    chunk_verts_translucent.append(vert_table.ravel())
+                else:
+                    chunk_verts.append(vert_table.ravel())
 
         if chunk_verts:
             self.chunk_lod0 = numpy.concatenate(chunk_verts, 0)
             self._draw_count = int(self.chunk_lod0.size // 10)
+            self.chunk_lod0_translucent = self.chunk_lod0.size
         else:
             self.chunk_lod0 = new_empty_verts()
             self._draw_count = 0
+
+        if chunk_verts_translucent:
+            chunk_verts_translucent.insert(0, self.chunk_lod0)
+            self.chunk_lod0 = numpy.concatenate(chunk_verts_translucent, 0)
+            self._draw_count = int(self.chunk_lod0.size // 10)
 
     def _create_lod1(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         # TODO

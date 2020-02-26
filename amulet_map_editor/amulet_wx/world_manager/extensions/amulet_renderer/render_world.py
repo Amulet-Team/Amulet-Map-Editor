@@ -327,7 +327,7 @@ class RenderWorld:
             length += 1
 
     def draw(self):
-        self._chunk_manager.draw(self.transformation_matrix)
+        self._chunk_manager.draw(self.transformation_matrix, self._camera[:3])
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
