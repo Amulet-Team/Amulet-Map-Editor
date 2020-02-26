@@ -1,4 +1,4 @@
-from amulet_map_editor.amulet_wx.block_select import VersionSelect
+from amulet_map_editor.amulet_wx.block_select import VersionSelect, BlockSelect, BlockDefine
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 from amulet.api.world import World
 import wx
@@ -14,8 +14,8 @@ class ConvertExtension(BaseWorldTool):
             container
         )
         self.world = world
-
-        self._version_select = VersionSelect(self, world.world_wrapper.translation_manager)
+        self._version_select = BlockDefine(self, world.world_wrapper.translation_manager)
+        self._version_select.populate()
         self.add_object(self._version_select, 0, wx.EXPAND)
 
 
