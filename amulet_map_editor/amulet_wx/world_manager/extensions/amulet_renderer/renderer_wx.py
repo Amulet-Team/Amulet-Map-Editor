@@ -63,6 +63,14 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL, self._mouse_wheel)
         self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
 
+        self._mouse_x = 0
+        self._mouse_y = 0
+        self._last_mouse_x = 0
+        self._last_mouse_y = 0
+        self._mouse_lock = False
+        self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
+        self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
+
     def enable(self):
         self._render_world.enable()
         self._draw_timer.Start(33)
@@ -82,7 +90,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         return self._render_world.is_closeable()
 
     def _mouse_wheel(self, evt):
-        self._render_world.camera_move_speed += evt.GetWheelRotation() / evt.GetWheelDelta()
+        self._render_world.camera_move_speed += 0.2 * evt.GetWheelRotation() / evt.GetWheelDelta()
         if self._render_world.camera_move_speed < 0.1:
             self._render_world.camera_move_speed = 0.1
         evt.Skip()
@@ -102,16 +110,35 @@ class World3dCanvas(glcanvas.GLCanvas):
         if key_map['right'] in self._keys_pressed:
             right += 1
 
-        if key_map['look_left'] in self._keys_pressed:
-            yaw -= 1
-        if key_map['look_right'] in self._keys_pressed:
-            yaw += 1
-        if key_map['look_up'] in self._keys_pressed:
-            pitch -= 1
-        if key_map['look_down'] in self._keys_pressed:
-            pitch += 1
+        pitch = (self._mouse_y - self._last_mouse_y) * 0.07
+        yaw = (self._mouse_x - self._last_mouse_x) * 0.07
+        self._last_mouse_x, self._last_mouse_y = self._mouse_x, self._mouse_y
+        if self._mouse_lock:
+            self._last_mouse_x, self._last_mouse_y = self.GetSize()[0]/2, self.GetSize()[1]/2
+            self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
         self._render_world.move_camera(forward, up, right, pitch, yaw)
         evt.Skip()
+
+    def _toggle_mouse_lock(self, evt):
+        if self._mouse_lock:
+            self._release_mouse()
+        else:
+            self.CaptureMouse()
+            wx.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
+            self._mouse_x, self._mouse_y = self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
+            self._mouse_lock = True
+
+    def _release_mouse(self):
+        wx.SetCursor(wx.NullCursor)
+        try:
+            self.ReleaseMouse()
+        except:
+            pass
+        self._mouse_lock = False
+
+    def _on_mouse_motion(self, evt):
+        if self._mouse_lock:
+            self._mouse_x, self._mouse_y = evt.GetPosition()
 
     def _on_key_release(self, event):
         key = event.GetUnicodeKey()
@@ -128,6 +155,7 @@ class World3dCanvas(glcanvas.GLCanvas):
 
     def _on_loss_focus(self, evt):
         self._keys_pressed.clear()
+        self._release_mouse()
         evt.Skip()
 
     def _on_resize(self, event):
