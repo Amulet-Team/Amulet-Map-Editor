@@ -61,6 +61,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
         self.Bind(wx.EVT_KEY_UP, self._on_key_release)
         self.Bind(wx.EVT_MOUSEWHEEL, self._mouse_wheel)
+        self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
 
     def enable(self):
         self._render_world.enable()
@@ -124,6 +125,10 @@ class World3dCanvas(glcanvas.GLCanvas):
         if key == wx.WXK_NONE:
             key = event.GetKeyCode()
         self._keys_pressed.add(key)
+
+    def _on_loss_focus(self, evt):
+        self._keys_pressed.clear()
+        evt.Skip()
 
     def _on_resize(self, event):
         self.set_size(*event.GetSize())
