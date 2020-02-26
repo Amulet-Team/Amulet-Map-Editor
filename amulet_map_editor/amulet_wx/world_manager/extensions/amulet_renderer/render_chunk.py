@@ -167,10 +167,10 @@ class RenderChunk:
 
         chunk_verts = []
 
-        for block_temp_id in unique_blocks:
+        for block_temp_id, model in sorted(models.items(), key=lambda x: x[1].is_transparent == 1):
             # for each unique blockstate in the chunk
             # get the model and the locations of the blocks
-            model: minecraft_model_reader.MinecraftMesh = models[block_temp_id]
+            model: minecraft_model_reader.MinecraftMesh
             all_block_locations = numpy.argwhere(blocks == block_temp_id)
             if not all_block_locations.size:
                 continue
