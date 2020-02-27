@@ -138,24 +138,22 @@ class RenderChunk:
             model = models[block_temp_id] = self._render_world().get_model(block_temp_id)
             transparent_array[larger_blocks == block_temp_id] = model.is_transparent
 
-        def get_transparent_array(offset_transparent_array, offset_block_array, block_array=None):
-            if block_array is None:
-                block_array = blocks
+        def get_transparent_array(offset_transparent_array, transparent_array):
             return numpy.logical_and(
                 offset_transparent_array,  # if the next block is transparent
                 numpy.logical_not(  # but is not the same block with transparency mode 1
-                    (offset_transparent_array == 1) * (block_array == offset_block_array)
+                    (offset_transparent_array == 1) * (offset_transparent_array == transparent_array)
                 )
             )
 
         show_up = numpy.ones(blocks.shape, dtype=numpy.bool)
         show_down = numpy.ones(blocks.shape, dtype=numpy.bool)
-        show_up[:, :-1, :] = get_transparent_array(transparent_array[1:-1, 1:, 1:-1], larger_blocks[1:-1, 1:, 1:-1], larger_blocks[1:-1, :-1, 1:-1])
-        show_down[:, 1:, :] = get_transparent_array(transparent_array[1:-1, :-1, 1:-1], larger_blocks[1:-1, :-1, 1:-1], larger_blocks[1:-1, 1:, 1:-1])
-        show_north = get_transparent_array(transparent_array[1:-1, :, :-2], larger_blocks[1:-1, :, :-2])
-        show_south = get_transparent_array(transparent_array[1:-1, :, 2:], larger_blocks[1:-1, :, 2:])
-        show_east = get_transparent_array(transparent_array[2:, :, 1:-1], larger_blocks[2:, :, 1:-1])
-        show_west = get_transparent_array(transparent_array[:-2, :, 1:-1], larger_blocks[:-2, :, 1:-1])
+        show_up[:, :-1, :] = get_transparent_array(transparent_array[1:-1, 1:, 1:-1], transparent_array[1:-1, :-1, 1:-1])
+        show_down[:, 1:, :] = get_transparent_array(transparent_array[1:-1, :-1, 1:-1], transparent_array[1:-1, 1:, 1:-1])
+        show_north = get_transparent_array(transparent_array[1:-1, :, :-2], transparent_array[1:-1, :, 1:-1])
+        show_south = get_transparent_array(transparent_array[1:-1, :, 2:], transparent_array[1:-1, :, 1:-1])
+        show_east = get_transparent_array(transparent_array[2:, :, 1:-1], transparent_array[1:-1, :, 1:-1])
+        show_west = get_transparent_array(transparent_array[:-2, :, 1:-1], transparent_array[1:-1, :, 1:-1])
 
         show_map = {
             'up': show_up,
