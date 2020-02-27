@@ -89,6 +89,8 @@ class RenderWorld:
         self._world = world
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera = [0, 300, 0, 90, 0]
+        self._last_camera = [0, 0, 0, 90, 0]
+        self._transformation_matrix = numpy.eye(4, dtype=numpy.float32)
         self._dimension = 0
         self._camera_move_speed = 5
         self._camera_rotate_speed = 2
@@ -151,6 +153,7 @@ class RenderWorld:
         log.info('Finished setting up texture atlas in OpenGL')
 
     def move_camera(self, forward, up, right, pitch, yaw):
+        self._last_camera = self._camera
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
             return
         self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + sin(self._camera[4]) * forward)
@@ -267,59 +270,60 @@ class RenderWorld:
     @property
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
-        transformation_matrix = numpy.eye(4, dtype=numpy.float32)
-        transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
+        if self._camera != self._last_camera:
+            transformation_matrix = numpy.eye(4, dtype=numpy.float32)
+            transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
 
-        theta = math.radians(self._camera[4])
-        c = math.cos(theta)
-        s = math.sin(theta)
+            theta = math.radians(self._camera[4])
+            c = math.cos(theta)
+            s = math.sin(theta)
 
-        y_rot = numpy.array(
-            [
-                [c, 0, -s, 0],
-                [0, 1, 0, 0],
-                [s, 0, c, 0],
-                [0, 0, 0, 1]
-            ],
-            dtype=numpy.float32
-        )
+            y_rot = numpy.array(
+                [
+                    [c, 0, -s, 0],
+                    [0, 1, 0, 0],
+                    [s, 0, c, 0],
+                    [0, 0, 0, 1]
+                ],
+                dtype=numpy.float32
+            )
 
-        transformation_matrix = numpy.matmul(transformation_matrix, y_rot)
+            transformation_matrix = numpy.matmul(transformation_matrix, y_rot)
 
-        # rotations
-        theta = math.radians(self._camera[3])
-        c = math.cos(theta)
-        s = math.sin(theta)
+            # rotations
+            theta = math.radians(self._camera[3])
+            c = math.cos(theta)
+            s = math.sin(theta)
 
-        x_rot = numpy.array(
-            [
-                [1, 0, 0, 0],
-                [0, c, s, 0],
-                [0, -s, c, 0],
-                [0, 0, 0, 1]
-            ],
-            dtype=numpy.float32
-        )
+            x_rot = numpy.array(
+                [
+                    [1, 0, 0, 0],
+                    [0, c, s, 0],
+                    [0, -s, c, 0],
+                    [0, 0, 0, 1]
+                ],
+                dtype=numpy.float32
+            )
 
-        transformation_matrix = numpy.matmul(transformation_matrix, x_rot)
+            transformation_matrix = numpy.matmul(transformation_matrix, x_rot)
 
-        # camera projection
-        fovy, aspect, z_near, z_far = self._projection
-        fovy = math.radians(fovy)
-        f = 1 / math.tan(fovy / 2)
-        projection = numpy.array(
-            [
-                [f/aspect, 0, 0, 0],
-                [0, f, 0, 0],
-                [0, 0, (z_far+z_near)/(z_near-z_far), -1],
-                [0, 0, (2*z_far*z_near)/(z_near-z_far), 0]
-            ],
-            dtype=numpy.float32
-        )
+            # camera projection
+            fovy, aspect, z_near, z_far = self._projection
+            fovy = math.radians(fovy)
+            f = 1 / math.tan(fovy / 2)
+            projection = numpy.array(
+                [
+                    [f/aspect, 0, 0, 0],
+                    [0, f, 0, 0],
+                    [0, 0, (z_far+z_near)/(z_near-z_far), -1],
+                    [0, 0, (2*z_far*z_near)/(z_near-z_far), 0]
+                ],
+                dtype=numpy.float32
+            )
 
-        transformation_matrix = numpy.matmul(transformation_matrix, projection)
+            self._transformation_matrix = numpy.matmul(transformation_matrix, projection)
 
-        return transformation_matrix
+        return self._transformation_matrix
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
