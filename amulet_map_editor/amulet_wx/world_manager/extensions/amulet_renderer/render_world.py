@@ -89,8 +89,8 @@ class RenderWorld:
         self._world = world
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera = [0, 300, 0, 90, 0]
-        self._last_camera = [0, 0, 0, 90, 0]
-        self._transformation_matrix = numpy.eye(4, dtype=numpy.float32)
+        self._transformation_matrix = None
+        self._collision_locations_cache = None
         self._dimension = 0
         self._camera_move_speed = 5
         self._camera_rotate_speed = 2
@@ -153,7 +153,6 @@ class RenderWorld:
         log.info('Finished setting up texture atlas in OpenGL')
 
     def move_camera(self, forward, up, right, pitch, yaw):
-        self._last_camera = self._camera
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
             return
         self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + sin(self._camera[4]) * forward)
@@ -164,6 +163,47 @@ class RenderWorld:
         if not -90 <= self._camera[3] <= 90:
             self._camera[3] = max(min(self._camera[3], 90), -90)
         self._camera[4] += self._camera_rotate_speed * yaw
+        self._transformation_matrix = None
+        self._collision_locations_cache = None
+
+        if up < 0:
+            print(self._collision_locations())
+
+    def _collision_locations(self):
+        if self._collision_locations_cache is None:
+            dx = math.sin(math.radians(self._camera[4])) * math.cos(math.radians(self._camera[3]))
+            dy = -math.sin(math.radians(self._camera[3]))
+            dz = -math.cos(math.radians(self._camera[4])) * math.cos(math.radians(self._camera[3]))
+            look_vector = numpy.array([dx, dy, dz])
+            max_distance = 5
+
+            vectors = numpy.array(
+                [
+                    look_vector / abs(dx),
+                    look_vector / abs(dy),
+                    look_vector / abs(dz)
+                ]
+            )
+            offsets = -numpy.eye(3)
+
+            locations = set()
+            start: numpy.ndarray = numpy.array(self._camera[:3], numpy.float32) % 1
+
+            for axis in range(3):
+                location: numpy.ndarray = start.copy()
+                vector = vectors[axis]
+                offset = offsets[axis]
+                if vector[axis] > 0:
+                    location = location + vector * (1-location[axis])
+                else:
+                    location = location + vector * location[axis]
+                while numpy.all(abs(location) < max_distance):
+                    locations.add(tuple(location.astype(numpy.int)))
+                    locations.add(tuple((location+offset).astype(numpy.int)))
+                    location += vector
+            self._collision_locations_cache = numpy.array(sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))) + self._camera[:3]
+
+        return self._collision_locations_cache
 
     @property
     def dimension(self) -> int:
@@ -270,7 +310,7 @@ class RenderWorld:
     @property
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
-        if self._camera != self._last_camera:
+        if self._transformation_matrix is None:
             transformation_matrix = numpy.eye(4, dtype=numpy.float32)
             transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
 
