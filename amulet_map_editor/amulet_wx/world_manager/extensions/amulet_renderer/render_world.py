@@ -14,6 +14,7 @@ import minecraft_model_reader
 from ..amulet_renderer import textureatlas
 from .render_chunk import RenderChunk
 from .render_region import ChunkManager
+from .selection import Selection
 if TYPE_CHECKING:
     from amulet.api.world import World
 
@@ -89,10 +90,10 @@ class RenderWorld:
         self._world = world
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera = [0, 300, 0, 90, 0]
-        self._transformation_matrix = None
-        self._collision_locations_cache = None
+        self._transformation_matrix: Optional[numpy.ndarray] = None
+        self._collision_locations_cache: Optional[numpy.ndarray] = None
         self._dimension = 0
-        self._camera_move_speed = 5
+        self._camera_move_speed = 1
         self._camera_rotate_speed = 2
 
         self._render_distance = 10
@@ -106,6 +107,9 @@ class RenderWorld:
         self._texture_atlas = None
         self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
+        self._select_distance = 10
+        self._selection_box = Selection(self.identifier, self.get_texture_bounds(('amulet', 'gui/selection')))
+        self._selection_box2 = Selection(self.identifier, self.get_texture_bounds(('amulet', 'gui/selection')))
         self._chunk_generator = ChunkGenerator(self)
 
     @property
@@ -166,8 +170,28 @@ class RenderWorld:
         self._transformation_matrix = None
         self._collision_locations_cache = None
 
-        if up < 0:
-            print(self._collision_locations())
+        location = self._collision_location_distance(10)
+        if self._selection_box.select_state == 0:
+            self._selection_box.min = self._selection_box.max = location
+            self._selection_box.max += 1
+            self._selection_box.create_geometry()
+        elif self._selection_box.select_state == 1:
+            self._selection_box.max = location + 1
+            self._selection_box.create_geometry()
+        elif self._selection_box.select_state == 2:
+            self._selection_box2.min = self._selection_box2.max = location
+            self._selection_box2.max += 1
+            self._selection_box2.create_geometry()
+
+    def _collision_location_distance(self, distance):
+        distance = distance ** 2
+        locations = self._collision_locations()
+        camera = numpy.array(self._camera[:3], dtype=numpy.int)
+        block = next((loc for loc in locations if sum((abs(loc-camera)+0.5)**2) >= distance), None)
+        if block is None:
+            return locations[-1]
+        else:
+            return block
 
     def _collision_locations(self):
         if self._collision_locations_cache is None:
@@ -175,7 +199,7 @@ class RenderWorld:
             dy = -math.sin(math.radians(self._camera[3]))
             dz = -math.cos(math.radians(self._camera[4])) * math.cos(math.radians(self._camera[3]))
             look_vector = numpy.array([dx, dy, dz])
-            max_distance = 5
+            max_distance = 30
 
             vectors = numpy.array(
                 [
@@ -201,7 +225,7 @@ class RenderWorld:
                     locations.add(tuple(location.astype(numpy.int)))
                     locations.add(tuple((location+offset).astype(numpy.int)))
                     location += vector
-            self._collision_locations_cache = numpy.array(sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))) + self._camera[:3]
+            self._collision_locations_cache = numpy.array(sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))) + numpy.array(self._camera[:3], dtype=numpy.int)
 
         return self._collision_locations_cache
 
@@ -383,6 +407,7 @@ class RenderWorld:
 
     def draw(self):
         self._chunk_manager.draw(self.transformation_matrix, self._camera[:3])
+        self._selection_box.draw(self.transformation_matrix)
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
