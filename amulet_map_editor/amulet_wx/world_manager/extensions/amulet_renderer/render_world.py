@@ -192,6 +192,10 @@ class RenderWorld:
             self._selection_box.create_geometry()
             self._selection_box.select_state = 1
 
+    @property
+    def selection(self) -> Optional[numpy.ndarray]:
+        return numpy.array([self._selection_box.min, self._selection_box.max])
+
     def _collision_location_distance(self, distance):
         distance = distance ** 2
         locations = self._collision_locations()

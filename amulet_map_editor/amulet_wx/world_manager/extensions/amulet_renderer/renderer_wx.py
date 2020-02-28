@@ -3,15 +3,19 @@ from wx import glcanvas
 from OpenGL.GL import *
 import sys
 import os
+import numpy
+from typing import TYPE_CHECKING
+
+from amulet.api.block import Block
+from amulet.api.errors import ChunkLoadError
+import minecraft_model_reader
+
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 from amulet_map_editor.amulet_wx.wx_util import SimplePanel
-from amulet.api.block import Block
-
 from .render_world import RenderWorld
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from amulet.api.world import World
-import minecraft_model_reader
 
 
 key_map = {
@@ -128,6 +132,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         evt.Skip()
 
     def _toggle_mouse_lock(self, evt):
+        self.SetFocus()
         if self._mouse_lock:
             self._release_mouse()
         else:
@@ -216,18 +221,34 @@ class World3DPanel(BaseWorldTool):
         event.Skip()
 
     def _set_stone(self, evt):
-        cx, cz = int(self._canvas._render_world._camera[0])>>4, int(self._canvas._render_world._camera[2])>>4
-        y = int(self._canvas._render_world._camera[1])
-        if 0 <= y <= 255:
-            chunk = self._world.get_chunk(cx, cz, self._canvas._render_world._dimension)
-            chunk.blocks[:, y, :] = self._world.palette.get_add_block(
-                Block(
-                    namespace='universal_minecraft',
-                    base_name='stone'
+        box = self._canvas._render_world.selection.reshape((2, 3)).astype(numpy.int32)
+        box_min_ = numpy.min(box, 0)
+        box_max_ = numpy.max(box, 0)
+
+        chunk_min: list = (box_min_/16).astype(numpy.int32).tolist()
+        chunk_max: list = (box_max_/16).astype(numpy.int32).tolist()
+        box_min: list = box_min_.tolist()
+        box_max: list = box_max_.tolist()
+
+        for cx in range(chunk_min[0], chunk_max[0]+1):
+            for cz in range(chunk_min[2], chunk_max[2]+1):
+                try:
+                    chunk = self._world.get_chunk(cx, cz, self._canvas._render_world._dimension)
+                except ChunkLoadError:
+                    continue
+
+                chunk.blocks[
+                    min(max(cx*16, box_min[0]), (cx+1)*16)-cx*16:min(max(cx*16, box_max[0]), (cx+1)*16)-cx*16,
+                    max(0, box_min[1]):min(255, box_max[1]),
+                    min(max(cz*16, box_min[2]), (cz+1)*16)-cz*16:min(max(cz*16, box_max[2]), (cz+1)*16)-cz*16,
+                ] = self._world.palette.get_add_block(
+                    Block(
+                        namespace='universal_minecraft',
+                        base_name='stone'
+                    )
                 )
-            )
-            chunk.changed = True
-            self._world._chunk_history_manager.create_snapshot(self._world._chunk_cache)
+                chunk.changed = True
+        self._world._chunk_history_manager.create_snapshot(self._world._chunk_cache)
 
     def _undo_event(self, evt):
         print('undo')
