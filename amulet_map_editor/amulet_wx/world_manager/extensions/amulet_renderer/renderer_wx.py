@@ -42,7 +42,11 @@ class World3dCanvas(glcanvas.GLCanvas):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        resource_packs = [minecraft_model_reader.JavaRP(rp) for rp in sys.argv[1:] if os.path.isdir(rp)]
+        os.makedirs('resource_packs', exist_ok=True)
+        if not os.path.isfile('resource_packs/readme.txt'):
+            with open('resource_packs/readme.txt', 'w') as f:
+                f.write('Put the resource pack you want loaded in here.')
+        resource_packs = [minecraft_model_reader.java_vanilla_latest] + [minecraft_model_reader.JavaRP(rp) for rp in os.listdir('resource_packs') if os.path.isdir(rp)] + [minecraft_model_reader.java_vanilla_fix]
         resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
 
         self._render_world = RenderWorld(world, resource_pack)
