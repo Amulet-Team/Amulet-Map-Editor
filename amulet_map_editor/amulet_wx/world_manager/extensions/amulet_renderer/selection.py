@@ -39,7 +39,6 @@ class Selection:
         self._loc[3:] = val
 
     def create_geometry(self):
-        print(self._loc)
         _box_coordinates = numpy.array(
             list(
                 itertools.product(
