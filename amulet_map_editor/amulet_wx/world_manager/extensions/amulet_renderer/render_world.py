@@ -93,7 +93,7 @@ class RenderWorld:
         self._transformation_matrix: Optional[numpy.ndarray] = None
         self._collision_locations_cache: Optional[numpy.ndarray] = None
         self._dimension = 0
-        self._camera_move_speed = 1
+        self._camera_move_speed = 2
         self._camera_rotate_speed = 2
 
         self._render_distance = 10
@@ -108,8 +108,8 @@ class RenderWorld:
         self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
         self._select_distance = 10
-        self._selection_box = Selection(self.identifier, self.get_texture_bounds(('amulet', 'gui/selection')))
-        self._selection_box2 = Selection(self.identifier, self.get_texture_bounds(('amulet', 'gui/selection')))
+        self._selection_box = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')))
+        self._selection_box2 = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')))
         self._chunk_generator = ChunkGenerator(self)
 
     @property
