@@ -108,8 +108,8 @@ class RenderWorld:
         self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
         self._select_distance = 10
-        self._selection_box = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')))
-        self._selection_box2 = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')))
+        self._selection_box = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
+        self._selection_box2 = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
         self._chunk_generator = ChunkGenerator(self)
 
     @property
@@ -182,6 +182,15 @@ class RenderWorld:
             self._selection_box2.min = self._selection_box2.max = location
             self._selection_box2.max += 1
             self._selection_box2.create_geometry()
+
+    def left_click(self):
+        if self._selection_box.select_state <= 1:
+            self._selection_box.select_state += 1
+            self._selection_box.create_geometry()
+        elif self._selection_box.select_state == 2:
+            self._selection_box.min = self._selection_box2.min
+            self._selection_box.create_geometry()
+            self._selection_box.select_state = 1
 
     def _collision_location_distance(self, distance):
         distance = distance ** 2
@@ -406,8 +415,12 @@ class RenderWorld:
             length += 1
 
     def draw(self):
+        glEnable(GL_CULL_FACE)
         self._chunk_manager.draw(self.transformation_matrix, self._camera[:3])
+        glDisable(GL_CULL_FACE)
         self._selection_box.draw(self.transformation_matrix)
+        if self._selection_box.select_state == 2:
+            self._selection_box2.draw(self.transformation_matrix)
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:

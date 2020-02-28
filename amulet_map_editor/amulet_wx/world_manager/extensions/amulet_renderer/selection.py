@@ -6,7 +6,12 @@ from typing import Tuple
 
 
 class Selection:
-    def __init__(self, identifier: str, texture_bounds: Tuple[float, float, float, float]):
+    def __init__(self,
+        identifier: str,
+        white_texture_bounds: Tuple[float, float, float, float],
+        green_texture_bounds: Tuple[float, float, float, float],
+        blue_texture_bounds: Tuple[float, float, float, float]
+    ):
         self.identifier = identifier
         self._select_state = 0  # number of points selected
         self._loc = numpy.zeros(6)
@@ -14,13 +19,19 @@ class Selection:
         self._trm_mat_loc = None
         self._vao = None
         self._vbo = None
-        self._verts = numpy.zeros((6*2*3, 10), dtype=numpy.float32)
-        self._verts[:, 5:9] = texture_bounds
+        self._verts = numpy.zeros((6*2*3*3, 10), dtype=numpy.float32)
+        self._verts[:36, 5:9] = white_texture_bounds
+        self._verts[36:72, 5:9] = green_texture_bounds
+        self._verts[72:, 5:9] = blue_texture_bounds
         self._draw_count = 36
 
     @property
     def select_state(self) -> int:
         return self._select_state
+
+    @select_state.setter
+    def select_state(self, value: int):
+        self._select_state = value
 
     @property
     def min(self) -> numpy.ndarray:
@@ -38,11 +49,12 @@ class Selection:
     def max(self, val):
         self._loc[3:] = val
 
-    def create_geometry(self):
+    def _create_box(self, box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
+        box = numpy.array([box_min, box_max]).T.tolist()
         _box_coordinates = numpy.array(
             list(
                 itertools.product(
-                    *self._loc.reshape((2, 3)).T.tolist()
+                    *box
                 )
             )
         )
@@ -57,11 +69,20 @@ class Selection:
         _texture_uv = numpy.array([0, 0, 1, 1], numpy.float)
         _uv_slice = [0, 1, 2, 1, 2, 3, 0, 3]
 
-        _tri_face = numpy.array([0, 1, 2, 0, 2, 3]*6, numpy.uint32).reshape((6, 6)) + numpy.arange(0, 24, 4).reshape((6,1))
-        _verts = _box_coordinates[_cube_face_lut[_tri_face]]
-        _texture_coords = _texture_uv[_uv_slice*6].reshape(-1, 2)[_tri_face, :]  # texture vertices
-        self._verts[:, :3] = _verts.reshape((-1, 3))
-        self._verts[:, 3:5] = _texture_coords.reshape(-1, 2)
+        _tri_face = numpy.array([0, 1, 2, 0, 2, 3] * 6, numpy.uint32).reshape((6, 6)) + numpy.arange(0, 24, 4).reshape((6, 1))
+        return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), _texture_uv[_uv_slice * 6].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
+
+    def create_geometry(self):
+        self._setup()
+        box = self._loc.reshape((2, 3))
+        box_min = numpy.min(box, 0)
+        box_max = numpy.max(box, 0)
+
+        if self.select_state >= 0:
+            self._verts[:36, :3], self._verts[:36, 3:5] = self._create_box(box_min-0.005, box_max+0.005)
+        if self.select_state >= 1:
+            self._verts[36:72, :3], self._verts[36:72, 3:5] = self._create_box(box_min-0.01, box_min+1.01)
+            self._verts[72:, :3], self._verts[72:, 3:5] = self._create_box(box_max-1.01, box_max+0.01)
 
         glBindVertexArray(self._vao)
         glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
@@ -105,4 +126,4 @@ class Selection:
             glUseProgram(self._shader)
             glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
             glBindVertexArray(self._vao)
-            glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
+            glDrawArrays(GL_TRIANGLES, 0, self._draw_count * (2*bool(self._select_state)+1))
