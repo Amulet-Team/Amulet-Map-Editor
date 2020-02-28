@@ -188,7 +188,7 @@ class RenderWorld:
             self._selection_box.select_state += 1
             self._selection_box.create_geometry()
         elif self._selection_box.select_state == 2:
-            self._selection_box.min = self._selection_box2.min
+            self._selection_box.min = self._selection_box.max = self._selection_box2.min
             self._selection_box.create_geometry()
             self._selection_box.select_state = 1
 
@@ -415,9 +415,7 @@ class RenderWorld:
             length += 1
 
     def draw(self):
-        glEnable(GL_CULL_FACE)
         self._chunk_manager.draw(self.transformation_matrix, self._camera[:3])
-        glDisable(GL_CULL_FACE)
         self._selection_box.draw(self.transformation_matrix)
         if self._selection_box.select_state == 2:
             self._selection_box2.draw(self.transformation_matrix)

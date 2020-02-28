@@ -50,11 +50,11 @@ class Selection:
         self._loc[3:] = val
 
     def _create_box(self, box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
-        box = numpy.array([box_min, box_max]).T.tolist()
+        box = numpy.array([box_min, box_max])
         _box_coordinates = numpy.array(
             list(
                 itertools.product(
-                    *box
+                    *box.T.tolist()
                 )
             )
         )
@@ -66,11 +66,19 @@ class Selection:
             1, 5, 7, 3,
             0, 1, 3, 2
         ])
-        _texture_uv = numpy.array([0, 0, 1, 1], numpy.float)
-        _uv_slice = [0, 1, 2, 1, 2, 3, 0, 3]
+        box = box.ravel()
+        _texture_index = numpy.array([
+            0, 2, 3, 5,
+            0, 2, 3, 5,
+            0, 1, 3, 4,
+            2, 1, 5, 4,
+            0, 1, 3, 4,
+            2, 1, 5, 4,
+        ], numpy.uint32)
+        _uv_slice = numpy.array([0, 1, 2, 1, 2, 3, 0, 3]*6, dtype=numpy.uint32).reshape((6, 8)) + numpy.arange(0, 24, 4).reshape((6, 1))
 
         _tri_face = numpy.array([0, 1, 2, 0, 2, 3] * 6, numpy.uint32).reshape((6, 6)) + numpy.arange(0, 24, 4).reshape((6, 1))
-        return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), _texture_uv[_uv_slice * 6].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
+        return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
 
     def create_geometry(self):
         self._setup()
