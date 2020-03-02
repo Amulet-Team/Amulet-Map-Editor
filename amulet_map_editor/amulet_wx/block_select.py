@@ -1,6 +1,7 @@
 from .wx_util import SimplePanel, SimpleText, SimpleChoice, SimpleChoiceAny
 import wx
 import PyMCTranslate
+import amulet_nbt
 from typing import Tuple, List
 
 
@@ -149,9 +150,16 @@ class BlockSelect(VersionSelect):
 class BlockDefine(BlockSelect):
     def __init__(self, parent, translation_manager: PyMCTranslate.TranslationManager):
         super().__init__(parent, translation_manager)
-        self._properties = []
+        self._properties: List[SimplePanel] = []
         self._properties_panel = SimplePanel(self, wx.VERTICAL)
         self.add_object(self._properties_panel, 0)
+
+    @property
+    def properties(self) -> dict:
+        return {
+            prop.GetChildren()[0].GetLabel(): prop.GetChildren()[1].GetString(prop.GetChildren()[1].GetSelection())
+            for prop in self._properties
+        }
 
     def _clear_properties(self):
         for prop in self._properties:
