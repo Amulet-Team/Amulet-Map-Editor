@@ -270,7 +270,7 @@ class WorldSelectAndRecentUI(wx_util.SimplePanel):
 
 
 class WorldSelectWindow(wx.Frame):
-    def __init__(self, open_world_callback: Callable[[str], None], close_callback):
+    def __init__(self, open_world_callback: Callable[[str], None], close_callback: Callable[[], None]):
         wx.Frame.__init__(
             self,
             None,
