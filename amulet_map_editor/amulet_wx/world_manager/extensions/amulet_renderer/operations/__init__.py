@@ -1,5 +1,3 @@
-
-
 """
 # Example plugin
 from amulet.operations.clone import clone
@@ -27,3 +25,61 @@ export = {
 }
 """
 
+import os
+import glob
+import importlib.util
+from amulet import log
+
+operations = []
+
+_input_options = ["src_box", "dst_box", "dst_box_multiple", "options", "wxoptions"]
+
+
+def _load_module(module_path: str):
+    spec = importlib.util.spec_from_file_location(os.path.basename(module_path), module_path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _load_modules(path: str):
+    if os.path.isdir(path):
+        for fpath in glob.iglob(os.path.join(path, "*.py")):
+            if fpath == __file__:
+                continue
+            mod = _load_module(fpath)
+            if hasattr(mod, "export"):
+                plugin = getattr(mod, "export")
+                if not isinstance(plugin, dict):
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. Export must be a dictionary.')
+                    continue
+                if not isinstance(plugin.get("name", None), str):
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "name" in export must exist and be a string.')
+                    continue
+                if not callable(plugin.get("operation", None)):
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "operation" in export must exist and be a function.')
+                    continue
+                inputs = plugin.get("inputs", [])
+                if not isinstance(inputs, list):
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "inputs" in export must be a list.')
+                    continue
+                if "dst_box" in inputs or "dst_box_multiple" in inputs:
+                    if "src_box" not in inputs:
+                        log.error(f'Error loading plugin {os.path.basename(fpath)}. "src_box" must be defined in "inputs" if "dst_box" or "dst_box_multiple" are.')
+                        continue
+
+                if "options" in inputs and "wxoptions" in inputs:
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. Only one of "options" and "wxoptions" may be defined in "inputs" at once.')
+                    continue
+                elif "options" in inputs and "options" not in plugin:
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "options" was specificed in "inputs" but was not present in the dictionary.')
+                    continue
+                elif "wxoptions" in inputs and "wxoptions" not in plugin:
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "wxoptions" was specificed in "inputs" but was not present in the dictionary.')
+                    continue
+
+
+def load_operations():
+    operations.clear()
+    for path in [os.path.dirname(__file__), "plugins"]:
+        _load_modules(path)
