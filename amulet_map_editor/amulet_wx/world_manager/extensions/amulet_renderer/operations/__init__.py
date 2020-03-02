@@ -1,14 +1,19 @@
 """
 # Example plugin
-from amulet.operations.clone import clone
 
-def operation(world, source_box, destination_box, options)
+def operation(world, source_box):
+    pass
+
+def show_ui(options: dict) -> dict:  # see below. Only needed if using wxoptions
+    # create a UI and show it (probably best using wx.Dialog)
+    # build the UI using the options that were returned last time (or an empty dictionary if it is the first)
+    # and return the options how you wish
 
 export = {
     "v": 1,  # a version 1 plugin
     "name": "Plugin Name",  # the name of the plugin
-    "operation": clone,  # the actual function to call when running the plugin
-    "inputs": [],  # a list of inputs to give to the plugin. World class is passed in as the first and these following
+    "operation": operation,  # the actual function to call when running the plugin
+    "inputs": ["src_box"],  # a list of inputs to give to the plugin. World class is passed in as the first and these following
         # possible inputs (max one from each list)
         ["src_box"]  # the box selected by the user
         [
@@ -20,7 +25,7 @@ export = {
             "wxoptions"  # "wxoptions" key must exist
         ]
     "options": {},  # a simple system of defining options from which a simple UI can be created
-    "wxoptions": wxpanel,  # a more complex system allowing users to work directly with wx
+    "wxoptions": show_ui,  # a more complex system allowing users to work directly with wx
     # The result is passed to the related slot in inputs
 }
 """
@@ -30,7 +35,8 @@ import glob
 import importlib.util
 from amulet import log
 
-operations = []
+operations = {}
+options = {}
 
 _input_options = ["src_box", "dst_box", "dst_box_multiple", "options", "wxoptions"]
 
@@ -42,7 +48,7 @@ def _load_module(module_path: str):
     return mod
 
 
-def _load_modules(path: str):
+def _load_operations(path: str):
     if os.path.isdir(path):
         for fpath in glob.iglob(os.path.join(path, "*.py")):
             if fpath == __file__:
@@ -79,8 +85,10 @@ def _load_modules(path: str):
                     log.error(f'Error loading plugin {os.path.basename(fpath)}. "wxoptions" was specificed in "inputs" but was not present in the dictionary.')
                     continue
 
+                operations[fpath] = plugin
+
 
 def load_operations():
     operations.clear()
     for path in [os.path.dirname(__file__), "plugins"]:
-        _load_modules(path)
+        _load_operations(path)
