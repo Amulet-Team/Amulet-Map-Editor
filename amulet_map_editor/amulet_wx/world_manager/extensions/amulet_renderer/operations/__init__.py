@@ -4,7 +4,7 @@
 def operation(world, source_box):
     pass
 
-def show_ui(options: dict) -> dict:  # see below. Only needed if using wxoptions
+def show_ui(parent, world: World, options: dict) -> dict:  # see below. Only needed if using wxoptions
     # create a UI and show it (probably best using wx.Dialog)
     # build the UI using the options that were returned last time (or an empty dictionary if it is the first)
     # and return the options how you wish
