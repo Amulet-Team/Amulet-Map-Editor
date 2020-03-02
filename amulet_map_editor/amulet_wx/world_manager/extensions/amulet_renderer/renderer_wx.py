@@ -248,7 +248,7 @@ class World3DPanel(BaseWorldTool):
                     )
                 )
                 chunk.changed = True
-        self._world._chunk_history_manager.create_snapshot(self._world._chunk_cache)
+        self._world.create_undo_point()
 
     def _undo_event(self, evt):
         print('undo')
