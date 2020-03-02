@@ -64,6 +64,7 @@ def _load_modules(path: str):
                     log.error(f'Error loading plugin {os.path.basename(fpath)}. "inputs" in export must be a list.')
                     continue
                 if "dst_box" in inputs or "dst_box_multiple" in inputs:
+                    continue  # TODO: uncommment when this is implemented in the UI
                     if "src_box" not in inputs:
                         log.error(f'Error loading plugin {os.path.basename(fpath)}. "src_box" must be defined in "inputs" if "dst_box" or "dst_box_multiple" are.')
                         continue
