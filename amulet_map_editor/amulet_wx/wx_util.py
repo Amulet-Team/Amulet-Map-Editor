@@ -101,3 +101,34 @@ class SimpleChoiceAny(wx.Choice):
         """Return the value currently selected in the form before it was converted to a string"""
         return self._items[self.GetSelection()]
 
+
+class SimpleDialog(wx.Dialog):
+    def __init__(self, parent, title):
+        wx.Dialog.__init__(
+            self,
+            parent,
+            title=title,
+            style=wx.CAPTION
+        )
+        sizer = SimpleSizer()
+        self.SetSizer(sizer)
+        self.custom_panel = SimplePanel(sizer)
+        sizer.add_object(self.custom_panel)
+        button_panel = SimplePanel(sizer, wx.HORIZONTAL)
+        sizer.add_object(button_panel)
+
+        ok_button = wx.Button(self, label='Ok')
+        close_button = wx.Button(self, label='Close')
+        button_panel.add_object(ok_button)
+        button_panel.add_object(close_button)
+
+        ok_button.Bind(wx.EVT_BUTTON, self._okay_event)
+        close_button.Bind(wx.EVT_BUTTON, self._cancel_event)
+
+    def _okay_event(self, evt):
+        self.EndModal(wx.OK)
+        evt.Skip()
+
+    def _cancel_event(self, evt):
+        self.EndModal(wx.CANCEL)
+        evt.Skip()
