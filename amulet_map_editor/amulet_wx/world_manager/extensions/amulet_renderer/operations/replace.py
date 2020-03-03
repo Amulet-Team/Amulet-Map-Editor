@@ -23,6 +23,8 @@ def replace_(
         ) for key in ['original_blocks', 'replacement_blocks']
     ):
         replace(world, selection_box, options)
+    else:
+        wx.MessageBox('Please specify the blocks before running the replace operation')
 
 
 def show_ui(parent, world: "World", options: dict) -> dict:

@@ -18,6 +18,8 @@ def fill_(
 ):
     if isinstance(options.get('fill_block'), Block):
         fill(world, selection_box, options)
+    else:
+        wx.MessageBox('Please specify a block before running the fill operation')
 
 
 def show_ui(parent, world: "World", options: dict) -> dict:

@@ -278,9 +278,7 @@ class World3DPanel(BaseWorldTool):
                         )
                     )
                 else:
-                    dialog = wx.MessageDialog(self, "You must select an area of the world before running", "Plugin Error", style=wx.ICON_WARNING | wx.OK | wx.CENTER)
-                    dialog.ShowModal()
-                    dialog.Destroy()
+                    wx.MessageBox("You must select an area of the world before running")
                     return
 
             elif inp in ["dst_box", "dst_box_multiple"]:
