@@ -3,6 +3,7 @@ import wx
 import PyMCTranslate
 import amulet_nbt
 from typing import Tuple, List
+from amulet.api.block import Block
 
 
 class VersionSelect(SimplePanel):
@@ -161,6 +162,14 @@ class BlockDefine(BlockSelect):
             for prop in self._properties
         }
 
+    @property
+    def block(self) -> Block:
+        return Block(
+            self.namespace,
+            self.base_name,
+            {key: amulet_nbt.from_snbt(value) for key, value in self.properties.items()}
+        )
+
     def _clear_properties(self):
         for prop in self._properties:
             prop.Destroy()
@@ -188,4 +197,6 @@ class BlockDefine(BlockSelect):
         if 'properties' in specification:
             for prop, options in specification['properties'].items():
                 self._add_property(prop, options)
+        self._properties_panel.Layout()
+        self._properties_panel.Fit()
         self.Fit()
