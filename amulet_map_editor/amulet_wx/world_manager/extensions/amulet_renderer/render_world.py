@@ -172,15 +172,15 @@ class RenderWorld:
 
         location = self._collision_location_distance(10)
         if self._selection_box.select_state == 0:
-            self._selection_box.min = self._selection_box.max = location
-            self._selection_box.max += 1
+            self._selection_box.point1 = self._selection_box.point2 = location
+            self._selection_box.point2 += 1
             self._selection_box.create_geometry()
         elif self._selection_box.select_state == 1:
-            self._selection_box.max = location + 1
+            self._selection_box.point2 = location + 1
             self._selection_box.create_geometry()
         elif self._selection_box.select_state == 2:
-            self._selection_box2.min = self._selection_box2.max = location
-            self._selection_box2.max += 1
+            self._selection_box2.point1 = self._selection_box2.point2 = location
+            self._selection_box2.point2 += 1
             self._selection_box2.create_geometry()
 
     def left_click(self):
@@ -188,7 +188,7 @@ class RenderWorld:
             self._selection_box.select_state += 1
             self._selection_box.create_geometry()
         elif self._selection_box.select_state == 2:
-            self._selection_box.min = self._selection_box.max = self._selection_box2.min
+            self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
             self._selection_box.create_geometry()
             self._selection_box.select_state = 1
 

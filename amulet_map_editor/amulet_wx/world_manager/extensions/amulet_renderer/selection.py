@@ -34,22 +34,31 @@ class Selection:
         self._select_state = value
 
     @property
-    def min(self) -> numpy.ndarray:
+    def point1(self) -> numpy.ndarray:
         return self._loc[:3]
 
-    @min.setter
-    def min(self, val):
+    @point1.setter
+    def point1(self, val):
         self._loc[:3] = val
 
     @property
-    def max(self) -> numpy.ndarray:
+    def point2(self) -> numpy.ndarray:
         return self._loc[3:]
 
-    @max.setter
-    def max(self, val):
+    @point2.setter
+    def point2(self, val):
         self._loc[3:] = val
 
-    def _create_box(self, box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
+    @property
+    def min(self) -> numpy.ndarray:
+        return numpy.min(self._loc.reshape((2, 3)), 0)
+
+    @property
+    def max(self) -> numpy.ndarray:
+        return numpy.max(self._loc.reshape((2, 3)), 0)
+
+    @staticmethod
+    def _create_box(box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
         box = numpy.array([box_min, box_max])
         _box_coordinates = numpy.array(
             list(
@@ -82,9 +91,8 @@ class Selection:
 
     def create_geometry(self):
         self._setup()
-        box = self._loc.reshape((2, 3))
-        box_min = numpy.min(box, 0)
-        box_max = numpy.max(box, 0)
+        box_min = self.min
+        box_max = self.max
 
         if self.select_state >= 0:
             self._verts[:36, :3], self._verts[:36, 3:5] = self._create_box(box_min-0.005, box_max+0.005)
