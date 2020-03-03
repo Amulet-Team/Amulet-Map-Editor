@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import wx
 
 from amulet.operations.fill import fill
-from amulet.api.selection import SelectionBox
+from amulet.api.selection import Selection
 from amulet.api.block import Block
 from amulet_map_editor.amulet_wx.block_select import BlockDefine
 from amulet_map_editor.amulet_wx.wx_util import SimpleDialog
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 def fill_(
     world: "World",
-    selection_box: SelectionBox,
+    selection_box: Selection,
     options: dict
 ):
     if isinstance(options.get('fill_block'), Block):

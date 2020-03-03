@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import wx
 
 from amulet.api.block import Block
-from amulet.api.selection import SelectionBox
+from amulet.api.selection import Selection
 from amulet.operations.replace import replace
 from amulet_map_editor.amulet_wx.block_select import BlockDefine
 from amulet_map_editor.amulet_wx.wx_util import SimpleDialog, SimplePanel
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 def replace_(
     world: "World",
-    selection_box: SelectionBox,
+    selection_box: Selection,
     options: dict
 ):
     if all(  # verify that the options are actually given
