@@ -1,6 +1,6 @@
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
-from typing import Any, Iterable
+from typing import Iterable, Union
 
 
 class SimpleSizer:
@@ -88,13 +88,24 @@ class SimpleChoiceAny(wx.Choice):
         self._items = ()
         self._sorted = sort
 
-    def SetItems(self, items: Iterable):
-        """Set items. Does not have to be strings"""
-        if self._sorted:
-            self._items = tuple(sorted(items))
+    def SetItems(self, items: Union[Iterable, dict]):
+        """Set items. Does not have to be strings.
+        If items is a dictionary the string of the values are show to the user and the key is returned from GetAny
+        If it is just an iterable the string of the values are shown and the raw equivalent input is returned."""
+        if not items:
+            return
+        if isinstance(items, dict):
+            items = [[key, str(value)] for key, value in items.items()]
+            if self._sorted:
+                items = sorted(items, key=lambda x: x[1])
+            self._items = [key for key, _ in items]
+            super().SetItems([value for _, value in items])
         else:
-            self._items = tuple(items)
-        super().SetItems([str(v) for v in self._items])
+            if self._sorted:
+                self._items = tuple(sorted(items))
+            else:
+                self._items = tuple(items)
+            super().SetItems([str(v) for v in self._items])
         self.SetSelection(0)
 
     def GetAny(self):
