@@ -293,11 +293,13 @@ class World3DPanel(BaseWorldTool):
             self.Update()
             self._menu = SimplePanel(self)
             self.add_object(self._menu, 0, wx.EXPAND)
+            self._menu.Bind(wx.EVT_MOTION, self._steal_focus)
 
             for text, operation in [
-                ['undo', self._undo_event],
-                ['redo', self._redo_event],
-                ['save', self._save_event]
+                ['Undo', self._undo_event],
+                ['Redo', self._redo_event],
+                ['Save', self._save_event],
+                ['Close', self._close_world]
             ]:
                 button = wx.Button(
                     self._menu,
@@ -352,6 +354,13 @@ class World3DPanel(BaseWorldTool):
         if self._canvas is not None:
             return self._canvas.is_closeable()
         return True
+
+    def _close_world(self, evt):
+        self.GetGrandParent().GetParent().close_world(self._world.world_path)
+
+    def _steal_focus(self, evt):
+        self._menu.SetFocus()
+        evt.Skip()
 
 
 if __name__ == "__main__":
