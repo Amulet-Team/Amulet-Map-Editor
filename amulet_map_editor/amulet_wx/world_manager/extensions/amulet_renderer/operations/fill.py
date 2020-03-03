@@ -20,22 +20,20 @@ def fill_(
         fill(world, selection_box, options)
 
 
-def show_ui(parent, world: World, options: dict) -> dict:
+def show_ui(parent, world: "World", options: dict) -> dict:
     dialog = SimpleDialog(parent, 'Fill')
     block_define = BlockDefine(dialog.custom_panel, world.world_wrapper.translation_manager)
     dialog.custom_panel.add_object(block_define)
+    block_define.populate()
+    dialog.Fit()
     if dialog.ShowModal() == wx.ID_OK:
         options = {
             'fill_block': world.world_wrapper.translation_manager.get_version(
                 block_define.platform,
                 block_define.version
             ).block.to_universal(
-                Block(
-                    block_define.namespace,
-                    block_define.base_name,
-                    block_define.properties
-                )
-            )
+                block_define.block
+            )[0]
         }
     return options
 

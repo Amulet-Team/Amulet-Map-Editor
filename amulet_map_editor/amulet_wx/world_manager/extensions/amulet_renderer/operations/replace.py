@@ -25,7 +25,7 @@ def replace_(
         replace(world, selection_box, options)
 
 
-def show_ui(parent, world: World, options: dict) -> dict:
+def show_ui(parent, world: "World", options: dict) -> dict:
     dialog = SimpleDialog(parent, 'Replace')
     horizontal_panel = SimplePanel(dialog.custom_panel, wx.HORIZONTAL)
     dialog.custom_panel.add_object(horizontal_panel)
@@ -34,6 +34,8 @@ def show_ui(parent, world: World, options: dict) -> dict:
     replacement_blocks = BlockDefine(horizontal_panel, world.world_wrapper.translation_manager)
     horizontal_panel.add_object(original_blocks)
     horizontal_panel.add_object(replacement_blocks)
+    original_blocks.populate()
+    replacement_blocks.populate()
 
     if dialog.ShowModal() == wx.ID_OK:
         options = {
@@ -41,22 +43,14 @@ def show_ui(parent, world: World, options: dict) -> dict:
                 original_blocks.platform,
                 original_blocks.version
             ).block.to_universal(
-                Block(
-                    original_blocks.namespace,
-                    original_blocks.base_name,
-                    original_blocks.properties
-                )
-            )],
+                original_blocks.block
+            )[0]],
             'replacement_blocks': [world.world_wrapper.translation_manager.get_version(
                 replacement_blocks.platform,
                 replacement_blocks.version
             ).block.to_universal(
-                Block(
-                    replacement_blocks.namespace,
-                    replacement_blocks.base_name,
-                    replacement_blocks.properties
-                )
-            )]
+                replacement_blocks.block
+            )[0]]
         }
     return options
 
