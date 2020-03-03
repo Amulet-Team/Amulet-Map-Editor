@@ -4,15 +4,18 @@ from OpenGL.GL import *
 import sys
 import os
 import numpy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from amulet.api.block import Block
 from amulet.api.errors import ChunkLoadError
+from amulet.api.selection import SelectionBox, SubBox
 import minecraft_model_reader
 
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
-from amulet_map_editor.amulet_wx.wx_util import SimplePanel
+from amulet_map_editor.amulet_wx.wx_util import SimplePanel, SimpleChoiceAny, SimpleSizer
 from .render_world import RenderWorld
+from . import operations
+from amulet_map_editor import log
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -201,7 +204,7 @@ class World3DPanel(BaseWorldTool):
     def __init__(self, parent: 'MainFrame', world: 'World'):
         super().__init__(parent, wx.HORIZONTAL)
         self._world = world
-        self._canvas = None
+        self._canvas: Optional[World3dCanvas] = None
         self._temp = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -212,6 +215,8 @@ class World3DPanel(BaseWorldTool):
         )
         self._menu = None
         self._menu_buttons = []
+        self._operation_choice: Optional[SimpleChoiceAny] = None
+        self._options_button: Optional[wx.Button] = None
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self.Bind(wx.EVT_SIZE, self._on_resize)
 
@@ -219,36 +224,6 @@ class World3DPanel(BaseWorldTool):
         if self._canvas is not None:
             self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
-
-    def _set_stone(self, evt):
-        box = self._canvas._render_world.selection.reshape((2, 3)).astype(numpy.int32)
-        box_min_ = numpy.min(box, 0)
-        box_max_ = numpy.max(box, 0)
-
-        chunk_min: list = (box_min_/16).astype(numpy.int32).tolist()
-        chunk_max: list = (box_max_/16).astype(numpy.int32).tolist()
-        box_min: list = box_min_.tolist()
-        box_max: list = box_max_.tolist()
-
-        for cx in range(chunk_min[0], chunk_max[0]+1):
-            for cz in range(chunk_min[2], chunk_max[2]+1):
-                try:
-                    chunk = self._world.get_chunk(cx, cz, self._canvas._render_world._dimension)
-                except ChunkLoadError:
-                    continue
-
-                chunk.blocks[
-                    min(max(cx*16, box_min[0]), (cx+1)*16)-cx*16:min(max(cx*16, box_max[0]), (cx+1)*16)-cx*16,
-                    max(0, box_min[1]):min(255, box_max[1]),
-                    min(max(cz*16, box_min[2]), (cz+1)*16)-cz*16:min(max(cz*16, box_max[2]), (cz+1)*16)-cz*16,
-                ] = self._world.palette.get_add_block(
-                    Block(
-                        namespace='universal_minecraft',
-                        base_name='stone'
-                    )
-                )
-                chunk.changed = True
-        self._world.create_undo_point()
 
     def _undo_event(self, evt):
         print('undo')
@@ -262,6 +237,59 @@ class World3DPanel(BaseWorldTool):
         print('save')
         self._world.save()
 
+    def _operation_selection_change(self, evt):
+        self._operation_selection_change_()
+        evt.Skip()
+
+    def _operation_selection_change_(self):
+        operation_path = self._operation_choice.GetAny()
+        operation = operations.operations[operation_path]
+        if "options" in operation.get("inputs", []) or "wxoptions" in operation.get("inputs", []):
+            self._options_button.Enable()
+        else:
+            self._options_button.Disable()
+
+    def _change_options(self, evt):
+        operation_path = self._operation_choice.GetAny()
+        operation = operations.operations[operation_path]
+        if "options" in operation.get("inputs", []):
+            pass  # TODO: implement this
+        elif "wxoptions" in operation.get("inputs", []):
+            options = operation["wxoptions"](self, self._world, operations.options.get(operation_path, {}))
+            if isinstance(options, dict):
+                operations.options[operation_path] = options
+            else:
+                log.error(f"Plugin {operation['name']} at {operation_path} did not return options in a valid format")
+
+    def _run_operation(self, evt):
+        operation_path = self._operation_choice.GetAny()
+        operation = operations.operations[operation_path]
+        operation_inputs = []
+        for inp in operation.get("inputs", []):
+            if inp == "src_box":
+                box = self._canvas._render_world._selection_box  # TODO: make a way to publicly access this
+                if box.select_state == 2:
+                    operation_inputs.append(
+                        SelectionBox(
+                            (SubBox(
+                                box.min,
+                                box.max
+                            ), )
+                        )
+                    )
+                else:
+                    dialog = wx.MessageDialog(self, "You must select an area of the world before running", "Plugin Error", style=wx.ICON_WARNING | wx.OK | wx.CENTER)
+                    dialog.ShowModal()
+                    dialog.Destroy()
+                    return
+
+            elif inp in ["dst_box", "dst_box_multiple"]:
+                return
+            elif inp in ["options", "wxoptions"]:
+                operation_inputs.append(operations.options.get(operation_path, {}))
+
+        self._world.run_operation(operation["operation"], *operation_inputs)
+
     def enable(self):
         if self._canvas is None:
             self.Update()
@@ -271,8 +299,7 @@ class World3DPanel(BaseWorldTool):
             for text, operation in [
                 ['undo', self._undo_event],
                 ['redo', self._redo_event],
-                ['save', self._save_event],
-                ['fill_blocks', self._set_stone]
+                ['save', self._save_event]
             ]:
                 button = wx.Button(
                     self._menu,
@@ -287,6 +314,24 @@ class World3DPanel(BaseWorldTool):
                 self._menu_buttons.append(
                     button
                 )
+            self._operation_choice = SimpleChoiceAny(self._menu)
+            self._operation_choice.SetItems({key: value["name"] for key, value in operations.operations.items()})
+            self._operation_choice.Bind(wx.EVT_CHOICE, self._operation_selection_change)
+            self._menu.add_object(self._operation_choice, 0)
+            self._options_button = wx.Button(
+                self._menu,
+                label="Change Options"
+            )
+            run_button = wx.Button(
+                self._menu,
+                label="Run Operation"
+            )
+            self._options_button.Bind(wx.EVT_BUTTON, self._change_options)
+            run_button.Bind(wx.EVT_BUTTON, self._run_operation)
+            self._menu.add_object(self._options_button)
+            self._menu.add_object(run_button)
+            self._operation_selection_change_()
+
             self._canvas = World3dCanvas(self, self._world)
             self.add_object(self._canvas, 0, wx.EXPAND)
             self._temp.Destroy()
