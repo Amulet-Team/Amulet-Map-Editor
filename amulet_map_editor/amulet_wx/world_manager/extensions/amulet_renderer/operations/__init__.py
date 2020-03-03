@@ -85,6 +85,12 @@ def _load_operations(path: str):
                     log.error(f'Error loading plugin {os.path.basename(fpath)}. "wxoptions" was specificed in "inputs" but was not present in the dictionary.')
                     continue
 
+                if not all(v in _input_options for v in inputs):
+                    for v in inputs:
+                        if v not in _input_options:
+                            log.error(f'Error loading plugin {os.path.basename(fpath)}. "{v}" is not a valid value in "inputs".')
+                    continue
+
                 operations[fpath] = plugin
 
 
