@@ -98,3 +98,5 @@ def load_operations():
     operations.clear()
     for path in [os.path.dirname(__file__), "plugins"]:
         _load_operations(path)
+
+load_operations()
