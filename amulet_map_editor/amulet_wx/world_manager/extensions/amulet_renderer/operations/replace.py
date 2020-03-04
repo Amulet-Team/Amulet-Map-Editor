@@ -36,8 +36,6 @@ def show_ui(parent, world: "World", options: dict) -> dict:
     replacement_blocks = BlockDefine(horizontal_panel, world.world_wrapper.translation_manager)
     horizontal_panel.add_object(original_blocks)
     horizontal_panel.add_object(replacement_blocks)
-    original_blocks.populate()
-    replacement_blocks.populate()
 
     if dialog.ShowModal() == wx.ID_OK:
         options = {

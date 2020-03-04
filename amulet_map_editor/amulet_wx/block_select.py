@@ -2,44 +2,42 @@ from .wx_util import SimplePanel, SimpleText, SimpleChoice, SimpleChoiceAny
 import wx
 import PyMCTranslate
 import amulet_nbt
-from typing import Tuple, List
+from typing import Tuple, List, Optional, Type
 from amulet.api.block import Block
+
+
+history = {}
 
 
 class VersionSelect(SimplePanel):
     def __init__(self, parent, translation_manager: PyMCTranslate.TranslationManager):
         super().__init__(parent)
+        self._populated = False
+
         self._translation_manager = translation_manager
+        self._platform_list: Optional[SimpleChoice] = None
+        self._version_list: Optional[SimpleChoiceAny] = None
+        self._blockstate_button: Optional[wx.CheckBox] = None
+        self._setup_ui()
+        self._set_platforms()
 
-        self._platform_panel = SimplePanel(self, wx.HORIZONTAL)
-        self._version_panel = SimplePanel(self, wx.HORIZONTAL)
-        self._blockstate_panel = SimplePanel(self, wx.HORIZONTAL)
-        self.add_object(self._platform_panel, 0)
-        self.add_object(self._version_panel, 0)
-        self.add_object(self._blockstate_panel, 0)
+    def _add_ui_element(self, label: str, obj: Type[wx.Control]) -> wx.Control:
+        panel = SimplePanel(self, wx.HORIZONTAL)
+        self.add_object(panel, 0)
+        text = SimpleText(panel, label)
+        panel.add_object(text, 0, wx.CENTER | wx.ALL)
+        wx_obj = obj(panel)
+        panel.add_object(wx_obj, 0, wx.CENTER | wx.ALL)
+        return wx_obj
 
-        self._platform_text = SimpleText(self._platform_panel, "Platform")
-        self._version_text = SimpleText(self._version_panel, "Version")
-        self._blockstate_text = SimpleText(self._blockstate_panel, "Force Blockstate")
-
-        self._platform_panel.add_object(self._platform_text, 0, wx.CENTER | wx.ALL)
-        self._version_panel.add_object(self._version_text, 0, wx.CENTER | wx.ALL)
-        self._blockstate_panel.add_object(self._blockstate_text, 0, wx.CENTER | wx.ALL)
-
-        self._platform_list = SimpleChoice(self._platform_panel)
-        self._version_list = SimpleChoiceAny(self._version_panel)
-        self._blockstate_button = wx.CheckBox(self._blockstate_panel)
-
-        self._platform_panel.add_object(self._platform_list, 0, wx.CENTER | wx.ALL)
-        self._version_panel.add_object(self._version_list, 0, wx.CENTER | wx.ALL)
-        self._blockstate_panel.add_object(self._blockstate_button, 0, wx.CENTER | wx.ALL)
+    def _setup_ui(self):
+        self._platform_list = self._add_ui_element("Platform", SimpleChoice)
+        self._version_list = self._add_ui_element("Version", SimpleChoiceAny)
+        self._blockstate_button = self._add_ui_element("Force Blockstate", wx.CheckBox)
 
         self._platform_list.Bind(wx.EVT_CHOICE, self._update_version)
         self._version_list.Bind(wx.EVT_CHOICE, self._update_blockstate)
         self._blockstate_button.Bind(wx.EVT_CHECKBOX, self._update_namespace)
-
-    def populate(self):
-        self._set_platforms()
 
     @property
     def platform(self) -> str:
@@ -53,22 +51,22 @@ class VersionSelect(SimplePanel):
     def force_blockstate(self) -> bool:
         return self._blockstate_button.GetValue()
 
-    def _set_platforms(self):
+    def _set_platforms(self, value: str = None):
         self._platform_list.SetItems(
             self._translation_manager.platforms()
         )
         self._platform_list.SetSelection(0)
         self._set_versions()
 
-    def _set_versions(self):
+    def _update_version(self, evt):
+        self._set_versions()
+        evt.Skip()
+
+    def _set_versions(self, value: Tuple[int, int, int] = None):
         self._version_list.SetItems(
             self._translation_manager.version_numbers(self.platform)
         )
         self._set_blockstate()
-
-    def _update_version(self, evt):
-        self._set_versions()
-        evt.Skip()
 
     def _update_blockstate(self, evt):
         self._set_blockstate()
@@ -83,6 +81,7 @@ class VersionSelect(SimplePanel):
 
     def _update_namespace(self, evt):
         self._set_namespace()
+        evt.Skip()
 
     def _set_namespace(self):
         pass
@@ -90,24 +89,14 @@ class VersionSelect(SimplePanel):
 
 class BlockSelect(VersionSelect):
     def __init__(self, parent, translation_manager: PyMCTranslate.TranslationManager):
+        self._namespace_list: Optional[SimpleChoice] = None
+        self._base_name_list: Optional[SimpleChoice] = None
         super().__init__(parent, translation_manager)
 
-        self._namespace_panel = SimplePanel(self, wx.HORIZONTAL)
-        self._base_name_panel = SimplePanel(self, wx.HORIZONTAL)
-        self.add_object(self._namespace_panel, 0)
-        self.add_object(self._base_name_panel, 0)
-
-        self._namespace_text = SimpleText(self._namespace_panel, "Namespace")
-        self._base_name_text = SimpleText(self._base_name_panel, "Base name")
-
-        self._namespace_panel.add_object(self._namespace_text, 0, wx.CENTER | wx.ALL)
-        self._base_name_panel.add_object(self._base_name_text, 0, wx.CENTER | wx.ALL)
-
-        self._namespace_list = SimpleChoice(self._namespace_panel)
-        self._base_name_list = SimpleChoice(self._base_name_panel)
-
-        self._namespace_panel.add_object(self._namespace_list, 0, wx.CENTER | wx.ALL)
-        self._base_name_panel.add_object(self._base_name_list, 0, wx.CENTER | wx.ALL)
+    def _setup_ui(self):
+        super()._setup_ui()
+        self._namespace_list = self._add_ui_element("Namespace", SimpleChoice)
+        self._base_name_list = self._add_ui_element("Base name", SimpleChoice)
 
         self._namespace_list.Bind(wx.EVT_CHOICE, self._update_base_name)
         self._base_name_list.Bind(wx.EVT_CHOICE, self._update_properties)
@@ -150,8 +139,12 @@ class BlockSelect(VersionSelect):
 
 class BlockDefine(BlockSelect):
     def __init__(self, parent, translation_manager: PyMCTranslate.TranslationManager):
-        super().__init__(parent, translation_manager)
         self._properties: List[SimplePanel] = []
+        self._properties_panel: Optional[SimplePanel] = None
+        super().__init__(parent, translation_manager)
+
+    def _setup_ui(self):
+        super()._setup_ui()
         self._properties_panel = SimplePanel(self, wx.VERTICAL)
         self.add_object(self._properties_panel, 0)
 

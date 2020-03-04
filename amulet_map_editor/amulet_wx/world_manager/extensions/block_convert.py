@@ -15,7 +15,6 @@ class ConvertExtension(BaseWorldTool):
         )
         self.world = world
         self._version_select = BlockDefine(self, world.world_wrapper.translation_manager)
-        self._version_select.populate()
         self.add_object(self._version_select, 0, wx.EXPAND)
 
 

@@ -26,7 +26,6 @@ def show_ui(parent, world: "World", options: dict) -> dict:
     dialog = SimpleDialog(parent, 'Fill')
     block_define = BlockDefine(dialog.custom_panel, world.world_wrapper.translation_manager)
     dialog.custom_panel.add_object(block_define)
-    block_define.populate()
     dialog.Fit()
     if dialog.ShowModal() == wx.ID_OK:
         options = {
