@@ -2,15 +2,19 @@ from .wx_util import SimplePanel, SimpleText, SimpleChoice, SimpleChoiceAny
 import wx
 import PyMCTranslate
 import amulet_nbt
-from typing import Tuple, List, Optional, Type
+from typing import Tuple, List, Optional, Type, Dict
 from amulet.api.block import Block
 
 
-history = {}
-
-
 class VersionSelect(SimplePanel):
-    def __init__(self, parent, translation_manager: PyMCTranslate.TranslationManager):
+    def __init__(
+            self,
+            parent,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None
+    ):
         super().__init__(parent)
         self._populated = False
 
@@ -19,7 +23,9 @@ class VersionSelect(SimplePanel):
         self._version_list: Optional[SimpleChoiceAny] = None
         self._blockstate_button: Optional[wx.CheckBox] = None
         self._setup_ui()
-        self._set_platforms()
+        self._set_platform(platform)
+        self._set_version(version)
+        self._set_blockstate(blockstate)
 
     def _add_ui_element(self, label: str, obj: Type[wx.Control]) -> wx.Control:
         panel = SimplePanel(self, wx.HORIZONTAL)
@@ -37,11 +43,10 @@ class VersionSelect(SimplePanel):
 
         self._platform_list.Bind(wx.EVT_CHOICE, self._update_version)
         self._version_list.Bind(wx.EVT_CHOICE, self._update_blockstate)
-        self._blockstate_button.Bind(wx.EVT_CHECKBOX, self._update_namespace)
 
     @property
     def platform(self) -> str:
-        return self._platform_list.GetString(self._platform_list.GetSelection())
+        return self._platform_list.GetCurrentString()
 
     @property
     def version(self) -> Tuple[int, int, int]:
@@ -51,100 +56,150 @@ class VersionSelect(SimplePanel):
     def force_blockstate(self) -> bool:
         return self._blockstate_button.GetValue()
 
-    def _set_platforms(self, value: str = None):
+    def _set_platform(self, platform: str = None):
+        platforms = self._translation_manager.platforms()
         self._platform_list.SetItems(
-            self._translation_manager.platforms()
+            platforms
         )
-        self._platform_list.SetSelection(0)
-        self._set_versions()
+        if platform and platform in platforms:
+            self._platform_list.SetSelection(platforms.index(platform))
+        else:
+            self._platform_list.SetSelection(0)
+        self._set_version()
 
     def _update_version(self, evt):
-        self._set_versions()
+        self._set_version()
         evt.Skip()
 
-    def _set_versions(self, value: Tuple[int, int, int] = None):
+    def _set_version(self, version: Tuple[int, int, int] = None):
         self._version_list.SetItems(
             self._translation_manager.version_numbers(self.platform)
         )
+        versions = self._version_list.items
+        if version and version in versions:
+            self._version_list.SetSelection(versions.index(version))
         self._set_blockstate()
 
     def _update_blockstate(self, evt):
         self._set_blockstate()
         evt.Skip()
 
-    def _set_blockstate(self):
+    def _set_blockstate(self, value: bool = None):
         if self._translation_manager.get_version(self.platform, self.version).has_abstract_format:
             self._blockstate_button.Enable()
+            if value is not None:
+                self._blockstate_button.SetValue(value)
         else:
             self._blockstate_button.Disable()
         self._set_namespace()
 
-    def _update_namespace(self, evt):
-        self._set_namespace()
-        evt.Skip()
-
-    def _set_namespace(self):
+    def _set_namespace(self, namespace: str = None):
         pass
 
 
 class BlockSelect(VersionSelect):
-    def __init__(self, parent, translation_manager: PyMCTranslate.TranslationManager):
+    def __init__(
+            self,
+            parent,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None,
+            namespace: str = None,
+            base_name: str = None
+    ):
         self._namespace_list: Optional[SimpleChoice] = None
         self._base_name_list: Optional[SimpleChoice] = None
-        super().__init__(parent, translation_manager)
+        super().__init__(
+            parent,
+            translation_manager,
+            platform,
+            version,
+            blockstate
+        )
+        self._set_namespace(namespace)
+        self._set_base_name(base_name)
 
     def _setup_ui(self):
         super()._setup_ui()
         self._namespace_list = self._add_ui_element("Namespace", SimpleChoice)
         self._base_name_list = self._add_ui_element("Base name", SimpleChoice)
 
+        self._blockstate_button.Bind(wx.EVT_CHECKBOX, self._update_namespace)
         self._namespace_list.Bind(wx.EVT_CHOICE, self._update_base_name)
-        self._base_name_list.Bind(wx.EVT_CHOICE, self._update_properties)
 
     @property
     def namespace(self) -> str:
-        return self._namespace_list.GetString(self._namespace_list.GetSelection())
+        return self._namespace_list.GetCurrentString()
 
     @property
     def base_name(self) -> str:
-        return self._base_name_list.GetString(self._base_name_list.GetSelection())
+        return self._base_name_list.GetCurrentString()
 
-    def _set_namespace(self):
+    def _update_namespace(self, evt):
+        self._set_namespace()
+        evt.Skip()
+
+    def _set_namespace(self, namespace: str = None):
         version = self._translation_manager.get_version(self.platform, self.version)
+        namespaces = version.block.namespaces(self.force_blockstate)
         self._namespace_list.SetItems(
-            version.block.namespaces(self.force_blockstate)
+            namespaces
         )
-        self._namespace_list.SetSelection(0)
+        if namespace and namespace in namespaces:
+            self._namespace_list.SetSelection(namespaces.index(namespace))
+        else:
+            self._namespace_list.SetSelection(0)
         self._set_base_name()
 
     def _update_base_name(self, evt):
         self._set_base_name()
         evt.Skip()
 
-    def _set_base_name(self):
+    def _set_base_name(self, base_name: str = None):
         version = self._translation_manager.get_version(self.platform, self.version)
+        base_names = version.block.base_names(self.namespace, self.force_blockstate)
         self._base_name_list.SetItems(
-            version.block.base_names(self.namespace, self.force_blockstate)
+            base_names
         )
-        self._base_name_list.SetSelection(0)
+        if base_name and base_name in base_names:
+            self._base_name_list.SetSelection(base_names.index(base_name))
+        else:
+            self._base_name_list.SetSelection(0)
         self._set_properties()
 
-    def _update_properties(self, evt):
-        self._set_properties()
-        evt.Skip()
-
-    def _set_properties(self):
+    def _set_properties(self, properties: Dict[str, str] = None):
         pass
 
 
 class BlockDefine(BlockSelect):
-    def __init__(self, parent, translation_manager: PyMCTranslate.TranslationManager):
+    def __init__(
+            self,
+            parent,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None,
+            namespace: str = None,
+            base_name: str = None,
+            properties: Dict[str, str] = None
+    ):
         self._properties: List[SimplePanel] = []
         self._properties_panel: Optional[SimplePanel] = None
-        super().__init__(parent, translation_manager)
+        super().__init__(
+            parent,
+            translation_manager,
+            platform,
+            version,
+            blockstate,
+            namespace,
+            base_name
+        )
+        self._set_properties(properties)
 
     def _setup_ui(self):
         super()._setup_ui()
+        self._base_name_list.Bind(wx.EVT_CHOICE, self._update_properties)
         self._properties_panel = SimplePanel(self, wx.VERTICAL)
         self.add_object(self._properties_panel, 0)
 
@@ -169,7 +224,7 @@ class BlockDefine(BlockSelect):
         self._properties.clear()
         self._properties_panel.Layout()
 
-    def _add_property(self, property_name: str, property_values: List[str]):
+    def _add_property(self, property_name: str, property_values: List[str], default: str = None):
         prop_panel = SimplePanel(self._properties_panel, wx.HORIZONTAL)
         self._properties.append(prop_panel)
         self._properties_panel.add_object(prop_panel, 0)
@@ -178,18 +233,27 @@ class BlockDefine(BlockSelect):
         name_list = SimpleChoice(prop_panel)
         prop_panel.add_object(name_list, 0, wx.CENTER | wx.ALL)
         name_list.SetItems(property_values)
-        name_list.SetSelection(0)
+        if default and default in property_values:
+            name_list.SetSelection(property_values.index(default))
+        else:
+            name_list.SetSelection(0)
 
-    def _set_properties(self):
+    def _update_properties(self, evt):
+        self._set_properties()
+        evt.Skip()
+
+    def _set_properties(self, properties: Dict[str, str] = None):
         self._clear_properties()
         specification = self._translation_manager.get_version(
             self.platform, self.version
         ).block.get_specification(
             self.namespace, self.base_name, self.force_blockstate
         )
+        if properties is None:
+            properties = {}
         if 'properties' in specification:
             for prop, options in specification['properties'].items():
-                self._add_property(prop, options)
+                self._add_property(prop, options, properties.get(prop, None))
         self._properties_panel.Layout()
         self._properties_panel.Fit()
         self.Fit()
