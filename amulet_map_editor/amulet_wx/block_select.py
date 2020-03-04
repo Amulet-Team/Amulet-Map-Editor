@@ -204,9 +204,11 @@ class BlockDefine(BlockSelect):
             blockstate: bool = None,
             namespace: str = None,
             base_name: str = None,
-            properties: Dict[str, str] = None
+            properties: Dict[str, str] = None,
+            wildcard: bool = False
     ):
         self._properties: List[SimplePanel] = []
+        self._wildcard = wildcard
         self._properties_panel: Optional[SimplePanel] = None
         super().__init__(
             parent,
@@ -263,11 +265,14 @@ class BlockDefine(BlockSelect):
 
     @property
     def block(self) -> Block:
-        return Block(
-            self.namespace,
-            self.base_name,
-            {key: amulet_nbt.from_snbt(value) for key, value in self.properties.items()}
-        )
+        if self._wildcard:
+            raise Exception('block property cannot be used when BlockDefine is in wildcard mode')
+        else:
+            return Block(
+                self.namespace,
+                self.base_name,
+                {key: amulet_nbt.from_snbt(value) for key, value in self.properties.items()}
+            )
 
     def _clear_properties(self):
         for prop in self._properties:
@@ -283,6 +288,9 @@ class BlockDefine(BlockSelect):
         prop_panel.add_object(name_text, 0, wx.CENTER | wx.ALL)
         name_list = SimpleChoice(prop_panel)
         prop_panel.add_object(name_list, 0, wx.CENTER | wx.ALL)
+
+        if self._wildcard:
+            property_values.insert(0, "*")
         name_list.SetItems(property_values)
         if default and default in property_values:
             name_list.SetSelection(property_values.index(default))
