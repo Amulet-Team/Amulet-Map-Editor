@@ -24,6 +24,10 @@ class VersionSelect(SimplePanel):
         self._setup_ui()
         self._populate_version(platform, version, blockstate)
 
+    @property
+    def options(self) -> Tuple[str, Tuple[int, int, int], bool]:
+        return self.platform, self.version, self.force_blockstate
+
     def _populate_version(
             self,
             platform: str = None,
@@ -124,6 +128,10 @@ class BlockSelect(VersionSelect):
         )
         self._populate_block(platform, version, blockstate, namespace, base_name)
 
+    @property
+    def options(self) -> Tuple[str, Tuple[int, int, int], bool, str, str]:
+        return self.platform, self.version, self.force_blockstate, self.namespace, self.base_name
+
     def _populate_version(
             self,
             platform: str = None,
@@ -221,6 +229,10 @@ class BlockDefine(BlockSelect):
         )
         self._populate_properties(platform, version, blockstate, namespace, base_name, properties)
 
+    @property
+    def options(self) -> Tuple[str, Tuple[int, int, int], bool, str, str, Dict[str, str]]:
+        return self.platform, self.version, self.force_blockstate, self.namespace, self.base_name, self.properties
+
     def _populate_version(
             self,
             platform: str = None,
@@ -257,7 +269,7 @@ class BlockDefine(BlockSelect):
         self.add_object(self._properties_panel, 0)
 
     @property
-    def properties(self) -> dict:
+    def properties(self) -> Dict[str, str]:
         return {
             prop.GetChildren()[0].GetLabel(): prop.GetChildren()[1].GetString(prop.GetChildren()[1].GetSelection())
             for prop in self._properties
