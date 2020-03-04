@@ -16,16 +16,21 @@ class VersionSelect(SimplePanel):
             blockstate: bool = None
     ):
         super().__init__(parent)
-        self._populated = False
 
         self._translation_manager = translation_manager
         self._platform_list: Optional[SimpleChoice] = None
         self._version_list: Optional[SimpleChoiceAny] = None
         self._blockstate_button: Optional[wx.CheckBox] = None
         self._setup_ui()
-        self._set_platform(platform)
-        self._set_version(version)
-        self._set_blockstate(blockstate)
+        self._populate_version(platform, version, blockstate)
+
+    def _populate_version(
+            self,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None
+    ):
+        self._set_platform(platform=platform, version=version, blockstate=blockstate)
 
     def _add_ui_element(self, label: str, obj: Type[wx.Control]) -> wx.Control:
         panel = SimplePanel(self, wx.HORIZONTAL)
@@ -56,7 +61,7 @@ class VersionSelect(SimplePanel):
     def force_blockstate(self) -> bool:
         return self._blockstate_button.GetValue()
 
-    def _set_platform(self, platform: str = None):
+    def _set_platform(self, platform: str = None, **kwargs):
         platforms = self._translation_manager.platforms()
         self._platform_list.SetItems(
             platforms
@@ -65,35 +70,35 @@ class VersionSelect(SimplePanel):
             self._platform_list.SetSelection(platforms.index(platform))
         else:
             self._platform_list.SetSelection(0)
-        self._set_version()
+        self._set_version(**kwargs)
 
     def _update_version(self, evt):
         self._set_version()
         evt.Skip()
 
-    def _set_version(self, version: Tuple[int, int, int] = None):
+    def _set_version(self, version: Tuple[int, int, int] = None, **kwargs):
         self._version_list.SetItems(
             self._translation_manager.version_numbers(self.platform)
         )
         versions = self._version_list.items
         if version and version in versions:
             self._version_list.SetSelection(versions.index(version))
-        self._set_blockstate()
+        self._set_blockstate(**kwargs)
 
     def _update_blockstate(self, evt):
         self._set_blockstate()
         evt.Skip()
 
-    def _set_blockstate(self, value: bool = None):
+    def _set_blockstate(self, blockstate: bool = None, **kwargs):
         if self._translation_manager.get_version(self.platform, self.version).has_abstract_format:
             self._blockstate_button.Enable()
-            if value is not None:
-                self._blockstate_button.SetValue(value)
+            if blockstate is not None:
+                self._blockstate_button.SetValue(blockstate)
         else:
             self._blockstate_button.Disable()
-        self._set_namespace()
+        self._set_namespace(**kwargs)
 
-    def _set_namespace(self, namespace: str = None):
+    def _set_namespace(self, namespace: str = None, **kwargs):
         pass
 
 
@@ -117,8 +122,25 @@ class BlockSelect(VersionSelect):
             version,
             blockstate
         )
-        self._set_namespace(namespace)
-        self._set_base_name(base_name)
+        self._populate_block(platform, version, blockstate, namespace, base_name)
+
+    def _populate_version(
+            self,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None
+    ):
+        pass
+
+    def _populate_block(
+            self,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None,
+            namespace: str = None,
+            base_name: str = None
+    ):
+        self._set_platform(platform=platform, version=version, blockstate=blockstate, namespace=namespace, base_name=base_name)
 
     def _setup_ui(self):
         super()._setup_ui()
@@ -140,7 +162,7 @@ class BlockSelect(VersionSelect):
         self._set_namespace()
         evt.Skip()
 
-    def _set_namespace(self, namespace: str = None):
+    def _set_namespace(self, namespace: str = None, **kwargs):
         version = self._translation_manager.get_version(self.platform, self.version)
         namespaces = version.block.namespaces(self.force_blockstate)
         self._namespace_list.SetItems(
@@ -150,13 +172,13 @@ class BlockSelect(VersionSelect):
             self._namespace_list.SetSelection(namespaces.index(namespace))
         else:
             self._namespace_list.SetSelection(0)
-        self._set_base_name()
+        self._set_base_name(**kwargs)
 
     def _update_base_name(self, evt):
         self._set_base_name()
         evt.Skip()
 
-    def _set_base_name(self, base_name: str = None):
+    def _set_base_name(self, base_name: str = None, **kwargs):
         version = self._translation_manager.get_version(self.platform, self.version)
         base_names = version.block.base_names(self.namespace, self.force_blockstate)
         self._base_name_list.SetItems(
@@ -166,7 +188,7 @@ class BlockSelect(VersionSelect):
             self._base_name_list.SetSelection(base_names.index(base_name))
         else:
             self._base_name_list.SetSelection(0)
-        self._set_properties()
+        self._set_properties(**kwargs)
 
     def _set_properties(self, properties: Dict[str, str] = None):
         pass
@@ -195,7 +217,36 @@ class BlockDefine(BlockSelect):
             namespace,
             base_name
         )
-        self._set_properties(properties)
+        self._populate_properties(platform, version, blockstate, namespace, base_name, properties)
+
+    def _populate_version(
+            self,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None
+    ):
+        pass
+
+    def _populate_block(
+            self,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None,
+            namespace: str = None,
+            base_name: str = None
+    ):
+        pass
+
+    def _populate_properties(
+            self,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None,
+            namespace: str = None,
+            base_name: str = None,
+            properties: Dict[str, str] = None
+    ):
+        self._set_platform(platform=platform, version=version, blockstate=blockstate, namespace=namespace, base_name=base_name, properties=properties)
 
     def _setup_ui(self):
         super()._setup_ui()
