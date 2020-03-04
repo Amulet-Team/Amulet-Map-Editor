@@ -161,7 +161,7 @@ class RenderRegion:
     def rebuild(self):
         """If there are any chunks that have not been merged recreate the merged vertex table"""
         self._setup()
-        if self._manual_chunks:
+        if self._manual_chunks and self._vao and self._vbo:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
             chunks: List[Tuple[Tuple[int, int], RenderChunk]] = list(self._chunks.items())
