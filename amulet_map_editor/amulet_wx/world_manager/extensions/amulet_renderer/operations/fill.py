@@ -27,12 +27,7 @@ def show_ui(parent, world: "World", options: dict) -> dict:
     block_define = BlockDefine(
         dialog.custom_panel,
         world.world_wrapper.translation_manager,
-        options.get("fill_block_platform"),
-        options.get("fill_block_version"),
-        options.get("fill_block_blockstate"),
-        options.get("fill_block_namespace"),
-        options.get("fill_block_base_name"),
-        options.get("fill_block_properties")
+        *options.get("fill_block_options", [])
     )
     dialog.custom_panel.add_object(block_define)
     dialog.Fit()
@@ -44,12 +39,7 @@ def show_ui(parent, world: "World", options: dict) -> dict:
             ).block.to_universal(
                 block_define.block
             )[0],
-            "fill_block_platform": block_define.platform,
-            "fill_block_version": block_define.version,
-            "fill_block_blockstate": block_define.force_blockstate,
-            "fill_block_namespace": block_define.namespace,
-            "fill_block_base_name": block_define.base_name,
-            "fill_block_properties": block_define.properties,
+            "fill_block_options": block_define.options
         }
     return options
 
