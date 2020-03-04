@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Optional
 
 from amulet.api.block import Block
 from amulet.api.errors import ChunkLoadError
-from amulet.api.selection import Selection, SubBox
+from amulet.api.selection import Selection, SubSelectionBox
 import minecraft_model_reader
 
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
@@ -271,7 +271,7 @@ class World3DPanel(BaseWorldTool):
                 if box.select_state == 2:
                     operation_inputs.append(
                         Selection(
-                            (SubBox(
+                            (SubSelectionBox(
                                 box.min,
                                 box.max
                             ), )
