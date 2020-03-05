@@ -126,7 +126,6 @@ class RenderRegion:
     def _disable_merged_chunk(self, chunk_coords: Tuple[int, int]):
         """Zero out the region of memory in the merged chunks related to a given chunk"""
         if chunk_coords in self._merged_chunk_locations:
-            print(f'Removing chunk {chunk_coords}')
             offset, size, translucent_offset, translucent_size = self._merged_chunk_locations.pop(chunk_coords)
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
