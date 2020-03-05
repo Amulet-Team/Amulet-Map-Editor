@@ -26,7 +26,7 @@ class ChunkManager:
         self._chunk_temp_set.add(chunk_coords)
 
     def render_chunk_needs_rebuild(self, chunk_coords: Tuple[int, int]) -> bool:
-        return self.render_chunk_in_main_database(chunk_coords) and self.get_render_chunk(chunk_coords).needs_rebuild()
+        return chunk_coords not in self._chunk_temp_set and self.render_chunk_in_main_database(chunk_coords) and self.get_render_chunk(chunk_coords).needs_rebuild()
 
     def get_render_chunk(self, chunk_coords: Tuple[int, int]) -> RenderChunk:
         """Get a RenderChunk from the database.
