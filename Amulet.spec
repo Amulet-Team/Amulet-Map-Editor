@@ -12,6 +12,10 @@ import amulet
 import PyMCTranslate
 import minecraft_model_reader
 
+AMULET_VERSION = input('Amulet Version Number:')
+with open('amulet_map_editor/version', 'w') as f:
+    f.write(AMULET_VERSION)
+
 AMULET_PATH = amulet.__path__[0]
 PYMCT_PATH = os.path.abspath(os.path.dirname(PyMCTranslate.__file__))
 REAL_PYMCT_PATH = PYMCT_PATH if not os.path.islink(PYMCT_PATH) else os.readlink(PYMCT_PATH)  # I have this linked by a symbolic link
