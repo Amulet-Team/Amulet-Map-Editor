@@ -116,6 +116,8 @@ class RenderRegion:
     def add_render_chunk(self, render_chunk: RenderChunk):
         """Add a chunk to the region"""
         chunk_coords = (render_chunk.cx, render_chunk.cz)
+        if chunk_coords in self._chunks:
+            self._chunks[chunk_coords].unload()
         self._disable_merged_chunk(chunk_coords)
         self._chunks[chunk_coords] = render_chunk
         self._manual_chunks[chunk_coords] = render_chunk
