@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-# python -m PyInstaller -y Amulet_Converter.spec
+# python -m PyInstaller -y Amulet.spec
 
 from PyInstaller.utils.hooks import collect_submodules
 
@@ -84,7 +84,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='Amulet-Converter',
+          name='Amulet',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -98,25 +98,20 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='Amulet-Converter')
+               name='Amulet')
 
 delete_files = [
-    'minecraft_model_reader/transparrency_cache.json'
+    '**/transparrency_cache.json'
+    '**/config.json'
 ]
 delete_folders = [
-    'amulet_map_editor/world_temp',
-    'minecraft_model_reader/resource_packs/java_vanilla'
+    '**/world_temp',
+    '**/__pycache__',
+    '**/minecraft_model_reader/resource_packs/java_vanilla'
 ]
 
-for fi in delete_files:
-    fi_path = os.path.join('dist', 'Amulet-Converter', fi)
-    if os.path.isfile(fi_path):
-        os.remove(fi_path)
-
-for fo in delete_folders:
-    fo_path = os.path.join('dist', 'Amulet-Converter', fo)
-    if os.path.isdir(fo_path):
-        shutil.rmtree(fo_path)
-
-for path in glob.iglob('dist/**/__pycache__', recursive=True):
-    shutil.rmtree(path)
+for fun, path_list in [[os.remove, delete_files], [shutil.rmtree, delete_folders]]:
+    for f_ext in delete_files:
+        glob_path = os.path.join('dist', f_ext)
+        for path in glob.iglob(glob_path, recursive=True):
+            fun(path)
