@@ -125,12 +125,14 @@ class World3dCanvas(glcanvas.GLCanvas):
         if key_map['right'] in self._keys_pressed:
             right += 1
 
-        pitch = (self._mouse_y - self._last_mouse_y) * 0.07
-        yaw = (self._mouse_x - self._last_mouse_x) * 0.07
-        self._last_mouse_x, self._last_mouse_y = self._mouse_x, self._mouse_y
         if self._mouse_lock:
-            self._last_mouse_x, self._last_mouse_y = self.GetSize()[0]/2, self.GetSize()[1]/2
+            pitch = (self._mouse_y - self._last_mouse_y) * 0.07
+            yaw = (self._mouse_x - self._last_mouse_x) * 0.07
+            self._mouse_x, self._mouse_y = self._last_mouse_x, self._last_mouse_y = self.GetSize()[0]/2, self.GetSize()[1]/2
             self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
+        else:
+            pitch = 0
+            yaw = 0
         self._render_world.move_camera(forward, up, right, pitch, yaw)
         evt.Skip()
 
