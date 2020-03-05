@@ -24,6 +24,7 @@ def replace(
         return
 
     original_platform, original_version, original_blockstate, original_namespace, original_base_name, original_properties = original_block_options
+    replacement_block_id = world.palette.get_add_block(replacement_block)
 
     original_block_matches = []
     universal_block_count = 0
@@ -34,7 +35,7 @@ def replace(
                 version_block = world.translation_manager.get_version(
                     original_platform,
                     original_version
-                ).block.to_universal(
+                ).block.from_universal(
                     world.palette[universal_block_id],
                     force_blockstate=original_blockstate
                 )[0]
@@ -44,7 +45,7 @@ def replace(
                     original_block_matches.append(universal_block_id)
 
             universal_block_count = len(world.palette)
-        chunk.blocks[slices][numpy.isin(chunk.blocks[slices], original_block_matches)] = replacement_block
+        chunk.blocks[slices][numpy.isin(chunk.blocks[slices], original_block_matches)] = replacement_block_id
 
 
 def show_ui(parent, world: "World", options: dict) -> dict:
