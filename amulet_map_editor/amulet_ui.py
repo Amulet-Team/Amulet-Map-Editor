@@ -1,4 +1,5 @@
 import wx
+import os
 from typing import Dict
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
 from amulet_map_editor import lang, config
@@ -12,7 +13,7 @@ class AmuletMainWindow(wx.Frame):
             self,
             parent,
             id=wx.ID_ANY,
-            title="Amulet Converter V0.2", # TODO: set this dynamically
+            title="Amulet V0.5", # TODO: set this dynamically
             pos=wx.DefaultPosition,
             size=wx.Size(560, 400),
             style=wx.CAPTION
@@ -25,6 +26,9 @@ class AmuletMainWindow(wx.Frame):
             | wx.CLIP_CHILDREN
             | wx.RESIZE_BORDER,
         )
+        icon = wx.EmptyIcon()
+        icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.path.dirname(__file__), 'img', 'icon64.png'), wx.BITMAP_TYPE_ANY))
+        self.SetIcon(icon)
 
         self._open_worlds: Dict[str, WorldManagerUI] = {}
 
