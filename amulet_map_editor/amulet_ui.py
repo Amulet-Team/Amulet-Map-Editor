@@ -2,7 +2,7 @@ import wx
 import os
 from typing import Dict
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
-from amulet_map_editor import lang, config
+from amulet_map_editor import lang, config, version
 from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
 from amulet_map_editor.amulet_wx import wx_util
 
@@ -13,7 +13,7 @@ class AmuletMainWindow(wx.Frame):
             self,
             parent,
             id=wx.ID_ANY,
-            title="Amulet V0.5", # TODO: set this dynamically
+            title=f"Amulet V{version}",
             pos=wx.DefaultPosition,
             size=wx.Size(560, 400),
             style=wx.CAPTION
