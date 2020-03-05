@@ -42,7 +42,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         super().__init__(world_panel, -1, size=world_panel.GetClientSize())
         self._context = glcanvas.GLContext(self)
         self.SetCurrent(self._context)
-        glClearColor(0.5, 0.5, 0.5, 1.0)
+        glClearColor(0.5, 0.66, 1.0, 1.0)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glDepthFunc(GL_LEQUAL)
