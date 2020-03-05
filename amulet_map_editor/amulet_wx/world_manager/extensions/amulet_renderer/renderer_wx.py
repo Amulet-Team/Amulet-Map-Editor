@@ -226,15 +226,12 @@ class World3DPanel(BaseWorldTool):
         event.Skip()
 
     def _undo_event(self, evt):
-        print('undo')
         self._world.undo()
 
     def _redo_event(self, evt):
-        print('redo')
         self._world.redo()
 
     def _save_event(self, evt):
-        print('save')
         self._world.save()
 
     def _operation_selection_change(self, evt):
