@@ -133,8 +133,9 @@ class Selection:
 
     def unload(self):
         if self._vao is not None:
-            glDeleteVertexArrays(1, self._vao)
+            vao = self._vao
             self._vao = None
+            glDeleteVertexArrays(1, self._vao)
 
     def draw(self, transformation_matrix):
         self._setup()
