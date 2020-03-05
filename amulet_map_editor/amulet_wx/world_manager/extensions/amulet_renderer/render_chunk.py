@@ -66,6 +66,10 @@ class RenderChunk:
     def chunk(self) -> "Chunk":
         return self._render_world().world.get_chunk(*self._coords, self._dimension)
 
+    @property
+    def chunk_state(self) -> int:
+        return self._chunk_state
+
     def needs_rebuild(self):
         """has the chunk data changed since the last rebuild"""
         try:

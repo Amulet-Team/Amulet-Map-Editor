@@ -16,6 +16,7 @@ class ChunkManager:
         # which causes issues due to dictionaries resizing
         self._chunk_temp: queue.Queue = queue.Queue()
         self._chunk_temp_set = set()
+        self.chunk_rebuilds = set()
 
     def add_render_chunk(self, render_chunk: RenderChunk):
         """Add a RenderChunk to the database.

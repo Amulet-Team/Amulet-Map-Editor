@@ -35,6 +35,10 @@ class ChunkGenerator(ThreadPoolExecutor):
         self._enabled = False
         self._generator: Optional[Future] = None
 
+    @property
+    def render_world(self) -> "RenderWorld":
+        return self._render_world()
+
     def start(self):
         if self._enabled:
             raise Exception('ChunkGenerator started more than once')
@@ -49,29 +53,47 @@ class ChunkGenerator(ThreadPoolExecutor):
 
     def _generate_chunks(self):
         while self._enabled:
+            # first check if there is a chunk that exists and needs rebuilding
             chunk_coords = next(
                 (
-                    c for c in self._render_world().chunk_coords() if
-                    self._render_world().chunk_manager.render_chunk_needs_rebuild(c)
+                    c for c in self.render_world.chunk_coords() if
+                    self.render_world.chunk_manager.render_chunk_needs_rebuild(c)
                 ),
                 None
             )
-            if chunk_coords is None:
+            if chunk_coords is not None:
+                # if there was a chunk found that needs rebuilding then add the surrounding chunks for rebuilding
+                # (this deals with if the chunk was deleted or the blocks up to the chunk boundary were deleted)
+                for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    chunk_coords_ = (chunk_coords[0] + offset[0], chunk_coords[1] + offset[1])
+                    if chunk_coords_ in self.render_world.chunk_manager:
+                        self.render_world.chunk_manager.chunk_rebuilds.add(chunk_coords_)
+            elif self.render_world.chunk_manager.chunk_rebuilds:
+                # if a chunk was not found that needs rebuilding due to it changing but a previously identified neighbour chunk needs rebuilding do that.
+                chunk_coords = self.render_world.chunk_manager.chunk_rebuilds.pop()
+            else:
+                # if no chunks need rebuilding then find a new chunk to load.
                 chunk_coords = next(
                     (
-                        c for c in self._render_world().chunk_coords() if
-                        c not in self._render_world().chunk_manager
+                        c for c in self.render_world.chunk_coords() if
+                        c not in self.render_world.chunk_manager
                     ),
                     None
                 )
             if chunk_coords is None:
+                # if no chunk was found to load go to sleep so this thread doesn't lock up the main thread.
                 time.sleep(1 / 30)
             else:
+                # if chunk coords is in here then remove it so it doesn't get generated twice.
+                if chunk_coords in self.render_world.chunk_manager.chunk_rebuilds:
+                    self.render_world.chunk_manager.chunk_rebuilds.remove(chunk_coords)
+
+                # generate the chunk
                 chunk = RenderChunk(
-                    self._render_world(),
+                    self.render_world,
                     self._region_size,
                     chunk_coords,
-                    self._render_world().dimension
+                    self.render_world.dimension
                 )
 
                 try:
@@ -79,7 +101,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                 except Exception as e:
                     log.error(f'Failed generating chunk geometry for chunk {chunk_coords}', exc_info=True)
 
-                self._render_world().chunk_manager.add_render_chunk(
+                self.render_world.chunk_manager.add_render_chunk(
                     chunk
                 )
 
