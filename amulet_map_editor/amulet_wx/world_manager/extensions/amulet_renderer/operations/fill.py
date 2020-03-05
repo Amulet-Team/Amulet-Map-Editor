@@ -37,7 +37,8 @@ def show_ui(parent, world: "World", options: dict) -> dict:
                 block_define.platform,
                 block_define.version
             ).block.to_universal(
-                block_define.block
+                block_define.block,
+                force_blockstate=block_define.force_blockstate
             )[0],
             "fill_block_options": block_define.options
         }
