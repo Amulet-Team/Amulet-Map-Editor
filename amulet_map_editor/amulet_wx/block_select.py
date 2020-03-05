@@ -325,6 +325,5 @@ class BlockDefine(BlockSelect):
         if 'properties' in specification:
             for prop, options in specification['properties'].items():
                 self._add_property(prop, options, properties.get(prop, None))
-        self._properties_panel.Layout()
-        self._properties_panel.Fit()
         self.Fit()
+        self.GetTopLevelParent().Fit()
