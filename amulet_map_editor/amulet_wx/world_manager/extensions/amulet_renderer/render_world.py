@@ -234,6 +234,7 @@ class RenderWorld:
             dy = -math.sin(math.radians(self._camera[3]))
             dz = -math.cos(math.radians(self._camera[4])) * math.cos(math.radians(self._camera[3]))
             look_vector = numpy.array([dx, dy, dz])
+            look_vector[abs(look_vector) < 0.000001] = 0.000001
             max_distance = 30
 
             vectors = numpy.array(
@@ -257,10 +258,10 @@ class RenderWorld:
                 else:
                     location = location + vector * location[axis]
                 while numpy.all(abs(location) < max_distance):
-                    locations.add(tuple(location.astype(numpy.int)))
-                    locations.add(tuple((location+offset).astype(numpy.int)))
+                    locations.add(tuple(numpy.floor(location).astype(numpy.int)))
+                    locations.add(tuple(numpy.floor(location+offset).astype(numpy.int)))
                     location += vector
-            self._collision_locations_cache = numpy.array(sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))) + numpy.array(self._camera[:3], dtype=numpy.int)
+            self._collision_locations_cache = numpy.array(sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))) + numpy.floor(self._camera[:3]).astype(numpy.int)
 
         return self._collision_locations_cache
 
