@@ -3,11 +3,8 @@ from wx import glcanvas
 from OpenGL.GL import *
 import sys
 import os
-import numpy
 from typing import TYPE_CHECKING, Optional
 
-from amulet.api.block import Block
-from amulet.api.errors import ChunkLoadError
 from amulet.api.selection import Selection, SubSelectionBox
 import minecraft_model_reader
 
@@ -174,11 +171,16 @@ class World3dCanvas(glcanvas.GLCanvas):
         if key == wx.WXK_NONE:
             key = event.GetKeyCode()
         self._keys_pressed.add(key)
+        if key == wx.WXK_ESCAPE:
+            self._escape()
 
     def _on_loss_focus(self, evt):
+        self._escape()
+        evt.Skip()
+
+    def _escape(self):
         self._keys_pressed.clear()
         self._release_mouse()
-        evt.Skip()
 
     def _on_resize(self, event):
         self.set_size(*event.GetSize())
