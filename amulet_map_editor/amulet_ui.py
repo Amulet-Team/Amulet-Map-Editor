@@ -92,7 +92,7 @@ class AmuletMainMenu(wx_util.SimplePanel):
         amulet_converter = wx.StaticText(
             self,
             wx.ID_ANY,
-            'Amulet Converter',
+            'Amulet',
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
