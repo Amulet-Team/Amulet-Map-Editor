@@ -8,13 +8,12 @@ import uuid
 import weakref
 
 from amulet_map_editor import log
-from amulet_map_editor.opengl import shaders
+from amulet_map_editor.opengl import shaders, textureatlas
 
 import minecraft_model_reader
-from ..amulet_renderer import textureatlas
-from .render_chunk import RenderChunk
-from .render_region import ChunkManager
-from .selection import Selection
+from .chunk import RenderChunk
+from .region import ChunkManager
+from amulet_map_editor.opengl.mesh.selection import Selection
 if TYPE_CHECKING:
     from amulet.api.world import World
 

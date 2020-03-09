@@ -3,7 +3,7 @@ import os
 from typing import Dict
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
 from amulet_map_editor import lang, config, version
-from amulet_map_editor.program_extensions import WorldManagerUI
+from amulet_map_editor.plugins.programs import WorldManagerUI
 from amulet_map_editor.amulet_wx import simple
 
 

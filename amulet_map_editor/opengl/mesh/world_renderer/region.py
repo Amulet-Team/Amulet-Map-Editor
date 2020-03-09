@@ -1,8 +1,8 @@
 from OpenGL.GL import *
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple
 import numpy
 import queue
-from .render_chunk import RenderChunk, new_empty_verts
+from .chunk import RenderChunk, new_empty_verts
 from amulet_map_editor.opengl.mesh.tri_mesh import TriMesh
 
 

@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Optional
 from amulet.api.selection import Selection, SubSelectionBox
 import minecraft_model_reader
 
-from amulet_map_editor.program_extensions import BaseWorldTool
+from amulet_map_editor.plugins.programs import BaseWorldProgram
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
-from .render_world import RenderWorld
-from . import operations
+from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld
+from amulet_map_editor.plugins import operations
 from amulet_map_editor import log
 
 if TYPE_CHECKING:
@@ -204,7 +204,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         event.Skip()
 
 
-class World3DPanel(BaseWorldTool):
+class World3DPanel(BaseWorldProgram):
     def __init__(self, parent: 'MainFrame', world: 'World'):
         super().__init__(parent, wx.HORIZONTAL)
         self._world = world

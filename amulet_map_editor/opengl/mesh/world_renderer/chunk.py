@@ -1,4 +1,3 @@
-from OpenGL.GL import *
 import numpy
 from typing import TYPE_CHECKING, Tuple, Dict
 import weakref
@@ -8,7 +7,7 @@ from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from amulet_map_editor.opengl.mesh.tri_mesh import TriMesh
 
 if TYPE_CHECKING:
-    from .render_world import RenderWorld
+    from .world import RenderWorld
     from amulet.api.chunk import Chunk
 
 

@@ -1,6 +1,6 @@
 from amulet_map_editor.amulet_wx.simple import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
-from amulet_map_editor.program_extensions import BaseWorldTool
+from amulet_map_editor.plugins.programs import BaseWorldProgram
 from amulet import world_interface
 from amulet.api.world import World
 from amulet.world_interface.formats import Format
@@ -12,7 +12,7 @@ thread_pool_executor = ThreadPoolExecutor(max_workers=1)
 work_count = 0
 
 
-class ConvertExtension(BaseWorldTool):
+class ConvertExtension(BaseWorldProgram):
     def __init__(self, container, world: World):
         super(ConvertExtension, self).__init__(
             container
