@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Optional
 from amulet.api.selection import Selection, SubSelectionBox
 import minecraft_model_reader
 
-from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
-from amulet_map_editor.wx.simple import SimplePanel, SimpleChoiceAny
+from amulet_map_editor.program_extensions import BaseWorldTool
+from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
 from .render_world import RenderWorld
 from . import operations
 from amulet_map_editor import log

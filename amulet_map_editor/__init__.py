@@ -1,7 +1,6 @@
 from .util import config
 from .util.log import log
 from . import lang
-from .amulet_wx import *
 import os
 
 _version_path = os.path.join(os.path.dirname(__file__), 'version')

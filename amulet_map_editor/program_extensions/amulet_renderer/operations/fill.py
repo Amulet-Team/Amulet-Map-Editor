@@ -4,8 +4,8 @@ import wx
 from amulet.operations.fill import fill
 from amulet.api.selection import Selection
 from amulet.api.block import Block
-from amulet_map_editor.wx.block_select import BlockDefine
-from amulet_map_editor.wx.simple import SimpleDialog
+from amulet_map_editor.amulet_wx.block_select import BlockDefine
+from amulet_map_editor.amulet_wx.simple import SimpleDialog
 
 if TYPE_CHECKING:
     from amulet.api.world import World

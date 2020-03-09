@@ -4,7 +4,7 @@ import glob
 from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
-from amulet_map_editor.wx import simple
+from amulet_map_editor.amulet_wx import simple
 from amulet_map_editor import log
 
 # Windows 	%APPDATA%\.minecraft

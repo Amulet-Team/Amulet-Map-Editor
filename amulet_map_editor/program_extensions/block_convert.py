@@ -1,5 +1,5 @@
-from amulet_map_editor.wx.block_select import BlockDefine
-from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
+from amulet_map_editor.amulet_wx.block_select import BlockDefine
+from amulet_map_editor.program_extensions import BaseWorldTool
 from amulet.api.world import World
 import wx
 from concurrent.futures import ThreadPoolExecutor

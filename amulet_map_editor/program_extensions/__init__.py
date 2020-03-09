@@ -1,7 +1,7 @@
 import wx
 import os
 from typing import List
-from amulet_map_editor.wx.simple import SimpleNotebook, SimplePanel
+from amulet_map_editor.amulet_wx.simple import SimpleNotebook, SimplePanel
 from amulet import world_interface
 import importlib
 import pkgutil
@@ -13,9 +13,9 @@ _extensions: List['BaseWorldTool'] = []
 
 def load_extensions():
     if not _extensions:
-        for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__), 'extensions')]):
+        for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__))]):
             # load module and confirm that all required attributes are defined
-            module = importlib.import_module(f'amulet_map_editor.amulet_wx.world_manager.extensions.{name}')
+            module = importlib.import_module(f'amulet_map_editor.program_extensions.{name}')
 
             if hasattr(module, 'export'):
                 export = getattr(module, 'export')

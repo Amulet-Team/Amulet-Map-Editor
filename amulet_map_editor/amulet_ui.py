@@ -1,10 +1,10 @@
 import wx
 import os
 from typing import Dict
-from amulet_map_editor.wx.world_select import WorldSelectWindow
+from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
 from amulet_map_editor import lang, config, version
-from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
-from amulet_map_editor.wx import simple
+from amulet_map_editor.program_extensions import WorldManagerUI
+from amulet_map_editor.amulet_wx import simple
 
 
 class AmuletMainWindow(wx.Frame):
