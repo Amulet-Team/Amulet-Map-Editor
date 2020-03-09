@@ -5,7 +5,7 @@ import weakref
 
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
-from ..amulet_renderer import shaders
+from amulet_map_editor.opengl import shaders
 
 if TYPE_CHECKING:
     from .render_world import RenderWorld

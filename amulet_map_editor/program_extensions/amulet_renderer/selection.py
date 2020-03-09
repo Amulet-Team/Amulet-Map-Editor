@@ -1,6 +1,6 @@
 import numpy
 from OpenGL.GL import *
-from ..amulet_renderer import shaders
+from amulet_map_editor.opengl import shaders
 import itertools
 from typing import Tuple
 

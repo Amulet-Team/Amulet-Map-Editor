@@ -8,7 +8,7 @@ import uuid
 import weakref
 
 from amulet_map_editor import log
-from ..amulet_renderer import shaders
+from amulet_map_editor.opengl import shaders
 
 import minecraft_model_reader
 from ..amulet_renderer import textureatlas

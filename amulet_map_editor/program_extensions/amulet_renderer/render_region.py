@@ -3,7 +3,7 @@ from typing import Dict, Tuple, List
 import numpy
 import queue
 from .render_chunk import RenderChunk, new_empty_verts
-from ..amulet_renderer import shaders
+from amulet_map_editor.opengl import shaders
 
 
 class ChunkManager:
