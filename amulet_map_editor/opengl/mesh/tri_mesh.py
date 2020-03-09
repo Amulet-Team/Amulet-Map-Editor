@@ -16,12 +16,17 @@ class TriMesh:
         self._vbo = None  # vertex buffer object
         self._shader = None  # the shader program
         self._trm_mat_loc = None  # the reference within the shader program of the transformation matrix
-        self._verts = new_empty_verts()  # the vertices to draw
-        self._draw_count = 0  # the number of vertices to draw
+        self.verts = new_empty_verts()  # the vertices to draw
+        self.draw_start = 0
+        self.draw_count = 0  # the number of vertices to draw
+
+    @property
+    def vertex_usage(self):
+        return GL_STATIC_DRAW
 
     @property
     def draw_mode(self):
-        return GL_STATIC_DRAW
+        return GL_TRIANGLES
 
     @property
     def shader(self):
@@ -40,7 +45,7 @@ class TriMesh:
         if self._vao is None:  # if the opengl state has not been set
             self._vao = glGenVertexArrays(1)  # create the array
             self._vbo = glGenBuffers(1)  # and the buffer
-            self._change_verts()
+            self.change_verts()
             self._setup_opengl_attrs()
             glBindVertexArray(0)
 
@@ -59,11 +64,11 @@ class TriMesh:
         glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
         glEnableVertexAttribArray(3)
 
-    def _change_verts(self):
+    def change_verts(self):
         """Modify the vertices in OpenGL"""
         glBindVertexArray(self._vao)
         glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-        glBufferData(GL_ARRAY_BUFFER, self._verts.size * 4, self._verts, self.draw_mode)
+        glBufferData(GL_ARRAY_BUFFER, self.verts.size * 4, self.verts, self.vertex_usage)
 
     def unload(self):
         """Unload all opengl data"""
@@ -78,4 +83,4 @@ class TriMesh:
         glUseProgram(self.shader)
         glUniformMatrix4fv(self.transform_location, 1, GL_FALSE, transformation_matrix)
         glBindVertexArray(self._vao)
-        glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
+        glDrawArrays(self.draw_mode, self.draw_start, self.draw_count)
