@@ -7,8 +7,8 @@ shader_dir = os.path.join(os.path.dirname(__file__))
 _shaders: Dict[Tuple[str, str], Any] = {}
 
 
-def get_shader(renderer_key: str, shader_name: str) -> OpenGL.GL.shaders.ShaderProgram:
-    shader_key = (renderer_key, shader_name)
+def get_shader(context_identifier: str, shader_name: str) -> OpenGL.GL.shaders.ShaderProgram:
+    shader_key = (context_identifier, shader_name)
     if shader_key not in _shaders:
         _shaders[shader_key] = OpenGL.GL.shaders.compileProgram(
             _load_shader(os.path.join(shader_dir, f'{shader_name}.vert'), GL_VERTEX_SHADER),
