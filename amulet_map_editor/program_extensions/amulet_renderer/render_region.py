@@ -3,7 +3,7 @@ from typing import Dict, Tuple, List
 import numpy
 import queue
 from .render_chunk import RenderChunk, new_empty_verts
-from amulet_map_editor.opengl import shaders
+from amulet_map_editor.opengl.mesh.tri_mesh import TriMesh
 
 
 class ChunkManager:
@@ -89,20 +89,15 @@ class ChunkManager:
             region.rebuild()
 
 
-class RenderRegion:
-    def __init__(self, rx: int, rz: int, region_size: int, identifier: str):
+class RenderRegion(TriMesh):
+    def __init__(self, rx: int, rz: int, region_size: int, context_identifier: str):
         """A group of RenderChunks to minimise the number of draw calls"""
-        self.identifier = identifier
+        super().__init__(context_identifier)
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
         self._merged_chunk_locations: Dict[Tuple[int, int], Tuple[int, int, int, int]] = {}
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
-        self._shader = None
-        self._trm_mat_loc = None
-        self._vao = None
-        self._vbo = None
-        self._draw_count = 0
 
         self.region_transform = numpy.eye(4, dtype=numpy.float32)
         self.region_transform[3, [0, 2]] = numpy.array([rx, rz]) * region_size * 16
@@ -134,53 +129,24 @@ class RenderRegion:
             glBufferSubData(GL_ARRAY_BUFFER, offset*4, size*4, numpy.zeros(size, dtype=numpy.float32))
             glBufferSubData(GL_ARRAY_BUFFER, translucent_offset*4, translucent_size*4, numpy.zeros(translucent_size, dtype=numpy.float32))
 
-    def _setup(self):
-        """Set up an empty VAO"""
-        if self._vao is None:
-            self._vao = glGenVertexArrays(1)
-            glBindVertexArray(self._vao)
-            self._vbo = glGenBuffers(1)
-            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            glBufferData(GL_ARRAY_BUFFER, 0, new_empty_verts(), GL_DYNAMIC_DRAW)
-            # vertex attribute pointers
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
-            glEnableVertexAttribArray(0)
-            # texture coords attribute pointers
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(12))
-            glEnableVertexAttribArray(1)
-            # texture coords attribute pointers
-            glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(20))
-            glEnableVertexAttribArray(2)
-            # tint value
-            glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
-            glEnableVertexAttribArray(3)
-
-            glBindVertexArray(0)
-
-            self._shader = shaders.get_shader(self.identifier, 'render_chunk')
-            self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
-
     def rebuild(self):
         """If there are any chunks that have not been merged recreate the merged vertex table"""
         self._setup()
         if self._manual_chunks and self._vao and self._vbo:
-            glBindVertexArray(self._vao)
-            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            chunks: List[Tuple[Tuple[int, int], RenderChunk]] = list(self._chunks.items())
             region_verts = []
             region_verts_translucent = []
             merged_locations: Dict[Tuple[int, int], Tuple[int, int, int, int]] = {}
             offset = 0
             translucent_offset = 0
-            for chunk_location, chunk in chunks:
-                region_verts.append(chunk.chunk_lod0[:chunk.chunk_lod0_translucent])
-                region_verts_translucent.append(chunk.chunk_lod0[chunk.chunk_lod0_translucent:])
+            for chunk_location, chunk in self._chunks.items():
+                region_verts.append(chunk.verts[:chunk.verts_translucent])
+                region_verts_translucent.append(chunk.verts[chunk.verts_translucent:])
                 merged_locations[chunk_location] = [
-                    offset, chunk.chunk_lod0_translucent,
-                    translucent_offset, chunk.chunk_lod0.size - chunk.chunk_lod0_translucent
+                    offset, chunk.verts_translucent,
+                    translucent_offset, chunk.verts.size - chunk.verts_translucent
                 ]
-                offset += chunk.chunk_lod0_translucent
-                translucent_offset += chunk.chunk_lod0.size - chunk.chunk_lod0_translucent
+                offset += chunk.verts_translucent
+                translucent_offset += chunk.verts.size - chunk.verts_translucent
 
             for val in merged_locations.values():
                 val[2] += offset
@@ -191,29 +157,23 @@ class RenderRegion:
                 verts = numpy.concatenate(region_verts)
             else:
                 verts = new_empty_verts()
-            self._draw_count = int(verts.size//10)
+            self.draw_count = int(verts.size//10)
             self._merged_chunk_locations = merged_locations
-            glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, GL_DYNAMIC_DRAW)
+
+            self.change_verts(verts)
             for chunk in self._manual_chunks.values():
                 chunk.unload()
             self._manual_chunks.clear()
 
     def unload(self):
         """Unload all opengl data"""
-        if self._vao is not None:
-            glDeleteVertexArrays(1, self._vao)
-            self._vao = None
+        super().unload()
         for chunk in self._chunks.values():
             chunk.unload()
         self._chunks.clear()
 
     def draw(self, transformation_matrix: numpy.ndarray, cam_cx, cam_cz):
-        self._setup()
-        if self._vao:
-            glUseProgram(self._shader)
-            transformation_matrix = numpy.matmul(self.region_transform, transformation_matrix)
-            glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
-            glBindVertexArray(self._vao)
-            glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
-            for chunk in sorted(self._manual_chunks.values(), key=lambda x: abs(x.cx-cam_cx) + abs(x.cz-cam_cz), reverse=True):
-                chunk.draw(transformation_matrix)
+        transformation_matrix = numpy.matmul(self.region_transform, transformation_matrix)
+        super().draw(transformation_matrix)
+        for chunk in sorted(self._manual_chunks.values(), key=lambda x: abs(x.cx-cam_cx) + abs(x.cz-cam_cz), reverse=True):
+            chunk.draw(transformation_matrix)

@@ -5,7 +5,7 @@ import weakref
 
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
-from amulet_map_editor.opengl import shaders
+from amulet_map_editor.opengl.mesh.tri_mesh import TriMesh
 
 if TYPE_CHECKING:
     from .render_world import RenderWorld
@@ -16,34 +16,29 @@ def new_empty_verts() -> numpy.ndarray:
     return numpy.zeros(0, dtype=numpy.float32)
 
 
-class RenderChunk:
+class RenderChunk(TriMesh):
     def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: int):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
+        super().__init__(render_world.identifier)
         self._render_world = weakref.ref(render_world)
         self._region_size = region_size
         self._coords = chunk_coords
         self._dimension = dimension
         self._chunk_state = 0  # 0 = chunk does not exist, 1 = chunk exists but failed to load, 2 = chunk exists
         self._changed_time = 0
-        self._shader = None
-        self._trm_mat_loc = None
-        self._vao = None
         self._rebuild = True
-        self.chunk_lod0: numpy.ndarray = new_empty_verts()
-        self.chunk_lod0_translucent = 0  # the offset into the above from which the faces can be translucent
-        self.chunk_lod1: numpy.ndarray = new_empty_verts()
-        self._draw_count = 0
+        self.verts_translucent = 0  # the offset into the above from which the faces can be translucent
+        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
 
     def __repr__(self):
         return f'RenderChunk({self._coords[0]}, {self._coords[1]})'
 
     def _setup(self):
         """Set up the opengl data which cannot be set up in another thread"""
-        if self._vao is None:
-            self._vao = glGenVertexArrays(1)
+        super()._setup()
         if self._rebuild:
-            self._setup_opengl()
+            self.change_verts()
             self._rebuild = False
 
     @property
@@ -127,13 +122,13 @@ class RenderChunk:
         self._rebuild = True
 
     def _create_empty_geometry(self):
-        self.chunk_lod0: numpy.ndarray = new_empty_verts()
-        self.chunk_lod1: numpy.ndarray = new_empty_verts()
+        self.verts: numpy.ndarray = new_empty_verts()
+        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
 
     def _create_error_geometry(self):
         # TODO
-        self.chunk_lod0: numpy.ndarray = new_empty_verts()
-        self.chunk_lod1: numpy.ndarray = new_empty_verts()
+        self.verts: numpy.ndarray = new_empty_verts()
+        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
 
     def _create_lod0(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
@@ -226,54 +221,19 @@ class RenderChunk:
                     chunk_verts.append(vert_table.ravel())
 
         if chunk_verts:
-            self.chunk_lod0 = numpy.concatenate(chunk_verts, 0)
-            self._draw_count = int(self.chunk_lod0.size // 10)
-            self.chunk_lod0_translucent = self.chunk_lod0.size
+            self.verts = numpy.concatenate(chunk_verts, 0)
+            self.draw_count = int(self.verts.size // 10)
+            self.verts_translucent = self.verts.size
         else:
-            self.chunk_lod0 = new_empty_verts()
-            self._draw_count = 0
+            self.verts = new_empty_verts()
+            self.draw_count = 0
 
         if chunk_verts_translucent:
-            chunk_verts_translucent.insert(0, self.chunk_lod0)
-            self.chunk_lod0 = numpy.concatenate(chunk_verts_translucent, 0)
-            self._draw_count = int(self.chunk_lod0.size // 10)
+            chunk_verts_translucent.insert(0, self.verts)
+            self.verts = numpy.concatenate(chunk_verts_translucent, 0)
+            self.draw_count = int(self.verts.size // 10)
 
     def _create_lod1(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         # TODO
-        self.chunk_lod0: numpy.ndarray = new_empty_verts()
-        self.chunk_lod1: numpy.ndarray = new_empty_verts()
-
-    def _setup_opengl(self):
-        glBindVertexArray(self._vao)
-        vbo = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, vbo)
-        glBufferData(GL_ARRAY_BUFFER, self.chunk_lod0.size * 4, self.chunk_lod0, GL_STATIC_DRAW)
-        # vertex attribute pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
-        glEnableVertexAttribArray(0)
-        # texture coords attribute pointers
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(12))
-        glEnableVertexAttribArray(1)
-        # texture coords attribute pointers
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(20))
-        glEnableVertexAttribArray(2)
-        # tint value
-        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
-        glEnableVertexAttribArray(3)
-
-        glBindVertexArray(0)
-
-        self._shader = shaders.get_shader(self._render_world().identifier, 'render_chunk')
-        self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
-
-    def draw(self, transformation_matrix: numpy.ndarray):
-        self._setup()
-        glUseProgram(self._shader)
-        glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
-        glBindVertexArray(self._vao)
-        glDrawArrays(GL_TRIANGLES, 0, self._draw_count)
-
-    def unload(self):
-        if self._vao is not None:
-            glDeleteVertexArrays(1, self._vao)
-            self._vao = None
+        self.verts: numpy.ndarray = new_empty_verts()
+        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
