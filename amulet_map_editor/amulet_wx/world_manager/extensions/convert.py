@@ -1,5 +1,5 @@
-from amulet_map_editor.amulet_wx.wx_util import SimplePanel
-from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
+from amulet_map_editor.wx.simple import SimplePanel
+from amulet_map_editor.wx.world_select import WorldSelectWindow, WorldUI
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 from amulet import world_interface
 from amulet.api.world import World

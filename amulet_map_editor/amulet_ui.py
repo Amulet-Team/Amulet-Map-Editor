@@ -1,10 +1,10 @@
 import wx
 import os
 from typing import Dict
-from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
+from amulet_map_editor.wx.world_select import WorldSelectWindow
 from amulet_map_editor import lang, config, version
 from amulet_map_editor.amulet_wx.world_manager import WorldManagerUI
-from amulet_map_editor.amulet_wx import wx_util
+from amulet_map_editor.wx import simple
 
 
 class AmuletMainWindow(wx.Frame):
@@ -83,7 +83,7 @@ class AmuletMainWindow(wx.Frame):
             )
 
 
-class AmuletMainMenu(wx_util.SimplePanel):
+class AmuletMainMenu(simple.SimplePanel):
     def __init__(self, parent, open_world):
         super(AmuletMainMenu, self).__init__(
             parent

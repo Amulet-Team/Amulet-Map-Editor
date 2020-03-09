@@ -9,7 +9,7 @@ from amulet.api.selection import Selection, SubSelectionBox
 import minecraft_model_reader
 
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
-from amulet_map_editor.amulet_wx.wx_util import SimplePanel, SimpleChoiceAny, SimpleSizer
+from amulet_map_editor.wx.simple import SimplePanel, SimpleChoiceAny
 from .render_world import RenderWorld
 from . import operations
 from amulet_map_editor import log

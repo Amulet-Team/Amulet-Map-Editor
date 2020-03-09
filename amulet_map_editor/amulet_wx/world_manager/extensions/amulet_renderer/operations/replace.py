@@ -4,8 +4,8 @@ import numpy
 
 from amulet.api.block import Block
 from amulet.api.selection import Selection
-from amulet_map_editor.amulet_wx.block_select import BlockDefine
-from amulet_map_editor.amulet_wx.wx_util import SimpleDialog, SimplePanel
+from amulet_map_editor.wx.block_select import BlockDefine
+from amulet_map_editor.wx.simple import SimpleDialog, SimplePanel
 
 if TYPE_CHECKING:
     from amulet.api.world import World

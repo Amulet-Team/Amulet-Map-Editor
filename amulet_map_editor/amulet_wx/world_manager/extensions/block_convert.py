@@ -1,4 +1,4 @@
-from amulet_map_editor.amulet_wx.block_select import VersionSelect, BlockSelect, BlockDefine
+from amulet_map_editor.wx.block_select import BlockDefine
 from amulet_map_editor.amulet_wx.world_manager import BaseWorldTool
 from amulet.api.world import World
 import wx

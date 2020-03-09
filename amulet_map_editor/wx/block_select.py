@@ -1,4 +1,4 @@
-from .wx_util import SimplePanel, SimpleText, SimpleChoice, SimpleChoiceAny
+from amulet_map_editor.wx.simple import SimplePanel, SimpleText, SimpleChoice, SimpleChoiceAny
 import wx
 import PyMCTranslate
 import amulet_nbt

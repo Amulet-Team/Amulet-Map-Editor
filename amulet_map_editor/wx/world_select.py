@@ -4,7 +4,7 @@ import glob
 from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
-from amulet_map_editor.amulet_wx import wx_util
+from amulet_map_editor.wx import simple
 from amulet_map_editor import log
 
 # Windows 	%APPDATA%\.minecraft
@@ -41,9 +41,9 @@ def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
     return world_images[image_path][1:3]
 
 
-class WorldUI(wx_util.SimplePanel):
+class WorldUI(simple.SimplePanel):
     # UI element that holds the world image, name and description
-    def __init__(self, parent: wx_util.SimplePanel, path: str):
+    def __init__(self, parent: simple.SimplePanel, path: str):
         super(WorldUI, self).__init__(
             parent,
             wx.HORIZONTAL
@@ -82,7 +82,7 @@ class WorldUI(wx_util.SimplePanel):
 
 class WorldUIButton(WorldUI):
     # a button that wraps around WorldUI so that WorldUI can be used without the button functionality
-    def __init__(self, parent: wx_util.SimplePanel, path: str, open_world_callback):
+    def __init__(self, parent: simple.SimplePanel, path: str, open_world_callback):
         super(WorldUIButton, self).__init__(
             parent,
             path
@@ -98,7 +98,7 @@ class WorldUIButton(WorldUI):
         self.open_world_callback(self.path)
 
 
-class WorldList(wx_util.SimplePanel):
+class WorldList(simple.SimplePanel):
     def __init__(self, parent, world_dirs, open_world_callback):
         super(WorldList, self).__init__(
             parent
@@ -151,7 +151,7 @@ class CollapseableWorldListUI(wx.CollapsiblePane):
         evt.Skip()
 
 
-class ScrollableWorldsUI(wx_util.SimpleScrollablePanel):
+class ScrollableWorldsUI(simple.SimpleScrollablePanel):
     # a frame to allow scrolling
     def __init__(self, parent, open_world_callback):
         super(ScrollableWorldsUI, self).__init__(
@@ -179,7 +179,7 @@ class ScrollableWorldsUI(wx_util.SimpleScrollablePanel):
         event.Skip()
 
 
-class WorldSelectUI(wx_util.SimplePanel):
+class WorldSelectUI(simple.SimplePanel):
     # a frame containing a refresh button for the UI, a sort order for the worlds
     # and a vertical list of `WorldDirectoryUI`s for each directory
     # perhaps also a select directory option
@@ -188,7 +188,7 @@ class WorldSelectUI(wx_util.SimplePanel):
             parent
         )
         self.open_world_callback = open_world_callback
-        self.header = wx_util.SimplePanel(self, wx.HORIZONTAL)
+        self.header = simple.SimplePanel(self, wx.HORIZONTAL)
         self.header_open_world = wx.Button(self.header, wx.ID_ANY, label=lang.get('open_world_button'))
         self.header_open_world.Bind(wx.EVT_BUTTON, self._open_world)
         self.header.add_object(self.header_open_world)
@@ -216,7 +216,7 @@ class WorldSelectUI(wx_util.SimplePanel):
         self.open_world_callback(path)
 
 
-class RecentWorldUI(wx_util.SimplePanel):
+class RecentWorldUI(simple.SimplePanel):
     def __init__(self, parent, open_world_callback):
         super(RecentWorldUI, self).__init__(
             parent
@@ -253,7 +253,7 @@ class RecentWorldUI(wx_util.SimplePanel):
         self.Layout()
 
 
-class WorldSelectAndRecentUI(wx_util.SimplePanel):
+class WorldSelectAndRecentUI(simple.SimplePanel):
     def __init__(self, parent, open_world_callback):
         super(WorldSelectAndRecentUI, self).__init__(
             parent,

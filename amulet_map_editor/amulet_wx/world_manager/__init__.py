@@ -1,7 +1,7 @@
 import wx
 import os
 from typing import List
-from amulet_map_editor.amulet_wx.wx_util import SimpleNotebook, SimplePanel
+from amulet_map_editor.wx.simple import SimpleNotebook, SimplePanel
 from amulet import world_interface
 import importlib
 import pkgutil
