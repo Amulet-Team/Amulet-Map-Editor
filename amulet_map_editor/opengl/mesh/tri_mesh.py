@@ -64,11 +64,14 @@ class TriMesh:
         glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
         glEnableVertexAttribArray(3)
 
-    def change_verts(self):
+    def change_verts(self, verts=None):
         """Modify the vertices in OpenGL"""
         glBindVertexArray(self._vao)
         glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-        glBufferData(GL_ARRAY_BUFFER, self.verts.size * 4, self.verts, self.vertex_usage)
+        if verts is not None:
+            glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, self.vertex_usage)
+        else:
+            glBufferData(GL_ARRAY_BUFFER, self.verts.size * 4, self.verts, self.vertex_usage)
 
     def unload(self):
         """Unload all opengl data"""
