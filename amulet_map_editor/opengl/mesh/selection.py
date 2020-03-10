@@ -52,11 +52,11 @@ class Selection(TriMesh):
 
     @property
     def min(self) -> numpy.ndarray:
-        return numpy.min(self._loc.reshape((2, 3)), 0)
+        return numpy.min(self._loc.reshape((2, 3)), 0) - (self.point2 <= self.point1)
 
     @property
     def max(self) -> numpy.ndarray:
-        return numpy.max(self._loc.reshape((2, 3)), 0)
+        return numpy.max(self._loc.reshape((2, 3)), 0) + (self.point2 <= self.point1)
 
     @staticmethod
     def _create_box(box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
