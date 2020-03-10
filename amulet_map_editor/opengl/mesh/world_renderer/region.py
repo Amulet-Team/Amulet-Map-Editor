@@ -102,6 +102,10 @@ class RenderRegion(TriMesh):
         self.region_transform = numpy.eye(4, dtype=numpy.float32)
         self.region_transform[3, [0, 2]] = numpy.array([rx, rz]) * region_size * 16
 
+    @property
+    def vertex_usage(self):
+        return GL_DYNAMIC_DRAW
+
     def __repr__(self):
         return f'RenderRegion({self.rx}, {self.rz})'
 
