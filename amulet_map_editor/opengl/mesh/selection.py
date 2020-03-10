@@ -1,29 +1,29 @@
 import numpy
 from OpenGL.GL import *
-from amulet_map_editor.opengl import shaders
 import itertools
 from typing import Tuple
+from .tri_mesh import TriMesh
 
 
-class Selection:
+class Selection(TriMesh):
     def __init__(self,
-        identifier: str,
+        context_identifier: str,
         white_texture_bounds: Tuple[float, float, float, float],
         green_texture_bounds: Tuple[float, float, float, float],
         blue_texture_bounds: Tuple[float, float, float, float]
     ):
-        self.identifier = identifier
+        super().__init__(context_identifier)
         self._select_state = 0  # number of points selected
         self._loc = numpy.zeros(6)
-        self._shader = None
-        self._trm_mat_loc = None
-        self._vao = None
-        self._vbo = None
-        self._verts = numpy.zeros((6*2*3*3, 10), dtype=numpy.float32)
-        self._verts[:36, 5:9] = white_texture_bounds
-        self._verts[36:72, 5:9] = green_texture_bounds
-        self._verts[72:, 5:9] = blue_texture_bounds
-        self._draw_count = 36
+        self.verts = numpy.zeros((6*2*3*3, 10), dtype=numpy.float32)
+        self.verts[:36, 5:9] = white_texture_bounds
+        self.verts[36:72, 5:9] = green_texture_bounds
+        self.verts[72:, 5:9] = blue_texture_bounds
+        self.draw_count = 36
+
+    @property
+    def vertex_usage(self):
+        return GL_DYNAMIC_DRAW
 
     @property
     def select_state(self) -> int:
@@ -32,6 +32,7 @@ class Selection:
     @select_state.setter
     def select_state(self, value: int):
         self._select_state = value
+        self.draw_count = 36 * (2 * bool(self._select_state) + 1)
 
     @property
     def point1(self) -> numpy.ndarray:
@@ -90,57 +91,20 @@ class Selection:
         return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
 
     def create_geometry(self):
-        self._setup()
+        if self._vao is None:
+            self._setup()
         box_min = self.min
         box_max = self.max
 
         if self.select_state >= 0:
-            self._verts[:36, :3], self._verts[:36, 3:5] = self._create_box(box_min-0.005, box_max+0.005)
+            self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(box_min-0.005, box_max+0.005)
         if self.select_state >= 1:
-            self._verts[36:72, :3], self._verts[36:72, 3:5] = self._create_box(box_min-0.01, box_min+1.01)
-            self._verts[72:, :3], self._verts[72:, 3:5] = self._create_box(box_max-1.01, box_max+0.01)
+            self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(box_min-0.01, box_min+1.01)
+            self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(box_max-1.01, box_max+0.01)
 
-        glBindVertexArray(self._vao)
-        glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-        glBufferData(GL_ARRAY_BUFFER, self._verts.size * 4, self._verts, GL_DYNAMIC_DRAW)
+        self.change_verts()
 
     def _setup(self):
         """Set up an empty VAO"""
-        if self._vao is None:
-            self._vao = glGenVertexArrays(1)
-            glBindVertexArray(self._vao)
-            self._vbo = glGenBuffers(1)
-            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            self.create_geometry()
-            glBufferData(GL_ARRAY_BUFFER, self._verts.size*4, self._verts, GL_DYNAMIC_DRAW)
-            # vertex attribute pointers
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
-            glEnableVertexAttribArray(0)
-            # texture coords attribute pointers
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(12))
-            glEnableVertexAttribArray(1)
-            # texture coords attribute pointers
-            glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(20))
-            glEnableVertexAttribArray(2)
-            # tint value
-            glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
-            glEnableVertexAttribArray(3)
-
-            glBindVertexArray(0)
-
-            self._shader = shaders.get_shader(self.identifier, 'render_chunk')
-            self._trm_mat_loc = glGetUniformLocation(self._shader, "transformation_matrix")
-
-    def unload(self):
-        if self._vao is not None:
-            vao = self._vao
-            self._vao = None
-            glDeleteVertexArrays(1, self._vao)
-
-    def draw(self, transformation_matrix):
-        self._setup()
-        if self._vao:
-            glUseProgram(self._shader)
-            glUniformMatrix4fv(self._trm_mat_loc, 1, GL_FALSE, transformation_matrix)
-            glBindVertexArray(self._vao)
-            glDrawArrays(GL_TRIANGLES, 0, self._draw_count * (2*bool(self._select_state)+1))
+        super()._setup()
+        self.create_geometry()
