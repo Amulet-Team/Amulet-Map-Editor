@@ -191,7 +191,7 @@ class RenderWorld:
         self._transformation_matrix = None
         self._collision_locations_cache = None
 
-        location = self._collision_location_distance(10)
+        location = self._collision_location_closest()
         if self._selection_box.select_state == 0:
             self._selection_box.point1 = self._selection_box.point2 = location
             self._selection_box.point2 += 1
@@ -216,6 +216,16 @@ class RenderWorld:
     @property
     def selection(self) -> Optional[numpy.ndarray]:
         return numpy.array([self._selection_box.min, self._selection_box.max])
+
+    def _collision_location_closest(self):
+        """Find the location of the closests non-air block"""
+        for location in self._collision_locations():
+            try:
+                if self.world.get_block(*location, self.dimension).namespaced_name != 'universal_minecraft:air':
+                    return location
+            except:
+                continue
+        return self._collision_locations()[-1]
 
     def _collision_location_distance(self, distance):
         distance = distance ** 2
@@ -442,9 +452,11 @@ class RenderWorld:
 
     def draw(self):
         self._chunk_manager.draw(self.transformation_matrix, self._camera[:3])
+        glDepthFunc(GL_ALWAYS)
         self._selection_box.draw(self.transformation_matrix)
         if self._selection_box.select_state == 2:
             self._selection_box2.draw(self.transformation_matrix)
+        glDepthFunc(GL_LEQUAL)
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
