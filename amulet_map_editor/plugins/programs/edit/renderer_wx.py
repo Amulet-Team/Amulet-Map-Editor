@@ -81,6 +81,7 @@ class World3dCanvas(glcanvas.GLCanvas):
         self._mouse_lock = False
         self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
         self.Bind(wx.EVT_LEFT_UP, self._box_click)
+        self.Bind(wx.EVT_RIGHT_UP, self._toggle_selection_mode)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
     def enable(self):
@@ -145,6 +146,10 @@ class World3dCanvas(glcanvas.GLCanvas):
 
     def _box_click(self, evt):
         self._render_world.left_click()
+        evt.Skip()
+
+    def _toggle_selection_mode(self, evt):
+        self._render_world.right_click()
         evt.Skip()
 
     def _release_mouse(self):

@@ -129,6 +129,7 @@ class RenderWorld:
         self._gl_texture_atlas = glGenTextures(1)
         self._create_atlas()
         self._select_distance = 10
+        self._select_mode = True
         self._selection_box = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
         self._selection_box2 = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
         self._chunk_generator = ChunkGenerator(self)
@@ -191,7 +192,10 @@ class RenderWorld:
         self._transformation_matrix = None
         self._collision_locations_cache = None
 
-        location = self._collision_location_closest()
+        if self._select_mode:
+            location = self._collision_location_closest()
+        else:
+            location = self._collision_location_distance(10)
         if self._selection_box.select_state == 0:
             self._selection_box.point1 = self._selection_box.point2 = location
             self._selection_box.point2 += 1
@@ -212,6 +216,9 @@ class RenderWorld:
             self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
             self._selection_box.create_geometry()
             self._selection_box.select_state = 1
+
+    def right_click(self):
+        self._select_mode = not self._select_mode
 
     @property
     def selection(self) -> Optional[numpy.ndarray]:
