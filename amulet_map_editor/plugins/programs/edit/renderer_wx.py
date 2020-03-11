@@ -199,10 +199,13 @@ class World3dCanvas(glcanvas.GLCanvas):
         self.DoSetSize(0, 0, width, height, 0)  # I don't know if this is how you are supposed to do this
 
     def _on_draw(self, event):
+        self.draw()
+        event.Skip()
+
+    def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw()
         self.SwapBuffers()
-        event.Skip()
 
     def _gc(self, event):
         self._render_world.run_garbage_collector()
@@ -345,6 +348,8 @@ class World3DPanel(BaseWorldProgram):
             self._menu.Fit()
             self.Update()
         self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
+        self._canvas.draw()
+        self._canvas.Update()
         self._canvas.enable()
 
     def disable(self):
