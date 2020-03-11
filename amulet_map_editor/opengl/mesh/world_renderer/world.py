@@ -348,6 +348,7 @@ class RenderWorld:
     @fov.setter
     def fov(self, fov: float):
         self._projection[0] = fov
+        self._transformation_matrix = None
 
     @property
     def aspect_ratio(self) -> float:
@@ -356,6 +357,7 @@ class RenderWorld:
     @aspect_ratio.setter
     def aspect_ratio(self, aspect_ratio: float):
         self._projection[1] = aspect_ratio
+        self._transformation_matrix = None
 
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:
