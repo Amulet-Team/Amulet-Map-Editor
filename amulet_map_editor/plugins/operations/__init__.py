@@ -1,6 +1,9 @@
 """
 # Example plugin
 
+def structure_callable(world, source_box) -> Selection:  # see below. Only required if "structure_callable" is defined
+    pass
+
 def operation(world, source_box):
     pass
 
@@ -10,6 +13,7 @@ def show_ui(parent, world: World, options: dict) -> dict:  # see below. Only nee
     # and return the options how you wish
 
 export = {
+    # required
     "v": 1,  # a version 1 plugin
     "name": "Plugin Name",  # the name of the plugin
     "operation": operation,  # the actual function to call when running the plugin
@@ -17,17 +21,60 @@ export = {
         # possible inputs (max one from each list)
         ["src_box"]  # the box selected by the user
         [
-            "dst_box"  # the destination selected by the user (box same size of src_box. "src_box" is required). The presence of this triggers the UI to enable the functionality
-            "dst_box_multiple"  # a list of destination boxes selected by the user (boxes same size of src_box. "src_box" is required). The presence of this triggers the UI to enable the functionality
-        ]
+            "dst_box"  # the destination selected by the user. The presence of this triggers the UI to enable the functionality
+            "dst_box_multiple"  # a list of destination boxes selected by the user. The presence of this triggers the UI to enable the functionality
+            # requires either a callable at "structure_callable" to create and return a Structure or "src_box" to extract the src
+        ],
+            [  # dst_... needs to be enabled to use this
+                "structure"  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
+            ]
         [
             "options",  # "options" key must exist
             "wxoptions"  # "wxoptions" key must exist
         ]
+
+    # optional (based on inputs)
     "options": {},  # a simple system of defining options from which a simple UI can be created
     "wxoptions": show_ui,  # a more complex system allowing users to work directly with wx
     # The result is passed to the related slot in inputs
+    "structure_callable": structure_callable  # this function is run before selecting the destination locations and returns a Structure for use there
 }
+
+
+normal filters
+    input box in editor
+    options
+    function with inputs
+    
+copy/extract
+    input box in editor
+    function with inputs
+    
+paste/import
+    select input file/structure in memory                       options
+    editor deals with picking location(s)
+    function run with input structure and output locations      main operation
+    
+clone
+    input box in editor
+    run operation button
+    selection extracted (either using inbuilt function or structure_callable
+    editor deals with picking location(s) based on the structure
+    function run with input structure and output locations      main operation    
+    
+    
+select operation
+select box if required
+pick options if valid
+run operation
+    if dst_box or dst_box_multiple is defined a pre-operation function is optional
+        if defined run structure_callable
+            given the same inputs as main operation minus destination box
+            returns Structure
+        else
+            extract the src_box and use that
+        select destination in UI
+    main operation
 """
 
 import os
@@ -38,7 +85,7 @@ from amulet import log
 operations = {}
 options = {}
 
-_input_options = ["src_box", "dst_box", "dst_box_multiple", "options", "wxoptions"]
+_input_options = ["src_box", "dst_box", "dst_box_multiple", "structure", "options", "wxoptions"]
 
 
 def _load_module(module_path: str):
@@ -70,10 +117,16 @@ def _load_operations(path: str):
                     log.error(f'Error loading plugin {os.path.basename(fpath)}. "inputs" in export must be a list.')
                     continue
                 if "dst_box" in inputs or "dst_box_multiple" in inputs:
-                    continue  # TODO: uncommment when this is implemented in the UI
-                    if "src_box" not in inputs:
-                        log.error(f'Error loading plugin {os.path.basename(fpath)}. "src_box" must be defined in "inputs" if "dst_box" or "dst_box_multiple" are.')
+                    if "structure_callable" not in plugin and "src_box" not in inputs:
+                        log.error(f'Error loading plugin {os.path.basename(fpath)}. "src_box" or "structure_callable" must be defined if "dst_box" or "dst_box_multiple" are.')
                         continue
+
+                elif "structure" in inputs:
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "structure" cannot be defined if "dst_box" or "dst_box_multiple" are not.')
+                    continue
+                elif "structure_callable" in plugin:
+                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "structure_callable" cannot be defined if "dst_box" or "dst_box_multiple" are not.')
+                    continue
 
                 if "options" in inputs and "wxoptions" in inputs:
                     log.error(f'Error loading plugin {os.path.basename(fpath)}. Only one of "options" and "wxoptions" may be defined in "inputs" at once.')
@@ -98,5 +151,6 @@ def load_operations():
     operations.clear()
     for path in [os.path.dirname(__file__), "plugins"]:
         _load_operations(path)
+
 
 load_operations()
