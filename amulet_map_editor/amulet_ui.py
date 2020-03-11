@@ -84,11 +84,11 @@ class AmuletMainWindow(wx.Frame):
         """Close a given world and remove it from the notebook"""
         if path in self._open_worlds:
             world = self._open_worlds[path]
+            world.disable()
+            world.close()
             self.world_tab_holder.DeletePage(
                 self.world_tab_holder.FindPage(world)
             )
-            world.disable()
-            world.close()
             del self._open_worlds[path]
             self._last_page: BaseWorldUI = self.world_tab_holder.GetCurrentPage()
             if self._last_page is not None:
