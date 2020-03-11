@@ -1,10 +1,11 @@
 import wx
 import os
-from typing import Dict
+from typing import Dict, Optional
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
 from amulet_map_editor import lang, config, version
 from amulet_map_editor.plugins.programs import WorldManagerUI
 from amulet_map_editor.amulet_wx import simple
+from amulet_map_editor.plugins.programs import BaseWorldUI
 
 
 class AmuletMainWindow(wx.Frame):
@@ -30,7 +31,7 @@ class AmuletMainWindow(wx.Frame):
         icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.path.dirname(__file__), 'img', 'icon64.png'), wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
 
-        self._open_worlds: Dict[str, WorldManagerUI] = {}
+        self._open_worlds: Dict[str, BaseWorldUI] = {}
 
         self.world_tab_holder = wx.Notebook(
             self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0
@@ -38,24 +39,45 @@ class AmuletMainWindow(wx.Frame):
 
         self._main_menu = AmuletMainMenu(self.world_tab_holder, self._open_world)
 
+        self._last_page: Optional[BaseWorldUI] = None
+
         self._add_world_tab(
             self._main_menu,
             lang.get('main_menu')
         )
 
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
         self.Show()
+
+    def _page_change(self, evt):
+        self._disable_enable()
+        evt.Skip()
+
+    def _disable_enable(self):
+        if self._last_page is not None:
+            self._last_page.disable()
+        self._last_page: BaseWorldUI = self.world_tab_holder.GetCurrentPage()
+        if self._last_page is not None:
+            self._last_page.enable()
 
     def _add_world_tab(self, obj, obj_name):
         # TODO: find a way for the tab to be optionally closeable
         self.world_tab_holder.AddPage(obj, obj_name, True)
+        self._disable_enable()
 
     def _open_world(self, path: str):
         """Open a world panel add add it to the notebook"""
-        world = WorldManagerUI(self.world_tab_holder, path)
-        self._open_worlds[path] = world
-        self._add_world_tab(world, world.world_name)
+        if path in self._open_worlds:
+            self.world_tab_holder.SetSelection(
+                self.world_tab_holder.FindPage(self._open_worlds[path])
+            )
+            self._disable_enable()
+        else:
+            world = WorldManagerUI(self.world_tab_holder, path)
+            self._open_worlds[path] = world
+            self._add_world_tab(world, world.world_name)
         self._main_menu.Enable()
 
     def close_world(self, path: str):
@@ -65,8 +87,12 @@ class AmuletMainWindow(wx.Frame):
             self.world_tab_holder.DeletePage(
                 self.world_tab_holder.FindPage(world)
             )
-            world.close_world()
+            world.disable()
+            world.close()
             del self._open_worlds[path]
+            self._last_page: BaseWorldUI = self.world_tab_holder.GetCurrentPage()
+            if self._last_page is not None:
+                self._last_page.enable()
 
     def _on_close(self, evt):
         close = True
@@ -83,7 +109,7 @@ class AmuletMainWindow(wx.Frame):
             )
 
 
-class AmuletMainMenu(simple.SimplePanel):
+class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
     def __init__(self, parent, open_world):
         super(AmuletMainMenu, self).__init__(
             parent

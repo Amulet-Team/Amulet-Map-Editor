@@ -23,7 +23,18 @@ def load_extensions():
                     _extensions.append([export.get('name', 'missingno'), export['ui']])
 
 
-class WorldManagerUI(SimpleNotebook):
+class BaseWorldUI:
+    def disable(self):
+        pass
+
+    def enable(self):
+        pass
+
+    def close(self):
+        pass
+
+
+class WorldManagerUI(SimpleNotebook, BaseWorldUI):
     def __init__(self, parent, path):
         SimpleNotebook.__init__(
             self,
@@ -51,7 +62,7 @@ class WorldManagerUI(SimpleNotebook):
         """Check if all extensions are safe to be closed"""
         return all(e.is_closeable() for e in self._extensions)
 
-    def close_world(self):
+    def close(self):
         """Close the world and destroy the UI
         Check is_closeable before running this"""
         for ext in self._extensions:
@@ -66,6 +77,12 @@ class WorldManagerUI(SimpleNotebook):
                 self._extensions[self.GetSelection()].enable()
             self._last_extension = self.GetSelection()
         evt.Skip()
+
+    def disable(self):
+        self._extensions[self.GetSelection()].disable()
+
+    def enable(self):
+        self._extensions[self.GetSelection()].enable()
 
 
 class BaseWorldProgram(SimplePanel):
