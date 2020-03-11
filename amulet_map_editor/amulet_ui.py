@@ -56,11 +56,13 @@ class AmuletMainWindow(wx.Frame):
         evt.Skip()
 
     def _disable_enable(self):
-        if self._last_page is not None:
-            self._last_page.disable()
-        self._last_page: BaseWorldUI = self.world_tab_holder.GetCurrentPage()
-        if self._last_page is not None:
-            self._last_page.enable()
+        current: BaseWorldUI = self.world_tab_holder.GetCurrentPage()
+        if self._last_page != current:
+            if self._last_page is not None:
+                self._last_page.disable()
+            self._last_page: BaseWorldUI = current
+            if self._last_page is not None:
+                self._last_page.enable()
 
     def _add_world_tab(self, obj, obj_name):
         # TODO: find a way for the tab to be optionally closeable
