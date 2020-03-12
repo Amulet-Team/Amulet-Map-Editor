@@ -115,7 +115,7 @@ class RenderChunk(BaseRenderChunk):
         else:
             self._changed_time = chunk.changed_time
             self._chunk_state = 2
-            blocks, larger_blocks, unique_blocks = self._get_block_data(chunk)
+            blocks, larger_blocks, unique_blocks = self._get_block_data(chunk.blocks)
             self._create_lod0(blocks, larger_blocks, unique_blocks)
         self._rebuild = True
 

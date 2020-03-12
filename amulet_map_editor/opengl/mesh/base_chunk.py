@@ -26,10 +26,9 @@ class BaseRenderChunk(TriMesh):
         raise NotImplementedError
         # 16 * (numpy.array([self._coords[0], 0, self._coords[1]]) % self._region_size)
 
-    def _get_block_data(self, chunk: "Chunk") -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
+    def _get_block_data(self, blocks: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
         :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks"""
-        blocks: numpy.ndarray = chunk.blocks
         larger_blocks = numpy.zeros(blocks.shape + numpy.array((2, 2, 2)), blocks.dtype)
         larger_blocks[1:-1, 1:-1, 1:-1] = blocks
 
