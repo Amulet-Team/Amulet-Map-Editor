@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional
+from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict
 import math
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
@@ -122,7 +122,7 @@ class RenderWorld:
         # self._loaded_render_chunks: Dict[Tuple[int, int], Union[RenderChunk, None]] = {}
         self._chunk_manager = ChunkManager(self.identifier)
         self._resource_pack = resource_pack
-        self._block_models = {}
+        self._block_models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
         self._texture_bounds = {}
         self._resource_pack_translator = self._world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
         self._texture_atlas = None
@@ -364,7 +364,7 @@ class RenderWorld:
             texture = ('minecraft', 'missing_no')
         return self._texture_bounds[texture]
 
-    def get_model(self, pallete_index: int):
+    def get_model(self, pallete_index: int) -> minecraft_model_reader.MinecraftMesh:
         if pallete_index not in self._block_models:
             block = self._world.palette[pallete_index]
             extra_blocks = tuple()
