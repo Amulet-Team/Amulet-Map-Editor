@@ -118,11 +118,12 @@ def _load_operations(path: str):
                     log.error(f'Error loading plugin {os.path.basename(fpath)}. "inputs" in export must be a list.')
                     continue
                 if "dst_box" in inputs or "dst_box_multiple" in inputs:
-                    if "structure_callable" not in plugin and "src_box" not in inputs:
+                    if "structure_callable" in plugin:
+                        if not callable(plugin["structure_callable"]):
+                            log.error(f'Error loading plugin {os.path.basename(fpath)}. "structure_callable" must be a callable if defined.')
+                            continue
+                    elif "src_box" not in inputs:
                         log.error(f'Error loading plugin {os.path.basename(fpath)}. "src_box" or "structure_callable" must be defined if "dst_box" or "dst_box_multiple" are.')
-                        continue
-                    if not callable(plugin["structure_callable"]):
-                        log.error(f'Error loading plugin {os.path.basename(fpath)}. "structure_callable" must be a callable if defined.')
                         continue
 
                 elif "structure" in inputs:
