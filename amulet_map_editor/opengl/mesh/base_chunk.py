@@ -32,6 +32,9 @@ class BaseRenderChunk(TriMesh):
     def _fill_boundary_block_data(self, larger_blocks: numpy.ndarray) -> numpy.ndarray:
         return larger_blocks
 
+    def create_geometry(self):
+        raise NotImplementedError
+
     def _create_lod0(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
         models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
