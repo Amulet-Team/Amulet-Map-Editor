@@ -1,11 +1,8 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple, Dict
+from typing import Tuple, Dict
 
 import minecraft_model_reader
 from amulet_map_editor.opengl.mesh import new_empty_verts, TriMesh
-
-if TYPE_CHECKING:
-    from amulet.api.chunk import Chunk
 
 
 class BaseRenderChunk(TriMesh):
@@ -13,18 +10,13 @@ class BaseRenderChunk(TriMesh):
 
     def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
         raise NotImplementedError
-        # self._render_world().get_model(block_temp_id)
 
     def _texture_bounds(self, texture):
         raise NotImplementedError
-        # self._render_world().get_texture_bounds(
-        #     model.textures[texture_index]
-        # )
 
     @property
     def offset(self) -> numpy.ndarray:
         raise NotImplementedError
-        # 16 * (numpy.array([self._coords[0], 0, self._coords[1]]) % self._region_size)
 
     def _get_block_data(self, blocks: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
