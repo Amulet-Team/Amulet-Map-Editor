@@ -6,6 +6,7 @@ import os
 from typing import TYPE_CHECKING, Optional
 
 from amulet.api.selection import Selection, SubSelectionBox
+from amulet.api.structure import Structure
 import minecraft_model_reader
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram
@@ -270,28 +271,75 @@ class World3DPanel(BaseWorldProgram):
             else:
                 log.error(f"Plugin {operation['name']} at {operation_path} did not return options in a valid format")
 
+    def _get_box(self) -> Optional[Selection]:
+        box = self._canvas._render_world._selection_box  # TODO: make a way to publicly access this
+        if box.select_state == 2:
+            return Selection(
+                (SubSelectionBox(
+                    box.min,
+                    box.max
+                ),)
+            )
+        else:
+            wx.MessageBox("You must select an area of the world before running this operation")
+            return None
+
     def _run_operation(self, evt):
         operation_path = self._operation_choice.GetAny()
         operation = operations.operations[operation_path]
-        operation_inputs = []
-        for inp in operation.get("inputs", []):
-            if inp == "src_box":
-                box = self._canvas._render_world._selection_box  # TODO: make a way to publicly access this
-                if box.select_state == 2:
-                    operation_inputs.append(
-                        Selection(
-                            (SubSelectionBox(
-                                box.min,
-                                box.max
-                            ), )
-                        )
-                    )
-                else:
-                    wx.MessageBox("You must select an area of the world before running")
-                    return
+        operation_input_definitions = operation.get("inputs", [])
+        if "dst_box" in operation_input_definitions or "dst_box_multiple" in operation_input_definitions:
+            if "structure_callable" in operation:
+                operation_inputs = []
+                for inp in operation_input_definitions:
+                    if inp == "src_box":
+                        selection = self._get_box()
+                        if selection is None:
+                            return
+                        operation_inputs.append(selection)
 
-            elif inp in ["dst_box", "dst_box_multiple"]:
+                    elif inp in ["options", "wxoptions"]:
+                        operation_inputs.append(operations.options.get(operation_path, {}))
+
+                structure = self._world.run_operation(operation["structure_callable"], *operation_inputs, create_undo=False)
+                if not isinstance(structure, Structure):
+                    wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
+                    return
+            elif "src_box" in operation_input_definitions:
+                selection = self._get_box()
+                if selection is None:
+                    return
+                structure = Structure.from_world(self._world, selection, self._canvas._render_world.dimension)
+            else:
+                wx.MessageBox("This should not happen")
                 return
+
+            if "dst_box" in operation_input_definitions:
+                # trigger UI to show select box UI
+                raise NotImplementedError
+
+            elif "dst_box_multiple" in operation_input_definitions:
+                # trigger UI to show select box multiple UI
+                raise NotImplementedError
+
+        else:
+            self._run_main_operation(operation_path, operation, operation_input_definitions)
+
+    def _run_main_operation(self, operation_path, operation, operation_input_definitions, dst_box=None, dst_box_multiple=None, structure=None):
+        operation_inputs = []
+        for inp in operation_input_definitions:
+            if inp == "src_box":
+                selection = self._get_box()
+                if selection is None:
+                    return
+                operation_inputs.append(selection)
+
+            elif inp == "dst_box":
+                operation_inputs.append(dst_box)
+            elif inp == "dst_box_multiple":
+                operation_inputs.append(dst_box_multiple)
+            elif inp == "structure":
+                operation_inputs.append(structure)
             elif inp in ["options", "wxoptions"]:
                 operation_inputs.append(operations.options.get(operation_path, {}))
 
