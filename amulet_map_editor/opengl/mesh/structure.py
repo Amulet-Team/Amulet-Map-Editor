@@ -49,7 +49,7 @@ class RenderStructure:
     def _create_geometry(self):
         offset = -self._structure.selection.min
         sections = []
-        for chunk, slices in self._structure.get_chunk_slices():
+        for chunk, slices, _ in self._structure.get_chunk_slices():
             section = SubRenderStructure(self._render_world(), self._structure.palette, chunk, slices, offset)
             section.create_geometry()
             sections.append(section)

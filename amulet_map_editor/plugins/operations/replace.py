@@ -29,7 +29,7 @@ def replace(
     original_block_matches = []
     universal_block_count = 0
 
-    for chunk, slices in world.get_chunk_slices(selection):
+    for chunk, slices, _ in world.get_chunk_slices(selection):
         if universal_block_count < len(world.palette):
             for universal_block_id in range(universal_block_count, len(world.palette)):
                 version_block = world.translation_manager.get_version(
