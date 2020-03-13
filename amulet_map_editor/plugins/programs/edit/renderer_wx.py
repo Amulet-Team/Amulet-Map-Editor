@@ -420,33 +420,3 @@ class World3DPanel(BaseWorldProgram):
     def _steal_focus(self, evt):
         self._menu.SetFocus()
         evt.Skip()
-
-
-if __name__ == "__main__":
-    class MainFrame(wx.Frame):
-        def __init__(self):
-            self.size = (400, 300)
-            wx.Frame.__init__(self, None, title="3D World View", size=self.size,
-                              style=wx.DEFAULT_FRAME_STYLE | wx.FULL_REPAINT_ON_RESIZE)
-            self.SetMinSize(self.size)
-            self.Bind(wx.EVT_CLOSE, self.on_close)
-
-            world_path = sys.argv[1]
-            import amulet.world_interface
-            world = amulet.world_interface.load_world(world_path)
-
-            self.panel = World3DPanel(self, world)
-
-        def on_close(self, event):
-            self.Destroy()
-            sys.exit(0)
-
-
-    class App(wx.App):
-        def OnInit(self):
-            frame = MainFrame()
-            frame.Show()
-            return True
-
-    app = App()
-    app.MainLoop()
