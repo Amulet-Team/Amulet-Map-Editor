@@ -3,14 +3,14 @@ from wx import glcanvas
 from OpenGL.GL import *
 import os
 import weakref
-from typing import TYPE_CHECKING, Optional, List, Callable
+from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
 
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure
 import minecraft_model_reader
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram
-from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
+from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld
 from amulet_map_editor.plugins import operations
 
@@ -266,6 +266,58 @@ class OperationUI(SimplePanel):
         evt.Skip()
 
 
+class SelectDestinationUI(SimplePanel):
+    def __init__(self, parent, cancel_callback, confirm_callback):
+        super().__init__(parent)
+        self._cancel_callback = cancel_callback
+        self._confirm_callback = confirm_callback
+
+        self._operation_path = None
+        self._operation = None
+        self._operation_input_definitions = None
+        self._structure = None
+
+        self._x: wx.SpinCtrl = self._add_row('x', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._y: wx.SpinCtrl = self._add_row('y', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._z: wx.SpinCtrl = self._add_row('z', wx.SpinCtrl, min=-30000000, max=30000000)
+
+        panel = SimplePanel(self, wx.HORIZONTAL)
+        self._cancel = wx.Button(panel, label="Cancel")
+        panel.add_object(self._cancel, 0, wx.CENTER | wx.ALL)
+        self._confirm = wx.Button(panel, label="Confirm")
+        panel.add_object(self._confirm, 0, wx.CENTER | wx.ALL)
+
+    def setup(self, operation_path, operation, operation_input_definitions, structure):
+        self._operation_path = operation_path
+        self._operation = operation
+        self._operation_input_definitions = operation_input_definitions
+        self._structure = structure
+
+    def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
+        panel = SimplePanel(self, wx.HORIZONTAL)
+        name_text = SimpleText(panel, label)
+        panel.add_object(name_text, 0, wx.CENTER | wx.ALL)
+        obj = wx_object(**kwargs)
+        panel.add_object(obj, 0, wx.CENTER | wx.ALL)
+        return obj
+
+    def _on_cancel(self):
+        self._cancel_callback()
+
+    def _on_confirm(self):
+        self._confirm_callback(
+            self._operation_path,
+            self._operation,
+            self._operation_input_definitions,
+            dst_box={
+                "x": self._x.GetValue(),
+                "y": self._y.GetValue(),
+                "z": self._z.GetValue()
+            },
+            structure=self._structure
+        )
+
+
 class EditExtension(BaseWorldProgram):
     def __init__(self, parent, world: 'World'):
         super().__init__(parent, wx.HORIZONTAL)
@@ -281,6 +333,7 @@ class EditExtension(BaseWorldProgram):
         )
         self._menu: Optional[SimplePanel] = None
         self._operation_ui: Optional[OperationUI] = None
+        self._select_destination_ui: Optional[SelectDestinationUI] = None
         self._menu_buttons: List[wx.Button] = []
         self._options_button: Optional[wx.Button] = None
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
@@ -345,15 +398,35 @@ class EditExtension(BaseWorldProgram):
 
             if "dst_box" in operation_input_definitions:
                 # trigger UI to show select box UI
-                raise NotImplementedError
+                self._select_destination_ui.setup(
+                    operation_path,
+                    operation,
+                    operation_input_definitions,
+                    structure
+                )
+                self._operation_ui.Hide()
+                self._select_destination_ui.Show()
 
-            elif "dst_box_multiple" in operation_input_definitions:
+            else:
                 # trigger UI to show select box multiple UI
                 raise NotImplementedError
 
         else:
+            self._operation_ui.Disable()
             self._run_main_operation(operation_path, operation, operation_input_definitions)
+            self._operation_ui.Enable()
         evt.Skip()
+
+    def _destination_select_cancel(self):
+        self._select_destination_ui.Hide()
+        self._operation_ui.Show()
+
+    def _destination_select_confirm(self, *args, **kwargs):
+        self._select_destination_ui.Disable()
+        self._run_main_operation(*args, **kwargs)
+        self._select_destination_ui.Hide()
+        self._select_destination_ui.Enable()
+        self._operation_ui.Show()
 
     def _run_main_operation(self, operation_path, operation, operation_input_definitions, dst_box=None, dst_box_multiple=None, structure=None):
         operation_inputs = []
@@ -407,6 +480,15 @@ class EditExtension(BaseWorldProgram):
             self._menu.add_object(self._operation_ui, options=0)
             self._operation_ui.Layout()
             self._operation_ui.Fit()
+            self._select_destination_ui = SelectDestinationUI(
+                self._menu,
+                self._destination_select_cancel,
+                self._destination_select_confirm
+            )
+            self._menu.add_object(self._select_destination_ui, options=0)
+            self._select_destination_ui.Layout()
+            self._select_destination_ui.Fit()
+            self._select_destination_ui.Hide()
 
             self._canvas = World3dCanvas(self, self._world)
             self.add_object(self._canvas, 0, wx.EXPAND)
