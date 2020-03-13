@@ -1,9 +1,9 @@
 import wx
 from wx import glcanvas
 from OpenGL.GL import *
-import sys
 import os
-from typing import TYPE_CHECKING, Optional
+import weakref
+from typing import TYPE_CHECKING, Optional, List, Callable
 
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure
@@ -13,6 +13,7 @@ from amulet_map_editor.plugins.programs import BaseWorldProgram
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld
 from amulet_map_editor.plugins import operations
+
 from amulet_map_editor import log
 
 if TYPE_CHECKING:
@@ -213,39 +214,31 @@ class World3dCanvas(glcanvas.GLCanvas):
         event.Skip()
 
 
-class EditExtension(BaseWorldProgram):
-    def __init__(self, parent, world: 'World'):
-        super().__init__(parent, wx.HORIZONTAL)
-        self._world = world
-        self._canvas: Optional[World3dCanvas] = None
-        self._temp = wx.StaticText(
+class OperationUI(SimplePanel):
+    def __init__(self, parent, world: 'World', run_operation: Callable):
+        super().__init__(parent)
+        self._world = weakref.ref(world)
+        self._operation_choice = SimpleChoiceAny(self)
+        self._operation_choice.SetItems({key: value["name"] for key, value in operations.operations.items()})
+        self._operation_choice.Bind(wx.EVT_CHOICE, self._operation_selection_change)
+        self.add_object(self._operation_choice, 0)
+        self._options_button = wx.Button(
             self,
-            wx.ID_ANY,
-            'Please wait while the renderer loads',
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
+            label="Change Options"
         )
-        self._menu = None
-        self._menu_buttons = []
-        self._operation_choice: Optional[SimpleChoiceAny] = None
-        self._options_button: Optional[wx.Button] = None
-        self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        self.Bind(wx.EVT_SIZE, self._on_resize)
+        run_button = wx.Button(
+            self,
+            label="Run Operation"
+        )
+        self._options_button.Bind(wx.EVT_BUTTON, self._change_options)
+        run_button.Bind(wx.EVT_BUTTON, run_operation)
+        self.add_object(self._options_button)
+        self.add_object(run_button)
+        self._operation_selection_change_()
 
-    def _on_resize(self, event):
-        if self._canvas is not None:
-            self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
-        event.Skip()
-
-    def _undo_event(self, evt):
-        self._world.undo()
-
-    def _redo_event(self, evt):
-        self._world.redo()
-
-    def _save_event(self, evt):
-        self._world.save()
+    @property
+    def operation(self) -> str:
+        return self._operation_choice.GetAny()
 
     def _operation_selection_change(self, evt):
         self._operation_selection_change_()
@@ -265,11 +258,47 @@ class EditExtension(BaseWorldProgram):
         if "options" in operation.get("inputs", []):
             pass  # TODO: implement this
         elif "wxoptions" in operation.get("inputs", []):
-            options = operation["wxoptions"](self, self._world, operations.options.get(operation_path, {}))
+            options = operation["wxoptions"](self, self._world(), operations.options.get(operation_path, {}))
             if isinstance(options, dict):
                 operations.options[operation_path] = options
             else:
                 log.error(f"Plugin {operation['name']} at {operation_path} did not return options in a valid format")
+        evt.Skip()
+
+
+class EditExtension(BaseWorldProgram):
+    def __init__(self, parent, world: 'World'):
+        super().__init__(parent, wx.HORIZONTAL)
+        self._world = world
+        self._canvas: Optional[World3dCanvas] = None
+        self._temp = wx.StaticText(
+            self,
+            wx.ID_ANY,
+            'Please wait while the renderer loads',
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self._menu: Optional[SimplePanel] = None
+        self._operation_ui: Optional[OperationUI] = None
+        self._menu_buttons: List[wx.Button] = []
+        self._options_button: Optional[wx.Button] = None
+        self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        self.Bind(wx.EVT_SIZE, self._on_resize)
+
+    def _on_resize(self, event):
+        if self._canvas is not None:
+            self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
+        event.Skip()
+
+    def _undo_event(self, evt):
+        self._world.undo()
+
+    def _redo_event(self, evt):
+        self._world.redo()
+
+    def _save_event(self, evt):
+        self._world.save()
 
     def _get_box(self) -> Optional[Selection]:
         box = self._canvas._render_world._selection_box  # TODO: make a way to publicly access this
@@ -285,7 +314,7 @@ class EditExtension(BaseWorldProgram):
             return None
 
     def _run_operation(self, evt):
-        operation_path = self._operation_choice.GetAny()
+        operation_path = self._operation_ui.operation
         operation = operations.operations[operation_path]
         operation_input_definitions = operation.get("inputs", [])
         if "dst_box" in operation_input_definitions or "dst_box_multiple" in operation_input_definitions:
@@ -324,6 +353,7 @@ class EditExtension(BaseWorldProgram):
 
         else:
             self._run_main_operation(operation_path, operation, operation_input_definitions)
+        evt.Skip()
 
     def _run_main_operation(self, operation_path, operation, operation_input_definitions, dst_box=None, dst_box_multiple=None, structure=None):
         operation_inputs = []
@@ -349,6 +379,7 @@ class EditExtension(BaseWorldProgram):
         if self._canvas is None:
             self.Update()
             self._menu = SimplePanel(self)
+            self._menu.Hide()
             self.add_object(self._menu, 0, wx.EXPAND)
             self._menu.Bind(wx.EVT_MOTION, self._steal_focus)
 
@@ -371,28 +402,19 @@ class EditExtension(BaseWorldProgram):
                 self._menu_buttons.append(
                     button
                 )
-            self._operation_choice = SimpleChoiceAny(self._menu)
-            self._operation_choice.SetItems({key: value["name"] for key, value in operations.operations.items()})
-            self._operation_choice.Bind(wx.EVT_CHOICE, self._operation_selection_change)
-            self._menu.add_object(self._operation_choice, 0)
-            self._options_button = wx.Button(
-                self._menu,
-                label="Change Options"
-            )
-            run_button = wx.Button(
-                self._menu,
-                label="Run Operation"
-            )
-            self._options_button.Bind(wx.EVT_BUTTON, self._change_options)
-            run_button.Bind(wx.EVT_BUTTON, self._run_operation)
-            self._menu.add_object(self._options_button)
-            self._menu.add_object(run_button)
-            self._operation_selection_change_()
+
+            self._operation_ui = OperationUI(self._menu, self._world, self._run_operation)
+            self._menu.add_object(self._operation_ui, options=0)
+            self._operation_ui.Layout()
+            self._operation_ui.Fit()
 
             self._canvas = World3dCanvas(self, self._world)
             self.add_object(self._canvas, 0, wx.EXPAND)
             self._temp.Destroy()
+            self._menu.Show()
+
             self.GetParent().Layout()
+            self._menu.Layout()
             self._menu.Fit()
             self.Update()
         self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
@@ -416,6 +438,7 @@ class EditExtension(BaseWorldProgram):
 
     def _close_world(self, evt):
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
+        evt.Skip()
 
     def _steal_focus(self, evt):
         self._menu.SetFocus()
