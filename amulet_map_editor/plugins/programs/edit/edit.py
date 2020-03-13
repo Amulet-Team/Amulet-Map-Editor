@@ -436,9 +436,8 @@ class EditExtension(BaseWorldProgram):
             return self._canvas.is_closeable()
         return True
 
-    def _close_world(self, evt):
+    def _close_world(self, _):
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
-        evt.Skip()
 
     def _steal_focus(self, evt):
         self._menu.SetFocus()
