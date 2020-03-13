@@ -1,6 +1,6 @@
-from .renderer_wx import World3DPanel
+from .edit import EditExtension
 
 export = {
     "name": "3D Editor",
-    "ui": World3DPanel
+    "ui": EditExtension
 }

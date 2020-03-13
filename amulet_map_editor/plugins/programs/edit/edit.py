@@ -35,7 +35,7 @@ key_map = {
 
 
 class World3dCanvas(glcanvas.GLCanvas):
-    def __init__(self, world_panel: 'World3DPanel', world: 'World'):
+    def __init__(self, world_panel: 'EditExtension', world: 'World'):
         self._keys_pressed = set()
         super().__init__(world_panel, -1, size=world_panel.GetClientSize())
         self._context = glcanvas.GLContext(self)
@@ -213,8 +213,8 @@ class World3dCanvas(glcanvas.GLCanvas):
         event.Skip()
 
 
-class World3DPanel(BaseWorldProgram):
-    def __init__(self, parent: 'MainFrame', world: 'World'):
+class EditExtension(BaseWorldProgram):
+    def __init__(self, parent, world: 'World'):
         super().__init__(parent, wx.HORIZONTAL)
         self._world = world
         self._canvas: Optional[World3dCanvas] = None
