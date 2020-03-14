@@ -461,7 +461,7 @@ class EditExtension(BaseWorldProgram):
             self._menu = SimplePanel(self)
             self._menu.Hide()
             self.add_object(self._menu, 0, wx.EXPAND)
-            self._menu.Bind(wx.EVT_MOTION, self._steal_focus)
+            self._menu.Bind(wx.EVT_MOTION, self._steal_focus_menu)
 
             for text, operation in [
                 ['Undo', self._undo_event],
@@ -485,6 +485,7 @@ class EditExtension(BaseWorldProgram):
 
             self._operation_ui = OperationUI(self._menu, self._world, self._run_operation)
             self._menu.add_object(self._operation_ui, options=0)
+            self._operation_ui.Bind(wx.EVT_MOTION, self._steal_focus_operation)
             self._operation_ui.Layout()
             self._operation_ui.Fit()
             self._select_destination_ui = SelectDestinationUI(
@@ -493,6 +494,7 @@ class EditExtension(BaseWorldProgram):
                 self._destination_select_confirm
             )
             self._menu.add_object(self._select_destination_ui, options=0)
+            self._select_destination_ui.Bind(wx.EVT_MOTION, self._steal_focus_destination)
             self._select_destination_ui.Layout()
             self._select_destination_ui.Fit()
             self._select_destination_ui.Hide()
@@ -528,6 +530,14 @@ class EditExtension(BaseWorldProgram):
     def _close_world(self, _):
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
 
-    def _steal_focus(self, evt):
+    def _steal_focus_menu(self, evt):
         self._menu.SetFocus()
+        evt.Skip()
+
+    def _steal_focus_operation(self, evt):
+        self._operation_ui.SetFocus()
+        evt.Skip()
+
+    def _steal_focus_destination(self, evt):
+        self._select_destination_ui.SetFocus()
         evt.Skip()
