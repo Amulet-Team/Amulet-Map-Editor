@@ -232,8 +232,8 @@ class OperationUI(SimplePanel):
         )
         self._options_button.Bind(wx.EVT_BUTTON, self._change_options)
         run_button.Bind(wx.EVT_BUTTON, run_operation)
-        self.add_object(self._options_button)
-        self.add_object(run_button)
+        self.add_object(self._options_button, 0)
+        self.add_object(run_button, 0)
         self._operation_selection_change_()
 
     @property
@@ -282,10 +282,14 @@ class SelectDestinationUI(SimplePanel):
         self._z: wx.SpinCtrl = self._add_row('z', wx.SpinCtrl, min=-30000000, max=30000000)
 
         panel = SimplePanel(self, wx.HORIZONTAL)
+        self.add_object(panel, 0, 0)
         self._cancel = wx.Button(panel, label="Cancel")
-        panel.add_object(self._cancel, 0, wx.CENTER | wx.ALL)
+        panel.add_object(self._cancel, 0, wx.CENTER)
         self._confirm = wx.Button(panel, label="Confirm")
-        panel.add_object(self._confirm, 0, wx.CENTER | wx.ALL)
+        panel.add_object(self._confirm, 0, wx.CENTER)
+
+        self._cancel.Bind(wx.EVT_BUTTON, self._on_cancel)
+        self._confirm.Bind(wx.EVT_BUTTON, self._on_confirm)
 
     def setup(self, operation_path, operation, operation_input_definitions, structure):
         self._operation_path = operation_path
@@ -295,16 +299,17 @@ class SelectDestinationUI(SimplePanel):
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         panel = SimplePanel(self, wx.HORIZONTAL)
+        self.add_object(panel, 0, 0)
         name_text = SimpleText(panel, label)
         panel.add_object(name_text, 0, wx.CENTER | wx.ALL)
-        obj = wx_object(**kwargs)
+        obj = wx_object(panel, **kwargs)
         panel.add_object(obj, 0, wx.CENTER | wx.ALL)
         return obj
 
-    def _on_cancel(self):
+    def _on_cancel(self, evt):
         self._cancel_callback()
 
-    def _on_confirm(self):
+    def _on_confirm(self, evt):
         self._confirm_callback(
             self._operation_path,
             self._operation,
@@ -406,7 +411,7 @@ class EditExtension(BaseWorldProgram):
                 )
                 self._operation_ui.Hide()
                 self._select_destination_ui.Show()
-
+                self._menu.Fit()
             else:
                 # trigger UI to show select box multiple UI
                 raise NotImplementedError
@@ -420,6 +425,7 @@ class EditExtension(BaseWorldProgram):
     def _destination_select_cancel(self):
         self._select_destination_ui.Hide()
         self._operation_ui.Show()
+        self._menu.Fit()
 
     def _destination_select_confirm(self, *args, **kwargs):
         self._select_destination_ui.Disable()
@@ -427,6 +433,7 @@ class EditExtension(BaseWorldProgram):
         self._select_destination_ui.Hide()
         self._select_destination_ui.Enable()
         self._operation_ui.Show()
+        self._menu.Fit()
 
     def _run_main_operation(self, operation_path, operation, operation_input_definitions, dst_box=None, dst_box_multiple=None, structure=None):
         operation_inputs = []
