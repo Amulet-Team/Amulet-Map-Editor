@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure
 
+from amulet_map_editor import log
 from amulet_map_editor.plugins.programs import BaseWorldProgram
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText
 from amulet_map_editor.plugins import operations
-from amulet_map_editor import log
+
 from .controllable_canvas import ControllableEditCanvas
 
 if TYPE_CHECKING:
@@ -160,7 +161,7 @@ class EditExtension(BaseWorldProgram):
         self._world.save()
 
     def _get_box(self) -> Optional[Selection]:
-        box = self._canvas._render_world._selection_box  # TODO: make a way to publicly access this
+        box = self._canvas._selection_box  # TODO: make a way to publicly access this
         if box.select_state == 2:
             return Selection(
                 (SubSelectionBox(
@@ -171,6 +172,19 @@ class EditExtension(BaseWorldProgram):
         else:
             wx.MessageBox("You must select an area of the world before running this operation")
             return None
+
+    def _enable_operation_ui(self):
+        self._select_destination_ui.Hide()
+        self._operation_ui.Show()
+        self._canvas.select_mode = 0
+        self._menu.Fit()
+
+    def _enable_select_destination_ui(self, structure: Structure):
+        self._operation_ui.Hide()
+        self._select_destination_ui.Show()
+        self._menu.Fit()
+        self._canvas.structure = structure
+        self._canvas.select_mode = 1
 
     def _run_operation(self, evt):
         operation_path = self._operation_ui.operation
@@ -189,7 +203,9 @@ class EditExtension(BaseWorldProgram):
                     elif inp in ["options", "wxoptions"]:
                         operation_inputs.append(operations.options.get(operation_path, {}))
 
+                self._operation_ui.Disable()
                 structure = self._world.run_operation(operation["structure_callable"], *operation_inputs, create_undo=False)
+                self._operation_ui.Enable()
                 if not isinstance(structure, Structure):
                     wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
                     return
@@ -197,7 +213,9 @@ class EditExtension(BaseWorldProgram):
                 selection = self._get_box()
                 if selection is None:
                     return
+                self._operation_ui.Disable()
                 structure = Structure.from_world(self._world, selection, self._canvas._render_world.dimension)
+                self._operation_ui.Enable()
             else:
                 wx.MessageBox("This should not happen")
                 return
@@ -210,9 +228,7 @@ class EditExtension(BaseWorldProgram):
                     operation_input_definitions,
                     structure
                 )
-                self._operation_ui.Hide()
-                self._select_destination_ui.Show()
-                self._menu.Fit()
+                self._enable_select_destination_ui(structure)
             else:
                 # trigger UI to show select box multiple UI
                 raise NotImplementedError
@@ -224,9 +240,7 @@ class EditExtension(BaseWorldProgram):
         evt.Skip()
 
     def _destination_select_cancel(self):
-        self._select_destination_ui.Hide()
-        self._operation_ui.Show()
-        self._menu.Fit()
+        self._enable_operation_ui()
 
     def _destination_select_confirm(self, *args, **kwargs):
         self._select_destination_ui.Disable()

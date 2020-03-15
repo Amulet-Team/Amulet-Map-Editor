@@ -113,9 +113,10 @@ class RenderWorld(ResourcePackManager):
         world: 'World',
         resource_pack: minecraft_model_reader.JavaRPHandler,
         texture: Any,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]]
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        translator: PyMCTranslate.Version
     ):
-        super().__init__(context_identifier, resource_pack, texture, texture_bounds)
+        super().__init__(context_identifier, resource_pack, texture, texture_bounds, translator)
         self._world = world
         self._camera = [0, 150, 0, 90, 0]
         self._dimension = 0
@@ -123,7 +124,6 @@ class RenderWorld(ResourcePackManager):
         self._garbage_distance = 20
         self._chunk_manager = ChunkManager(self.context_identifier)
         self._chunk_generator = ChunkGenerator(self)
-        self._resource_pack_translator = self._world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
 
     @property
     def world(self) -> 'World':
@@ -138,7 +138,7 @@ class RenderWorld(ResourcePackManager):
         return self._world.palette
 
     @property
-    def _translator(self) -> PyMCTranslate.version:
+    def translator(self) -> PyMCTranslate.Version:
         return self._resource_pack_translator
 
     def is_closeable(self):

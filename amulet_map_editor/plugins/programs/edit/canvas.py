@@ -2,15 +2,17 @@ import wx
 from wx import glcanvas
 from OpenGL.GL import *
 import os
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List
 import uuid
 import numpy
 import math
 
 import minecraft_model_reader
+from amulet.api.structure import Structure
 
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos
 from amulet_map_editor.opengl.mesh.selection import RenderSelection
+from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor import log
 
@@ -45,12 +47,15 @@ class EditCanvas(glcanvas.GLCanvas):
             minecraft_model_reader.java_vanilla_fix
         )
 
+        self._resource_pack_translator = world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
+
         self._render_world = RenderWorld(
             self.context_identifier,
             world,
             self._resource_pack,
             self._gl_texture_atlas,
-            self._texture_bounds
+            self._texture_bounds,
+            self._resource_pack_translator
         )
 
         self._transformation_matrix: Optional[numpy.ndarray] = None
@@ -70,6 +75,8 @@ class EditCanvas(glcanvas.GLCanvas):
             self.context_identifier,
             self._texture_bounds
         )
+        self._structure: Optional[RenderStructure] = None
+        self.structure_locations: List[numpy.ndarray] = []
 
         self._draw_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
@@ -126,6 +133,29 @@ class EditCanvas(glcanvas.GLCanvas):
         glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_atlas)
         log.info('Finished setting up texture atlas in OpenGL')
+
+    @property
+    def structure(self) -> RenderStructure:
+        return self._structure
+
+    @structure.setter
+    def structure(self, structure: Structure):
+        self._structure = RenderStructure(
+            self.context_identifier,
+            structure,
+            self._resource_pack,
+            self._gl_texture_atlas,
+            self._texture_bounds,
+            self._resource_pack_translator
+        )
+
+    @property
+    def select_mode(self) -> int:
+        return self._select_mode
+
+    @select_mode.setter
+    def select_mode(self, select_mode: int):
+        self._select_mode = select_mode
 
     @property
     def camera_move_speed(self) -> float:
@@ -300,11 +330,17 @@ class EditCanvas(glcanvas.GLCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        glDepthFunc(GL_ALWAYS)
-        self._selection_box.draw(self.transformation_matrix)
-        if self._selection_box.select_state == 2:
-            self._selection_box2.draw(self.transformation_matrix)
-        glDepthFunc(GL_LEQUAL)
+        if self._select_mode == 0:
+            glDepthFunc(GL_ALWAYS)
+            self._selection_box.draw(self.transformation_matrix)
+            if self._selection_box.select_state == 2:
+                self._selection_box2.draw(self.transformation_matrix)
+            glDepthFunc(GL_LEQUAL)
+        elif self._structure is not None:
+            for location in self.structure_locations:
+                transform = numpy.eye(4, dtype=numpy.float32)
+                transform[3, 0:3] = location
+                self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
         self.SwapBuffers()
 
     def _gc(self, event):
