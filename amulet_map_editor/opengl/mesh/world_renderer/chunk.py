@@ -1,18 +1,18 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple, Dict
+from typing import TYPE_CHECKING, Tuple
 import weakref
 
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
-from amulet_map_editor.opengl.mesh import new_empty_verts, TriMesh
-from amulet_map_editor.opengl.mesh.base_chunk import BaseRenderChunk
+from amulet_map_editor.opengl.mesh import new_empty_verts
+from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 
 if TYPE_CHECKING:
     from .world import RenderWorld
     from amulet.api.chunk import Chunk
 
 
-class RenderChunk(BaseRenderChunk):
+class RenderChunk(RenderChunkBuilder):
     def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: int):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform

@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 import numpy
 import queue
 from .chunk import RenderChunk, new_empty_verts
-from amulet_map_editor.opengl.mesh.tri_mesh import TriMesh
+from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 
 
 class ChunkManager:

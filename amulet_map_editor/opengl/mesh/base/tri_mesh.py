@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 import numpy
-from . import new_empty_verts
+from amulet_map_editor.opengl.mesh import new_empty_verts
 from amulet_map_editor.opengl.shaders import get_shader
 
 

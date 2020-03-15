@@ -2,7 +2,7 @@ import numpy
 from OpenGL.GL import *
 import itertools
 from typing import Tuple
-from .tri_mesh import TriMesh
+from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 
 
 class Selection(TriMesh):

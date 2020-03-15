@@ -5,7 +5,7 @@ import minecraft_model_reader
 from amulet_map_editor.opengl.mesh import new_empty_verts, TriMesh
 
 
-class BaseRenderChunk(TriMesh):
+class RenderChunkBuilder(TriMesh):
     """A class to define the logic to generate geometry from a block array"""
 
     def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:

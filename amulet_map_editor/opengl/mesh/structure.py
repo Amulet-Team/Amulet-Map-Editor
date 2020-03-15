@@ -5,14 +5,14 @@ import numpy
 from amulet.api.structure import Structure
 from amulet.api.chunk import Chunk
 from amulet.api.block import BlockManager
-from amulet_map_editor.opengl.mesh.base_chunk import BaseRenderChunk
+from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 import minecraft_model_reader
 
 if TYPE_CHECKING:
     from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld
 
 
-class SubRenderStructure(BaseRenderChunk):
+class SubRenderStructure(RenderChunkBuilder):
     def __init__(self, render_world: 'RenderWorld', structure_palette: BlockManager, chunk: Chunk, slices: Tuple[slice, slice, slice], offset: numpy.ndarray):
         super().__init__(render_world.identifier)
         self._render_world = weakref.ref(render_world)
