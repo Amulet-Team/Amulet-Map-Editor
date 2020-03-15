@@ -1,254 +1,18 @@
 import wx
-from wx import glcanvas
-from OpenGL.GL import *
-import os
 import weakref
-from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any, Dict, Tuple
-import uuid
+from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
 
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure
-import minecraft_model_reader
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText
-from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld
 from amulet_map_editor.plugins import operations
-from amulet_map_editor.opengl import shaders, textureatlas
 from amulet_map_editor import log
+from .controllable_canvas import ControllableEditCanvas
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-
-
-key_map = {
-    'up': wx.WXK_SPACE,
-    'down': wx.WXK_SHIFT,
-    'forwards': 87,
-    'backwards': 83,
-    'left': 65,
-    'right': 68,
-
-    'look_left': 74,
-    'look_right': 76,
-    'look_up': 73,
-    'look_down': 75,
-}
-
-
-class World3dCanvas(glcanvas.GLCanvas):
-    def __init__(self, world_panel: 'EditExtension', world: 'World'):
-        self._keys_pressed = set()
-        super().__init__(world_panel, -1, size=world_panel.GetClientSize())
-        self._context = glcanvas.GLContext(self)  # setup the OpenGL context
-        self.SetCurrent(self._context)
-        self.context_identifier = str(uuid.uuid4())  # create a UUID for the context. Used to get shaders
-        self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
-        self._setup_opengl()  # set some OpenGL states
-
-        # load the resource packs
-        os.makedirs('resource_packs', exist_ok=True)
-        if not os.path.isfile('resource_packs/readme.txt'):
-            with open('resource_packs/readme.txt', 'w') as f:
-                f.write('Put the Java resource pack you want loaded in here.')
-
-        self._texture_bounds: Optional[Dict[Any, Tuple[float, float, float, float]]] = None
-        self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
-
-        self._load_resource_pack(
-            minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), 'amulet_resource_pack')),
-            minecraft_model_reader.java_vanilla_latest,
-            *[minecraft_model_reader.JavaRP(rp) for rp in os.listdir('resource_packs') if os.path.isdir(rp)],
-            minecraft_model_reader.java_vanilla_fix
-        )
-
-        self._render_world = RenderWorld(
-            self.context_identifier,
-            world,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds
-        )
-
-        self._draw_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
-
-        self._input_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._process_inputs, self._input_timer)
-
-        self._gc_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
-
-        world_panel.Bind(wx.EVT_SIZE, self._on_resize)
-
-        self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
-        self.Bind(wx.EVT_KEY_UP, self._on_key_release)
-        self.Bind(wx.EVT_MOUSEWHEEL, self._mouse_wheel)
-        self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
-
-        self._mouse_x = 0
-        self._mouse_y = 0
-        self._last_mouse_x = 0
-        self._last_mouse_y = 0
-        self._mouse_lock = False
-        self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
-        self.Bind(wx.EVT_LEFT_UP, self._box_click)
-        self.Bind(wx.EVT_RIGHT_UP, self._toggle_selection_mode)
-        self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
-
-    def enable(self):
-        self._render_world.enable()
-        self._draw_timer.Start(33)
-        self._input_timer.Start(33)
-        self._gc_timer.Start(10000)
-
-    def disable(self):
-        self._draw_timer.Stop()
-        self._input_timer.Stop()
-        self._gc_timer.Stop()
-        self._render_world.disable()
-
-    def close(self):
-        self._render_world.close()
-        glDeleteTextures([self._gl_texture_atlas])
-
-    def is_closeable(self):
-        return self._render_world.is_closeable()
-
-    def _setup_opengl(self):
-        glClearColor(0.5, 0.66, 1.0, 1.0)
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_CULL_FACE)
-        glDepthFunc(GL_LEQUAL)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-
-    def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
-        self._resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
-        self._create_atlas()
-
-    def _create_atlas(self):
-        texture_atlas, self._texture_bounds, width, height = textureatlas.create_atlas(
-            self._resource_pack.textures
-        )
-        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_atlas)
-        log.info('Finished setting up texture atlas in OpenGL')
-
-    def _mouse_wheel(self, evt):
-        self._render_world.camera_move_speed += 0.2 * evt.GetWheelRotation() / evt.GetWheelDelta()
-        if self._render_world.camera_move_speed < 0.1:
-            self._render_world.camera_move_speed = 0.1
-        evt.Skip()
-
-    def _process_inputs(self, evt):
-        forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
-        if key_map['up'] in self._keys_pressed:
-            up += 1
-        if key_map['down'] in self._keys_pressed:
-            up -= 1
-        if key_map['forwards'] in self._keys_pressed:
-            forward += 1
-        if key_map['backwards'] in self._keys_pressed:
-            forward -= 1
-        if key_map['left'] in self._keys_pressed:
-            right -= 1
-        if key_map['right'] in self._keys_pressed:
-            right += 1
-
-        if self._mouse_lock:
-            pitch = (self._mouse_y - self._last_mouse_y) * 0.07
-            yaw = (self._mouse_x - self._last_mouse_x) * 0.07
-            self._mouse_x, self._mouse_y = self._last_mouse_x, self._last_mouse_y = self.GetSize()[0]/2, self.GetSize()[1]/2
-            self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
-        else:
-            pitch = 0
-            yaw = 0
-        self._render_world.move_camera(forward, up, right, pitch, yaw)
-        evt.Skip()
-
-    def _toggle_mouse_lock(self, evt):
-        self.SetFocus()
-        if self._mouse_lock:
-            self._release_mouse()
-        else:
-            self.CaptureMouse()
-            wx.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-            self._mouse_x, self._mouse_y = self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
-            self._mouse_lock = True
-
-    def _box_click(self, evt):
-        self._render_world.left_click()
-        evt.Skip()
-
-    def _toggle_selection_mode(self, evt):
-        self._render_world.right_click()
-        evt.Skip()
-
-    def _release_mouse(self):
-        wx.SetCursor(wx.NullCursor)
-        try:
-            self.ReleaseMouse()
-        except:
-            pass
-        self._mouse_lock = False
-
-    def _on_mouse_motion(self, evt):
-        if self._mouse_lock:
-            self._mouse_x, self._mouse_y = evt.GetPosition()
-
-    def _on_key_release(self, event):
-        key = event.GetUnicodeKey()
-        if key == wx.WXK_NONE:
-            key = event.GetKeyCode()
-        if key in self._keys_pressed:
-            self._keys_pressed.remove(key)
-
-    def _on_key_press(self, event):
-        key = event.GetUnicodeKey()
-        if key == wx.WXK_NONE:
-            key = event.GetKeyCode()
-        self._keys_pressed.add(key)
-        if key == wx.WXK_ESCAPE:
-            self._escape()
-
-    def _on_loss_focus(self, evt):
-        self._escape()
-        evt.Skip()
-
-    def _escape(self):
-        self._keys_pressed.clear()
-        self._release_mouse()
-
-    def _on_resize(self, event):
-        self.set_size(*event.GetSize())
-
-    def set_size(self, width, height):
-        glViewport(0, 0, width, height)
-        if height > 0:
-            self._render_world.aspect_ratio = width / height
-        else:
-            self._render_world.aspect_ratio = 1
-        self.DoSetSize(0, 0, width, height, 0)  # I don't know if this is how you are supposed to do this
-
-    def _on_draw(self, event):
-        self.draw()
-        event.Skip()
-
-    def draw(self):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self._render_world.draw()
-        self.SwapBuffers()
-
-    def _gc(self, event):
-        self._render_world.run_garbage_collector()
-        event.Skip()
 
 
 class OperationUI(SimplePanel):
@@ -364,7 +128,7 @@ class EditExtension(BaseWorldProgram):
     def __init__(self, parent, world: 'World'):
         super().__init__(parent, wx.HORIZONTAL)
         self._world = world
-        self._canvas: Optional[World3dCanvas] = None
+        self._canvas: Optional[ControllableEditCanvas] = None
         self._temp = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -536,7 +300,7 @@ class EditExtension(BaseWorldProgram):
             self._select_destination_ui.Fit()
             self._select_destination_ui.Hide()
 
-            self._canvas = World3dCanvas(self, self._world)
+            self._canvas = ControllableEditCanvas(self, self._world)
             self.add_object(self._canvas, 0, wx.EXPAND)
             self._temp.Destroy()
             self._menu.Show()

@@ -1,24 +1,23 @@
 import numpy
 from OpenGL.GL import *
 import itertools
-from typing import Tuple
+from typing import Tuple, Dict, Any
 from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 
 
-class Selection(TriMesh):
+class RenderSelection(TriMesh):
     def __init__(self,
         context_identifier: str,
-        white_texture_bounds: Tuple[float, float, float, float],
-        green_texture_bounds: Tuple[float, float, float, float],
-        blue_texture_bounds: Tuple[float, float, float, float]
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]]
     ):
         super().__init__(context_identifier)
         self._select_state = 0  # number of points selected
         self._loc = numpy.zeros(6)
         self.verts = numpy.zeros((6*2*3*3, 10), dtype=numpy.float32)
-        self.verts[:36, 5:9] = white_texture_bounds
-        self.verts[36:72, 5:9] = green_texture_bounds
-        self.verts[72:, 5:9] = blue_texture_bounds
+
+        self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), ('minecraft', 'missing_no'))
+        self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), ('minecraft', 'missing_no'))
+        self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), ('minecraft', 'missing_no'))
         self.draw_count = 36
 
     @property
