@@ -11,7 +11,7 @@ class TriMesh:
         """Create a new TriMesh.
         The object can be created from another thread so OpenGL
         variables cannot be set from here"""
-        self._context_identifier = context_identifier  # a string identifier unique to the context
+        self.context_identifier = context_identifier  # a string identifier unique to the context
         self._vao = None  # vertex array object
         self._vbo = None  # vertex buffer object
         self._shader = None  # the shader program
@@ -31,7 +31,7 @@ class TriMesh:
     @property
     def shader(self):
         if self._shader is None:
-            self._shader = get_shader(self._context_identifier, 'render_chunk')
+            self._shader = get_shader(self.context_identifier, 'render_chunk')
         return self._shader
 
     @property

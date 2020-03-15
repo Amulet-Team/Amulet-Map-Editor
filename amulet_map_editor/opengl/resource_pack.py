@@ -1,0 +1,74 @@
+from OpenGL.GL import *
+from typing import Any, Dict, Tuple, List
+
+import minecraft_model_reader
+import PyMCTranslate
+from amulet.api.block import BlockManager
+
+from amulet_map_editor.opengl import shaders
+
+
+class ResourcePackManager:
+    def __init__(
+        self,
+        context_identifier: Any,
+        resource_pack: minecraft_model_reader.BaseRPHandler,
+        texture: Any,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]]
+    ):
+        self.context_identifier = context_identifier
+        self._set_shader_texture(texture)
+        self._resource_pack = resource_pack
+        self._texture_bounds: Dict[Any, Tuple[float, float, float, float]] = texture_bounds
+
+        self._block_models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
+
+    def set_resource_pack(
+        self,
+        resource_pack: minecraft_model_reader.BaseRPHandler,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]]
+    ):
+        self._resource_pack = resource_pack
+        self._texture_bounds = texture_bounds
+        self._block_models.clear()
+
+    def _set_shader_texture(self, texture: Any):
+        shader = shaders.get_shader(self.context_identifier, 'render_chunk')
+        glUseProgram(shader)
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, texture)
+        glUniform1i(glGetUniformLocation(shader, 'image'), 0)
+
+    def get_texture_bounds(self, texture):
+        if texture not in self._texture_bounds:
+            texture = ('minecraft', 'missing_no')
+        return self._texture_bounds[texture]
+
+    @property
+    def _palette(self) -> BlockManager:
+        raise NotImplementedError
+
+    @property
+    def _translator(self) -> PyMCTranslate.version:
+        raise NotImplementedError
+
+    def get_block_model(self, pallete_index: int) -> minecraft_model_reader.MinecraftMesh:
+        if pallete_index not in self._block_models:
+            block = self._palette[pallete_index]
+            extra_blocks = tuple()
+            if block.extra_blocks:
+                extra_blocks = tuple(
+                    self._translator.block.from_universal(
+                        block_
+                    )[0] for block_ in block.extra_blocks
+                )
+            block = self._translator.block.from_universal(
+                block.base_block
+            )[0]
+            for block_ in extra_blocks:
+                block += block_
+            self._block_models[pallete_index] = self._resource_pack.get_model(
+                block
+            )
+
+        return self._block_models[pallete_index]

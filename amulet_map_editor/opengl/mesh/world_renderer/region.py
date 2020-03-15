@@ -8,7 +8,7 @@ from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 
 class ChunkManager:
     def __init__(self, identifier: str, region_size=16):
-        self.identifier = identifier
+        self.context_identifier = identifier
         self.region_size = region_size
         self._regions: Dict[Tuple[int, int], RenderRegion] = {}
         # added chunks are put in here and then processed on the next call of draw
@@ -39,7 +39,7 @@ class ChunkManager:
             render_chunk = self._chunk_temp.get()
             region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
             if region_coords not in self._regions:
-                self._regions[region_coords] = RenderRegion(region_coords[0], region_coords[1], self.region_size, self.identifier)
+                self._regions[region_coords] = RenderRegion(region_coords[0], region_coords[1], self.region_size, self.context_identifier)
             self._regions[region_coords].add_render_chunk(render_chunk)
         self._chunk_temp_set.clear()
 

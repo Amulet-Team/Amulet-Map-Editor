@@ -1,19 +1,21 @@
 from OpenGL.GL import *
 import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict
+from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, List
 import math
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
-import uuid
 import weakref
 
-from amulet_map_editor import log
-from amulet_map_editor.opengl import shaders, textureatlas
-
 import minecraft_model_reader
+import PyMCTranslate
+from amulet.api.block import BlockManager
+
+from amulet_map_editor import log
 from .chunk import RenderChunk
 from .region import ChunkManager
 from amulet_map_editor.opengl.mesh.selection import Selection
+from amulet_map_editor.opengl.resource_pack import ResourcePackManager
+
 if TYPE_CHECKING:
     from amulet.api.world import World
 
@@ -105,34 +107,35 @@ class ChunkGenerator(ThreadPoolExecutor):
                 )
 
 
-class RenderWorld:
-    def __init__(self, world: 'World', resource_pack: minecraft_model_reader.JavaRPHandler):
-        self.identifier = str(uuid.uuid4())
+class RenderWorld(ResourcePackManager):
+    def __init__(
+        self,
+        context_identifier: Any,
+        world: 'World',
+        resource_pack: minecraft_model_reader.JavaRPHandler,
+        texture: Any,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]]
+    ):
+        super().__init__(context_identifier, resource_pack, texture, texture_bounds)
         self._world = world
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera = [0, 300, 0, 90, 0]
-        self._transformation_matrix: Optional[numpy.ndarray] = None
-        self._collision_locations_cache: Optional[numpy.ndarray] = None
         self._dimension = 0
-        self._camera_move_speed = 2
-        self._camera_rotate_speed = 2
-
         self._render_distance = 10
         self._garbage_distance = 20
-        # self._loaded_render_chunks: Dict[Tuple[int, int], Union[RenderChunk, None]] = {}
-        self._chunk_manager = ChunkManager(self.identifier)
-        self._resource_pack = resource_pack
-        self._block_models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
-        self._texture_bounds = {}
+        self._transformation_matrix: Optional[numpy.ndarray] = None
+        self._chunk_manager = ChunkManager(self.context_identifier)
+        self._chunk_generator = ChunkGenerator(self)
         self._resource_pack_translator = self._world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
-        self._texture_atlas = None
-        self._gl_texture_atlas = glGenTextures(1)
-        self._create_atlas()
+
+        # TODO: move this to a controller
+        self._collision_locations_cache: Optional[numpy.ndarray] = None
+        self._camera_move_speed = 2
+        self._camera_rotate_speed = 2
         self._select_distance = 10
         self._select_mode = True
-        self._selection_box = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
-        self._selection_box2 = Selection(self.identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
-        self._chunk_generator = ChunkGenerator(self)
+        self._selection_box = Selection(self.context_identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
+        self._selection_box2 = Selection(self.context_identifier, self.get_texture_bounds(('amulet', 'ui/selection')), self.get_texture_bounds(('amulet', 'ui/selection_green')), self.get_texture_bounds(('amulet', 'ui/selection_blue')))
 
     @property
     def world(self) -> 'World':
@@ -141,6 +144,14 @@ class RenderWorld:
     @property
     def chunk_manager(self) -> ChunkManager:
         return self._chunk_manager
+
+    @property
+    def _palette(self) -> BlockManager:
+        return self._world.palette
+
+    @property
+    def _translator(self) -> PyMCTranslate.version:
+        return self._resource_pack_translator
 
     def is_closeable(self):
         return True
@@ -154,29 +165,6 @@ class RenderWorld:
 
     def close(self):
         self.disable()
-        glDeleteTextures([self._gl_texture_atlas])
-
-    def _create_atlas(self):
-        # filename = str(hash(tuple(self._resource_pack.pack_paths)))
-        # ext = 'png'
-
-        self._texture_atlas, self._texture_bounds, width, height = textureatlas.create_atlas(self._resource_pack.textures)
-
-        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, self._texture_atlas)
-
-        shader = shaders.get_shader(self.identifier, 'render_chunk')
-        glUseProgram(shader)
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-        glUniform1i(glGetUniformLocation(shader, 'image'), 0)
-
-        log.info('Finished setting up texture atlas in OpenGL')
 
     def move_camera(self, forward, up, right, pitch, yaw):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
@@ -331,17 +319,6 @@ class RenderWorld:
         self._garbage_distance = val
 
     @property
-    def resource_pack(self) -> minecraft_model_reader.JavaRPHandler:
-        """The resource pack being used by the renderer"""
-        return self._resource_pack
-
-    @resource_pack.setter
-    def resource_pack(self, val: minecraft_model_reader.JavaRPHandler):
-        raise NotImplementedError
-        # TODO: implement a way to reload all chunks with a new resource pack
-        # self._resource_pack = val
-
-    @property
     def fov(self) -> float:
         return self._projection[0]
 
@@ -358,32 +335,6 @@ class RenderWorld:
     def aspect_ratio(self, aspect_ratio: float):
         self._projection[1] = aspect_ratio
         self._transformation_matrix = None
-
-    def get_texture_bounds(self, texture):
-        if texture not in self._texture_bounds:
-            texture = ('minecraft', 'missing_no')
-        return self._texture_bounds[texture]
-
-    def get_model(self, pallete_index: int) -> minecraft_model_reader.MinecraftMesh:
-        if pallete_index not in self._block_models:
-            block = self._world.palette[pallete_index]
-            extra_blocks = tuple()
-            if block.extra_blocks:
-                extra_blocks = tuple(
-                    self._resource_pack_translator.block.from_universal(
-                        block_
-                    )[0] for block_ in block.extra_blocks
-                )
-            block = self._resource_pack_translator.block.from_universal(
-                block.base_block
-            )[0]
-            for block_ in extra_blocks:
-                block += block_
-            self._block_models[pallete_index] = self._resource_pack.get_model(
-                block
-            )
-
-        return self._block_models[pallete_index]
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:

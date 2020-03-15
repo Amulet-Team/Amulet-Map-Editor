@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class SubRenderStructure(RenderChunkBuilder):
     def __init__(self, render_world: 'RenderWorld', structure_palette: BlockManager, chunk: Chunk, slices: Tuple[slice, slice, slice], offset: numpy.ndarray):
-        super().__init__(render_world.identifier)
+        super().__init__(render_world.context_identifier)
         self._render_world = weakref.ref(render_world)
         self._structure_palette = structure_palette
         self._chunk = weakref.ref(chunk)
@@ -29,7 +29,7 @@ class SubRenderStructure(RenderChunkBuilder):
         # The structure and world may have different block palettes so need to convert from one to the other
         block = self._structure_palette[block_temp_id]
         world_block_temp_id = self._render_world().palette.get_add_block(block)
-        return self._render_world().get_model(world_block_temp_id)
+        return self._render_world().get_block_model(world_block_temp_id)
 
     def _texture_bounds(self, texture):
         return self._render_world().get_texture_bounds(texture)

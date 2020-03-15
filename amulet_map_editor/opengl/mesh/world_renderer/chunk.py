@@ -16,7 +16,7 @@ class RenderChunk(RenderChunkBuilder):
     def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: int):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
-        super().__init__(render_world.identifier)
+        super().__init__(render_world.context_identifier)
         self._render_world = weakref.ref(render_world)
         self._region_size = region_size
         self._coords = chunk_coords
@@ -38,7 +38,7 @@ class RenderChunk(RenderChunkBuilder):
             self._rebuild = False
 
     def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
-        return self._render_world().get_model(block_temp_id)
+        return self._render_world().get_block_model(block_temp_id)
 
     def _texture_bounds(self, texture):
         return self._render_world().get_texture_bounds(texture)

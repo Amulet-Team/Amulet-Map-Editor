@@ -3,7 +3,8 @@ from wx import glcanvas
 from OpenGL.GL import *
 import os
 import weakref
-from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
+from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any, Dict, Tuple
+import uuid
 
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure
@@ -13,7 +14,7 @@ from amulet_map_editor.plugins.programs import BaseWorldProgram
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld
 from amulet_map_editor.plugins import operations
-
+from amulet_map_editor.opengl import shaders, textureatlas
 from amulet_map_editor import log
 
 if TYPE_CHECKING:
@@ -39,26 +40,35 @@ class World3dCanvas(glcanvas.GLCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         self._keys_pressed = set()
         super().__init__(world_panel, -1, size=world_panel.GetClientSize())
-        self._context = glcanvas.GLContext(self)
+        self._context = glcanvas.GLContext(self)  # setup the OpenGL context
         self.SetCurrent(self._context)
-        glClearColor(0.5, 0.66, 1.0, 1.0)
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_CULL_FACE)
-        glDepthFunc(GL_LEQUAL)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        self.context_identifier = str(uuid.uuid4())  # create a UUID for the context. Used to get shaders
+        self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
+        self._setup_opengl()  # set some OpenGL states
 
+        # load the resource packs
         os.makedirs('resource_packs', exist_ok=True)
         if not os.path.isfile('resource_packs/readme.txt'):
             with open('resource_packs/readme.txt', 'w') as f:
                 f.write('Put the Java resource pack you want loaded in here.')
 
-        resource_packs = [minecraft_model_reader.java_vanilla_latest] + \
-                         [minecraft_model_reader.JavaRP(rp) for rp in os.listdir('resource_packs') if os.path.isdir(rp)] + \
-                         [minecraft_model_reader.java_vanilla_fix, minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), 'amulet_resource_pack'))]
-        resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
+        self._texture_bounds: Optional[Dict[Any, Tuple[float, float, float, float]]] = None
+        self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
 
-        self._render_world = RenderWorld(world, resource_pack)
+        self._load_resource_pack(
+            minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), 'amulet_resource_pack')),
+            minecraft_model_reader.java_vanilla_latest,
+            *[minecraft_model_reader.JavaRP(rp) for rp in os.listdir('resource_packs') if os.path.isdir(rp)],
+            minecraft_model_reader.java_vanilla_fix
+        )
+
+        self._render_world = RenderWorld(
+            self.context_identifier,
+            world,
+            self._resource_pack,
+            self._gl_texture_atlas,
+            self._texture_bounds
+        )
 
         self._draw_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
@@ -100,9 +110,36 @@ class World3dCanvas(glcanvas.GLCanvas):
 
     def close(self):
         self._render_world.close()
+        glDeleteTextures([self._gl_texture_atlas])
 
     def is_closeable(self):
         return self._render_world.is_closeable()
+
+    def _setup_opengl(self):
+        glClearColor(0.5, 0.66, 1.0, 1.0)
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_CULL_FACE)
+        glDepthFunc(GL_LEQUAL)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+
+    def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
+        self._resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
+        self._create_atlas()
+
+    def _create_atlas(self):
+        texture_atlas, self._texture_bounds, width, height = textureatlas.create_atlas(
+            self._resource_pack.textures
+        )
+        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_atlas)
+        log.info('Finished setting up texture atlas in OpenGL')
 
     def _mouse_wheel(self, evt):
         self._render_world.camera_move_speed += 0.2 * evt.GetWheelRotation() / evt.GetWheelDelta()
