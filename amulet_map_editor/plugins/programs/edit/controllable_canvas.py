@@ -97,6 +97,7 @@ class ControllableEditCanvas(EditCanvas):
         self._camera[4] += self._camera_rotate_speed * yaw
         self._collision_locations_cache = None
         self._transformation_matrix = None
+        self._render_world.camera = self._camera
 
         if self._select_style:
             location = self._collision_location_closest()
