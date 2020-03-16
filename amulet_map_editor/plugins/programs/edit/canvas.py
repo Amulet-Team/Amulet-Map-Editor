@@ -77,7 +77,7 @@ class EditCanvas(glcanvas.GLCanvas):
             self._texture_bounds
         )
         self._structure: Optional[RenderStructure] = None
-        self.structure_locations: List[numpy.ndarray] = []
+        self._structure_locations: List[numpy.ndarray] = []
 
         self._draw_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
@@ -149,6 +149,10 @@ class EditCanvas(glcanvas.GLCanvas):
             self._texture_bounds,
             self._resource_pack_translator
         )
+
+    @property
+    def structure_locations(self) -> List[numpy.ndarray]:
+        return self._structure_locations
 
     @property
     def select_mode(self) -> int:
@@ -334,17 +338,14 @@ class EditCanvas(glcanvas.GLCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        if self._select_mode == 0:
-            glDepthFunc(GL_ALWAYS)
-            self._selection_box.draw(self.transformation_matrix)
-            if self._selection_box.select_state == 2:
-                self._selection_box2.draw(self.transformation_matrix)
-            glDepthFunc(GL_LEQUAL)
-        elif self._structure is not None:
+        if self._select_mode == 1 and self._structure is not None:
+            transform = numpy.eye(4, dtype=numpy.float32)
             for location in self.structure_locations:
-                transform = numpy.eye(4, dtype=numpy.float32)
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
+        self._selection_box.draw(self.transformation_matrix)
+        if self._selection_box.select_state == 2:
+            self._selection_box2.draw(self.transformation_matrix)
         self.SwapBuffers()
 
     def _gc(self, event):

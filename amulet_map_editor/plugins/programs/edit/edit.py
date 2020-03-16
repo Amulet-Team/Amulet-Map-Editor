@@ -1,5 +1,6 @@
 import wx
 import weakref
+import numpy
 from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
 
 from amulet.api.selection import Selection, SubSelectionBox
@@ -69,10 +70,11 @@ class OperationUI(SimplePanel):
 
 
 class SelectDestinationUI(SimplePanel):
-    def __init__(self, parent, cancel_callback, confirm_callback):
+    def __init__(self, parent, cancel_callback, confirm_callback, locations: List[numpy.ndarray]):
         super().__init__(parent)
         self._cancel_callback = cancel_callback
         self._confirm_callback = confirm_callback
+        self._locations = locations
 
         self._operation_path = None
         self._operation = None
@@ -82,6 +84,9 @@ class SelectDestinationUI(SimplePanel):
         self._x: wx.SpinCtrl = self._add_row('x', wx.SpinCtrl, min=-30000000, max=30000000)
         self._y: wx.SpinCtrl = self._add_row('y', wx.SpinCtrl, min=-30000000, max=30000000)
         self._z: wx.SpinCtrl = self._add_row('z', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x.Bind(wx.EVT_SPINCTRL, self._on_location_change)
+        self._y.Bind(wx.EVT_SPINCTRL, self._on_location_change)
+        self._z.Bind(wx.EVT_SPINCTRL, self._on_location_change)
 
         panel = SimplePanel(self, wx.HORIZONTAL)
         self.add_object(panel, 0, 0)
@@ -98,6 +103,11 @@ class SelectDestinationUI(SimplePanel):
         self._operation = operation
         self._operation_input_definitions = operation_input_definitions
         self._structure = structure
+        self._locations.clear()
+        self._locations.append(structure.selection.min.tolist())
+        self._x.SetValue(structure.selection.min[0])
+        self._y.SetValue(structure.selection.min[1])
+        self._z.SetValue(structure.selection.min[2])
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         panel = SimplePanel(self, wx.HORIZONTAL)
@@ -107,6 +117,9 @@ class SelectDestinationUI(SimplePanel):
         obj = wx_object(panel, **kwargs)
         panel.add_object(obj, 0, wx.CENTER | wx.ALL)
         return obj
+
+    def _on_location_change(self, evt):
+        self._locations[-1] = numpy.array([self._x.GetValue(), self._y.GetValue(), self._z.GetValue()])
 
     def _on_cancel(self, evt):
         self._cancel_callback()
@@ -245,10 +258,8 @@ class EditExtension(BaseWorldProgram):
     def _destination_select_confirm(self, *args, **kwargs):
         self._select_destination_ui.Disable()
         self._run_main_operation(*args, **kwargs)
-        self._select_destination_ui.Hide()
         self._select_destination_ui.Enable()
-        self._operation_ui.Show()
-        self._menu.Fit()
+        self._enable_operation_ui()
 
     def _run_main_operation(self, operation_path, operation, operation_input_definitions, dst_box=None, dst_box_multiple=None, structure=None):
         operation_inputs = []
@@ -303,10 +314,12 @@ class EditExtension(BaseWorldProgram):
             self._operation_ui.Bind(wx.EVT_MOTION, self._steal_focus_operation)
             self._operation_ui.Layout()
             self._operation_ui.Fit()
+            self._canvas = ControllableEditCanvas(self, self._world)
             self._select_destination_ui = SelectDestinationUI(
                 self._menu,
                 self._destination_select_cancel,
-                self._destination_select_confirm
+                self._destination_select_confirm,
+                self._canvas.structure_locations
             )
             self._menu.add_object(self._select_destination_ui, options=0)
             self._select_destination_ui.Bind(wx.EVT_MOTION, self._steal_focus_destination)
@@ -314,7 +327,7 @@ class EditExtension(BaseWorldProgram):
             self._select_destination_ui.Fit()
             self._select_destination_ui.Hide()
 
-            self._canvas = ControllableEditCanvas(self, self._world)
+
             self.add_object(self._canvas, 0, wx.EXPAND)
             self._temp.Destroy()
             self._menu.Show()

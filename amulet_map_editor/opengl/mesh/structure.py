@@ -29,7 +29,7 @@ class SubRenderStructure(RenderChunkBuilder):
         self._cx = chunk.cx
         self._cz = chunk.cz
         self._slices = slices
-        self._offset = (offset + (s.start for s in slices)) + (chunk.cx*16, 0, chunk.cz*16)
+        self._offset = (offset + tuple(s.start for s in slices)) + (chunk.cx*16, 0, chunk.cz*16)
 
     @property
     def cx(self):
@@ -80,6 +80,7 @@ class RenderStructure(ResourcePackManager):
             section = SubRenderStructure(self, self._structure.palette, chunk, slices, offset)
             section.create_geometry()
             sections.append(section)
+        self._sub_structures = sections
 
     def draw(self, transformation_matrix: numpy.ndarray, cam_cx, cam_cz):
         for chunk in sorted(
