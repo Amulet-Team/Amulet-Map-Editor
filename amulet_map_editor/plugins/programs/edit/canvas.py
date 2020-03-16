@@ -9,6 +9,7 @@ import math
 
 import minecraft_model_reader
 from amulet.api.structure import Structure
+from amulet.api.errors import ChunkLoadError
 
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos
 from amulet_map_editor.opengl.mesh.selection import RenderSelection
@@ -255,11 +256,14 @@ class EditCanvas(glcanvas.GLCanvas):
 
     def _collision_location_closest(self):
         """Find the location of the closests non-air block"""
+        # TODO: optimise this
         for location in self._collision_locations():
             try:
-                if self.world.get_block(*location, self.dimension).namespaced_name != 'universal_minecraft:air':
+                if self._render_world.world.get_block(*location, self._render_world.dimension).namespaced_name != 'universal_minecraft:air':
                     return location
-            except:
+            except IndexError:
+                continue
+            except ChunkLoadError:
                 continue
         return self._collision_locations()[-1]
 
