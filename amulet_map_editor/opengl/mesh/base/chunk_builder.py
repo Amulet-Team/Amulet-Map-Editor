@@ -22,7 +22,7 @@ class RenderChunkBuilder(TriMesh):
     def _get_block_data(self, blocks: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
         :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks"""
-        larger_blocks = numpy.zeros(blocks.shape + (2, 2, 2), blocks.dtype)
+        larger_blocks = numpy.zeros(blocks.shape + numpy.array((2, 2, 2)), blocks.dtype)
         larger_blocks[1:-1, 1:-1, 1:-1] = blocks
         unique_blocks = numpy.unique(larger_blocks)
         return larger_blocks, unique_blocks
@@ -43,11 +43,11 @@ class RenderChunkBuilder(TriMesh):
 
         self.draw_count = int(self.verts.size // 10)
 
-    def _create_lod0_multi(self, blocks: List[Tuple[numpy.ndarray, numpy.ndarray]]):
+    def _create_lod0_multi(self, blocks: List[Tuple[numpy.ndarray, numpy.ndarray, Tuple[int, int, int]]]):
         chunk_verts = []
         chunk_verts_translucent = []
-        for larger_blocks, unique_blocks in blocks:
-            chunk_verts_, chunk_verts_translucent_ = self._create_lod0_array(larger_blocks, unique_blocks)
+        for larger_blocks, unique_blocks, offset in blocks:
+            chunk_verts_, chunk_verts_translucent_ = self._create_lod0_array(larger_blocks, unique_blocks, offset)
             chunk_verts += chunk_verts_
             chunk_verts_translucent += chunk_verts_translucent_
         self._set_verts(chunk_verts, chunk_verts_translucent)
@@ -57,7 +57,7 @@ class RenderChunkBuilder(TriMesh):
             *self._create_lod0_array(larger_blocks, unique_blocks)
         )
 
-    def _create_lod0_array(self, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray) -> Tuple[List[numpy.ndarray], List[numpy.ndarray]]:
+    def _create_lod0_array(self, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray, offset: Tuple[int, int, int] = None) -> Tuple[List[numpy.ndarray], List[numpy.ndarray]]:
         """Create a numpy array for opaque geometry and a numpy array for """
         blocks = larger_blocks[1:-1, 1:-1, 1:-1]
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
@@ -127,7 +127,7 @@ class RenderChunkBuilder(TriMesh):
 
                 # each slice in the first axis is a new block, each slice in the second is a new vertex
                 vert_table = numpy.zeros((block_count, faces.size, 10), dtype=numpy.float32)
-                vert_table[:, :, :3] = verts[faces] + block_offsets[:, :].reshape((-1, 1, 3)) + self.offset
+                vert_table[:, :, :3] = verts[faces] + block_offsets[:, :].reshape((-1, 1, 3)) + self.offset + offset
                 vert_table[:, :, 3:5] = tverts[faces]
 
                 vert_index = 0

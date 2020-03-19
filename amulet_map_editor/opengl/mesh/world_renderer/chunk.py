@@ -91,7 +91,7 @@ class RenderChunk(RenderChunkBuilder):
                 return True
         return chunk_state != self._chunk_state
 
-    def _sub_chunks(self, blocks: Blocks) -> List[Tuple[numpy.ndarray, numpy.ndarray]]:
+    def _sub_chunks(self, blocks: Blocks) -> List[Tuple[numpy.ndarray, numpy.ndarray, Tuple[int, int, int]]]:
         sub_chunks = []
         neighbour_chunks = {}
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
@@ -100,11 +100,11 @@ class RenderChunk(RenderChunkBuilder):
             except ChunkLoadError:
                 continue
 
-        for cy in blocks:
+        for cy in blocks.sub_chunks:
             sub_chunk = blocks.get_sub_chunk(cy)
-            larger_blocks = numpy.zeros(sub_chunk.shape + (2, 2, 2), sub_chunk.dtype)
-            larger_blocks[1:-1, 1:-1, 1:-1] = blocks
-            for chunk_offset, neighbour_blocks in neighbour_chunks.values():
+            larger_blocks = numpy.zeros(sub_chunk.shape + numpy.array((2, 2, 2)), sub_chunk.dtype)
+            larger_blocks[1:-1, 1:-1, 1:-1] = sub_chunk
+            for chunk_offset, neighbour_blocks in neighbour_chunks.items():
                 if cy not in neighbour_blocks:
                     continue
                 if chunk_offset == (-1, 0):
@@ -115,8 +115,12 @@ class RenderChunk(RenderChunkBuilder):
                     larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(cy)[:, :, -1]
                 elif chunk_offset == (0, 1):
                     larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(cy)[:, :, 0]
+            if cy - 1 in blocks:
+                larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy-1)[:, -1, :]
+            if cy + 1 in blocks:
+                larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy+1)[:, 0, :]
             unique_blocks = numpy.unique(larger_blocks)
-            sub_chunks.append((larger_blocks, unique_blocks))
+            sub_chunks.append((larger_blocks, unique_blocks, (0, cy*16, 0)))
         return sub_chunks
 
     def create_geometry(self):
