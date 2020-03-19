@@ -1,7 +1,8 @@
 import numpy
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 
 import minecraft_model_reader
+
 from amulet_map_editor.opengl.mesh import new_empty_verts, TriMesh
 
 
@@ -18,24 +19,47 @@ class RenderChunkBuilder(TriMesh):
     def offset(self) -> numpy.ndarray:
         raise NotImplementedError
 
-    def _get_block_data(self, blocks: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
+    def _get_block_data(self, blocks: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
         :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks"""
-        larger_blocks = numpy.zeros(blocks.shape + numpy.array((2, 2, 2)), blocks.dtype)
+        larger_blocks = numpy.zeros(blocks.shape + (2, 2, 2), blocks.dtype)
         larger_blocks[1:-1, 1:-1, 1:-1] = blocks
-
-        larger_blocks = self._fill_boundary_block_data(larger_blocks)
-
         unique_blocks = numpy.unique(larger_blocks)
-        return blocks, larger_blocks, unique_blocks
-
-    def _fill_boundary_block_data(self, larger_blocks: numpy.ndarray) -> numpy.ndarray:
-        return larger_blocks
+        return larger_blocks, unique_blocks
 
     def create_geometry(self):
         raise NotImplementedError
 
-    def _create_lod0(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
+    def _set_verts(self, chunk_verts: List[numpy.ndarray], chunk_verts_translucent: List[numpy.ndarray]):
+        if chunk_verts:
+            self.verts = numpy.concatenate(chunk_verts, 0)
+            self.verts_translucent = self.verts.size
+        else:
+            self.verts = new_empty_verts()
+
+        if chunk_verts_translucent:
+            chunk_verts_translucent.insert(0, self.verts)
+            self.verts = numpy.concatenate(chunk_verts_translucent, 0)
+
+        self.draw_count = int(self.verts.size // 10)
+
+    def _create_lod0_multi(self, blocks: List[Tuple[numpy.ndarray, numpy.ndarray]]):
+        chunk_verts = []
+        chunk_verts_translucent = []
+        for larger_blocks, unique_blocks in blocks:
+            chunk_verts_, chunk_verts_translucent_ = self._create_lod0_array(larger_blocks, unique_blocks)
+            chunk_verts += chunk_verts_
+            chunk_verts_translucent += chunk_verts_translucent_
+        self._set_verts(chunk_verts, chunk_verts_translucent)
+
+    def _create_lod0(self, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
+        self._set_verts(
+            *self._create_lod0_array(larger_blocks, unique_blocks)
+        )
+
+    def _create_lod0_array(self, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray) -> Tuple[List[numpy.ndarray], List[numpy.ndarray]]:
+        """Create a numpy array for opaque geometry and a numpy array for """
+        blocks = larger_blocks[1:-1, 1:-1, 1:-1]
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
         models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
         for block_temp_id in unique_blocks:
@@ -120,15 +144,4 @@ class RenderChunkBuilder(TriMesh):
                 else:
                     chunk_verts.append(vert_table.ravel())
 
-        if chunk_verts:
-            self.verts = numpy.concatenate(chunk_verts, 0)
-            self.draw_count = int(self.verts.size // 10)
-            self.verts_translucent = self.verts.size
-        else:
-            self.verts = new_empty_verts()
-            self.draw_count = 0
-
-        if chunk_verts_translucent:
-            chunk_verts_translucent.insert(0, self.verts)
-            self.verts = numpy.concatenate(chunk_verts_translucent, 0)
-            self.draw_count = int(self.verts.size // 10)
+        return chunk_verts, chunk_verts_translucent

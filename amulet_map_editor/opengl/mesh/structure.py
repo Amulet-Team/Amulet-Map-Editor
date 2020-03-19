@@ -40,8 +40,8 @@ class SubRenderStructure(RenderChunkBuilder):
         return self._cz
 
     def create_geometry(self):
-        blocks, larger_blocks, unique_blocks = self._get_block_data(self._chunk().blocks[self._slices])
-        self._create_lod0(blocks, larger_blocks, unique_blocks)
+        larger_blocks, unique_blocks = self._get_block_data(self._chunk().blocks[self._slices])
+        self._create_lod0(larger_blocks, unique_blocks)
 
     def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
         return self._render_structure().get_block_model(block_temp_id)

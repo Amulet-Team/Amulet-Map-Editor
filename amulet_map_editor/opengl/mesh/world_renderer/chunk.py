@@ -1,9 +1,11 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Tuple, List
 import weakref
 
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
+from amulet.api.chunk.blocks import Blocks
+
 from amulet_map_editor.opengl.mesh import new_empty_verts
 from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 
@@ -17,7 +19,7 @@ class RenderChunk(RenderChunkBuilder):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
         super().__init__(render_world.context_identifier)
-        self._render_world = weakref.ref(render_world)
+        self._render_world_ = weakref.ref(render_world)
         self._region_size = region_size
         self._coords = chunk_coords
         self._dimension = dimension
@@ -37,11 +39,15 @@ class RenderChunk(RenderChunkBuilder):
             self.change_verts()
             self._rebuild = False
 
+    @property
+    def _render_world(self) -> 'RenderWorld':
+        return self._render_world_()
+
     def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
-        return self._render_world().get_block_model(block_temp_id)
+        return self._render_world.get_block_model(block_temp_id)
 
     def _texture_bounds(self, texture):
-        return self._render_world().get_texture_bounds(texture)
+        return self._render_world.get_texture_bounds(texture)
 
     @property
     def offset(self) -> numpy.ndarray:
@@ -65,7 +71,7 @@ class RenderChunk(RenderChunkBuilder):
 
     @property
     def chunk(self) -> "Chunk":
-        return self._render_world().world.get_chunk(*self._coords, self._dimension)
+        return self._render_world.world.get_chunk(*self._coords, self._dimension)
 
     @property
     def chunk_state(self) -> int:
@@ -85,22 +91,33 @@ class RenderChunk(RenderChunkBuilder):
                 return True
         return chunk_state != self._chunk_state
 
-    def _fill_boundary_block_data(self, larger_blocks):
+    def _sub_chunks(self, blocks: Blocks) -> List[Tuple[numpy.ndarray, numpy.ndarray]]:
+        sub_chunks = []
+        neighbour_chunks = {}
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             try:
-                blocks_temp: numpy.ndarray = self._render_world().world.get_chunk(self.cx + dx, self.cz + dz).blocks
-                if (dx, dz) == (-1, 0):
-                    larger_blocks[0, 1:-1, 1:-1] = blocks_temp[-1, :, :]
-                elif (dx, dz) == (1, 0):
-                    larger_blocks[-1, 1:-1, 1:-1] = blocks_temp[0, :, :]
-                elif (dx, dz) == (0, -1):
-                    larger_blocks[1:-1, 1:-1, 0] = blocks_temp[:, :, -1]
-                elif (dx, dz) == (0, 1):
-                    larger_blocks[1:-1, 1:-1, -1] = blocks_temp[:, :, 0]
-
+                neighbour_chunks[(dx, dz)] = self._render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks2
             except ChunkLoadError:
                 continue
-        return larger_blocks
+
+        for cy in blocks:
+            sub_chunk = blocks.get_sub_chunk(cy)
+            larger_blocks = numpy.zeros(sub_chunk.shape + (2, 2, 2), sub_chunk.dtype)
+            larger_blocks[1:-1, 1:-1, 1:-1] = blocks
+            for chunk_offset, neighbour_blocks in neighbour_chunks.values():
+                if cy not in neighbour_blocks:
+                    continue
+                if chunk_offset == (-1, 0):
+                    larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[-1, :, :]
+                elif chunk_offset == (1, 0):
+                    larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[0, :, :]
+                elif chunk_offset == (0, -1):
+                    larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(cy)[:, :, -1]
+                elif chunk_offset == (0, 1):
+                    larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(cy)[:, :, 0]
+            unique_blocks = numpy.unique(larger_blocks)
+            sub_chunks.append((larger_blocks, unique_blocks))
+        return sub_chunks
 
     def create_geometry(self):
         try:
@@ -115,8 +132,7 @@ class RenderChunk(RenderChunkBuilder):
         else:
             self._changed_time = chunk.changed_time
             self._chunk_state = 2
-            blocks, larger_blocks, unique_blocks = self._get_block_data(chunk.blocks)
-            self._create_lod0(blocks, larger_blocks, unique_blocks)
+            self._create_lod0_multi(self._sub_chunks(chunk.blocks2))
         self._rebuild = True
 
     def _create_empty_geometry(self):
