@@ -45,7 +45,10 @@ def replace(
                     original_block_matches.append(universal_block_id)
 
             universal_block_count = len(world.palette)
-        chunk.blocks[slices][numpy.isin(chunk.blocks[slices], original_block_matches)] = replacement_block_id
+        blocks = chunk.blocks2[slices]
+        blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
+        chunk.blocks2[slices] = blocks
+        chunk.changed = True
 
 
 def show_ui(parent, world: "World", options: dict) -> dict:

@@ -10,7 +10,9 @@ if TYPE_CHECKING:
 def paste(world: "World", source: Selection, structure: Structure, dst: dict):
     dst_location = (dst.get('x', 0), dst.get('y', 0), dst.get('z', 0))
     for src_chunk, src_slices, _, (dst_cx, dst_cz), dst_slices, _ in structure.get_moved_chunk_slices(dst_location):
-        world.get_chunk(dst_cx, dst_cz).blocks[dst_slices] = src_chunk.blocks[src_slices]
+        dst_chunk = world.get_chunk(dst_cx, dst_cz)
+        dst_chunk.blocks2[dst_slices] = src_chunk.blocks2[src_slices]
+        dst_chunk.changed = True
 
 
 export = {
