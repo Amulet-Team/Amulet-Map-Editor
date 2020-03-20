@@ -98,7 +98,9 @@ class ControllableEditCanvas(EditCanvas):
         self._collision_locations_cache = None
         self._transformation_matrix = None
         self._render_world.camera = self._camera
+        self._change_box_location()
 
+    def _change_box_location(self):
         if self._select_style:
             location = self._collision_location_closest()
         else:
@@ -130,6 +132,7 @@ class ControllableEditCanvas(EditCanvas):
 
     def _toggle_selection_mode(self, evt):
         self._select_style = not self._select_style
+        self._change_box_location()
         evt.Skip()
 
     def _release_mouse(self):
