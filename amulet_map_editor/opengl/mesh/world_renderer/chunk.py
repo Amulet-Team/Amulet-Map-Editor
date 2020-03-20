@@ -96,7 +96,7 @@ class RenderChunk(RenderChunkBuilder):
         neighbour_chunks = {}
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             try:
-                neighbour_chunks[(dx, dz)] = self._render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks2
+                neighbour_chunks[(dx, dz)] = self._render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks
             except ChunkLoadError:
                 continue
 
@@ -136,7 +136,7 @@ class RenderChunk(RenderChunkBuilder):
         else:
             self._changed_time = chunk.changed_time
             self._chunk_state = 2
-            self._create_lod0_multi(self._sub_chunks(chunk.blocks2))
+            self._create_lod0_multi(self._sub_chunks(chunk.blocks))
         self._rebuild = True
 
     def _create_empty_geometry(self):

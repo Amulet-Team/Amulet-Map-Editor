@@ -45,9 +45,9 @@ def replace(
                     original_block_matches.append(universal_block_id)
 
             universal_block_count = len(world.palette)
-        blocks = chunk.blocks2[slices]
+        blocks = chunk.blocks[slices]
         blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
-        chunk.blocks2[slices] = blocks
+        chunk.blocks[slices] = blocks
         chunk.changed = True
 
 
