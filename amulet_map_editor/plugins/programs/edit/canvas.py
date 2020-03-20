@@ -294,6 +294,7 @@ class EditCanvas(glcanvas.GLCanvas):
             dz = -cos(self._camera[4]) * cos(self._camera[3])
             look_vector = numpy.array([dx, dy, dz])
             look_vector[abs(look_vector) < 0.000001] = 0.000001
+            dx, dy, dz = look_vector
             max_distance = 30
 
             vectors = numpy.array(
