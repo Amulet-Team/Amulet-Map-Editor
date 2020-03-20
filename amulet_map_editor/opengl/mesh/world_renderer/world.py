@@ -134,6 +134,10 @@ class RenderWorld(ResourcePackManager):
         return self._chunk_manager
 
     @property
+    def chunk_generator(self) -> ChunkGenerator:
+        return self._chunk_generator
+
+    @property
     def _palette(self) -> BlockManager:
         return self._world.palette
 

@@ -171,7 +171,9 @@ class EditExtension(BaseWorldProgram):
         self._world.redo()
 
     def _save_event(self, evt):
+        self._canvas.disable_threads()
         self._world.save()
+        self._canvas.enable_threads()
 
     def _get_box(self) -> Optional[Selection]:
         box = self._canvas._selection_box  # TODO: make a way to publicly access this

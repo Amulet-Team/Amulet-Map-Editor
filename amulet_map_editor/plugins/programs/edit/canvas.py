@@ -102,6 +102,12 @@ class EditCanvas(glcanvas.GLCanvas):
         self._gc_timer.Stop()
         self._render_world.disable()
 
+    def disable_threads(self):
+        self._render_world.chunk_generator.stop()
+
+    def enable_threads(self):
+        self._render_world.chunk_generator.start()
+
     def close(self):
         self._render_world.close()
         glDeleteTextures([self._gl_texture_atlas])
