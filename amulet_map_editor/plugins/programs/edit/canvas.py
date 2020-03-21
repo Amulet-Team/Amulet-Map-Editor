@@ -25,7 +25,8 @@ if TYPE_CHECKING:
 class EditCanvas(glcanvas.GLCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         self._keys_pressed = set()
-        super().__init__(world_panel, -1, size=world_panel.GetClientSize())
+        attribs = (glcanvas.WX_GL_CORE_PROFILE, glcanvas.WX_GL_RGBA, glcanvas.WX_GL_DOUBLEBUFFER, glcanvas.WX_GL_DEPTH_SIZE, 24)
+        super().__init__(world_panel, -1, size=world_panel.GetClientSize(), attribList=attribs)
         self._context = glcanvas.GLContext(self)  # setup the OpenGL context
         self.SetCurrent(self._context)
         self.context_identifier = str(uuid.uuid4())  # create a UUID for the context. Used to get shaders
