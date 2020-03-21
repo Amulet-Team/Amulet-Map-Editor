@@ -27,10 +27,10 @@ key_map = {
 class ControllableEditCanvas(EditCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
-        self._mouse_x = 0
-        self._mouse_y = 0
         self._last_mouse_x = 0
         self._last_mouse_y = 0
+        self._mouse_delta_x = 0
+        self._mouse_delta_y = 0
         self._mouse_lock = False
         self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
         self.Bind(wx.EVT_LEFT_UP, self._box_click)
@@ -55,7 +55,7 @@ class ControllableEditCanvas(EditCanvas):
         else:
             self.CaptureMouse()
             wx.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-            self._mouse_x, self._mouse_y = self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
+            self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
             self._mouse_lock = True
 
     def _process_inputs(self, evt):
@@ -74,13 +74,13 @@ class ControllableEditCanvas(EditCanvas):
             right += 1
 
         if self._mouse_lock:
-            pitch = (self._mouse_y - self._last_mouse_y) * 0.07
-            yaw = (self._mouse_x - self._last_mouse_x) * 0.07
-            self._mouse_x, self._mouse_y = self._last_mouse_x, self._last_mouse_y = self.GetSize()[0]/2, self.GetSize()[1]/2
-            self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
+            pitch = self._mouse_delta_y * 0.07
+            yaw = self._mouse_delta_x * 0.07
         else:
             pitch = 0
             yaw = 0
+        self._mouse_delta_x = 0
+        self._mouse_delta_y = 0
         self.move_camera_relative(forward, up, right, pitch, yaw)
         evt.Skip()
 
@@ -145,7 +145,19 @@ class ControllableEditCanvas(EditCanvas):
 
     def _on_mouse_motion(self, evt):
         if self._mouse_lock:
-            self._mouse_x, self._mouse_y = evt.GetPosition()
+            mouse_x, mouse_y = evt.GetPosition()
+            dx = mouse_x - self._last_mouse_x
+            dy = mouse_y - self._last_mouse_y
+            self._last_mouse_x, self._last_mouse_y = (
+                int(self.GetSize()[0] / 2),
+                int(self.GetSize()[1] / 2),
+            )
+            # only if location actually changed from the center, because WarpPointer may generate a mouse motion event
+            # this check avoids using WarpPointer for events caused by WarpPointer
+            if dx != 0 or dy != 0:
+                self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
+            self._mouse_delta_x += dx
+            self._mouse_delta_y += dy
 
     def _on_key_release(self, event):
         key = event.GetUnicodeKey()
