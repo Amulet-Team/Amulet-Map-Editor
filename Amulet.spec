@@ -69,7 +69,7 @@ for path in os.listdir(PYMCT_PATH):
         )
 
 
-a = Analysis(['./amulet_map_editor/amulet_ui.py'],
+a = Analysis(['./main.py'],
              pathex=['.', 'amulet_map_editor'],
              binaries=[],
              datas=datas,
