@@ -1,10 +1,10 @@
 """
 # Example plugin
 
-def structure_callable(world, source_box) -> Selection:  # see below. Only required if "structure_callable" is defined
+def structure_callable(world, dimension, source_box) -> Selection:  # see below. Only required if "structure_callable" is defined
     pass
 
-def operation(world, source_box):
+def operation(world, dimension, source_box):
     pass
 
 def show_ui(parent, world: World, options: dict) -> dict:  # see below. Only needed if using wxoptions
