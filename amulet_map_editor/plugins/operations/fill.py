@@ -13,11 +13,12 @@ if TYPE_CHECKING:
 
 def fill_(
     world: "World",
+    dimension: int,
     selection_box: Selection,
     options: dict
 ):
     if isinstance(options.get('fill_block'), Block):
-        fill(world, selection_box, options)
+        fill(world, dimension, selection_box, options)
     else:
         wx.MessageBox('Please specify a block before running the fill operation')
 

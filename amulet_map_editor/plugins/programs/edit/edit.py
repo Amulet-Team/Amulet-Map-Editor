@@ -219,7 +219,7 @@ class EditExtension(BaseWorldProgram):
                         operation_inputs.append(operations.options.get(operation_path, {}))
 
                 self._operation_ui.Disable()
-                structure = self._world.run_operation(operation["structure_callable"], *operation_inputs, create_undo=False)
+                structure = self._world.run_operation(operation["structure_callable"], self._canvas.dimension, *operation_inputs, create_undo=False)
                 self._operation_ui.Enable()
                 if not isinstance(structure, Structure):
                     wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
@@ -281,7 +281,7 @@ class EditExtension(BaseWorldProgram):
             elif inp in ["options", "wxoptions"]:
                 operation_inputs.append(operations.options.get(operation_path, {}))
 
-        self._world.run_operation(operation["operation"], *operation_inputs)
+        self._world.run_operation(operation["operation"], self._canvas.dimension, *operation_inputs)
 
     def enable(self):
         if self._canvas is None:
