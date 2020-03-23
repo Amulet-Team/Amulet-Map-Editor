@@ -5,6 +5,17 @@ import minecraft_model_reader
 
 from amulet_map_editor.opengl.mesh import new_empty_verts, TriMesh
 
+_brightness_step = 0.15
+_brightness_multiplier = {
+    None: (1,)*3,
+    'up': (1,)*3,
+    'north': (1-_brightness_step,)*3,
+    'south': (1-_brightness_step,)*3,
+    'east': (1-_brightness_step*2,)*3,
+    'west': (1-_brightness_step*2,)*3,
+    'down': (1-_brightness_step*3,)*3,
+}
+
 
 class RenderChunkBuilder(TriMesh):
     """A class to define the logic to generate geometry from a block array"""
@@ -138,7 +149,7 @@ class RenderChunkBuilder(TriMesh):
                     vert_table[:, vert_index:vert_index+3, 5:9] = tex_bounds
                     vert_index += 3
 
-                vert_table[:, :, 9:12] = model.tint_verts[cull_dir].reshape((-1, 3))[faces]
+                vert_table[:, :, 9:12] = model.tint_verts[cull_dir].reshape((-1, 3))[faces] * _brightness_multiplier[cull_dir]
 
                 if model.is_transparent == 1:
                     chunk_verts_translucent.append(vert_table.ravel())
