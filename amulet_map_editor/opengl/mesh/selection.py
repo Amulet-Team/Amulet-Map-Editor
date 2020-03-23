@@ -18,6 +18,7 @@ class RenderSelection(TriMesh):
         self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), ('minecraft', 'missing_no'))
         self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), ('minecraft', 'missing_no'))
         self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), ('minecraft', 'missing_no'))
+        self.verts[:, 9:12] = 1
         self.draw_count = 36
 
     @property

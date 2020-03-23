@@ -138,7 +138,7 @@ class RenderChunkBuilder(TriMesh):
                     vert_table[:, vert_index:vert_index+3, 5:9] = tex_bounds
                     vert_index += 3
 
-                vert_table[:, :, 9] = model.tint_verts[cull_dir][faces]
+                vert_table[:, :, 9:12] = model.tint_verts[cull_dir].reshape((-1, 3))[faces]
 
                 if model.is_transparent == 1:
                     chunk_verts_translucent.append(vert_table.ravel())
