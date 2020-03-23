@@ -59,6 +59,7 @@ class RenderChunkBuilder(TriMesh):
 
     def _create_lod0_array(self, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray, offset: Tuple[int, int, int] = None) -> Tuple[List[numpy.ndarray], List[numpy.ndarray]]:
         """Create a numpy array for opaque geometry and a numpy array for """
+        offset = offset or (0, 0, 0)
         blocks = larger_blocks[1:-1, 1:-1, 1:-1]
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
         models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
