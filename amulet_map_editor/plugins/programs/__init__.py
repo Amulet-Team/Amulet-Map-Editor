@@ -1,10 +1,13 @@
 import wx
 import os
 from typing import List
-from amulet_map_editor.amulet_wx.simple import SimpleNotebook, SimplePanel
-from amulet import world_interface
 import importlib
 import pkgutil
+
+from amulet.api.errors import LoaderNoneMatched
+from amulet import world_interface
+
+from amulet_map_editor.amulet_wx.simple import SimpleNotebook, SimplePanel
 
 # this is where most of the magic will happen
 
@@ -43,7 +46,11 @@ class WorldManagerUI(SimpleNotebook, BaseWorldUI):
         )
         self._finished = False
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
-        self.world = world_interface.load_world(path)
+        try:
+            self.world = world_interface.load_world(path)
+        except LoaderNoneMatched as e:
+            self.Destroy()
+            raise e
         self.world_name = self.world.world_wrapper.world_name
         self._extensions: List[BaseWorldProgram] = []
         self._last_extension: int = -1

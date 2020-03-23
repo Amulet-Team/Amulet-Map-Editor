@@ -1,8 +1,9 @@
 import wx
 import os
 from typing import Dict, Optional
+from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
-from amulet_map_editor import lang, config, version
+from amulet_map_editor import lang, config, version, log
 from amulet_map_editor.plugins.programs import WorldManagerUI
 from amulet_map_editor.amulet_wx import simple
 from amulet_map_editor.plugins.programs import BaseWorldUI
@@ -77,9 +78,14 @@ class AmuletMainWindow(wx.Frame):
             )
             self._disable_enable()
         else:
-            world = WorldManagerUI(self.world_tab_holder, path)
-            self._open_worlds[path] = world
-            self._add_world_tab(world, world.world_name)
+            try:
+                world = WorldManagerUI(self.world_tab_holder, path)
+            except LoaderNoneMatched as e:
+                log.error(e)
+                wx.MessageBox(str(e))
+            else:
+                self._open_worlds[path] = world
+                self._add_world_tab(world, world.world_name)
         self._main_menu.Enable()
 
     def close_world(self, path: str):
