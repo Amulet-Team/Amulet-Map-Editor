@@ -136,10 +136,3 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
     def _show_world_select(self, evt):
         self.Disable()
         WorldSelectWindow(self._open_world_callback, self.Enable)
-
-
-if __name__ == "__main__":
-    app = wx.App()
-    frame = AmuletMainWindow(None)
-    app.MainLoop()
-    config.save()

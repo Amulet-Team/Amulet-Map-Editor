@@ -69,7 +69,7 @@ for path in os.listdir(PYMCT_PATH):
         )
 
 
-a = Analysis(['./amulet_map_editor/amulet_ui.py'],
+a = Analysis(['./main.py'],
              pathex=['.', 'amulet_map_editor'],
              binaries=[],
              datas=datas,
@@ -104,7 +104,7 @@ coll = COLLECT(exe,
                name='Amulet')
 
 delete_files = [
-    '**/transparrency_cache.json'
+    '**/transparrency_cache.json',
     '**/config.json'
 ]
 delete_folders = [
@@ -114,7 +114,7 @@ delete_folders = [
 ]
 
 for fun, path_list in [[os.remove, delete_files], [shutil.rmtree, delete_folders]]:
-    for f_ext in delete_files:
+    for f_ext in path_list:
         glob_path = os.path.join('dist', f_ext)
         for path in glob.iglob(glob_path, recursive=True):
             fun(path)
