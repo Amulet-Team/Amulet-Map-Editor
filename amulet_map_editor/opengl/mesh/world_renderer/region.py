@@ -161,7 +161,7 @@ class RenderRegion(TriMesh):
                 verts = numpy.concatenate(region_verts)
             else:
                 verts = new_empty_verts()
-            self.draw_count = int(verts.size//10)
+            self.draw_count = int(verts.size//self._vert_len)
             self._merged_chunk_locations = merged_locations
 
             self.change_verts(verts)

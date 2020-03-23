@@ -7,6 +7,14 @@ from amulet_map_editor.opengl.shaders import get_shader
 class TriMesh:
     """The base class for a triangular face mesh.
     Implements the base logic to set up and unload OpenGL."""
+    _vertex_attrs = (
+        3,  # vertex attribute pointers
+        2,  # texture coords attribute pointers
+        4,  # texture coords attribute pointers
+        3,  # tint value (also shading)
+    )
+    _vert_len = sum(_vertex_attrs)
+
     def __init__(self, context_identifier: str):
         """Create a new TriMesh.
         The object can be created from another thread so OpenGL
@@ -51,18 +59,11 @@ class TriMesh:
 
     def _setup_opengl_attrs(self):
         """Set up OpenGL vertex attributes"""
-        # vertex attribute pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(0))
-        glEnableVertexAttribArray(0)
-        # texture coords attribute pointers
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(12))
-        glEnableVertexAttribArray(1)
-        # texture coords attribute pointers
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(20))
-        glEnableVertexAttribArray(2)
-        # tint value
-        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 40, ctypes.c_void_p(36))
-        glEnableVertexAttribArray(3)
+        attr_start = 0
+        for index, attr_count in enumerate(self._vertex_attrs):
+            glVertexAttribPointer(index, attr_count, GL_FLOAT, GL_FALSE, self._vert_len * 4, ctypes.c_void_p(attr_start * 4))
+            glEnableVertexAttribArray(index)
+            attr_start += attr_count
 
     def change_verts(self, verts=None):
         """Modify the vertices in OpenGL"""

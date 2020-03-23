@@ -41,7 +41,7 @@ class RenderChunkBuilder(TriMesh):
             chunk_verts_translucent.insert(0, self.verts)
             self.verts = numpy.concatenate(chunk_verts_translucent, 0)
 
-        self.draw_count = int(self.verts.size // 10)
+        self.draw_count = int(self.verts.size // self._vert_len)
 
     def _create_lod0_multi(self, blocks: List[Tuple[numpy.ndarray, numpy.ndarray, Tuple[int, int, int]]]):
         chunk_verts = []
@@ -127,7 +127,7 @@ class RenderChunkBuilder(TriMesh):
                 faces = model.faces[cull_dir]
 
                 # each slice in the first axis is a new block, each slice in the second is a new vertex
-                vert_table = numpy.zeros((block_count, faces.size, 10), dtype=numpy.float32)
+                vert_table = numpy.zeros((block_count, faces.size, self._vert_len), dtype=numpy.float32)
                 vert_table[:, :, :3] = verts[faces] + block_offsets[:, :].reshape((-1, 1, 3)) + self.offset + offset
                 vert_table[:, :, 3:5] = tverts[faces]
 

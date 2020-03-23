@@ -13,7 +13,7 @@ class RenderSelection(TriMesh):
         super().__init__(context_identifier)
         self._select_state = 0  # number of points selected
         self._loc = numpy.zeros(6)
-        self.verts = numpy.zeros((6*2*3*3, 10), dtype=numpy.float32)
+        self.verts = numpy.zeros((6*2*3*3, self._vert_len), dtype=numpy.float32)
 
         self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), ('minecraft', 'missing_no'))
         self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), ('minecraft', 'missing_no'))
