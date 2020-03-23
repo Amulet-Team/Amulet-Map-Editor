@@ -25,7 +25,7 @@
 from PIL import Image
 import numpy
 import math
-from typing import Dict, Tuple, List, Any
+from typing import Dict, Tuple, List, Any, Optional
 from amulet_map_editor import log
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
@@ -40,72 +40,72 @@ class AtlasTooSmall(Exception):
 class Packable(object):
     """A two-dimensional object with position information."""
 
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int):
         self._x = 0
         self._y = 0
         self._width = width
         self._height = height
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self._x
 
     @x.setter
-    def x(self, value):
+    def x(self, value: int):
         self._x = value
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self._y
 
     @y.setter
-    def y(self, value):
+    def y(self, value: int):
         self._y = value
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self._width
 
     @property
-    def height(self):
+    def height(self) -> int:
         return self._height
 
     @property
-    def perimeter(self):
+    def perimeter(self) -> int:
         return 2*self._width + 2*self._height
 
 
 class PackRegion(object):
     """A region that two-dimensional Packable objects can be packed into."""
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, x: int, y: int, width: int, height: int):
         """Constructor."""
         self._x = x
         self._y = y
         self._width = width
         self._height = height
-        self._sub1 = None
-        self._sub2 = None
-        self._packable = None
+        self._sub1: Optional[PackRegion] = None
+        self._sub2: Optional[PackRegion] = None
+        self._packable: Optional[Packable] = None
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self._x
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self._y
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self._width
 
     @property
-    def height(self):
+    def height(self) -> int:
         return self._height
 
     @property
-    def packable(self):
+    def packable(self) -> Packable:
         return self._packable
 
     def get_all_packables(self):
@@ -115,89 +115,92 @@ class PackRegion(object):
                                       self._sub2.get_all_packables()
         return []
 
-    def pack(self, packable):
+    def pack(self, packable: Packable, border: int):
         """Pack 2D packable into this region."""
         if not self._packable:
             # Is there room to pack this?
-            if (packable.width > self._width) or \
-               (packable.height > self._height):
+            if (packable.width+border*2 > self._width) or \
+               (packable.height+border*2 > self._height):
                 return False
 
             # Pack
             self._packable = packable
 
             # Set x, y on Packable
-            self._packable.x = self._x
-            self._packable.y = self._y
+            self._packable.x = self._x + border
+            self._packable.y = self._y + border
 
             # Create sub-regions
             self._sub1 = PackRegion(self._x,
-                                    self._y+self._packable.height,
-                                    self._packable.width,
-                                    self._height-self._packable.height)
-            self._sub2 = PackRegion(self._x+self._packable.width,
+                                    self._y+self._packable.height+border*2,
+                                    self._packable.width+border*2,
+                                    self._height-self._packable.height-border*2)
+            self._sub2 = PackRegion(self._x+self._packable.width+border*2,
                                     self._y,
-                                    self._width-self._packable.width,
+                                    self._width-self._packable.width-border*2,
                                     self._height)
             return True
 
         # Pack into sub-region
-        return self._sub1.pack(packable) or self._sub2.pack(packable)
+        return self._sub1.pack(packable, border) or self._sub2.pack(packable, border)
 
 
 class Frame(Packable):
     """An image file that can be packed into a PackRegion."""
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self._filename = filename
 
         # Determine frame dimensions
-        self._image = Image.open(filename)
+        self._image: Image.Image = Image.open(filename)
         width, height = self._image.size
 
         super(Frame, self).__init__(width, height)
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         return self._filename
 
-    def draw(self, image):
+    def draw(self, image: Image.Image, border: int):
         """Draw this frame into another Image."""
+        if border:
+            image.paste(self._image.resize(tuple(s+border*2 for s in self._image.size)), (self.x-border, self.y-border))
         image.paste(self._image, (self.x, self.y))
 
 
 class Texture(object):
     """A collection of one or more frames."""
 
-    def __init__(self, name, frames):
+    def __init__(self, name: str, frames: List[Frame]):
         self._name = name
-        self._frames = frames
+        self._frames: List[Frame] = frames
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def frames(self):
+    def frames(self) -> List[Frame]:
         return self._frames
 
 
 class TextureAtlas(PackRegion):
     """Texture Atlas generator."""
 
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int, border: int = 0):
         super(TextureAtlas, self).__init__(0, 0, width, height)
-        self._textures = []
+        self._textures: List[Texture] = []
+        self._border = border
 
     @property
     def textures(self) -> List[Texture]:
         return self._textures
 
-    def pack(self, texture):
+    def pack(self, texture: Texture):
         """Pack a Texture into this atlas."""
         self._textures.append(texture)
         for frame in texture.frames:
-            if not super(TextureAtlas, self).pack(frame):
+            if not super(TextureAtlas, self).pack(frame, self._border):
                 raise AtlasTooSmall('Failed to pack frame %s' % frame.filename)
 
     def to_dict(self) -> Dict[str, Tuple[int, int, int, int]]:
@@ -210,15 +213,15 @@ class TextureAtlas(PackRegion):
             ) for tex in self.textures
         }
 
-    def generate(self, mode):
+    def generate(self, mode: str) -> Image.Image:
         """Generates the final texture atlas."""
         out = Image.new(mode, (self.width, self.height))
         for t in self._textures:
             for f in t.frames:
-                f.draw(out)
+                f.draw(out, self._border)
         return out
 
-    def write(self, filename, mode):
+    def write(self, filename: str, mode: str):
         """Generates and saves the final texture atlas."""
         out = self.generate(mode)
         out.save(filename)
