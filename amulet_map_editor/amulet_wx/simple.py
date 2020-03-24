@@ -115,6 +115,10 @@ class SimpleChoiceAny(wx.Choice):
             super().SetItems([str(v) for v in self._items])
         self.SetSelection(0)
 
+    def SetValue(self, value: Any):
+        if value in self._items:
+            self.SetSelection(self._items.index(value))
+
     def GetAny(self):
         """Return the value currently selected in the form before it was converted to a string"""
         return self._items[self.GetSelection()]

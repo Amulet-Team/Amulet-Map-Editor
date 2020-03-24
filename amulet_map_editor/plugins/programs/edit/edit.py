@@ -8,7 +8,7 @@ from amulet.api.structure import Structure
 
 from amulet_map_editor import log
 from amulet_map_editor.plugins.programs import BaseWorldProgram
-from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText
+from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText, SimpleSizer
 from amulet_map_editor.plugins import operations
 
 from .controllable_canvas import ControllableEditCanvas
@@ -155,6 +155,7 @@ class EditExtension(BaseWorldProgram):
         self._operation_ui: Optional[OperationUI] = None
         self._select_destination_ui: Optional[SelectDestinationUI] = None
         self._menu_buttons: List[wx.Button] = []
+        self._dim_options: Optional[SimpleChoiceAny] = None
         self._options_button: Optional[wx.Button] = None
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self.Bind(wx.EVT_SIZE, self._on_resize)
@@ -291,6 +292,17 @@ class EditExtension(BaseWorldProgram):
             self.add_object(self._menu, 0, wx.EXPAND)
             self._menu.Bind(wx.EVT_MOTION, self._steal_focus_menu)
 
+            dim_label = wx.StaticText(self._menu, label="Dimension:")
+            self._dim_options = SimpleChoiceAny(self._menu)
+            self._dim_options.SetItems(dict(zip(self._world.world_wrapper.dimensions.values(), self._world.world_wrapper.dimensions.keys())))
+            self._dim_options.SetValue("overworld")
+            self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
+
+            sizer = wx.BoxSizer(wx.HORIZONTAL)
+            sizer.Add(dim_label, 0, wx.ALL, 5)
+            sizer.Add(self._dim_options, 0, wx.ALL, 5)
+            self._menu.add_object(sizer, 0)
+
             for text, operation in [
                 ['Undo', self._undo_event],
                 ['Redo', self._redo_event],
@@ -329,7 +341,6 @@ class EditExtension(BaseWorldProgram):
             self._select_destination_ui.Fit()
             self._select_destination_ui.Hide()
 
-
             self.add_object(self._canvas, 0, wx.EXPAND)
             self._temp.Destroy()
             self._menu.Show()
@@ -342,6 +353,7 @@ class EditExtension(BaseWorldProgram):
         self._canvas.draw()
         self._canvas.Update()
         self._canvas.enable()
+        self._change_dimension()
 
     def disable(self):
         if self._canvas is not None:
@@ -359,6 +371,14 @@ class EditExtension(BaseWorldProgram):
 
     def _close_world(self, _):
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
+
+    def _on_dimension_change(self, evt):
+        self._change_dimension()
+        evt.Skip()
+
+    def _change_dimension(self):
+        dimension = self._dim_options.GetAny()
+        self._canvas.dimension = dimension
 
     def _steal_focus_menu(self, evt):
         self._menu.SetFocus()
