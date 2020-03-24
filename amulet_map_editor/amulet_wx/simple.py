@@ -93,7 +93,7 @@ class SimpleChoiceAny(wx.Choice):
         self._sorted = sort
 
     @property
-    def items(self) -> Iterable[Any, ...]:
+    def values(self) -> List[Any]:
         return self._values
 
     def SetItems(self, items: Union[Iterable, dict]):

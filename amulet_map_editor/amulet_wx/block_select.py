@@ -84,7 +84,7 @@ class VersionSelect(SimplePanel):
         self._version_list.SetItems(
             self._translation_manager.version_numbers(self.platform)
         )
-        versions = self._version_list.items
+        versions = self._version_list.values
         if version and version in versions:
             self._version_list.SetSelection(versions.index(version))
         self._set_blockstate(**kwargs)
