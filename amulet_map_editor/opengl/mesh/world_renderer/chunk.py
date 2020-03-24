@@ -1,6 +1,7 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple, List
+from typing import TYPE_CHECKING, Tuple, List, Union
 import weakref
+import itertools
 
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
@@ -137,16 +138,50 @@ class RenderChunk(RenderChunkBuilder):
             self._changed_time = chunk.changed_time
             self._chunk_state = 2
             self._create_lod0_multi(self._sub_chunks(chunk.blocks))
+            plane: numpy.ndarray = numpy.ones((self._vert_len*12), dtype=numpy.float32).reshape((-1, self._vert_len))
+            plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(-0.01)
+            plane[:, 5:9] = self._texture_bounds(('amulet', 'ui/translucent_white'))
+            if (self.cx+self.cz) % 2:
+                plane[:, 9:12] = [0.55, 0.5, 0.9]
+            else:
+                plane[:, 9:12] = [0.4, 0.4, 0.85]
+            self.verts = numpy.concatenate([self.verts, plane.ravel()], 0)
+            self.draw_count += 12
         self._rebuild = True
 
     def _create_empty_geometry(self):
         self.verts: numpy.ndarray = new_empty_verts()
         # self.chunk_lod1: numpy.ndarray = new_empty_verts()
 
+    def _create_chunk_plane(self, height: Union[int, float]) -> Tuple[numpy.ndarray, numpy.ndarray]:
+        box = numpy.array([(0, height, 0), (16, height, 16)]) + self.offset
+        _box_coordinates = numpy.array(
+            list(
+                itertools.product(
+                    *box.T.tolist()
+                )
+            )
+        )
+        _cube_face_lut = numpy.array([  # This maps to the verticies used (defined in cube_vert_lut)
+            0, 4, 5, 1,
+            3, 7, 6, 2
+        ])
+        box = box.ravel()
+        _texture_index = numpy.array([
+            0, 2, 3, 5,
+            0, 2, 3, 5
+        ], numpy.uint32)
+        _uv_slice = numpy.array([0, 1, 2, 1, 2, 3, 0, 3] * 2, dtype=numpy.uint32).reshape((-1, 8)) + numpy.arange(0, 8, 4).reshape((-1, 1))
+
+        _tri_face = numpy.array([0, 1, 2, 0, 2, 3] * 2, numpy.uint32).reshape((-1, 6)) + numpy.arange(0, 8, 4).reshape((-1, 1))
+        return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
+
     def _create_error_geometry(self):
-        # TODO
-        self.verts: numpy.ndarray = new_empty_verts()
-        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
+        self.verts: numpy.ndarray = numpy.ones((self._vert_len*12), dtype=numpy.float32).reshape((-1, self._vert_len))
+        self.verts[:, :3], self.verts[:, 3:5] = self._create_chunk_plane(0)
+        self.verts[:, 5:9] = self._texture_bounds(('amulet', 'ui/translucent_white'))
+        self.verts[:, 9:12] = [1, 0.7, 0.7]
+        self.draw_count = 8
 
     def _create_lod1(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         # TODO
