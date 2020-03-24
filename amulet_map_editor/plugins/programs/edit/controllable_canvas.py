@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Tuple
 import wx
 
 from .canvas import EditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
+from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimplePanel
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -22,6 +23,28 @@ key_map = {
     'look_up': 73,
     'look_down': 75,
 }
+
+
+def show_goto(parent, x: float, y: float, z: float) -> Optional[Tuple[float, float, float]]:
+    dialog = SimpleDialog(parent, 'Replace', wx.HORIZONTAL)
+    panel = dialog.custom_panel
+    x_text = wx.StaticText(panel, label='x:')
+    x = wx.SpinCtrlDouble(panel, min=-30000000, max=30000000, initial=x)
+    y_text = wx.StaticText(panel, label='y:')
+    y = wx.SpinCtrlDouble(panel, min=-30000000, max=30000000, initial=y)
+    z_text = wx.StaticText(panel, label='z:')
+    z = wx.SpinCtrlDouble(panel, min=-30000000, max=30000000, initial=z)
+    panel.add_object(x_text, 0, wx.CENTER | wx.ALL)
+    panel.add_object(x, 1, wx.CENTER | wx.ALL)
+    panel.add_object(y_text, 0, wx.CENTER | wx.ALL)
+    panel.add_object(y, 1, wx.CENTER | wx.ALL)
+    panel.add_object(z_text, 0, wx.CENTER | wx.ALL)
+    panel.add_object(z, 1, wx.CENTER | wx.ALL)
+
+    dialog.Fit()
+
+    if dialog.ShowModal() == wx.ID_OK:
+        return x.GetValue(), y.GetValue(), z.GetValue()
 
 
 class ControllableEditCanvas(EditCanvas):
@@ -166,13 +189,21 @@ class ControllableEditCanvas(EditCanvas):
         if key in self._keys_pressed:
             self._keys_pressed.remove(key)
 
-    def _on_key_press(self, event):
+    def _on_key_press(self, event: wx.KeyEvent):
         key = event.GetUnicodeKey()
         if key == wx.WXK_NONE:
             key = event.GetKeyCode()
         self._keys_pressed.add(key)
         if key == wx.WXK_ESCAPE:
             self._escape()
+        if event.ControlDown() and key != wx.WXK_CONTROL:
+            if key == 71:
+                location = show_goto(self, *self._camera[:3])
+                if location:
+                    self._camera[:3] = location
+                    self._collision_locations_cache = None
+                    self._transformation_matrix = None
+                    self._change_box_location()
 
     def _on_loss_focus(self, evt):
         self._escape()

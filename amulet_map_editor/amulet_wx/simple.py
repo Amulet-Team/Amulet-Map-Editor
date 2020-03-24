@@ -121,7 +121,7 @@ class SimpleChoiceAny(wx.Choice):
 
 
 class SimpleDialog(wx.Dialog, SimpleSizer):
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, sizer_dir=wx.VERTICAL):
         wx.Dialog.__init__(
             self,
             parent,
@@ -130,7 +130,7 @@ class SimpleDialog(wx.Dialog, SimpleSizer):
         )
         SimpleSizer.__init__(self)
         self.SetSizer(self.sizer)
-        self.custom_panel = SimplePanel(self)
+        self.custom_panel = SimplePanel(self, sizer_dir)
         self.add_object(self.custom_panel, 0)
         button_sizer = self.CreateButtonSizer(wx.OK | wx.CANCEL)
         self.add_object(button_sizer, 0)
