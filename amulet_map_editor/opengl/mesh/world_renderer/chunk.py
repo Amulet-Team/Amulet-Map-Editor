@@ -97,7 +97,7 @@ class RenderChunk(RenderChunkBuilder):
         neighbour_chunks = {}
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             try:
-                neighbour_chunks[(dx, dz)] = self._render_world.world.get_chunk(self.cx + dx, self.cz + dz).blocks
+                neighbour_chunks[(dx, dz)] = self._render_world.world.get_chunk(self.cx + dx, self.cz + dz, self.dimension).blocks
             except ChunkLoadError:
                 continue
 
