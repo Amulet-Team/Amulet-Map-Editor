@@ -150,8 +150,15 @@ class RenderChunk(RenderChunkBuilder):
         self._rebuild = True
 
     def _create_empty_geometry(self):
-        self.verts: numpy.ndarray = new_empty_verts()
-        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
+        plane: numpy.ndarray = numpy.ones((self._vert_len * 12), dtype=numpy.float32).reshape((-1, self._vert_len))
+        plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
+        plane[:, 5:9] = self._texture_bounds(('amulet', 'ui/translucent_white'))
+        if (self.cx + self.cz) % 2:
+            plane[:, 9:12] = [0.3, 0.3, 0.3]
+        else:
+            plane[:, 9:12] = [0.2, 0.2, 0.2]
+        self.verts = plane.ravel()
+        self.draw_count = 12
 
     def _create_chunk_plane(self, height: Union[int, float]) -> Tuple[numpy.ndarray, numpy.ndarray]:
         box = numpy.array([(0, height, 0), (16, height, 16)]) + self.offset
@@ -177,11 +184,12 @@ class RenderChunk(RenderChunkBuilder):
         return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
 
     def _create_error_geometry(self):
-        self.verts: numpy.ndarray = numpy.ones((self._vert_len*12), dtype=numpy.float32).reshape((-1, self._vert_len))
-        self.verts[:, :3], self.verts[:, 3:5] = self._create_chunk_plane(0)
-        self.verts[:, 5:9] = self._texture_bounds(('amulet', 'ui/translucent_white'))
-        self.verts[:, 9:12] = [1, 0.7, 0.7]
-        self.draw_count = 8
+        plane: numpy.ndarray = numpy.ones((self._vert_len*12), dtype=numpy.float32).reshape((-1, self._vert_len))
+        plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
+        plane[:, 5:9] = self._texture_bounds(('amulet', 'ui/translucent_white'))
+        plane[:, 9:12] = [1, 0.7, 0.7]
+        self.verts = plane.ravel()
+        self.draw_count = 12
 
     def _create_lod1(self, blocks: numpy.ndarray, larger_blocks: numpy.ndarray, unique_blocks: numpy.ndarray):
         # TODO
