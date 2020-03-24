@@ -104,7 +104,7 @@ coll = COLLECT(exe,
                name='Amulet')
 
 delete_files = [
-    '**/transparrency_cache.json',
+    '**/transparency_cache.json',
     '**/config.json'
 ]
 delete_folders = [
