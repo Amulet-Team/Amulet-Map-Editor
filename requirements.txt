@@ -1,5 +1,7 @@
-wxPython
-numpy==1.15.2
+wxPython==4.0.7.post2
+numpy==1.17.4
+pyopengl==3.1.5
+git+git://github.com/Amulet-Team/Amulet-Core.git
 git+git://github.com/Amulet-Team/Amulet-NBT.git
 git+git://github.com/gentlegiantJGC/PyMCTranslate.git
-git+git://github.com/Amulet-Team/Amulet-Core.git
+git+git://github.com/gentlegiantJGC/Minecraft-Model-Reader.git
