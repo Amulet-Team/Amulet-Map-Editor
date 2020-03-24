@@ -1,6 +1,6 @@
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
-from typing import Iterable, Union, Tuple, Any
+from typing import Iterable, Union, Any, List
 
 
 class SimpleSizer:
@@ -88,12 +88,13 @@ class SimpleChoiceAny(wx.Choice):
         super().__init__(
             parent
         )
-        self._items = ()
+        self._values: List[Any] = []
+        self._keys: List[str] = []
         self._sorted = sort
 
     @property
-    def items(self) -> Tuple[Any, ...]:
-        return self._items
+    def items(self) -> Iterable[Any, ...]:
+        return self._values
 
     def SetItems(self, items: Union[Iterable, dict]):
         """Set items. Does not have to be strings.
@@ -102,26 +103,27 @@ class SimpleChoiceAny(wx.Choice):
         if not items:
             return
         if isinstance(items, dict):
-            items = [[key, str(value)] for key, value in items.items()]
+            items = [[str(value), key] for key, value in items.items()]
             if self._sorted:
-                items = sorted(items, key=lambda x: x[1])
-            self._items = [key for key, _ in items]
-            super().SetItems([value for _, value in items])
+                items = sorted(items, key=lambda x: x[0])
+            self._keys = [key for key, _ in items]
+            self._values = [value for _, value in items]
         else:
             if self._sorted:
-                self._items = tuple(sorted(items))
+                self._values = list(sorted(items))
             else:
-                self._items = tuple(items)
-            super().SetItems([str(v) for v in self._items])
+                self._values = list(items)
+            self._keys = [str(v) for v in self._values]
+        super().SetItems(self._keys)
         self.SetSelection(0)
 
     def SetValue(self, value: Any):
-        if value in self._items:
-            self.SetSelection(self._items.index(value))
+        if value in self._keys:
+            self.SetSelection(self._keys.index(value))
 
     def GetAny(self):
         """Return the value currently selected in the form before it was converted to a string"""
-        return self._items[self.GetSelection()]
+        return self._values[self.GetSelection()]
 
 
 class SimpleDialog(wx.Dialog, SimpleSizer):
