@@ -3,3 +3,4 @@ numpy==1.15.2
 git+git://github.com/Amulet-Team/Amulet-NBT.git
 git+git://github.com/gentlegiantJGC/PyMCTranslate.git
 git+git://github.com/Amulet-Team/Amulet-Core.git
+pyopengl
