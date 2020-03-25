@@ -7,7 +7,7 @@ from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure
 
 from amulet_map_editor import log
-from amulet_map_editor.plugins.programs import BaseWorldProgram
+from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText, SimpleSizer
 from amulet_map_editor.plugins import operations
 
@@ -159,6 +159,14 @@ class EditExtension(BaseWorldProgram):
         self._options_button: Optional[wx.Button] = None
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self.Bind(wx.EVT_SIZE, self._on_resize)
+
+    def menu(self, menu: MenuData) -> MenuData:
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Undo\tCtrl+z', lambda evt: self._world.undo())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Redo\tCtrl+y', lambda evt: self._world.redo())
+        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
+        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy', lambda evt: self.world.save())
+        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste', lambda evt: self.world.save())
+        return menu
 
     def _on_resize(self, event):
         if self._canvas is not None:

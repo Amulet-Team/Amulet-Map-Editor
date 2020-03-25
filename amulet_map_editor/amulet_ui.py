@@ -50,7 +50,48 @@ class AmuletMainWindow(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
+        self._disable_enable()
+
         self.Show()
+
+    def create_menu(self):
+        menu_dict = {}
+        menu_dict.setdefault('&File', {}).setdefault('system', {}).setdefault('Open World', lambda evt: self._show_open_world())
+        # menu_dict.setdefault('&File', {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
+        menu_dict = self._last_page.menu(menu_dict)
+        menu_bar = wx.MenuBar()
+        for menu_name, menu_data in menu_dict.items():
+            menu = wx.Menu()
+            separator = False
+            for menu_section in menu_data.values():
+                if separator:
+                    menu.AppendSeparator()
+                separator = True
+                for menu_item_name, menu_item_options in menu_section.items():
+                    callback = None
+                    menu_item_description = None
+                    wx_id = None
+                    if callable(menu_item_options):
+                        callback = menu_item_options
+                    elif isinstance(menu_item_options, tuple):
+                        if len(menu_item_options) >= 1:
+                            callback = menu_item_options[0]
+                        if len(menu_item_options) >= 2:
+                            menu_item_description = menu_item_options[1]
+                        if len(menu_item_options) >= 3:
+                            wx_id = menu_item_options[2]
+                    else:
+                        continue
+
+                    if not menu_item_description:
+                        menu_item_description = ''
+                    if not wx_id:
+                        wx_id = wx.ID_ANY
+
+                    menu_item: wx.MenuItem = menu.Append(wx.ID_ANY, menu_item_name, menu_item_description)
+                    self.Bind(wx.EVT_MENU, callback, menu_item)
+            menu_bar.Append(menu, menu_name)
+        self.SetMenuBar(menu_bar)
 
     def _page_change(self, evt):
         self._disable_enable()
@@ -69,6 +110,10 @@ class AmuletMainWindow(wx.Frame):
         # TODO: find a way for the tab to be optionally closeable
         self.world_tab_holder.AddPage(obj, obj_name, True)
         self._disable_enable()
+
+    def _show_open_world(self):
+        self.Disable()
+        WorldSelectWindow(self._open_world, self.Enable)
 
     def _open_world(self, path: str):
         """Open a world panel add add it to the notebook"""
@@ -142,3 +187,6 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
     def _show_world_select(self, evt):
         self.Disable()
         WorldSelectWindow(self._open_world_callback, self.Enable)
+
+    def enable(self):
+        self.GetGrandParent().create_menu()

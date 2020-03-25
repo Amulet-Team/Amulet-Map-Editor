@@ -1,6 +1,6 @@
 import wx
 import os
-from typing import List
+from typing import List, Dict, Callable, Union, Tuple, Any
 import importlib
 import pkgutil
 
@@ -8,6 +8,19 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet import world_interface
 
 from amulet_map_editor.amulet_wx.simple import SimpleNotebook, SimplePanel
+
+MenuData = Dict[
+    str, Dict[
+        str, Dict[
+            str, Union[
+                Callable,
+                Tuple[Callable],
+                Tuple[Callable, str],
+                Tuple[Callable, str, Any],
+            ]
+        ]
+    ]
+]
 
 # this is where most of the magic will happen
 
@@ -36,6 +49,9 @@ class BaseWorldUI:
     def close(self):
         pass
 
+    def menu(self, menu: MenuData) -> MenuData:
+        return menu
+
 
 class WorldManagerUI(SimpleNotebook, BaseWorldUI):
     def __init__(self, parent, path):
@@ -56,6 +72,12 @@ class WorldManagerUI(SimpleNotebook, BaseWorldUI):
         self._last_extension: int = -1
         self._load_extensions()
         self._finished = True
+
+    def menu(self, menu: MenuData) -> MenuData:
+        menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save', lambda evt: self.world.save())
+        # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        menu.setdefault('&File', {}).setdefault('exit', {}).setdefault('Close World', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        return self._extensions[self.GetSelection()].menu(menu)
 
     def _load_extensions(self):
         """Load and create instances of each of the extensions"""
@@ -82,6 +104,7 @@ class WorldManagerUI(SimpleNotebook, BaseWorldUI):
             if self._finished:
                 self._extensions[self._last_extension].disable()
                 self._extensions[self.GetSelection()].enable()
+                self.GetGrandParent().create_menu()
             self._last_extension = self.GetSelection()
         evt.Skip()
 
@@ -90,6 +113,7 @@ class WorldManagerUI(SimpleNotebook, BaseWorldUI):
 
     def enable(self):
         self._extensions[self.GetSelection()].enable()
+        self.GetGrandParent().create_menu()
 
 
 class BaseWorldProgram(SimplePanel):
@@ -108,3 +132,6 @@ class BaseWorldProgram(SimplePanel):
     def close(self):
         """Run when the world is closed"""
         pass
+
+    def menu(self, menu: MenuData) -> MenuData:
+        return menu
