@@ -52,6 +52,7 @@ class ChunkGenerator(ThreadPoolExecutor):
 
     def _generate_chunks(self):
         while self._enabled:
+            start_time = time.time()
             # first check if there is a chunk that exists and needs rebuilding
             chunk_coords = next(
                 (
@@ -80,10 +81,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                     ),
                     None
                 )
-            if chunk_coords is None:
-                # if no chunk was found to load go to sleep so this thread doesn't lock up the main thread.
-                time.sleep(1 / 30)
-            else:
+            if chunk_coords is not None:
                 # if chunk coords is in here then remove it so it doesn't get generated twice.
                 if chunk_coords in self.render_world.chunk_manager.chunk_rebuilds:
                     self.render_world.chunk_manager.chunk_rebuilds.remove(chunk_coords)
@@ -104,6 +102,10 @@ class ChunkGenerator(ThreadPoolExecutor):
                 self.render_world.chunk_manager.add_render_chunk(
                     chunk
                 )
+            delta_time = time.time() - start_time
+            if delta_time < 1/120:
+                # go to sleep so this thread doesn't lock up the main thread.
+                time.sleep(1/120-delta_time)
 
 
 class RenderWorld(ResourcePackManager):
