@@ -58,6 +58,7 @@ class AmuletMainWindow(wx.Frame):
         menu_dict = {}
         menu_dict.setdefault('&File', {}).setdefault('system', {}).setdefault('Open World', lambda evt: self._show_open_world())
         # menu_dict.setdefault('&File', {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
+        menu_dict.setdefault('&File', {}).setdefault('exit', {}).setdefault('Quit', lambda evt: self.Close())
         menu_dict = self._last_page.menu(menu_dict)
         menu_bar = wx.MenuBar()
         for menu_name, menu_data in menu_dict.items():
