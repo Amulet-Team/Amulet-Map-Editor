@@ -188,6 +188,7 @@ class ControllableEditCanvas(EditCanvas):
             key = event.GetKeyCode()
         if key in self._keys_pressed:
             self._keys_pressed.remove(key)
+        event.Skip()
 
     def _on_key_press(self, event: wx.KeyEvent):
         key = event.GetUnicodeKey()
@@ -204,6 +205,7 @@ class ControllableEditCanvas(EditCanvas):
                     self._collision_locations_cache = None
                     self._transformation_matrix = None
                     self._change_box_location()
+        event.Skip()
 
     def _on_loss_focus(self, evt):
         self._escape()
