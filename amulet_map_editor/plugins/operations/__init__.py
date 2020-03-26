@@ -1,44 +1,61 @@
 """
-# Example plugin
-
-def structure_callable(world, dimension, source_box) -> Selection:  # see below. Only required if "structure_callable" is defined
-    pass
-
-def operation(world, dimension, source_box):
-    pass
-
-def show_ui(parent, world: World, options: dict) -> dict:  # see below. Only needed if using wxoptions
-    # create a UI and show it (probably best using wx.Dialog)
-    # build the UI using the options that were returned last time (or an empty dictionary if it is the first)
-    # and return the options how you wish
-
-export = {
-    # required
-    "v": 1,  # a version 1 plugin
-    "name": "Plugin Name",  # the name of the plugin
-    "operation": operation,  # the actual function to call when running the plugin
-    "inputs": ["src_box"],  # a list of inputs to give to the plugin. World class is passed in as the first and these following
-        # possible inputs (max one from each list)
-        ["src_box"]  # the box selected by the user
-        [
-            "dst_box"  # the destination selected by the user. The presence of this triggers the UI to enable the functionality
-            "dst_box_multiple"  # a list of destination boxes selected by the user. The presence of this triggers the UI to enable the functionality
-            # requires either a callable at "structure_callable" to create and return a Structure or "src_box" to extract the src
-        ],
-            [  # dst_... needs to be enabled to use this
-                "structure"  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
-            ]
-        [
-            "options",  # "options" key must exist
-            "wxoptions"  # "wxoptions" key must exist
-        ]
-
-    # optional (based on inputs)
-    "options": {},  # a simple system of defining options from which a simple UI can be created
-    "wxoptions": show_ui,  # a more complex system allowing users to work directly with wx
-    # The result is passed to the related slot in inputs
-    "structure_callable": structure_callable  # this function is run before selecting the destination locations and returns a Structure for use there
-}
+>>> # Example plugin
+>>> from typing import List, Any, Callable, Dict, Optional
+>>> from amulet.api.selection import Selection
+>>> from amulet.api.structure import Structure
+>>> from amulet.api.world import World
+>>> WX_OBJ = Any
+>>> Dimension = Any
+>>> Options = Dict
+>>> Destination = {"x": int, "y": int, "z": int}
+>>>
+>>> def show_ui(parent, world: World, options: dict) -> dict:  # see below. Only needed if using wxoptions
+>>>     # create a UI and show it (probably best using wx.Dialog)
+>>>     # build the UI using the options that were returned last time (or an empty dictionary if it is the first)
+>>>     # and return the options how you wish
+>>>
+>>> export = {
+>>>     # required
+>>>     "v": 1,  # a version 1 plugin
+>>>     "name": "Plugin Name",  # the name of the plugin
+>>>     "features": List[str], # a list of features that enable functionality in the UI
+>>>         # the valid options are: (any invalid options will cause the operation to fail to load)
+>>>         "src_selection"  # The user is required to select an area before running the plugin. They will be prompted if they do not.
+>>>         "dst_selection_absolute"  # This enables a UI to select a destination location. It also enables an optional callable and inputs at structure_callable.
+>>>         # If the callable is defined it will be run. If not the selection is extracted and used.
+>>>         # After the function has run the user will be shown a UI to pick a destination location for the Structure that was returned.
+>>>         # TODO: "options"  # a simple system to create a UI to be shown to the user. Enables "options" key
+>>>         "wxoptions"  # enables "wxoptions" key storing a callable allowing direct use of wx
+>>>
+>>>     "options": dict,  # requires "options" in features. A simple system of defining options from which a simple UI can be created
+>>>     "wxoptions": Callable[[WX_OBJ, World, Options], Options],  # a more complex system allowing users to work directly with wx
+>>>
+>>>     # if one of the dst_selection options is enabled the following is valid
+>>>     "structure_callable_inputs": List[str],  # see inputs below
+>>>     "structure_callable": Callable[[World, Dimension, ...], Structure]  # World and Dimension are always the first two inputs. Above inputs follow.
+>>>     # this function is run before selecting the destination locations and returns a Structure for use there
+>>>
+>>>     "inputs": List[str],  # see inputs below
+>>>     "operation": Callable[[World, Dimension, ...], Optional[Any]],  # the actual function to call when running the plugin
+>>>       # World and Dimension are always the first two inputs. Above inputs follow.
+>>> }
+>>>
+>>> # Input format
+>>> # a list of inputs to give to the plugin. World class and dimension are first and these follow
+>>> # possible inputs (max one from each group)
+>>> {"src_selection": Selection}  # the user created selection
+>>> {  # requires respective feature to be enabled
+>>>     "dst_selection": Destination  # the destination selected by the user. Only valid in main inputs
+>>>     "dst_selection_multiple": List[Destination]  # a list of destinations selected by the user. Only valid in main inputs
+>>>     # requires either a callable at "structure_callable" to create and return a Structure or "src_box" to extract the src
+>>> },
+>>> {  # requires a dst_selection feature to be enabled. Only valid in main inputs
+>>>     "structure": Structure  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
+>>> }
+>>> {  # requires respective option feature to be enabled
+>>>     "options": dict,  # "options" key must exist
+>>>     "wxoptions": dict  # "wxoptions" key must exist
+>>> }
 
 
 normal filters
