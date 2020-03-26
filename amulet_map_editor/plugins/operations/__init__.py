@@ -103,8 +103,6 @@ from typing import Dict
 operations: Dict[str, dict] = {}
 options: Dict[str, dict] = {}
 
-_input_options = ["src_box", "dst_box", "dst_box_multiple", "structure", "options", "wxoptions"]
-
 
 def _load_module(module_path: str):
     spec = importlib.util.spec_from_file_location(os.path.basename(module_path), module_path)
@@ -118,52 +116,96 @@ def _load_operations(path: str):
         for fpath in glob.iglob(os.path.join(path, "*.py")):
             if fpath == __file__:
                 continue
+
+            def error(msg):
+                log.error(f'Error loading plugin {os.path.basename(fpath)}. {msg}')
             mod = _load_module(fpath)
             if hasattr(mod, "export"):
                 plugin = getattr(mod, "export")
                 if not isinstance(plugin, dict):
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. Export must be a dictionary.')
+                    error('Export must be a dictionary.')
                     continue
                 if not isinstance(plugin.get("name", None), str):
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "name" in export must exist and be a string.')
+                    error('"name" in export must exist and be a string.')
                     continue
-                if not callable(plugin.get("operation", None)):
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "operation" in export must exist and be a function.')
+                structure_callable_options = []
+                input_options = []
+                dst_ui_enabled = False
+                features = plugin.get("features", [])
+                feature_index = 0
+                stop = False
+                while feature_index < len(features):
+                    feature = features[feature_index]
+                    feature_index += 1
+                    if feature == "src_selection":
+                        structure_callable_options.append("src_selection")
+                        input_options.append("src_selection")
+                    elif feature == "wxoptions":
+                        structure_callable_options.append("wxoptions")
+                        input_options.append("wxoptions")
+                        if "wxoptions" not in plugin:
+                            error('"wxoptions" key must be defined if wxoptions function is enabled.')
+                            stop = True
+                            break
+                        elif not callable(plugin["wxoptions"]):
+                            error('"wxoptions" must be callable.')
+                            stop = True
+                            break
+                        elif "options" in features:
+                            error('Only one of options and wxoptions features may be enabled at once.')
+                            stop = True
+                            break
+                    elif feature == "options":
+                        structure_callable_options.append("options")
+                        input_options.append("options")
+                        if "options" not in plugin:
+                            error('"options" key must be defined if options function is enabled.')
+                            stop = True
+                            break
+                        elif "wxoptions" in features:
+                            error('Only one of options and wxoptions features may be enabled at once.')
+                            stop = True
+                            break
+                    elif feature == "dst_selection_absolute":
+                        if dst_ui_enabled:
+                            error("Only one dst_selection feature can be enabled at once")
+                        dst_ui_enabled = True
+                        input_options.append("dst_selection")
+                        input_options.append("structure")
+                if stop:
                     continue
-                inputs = plugin.get("inputs", [])
-                if not isinstance(inputs, list):
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "inputs" in export must be a list.')
-                    continue
-                if "dst_box" in inputs or "dst_box_multiple" in inputs:
+
+                if dst_ui_enabled:
                     if "structure_callable" in plugin:
                         if not callable(plugin["structure_callable"]):
-                            log.error(f'Error loading plugin {os.path.basename(fpath)}. "structure_callable" must be a callable if defined.')
+                            error('"structure_callable" must be a callable if defined.')
                             continue
-                    elif "src_box" not in inputs:
-                        log.error(f'Error loading plugin {os.path.basename(fpath)}. "src_box" or "structure_callable" must be defined if "dst_box" or "dst_box_multiple" are.')
-                        continue
+                        structure_callable_enabled = True
+                    else:
+                        if "src_selection" not in features:
+                            features.append("src_selection")
+                        structure_callable_enabled = False
+                else:
+                    structure_callable_enabled = False
 
-                elif "structure" in inputs:
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "structure" cannot be defined if "dst_box" or "dst_box_multiple" are not.')
-                    continue
-                elif "structure_callable" in plugin:
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "structure_callable" cannot be defined if "dst_box" or "dst_box_multiple" are not.')
-                    continue
-
-                if "options" in inputs and "wxoptions" in inputs:
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. Only one of "options" and "wxoptions" may be defined in "inputs" at once.')
-                    continue
-                elif "options" in inputs and "options" not in plugin:
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "options" was specificed in "inputs" but was not present in the dictionary.')
-                    continue
-                elif "wxoptions" in inputs and "wxoptions" not in plugin:
-                    log.error(f'Error loading plugin {os.path.basename(fpath)}. "wxoptions" was specificed in "inputs" but was not present in the dictionary.')
-                    continue
-
-                if not all(v in _input_options for v in inputs):
-                    for v in inputs:
-                        if v not in _input_options:
-                            log.error(f'Error loading plugin {os.path.basename(fpath)}. "{v}" is not a valid value in "inputs".')
+                plugin_operations = [("operation", plugin.get("operation", None), plugin.get("inputs", []), input_options)]
+                if structure_callable_enabled:
+                    plugin_operations.append(("structure_callable", plugin.get("structure_callable", None), plugin.get("structure_callable_inputs", []), structure_callable_options))
+                for name, operation, inputs, options in plugin_operations:
+                    if not callable(operation):
+                        error(f'"{name}" in export must exist and be a function.')
+                        stop = True
+                        break
+                    if not isinstance(inputs, list):
+                        error(f'"{name}" inputs in export must be a list.')
+                        stop = True
+                        break
+                    for inp in inputs:
+                        if inp not in options:
+                            error(f'"{inp}" is not a supported input for "{name}"')
+                            stop = True
+                            break
+                if stop:
                     continue
 
                 operations[fpath] = plugin

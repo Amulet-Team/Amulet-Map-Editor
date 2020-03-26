@@ -214,12 +214,13 @@ class EditExtension(BaseWorldProgram):
     def _run_operation(self, evt):
         operation_path = self._operation_ui.operation
         operation = operations.operations[operation_path]
+        features = operation.get("features", [])
         operation_input_definitions = operation.get("inputs", [])
-        if "dst_box" in operation_input_definitions or "dst_box_multiple" in operation_input_definitions:
+        if any(feature in features for feature in ("dst_selection_absolute", )):
             if "structure_callable" in operation:
                 operation_inputs = []
-                for inp in operation_input_definitions:
-                    if inp == "src_box":
+                for inp in operation.get("structure_callable_inputs", []):
+                    if inp == "src_selection":
                         selection = self._get_box()
                         if selection is None:
                             return
@@ -234,18 +235,15 @@ class EditExtension(BaseWorldProgram):
                 if not isinstance(structure, Structure):
                     wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
                     return
-            elif "src_box" in operation_input_definitions:
+            else:
                 selection = self._get_box()
                 if selection is None:
                     return
                 self._operation_ui.Disable()
                 structure = Structure.from_world(self._world, selection, self._canvas.dimension)
                 self._operation_ui.Enable()
-            else:
-                wx.MessageBox("This should not happen")
-                return
 
-            if "dst_box" in operation_input_definitions:
+            if "dst_selection_absolute" in features:
                 # trigger UI to show select box UI
                 self._select_destination_ui.setup(
                     operation_path,
@@ -276,15 +274,15 @@ class EditExtension(BaseWorldProgram):
     def _run_main_operation(self, operation_path, operation, operation_input_definitions, dst_box=None, dst_box_multiple=None, structure=None):
         operation_inputs = []
         for inp in operation_input_definitions:
-            if inp == "src_box":
+            if inp == "src_selection":
                 selection = self._get_box()
                 if selection is None:
                     return
                 operation_inputs.append(selection)
 
-            elif inp == "dst_box":
+            elif inp == "dst_selection":
                 operation_inputs.append(dst_box)
-            elif inp == "dst_box_multiple":
+            elif inp == "dst_selection_multiple":
                 operation_inputs.append(dst_box_multiple)
             elif inp == "structure":
                 operation_inputs.append(structure)
@@ -393,7 +391,7 @@ class EditExtension(BaseWorldProgram):
         self._select_destination_ui.setup(
             None,
             paste,
-            ["src_box", "structure", "dst_box"],
+            ["structure", "dst_box"],
             structure
         )
         self._enable_select_destination_ui(structure)
