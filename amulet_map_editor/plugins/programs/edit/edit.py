@@ -4,11 +4,12 @@ import numpy
 from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
 
 from amulet.api.selection import Selection, SubSelectionBox
-from amulet.api.structure import Structure
+from amulet.api.structure import Structure, structure_buffer
+from amulet.operations.paste import paste
 
 from amulet_map_editor import log
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText, SimpleSizer
+from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText
 from amulet_map_editor.plugins import operations
 
 from .controllable_canvas import ControllableEditCanvas
@@ -164,8 +165,8 @@ class EditExtension(BaseWorldProgram):
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Undo\tCtrl+z', lambda evt: self._world.undo())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Redo\tCtrl+y', lambda evt: self._world.redo())
         # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
-        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy', lambda evt: self.world.save())
-        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste', lambda evt: self.world.save())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy\tCtrl+c', lambda evt: self._copy())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste\tCtrl+v', lambda evt: self._paste())
         return menu
 
     def _on_resize(self, event):
@@ -238,7 +239,7 @@ class EditExtension(BaseWorldProgram):
                 if selection is None:
                     return
                 self._operation_ui.Disable()
-                structure = Structure.from_world(self._world, selection, self._canvas._render_world.dimension)
+                structure = Structure.from_world(self._world, selection, self._canvas.dimension)
                 self._operation_ui.Enable()
             else:
                 wx.MessageBox("This should not happen")
@@ -379,6 +380,23 @@ class EditExtension(BaseWorldProgram):
 
     def _close_world(self, _):
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
+
+    def _copy(self):
+        selection = self._get_box()
+        if selection is None:
+            return
+        structure = Structure.from_world(self._world, selection, self._canvas.dimension)
+        structure_buffer.append(structure)
+
+    def _paste(self):
+        structure = structure_buffer[-1]
+        self._select_destination_ui.setup(
+            None,
+            paste,
+            ["src_box", "structure", "dst_box"],
+            structure
+        )
+        self._enable_select_destination_ui(structure)
 
     def _on_dimension_change(self, evt):
         self._change_dimension()
