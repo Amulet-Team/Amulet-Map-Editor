@@ -21,7 +21,7 @@
 >>>     "features": List[str], # a list of features that enable functionality in the UI
 >>>         # the valid options are: (any invalid options will cause the operation to fail to load)
 >>>         "src_selection"  # The user is required to select an area before running the plugin. They will be prompted if they do not.
->>>         "dst_selection_absolute"  # This enables a UI to select a destination location. It also enables an optional callable and inputs at structure_callable.
+>>>         "dst_location_absolute"  # This enables a UI to select a destination location. It also enables an optional callable and inputs at structure_callable.
 >>>         # If the callable is defined it will be run. If not the selection is extracted and used.
 >>>         # After the function has run the user will be shown a UI to pick a destination location for the Structure that was returned.
 >>>         # TODO: "options"  # a simple system to create a UI to be shown to the user. Enables "options" key
@@ -30,7 +30,7 @@
 >>>     "options": dict,  # requires "options" in features. A simple system of defining options from which a simple UI can be created
 >>>     "wxoptions": Callable[[WX_OBJ, World, Options], Options],  # a more complex system allowing users to work directly with wx
 >>>
->>>     # if one of the dst_selection options is enabled the following is valid
+>>>     # if one of the dst_location options is enabled the following is valid
 >>>     "structure_callable_inputs": List[str],  # see inputs below
 >>>     "structure_callable": Callable[[World, Dimension, ...], Structure]  # World and Dimension are always the first two inputs. Above inputs follow.
 >>>     # this function is run before selecting the destination locations and returns a Structure for use there
@@ -45,11 +45,11 @@
 >>> # possible inputs (max one from each group)
 >>> {"src_selection": Selection}  # the user created selection
 >>> {  # requires respective feature to be enabled
->>>     "dst_selection": Destination  # the destination selected by the user. Only valid in main inputs
->>>     "dst_selection_multiple": List[Destination]  # a list of destinations selected by the user. Only valid in main inputs
+>>>     "dst_location": Destination  # the destination selected by the user. Only valid in main inputs
+>>>     "dst_location_multiple": List[Destination]  # a list of destinations selected by the user. Only valid in main inputs
 >>>     # requires either a callable at "structure_callable" to create and return a Structure or "src_box" to extract the src
 >>> },
->>> {  # requires a dst_selection feature to be enabled. Only valid in main inputs
+>>> {  # requires a dst_location feature to be enabled. Only valid in main inputs
 >>>     "structure": Structure  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
 >>> }
 >>> {  # requires respective option feature to be enabled
@@ -166,11 +166,11 @@ def _load_operations(path: str):
                             error('Only one of options and wxoptions features may be enabled at once.')
                             stop = True
                             break
-                    elif feature == "dst_selection_absolute":
+                    elif feature == "dst_location_absolute":
                         if dst_ui_enabled:
-                            error("Only one dst_selection feature can be enabled at once")
+                            error("Only one dst_location feature can be enabled at once")
                         dst_ui_enabled = True
-                        input_options.append("dst_selection")
+                        input_options.append("dst_location")
                         input_options.append("structure")
                 if stop:
                     continue

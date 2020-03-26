@@ -216,7 +216,7 @@ class EditExtension(BaseWorldProgram):
         operation = operations.operations[operation_path]
         features = operation.get("features", [])
         operation_input_definitions = operation.get("inputs", [])
-        if any(feature in features for feature in ("dst_selection_absolute", )):
+        if any(feature in features for feature in ("dst_location_absolute", )):
             if "structure_callable" in operation:
                 operation_inputs = []
                 for inp in operation.get("structure_callable_inputs", []):
@@ -243,11 +243,11 @@ class EditExtension(BaseWorldProgram):
                 structure = Structure.from_world(self._world, selection, self._canvas.dimension)
                 self._operation_ui.Enable()
 
-            if "dst_selection_absolute" in features:
+            if "dst_location_absolute" in features:
                 # trigger UI to show select box UI
                 self._select_destination_ui.setup(
                     operation_path,
-                    operation,
+                    operation["operation"],
                     operation_input_definitions,
                     structure
                 )
@@ -258,7 +258,7 @@ class EditExtension(BaseWorldProgram):
 
         else:
             self._operation_ui.Disable()
-            self._run_main_operation(operation_path, operation, operation_input_definitions)
+            self._run_main_operation(operation_path, operation["operation"], operation_input_definitions)
             self._operation_ui.Enable()
         evt.Skip()
 
@@ -271,7 +271,7 @@ class EditExtension(BaseWorldProgram):
         self._select_destination_ui.Enable()
         self._enable_operation_ui()
 
-    def _run_main_operation(self, operation_path, operation, operation_input_definitions, dst_box=None, dst_box_multiple=None, structure=None):
+    def _run_main_operation(self, operation_path: str, operation: Callable, operation_input_definitions: List[str], dst_box=None, dst_box_multiple=None, structure=None):
         operation_inputs = []
         for inp in operation_input_definitions:
             if inp == "src_selection":
@@ -280,16 +280,16 @@ class EditExtension(BaseWorldProgram):
                     return
                 operation_inputs.append(selection)
 
-            elif inp == "dst_selection":
+            elif inp == "dst_location":
                 operation_inputs.append(dst_box)
-            elif inp == "dst_selection_multiple":
+            elif inp == "dst_location_multiple":
                 operation_inputs.append(dst_box_multiple)
             elif inp == "structure":
                 operation_inputs.append(structure)
             elif inp in ["options", "wxoptions"]:
                 operation_inputs.append(operations.options.get(operation_path, {}))
 
-        self._world.run_operation(operation["operation"], self._canvas.dimension, *operation_inputs)
+        self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)
 
     def enable(self):
         if self._canvas is None:
@@ -391,7 +391,7 @@ class EditExtension(BaseWorldProgram):
         self._select_destination_ui.setup(
             None,
             paste,
-            ["structure", "dst_box"],
+            ["structure", "dst_location"],
             structure
         )
         self._enable_select_destination_ui(structure)
