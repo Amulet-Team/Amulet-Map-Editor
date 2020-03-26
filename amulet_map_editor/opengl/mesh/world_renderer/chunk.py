@@ -187,7 +187,10 @@ class RenderChunk(RenderChunkBuilder):
         plane: numpy.ndarray = numpy.ones((self._vert_len*12), dtype=numpy.float32).reshape((-1, self._vert_len))
         plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
         plane[:, 5:9] = self._texture_bounds(('amulet', 'ui/translucent_white'))
-        plane[:, 9:12] = [1, 0.7, 0.7]
+        if (self.cx + self.cz) % 2:
+            plane[:, 9:12] = [1, 0.2, 0.2]
+        else:
+            plane[:, 9:12] = [0.75, 0.2, 0.2]
         self.verts = plane.ravel()
         self.draw_count = 12
 
