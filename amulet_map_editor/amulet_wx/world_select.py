@@ -48,10 +48,9 @@ class WorldUI(simple.SimplePanel):
             parent,
             wx.HORIZONTAL
         )
+        self.SetWindowStyle(wx.TAB_TRAVERSAL|wx.BORDER_RAISED)
 
         world = world_interface.load_format(path)
-
-        self.BackgroundColour = (190, 190, 200)
 
         img, width = get_world_image(world.world_image_path)
 
