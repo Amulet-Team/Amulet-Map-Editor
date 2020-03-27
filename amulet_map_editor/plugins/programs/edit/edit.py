@@ -89,12 +89,12 @@ class SelectDestinationUI(SimplePanel):
         self._y.Bind(wx.EVT_SPINCTRL, self._on_location_change)
         self._z.Bind(wx.EVT_SPINCTRL, self._on_location_change)
 
-        panel = SimplePanel(self, wx.HORIZONTAL)
-        self.add_object(panel, 0, 0)
-        self._cancel = wx.Button(panel, label="Cancel")
-        panel.add_object(self._cancel, 0, wx.CENTER)
-        self._confirm = wx.Button(panel, label="Confirm")
-        panel.add_object(self._confirm, 0, wx.CENTER)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.add_object(sizer, 0, 0)
+        self._cancel = wx.Button(self, label="Cancel")
+        sizer.Add(self._cancel, flag=wx.CENTER, border=5)
+        self._confirm = wx.Button(self, label="Confirm")
+        sizer.Add(self._confirm, flag=wx.CENTER, border=5)
 
         self._cancel.Bind(wx.EVT_BUTTON, self._on_cancel)
         self._confirm.Bind(wx.EVT_BUTTON, self._on_confirm)
@@ -111,12 +111,12 @@ class SelectDestinationUI(SimplePanel):
         self._z.SetValue(structure.selection.min[2])
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
-        panel = SimplePanel(self, wx.HORIZONTAL)
-        self.add_object(panel, 0, 0)
-        name_text = SimpleText(panel, label)
-        panel.add_object(name_text, 0, wx.CENTER | wx.ALL)
-        obj = wx_object(panel, **kwargs)
-        panel.add_object(obj, 0, wx.CENTER | wx.ALL)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.add_object(sizer, 0, 0)
+        name_text = wx.StaticText(self, label=label)
+        sizer.Add(name_text, flag=wx.CENTER | wx.ALL, border=5)
+        obj = wx_object(self, **kwargs)
+        sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
         return obj
 
     def _on_location_change(self, evt):
@@ -297,7 +297,7 @@ class EditExtension(BaseWorldProgram):
             self._menu = SimplePanel(self)
             self._menu.Hide()
             self.add_object(self._menu, 0, wx.EXPAND)
-            self._menu.Bind(wx.EVT_MOTION, self._steal_focus_menu)
+            self._menu.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_menu)
 
             dim_label = wx.StaticText(self._menu, label="Dimension:")
             self._dim_options = SimpleChoiceAny(self._menu)
@@ -332,7 +332,7 @@ class EditExtension(BaseWorldProgram):
 
             self._operation_ui = OperationUI(self._menu, self._world, self._run_operation)
             self._menu.add_object(self._operation_ui, options=0)
-            self._operation_ui.Bind(wx.EVT_MOTION, self._steal_focus_operation)
+            self._operation_ui.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_operation)
             self._operation_ui.Layout()
             self._operation_ui.Fit()
             self._canvas = ControllableEditCanvas(self, self._world)
@@ -343,7 +343,7 @@ class EditExtension(BaseWorldProgram):
                 self._canvas.structure_locations
             )
             self._menu.add_object(self._select_destination_ui, options=0)
-            self._select_destination_ui.Bind(wx.EVT_MOTION, self._steal_focus_destination)
+            self._select_destination_ui.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_destination)
             self._select_destination_ui.Layout()
             self._select_destination_ui.Fit()
             self._select_destination_ui.Hide()
