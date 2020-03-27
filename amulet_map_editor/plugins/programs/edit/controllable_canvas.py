@@ -76,8 +76,7 @@ class ControllableEditCanvas(EditCanvas):
         if self._mouse_lock:
             self._release_mouse()
         else:
-            self.CaptureMouse()
-            wx.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
+            self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
             self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
             self._mouse_lock = True
 
@@ -159,11 +158,7 @@ class ControllableEditCanvas(EditCanvas):
         evt.Skip()
 
     def _release_mouse(self):
-        wx.SetCursor(wx.NullCursor)
-        try:
-            self.ReleaseMouse()
-        except:
-            pass
+        self.SetCursor(wx.NullCursor)
         self._mouse_lock = False
 
     def _on_mouse_motion(self, evt):
