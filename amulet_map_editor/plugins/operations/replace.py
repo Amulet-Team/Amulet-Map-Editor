@@ -82,7 +82,7 @@ export = {
     "v": 1,  # a version 1 plugin
     "name": "Replace",  # the name of the plugin
     "features": ["src_selection", "wxoptions"],
-    "inputs": ["src_selection", "wxoptions"],  # the inputs to give to the plugin
+    "inputs": ["src_selection", "options"],  # the inputs to give to the plugin
     "operation": replace,  # the actual function to call when running the plugin
     "wxoptions": show_ui
 }

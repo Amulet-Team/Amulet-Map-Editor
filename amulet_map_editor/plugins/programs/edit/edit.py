@@ -51,7 +51,7 @@ class OperationUI(SimplePanel):
     def _operation_selection_change_(self):
         operation_path = self._operation_choice.GetAny()
         operation = operations.operations[operation_path]
-        if "options" in operation.get("inputs", []) or "wxoptions" in operation.get("inputs", []):
+        if "options" in operation.get("features", []) or "wxoptions" in operation.get("features", []):
             self._options_button.Enable()
         else:
             self._options_button.Disable()
@@ -59,9 +59,9 @@ class OperationUI(SimplePanel):
     def _change_options(self, evt):
         operation_path = self._operation_choice.GetAny()
         operation = operations.operations[operation_path]
-        if "options" in operation.get("inputs", []):
+        if "options" in operation.get("features", []):
             pass  # TODO: implement this
-        elif "wxoptions" in operation.get("inputs", []):
+        elif "wxoptions" in operation.get("features", []):
             options = operation["wxoptions"](self, self._world(), operations.options.get(operation_path, {}))
             if isinstance(options, dict):
                 operations.options[operation_path] = options
@@ -226,7 +226,7 @@ class EditExtension(BaseWorldProgram):
                             return
                         operation_inputs.append(selection)
 
-                    elif inp in ["options", "wxoptions"]:
+                    elif inp == "options":
                         operation_inputs.append(operations.options.get(operation_path, {}))
 
                 self._operation_ui.Disable()
@@ -286,7 +286,7 @@ class EditExtension(BaseWorldProgram):
                 operation_inputs.append(dst_box_multiple)
             elif inp == "structure":
                 operation_inputs.append(structure)
-            elif inp in ["options", "wxoptions"]:
+            elif inp == "options":
                 operation_inputs.append(operations.options.get(operation_path, {}))
 
         self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)

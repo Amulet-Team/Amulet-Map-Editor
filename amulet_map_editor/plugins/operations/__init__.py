@@ -52,9 +52,8 @@
 >>> {  # requires a dst_location feature to be enabled. Only valid in main inputs
 >>>     "structure": Structure  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
 >>> }
->>> {  # requires respective option feature to be enabled
->>>     "options": dict,  # "options" key must exist
->>>     "wxoptions": dict  # "wxoptions" key must exist
+>>> {
+>>>     "options": dict,  # "options" or "wxoptions" feature must be enabled
 >>> }
 
 
@@ -128,8 +127,8 @@ def _load_operations(path: str):
                 if not isinstance(plugin.get("name", None), str):
                     error('"name" in export must exist and be a string.')
                     continue
-                structure_callable_options = []
-                input_options = []
+                structure_callable_options = ["options"]
+                input_options = ["options"]
                 dst_ui_enabled = False
                 features = plugin.get("features", [])
                 feature_index = 0
@@ -141,10 +140,8 @@ def _load_operations(path: str):
                         structure_callable_options.append("src_selection")
                         input_options.append("src_selection")
                     elif feature == "wxoptions":
-                        structure_callable_options.append("wxoptions")
-                        input_options.append("wxoptions")
                         if "wxoptions" not in plugin:
-                            error('"wxoptions" key must be defined if wxoptions function is enabled.')
+                            error('"wxoptions" key must be defined if wxoptions feature is enabled.')
                             stop = True
                             break
                         elif not callable(plugin["wxoptions"]):
@@ -156,10 +153,8 @@ def _load_operations(path: str):
                             stop = True
                             break
                     elif feature == "options":
-                        structure_callable_options.append("options")
-                        input_options.append("options")
                         if "options" not in plugin:
-                            error('"options" key must be defined if options function is enabled.')
+                            error('"options" key must be defined if options feature is enabled.')
                             stop = True
                             break
                         elif "wxoptions" in features:
