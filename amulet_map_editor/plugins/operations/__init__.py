@@ -44,11 +44,6 @@
 >>> # a list of inputs to give to the plugin. World class and dimension are first and these follow
 >>> # possible inputs (max one from each group)
 >>> {"src_selection": Selection}  # the user created selection
->>> {  # requires respective feature to be enabled
->>>     "dst_location": Destination  # the destination selected by the user. Only valid in main inputs
->>>     "dst_location_multiple": List[Destination]  # a list of destinations selected by the user. Only valid in main inputs
->>>     # requires either a callable at "structure_callable" to create and return a Structure or "src_box" to extract the src
->>> },
 >>> {  # requires a dst_location feature to be enabled. Only valid in main inputs
 >>>     "structure": Structure  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
 >>> }

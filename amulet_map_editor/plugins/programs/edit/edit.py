@@ -77,10 +77,11 @@ class SelectDestinationUI(SimplePanel):
         self._confirm_callback = confirm_callback
         self._locations = locations
 
-        self._operation_path = None
-        self._operation = None
-        self._operation_input_definitions = None
-        self._structure = None
+        self._operation_path: Optional[str] = None
+        self._operation: Optional[Callable] = None
+        self._operation_input_definitions: Optional[List[str]] = None
+        self._structure: Optional[Structure] = None
+        self._options: Optional[dict] = None
 
         self._x: wx.SpinCtrl = self._add_row('x', wx.SpinCtrl, min=-30000000, max=30000000)
         self._y: wx.SpinCtrl = self._add_row('y', wx.SpinCtrl, min=-30000000, max=30000000)
@@ -99,16 +100,17 @@ class SelectDestinationUI(SimplePanel):
         self._cancel.Bind(wx.EVT_BUTTON, self._on_cancel)
         self._confirm.Bind(wx.EVT_BUTTON, self._on_confirm)
 
-    def setup(self, operation_path, operation, operation_input_definitions, structure):
+    def setup(self, operation_path: Any, operation: Callable, operation_input_definitions: List[str], structure: Structure, options: dict):
         self._operation_path = operation_path
         self._operation = operation
         self._operation_input_definitions = operation_input_definitions
         self._structure = structure
         self._locations.clear()
-        self._locations.append(structure.selection.min.tolist())
+        self._locations.append(structure.selection.min)
         self._x.SetValue(structure.selection.min[0])
         self._y.SetValue(structure.selection.min[1])
         self._z.SetValue(structure.selection.min[2])
+        self._options = options
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -126,15 +128,12 @@ class SelectDestinationUI(SimplePanel):
         self._cancel_callback()
 
     def _on_confirm(self, evt):
+        self._options['location'] = (self._x.GetValue(), self._y.GetValue(), self._z.GetValue())
         self._confirm_callback(
             self._operation_path,
             self._operation,
             self._operation_input_definitions,
-            dst_box={
-                "x": self._x.GetValue(),
-                "y": self._y.GetValue(),
-                "z": self._z.GetValue()
-            },
+            options=self._options,
             structure=self._structure
         )
 
@@ -249,7 +248,8 @@ class EditExtension(BaseWorldProgram):
                     operation_path,
                     operation["operation"],
                     operation_input_definitions,
-                    structure
+                    structure,
+                    operations.options.get(operation_path, {})
                 )
                 self._enable_select_destination_ui(structure)
             else:
@@ -271,7 +271,7 @@ class EditExtension(BaseWorldProgram):
         self._select_destination_ui.Enable()
         self._enable_operation_ui()
 
-    def _run_main_operation(self, operation_path: str, operation: Callable, operation_input_definitions: List[str], dst_box=None, dst_box_multiple=None, structure=None):
+    def _run_main_operation(self, operation_path: str, operation: Callable, operation_input_definitions: List[str], options=None, structure=None):
         operation_inputs = []
         for inp in operation_input_definitions:
             if inp == "src_selection":
@@ -279,15 +279,13 @@ class EditExtension(BaseWorldProgram):
                 if selection is None:
                     return
                 operation_inputs.append(selection)
-
-            elif inp == "dst_location":
-                operation_inputs.append(dst_box)
-            elif inp == "dst_location_multiple":
-                operation_inputs.append(dst_box_multiple)
             elif inp == "structure":
                 operation_inputs.append(structure)
             elif inp == "options":
-                operation_inputs.append(operations.options.get(operation_path, {}))
+                if options:
+                    operation_inputs.append(options)
+                else:
+                    operation_inputs.append(operations.options.get(operation_path, {}))
 
         self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)
 
@@ -391,8 +389,9 @@ class EditExtension(BaseWorldProgram):
         self._select_destination_ui.setup(
             None,
             paste,
-            ["structure", "dst_location"],
-            structure
+            ["structure", "options"],
+            structure,
+            {}
         )
         self._enable_select_destination_ui(structure)
 
