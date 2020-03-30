@@ -39,9 +39,7 @@ class ChunkGenerator(ThreadPoolExecutor):
         return self._render_world()
 
     def start(self):
-        if self._enabled:
-            raise Exception('ChunkGenerator started more than once')
-        else:
+        if not self._enabled:
             self._enabled = True
             self._generator = self.submit(self._generate_chunks)
 

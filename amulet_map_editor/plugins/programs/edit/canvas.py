@@ -92,6 +92,7 @@ class EditCanvas(glcanvas.GLCanvas):
         world_panel.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
+        self.SetCurrent(self._context)
         self._render_world.enable()
         self._draw_timer.Start(33)
         self._input_timer.Start(33)

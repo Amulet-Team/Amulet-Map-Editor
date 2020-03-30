@@ -40,7 +40,7 @@ class AmuletMainWindow(wx.Frame):
 
         self._main_menu = AmuletMainMenu(self.world_tab_holder, self._open_world)
 
-        self._last_page: Optional[BaseWorldUI] = None
+        self._last_page: BaseWorldUI = self._main_menu
 
         self._add_world_tab(
             self._main_menu,
@@ -49,8 +49,6 @@ class AmuletMainWindow(wx.Frame):
 
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
-
-        self._disable_enable()
 
         self.Show()
 
@@ -104,8 +102,8 @@ class AmuletMainWindow(wx.Frame):
             if self._last_page is not None:
                 self._last_page.disable()
             self._last_page: BaseWorldUI = current
-            if self._last_page is not None:
-                self._last_page.enable()
+        if self._last_page is not None:
+            self._last_page.enable()
 
     def _add_world_tab(self, obj, obj_name):
         # TODO: find a way for the tab to be optionally closeable
@@ -132,7 +130,6 @@ class AmuletMainWindow(wx.Frame):
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)
-        self._main_menu.Enable()
 
     def close_world(self, path: str):
         """Close a given world and remove it from the notebook"""
