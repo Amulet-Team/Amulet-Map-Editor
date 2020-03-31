@@ -286,6 +286,7 @@ class EditExtension(BaseWorldProgram):
                 operation_inputs.append(structure)
             elif inp == "options":
                 if options:
+                    operations.options[operation_path] = options
                     operation_inputs.append(options)
                 else:
                     operation_inputs.append(operations.options.get(operation_path, {}))
