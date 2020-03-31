@@ -160,6 +160,9 @@ class EditExtension(BaseWorldProgram):
         self._menu_buttons: List[wx.Button] = []
         self._dim_options: Optional[SimpleChoiceAny] = None
         self._options_button: Optional[wx.Button] = None
+        self._undo_button: Optional[wx.Button] = None
+        self._redo_button: Optional[wx.Button] = None
+        self._save_button: Optional[wx.Button] = None
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self.Bind(wx.EVT_SIZE, self._on_resize)
 
@@ -178,13 +181,21 @@ class EditExtension(BaseWorldProgram):
 
     def _undo_event(self, evt):
         self._world.undo()
+        self._update_buttons()
 
     def _redo_event(self, evt):
         self._world.redo()
+        self._update_buttons()
+
+    def _update_buttons(self):
+        self._undo_button.SetLabel(f"Undo | {self._world.chunk_history_manager.undo_count}")
+        self._redo_button.SetLabel(f"Redo | {self._world.chunk_history_manager.redo_count}")
+        self._save_button.SetLabel(f"Save | {self._world.chunk_history_manager.unsaved_changes}")
 
     def _save_event(self, evt):
         self._canvas.disable_threads()
         self._world.save()
+        self._update_buttons()
         self._canvas.enable_threads()
 
     def _get_box(self) -> Optional[Selection]:
@@ -240,7 +251,7 @@ class EditExtension(BaseWorldProgram):
                     wx.MessageBox(f"Error running structure operation: {e}")
                     self._world.restore_last_undo_point()
                     self._canvas.enable_threads()
-                    return 
+                    return
                 self._canvas.enable_threads()
 
                 self._operation_ui.Enable()
@@ -304,6 +315,7 @@ class EditExtension(BaseWorldProgram):
         self._canvas.disable_threads()
         try:
             self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)
+            self._update_buttons()
         except Exception as e:
             wx.MessageBox(f"Error running operation: {e}")
             self._world.restore_last_undo_point()
@@ -328,25 +340,22 @@ class EditExtension(BaseWorldProgram):
             sizer.Add(self._dim_options, 0, wx.ALL, 5)
             self._menu.add_object(sizer, 0)
 
-            for text, operation in [
-                ['Undo', self._undo_event],
-                ['Redo', self._redo_event],
-                ['Save', self._save_event],
-                ['Close', self._close_world]
-            ]:
+            def create_button(text, operation):
                 button = wx.Button(
                     self._menu,
-                    wx.ID_ANY,
-                    text,
-                    wx.DefaultPosition,
-                    wx.DefaultSize,
-                    0,
+                    label=text
                 )
                 button.Bind(wx.EVT_BUTTON, operation)
                 self._menu.add_object(button, 0)
                 self._menu_buttons.append(
                     button
                 )
+                return button
+            self._undo_button = create_button('Undo', self._undo_event)
+            self._redo_button = create_button('Redo', self._redo_event)
+            self._save_button = create_button('Save', self._save_event)
+            create_button('Close', self._close_world)
+            self._update_buttons()
 
             self._operation_ui = OperationUI(self._menu, self._world, self._run_operation)
             self._menu.add_object(self._operation_ui, options=0)
