@@ -193,6 +193,9 @@ class EditExtension(BaseWorldProgram):
         self._save_button.SetLabel(f"Save | {self._world.chunk_history_manager.unsaved_changes}")
 
     def _save_event(self, evt):
+        self._save_world()
+
+    def _save_world(self):
         self._canvas.disable_threads()
         self._world.save()
         self._update_buttons()
@@ -404,6 +407,18 @@ class EditExtension(BaseWorldProgram):
         return True
 
     def _close_world(self, _):
+        unsaved_changes = self._world.chunk_history_manager.unsaved_changes
+        if unsaved_changes:
+            msg = wx.MessageDialog(
+                self,
+                f"There {'is' if unsaved_changes == 1 else 'are'} {unsaved_changes} unsaved change{'s' if unsaved_changes >= 2 else ''}. Would you like to save?",
+                style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT
+            )
+            response = msg.ShowModal()
+            if response == wx.ID_YES:
+                self._save_world()
+            elif response == wx.ID_CANCEL:
+                return
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
 
     def _copy(self):
