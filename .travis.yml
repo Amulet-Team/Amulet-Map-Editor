@@ -1,0 +1,67 @@
+language: python
+matrix:
+  include:
+    - name: "Python 3.7.4 on Windows"
+      os: windows
+      language: shell
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+    - name: "Python 3.7.1 on Linux"
+      python: 3.7.1
+      language: python
+    - name: "Python 3.7.4 on macOS"
+      os: osx
+      osx_image: xcode11
+      language: shell
+  allow_failures:
+    - os: linux
+    - os: osx
+
+if: branch IN (master, dev) OR tag =~ ^v(\d*\.\d*)*$
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then choco install python --version 3.7.5; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then python -m pip install --upgrade pip ; fi
+  - git config --global user.email ${USER_EMAIL}
+  - git config --global user.name ${USER_NAME}
+  - if [[ -z "$TRAVIS_TAG" ]]; then export TRAVIS_TAG="$(git describe --abbrev=0 --tags --exclude *-travis-*)-travis-${TRAVIS_COMMIT:0:7}" ; fi
+  - export ZIPFILE_NAME="Amulet-${TRAVIS_TAG}-${TRAVIS_OS_NAME}"
+  - export AMULET_MAP_EDITOR_VERSION=${TRAVIS_TAG:1}
+  - git remote add gh https://${TRAVIS_REPO_SLUG%/*}:${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
+  - while read in ; do if [ "$TRAVIS_TAG" != "$in" ] ; then git tag --delete $in && git push gh :refs/tags/$in; fi ; done < <(git tag -l *-travis-*)
+  - git remote remove gh
+
+install:
+  - pip3 install --upgrade pip
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user --upgrade setuptools wheel ; else pip3 install --upgrade setuptools wheel ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user -r requirements.txt ; else pip3 install -r requirements.txt ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install pypiwin32 ; fi
+  - pip3 install pyinstaller>=3.5
+  - wget https://raw.githubusercontent.com/gentlegiantJGC/PyMCTranslate/master/minify_json.py
+  - pyinstaller -y Amulet.spec
+
+script:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then 7z a "${ZIPFILE_NAME}.zip" -r ./dist/* ; else zip -r "${ZIPFILE_NAME}.zip" "dist" -x "*/\.DS_Store" ; fi
+
+deploy:
+  - provider: releases
+    api_key: $GITHUB_TOKEN
+    name: "Amulet $TRAVIS_TAG"
+    skip_cleanup: true
+    file_glob: true
+    file: '*.zip'
+    on:
+      all_branches: true
+      condition: $TRAVIS_TAG =~ ^v[0-9]+\.?[0-9]*\.?[0-9]*$
+  - provider: releases
+    api_key: $GITHUB_TOKEN
+    name: "Amulet $TRAVIS_TAG"
+    prerelease: true
+    skip_cleanup: true
+    file_glob: true
+    file: '*.zip'
+    on:
+      all_branches: true
+      condition: $TRAVIS_TAG =~ ^v[0-9]+\.?[0-9]*\.?[0-9]*-travis-[a-f0-9]{7}$
+
+notifications:
+  email: false

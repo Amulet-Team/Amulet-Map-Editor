@@ -4,6 +4,7 @@
 
 from PyInstaller.utils.hooks import collect_submodules
 
+import sys
 import os
 import shutil
 import glob
@@ -12,7 +13,9 @@ import amulet
 import PyMCTranslate
 import minecraft_model_reader
 
-AMULET_VERSION = input('Amulet Version Number:')
+sys.modules['FixTk'] = None
+
+AMULET_VERSION = os.environ.get("AMULET_MAP_EDITOR_VERSION", "-1.0")
 with open('amulet_map_editor/version', 'w') as f:
     f.write(AMULET_VERSION)
 
@@ -49,12 +52,19 @@ def load_module(path: str):
     spec.loader.exec_module(modu)
     return modu
 
-
-mod = load_module(
-    os.path.realpath(
+PYMCT_MINIFY_PATH = os.path.realpath(
         os.path.join(REAL_PYMCT_PATH, '..', 'minify_json.py')
     )
-)
+
+LOCAL_MINIFY_PATH = os.path.realpath(os.path.join('.', 'minify_json.py'))
+
+if os.path.exists(PYMCT_MINIFY_PATH):
+    mod = load_module(PYMCT_MINIFY_PATH)
+elif os.path.exists(LOCAL_MINIFY_PATH):
+    mod = load_module(LOCAL_MINIFY_PATH)
+else:
+    raise Exception("Couldn't location minify_json.py")
+
 mod.main(PYMCT_PATH)
 for path in os.listdir(PYMCT_PATH):
     input_path = os.path.join(PYMCT_PATH, path)
@@ -76,7 +86,7 @@ a = Analysis(['./main.py'],
              hiddenimports=hidden,
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
@@ -104,7 +114,7 @@ coll = COLLECT(exe,
                name='Amulet')
 
 delete_files = [
-    '**/transparency_cache.json',
+    '**/transparrency_cache.json',
     '**/config.json'
 ]
 delete_folders = [
