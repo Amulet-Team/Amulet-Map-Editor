@@ -86,6 +86,7 @@ class SelectDestinationUI(SimplePanel):
         self._x: wx.SpinCtrl = self._add_row('x', wx.SpinCtrl, min=-30000000, max=30000000)
         self._y: wx.SpinCtrl = self._add_row('y', wx.SpinCtrl, min=-30000000, max=30000000)
         self._z: wx.SpinCtrl = self._add_row('z', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._copy_air: wx.CheckBox = self._add_row('Copy Air', wx.CheckBox)
         self._x.Bind(wx.EVT_SPINCTRL, self._on_location_change)
         self._y.Bind(wx.EVT_SPINCTRL, self._on_location_change)
         self._z.Bind(wx.EVT_SPINCTRL, self._on_location_change)
@@ -110,6 +111,7 @@ class SelectDestinationUI(SimplePanel):
         self._x.SetValue(structure.selection.min[0])
         self._y.SetValue(structure.selection.min[1])
         self._z.SetValue(structure.selection.min[2])
+        self._copy_air.SetValue(options.get('copy_air', False))
         self._options = options
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
@@ -129,6 +131,7 @@ class SelectDestinationUI(SimplePanel):
 
     def _on_confirm(self, evt):
         self._options['location'] = (self._x.GetValue(), self._y.GetValue(), self._z.GetValue())
+        self._options['copy_air'] = self._copy_air.GetValue()
         self._confirm_callback(
             self._operation_path,
             self._operation,
