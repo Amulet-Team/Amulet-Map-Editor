@@ -232,7 +232,17 @@ class EditExtension(BaseWorldProgram):
                         operation_inputs.append(operations.options.get(operation_path, {}))
 
                 self._operation_ui.Disable()
-                structure = self._world.run_operation(operation["structure_callable"], self._canvas.dimension, *operation_inputs, create_undo=False)
+
+                self._canvas.disable_threads()
+                try:
+                    structure = self._world.run_operation(operation["structure_callable"], self._canvas.dimension, *operation_inputs, create_undo=False)
+                except Exception as e:
+                    wx.MessageBox(f"Error running structure operation: {e}")
+                    self._world.restore_last_undo_point()
+                    self._canvas.enable_threads()
+                    return 
+                self._canvas.enable_threads()
+
                 self._operation_ui.Enable()
                 if not isinstance(structure, Structure):
                     wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
@@ -291,7 +301,13 @@ class EditExtension(BaseWorldProgram):
                 else:
                     operation_inputs.append(operations.options.get(operation_path, {}))
 
-        self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)
+        self._canvas.disable_threads()
+        try:
+            self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)
+        except Exception as e:
+            wx.MessageBox(f"Error running operation: {e}")
+            self._world.restore_last_undo_point()
+        self._canvas.enable_threads()
 
     def enable(self):
         if self._canvas is None:
