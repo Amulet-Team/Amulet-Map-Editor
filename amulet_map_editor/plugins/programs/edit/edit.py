@@ -403,8 +403,8 @@ class EditExtension(BaseWorldProgram):
 
     def is_closeable(self):
         if self._canvas is not None:
-            return self._canvas.is_closeable()
-        return True
+            return self._canvas.is_closeable() and not bool(self._world.chunk_history_manager.unsaved_changes)
+        return not bool(self._world.chunk_history_manager.unsaved_changes)
 
     def _close_world(self, _):
         unsaved_changes = self._world.chunk_history_manager.unsaved_changes
