@@ -50,11 +50,6 @@ def show_goto(parent, x: float, y: float, z: float) -> Optional[Tuple[float, flo
 class ControllableEditCanvas(EditCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
-        self._last_mouse_x = 0
-        self._last_mouse_y = 0
-        self._mouse_delta_x = 0
-        self._mouse_delta_y = 0
-        self._mouse_lock = False
         self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
         self.Bind(wx.EVT_LEFT_UP, self._box_click)
         self.Bind(wx.EVT_RIGHT_UP, self._toggle_selection_mode)
@@ -78,6 +73,8 @@ class ControllableEditCanvas(EditCanvas):
         else:
             self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
             self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
+            self._mouse_delta_x = 0
+            self._mouse_delta_y = 0
             self._mouse_lock = True
 
     def _process_inputs(self, evt):
@@ -98,11 +95,11 @@ class ControllableEditCanvas(EditCanvas):
         if self._mouse_lock:
             pitch = self._mouse_delta_y * 0.07
             yaw = self._mouse_delta_x * 0.07
+            self._mouse_delta_x = 0
+            self._mouse_delta_y = 0
         else:
             pitch = 0
             yaw = 0
-        self._mouse_delta_x = 0
-        self._mouse_delta_y = 0
         self.move_camera_relative(forward, up, right, pitch, yaw)
         evt.Skip()
 

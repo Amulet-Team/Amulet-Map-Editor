@@ -33,6 +33,12 @@ class EditCanvas(glcanvas.GLCanvas):
         self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
         self._setup_opengl()  # set some OpenGL states
 
+        self._last_mouse_x = 0
+        self._last_mouse_y = 0
+        self._mouse_delta_x = 0
+        self._mouse_delta_y = 0
+        self._mouse_lock = False
+
         # load the resource packs
         os.makedirs('resource_packs', exist_ok=True)
         if not os.path.isfile('resource_packs/readme.txt'):
@@ -299,6 +305,7 @@ class EditCanvas(glcanvas.GLCanvas):
 
     def _collision_locations(self):
         if self._collision_locations_cache is None:
+
             dx = sin(self._camera[4]) * cos(self._camera[3])
             dy = -sin(self._camera[3])
             dz = -cos(self._camera[4]) * cos(self._camera[3])
