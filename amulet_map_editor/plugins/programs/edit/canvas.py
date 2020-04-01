@@ -11,7 +11,7 @@ import minecraft_model_reader
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
 
-from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos
+from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, asin, acos
 from amulet_map_editor.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
@@ -38,6 +38,7 @@ class EditCanvas(glcanvas.GLCanvas):
         self._mouse_delta_x = 0
         self._mouse_delta_y = 0
         self._mouse_lock = False
+        self._mouse_moved = False
 
         # load the resource packs
         os.makedirs('resource_packs', exist_ok=True)
@@ -220,6 +221,37 @@ class EditCanvas(glcanvas.GLCanvas):
         self._projection[1] = aspect_ratio
         self._transformation_matrix = None
 
+    @staticmethod
+    def rotation_matrix(pitch, yaw):
+        c = cos(yaw)
+        s = sin(yaw)
+
+        y_rot = numpy.array(
+            [
+                [c, 0, -s, 0],
+                [0, 1, 0, 0],
+                [s, 0, c, 0],
+                [0, 0, 0, 1]
+            ],
+            dtype=numpy.float32
+        )
+
+        # rotations
+        c = cos(pitch)
+        s = sin(pitch)
+
+        x_rot = numpy.array(
+            [
+                [1, 0, 0, 0],
+                [0, c, s, 0],
+                [0, -s, c, 0],
+                [0, 0, 0, 1]
+            ],
+            dtype=numpy.float32
+        )
+
+        return numpy.matmul(y_rot, x_rot)
+
     @property
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
@@ -227,36 +259,7 @@ class EditCanvas(glcanvas.GLCanvas):
             transformation_matrix = numpy.eye(4, dtype=numpy.float32)
             transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
 
-            c = cos(self._camera[4])
-            s = sin(self._camera[4])
-
-            y_rot = numpy.array(
-                [
-                    [c, 0, -s, 0],
-                    [0, 1, 0, 0],
-                    [s, 0, c, 0],
-                    [0, 0, 0, 1]
-                ],
-                dtype=numpy.float32
-            )
-
-            transformation_matrix = numpy.matmul(transformation_matrix, y_rot)
-
-            # rotations
-            c = cos(self._camera[3])
-            s = sin(self._camera[3])
-
-            x_rot = numpy.array(
-                [
-                    [1, 0, 0, 0],
-                    [0, c, s, 0],
-                    [0, -s, c, 0],
-                    [0, 0, 0, 1]
-                ],
-                dtype=numpy.float32
-            )
-
-            transformation_matrix = numpy.matmul(transformation_matrix, x_rot)
+            transformation_matrix = numpy.matmul(transformation_matrix, self.rotation_matrix(*self._camera[3:5]))
 
             # camera projection
             fovy, aspect, z_near, z_far = self._projection
@@ -280,7 +283,7 @@ class EditCanvas(glcanvas.GLCanvas):
     def selection(self) -> Optional[numpy.ndarray]:
         return numpy.array([self._selection_box.min, self._selection_box.max])
 
-    def _collision_location_closest(self):
+    def _collision_location_closest(self) -> numpy.ndarray:
         """Find the location of the closests non-air block"""
         # TODO: optimise this
         for location in self._collision_locations():
@@ -293,7 +296,7 @@ class EditCanvas(glcanvas.GLCanvas):
                 continue
         return self._collision_locations()[-1]
 
-    def _collision_location_distance(self, distance):
+    def _collision_location_distance(self, distance) -> numpy.ndarray:
         distance = distance ** 2
         locations = self._collision_locations()
         camera = numpy.array(self._camera[:3], dtype=numpy.int)
@@ -303,16 +306,18 @@ class EditCanvas(glcanvas.GLCanvas):
         else:
             return block
 
-    def _collision_locations(self):
+    def _collision_locations(self) -> numpy.ndarray:
         if self._collision_locations_cache is None:
-
-            dx = sin(self._camera[4]) * cos(self._camera[3])
-            dy = -sin(self._camera[3])
-            dz = -cos(self._camera[4]) * cos(self._camera[3])
-            look_vector = numpy.array([dx, dy, dz])
+            look_vector = numpy.array([0, 0, -1, 0])
+            if not self._mouse_lock:
+                screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
+                screen_dy = asin(sin(self.fov/2) * self._mouse_delta_y/screen_y)
+                screen_dx = asin(sin(self.aspect_ratio * self.fov/2) * self._mouse_delta_x/screen_x)
+                look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
+            look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
             look_vector[abs(look_vector) < 0.000001] = 0.000001
             dx, dy, dz = look_vector
-            max_distance = 30
+            max_distance = 100
 
             vectors = numpy.array(
                 [
@@ -338,9 +343,12 @@ class EditCanvas(glcanvas.GLCanvas):
                     locations.add(tuple(numpy.floor(location).astype(numpy.int)))
                     locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
                     location += vector
-            self._collision_locations_cache = numpy.array(
-                sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))) + numpy.floor(
-                self._camera[:3]).astype(numpy.int)
+            if locations:
+                self._collision_locations_cache = numpy.array(
+                    sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
+                ) + numpy.floor(self._camera[:3]).astype(numpy.int)
+            else:
+                self._collision_locations_cache = start.astype(numpy.int)
 
         return self._collision_locations_cache
 

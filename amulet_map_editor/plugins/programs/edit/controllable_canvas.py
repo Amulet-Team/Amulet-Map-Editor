@@ -76,6 +76,8 @@ class ControllableEditCanvas(EditCanvas):
             self._mouse_delta_x = 0
             self._mouse_delta_y = 0
             self._mouse_lock = True
+            self._collision_locations_cache = None
+            self._change_box_location()
 
     def _process_inputs(self, evt):
         forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
@@ -105,6 +107,10 @@ class ControllableEditCanvas(EditCanvas):
 
     def move_camera_relative(self, forward, up, right, pitch, yaw):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
+            if not self._mouse_lock and self._mouse_moved:
+                self._mouse_moved = False
+                self._collision_locations_cache = None
+                self._change_box_location()
             return
         self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + sin(self._camera[4]) * forward)
         self._camera[1] += self._camera_move_speed * up
@@ -169,10 +175,19 @@ class ControllableEditCanvas(EditCanvas):
             )
             # only if location actually changed from the center, because WarpPointer may generate a mouse motion event
             # this check avoids using WarpPointer for events caused by WarpPointer
-            if dx != 0 or dy != 0:
+            if dx or dy:
                 self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
             self._mouse_delta_x += dx
             self._mouse_delta_y += dy
+        else:
+            mouse_x, mouse_y = evt.GetPosition()
+            self._last_mouse_x, self._last_mouse_y = (
+                int(self.GetSize()[0] / 2),
+                int(self.GetSize()[1] / 2),
+            )
+            self._mouse_delta_x = mouse_x - self._last_mouse_x
+            self._mouse_delta_y = mouse_y - self._last_mouse_y
+            self._mouse_moved = True
 
     def _on_key_release(self, event):
         key = event.GetUnicodeKey()

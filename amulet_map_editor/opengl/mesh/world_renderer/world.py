@@ -26,6 +26,14 @@ def cos(theta: Union[int, float]) -> float:
     return math.cos(math.radians(theta))
 
 
+def asin(x: Union[int, float]) -> float:
+    return math.degrees(math.asin(x))
+
+
+def acos(x: Union[int, float]) -> float:
+    return math.degrees(math.acos(x))
+
+
 class ChunkGenerator(ThreadPoolExecutor):
     def __init__(self, render_world: 'RenderWorld'):
         super().__init__(max_workers=1)
