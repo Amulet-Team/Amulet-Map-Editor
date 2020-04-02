@@ -11,7 +11,7 @@ import minecraft_model_reader
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
 
-from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, asin, acos
+from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, asin, acos, tan, atan
 from amulet_map_editor.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
@@ -252,6 +252,21 @@ class EditCanvas(glcanvas.GLCanvas):
 
         return numpy.matmul(y_rot, x_rot)
 
+    def projection_matrix(self):
+        # camera projection
+        fovy, aspect, z_near, z_far = self._projection
+        fovy = math.radians(fovy)
+        f = 1 / math.tan(fovy / 2)
+        return numpy.array(
+            [
+                [f / aspect, 0, 0, 0],
+                [0, f, 0, 0],
+                [0, 0, (z_far + z_near) / (z_near - z_far), -1],
+                [0, 0, (2 * z_far * z_near) / (z_near - z_far), 0]
+            ],
+            dtype=numpy.float32
+        )
+
     @property
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
@@ -260,22 +275,7 @@ class EditCanvas(glcanvas.GLCanvas):
             transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
 
             transformation_matrix = numpy.matmul(transformation_matrix, self.rotation_matrix(*self._camera[3:5]))
-
-            # camera projection
-            fovy, aspect, z_near, z_far = self._projection
-            fovy = math.radians(fovy)
-            f = 1 / math.tan(fovy / 2)
-            projection = numpy.array(
-                [
-                    [f/aspect, 0, 0, 0],
-                    [0, f, 0, 0],
-                    [0, 0, (z_far+z_near)/(z_near-z_far), -1],
-                    [0, 0, (2*z_far*z_near)/(z_near-z_far), 0]
-                ],
-                dtype=numpy.float32
-            )
-
-            self._transformation_matrix = numpy.matmul(transformation_matrix, projection)
+            self._transformation_matrix = numpy.matmul(transformation_matrix, self.projection_matrix())
 
         return self._transformation_matrix
 
@@ -311,9 +311,11 @@ class EditCanvas(glcanvas.GLCanvas):
             look_vector = numpy.array([0, 0, -1, 0])
             if not self._mouse_lock:
                 screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
-                screen_dy = asin(sin(self.fov/2) * self._mouse_delta_y/screen_y)
-                screen_dx = asin(sin(self.aspect_ratio * self.fov/2) * self._mouse_delta_x/screen_x)
-                look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
+                screen_dy = atan(tan(self.fov/2) * self._mouse_delta_y/screen_y)
+                screen_dx = atan(self.aspect_ratio * tan(self.fov/2) * self._mouse_delta_x/screen_x)
+                print(screen_dx, screen_dy, self._mouse_delta_x/screen_x, self._mouse_delta_y/screen_y, self.fov)
+                look_vector = numpy.matmul(self.rotation_matrix(0, screen_dx), look_vector)
+                look_vector = numpy.matmul(self.rotation_matrix(screen_dy, 0), look_vector)
             look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
             look_vector[abs(look_vector) < 0.000001] = 0.000001
             dx, dy, dz = look_vector

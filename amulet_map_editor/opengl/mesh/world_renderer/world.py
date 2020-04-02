@@ -26,12 +26,20 @@ def cos(theta: Union[int, float]) -> float:
     return math.cos(math.radians(theta))
 
 
+def tan(theta: Union[int, float]) -> float:
+    return math.tan(math.radians(theta))
+
+
 def asin(x: Union[int, float]) -> float:
     return math.degrees(math.asin(x))
 
 
 def acos(x: Union[int, float]) -> float:
     return math.degrees(math.acos(x))
+
+
+def atan(x: Union[int, float]) -> float:
+    return math.degrees(math.atan(x))
 
 
 class ChunkGenerator(ThreadPoolExecutor):
