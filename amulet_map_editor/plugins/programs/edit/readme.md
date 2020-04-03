@@ -62,6 +62,6 @@ Below that is a button that will run the operation. Some operations may require 
 
 ### Copy and Paste
 - Select an area and press ctrl+c to copy (or Edit -> Copy)
-- Press ctrl+v (or Edit -> Paste) to choose where to paste the selection in the world. See [clone](###clone) for more information
+- Press ctrl+v (or Edit -> Paste) to choose where to paste the selection in the world. See [clone](#clone) for more information
 - It is worth noting here that Amulet is able to have multiple worlds open at the same time and the copied area can be pasted into a different world.
 - Our translation system also handles conversion between different world formats so the source and destination worlds do not need to be from the same version or platform.
