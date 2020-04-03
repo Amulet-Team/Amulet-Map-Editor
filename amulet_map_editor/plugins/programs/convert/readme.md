@@ -7,7 +7,7 @@ This means that any chunks that exist in the source world will be overwritten in
 
 If there is a chunk in the destination world and there is no chunk in the source world at that location then the chunk will be left as it was.
 
-![edit](../../../resource/img/convert.jpg)
+![edit](../../../../resource/img/convert.jpg)
 
 ## How to use
 
