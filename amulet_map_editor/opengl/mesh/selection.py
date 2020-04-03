@@ -21,10 +21,15 @@ class RenderSelection(TriMesh):
         self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), ('minecraft', 'missing_no'))
         self.verts[:, 9:12] = 1
         self.draw_count = 36
+        self._draw_mode = GL_TRIANGLES
 
     @property
     def vertex_usage(self):
         return GL_DYNAMIC_DRAW
+
+    @property
+    def draw_mode(self):
+        return self._draw_mode
 
     @property
     def select_state(self) -> int:
@@ -81,24 +86,24 @@ class RenderSelection(TriMesh):
         )
         _cube_face_lut = numpy.array([  # This maps to the verticies used (defined in cube_vert_lut)
             0, 4, 5, 1,  # down
-            3, 7, 6, 2,  # up
+            0, 1, 3, 2,  # west
             4, 0, 2, 6,  # north
             5, 4, 6, 7,  # east
             1, 5, 7, 3,  # south
-            0, 1, 3, 2   # west
+            3, 7, 6, 2,  # up
         ])
         box = box.ravel()
         _texture_index = numpy.array([
-            0, 2, 3, 5,
-            0, 5, 3, 2,
-            3, 1, 0, 4,
-            5, 1, 2, 4,
-            0, 1, 3, 4,
-            2, 1, 5, 4,
+            0, 2, 3, 5,  # down
+            2, 1, 5, 4,  # west
+            3, 1, 0, 4,  # north
+            5, 1, 2, 4,  # east
+            0, 1, 3, 4,  # south
+            0, 5, 3, 2,  # up
         ], numpy.uint32)
         _uv_slice = numpy.array([0, 1, 2, 1, 2, 3, 0, 3]*6, dtype=numpy.uint32).reshape((6, 8)) + numpy.arange(0, 24, 4).reshape((6, 1))
 
-        _tri_face = numpy.array([0, 1, 2, 0, 2, 3] * 6, numpy.uint32).reshape((6, 6)) + numpy.arange(0, 24, 4).reshape((6, 1))
+        _tri_face = numpy.array([0, 1, 2, 2, 3, 0] * 6, numpy.uint32).reshape((6, 6)) + numpy.arange(0, 24, 4).reshape((6, 1))
         return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
 
     def create_geometry(self):
@@ -118,3 +123,18 @@ class RenderSelection(TriMesh):
         """Set up an empty VAO"""
         super()._setup()
         self.create_geometry()
+
+    def draw(self, transformation_matrix: numpy.ndarray):
+        self._draw_mode = GL_TRIANGLES
+        self.draw_start = 0
+        super().draw(transformation_matrix)
+
+        glDisable(GL_DEPTH_TEST)
+        self._draw_mode = GL_LINE_STRIP
+        draw_count = self.draw_count
+        self.draw_count = 36
+        for start in range(0, draw_count, 36):
+            self.draw_start = start
+            super().draw(transformation_matrix)
+        self.draw_count = draw_count
+        glEnable(GL_DEPTH_TEST)
