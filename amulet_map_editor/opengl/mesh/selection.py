@@ -1,7 +1,7 @@
 import numpy
 from OpenGL.GL import *
 import itertools
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 
 
@@ -12,7 +12,8 @@ class RenderSelection(TriMesh):
     ):
         super().__init__(context_identifier)
         self._select_state = 0  # number of points selected
-        self._loc = numpy.zeros(6)
+        self._points: numpy.ndarray = numpy.zeros((2, 3))  # The points set using point1 and point2
+        self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
         self.verts = numpy.zeros((6*2*3*3, self._vert_len), dtype=numpy.float32)
 
         self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), ('minecraft', 'missing_no'))
@@ -36,27 +37,37 @@ class RenderSelection(TriMesh):
 
     @property
     def point1(self) -> numpy.ndarray:
-        return self._loc[:3]
+        return self._points[0]
 
     @point1.setter
     def point1(self, val):
-        self._loc[:3] = val
+        self._points[0] = val
+        self._bounds_ = None
 
     @property
     def point2(self) -> numpy.ndarray:
-        return self._loc[3:]
+        return self._points[1]
 
     @point2.setter
     def point2(self, val):
-        self._loc[3:] = val
+        self._points[1] = val
+        self._bounds_ = None
+
+    @property
+    def _bounds(self) -> numpy.ndarray:
+        """The array storing min and max locations"""
+        if self._bounds_ is None:
+            self._bounds_ = numpy.sort(self._points, 0)
+            self._bounds[1] += 1
+        return self._bounds_
 
     @property
     def min(self) -> numpy.ndarray:
-        return numpy.min(self._loc.reshape((2, 3)), 0) - (self.point2 <= self.point1)
+        return self._bounds[0]
 
     @property
     def max(self) -> numpy.ndarray:
-        return numpy.max(self._loc.reshape((2, 3)), 0) + (self.point2 <= self.point1)
+        return self._bounds[1]
 
     @staticmethod
     def _create_box(box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
@@ -93,14 +104,12 @@ class RenderSelection(TriMesh):
     def create_geometry(self):
         if self._vao is None:
             self._setup()
-        box_min = self.min
-        box_max = self.max
 
         if self.select_state >= 0:
-            self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(box_min-0.005, box_max+0.005)
+            self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(self.min-0.005, self.max+0.005)
         if self.select_state >= 1:
-            self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(box_min-0.01, box_min+1.01)
-            self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(box_max-1.01, box_max+0.01)
+            self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(self.point1-0.01, self.point1+1.01)
+            self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(self.point2-0.01, self.point2+1.01)
 
         self.change_verts()
 
