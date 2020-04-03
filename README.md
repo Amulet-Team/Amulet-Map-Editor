@@ -5,6 +5,8 @@
 
 A new Minecraft world editor and converter that supports most versions of Java and Bedrock.
 
+![edit](resource/img/edit.jpg)
+
 ### Running compiled builds
 
 Download the zip file for your operating system from the list of [compiled builds](https://github.com/Amulet-Team/Amulet-Map-Editor/releases). (Currently Windows only)
