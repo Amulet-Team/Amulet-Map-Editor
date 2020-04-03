@@ -80,19 +80,19 @@ class RenderSelection(TriMesh):
             )
         )
         _cube_face_lut = numpy.array([  # This maps to the verticies used (defined in cube_vert_lut)
-            0, 4, 5, 1,
-            3, 7, 6, 2,
-            4, 0, 2, 6,
-            5, 4, 6, 7,
-            1, 5, 7, 3,
-            0, 1, 3, 2
+            0, 4, 5, 1,  # down
+            3, 7, 6, 2,  # up
+            4, 0, 2, 6,  # north
+            5, 4, 6, 7,  # east
+            1, 5, 7, 3,  # south
+            0, 1, 3, 2   # west
         ])
         box = box.ravel()
         _texture_index = numpy.array([
             0, 2, 3, 5,
-            0, 2, 3, 5,
-            0, 1, 3, 4,
-            2, 1, 5, 4,
+            0, 5, 3, 2,
+            3, 1, 0, 4,
+            5, 1, 2, 4,
             0, 1, 3, 4,
             2, 1, 5, 4,
         ], numpy.uint32)
@@ -107,6 +107,7 @@ class RenderSelection(TriMesh):
 
         if self.select_state >= 0:
             self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(self.min-0.005, self.max+0.005)
+            self.verts[:36, 3:5] /= 16
         if self.select_state >= 1:
             self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(self.point1-0.01, self.point1+1.01)
             self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(self.point2-0.01, self.point2+1.01)
