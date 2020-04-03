@@ -146,9 +146,3 @@ class ConvertExtension(BaseWorldProgram):
 
     def _close_world(self, evt):
         self.GetGrandParent().GetParent().close_world(self.world.world_path)
-
-
-export = {
-    "name": "Convert",
-    "ui": ConvertExtension
-}
