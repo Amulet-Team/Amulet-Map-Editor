@@ -311,10 +311,9 @@ class EditCanvas(glcanvas.GLCanvas):
             look_vector = numpy.array([0, 0, -1, 0])
             if not self._mouse_lock:
                 screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
-                screen_dy = atan(tan(self.fov/2) * self._mouse_delta_y/screen_y)
-                screen_dx = atan(self.aspect_ratio * tan(self.fov/2) * self._mouse_delta_x/screen_x)
-                look_vector = numpy.matmul(self.rotation_matrix(0, screen_dx), look_vector)
-                look_vector = numpy.matmul(self.rotation_matrix(screen_dy, 0), look_vector)
+                screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
+                screen_dy = atan(cos(screen_dx) * tan(self.fov/2) * self._mouse_delta_y/screen_y)
+                look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
             look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
             look_vector[abs(look_vector) < 0.000001] = 0.000001
             dx, dy, dz = look_vector
