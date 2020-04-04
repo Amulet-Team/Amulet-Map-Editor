@@ -1,6 +1,6 @@
 import wx
 import os
-from typing import List, Dict, Callable, Union, Tuple, Any
+from typing import List, Dict, Callable, Union, Tuple, Any, Type, TYPE_CHECKING
 import importlib
 import pkgutil
 
@@ -8,6 +8,10 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet import world_interface
 
 from amulet_map_editor.amulet_wx.simple import SimpleNotebook, SimplePanel
+from amulet_map_editor.amulet_wx.world_select import WorldUI
+
+if TYPE_CHECKING:
+    from amulet.api.world import World
 
 MenuData = Dict[
     str, Dict[
@@ -24,11 +28,13 @@ MenuData = Dict[
 
 # this is where most of the magic will happen
 
-_extensions: List['BaseWorldProgram'] = []
+_extensions: List[Tuple[str, Type['BaseWorldProgram']]] = []
+_fixed_extensions: List[Tuple[str, Type['BaseWorldProgram']]] = []
 
 
 def load_extensions():
     if not _extensions:
+        _extensions.extend(_fixed_extensions)
         for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__))]):
             # load module and confirm that all required attributes are defined
             module = importlib.import_module(f'amulet_map_editor.plugins.programs.{name}')
@@ -36,7 +42,7 @@ def load_extensions():
             if hasattr(module, 'export'):
                 export = getattr(module, 'export')
                 if 'ui' in export and issubclass(export['ui'], BaseWorldProgram):
-                    _extensions.append([export.get('name', 'missingno'), export['ui']])
+                    _extensions.append((export.get('name', 'missingno'), export['ui']))
 
 
 class BaseWorldUI:
@@ -82,10 +88,12 @@ class WorldManagerUI(SimpleNotebook, BaseWorldUI):
     def _load_extensions(self):
         """Load and create instances of each of the extensions"""
         load_extensions()
+        select = True
         for extension_name, extension in _extensions:
             ext = extension(self, self.world)
             self._extensions.append(ext)
-            self.AddPage(ext, extension_name, True)
+            self.AddPage(ext, extension_name, select)
+            select = False
 
     def is_closeable(self) -> bool:
         """Check if all extensions are safe to be closed"""
@@ -135,3 +143,39 @@ class BaseWorldProgram(SimplePanel):
 
     def menu(self, menu: MenuData) -> MenuData:
         return menu
+
+
+class AboutExtension(BaseWorldProgram):
+    def __init__(self, container, world: 'World'):
+        super(AboutExtension, self).__init__(
+            container
+        )
+        self.world = world
+
+        self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
+        self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
+        self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
+
+        self.add_object(
+            wx.StaticText(
+                self,
+                label='Currently Opened World: '
+            ), 0, wx.ALL | wx.CENTER
+        )
+        self.add_object(
+            WorldUI(self, self.world.world_path), 0, wx.ALL | wx.CENTER
+        )
+        self.add_object(
+            wx.StaticText(
+                self,
+                label='Choose from the options on the left what you would like to do.\n'
+                      'You can switch between these at any time.\n'
+                      '<================='
+            ), 0, wx.ALL | wx.CENTER
+        )
+
+    def _close_world(self, evt):
+        self.GetGrandParent().GetParent().close_world(self.world.world_path)
+
+
+_fixed_extensions.append(("About", AboutExtension))
