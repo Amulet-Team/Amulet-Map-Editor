@@ -1,6 +1,7 @@
 import os
 import wx
 import glob
+from sys import platform
 from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
@@ -11,15 +12,23 @@ from amulet_map_editor import log
 # macOS 	~/Library/Application Support/minecraft
 # Linux 	~/.minecraft
 
-java_dir = os.path.join(os.getenv('APPDATA'), '.minecraft', 'saves')
-bedrock_dir = os.path.join(os.getenv('LOCALAPPDATA'), 'Packages', 'Microsoft.MinecraftUWP_8wekyb3d8bbwe', 'LocalState', 'games', 'com.mojang', 'minecraftWorlds')
-# TODO: handle other OSs
+def get_java_dir():
+    if platform == "win32":
+        return os.path.join(os.getenv('APPDATA'), '.minecraft')
+    elif platform == "darwin":
+        return os.path.expanduser('~/Library/Application Support/minecraft')
+    else:
+        return os.path.expanduser('~/.minecraft')
 
+def get_java_saves_dir():
+    return os.path.join(get_java_dir(), 'saves')
 
 minecraft_world_paths = {
-    lang.get('java_platform'): java_dir,
-    lang.get('bedrock_platform'): bedrock_dir
+    lang.get('java_platform'): get_java_saves_dir()
 }
+
+if platform == "win32":
+    minecraft_world_paths[lang.get('bedrock_platform')] = os.path.join(os.getenv('LOCALAPPDATA'), 'Packages', 'Microsoft.MinecraftUWP_8wekyb3d8bbwe', 'LocalState', 'games', 'com.mojang', 'minecraftWorlds')
 
 world_images: Dict[str, Tuple[int, wx.Bitmap, int]] = {}
 
@@ -69,7 +78,7 @@ class WorldUI(simple.SimplePanel):
             wx.ID_ANY,
             '\n'.join([
                 world.world_name,
-                world.game_version_string,
+                'Unknown', # world.game_version_string,
                 os.path.join(*os.path.normpath(path).split(os.sep)[-3:])
             ]),
             wx.DefaultPosition,
