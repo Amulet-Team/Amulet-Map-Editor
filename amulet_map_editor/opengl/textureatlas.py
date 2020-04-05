@@ -152,7 +152,10 @@ class Frame(Packable):
         self._filename = filename
 
         # Determine frame dimensions
-        self._image: Image.Image = Image.open(filename)
+        image: Image.Image = Image.open(filename)
+        self._image: Image.Image = image.copy()
+        image.close()
+
         width, height = self._image.size
 
         super(Frame, self).__init__(width, height)
