@@ -78,7 +78,7 @@ class WorldUI(simple.SimplePanel):
             wx.ID_ANY,
             '\n'.join([
                 world.world_name,
-                'Unknown', # world.game_version_string,
+                world.game_version_string,
                 os.path.join(*os.path.normpath(path).split(os.sep)[-3:])
             ]),
             wx.DefaultPosition,
