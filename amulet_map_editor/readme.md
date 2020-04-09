@@ -8,6 +8,8 @@ First of all backup any worlds that you intend to edit just in case they get cor
 
 Click on the open world button and a new window should appear that looks like the image below.
 
+### Open World
+
 ![world select](../resource/img/world_select.jpg)
 
 On the left should be some expandable panes containing the worlds stored in the respective directories. Click on the button to show the worlds in that location. 
@@ -27,6 +29,8 @@ Once you have opened a world you should see a screen that looks like the image b
 ![world select expand](../resource/img/about.jpg)
 
 On the top are the worlds that you currently have open in Amulet to make it easy to switch between. More worlds can be opened at the same time either by selecting the main menu and opening again or through File -> Open World
+
+# Sub-Programs
 
 On the left are the different sub-programs contained within Amulet. The documentation for which can be found below.
 
