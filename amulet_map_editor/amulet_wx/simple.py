@@ -46,18 +46,6 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
         self.SetAutoLayout(1)
 
 
-class SimpleNotebook(wx.Notebook):
-    def __init__(self, parent, style=0):
-        wx.Notebook.__init__(
-            self,
-            parent,
-            wx.ID_ANY,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            style
-        )
-
-
 class SimpleText(wx.StaticText):
     def __init__(self, parent, text):
         super().__init__(

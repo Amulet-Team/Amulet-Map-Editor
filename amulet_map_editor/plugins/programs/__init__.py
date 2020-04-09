@@ -7,7 +7,7 @@ import pkgutil
 from amulet.api.errors import LoaderNoneMatched
 from amulet import world_interface
 
-from amulet_map_editor.amulet_wx.simple import SimpleNotebook, SimplePanel
+from amulet_map_editor.amulet_wx.simple import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldUI
 
 if TYPE_CHECKING:
@@ -59,13 +59,9 @@ class BaseWorldUI:
         return menu
 
 
-class WorldManagerUI(SimpleNotebook, BaseWorldUI):
+class WorldManagerUI(wx.Notebook, BaseWorldUI):
     def __init__(self, parent, path):
-        SimpleNotebook.__init__(
-            self,
-            parent,
-            wx.NB_LEFT
-        )
+        super().__init__(parent, style=wx.NB_LEFT)
         self._finished = False
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
         try:
