@@ -10,7 +10,7 @@ from amulet.operations.paste import paste
 
 from amulet_map_editor import log
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny, SimpleText
+from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
 from amulet_map_editor.plugins import operations
 
 from .controllable_canvas import ControllableEditCanvas

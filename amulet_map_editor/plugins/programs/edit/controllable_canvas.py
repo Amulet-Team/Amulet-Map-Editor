@@ -53,6 +53,7 @@ class ControllableEditCanvas(EditCanvas):
         self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
         self.Bind(wx.EVT_LEFT_UP, self._box_click)
         self.Bind(wx.EVT_RIGHT_UP, self._toggle_selection_mode)
+        self.Bind(wx.EVT_RIGHT_DCLICK, self._toggle_mouse_lock)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
         self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
