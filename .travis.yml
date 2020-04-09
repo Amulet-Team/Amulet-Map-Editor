@@ -16,19 +16,16 @@ matrix:
     - os: linux
     - os: osx
 
-if: branch IN (master, dev) OR tag =~ ^v(\d*\.\d*)*$
+if: branch = master
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then choco install python --version 3.7.5; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then python -m pip install --upgrade pip ; fi
   - git config --global user.email ${USER_EMAIL}
   - git config --global user.name ${USER_NAME}
-  - if [[ -z "$TRAVIS_TAG" ]]; then export TRAVIS_TAG="$(git describe --abbrev=0 --tags --exclude *-travis-*)-travis-${TRAVIS_COMMIT:0:7}" ; fi
+  - export TRAVIS_TAG="v$(cat ./amulet_map_editor/version)"
+  - if [ $(git tag -l "${TRAVIS_TAG}") ] ; then travis_terminate 1 ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then choco install python --version 3.7.5; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then python -m pip install --upgrade pip ; fi
   - export ZIPFILE_NAME="Amulet-${TRAVIS_TAG}-${TRAVIS_OS_NAME}"
-  - export AMULET_MAP_EDITOR_VERSION=${TRAVIS_TAG:1}
-  - git remote add gh https://${TRAVIS_REPO_SLUG%/*}:${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
-  - while read in ; do if [ "$TRAVIS_TAG" != "$in" ] ; then git tag --delete $in && git push gh :refs/tags/$in; fi ; done < <(git tag -l *-travis-*)
-  - git remote remove gh
 
 install:
   - pip3 install --upgrade pip
@@ -49,19 +46,7 @@ deploy:
     skip_cleanup: true
     file_glob: true
     file: '*.zip'
-    on:
-      all_branches: true
-      condition: $TRAVIS_TAG =~ ^v[0-9]+\.?[0-9]*\.?[0-9]*$
-  - provider: releases
-    api_key: $GITHUB_TOKEN
-    name: "Amulet $TRAVIS_TAG"
-    prerelease: true
-    skip_cleanup: true
-    file_glob: true
-    file: '*.zip'
-    on:
-      all_branches: true
-      condition: $TRAVIS_TAG =~ ^v[0-9]+\.?[0-9]*\.?[0-9]*-travis-[a-f0-9]{7}$
+    tag_name: $TRAVIS_TAG
 
 notifications:
   email: false
