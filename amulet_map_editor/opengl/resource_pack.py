@@ -35,11 +35,14 @@ class ResourcePackManager:
         self._block_models.clear()
 
     def _set_shader_texture(self, texture: Any):
+        vao = glGenVertexArrays(1)
+        glBindVertexArray(vao)
         shader = shaders.get_shader(self.context_identifier, 'render_chunk')
         glUseProgram(shader)
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, texture)
         glUniform1i(glGetUniformLocation(shader, 'image'), 0)
+        glBindVertexArray(0)
 
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:
