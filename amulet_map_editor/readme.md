@@ -2,17 +2,17 @@
 
 When you open Amulet you should be greeted by a screen that looks similar to the image below.
 
-![main menu](../../resource/img/main_menu.jpg)
+![main menu](../resource/img/main_menu.jpg)
 
 First of all backup any worlds that you intend to edit just in case they get corrupted when editing.
 
 Click on the open world button and a new window should appear that looks like the image below.
 
-![world select](../../resource/img/world_select.jpg)
+![world select](../resource/img/world_select.jpg)
 
 On the left should be some expandable panes containing the worlds stored in the respective directories. Click on the button to show the worlds in that location. 
 
-![world select expand](../../resource/img/world_select_expand.jpg)
+![world select expand](../resource/img/world_select_expand.jpg)
 
 Click on a world to open it with Amulet.
 
@@ -24,7 +24,7 @@ There are some cases where you will not see a world listed or are not able to op
 
 Once you have opened a world you should see a screen that looks like the image below.
 
-![world select expand](../../resource/img/about.jpg)
+![world select expand](../resource/img/about.jpg)
 
 On the top are the worlds that you currently have open in Amulet to make it easy to switch between. More worlds can be opened at the same time either by selecting the main menu and opening again or through File -> Open World
 
