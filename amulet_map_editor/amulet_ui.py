@@ -213,7 +213,7 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
         WorldSelectWindow(self._open_world_callback, self.Enable)
 
     def _documentation(self, evt):
-        webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/readme.md')
+        webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/readme.md')
 
     def enable(self):
         self.GetGrandParent().create_menu()

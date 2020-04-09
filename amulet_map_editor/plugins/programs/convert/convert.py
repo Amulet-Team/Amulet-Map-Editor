@@ -1,12 +1,16 @@
-from amulet_map_editor.amulet_wx.simple import SimplePanel
-from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
-from amulet_map_editor.plugins.programs import BaseWorldProgram
+import wx
+from concurrent.futures import ThreadPoolExecutor
+import webbrowser
+
 from amulet import world_interface
 from amulet.api.world import World
 from amulet.world_interface.formats import Format
-import wx
+
 from amulet_map_editor import lang, log
-from concurrent.futures import ThreadPoolExecutor
+from amulet_map_editor.amulet_wx.simple import SimplePanel
+from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
+from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
+
 
 thread_pool_executor = ThreadPoolExecutor(max_workers=1)
 work_count = 0
@@ -75,6 +79,13 @@ class ConvertExtension(BaseWorldProgram):
         self.convert_button.Bind(wx.EVT_BUTTON, self._convert_event)
 
         self.out_world_path = None
+
+    def menu(self, menu: MenuData) -> MenuData:
+        menu.setdefault('&Help', {}).setdefault('control', {}).setdefault('Controls', lambda evt: self._help_controls())
+        return menu
+
+    def _help_controls(self):
+        webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/plugins/programs/convert/readme.md")
 
     def _show_world_select(self, evt):
         self.Disable()

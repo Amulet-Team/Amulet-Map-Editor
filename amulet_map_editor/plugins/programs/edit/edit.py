@@ -2,6 +2,7 @@ import wx
 import weakref
 import numpy
 from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
+import webbrowser
 
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure, structure_buffer
@@ -172,7 +173,11 @@ class EditExtension(BaseWorldProgram):
         # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy\tCtrl+c', lambda evt: self._copy())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste\tCtrl+v', lambda evt: self._paste())
+        menu.setdefault('&Help', {}).setdefault('control', {}).setdefault('Controls', lambda evt: self._help_controls())
         return menu
+
+    def _help_controls(self):
+        webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/plugins/programs/edit/readme.md")
 
     def _on_resize(self, event):
         if self._canvas is not None:
