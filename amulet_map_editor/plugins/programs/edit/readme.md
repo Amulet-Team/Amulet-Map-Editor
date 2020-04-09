@@ -15,7 +15,7 @@ The controls are currently hard coded but in the future they will be customisabl
 - right D
 - down: Shift
 - up: Spacebar
-- toggle camera rotation: middle click
+- toggle camera rotation: middle click or double right click
 - select box corner: Left click
 - change mouse select mode: Right click (options are closest non-air block and fixed distance)
 - change fly speed: Middle mouse scroll
