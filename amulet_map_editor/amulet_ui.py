@@ -1,9 +1,11 @@
 import wx
 import os
-from typing import Dict, Optional
+from typing import Dict
+import webbrowser
+
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
-from amulet_map_editor import lang, config, version, log
+from amulet_map_editor import lang, config, version, log, IMG_DIR
 from amulet_map_editor.plugins.programs import WorldManagerUI
 from amulet_map_editor.amulet_wx import simple
 from amulet_map_editor.plugins.programs import BaseWorldUI
@@ -166,25 +168,52 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
             parent
         )
         self._open_world_callback = open_world
-        amulet_converter = wx.StaticText(
+        sizer = wx.BoxSizer()
+        self.add_object(sizer, 0, wx.ALL | wx.CENTER)
+        img = wx.Image(
+            os.path.join(IMG_DIR, 'icon128.png'),
+            wx.BITMAP_TYPE_ANY
+        )
+
+        icon = wx.StaticBitmap(
             self,
             wx.ID_ANY,
-            'Amulet',
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
+            img.Scale(64, 64, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(),
+            (0, 0),
+            (64, 64)
         )
+        icon2 = wx.StaticBitmap(
+            self,
+            wx.ID_ANY,
+            img.Scale(64, 64, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(),
+            (0, 0),
+            (64, 64)
+        )
+        sizer.Add(icon, flag=wx.CENTER)
+
+        amulet_converter = wx.StaticText(self, label='Amulet')
         amulet_converter.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        self.add_object(
-            amulet_converter, 0, wx.ALL|wx.CENTER
+        sizer.Add(
+            amulet_converter, flag=wx.CENTER
         )
-        self._open_world_button = wx.Button(self, wx.ID_ANY, label='Select World')
+        sizer.Add(icon2, flag=wx.CENTER)
+        button_font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
+        self._open_world_button = wx.Button(self, label='Open World', size=(400, 70))
+        self._open_world_button.SetFont(button_font)
         self._open_world_button.Bind(wx.EVT_BUTTON, self._show_world_select)
         self.add_object(self._open_world_button, 0, wx.ALL|wx.CENTER)
+
+        self._help_button = wx.Button(self, label='Help', size=(400, 70))
+        self._help_button.SetFont(button_font)
+        self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
+        self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
 
     def _show_world_select(self, evt):
         self.Disable()
         WorldSelectWindow(self._open_world_callback, self.Enable)
+
+    def _documentation(self, evt):
+        webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/readme.md')
 
     def enable(self):
         self.GetGrandParent().create_menu()
