@@ -28,7 +28,7 @@ Dimension: Select which dimension is active
 Undo: Undo the last change. (ctrl+z)
 Redo: Reapply an undone change. (ctrl+y)
 Save: Save all changes to the world. Any changes in the editor are saved in the editor until the user requests them to be saved to the world. (ctrl+s)
-Close: Close the current world. (ctrl+w)
+Close: Close the current world.
 
 ### Operations
 

@@ -78,7 +78,7 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
     def menu(self, menu: MenuData) -> MenuData:
         menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save\tCtrl+s', lambda evt: self.world.save())
         # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
-        menu.setdefault('&File', {}).setdefault('exit', {}).setdefault('Close World\tCtrl+w', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        menu.setdefault('&File', {}).setdefault('exit', {}).setdefault('Close World', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
         return self._extensions[self.GetSelection()].menu(menu)
 
     def _load_extensions(self):
