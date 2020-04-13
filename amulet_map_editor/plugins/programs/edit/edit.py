@@ -32,8 +32,8 @@ class FilePanel(wx.Panel):
         self._dim_options.SetValue("overworld")
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
-        top_sizer.Add(dim_label, 0, wx.ALL, 5)
-        top_sizer.Add(self._dim_options, 0, wx.ALL, 5)
+        top_sizer.Add(dim_label, 0, wx.ALL | wx.CENTER, 5)
+        top_sizer.Add(self._dim_options, 0, wx.ALL | wx.CENTER, 5)
 
         def create_button(text, operation):
             button = wx.Button(self, label=text)

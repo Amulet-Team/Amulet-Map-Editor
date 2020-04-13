@@ -17,7 +17,7 @@ class SelectOperationUI(SimplePanel):
         self._operation_choice = SimpleChoiceAny(self)
         self._operation_choice.SetItems({key: value["name"] for key, value in operations.operations.items()})
         self._operation_choice.Bind(wx.EVT_CHOICE, self._operation_selection_change)
-        self.add_object(self._operation_choice, 0)
+        self.add_object(self._operation_choice, 0, wx.ALL | wx.EXPAND)
         self._options_button = wx.Button(
             self,
             label="Change Options"
@@ -28,8 +28,8 @@ class SelectOperationUI(SimplePanel):
         )
         self._options_button.Bind(wx.EVT_BUTTON, self._change_options)
         run_button.Bind(wx.EVT_BUTTON, run_operation)
-        self.add_object(self._options_button, 0)
-        self.add_object(run_button, 0)
+        self.add_object(self._options_button, 0, wx.ALL | wx.EXPAND)
+        self.add_object(run_button, 0, wx.ALL | wx.EXPAND)
         self._operation_selection_change_()
 
     @property

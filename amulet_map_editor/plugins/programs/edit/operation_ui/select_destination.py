@@ -57,7 +57,7 @@ class SelectDestinationUI(SimplePanel):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.add_object(sizer, 0, 0)
         name_text = wx.StaticText(self, label=label)
-        sizer.Add(name_text, flag=wx.CENTER | wx.ALL, border=5)
+        sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
         obj = wx_object(self, **kwargs)
         sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
         return obj
