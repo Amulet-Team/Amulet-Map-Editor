@@ -1,20 +1,17 @@
 import wx
-import weakref
-import numpy
-from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
+from typing import TYPE_CHECKING, Optional, List, Callable
 import webbrowser
 
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure, structure_buffer
 from amulet.operations.paste import paste
 
-from amulet_map_editor import log
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
 from amulet_map_editor.plugins import operations
 from .operation_ui import SelectOperationUI, SelectDestinationUI
 
-from .controllable_canvas import ControllableEditCanvas
+from .canvas.controllable_canvas import ControllableEditCanvas
 
 if TYPE_CHECKING:
     from amulet.api.world import World

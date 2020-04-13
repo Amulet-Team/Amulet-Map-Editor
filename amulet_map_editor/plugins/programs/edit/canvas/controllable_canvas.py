@@ -3,11 +3,11 @@ import wx
 
 from .canvas import EditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimplePanel
+from amulet_map_editor.amulet_wx.simple import SimpleDialog
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from .edit import EditExtension
+    from amulet_map_editor.plugins.programs.edit.edit import EditExtension
 
 
 key_map = {

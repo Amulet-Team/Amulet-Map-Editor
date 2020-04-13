@@ -19,7 +19,7 @@ from amulet_map_editor import log
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from .edit import EditExtension
+    from amulet_map_editor.plugins.programs.edit.edit import EditExtension
 
 
 class EditCanvas(glcanvas.GLCanvas):
@@ -50,7 +50,7 @@ class EditCanvas(glcanvas.GLCanvas):
         self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
 
         self._load_resource_pack(
-            minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), 'amulet_resource_pack')),
+            minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), '..', 'amulet_resource_pack')),
             minecraft_model_reader.java_vanilla_latest,
             *[minecraft_model_reader.JavaRP(rp) for rp in os.listdir('resource_packs') if os.path.isdir(rp)],
             minecraft_model_reader.java_vanilla_fix
@@ -96,9 +96,10 @@ class EditCanvas(glcanvas.GLCanvas):
         self._gc_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
 
-        world_panel.Bind(wx.EVT_SIZE, self._on_resize)
+        # world_panel.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
+        # return
         self.SetCurrent(self._context)
         self._render_world.enable()
         self._draw_timer.Start(33)
@@ -352,8 +353,8 @@ class EditCanvas(glcanvas.GLCanvas):
 
         return self._collision_locations_cache
 
-    def _on_resize(self, event):
-        self.set_size(*event.GetSize())
+    # def _on_resize(self, event):
+    #     self.set_size(*event.GetSize())
 
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
