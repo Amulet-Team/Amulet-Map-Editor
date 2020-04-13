@@ -7,11 +7,11 @@ from amulet_map_editor.amulet_wx.simple import SimplePanel
 
 
 class SelectDestinationUI(SimplePanel):
-    def __init__(self, parent, cancel_callback, confirm_callback, locations: List[numpy.ndarray]):
+    def __init__(self, parent, cancel_callback, confirm_callback):
         super().__init__(parent)
         self._cancel_callback = cancel_callback
         self._confirm_callback = confirm_callback
-        self._locations = locations
+        self._locations = None
 
         self._operation_path: Optional[str] = None
         self._operation: Optional[Callable] = None
@@ -36,6 +36,9 @@ class SelectDestinationUI(SimplePanel):
 
         self._cancel.Bind(wx.EVT_BUTTON, self._on_cancel)
         self._confirm.Bind(wx.EVT_BUTTON, self._on_confirm)
+
+    def bind_locations(self, locations: List[numpy.ndarray]):
+        self._locations = locations
 
     def setup(self, operation_path: Any, operation: Callable, operation_input_definitions: List[str], structure: Structure, options: dict):
         self._operation_path = operation_path

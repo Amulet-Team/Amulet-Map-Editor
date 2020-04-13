@@ -19,9 +19,9 @@ if TYPE_CHECKING:
 
 
 class FilePanel(wx.Panel):
-    def __init__(self, parent, canvas, world, undo_evt, redo_evt, save_evt, close_evt):
+    def __init__(self, parent, world, undo_evt, redo_evt, save_evt, close_evt):
         wx.Panel.__init__(self, parent)
-        self._canvas = weakref.ref(canvas)
+        self._canvas = None
         self._world = weakref.ref(world)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -51,6 +51,9 @@ class FilePanel(wx.Panel):
         top_sizer.Fit(self)
         self.Layout()
 
+    def set_canvas(self, canvas):
+        self._canvas = weakref.ref(canvas)
+
     def update_buttons(self):
         self._undo_button.SetLabel(f"Undo | {self._world().chunk_history_manager.undo_count}")
         self._redo_button.SetLabel(f"Redo | {self._world().chunk_history_manager.redo_count}")
@@ -66,12 +69,12 @@ class FilePanel(wx.Panel):
 
 
 class OperationUI(wx.Panel):
-    def __init__(self, parent, canvas, world, run_operation, run_main_operation):
+    def __init__(self, parent, world, run_operation, run_main_operation):
         wx.Panel.__init__(self, parent)
 
         self._world = weakref.ref(world)
-        self._canvas = weakref.ref(canvas)
-        self._run_main_operation = weakref.ref(run_main_operation)
+        self._canvas = None
+        self._run_main_operation =run_main_operation
 
         middle_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -83,8 +86,7 @@ class OperationUI(wx.Panel):
         self._select_destination_ui: Optional[SelectDestinationUI] = SelectDestinationUI(
             self,
             self._destination_select_cancel,
-            self._destination_select_confirm,
-            canvas.structure_locations
+            self._destination_select_confirm
         )
         middle_sizer.Add(self._select_destination_ui)
         # self._select_destination_ui.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_destination)
@@ -96,9 +98,13 @@ class OperationUI(wx.Panel):
         middle_sizer.Fit(self)
         self.Layout()
 
+    def set_canvas(self, canvas):
+        self._canvas = weakref.ref(canvas)
+        self._select_destination_ui.bind_locations(canvas.structure_locations)
+
     def enable_select_destination_ui(self, operation_path: Any, operation: Callable, operation_input_definitions: List[str], structure: Structure, options: dict):
         self._select_destination_ui.setup(operation_path, operation, operation_input_definitions, structure, options)
-        self._operation_ui.Hide()
+        self._hide_all()
         self._select_destination_ui.Show()
         self.Fit()
         self._canvas().structure = structure
@@ -109,15 +115,22 @@ class OperationUI(wx.Panel):
 
     def _destination_select_confirm(self, *args, **kwargs):
         self._select_destination_ui.Disable()
-        self._run_main_operation()(*args, **kwargs)
+        self._run_main_operation(*args, **kwargs)
         self._select_destination_ui.Enable()
         self.enable_operation_ui()
 
     def enable_operation_ui(self):
-        self._select_destination_ui.Hide()
+        self._hide_all()
         self._operation_ui.Show()
         self._canvas().select_mode = 0
         self.Fit()
+
+    def hide(self):
+        self.Hide()
+
+    def _hide_all(self):
+        self._operation_ui.Hide()
+        self._select_destination_ui.Hide()
 
     @property
     def operation(self):
@@ -132,17 +145,6 @@ class ToolSelect(wx.Panel):
         self.button_6 = wx.Button(self, wx.ID_ANY, "button_6")
         self.button_7 = wx.Button(self, wx.ID_ANY, "button_7")
 
-        self.__set_properties()
-        self.__do_layout()
-        # end wxGlade
-
-    def __set_properties(self):
-        # begin wxGlade: toolSelect.__set_properties
-        self.SetBackgroundColour(wx.Colour(35, 35, 142))
-        # end wxGlade
-
-    def __do_layout(self):
-        # begin wxGlade: toolSelect.__do_layout
         bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
         bottom_sizer.Add(self.button_6, 0, 0, 0)
         bottom_sizer.Add(self.button_7, 0, 0, 0)
@@ -172,14 +174,17 @@ class EditExtension(BaseWorldProgram):
         if self._canvas is None:
             self.Update()
 
-            self._canvas = ControllableEditCanvas(self, self._world)
-            self._top_panel = FilePanel(self, self._canvas, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
-            self._left_panel = OperationUI(self, self._canvas, self._world, self._run_operation, self._run_main_operation)
+            self._top_panel = FilePanel(self, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
+            self._left_panel = OperationUI(self, self._world, self._run_operation, self._run_main_operation)
             self._bottom_panel = ToolSelect(self, wx.ID_ANY)
+
+            self._canvas = ControllableEditCanvas(self, self._world)
+            self._top_panel.set_canvas(self._canvas)
+            self._left_panel.set_canvas(self._canvas)
+
             self._top_panel.Hide()
             self._left_panel.Hide()
             self._bottom_panel.Hide()
-
 
             bottom_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
             middle_sizer0 = wx.BoxSizer(wx.VERTICAL)
@@ -188,28 +193,20 @@ class EditExtension(BaseWorldProgram):
             top_sizer0.Add(self._top_panel, 0, wx.EXPAND, 0)
             self.sizer.Add(top_sizer0, 0, wx.EXPAND, 0)
             middle_sizer0.Add((20, 20), 1, 0, 0)
-            middle_sizer0.Add(self._left_panel, 0, wx.EXPAND, 0)
+            middle_sizer0.Add(self._left_panel, 0, 0, 0)
             middle_sizer0.Add((20, 20), 1, 0, 0)
             self.sizer.Add(middle_sizer0, 1, wx.EXPAND, 0)
             bottom_sizer0.Add((20, 20), 1, 0, 0)
             bottom_sizer0.Add(self._bottom_panel, 0, wx.EXPAND, 0)
             bottom_sizer0.Add((20, 20), 1, 0, 0)
             self.sizer.Add(bottom_sizer0, 0, wx.EXPAND, 0)
-            self.sizer.Add(self._canvas, 0, wx.EXPAND)
-
-            self.sizer.Fit(self)
-            self.Layout()
 
             self._temp.Destroy()
             self._top_panel.Show()
             self._left_panel.Show()
             self._bottom_panel.Show()
 
-            self.GetParent().Layout()
-            self._left_panel.Layout()
-            self._left_panel.Fit()
             self.Layout()
-            self.Update()
         self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
         self._canvas.draw()
         self._canvas.Update()
