@@ -208,12 +208,20 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
         self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
         self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
 
+        self._help_button = wx.Button(self, label='Amulet Discord', size=(400, 70))
+        self._help_button.SetFont(button_font)
+        self._help_button.Bind(wx.EVT_BUTTON, self._discord)
+        self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
+
     def _show_world_select(self, evt):
         self.Disable()
         WorldSelectWindow(self._open_world_callback, self.Enable)
 
     def _documentation(self, evt):
         webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/readme.md')
+
+    def _discord(self, evt):
+        webbrowser.open('https://discord.gg/BTm6jnf')
 
     def enable(self):
         self.GetGrandParent().create_menu()
