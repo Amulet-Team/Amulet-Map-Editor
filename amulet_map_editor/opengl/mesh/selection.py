@@ -16,9 +16,10 @@ class RenderSelection(TriMesh):
         self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
         self.verts = numpy.zeros((6*2*3*3, self._vert_len), dtype=numpy.float32)
 
-        self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), ('minecraft', 'missing_no'))
-        self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), ('minecraft', 'missing_no'))
-        self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), ('minecraft', 'missing_no'))
+        missing_no = texture_bounds.get(('minecraft', 'missing_no'), (0, 0, 0, 0))
+        self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
+        self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), missing_no)
+        self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), missing_no)
         self.verts[:, 9:12] = 1
         self.draw_count = 36
         self._draw_mode = GL_TRIANGLES
