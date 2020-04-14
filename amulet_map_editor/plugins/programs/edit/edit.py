@@ -255,7 +255,7 @@ class EditExtension(BaseWorldProgram):
         self._canvas.enable_threads()
 
     def _get_box(self) -> Optional[Selection]:
-        box = self._canvas._selection_box  # TODO: make a way to publicly access this
+        box = self._canvas.selection_box
         if box.select_state == 2:
             return Selection(
                 (SubSelectionBox(

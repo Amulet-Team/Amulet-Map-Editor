@@ -100,6 +100,10 @@ class EditCanvas(glcanvas.GLCanvas):
         self._gc_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
 
+    @property
+    def selection_box(self) -> RenderSelection:
+        return self._selection_box
+
     def enable(self):
         # return
         self.SetCurrent(self._context)
