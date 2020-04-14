@@ -4,7 +4,12 @@ import wx
 from .canvas import EditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
 from amulet_map_editor.amulet_wx.simple import SimpleDialog
-from ..events import CameraMoveEvent
+from ..events import (
+    CameraMoveEvent,
+    BoxGreenCornerChangeEvent,
+    BoxBlueCornerChangeEvent,
+    BoxCoordsEnableEvent
+)
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -136,9 +141,14 @@ class ControllableEditCanvas(EditCanvas):
         if self._selection_box.select_state == 0:
             self._selection_box.point1 = self._selection_box.point2 = location
             self._selection_box.create_geometry()
+            x, y, z = self._selection_box.point1
+            wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
+            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
         elif self._selection_box.select_state == 1:
             self._selection_box.point2 = location
             self._selection_box.create_geometry()
+            x, y, z = self._selection_box.point2
+            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
         elif self._selection_box.select_state == 2:
             self._selection_box2.point1 = self._selection_box2.point2 = location
             self._selection_box2.create_geometry()
@@ -151,6 +161,10 @@ class ControllableEditCanvas(EditCanvas):
             self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
             self._selection_box.create_geometry()
             self._selection_box.select_state = 1
+            x, y, z = self._selection_box.point1
+            wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
+            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
+        wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
 
     def _box_click(self, evt):
         if self.select_mode == 0:
