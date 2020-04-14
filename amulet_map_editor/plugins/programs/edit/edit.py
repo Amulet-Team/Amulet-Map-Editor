@@ -174,11 +174,12 @@ class EditExtension(BaseWorldProgram):
         if self._canvas is None:
             self.Update()
 
-            self._top_panel = FilePanel(self, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
-            self._left_panel = OperationUI(self, self._world, self._run_operation, self._run_main_operation)
-            self._bottom_panel = ToolSelect(self, wx.ID_ANY)
-
             self._canvas = ControllableEditCanvas(self, self._world)
+
+            self._top_panel = FilePanel(self._canvas, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
+            self._left_panel = OperationUI(self._canvas, self._world, self._run_operation, self._run_main_operation)
+            self._bottom_panel = ToolSelect(self._canvas, wx.ID_ANY)
+
             self._top_panel.set_canvas(self._canvas)
             self._left_panel.set_canvas(self._canvas)
 
@@ -186,20 +187,24 @@ class EditExtension(BaseWorldProgram):
             self._left_panel.Hide()
             self._bottom_panel.Hide()
 
+            self.sizer.Add(self._canvas, 0, wx.EXPAND)
+
+            canvas_sizer = wx.BoxSizer(wx.VERTICAL)
+            self._canvas.SetSizer(canvas_sizer)
             bottom_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
             middle_sizer0 = wx.BoxSizer(wx.VERTICAL)
             top_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
             top_sizer0.Add((20, 20), 1, 0, 0)
             top_sizer0.Add(self._top_panel, 0, wx.EXPAND, 0)
-            self.sizer.Add(top_sizer0, 0, wx.EXPAND, 0)
+            canvas_sizer.Add(top_sizer0, 0, wx.EXPAND, 0)
             middle_sizer0.Add((20, 20), 1, 0, 0)
             middle_sizer0.Add(self._left_panel, 0, 0, 0)
             middle_sizer0.Add((20, 20), 1, 0, 0)
-            self.sizer.Add(middle_sizer0, 1, wx.EXPAND, 0)
+            canvas_sizer.Add(middle_sizer0, 1, wx.EXPAND, 0)
             bottom_sizer0.Add((20, 20), 1, 0, 0)
             bottom_sizer0.Add(self._bottom_panel, 0, wx.EXPAND, 0)
             bottom_sizer0.Add((20, 20), 1, 0, 0)
-            self.sizer.Add(bottom_sizer0, 0, wx.EXPAND, 0)
+            canvas_sizer.Add(bottom_sizer0, 0, wx.EXPAND, 0)
 
             self._temp.Destroy()
             self._top_panel.Show()
