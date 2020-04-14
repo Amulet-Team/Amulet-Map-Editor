@@ -4,6 +4,7 @@ import wx
 from .canvas import EditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
 from amulet_map_editor.amulet_wx.simple import SimpleDialog
+from ..events import CameraMoveEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -125,6 +126,7 @@ class ControllableEditCanvas(EditCanvas):
         self._transformation_matrix = None
         self._render_world.camera = self._camera
         self._change_box_location()
+        wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
 
     def _change_box_location(self):
         if self._select_style:
@@ -211,6 +213,7 @@ class ControllableEditCanvas(EditCanvas):
                     self._collision_locations_cache = None
                     self._transformation_matrix = None
                     self._change_box_location()
+                    wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
         event.Skip()
 
     def _on_loss_focus(self, evt):
