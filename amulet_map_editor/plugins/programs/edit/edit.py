@@ -8,7 +8,7 @@ from amulet.api.structure import Structure, structure_buffer
 from amulet.operations.paste import paste
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
+from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 from amulet_map_editor.plugins import operations
 from .operation_ui import SelectOperationUI, SelectDestinationUI
 
@@ -194,16 +194,16 @@ class EditExtension(BaseWorldProgram):
             bottom_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
             middle_sizer0 = wx.BoxSizer(wx.VERTICAL)
             top_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
-            top_sizer0.Add((20, 20), 1, 0, 0)
+            top_sizer0.AddStretchSpacer(1)
             top_sizer0.Add(self._top_panel, 0, wx.EXPAND, 0)
             canvas_sizer.Add(top_sizer0, 0, wx.EXPAND, 0)
-            middle_sizer0.Add((20, 20), 1, 0, 0)
+            middle_sizer0.AddStretchSpacer(1)
             middle_sizer0.Add(self._left_panel, 0, 0, 0)
-            middle_sizer0.Add((20, 20), 1, 0, 0)
+            middle_sizer0.AddStretchSpacer(1)
             canvas_sizer.Add(middle_sizer0, 1, wx.EXPAND, 0)
-            bottom_sizer0.Add((20, 20), 1, 0, 0)
+            bottom_sizer0.AddStretchSpacer(1)
             bottom_sizer0.Add(self._bottom_panel, 0, wx.EXPAND, 0)
-            bottom_sizer0.Add((20, 20), 1, 0, 0)
+            bottom_sizer0.AddStretchSpacer(1)
             canvas_sizer.Add(bottom_sizer0, 0, wx.EXPAND, 0)
 
             self._temp.Destroy()
