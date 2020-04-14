@@ -11,7 +11,7 @@ from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 from amulet_map_editor.plugins import operations
 from .operation_ui import OperationUI
-from .events import EVT_CAMERA_MOVE
+from .events import EVT_CAMERA_MOVE, SelectToolEnabledEvent, OperationToolEnabledEvent
 
 from .canvas.controllable_canvas import ControllableEditCanvas
 
@@ -75,19 +75,29 @@ class FilePanel(wx.Panel):
 
 
 class ToolSelect(wx.Panel):
-    def __init__(self, *args, **kwds):
-        # begin wxGlade: toolSelect.__init__
-        kwds["style"] = kwds.get("style", 0) | wx.BORDER_NONE
-        wx.Panel.__init__(self, *args, **kwds)
-        self.button_6 = wx.Button(self, wx.ID_ANY, "button_6")
-        self.button_7 = wx.Button(self, wx.ID_ANY, "button_7")
+    def __init__(self, canvas):
+        wx.Panel.__init__(self, canvas)
 
-        bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        bottom_sizer.Add(self.button_6, 0, 0, 0)
-        bottom_sizer.Add(self.button_7, 0, 0, 0)
-        self.SetSizer(bottom_sizer)
-        bottom_sizer.Fit(self)
+        self.select_button = wx.Button(self, label="Select")
+        self.select_button.Bind(wx.EVT_BUTTON, self._select_evt)
+        self.operation_button = wx.Button(self, label="Operation")
+        self.operation_button.Bind(wx.EVT_BUTTON, self._operation_evt)
+        
+        # self.import_button = wx.Button(self, label="Import")
+        # self.export_button = wx.Button(self, label="Export")
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.select_button)
+        sizer.Add(self.operation_button)
+        self.SetSizer(sizer)
+        sizer.Fit(self)
         self.Layout()
+
+    def _select_evt(self, evt):
+        wx.PostEvent(self, SelectToolEnabledEvent())
+
+    def _operation_evt(self, evt):
+        wx.PostEvent(self, OperationToolEnabledEvent())
 
 
 class EditExtension(BaseWorldProgram):
@@ -115,7 +125,7 @@ class EditExtension(BaseWorldProgram):
 
             self._file_panel = FilePanel(self._canvas, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
             self._operation_panel = OperationUI(self._canvas, self._world, self._run_operation, self._run_main_operation)
-            self._tool_panel = ToolSelect(self._canvas, wx.ID_ANY)
+            self._tool_panel = ToolSelect(self._canvas)
 
             self._canvas.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
 
