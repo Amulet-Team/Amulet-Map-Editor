@@ -153,7 +153,8 @@ class ControllableEditCanvas(EditCanvas):
             self._selection_box.select_state = 1
 
     def _box_click(self, evt):
-        self.box_select()
+        if self.select_mode == 0:
+            self.box_select()
         evt.Skip()
 
     def _toggle_selection_mode(self, evt):
@@ -166,6 +167,7 @@ class ControllableEditCanvas(EditCanvas):
         self._mouse_lock = False
 
     def _on_mouse_motion(self, evt):
+        self.SetFocus()
         if self._mouse_lock:
             mouse_x, mouse_y = evt.GetPosition()
             dx = mouse_x - self._last_mouse_x

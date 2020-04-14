@@ -125,17 +125,21 @@ class RenderSelection(TriMesh):
         super()._setup()
         self.create_geometry()
 
-    def draw(self, transformation_matrix: numpy.ndarray):
+    def draw(self, transformation_matrix: numpy.ndarray, draw_corners=True):
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
+        draw_count = self.draw_count
+        if not draw_corners:
+            self.draw_count = 36
         super().draw(transformation_matrix)
 
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
-        draw_count = self.draw_count
         self.draw_count = 36
-        for start in range(0, draw_count, 36):
-            self.draw_start = start
-            super().draw(transformation_matrix)
+        super().draw(transformation_matrix)
+        if draw_corners:
+            for start in range(36, draw_count, 36):
+                self.draw_start = start
+                super().draw(transformation_matrix)
         self.draw_count = draw_count
         glEnable(GL_DEPTH_TEST)

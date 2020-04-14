@@ -11,7 +11,7 @@ from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 from amulet_map_editor.plugins import operations
 from .operation_ui import OperationUI
-from .events import EVT_CAMERA_MOVE, SelectToolEnabledEvent, OperationToolEnabledEvent
+from .events import EVT_CAMERA_MOVE, SelectToolEnabledEvent, OperationToolEnabledEvent, EVT_SELECT_TOOL_ENABLED, EVT_OPERATION_TOOL_ENABLED
 
 from .canvas.controllable_canvas import ControllableEditCanvas
 
@@ -74,6 +74,29 @@ class FilePanel(wx.Panel):
         self.GetParent().Layout()
 
 
+class SelectOptions(wx.Panel):
+    def __init__(self, canvas):
+        wx.Panel.__init__(self, canvas)
+        self._canvas = weakref.ref(canvas)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+        button = wx.Button(self, label='hi')
+        sizer.Add(button)
+
+    def enable(self):
+        self._canvas().select_mode = 0
+        self.Show()
+
+"""
+SelectOptions
+OperationOptions
+    SelectOperationOptions
+    SelectAbsoluteLocationOptions
+    # SelectAbsoluteLocationMultipleOptions
+    # SelectCloneOptions
+"""
+
+
 class ToolSelect(wx.Panel):
     def __init__(self, canvas):
         wx.Panel.__init__(self, canvas)
@@ -82,7 +105,7 @@ class ToolSelect(wx.Panel):
         self.select_button.Bind(wx.EVT_BUTTON, self._select_evt)
         self.operation_button = wx.Button(self, label="Operation")
         self.operation_button.Bind(wx.EVT_BUTTON, self._operation_evt)
-        
+
         # self.import_button = wx.Button(self, label="Import")
         # self.export_button = wx.Button(self, label="Export")
 
@@ -107,13 +130,11 @@ class EditExtension(BaseWorldProgram):
         self._canvas: Optional[ControllableEditCanvas] = None
         self._temp = wx.StaticText(self, label='Please wait while the renderer loads')
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        # self.add_object(self._temp)
 
         self._file_panel: Optional[FilePanel] = None
-        self._operation_panel: Optional[OperationUI] = None
+        self._select_options: Optional[SelectOptions] = None
+        self._operation_options: Optional[OperationUI] = None
         self._tool_panel: Optional[ToolSelect] = None
-
-        self._options_button: Optional[wx.Button] = None
 
         self.Bind(wx.EVT_SIZE, self._on_resize)
 
@@ -124,13 +145,17 @@ class EditExtension(BaseWorldProgram):
             self._canvas = ControllableEditCanvas(self, self._world)
 
             self._file_panel = FilePanel(self._canvas, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
-            self._operation_panel = OperationUI(self._canvas, self._world, self._run_operation, self._run_main_operation)
+            self._select_options = SelectOptions(self._canvas)
+            self._operation_options = OperationUI(self._canvas, self._world, self._run_operation, self._run_main_operation)
             self._tool_panel = ToolSelect(self._canvas)
 
             self._canvas.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
+            self._tool_panel.Bind(EVT_SELECT_TOOL_ENABLED, self.show_select_options)
+            self._tool_panel.Bind(EVT_OPERATION_TOOL_ENABLED, self.show_operation_options)
 
             self._file_panel.Hide()
-            self._operation_panel.Hide()
+            self._select_options.Hide()
+            self._operation_options.Hide()
             self._tool_panel.Hide()
 
             self.sizer.Add(self._canvas, 0, wx.EXPAND)
@@ -144,7 +169,8 @@ class EditExtension(BaseWorldProgram):
             top_sizer0.Add(self._file_panel, 0, wx.EXPAND, 0)
             canvas_sizer.Add(top_sizer0, 0, wx.EXPAND, 0)
             middle_sizer0.AddStretchSpacer(1)
-            middle_sizer0.Add(self._operation_panel, 0, 0, 0)
+            middle_sizer0.Add(self._select_options, 0, 0, 0)
+            middle_sizer0.Add(self._operation_options, 0, 0, 0)
             middle_sizer0.AddStretchSpacer(1)
             canvas_sizer.Add(middle_sizer0, 1, wx.EXPAND, 0)
             bottom_sizer0.AddStretchSpacer(1)
@@ -154,7 +180,7 @@ class EditExtension(BaseWorldProgram):
 
             self._temp.Destroy()
             self._file_panel.Show()
-            self._operation_panel.Show()
+            self._select_options.Show()
             self._tool_panel.Show()
 
             self.Layout()
@@ -242,7 +268,7 @@ class EditExtension(BaseWorldProgram):
             return None
 
     def _run_operation(self, evt):
-        operation_path = self._operation_panel.operation
+        operation_path = self._operation_options.operation
         operation = operations.operations[operation_path]
         features = operation.get("features", [])
         operation_input_definitions = operation.get("inputs", [])
@@ -259,7 +285,7 @@ class EditExtension(BaseWorldProgram):
                     elif inp == "options":
                         operation_inputs.append(operations.options.get(operation_path, {}))
 
-                self._operation_panel.Disable()
+                self._operation_options.Disable()
 
                 self._canvas.disable_threads()
                 try:
@@ -271,7 +297,7 @@ class EditExtension(BaseWorldProgram):
                     return
                 self._canvas.enable_threads()
 
-                self._operation_panel.Enable()
+                self._operation_options.Enable()
                 if not isinstance(structure, Structure):
                     wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
                     return
@@ -279,13 +305,13 @@ class EditExtension(BaseWorldProgram):
                 selection = self._get_box()
                 if selection is None:
                     return
-                self._operation_panel.Disable()
+                self._operation_options.Disable()
                 structure = Structure.from_world(self._world, selection, self._canvas.dimension)
-                self._operation_panel.Enable()
+                self._operation_options.Enable()
 
             if "dst_location_absolute" in features:
                 # trigger UI to show select box UI
-                self._operation_panel.enable_select_destination_ui(
+                self._operation_options.enable_select_destination_ui(
                     operation_path,
                     operation["operation"],
                     operation_input_definitions,
@@ -297,9 +323,9 @@ class EditExtension(BaseWorldProgram):
                 raise NotImplementedError
 
         else:
-            self._operation_panel.Disable()
+            self._operation_options.Disable()
             self._run_main_operation(operation_path, operation["operation"], operation_input_definitions)
-            self._operation_panel.Enable()
+            self._operation_options.Enable()
         evt.Skip()
 
     def _run_main_operation(self, operation_path: str, operation: Callable, operation_input_definitions: List[str], options=None, structure=None):
@@ -337,7 +363,7 @@ class EditExtension(BaseWorldProgram):
 
     def _paste(self):
         structure = structure_buffer[-1]
-        self._operation_panel.enable_select_destination_ui(
+        self._operation_options.enable_select_destination_ui(
             None,
             paste,
             ["structure", "options"],
@@ -345,14 +371,12 @@ class EditExtension(BaseWorldProgram):
             {}
         )
 
-    # def _steal_focus_menu(self, evt):
-    #     self._left_panel.SetFocus()
-    #     evt.Skip()
+    def show_select_options(self, _):
+        self._operation_options.Hide()
+        self._select_options.enable()
+        self.Layout()
 
-    # def _steal_focus_operation(self, evt):
-    #     self._operation_ui.SetFocus()
-    #     evt.Skip()
-    #
-    # def _steal_focus_destination(self, evt):
-    #     self._select_destination_ui.SetFocus()
-    #     evt.Skip()
+    def show_operation_options(self, _):
+        self._select_options.Hide()
+        self._operation_options.enable_operation_ui()
+        self.Layout()

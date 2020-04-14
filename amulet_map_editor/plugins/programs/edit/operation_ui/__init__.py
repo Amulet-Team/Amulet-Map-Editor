@@ -42,10 +42,11 @@ class OperationUI(wx.Panel):
     def enable_select_destination_ui(self, operation_path: Any, operation: Callable, operation_input_definitions: List[str], structure: Structure, options: dict):
         self._select_destination_ui.setup(operation_path, operation, operation_input_definitions, structure, options)
         self._hide_all()
+        self.Show()
         self._select_destination_ui.Show()
         self.Fit()
         self._canvas().structure = structure
-        self._canvas().select_mode = 1
+        self._canvas().select_mode = 2
 
     def _destination_select_cancel(self):
         self.enable_operation_ui()
@@ -58,8 +59,9 @@ class OperationUI(wx.Panel):
 
     def enable_operation_ui(self):
         self._hide_all()
+        self.Show()
         self._operation_ui.Show()
-        self._canvas().select_mode = 0
+        self._canvas().select_mode = 1
         self.Fit()
 
     def hide(self):

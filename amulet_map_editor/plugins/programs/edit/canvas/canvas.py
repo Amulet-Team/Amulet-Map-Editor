@@ -74,7 +74,11 @@ class EditCanvas(glcanvas.GLCanvas):
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
         self._select_distance = 10
-        self._select_mode = 0  # 0 is normal box select, 1 is selection place
+        self._select_mode = 0  # 0 is normal box select, 1 is fixed box, 2 is selection place
+        # normal box select = draw box + draw box corners + accept box user inputs
+        # fixed box = draw box
+        # select destination = draw box + draw structure + accept destination user inputs
+
         self._select_style = 1  # 0 is select at fixed distance, 1 is select closest non-air
         self._selection_box = RenderSelection(
             self.context_identifier,
@@ -95,8 +99,6 @@ class EditCanvas(glcanvas.GLCanvas):
 
         self._gc_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
-
-        # world_panel.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
         # return
@@ -353,9 +355,6 @@ class EditCanvas(glcanvas.GLCanvas):
 
         return self._collision_locations_cache
 
-    # def _on_resize(self, event):
-    #     self.set_size(*event.GetSize())
-
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
         if height > 0:
@@ -371,13 +370,13 @@ class EditCanvas(glcanvas.GLCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        if self._select_mode == 1 and self._structure is not None:
+        if self._select_mode == 2 and self._structure is not None:
             transform = numpy.eye(4, dtype=numpy.float32)
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
-        self._selection_box.draw(self.transformation_matrix)
-        if self._selection_box.select_state == 2:
+        self._selection_box.draw(self.transformation_matrix, self._select_mode == 0)
+        if self._selection_box.select_state == 2 and self.select_mode == 0:
             self._selection_box2.draw(self.transformation_matrix)
         self.SwapBuffers()
 
