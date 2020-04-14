@@ -1,6 +1,6 @@
 import wx
 import weakref
-from typing import TYPE_CHECKING, Optional, List, Callable, Any
+from typing import TYPE_CHECKING, Optional, List, Callable
 import webbrowser
 
 from amulet.api.selection import Selection, SubSelectionBox
@@ -19,9 +19,9 @@ if TYPE_CHECKING:
 
 
 class FilePanel(wx.Panel):
-    def __init__(self, parent, world, undo_evt, redo_evt, save_evt, close_evt):
-        wx.Panel.__init__(self, parent)
-        self._canvas = None
+    def __init__(self, canvas, world, undo_evt, redo_evt, save_evt, close_evt):
+        wx.Panel.__init__(self, canvas)
+        self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -50,9 +50,6 @@ class FilePanel(wx.Panel):
         self.SetSizer(top_sizer)
         top_sizer.Fit(self)
         self.Layout()
-
-    def set_canvas(self, canvas):
-        self._canvas = weakref.ref(canvas)
 
     def update_buttons(self):
         self._undo_button.SetLabel(f"Undo | {self._world().chunk_history_manager.undo_count}")
@@ -110,9 +107,6 @@ class EditExtension(BaseWorldProgram):
             self._top_panel = FilePanel(self._canvas, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
             self._left_panel = OperationUI(self._canvas, self._world, self._run_operation, self._run_main_operation)
             self._bottom_panel = ToolSelect(self._canvas, wx.ID_ANY)
-
-            self._top_panel.set_canvas(self._canvas)
-            self._left_panel.set_canvas(self._canvas)
 
             self._top_panel.Hide()
             self._left_panel.Hide()

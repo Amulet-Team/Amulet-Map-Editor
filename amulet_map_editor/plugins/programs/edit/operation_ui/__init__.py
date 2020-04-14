@@ -1,17 +1,19 @@
 import wx
 import weakref
-from typing import Optional, Any, Callable
+from typing import Optional, Any, Callable, List
+
+from amulet.api.structure import Structure
 
 from .select_destination import SelectDestinationUI
 from .select_operation import SelectOperationUI
 
 
 class OperationUI(wx.Panel):
-    def __init__(self, parent, world, run_operation, run_main_operation):
-        wx.Panel.__init__(self, parent)
+    def __init__(self, canvas, world, run_operation, run_main_operation):
+        wx.Panel.__init__(self, canvas)
 
         self._world = weakref.ref(world)
-        self._canvas = None
+        self._canvas = weakref.ref(canvas)
         self._run_main_operation = run_main_operation
 
         middle_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -24,7 +26,8 @@ class OperationUI(wx.Panel):
         self._select_destination_ui: Optional[SelectDestinationUI] = SelectDestinationUI(
             self,
             self._destination_select_cancel,
-            self._destination_select_confirm
+            self._destination_select_confirm,
+            canvas.structure_locations
         )
         middle_sizer.Add(self._select_destination_ui)
         # self._select_destination_ui.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_destination)
@@ -35,10 +38,6 @@ class OperationUI(wx.Panel):
         self.SetSizer(middle_sizer)
         middle_sizer.Fit(self)
         self.Layout()
-
-    def set_canvas(self, canvas):
-        self._canvas = weakref.ref(canvas)
-        self._select_destination_ui.bind_locations(canvas.structure_locations)
 
     def enable_select_destination_ui(self, operation_path: Any, operation: Callable, operation_input_definitions: List[str], structure: Structure, options: dict):
         self._select_destination_ui.setup(operation_path, operation, operation_input_definitions, structure, options)
