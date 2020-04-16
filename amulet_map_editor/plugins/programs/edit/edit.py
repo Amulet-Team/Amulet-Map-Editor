@@ -1,10 +1,13 @@
 import wx
 import weakref
 from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
+from types import GeneratorType
 import webbrowser
+import time
 
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure, structure_buffer
+from amulet.api.data_types import OperationType, OperationReturnType
 from amulet.operations.paste import paste
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
@@ -197,6 +200,32 @@ class ToolSelect(wx.Panel):
         wx.PostEvent(self, OperationToolEnabledEvent())
 
 
+def show_loading_dialog(run: Callable[[], OperationReturnType], title: str, message: str, parent: wx.Window) -> Any:
+    dialog = wx.ProgressDialog(title, message, parent=parent, style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE)
+    t = time.time()
+    try:
+        obj = run()
+        if isinstance(obj, GeneratorType):
+            try:
+                while True:
+                    progress = next(obj)
+                    if isinstance(progress, (list, tuple)):
+                        if len(progress) >= 2:
+                            message = progress[1]
+                        if len(progress) >= 1:
+                            progress = progress[0]
+                    if isinstance(progress, (int, float)) and isinstance(message, str):
+                        dialog.Update(min(max(0, progress), 99.99), message)
+            except StopIteration as e:
+                obj = e.value
+    except Exception as e:
+        dialog.Destroy()
+        raise e
+    time.sleep(max(0.2-time.time()+t, 0))
+    dialog.Destroy()
+    return obj
+
+
 class EditExtension(BaseWorldProgram):
     def __init__(self, parent, world: 'World'):
         super().__init__(parent, wx.VERTICAL)
@@ -363,7 +392,12 @@ class EditExtension(BaseWorldProgram):
 
                 self._canvas.disable_threads()
                 try:
-                    structure = self._world.run_operation(operation["structure_callable"], self._canvas.dimension, *operation_inputs, create_undo=False)
+                    structure = show_loading_dialog(
+                        lambda: operation["structure_callable"](self._world, self._canvas.dimension, *operation_inputs),
+                        f'Running structure operation for {operation["name"]}.',
+                        'Please wait for the operation to finish.',
+                        self
+                    )
                 except Exception as e:
                     wx.MessageBox(f"Error running structure operation: {e}")
                     self._world.restore_last_undo_point()
@@ -380,7 +414,12 @@ class EditExtension(BaseWorldProgram):
                 if selection is None:
                     return
                 self._operation_options.Disable()
-                structure = Structure.from_world(self._world, selection, self._canvas.dimension)
+                structure = show_loading_dialog(
+                    lambda: Structure.from_world(self._world, selection, self._canvas.dimension),
+                    f'Running structure operation for {operation["name"]}.',
+                    'Copying structure from world.',
+                    self
+                )
                 self._operation_options.Enable()
 
             if "dst_location_absolute" in features:
@@ -402,7 +441,7 @@ class EditExtension(BaseWorldProgram):
             self._operation_options.Enable()
         evt.Skip()
 
-    def _run_main_operation(self, operation_path: str, operation: Callable, operation_input_definitions: List[str], options=None, structure=None):
+    def _run_main_operation(self, operation_path: str, operation: OperationType, operation_input_definitions: List[str], options=None, structure=None):
         operation_inputs = []
         for inp in operation_input_definitions:
             if inp == "src_selection":
@@ -421,7 +460,13 @@ class EditExtension(BaseWorldProgram):
 
         self._canvas.disable_threads()
         try:
-            self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)
+            show_loading_dialog(
+                lambda: operation(self._world, self._canvas.dimension, *operation_inputs),
+                f'Running Operation ?.',
+                'Please wait for the operation to finish.',
+                self
+            )
+            self._world.create_undo_point()
             self._file_panel.update_buttons()
         except Exception as e:
             wx.MessageBox(f"Error running operation: {e}")
@@ -432,7 +477,12 @@ class EditExtension(BaseWorldProgram):
         selection = self._get_box()
         if selection is None:
             return
-        structure = Structure.from_world(self._world, selection, self._canvas.dimension)
+        structure = show_loading_dialog(
+            lambda: Structure.from_world(self._world, selection, self._canvas.dimension),
+            f'Copying selection.',
+            '',
+            self
+        )
         structure_buffer.append(structure)
 
     def _paste(self):
