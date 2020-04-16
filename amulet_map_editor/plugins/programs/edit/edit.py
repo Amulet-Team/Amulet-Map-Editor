@@ -436,14 +436,16 @@ class EditExtension(BaseWorldProgram):
         structure_buffer.append(structure)
 
     def _paste(self):
-        structure = structure_buffer[-1]
-        self._operation_options.enable_select_destination_ui(
-            None,
-            paste,
-            ["structure", "options"],
-            structure,
-            {}
-        )
+        if structure_buffer:
+            self.show_operation_options(None)
+            structure = structure_buffer[-1]
+            self._operation_options.enable_select_destination_ui(
+                None,
+                paste,
+                ["structure", "options"],
+                structure,
+                {}
+            )
 
     def show_select_options(self, _):
         self._operation_options.Hide()
