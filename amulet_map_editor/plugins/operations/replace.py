@@ -4,6 +4,7 @@ import numpy
 
 from amulet.api.block import Block
 from amulet.api.selection import Selection
+from amulet.api.data_types import Dimension
 from amulet_map_editor.amulet_wx.block_select import BlockDefine
 from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimplePanel
 
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 def replace(
     world: "World",
-    dimension: int,
+    dimension: Dimension,
     selection: Selection,
     options: dict
 ):
@@ -29,6 +30,9 @@ def replace(
 
     original_block_matches = []
     universal_block_count = 0
+
+    iter_count = len(list(world.get_chunk_slices(selection, dimension)))
+    count = 0
 
     for chunk, slices, _ in world.get_chunk_slices(selection, dimension):
         if universal_block_count < len(world.palette):
@@ -50,6 +54,9 @@ def replace(
         blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
         chunk.blocks[slices] = blocks
         chunk.changed = True
+
+        count += 1
+        yield 100 * count / iter_count
 
 
 def show_ui(parent, world: "World", options: dict) -> dict:
