@@ -287,10 +287,10 @@ class EditExtension(BaseWorldProgram):
             self._tool_panel.Show()
 
             self.Layout()
-        self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
-        self._canvas.draw()
         self._canvas.Update()
         self._canvas.enable()
+        self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
+        self._canvas.draw()
         self._file_panel.change_dimension()
 
     def disable(self):
