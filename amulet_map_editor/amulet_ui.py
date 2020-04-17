@@ -114,8 +114,8 @@ class AmuletMainWindow(wx.Frame):
         self._disable_enable()
 
     def _show_open_world(self):
-        self.Disable()
-        WorldSelectWindow(self._open_world, self.Enable)
+        select_world = WorldSelectWindow(self, self._open_world)
+        select_world.ShowModal()
 
     def _open_world(self, path: str):
         """Open a world panel add add it to the notebook"""
@@ -215,8 +215,8 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
         self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
 
     def _show_world_select(self, evt):
-        self.Disable()
-        WorldSelectWindow(self._open_world_callback, self.Enable)
+        select_world = WorldSelectWindow(self, self._open_world_callback)
+        select_world.ShowModal()
 
     def _documentation(self, evt):
         webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/readme.md')

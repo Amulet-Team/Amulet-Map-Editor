@@ -88,8 +88,8 @@ class ConvertExtension(BaseWorldProgram):
         webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/plugins/programs/convert/readme.md")
 
     def _show_world_select(self, evt):
-        self.Disable()
-        WorldSelectWindow(self._output_world_callback, self.Enable)
+        select_world = WorldSelectWindow(self, self._output_world_callback)
+        select_world.ShowModal()
 
     def _output_world_callback(self, path):
         if path == self.world.world_path:
