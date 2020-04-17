@@ -2,12 +2,14 @@ import wx
 from wx import glcanvas
 from OpenGL.GL import *
 import os
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import uuid
 import numpy
 import math
+import time
 
 import minecraft_model_reader
+from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
 
@@ -292,28 +294,39 @@ class EditCanvas(glcanvas.GLCanvas):
 
     def _collision_location_closest(self) -> numpy.ndarray:
         """Find the location of the closests non-air block"""
-        # TODO: optimise this
+        cx: Optional[int] = None
+        cz: Optional[int] = None
+        chunk: Optional[Chunk] = None
+        t = time.time()
+        location = numpy.array([0, 0, 0], dtype=numpy.int32)
         for location in self._collision_locations():
-            try:
-                if self._render_world.world.get_block(*location, self._render_world.dimension).namespaced_name != 'universal_minecraft:air':
-                    return location
-            except IndexError:
-                continue
-            except ChunkLoadError:
-                continue
-        return self._collision_locations()[-1]
+            x, y, z = location
+            cx_ = x >> 4
+            cz_ = z >> 4
+            if cx is None or cx != cx_ or cz != cz_:
+                cx = cx_
+                cz = cz_
+                try:
+                    chunk = self._render_world.world.get_chunk(cx, cz)
+                except ChunkLoadError:
+                    chunk = None
+
+            if chunk is not None and self._render_world.world.palette[chunk.blocks[x%16, y, z%16]].namespaced_name != 'universal_minecraft:air':
+                print(time.time()-t)
+                return location
+        print(time.time() - t)
+        return location
 
     def _collision_location_distance(self, distance) -> numpy.ndarray:
         distance = distance ** 2
         locations = self._collision_locations()
         camera = numpy.array(self._camera[:3], dtype=numpy.int)
-        block = next((loc for loc in locations if sum((abs(loc - camera) + 0.5) ** 2) >= distance), None)
-        if block is None:
-            return locations[-1]
-        else:
-            return block
+        return next(
+            (loc for loc in locations if sum((abs(loc - camera) + 0.5) ** 2) >= distance),
+            numpy.array([0, 0, 0], dtype=numpy.int32)
+        )
 
-    def _collision_locations(self) -> numpy.ndarray:
+    def _collision_locations(self) -> Generator[numpy.ndarray, None, None]:
         if self._collision_locations_cache is None:
             look_vector = numpy.array([0, 0, -1, 0])
             if not self._mouse_lock:
@@ -357,7 +370,8 @@ class EditCanvas(glcanvas.GLCanvas):
             else:
                 self._collision_locations_cache = start.astype(numpy.int)
 
-        return self._collision_locations_cache
+        for location in self._collision_locations_cache:
+            yield location
 
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
