@@ -100,6 +100,9 @@ class EditCanvas(glcanvas.GLCanvas):
         self._gc_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
 
+        self._rebuild_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
+
     @property
     def selection_box(self) -> RenderSelection:
         return self._selection_box
@@ -111,11 +114,13 @@ class EditCanvas(glcanvas.GLCanvas):
         self._draw_timer.Start(33)
         self._input_timer.Start(33)
         self._gc_timer.Start(10000)
+        self._rebuild_timer.Start(1000)
 
     def disable(self):
         self._draw_timer.Stop()
         self._input_timer.Stop()
         self._gc_timer.Stop()
+        self._rebuild_timer.Stop()
         self._render_world.disable()
 
     def disable_threads(self):
@@ -395,3 +400,7 @@ class EditCanvas(glcanvas.GLCanvas):
     def _gc(self, event):
         self._render_world.run_garbage_collector()
         event.Skip()
+
+    def _rebuild(self, evt):
+        self._render_world.chunk_manager.rebuild()
+        evt.Skip()
