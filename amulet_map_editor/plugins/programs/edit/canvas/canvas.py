@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import uuid
 import numpy
 import math
-import time
 
 import minecraft_model_reader
 from amulet.api.chunk import Chunk
@@ -70,7 +69,6 @@ class EditCanvas(glcanvas.GLCanvas):
         )
 
         self._transformation_matrix: Optional[numpy.ndarray] = None
-        self._collision_locations_cache: Optional[numpy.ndarray] = None
         self._camera = [0, 150, 0, 90, 0]
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera_move_speed = 2
@@ -297,7 +295,6 @@ class EditCanvas(glcanvas.GLCanvas):
         cx: Optional[int] = None
         cz: Optional[int] = None
         chunk: Optional[Chunk] = None
-        t = time.time()
         location = numpy.array([0, 0, 0], dtype=numpy.int32)
         for location in self._collision_locations():
             x, y, z = location
@@ -312,9 +309,7 @@ class EditCanvas(glcanvas.GLCanvas):
                     chunk = None
 
             if chunk is not None and self._render_world.world.palette[chunk.blocks[x%16, y, z%16]].namespaced_name != 'universal_minecraft:air':
-                print(time.time()-t)
                 return location
-        print(time.time() - t)
         return location
 
     def _collision_location_distance(self, distance) -> numpy.ndarray:
@@ -327,50 +322,49 @@ class EditCanvas(glcanvas.GLCanvas):
         )
 
     def _collision_locations(self) -> Generator[numpy.ndarray, None, None]:
-        if self._collision_locations_cache is None:
-            look_vector = numpy.array([0, 0, -1, 0])
-            if not self._mouse_lock:
-                screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
-                screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
-                screen_dy = atan(cos(screen_dx) * tan(self.fov/2) * self._mouse_delta_y/screen_y)
-                look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
-            look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
-            look_vector[abs(look_vector) < 0.000001] = 0.000001
-            dx, dy, dz = look_vector
-            max_distance = 100
+        look_vector = numpy.array([0, 0, -1, 0])
+        if not self._mouse_lock:
+            screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
+            screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
+            screen_dy = atan(cos(screen_dx) * tan(self.fov/2) * self._mouse_delta_y/screen_y)
+            look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
+        look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
+        look_vector[abs(look_vector) < 0.000001] = 0.000001
+        dx, dy, dz = look_vector
+        max_distance = 100
 
-            vectors = numpy.array(
-                [
-                    look_vector / abs(dx),
-                    look_vector / abs(dy),
-                    look_vector / abs(dz)
-                ]
-            )
-            offsets = -numpy.eye(3)
+        vectors = numpy.array(
+            [
+                look_vector / abs(dx),
+                look_vector / abs(dy),
+                look_vector / abs(dz)
+            ]
+        )
+        offsets = -numpy.eye(3)
 
-            locations = set()
-            start: numpy.ndarray = numpy.array(self._camera[:3], numpy.float32) % 1
+        locations = set()
+        start: numpy.ndarray = numpy.array(self._camera[:3], numpy.float32) % 1
 
-            for axis in range(3):
-                location: numpy.ndarray = start.copy()
-                vector = vectors[axis]
-                offset = offsets[axis]
-                if vector[axis] > 0:
-                    location = location + vector * (1 - location[axis])
-                else:
-                    location = location + vector * location[axis]
-                while numpy.all(abs(location) < max_distance):
-                    locations.add(tuple(numpy.floor(location).astype(numpy.int)))
-                    locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
-                    location += vector
-            if locations:
-                self._collision_locations_cache = numpy.array(
-                    sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
-                ) + numpy.floor(self._camera[:3]).astype(numpy.int)
+        for axis in range(3):
+            location: numpy.ndarray = start.copy()
+            vector = vectors[axis]
+            offset = offsets[axis]
+            if vector[axis] > 0:
+                location = location + vector * (1 - location[axis])
             else:
-                self._collision_locations_cache = start.astype(numpy.int)
+                location = location + vector * location[axis]
+            while numpy.all(abs(location) < max_distance):
+                locations.add(tuple(numpy.floor(location).astype(numpy.int)))
+                locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
+                location += vector
+        if locations:
+            collision_locations = numpy.array(
+                sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
+            ) + numpy.floor(self._camera[:3]).astype(numpy.int)
+        else:
+            collision_locations = start.astype(numpy.int)
 
-        for location in self._collision_locations_cache:
+        for location in collision_locations:
             yield location
 
     def set_size(self, width, height):

@@ -83,7 +83,6 @@ class ControllableEditCanvas(EditCanvas):
             self._mouse_delta_x = 0
             self._mouse_delta_y = 0
             self._mouse_lock = True
-            self._collision_locations_cache = None
             self._change_box_location()
 
     def _process_inputs(self, evt):
@@ -116,7 +115,6 @@ class ControllableEditCanvas(EditCanvas):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
             if not self._mouse_lock and self._mouse_moved:
                 self._mouse_moved = False
-                self._collision_locations_cache = None
                 self._change_box_location()
             return
         self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + sin(self._camera[4]) * forward)
@@ -127,7 +125,6 @@ class ControllableEditCanvas(EditCanvas):
         if not -90 <= self._camera[3] <= 90:
             self._camera[3] = max(min(self._camera[3], 90), -90)
         self._camera[4] += self._camera_rotate_speed * yaw
-        self._collision_locations_cache = None
         self._transformation_matrix = None
         self._render_world.camera = self._camera
         self._change_box_location()
@@ -226,7 +223,6 @@ class ControllableEditCanvas(EditCanvas):
                 location = show_goto(self, *self._camera[:3])
                 if location:
                     self._camera[:3] = location
-                    self._collision_locations_cache = None
                     self._transformation_matrix = None
                     self._change_box_location()
                     wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
