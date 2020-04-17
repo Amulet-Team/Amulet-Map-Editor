@@ -353,7 +353,16 @@ class EditExtension(BaseWorldProgram):
 
     def _save_world(self):
         self._canvas.disable_threads()
-        self._world.save()
+
+        def save():
+            for chunk_index, chunk_count in self._world.save_iter():
+                yield 100 * chunk_index / chunk_count
+        show_loading_dialog(
+            lambda: save(),
+            f'Saving world.',
+            'Please wait.',
+            self
+        )
         self._file_panel.update_buttons()
         self._canvas.enable_threads()
 
