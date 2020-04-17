@@ -5,10 +5,12 @@ from types import GeneratorType
 import webbrowser
 import time
 
+from amulet.api.block import Block
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure, structure_buffer
 from amulet.api.data_types import OperationType, OperationReturnType
 from amulet.operations.paste import paste
+from amulet.operations.fill import fill
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
@@ -22,7 +24,8 @@ from .events import (
     EVT_OPERATION_TOOL_ENABLED,
     EVT_BOX_GREEN_CORNER_CHANGE,
     EVT_BOX_BLUE_CORNER_CHANGE,
-    EVT_BOX_COORDS_ENABLE
+    EVT_BOX_COORDS_ENABLE,
+    EVT_DELETE
 )
 
 from .canvas.controllable_canvas import ControllableEditCanvas
@@ -253,6 +256,7 @@ class EditExtension(BaseWorldProgram):
             self._tool_panel = ToolSelect(self._canvas)
 
             self._canvas.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
+            self._canvas.Bind(EVT_DELETE, self._delete)
             self._tool_panel.Bind(EVT_SELECT_TOOL_ENABLED, self.show_select_options)
             self._tool_panel.Bind(EVT_OPERATION_TOOL_ENABLED, self.show_operation_options)
 
@@ -505,6 +509,18 @@ class EditExtension(BaseWorldProgram):
                 structure,
                 {}
             )
+
+    def _delete(self, evt):
+        selection = self._get_box()
+        if selection is None:
+            return
+        show_loading_dialog(
+            lambda: fill(self._world, self._canvas.dimension, selection, {"fill_block": Block("universal_minecraft", "air")}),
+            f'Deleting selection.',
+            '',
+            self
+        )
+        evt.Skip()
 
     def show_select_options(self, _):
         self._operation_options.Hide()

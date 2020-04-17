@@ -8,7 +8,8 @@ from ..events import (
     CameraMoveEvent,
     BoxGreenCornerChangeEvent,
     BoxBlueCornerChangeEvent,
-    BoxCoordsEnableEvent
+    BoxCoordsEnableEvent,
+    DeleteEvent
 )
 
 if TYPE_CHECKING:
@@ -218,6 +219,8 @@ class ControllableEditCanvas(EditCanvas):
         self._keys_pressed.add(key)
         if key == wx.WXK_ESCAPE:
             self._escape()
+        elif key == wx.WXK_DELETE:
+            wx.PostEvent(self, DeleteEvent())
         if event.ControlDown() and key != wx.WXK_CONTROL:
             if key == 71:
                 location = show_goto(self, *self._camera[:3])
