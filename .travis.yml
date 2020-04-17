@@ -43,6 +43,8 @@ deploy:
   - provider: releases
     api_key: $GITHUB_TOKEN
     name: "Amulet $TRAVIS_TAG"
+    draft: true
+    prerelease: true
     skip_cleanup: true
     file_glob: true
     file: '*.zip'
