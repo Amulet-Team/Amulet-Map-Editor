@@ -327,6 +327,8 @@ class EditExtension(BaseWorldProgram):
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
 
     def menu(self, menu: MenuData) -> MenuData:
+        menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save\tCtrl+s', lambda evt: self._save_world())
+        # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Undo\tCtrl+z', lambda evt: self._world.undo())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Redo\tCtrl+y', lambda evt: self._world.redo())
         # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
