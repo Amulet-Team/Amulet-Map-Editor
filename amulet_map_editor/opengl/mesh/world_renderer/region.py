@@ -16,7 +16,7 @@ class ChunkManager:
         # which causes issues due to dictionaries resizing
         self._chunk_temp: queue.Queue = queue.Queue()
         self._chunk_temp_set = set()
-        self.chunk_rebuilds = set()
+        self._rebuild_regions = []
 
     def add_render_chunk(self, render_chunk: RenderChunk):
         """Add a RenderChunk to the database.
@@ -73,9 +73,7 @@ class ChunkManager:
             max_rx, max_rz = self.region_coords(*safe_area[2:])
             delete_regions = []
             for region in self._regions.values():
-                if min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz:
-                    region.rebuild()
-                else:
+                if not (min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz):
                     region.unload()
                     delete_regions.append((region.rx, region.rz))
 
@@ -83,10 +81,15 @@ class ChunkManager:
                 del self._regions[region]
 
     def rebuild(self):
-        """Force a rebuild of the region geometry from the chunk geometry
-        Useful to force an update rather than wait for the next unload call."""
-        for region in self._regions.values():
-            region.rebuild()
+        """Rebuild a single region which was last rebuild the longest ago.
+        Put this on a semi-fast clock to rebuild all regions."""
+        if not self._rebuild_regions:
+            self._rebuild_regions = list(self._regions.keys())
+
+        if self._rebuild_regions:
+            region = self._rebuild_regions.pop(0)
+            if region in self._regions:
+                self._regions[region].rebuild()
 
 
 class RenderRegion(TriMesh):

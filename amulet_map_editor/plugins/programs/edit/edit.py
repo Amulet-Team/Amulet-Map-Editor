@@ -1,401 +1,301 @@
 import wx
 import weakref
-import numpy
 from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
+from types import GeneratorType
 import webbrowser
+import time
 
+from amulet.api.block import Block
 from amulet.api.selection import Selection, SubSelectionBox
 from amulet.api.structure import Structure, structure_buffer
+from amulet.api.data_types import OperationType, OperationReturnType
 from amulet.operations.paste import paste
+from amulet.operations.fill import fill
 
-from amulet_map_editor import log
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
+from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 from amulet_map_editor.plugins import operations
+from .operation_ui import OperationUI
+from .events import (
+    EVT_CAMERA_MOVE,
+    SelectToolEnabledEvent,
+    EVT_SELECT_TOOL_ENABLED,
+    OperationToolEnabledEvent,
+    EVT_OPERATION_TOOL_ENABLED,
+    EVT_BOX_GREEN_CORNER_CHANGE,
+    EVT_BOX_BLUE_CORNER_CHANGE,
+    EVT_BOX_COORDS_ENABLE,
+    EVT_DELETE
+)
 
-from .controllable_canvas import ControllableEditCanvas
+from .canvas.controllable_canvas import ControllableEditCanvas
 
 if TYPE_CHECKING:
     from amulet.api.world import World
 
 
-class OperationUI(SimplePanel):
-    def __init__(self, parent, world: 'World', run_operation: Callable):
-        super().__init__(parent)
+class FilePanel(wx.Panel):
+    def __init__(self, canvas, world, undo_evt, redo_evt, save_evt, close_evt):
+        wx.Panel.__init__(self, canvas)
+        self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
-        self._operation_choice = SimpleChoiceAny(self)
-        self._operation_choice.SetItems({key: value["name"] for key, value in operations.operations.items()})
-        self._operation_choice.Bind(wx.EVT_CHOICE, self._operation_selection_change)
-        self.add_object(self._operation_choice, 0)
-        self._options_button = wx.Button(
-            self,
-            label="Change Options"
-        )
-        run_button = wx.Button(
-            self,
-            label="Run Operation"
-        )
-        self._options_button.Bind(wx.EVT_BUTTON, self._change_options)
-        run_button.Bind(wx.EVT_BUTTON, run_operation)
-        self.add_object(self._options_button, 0)
-        self.add_object(run_button, 0)
-        self._operation_selection_change_()
 
-    @property
-    def operation(self) -> str:
-        return self._operation_choice.GetAny()
+        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-    def _operation_selection_change(self, evt):
-        self._operation_selection_change_()
+        self._location_label = wx.StaticText(self, label="x, y, z")
+        top_sizer.Add(self._location_label, 0, wx.ALL | wx.CENTER, 5)
+
+        dim_label = wx.StaticText(self, label="Dimension:")
+        self._dim_options = SimpleChoiceAny(self)
+        self._dim_options.SetItems(dict(zip(self._world().world_wrapper.dimensions.values(), self._world().world_wrapper.dimensions.keys())))
+        self._dim_options.SetValue("overworld")
+        self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
+
+        top_sizer.Add(dim_label, 0, wx.ALL | wx.CENTER, 5)
+        top_sizer.Add(self._dim_options, 0, wx.ALL | wx.CENTER, 5)
+
+        def create_button(text, operation):
+            button = wx.Button(self, label=text)
+            button.Bind(wx.EVT_BUTTON, operation)
+            top_sizer.Add(button, 0, wx.ALL, 5)
+            return button
+
+        self._undo_button: Optional[wx.Button] = create_button('Undo', undo_evt)
+        self._redo_button: Optional[wx.Button] = create_button('Redo', redo_evt)
+        self._save_button: Optional[wx.Button] = create_button('Save', save_evt)
+        create_button('Close', close_evt)
+        self.update_buttons()
+
+        self.SetSizer(top_sizer)
+        top_sizer.Fit(self)
+        self.Layout()
+
+    def update_buttons(self):
+        self._undo_button.SetLabel(f"Undo | {self._world().chunk_history_manager.undo_count}")
+        self._redo_button.SetLabel(f"Redo | {self._world().chunk_history_manager.redo_count}")
+        self._save_button.SetLabel(f"Save | {self._world().chunk_history_manager.unsaved_changes}")
+
+    def _on_dimension_change(self, evt):
+        self.change_dimension()
         evt.Skip()
 
-    def _operation_selection_change_(self):
-        operation_path = self._operation_choice.GetAny()
-        operation = operations.operations[operation_path]
-        if "options" in operation.get("features", []) or "wxoptions" in operation.get("features", []):
-            self._options_button.Enable()
-        else:
-            self._options_button.Disable()
+    def change_dimension(self):
+        dimension = self._dim_options.GetAny()
+        self._canvas().dimension = dimension
 
-    def _change_options(self, evt):
-        operation_path = self._operation_choice.GetAny()
-        operation = operations.operations[operation_path]
-        if "options" in operation.get("features", []):
-            pass  # TODO: implement this
-        elif "wxoptions" in operation.get("features", []):
-            options = operation["wxoptions"](self, self._world(), operations.options.get(operation_path, {}))
-            if isinstance(options, dict):
-                operations.options[operation_path] = options
-            else:
-                log.error(f"Plugin {operation['name']} at {operation_path} did not return options in a valid format")
-        evt.Skip()
+    def move_event(self, evt):
+        self._location_label.SetLabel(f'{evt.x:.2f}, {evt.y:.2f}, {evt.z:.2f}')
+        self.Layout()
+        self.GetParent().Layout()
 
 
-class SelectDestinationUI(SimplePanel):
-    def __init__(self, parent, cancel_callback, confirm_callback, locations: List[numpy.ndarray]):
-        super().__init__(parent)
-        self._cancel_callback = cancel_callback
-        self._confirm_callback = confirm_callback
-        self._locations = locations
+class SelectOptions(wx.Panel):
+    def __init__(self, canvas):
+        wx.Panel.__init__(self, canvas)
+        self._canvas = weakref.ref(canvas)
+        self._sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self._sizer)
 
-        self._operation_path: Optional[str] = None
-        self._operation: Optional[Callable] = None
-        self._operation_input_definitions: Optional[List[str]] = None
-        self._structure: Optional[Structure] = None
-        self._options: Optional[dict] = None
+        self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._z1: wx.SpinCtrl = self._add_row('z1', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
+        self._y1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
+        self._z1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
 
-        self._x: wx.SpinCtrl = self._add_row('x', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._y: wx.SpinCtrl = self._add_row('y', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._z: wx.SpinCtrl = self._add_row('z', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._copy_air: wx.CheckBox = self._add_row('Copy Air', wx.CheckBox)
-        self._x.Bind(wx.EVT_SPINCTRL, self._on_location_change)
-        self._y.Bind(wx.EVT_SPINCTRL, self._on_location_change)
-        self._z.Bind(wx.EVT_SPINCTRL, self._on_location_change)
+        self._x2: wx.SpinCtrl = self._add_row('x2', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._y2: wx.SpinCtrl = self._add_row('y2', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._z2: wx.SpinCtrl = self._add_row('z2', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
+        self._y2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
+        self._z2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
 
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.add_object(sizer, 0, 0)
-        self._cancel = wx.Button(self, label="Cancel")
-        sizer.Add(self._cancel, flag=wx.CENTER, border=5)
-        self._confirm = wx.Button(self, label="Confirm")
-        sizer.Add(self._confirm, flag=wx.CENTER, border=5)
+        self._x1.Disable()
+        self._y1.Disable()
+        self._z1.Disable()
+        self._x2.Disable()
+        self._y2.Disable()
+        self._z2.Disable()
 
-        self._cancel.Bind(wx.EVT_BUTTON, self._on_cancel)
-        self._confirm.Bind(wx.EVT_BUTTON, self._on_confirm)
+        self._x1.SetBackgroundColour((160, 215, 145))
+        self._y1.SetBackgroundColour((160, 215, 145))
+        self._z1.SetBackgroundColour((160, 215, 145))
 
-    def setup(self, operation_path: Any, operation: Callable, operation_input_definitions: List[str], structure: Structure, options: dict):
-        self._operation_path = operation_path
-        self._operation = operation
-        self._operation_input_definitions = operation_input_definitions
-        self._structure = structure
-        self._locations.clear()
-        self._locations.append(structure.selection.min)
-        self._x.SetValue(structure.selection.min[0])
-        self._y.SetValue(structure.selection.min[1])
-        self._z.SetValue(structure.selection.min[2])
-        self._copy_air.SetValue(options.get('copy_air', False))
-        self._options = options
+        self._x2.SetBackgroundColour((150, 150, 215))
+        self._y2.SetBackgroundColour((150, 150, 215))
+        self._z2.SetBackgroundColour((150, 150, 215))
+
+        self._canvas().Bind(EVT_BOX_GREEN_CORNER_CHANGE, self._green_corner_renderer_change)
+        self._canvas().Bind(EVT_BOX_BLUE_CORNER_CHANGE, self._blue_corner_renderer_change)
+        self._canvas().Bind(EVT_BOX_COORDS_ENABLE, self._enable_scrolls)
+
+    def enable(self):
+        self._canvas().select_mode = 0
+        self.Show()
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.add_object(sizer, 0, 0)
+        self._sizer.Add(sizer, 0, 0)
         name_text = wx.StaticText(self, label=label)
-        sizer.Add(name_text, flag=wx.CENTER | wx.ALL, border=5)
+        sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
         obj = wx_object(self, **kwargs)
         sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
         return obj
 
-    def _on_location_change(self, evt):
-        self._locations[-1] = numpy.array([self._x.GetValue(), self._y.GetValue(), self._z.GetValue()])
+    def _green_corner_input_change(self, _):
+        self._canvas().selection_box.point1 = [self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()]
 
-    def _on_cancel(self, evt):
-        self._cancel_callback()
+    def _blue_corner_input_change(self, _):
+        self._canvas().selection_box.point2 = [self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()]
 
-    def _on_confirm(self, evt):
-        self._options['location'] = (self._x.GetValue(), self._y.GetValue(), self._z.GetValue())
-        self._options['copy_air'] = self._copy_air.GetValue()
-        self._confirm_callback(
-            self._operation_path,
-            self._operation,
-            self._operation_input_definitions,
-            options=self._options,
-            structure=self._structure
-        )
+    def _green_corner_renderer_change(self, evt):
+        self._x1.SetValue(evt.x)
+        self._y1.SetValue(evt.y)
+        self._z1.SetValue(evt.z)
+
+    def _blue_corner_renderer_change(self, evt):
+        self._x2.SetValue(evt.x)
+        self._y2.SetValue(evt.y)
+        self._z2.SetValue(evt.z)
+
+    def _enable_scrolls(self, evt):
+        self._x1.Enable(evt.enabled)
+        self._y1.Enable(evt.enabled)
+        self._z1.Enable(evt.enabled)
+        self._x2.Enable(evt.enabled)
+        self._y2.Enable(evt.enabled)
+        self._z2.Enable(evt.enabled)
+
+
+"""
+SelectOptions
+OperationOptions
+    SelectOperationOptions
+    SelectAbsoluteLocationOptions
+    # SelectAbsoluteLocationMultipleOptions
+    # SelectCloneOptions
+"""
+
+
+class ToolSelect(wx.Panel):
+    def __init__(self, canvas):
+        wx.Panel.__init__(self, canvas)
+
+        self.select_button = wx.Button(self, label="Select")
+        self.select_button.Bind(wx.EVT_BUTTON, self._select_evt)
+        self.operation_button = wx.Button(self, label="Operation")
+        self.operation_button.Bind(wx.EVT_BUTTON, self._operation_evt)
+
+        # self.import_button = wx.Button(self, label="Import")
+        # self.export_button = wx.Button(self, label="Export")
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.select_button)
+        sizer.Add(self.operation_button)
+        self.SetSizer(sizer)
+        sizer.Fit(self)
+        self.Layout()
+
+    def _select_evt(self, evt):
+        wx.PostEvent(self, SelectToolEnabledEvent())
+
+    def _operation_evt(self, evt):
+        wx.PostEvent(self, OperationToolEnabledEvent())
+
+
+def show_loading_dialog(run: Callable[[], OperationReturnType], title: str, message: str, parent: wx.Window) -> Any:
+    dialog = wx.ProgressDialog(title, message, parent=parent, style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE)
+    t = time.time()
+    try:
+        obj = run()
+        if isinstance(obj, GeneratorType):
+            try:
+                while True:
+                    progress = next(obj)
+                    if isinstance(progress, (list, tuple)):
+                        if len(progress) >= 2:
+                            message = progress[1]
+                        if len(progress) >= 1:
+                            progress = progress[0]
+                    if isinstance(progress, (int, float)) and isinstance(message, str):
+                        dialog.Update(min(max(0, progress), 99.99), message)
+            except StopIteration as e:
+                obj = e.value
+    except Exception as e:
+        dialog.Destroy()
+        raise e
+    time.sleep(max(0.2-time.time()+t, 0))
+    dialog.Destroy()
+    return obj
 
 
 class EditExtension(BaseWorldProgram):
     def __init__(self, parent, world: 'World'):
-        super().__init__(parent, wx.HORIZONTAL)
+        super().__init__(parent, wx.VERTICAL)
         self._world = world
         self._canvas: Optional[ControllableEditCanvas] = None
-        self._temp = wx.StaticText(
-            self,
-            wx.ID_ANY,
-            'Please wait while the renderer loads',
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-        )
-        self._menu: Optional[SimplePanel] = None
-        self._operation_ui: Optional[OperationUI] = None
-        self._select_destination_ui: Optional[SelectDestinationUI] = None
-        self._menu_buttons: List[wx.Button] = []
-        self._dim_options: Optional[SimpleChoiceAny] = None
-        self._options_button: Optional[wx.Button] = None
-        self._undo_button: Optional[wx.Button] = None
-        self._redo_button: Optional[wx.Button] = None
-        self._save_button: Optional[wx.Button] = None
+        self._temp = wx.StaticText(self, label='Please wait while the renderer loads')
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+
+        self._file_panel: Optional[FilePanel] = None
+        self._select_options: Optional[SelectOptions] = None
+        self._operation_options: Optional[OperationUI] = None
+        self._tool_panel: Optional[ToolSelect] = None
+
         self.Bind(wx.EVT_SIZE, self._on_resize)
-
-    def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Undo\tCtrl+z', lambda evt: self._world.undo())
-        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Redo\tCtrl+y', lambda evt: self._world.redo())
-        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
-        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy\tCtrl+c', lambda evt: self._copy())
-        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste\tCtrl+v', lambda evt: self._paste())
-        menu.setdefault('&Help', {}).setdefault('control', {}).setdefault('Controls', lambda evt: self._help_controls())
-        return menu
-
-    def _help_controls(self):
-        webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/plugins/programs/edit/readme.md")
-
-    def _on_resize(self, event):
-        if self._canvas is not None:
-            self._canvas.SetSize(self.GetSize()[0], self.GetSize()[1])
-        event.Skip()
-
-    def _undo_event(self, evt):
-        self._world.undo()
-        self._update_buttons()
-
-    def _redo_event(self, evt):
-        self._world.redo()
-        self._update_buttons()
-
-    def _update_buttons(self):
-        self._undo_button.SetLabel(f"Undo | {self._world.chunk_history_manager.undo_count}")
-        self._redo_button.SetLabel(f"Redo | {self._world.chunk_history_manager.redo_count}")
-        self._save_button.SetLabel(f"Save | {self._world.chunk_history_manager.unsaved_changes}")
-
-    def _save_event(self, evt):
-        self._save_world()
-
-    def _save_world(self):
-        self._canvas.disable_threads()
-        self._world.save()
-        self._update_buttons()
-        self._canvas.enable_threads()
-
-    def _get_box(self) -> Optional[Selection]:
-        box = self._canvas._selection_box  # TODO: make a way to publicly access this
-        if box.select_state == 2:
-            return Selection(
-                (SubSelectionBox(
-                    box.min,
-                    box.max
-                ),)
-            )
-        else:
-            wx.MessageBox("You must select an area of the world before running this operation")
-            return None
-
-    def _enable_operation_ui(self):
-        self._select_destination_ui.Hide()
-        self._operation_ui.Show()
-        self._canvas.select_mode = 0
-        self._menu.Fit()
-
-    def _enable_select_destination_ui(self, structure: Structure):
-        self._operation_ui.Hide()
-        self._select_destination_ui.Show()
-        self._menu.Fit()
-        self._canvas.structure = structure
-        self._canvas.select_mode = 1
-
-    def _run_operation(self, evt):
-        operation_path = self._operation_ui.operation
-        operation = operations.operations[operation_path]
-        features = operation.get("features", [])
-        operation_input_definitions = operation.get("inputs", [])
-        if any(feature in features for feature in ("dst_location_absolute", )):
-            if "structure_callable" in operation:
-                operation_inputs = []
-                for inp in operation.get("structure_callable_inputs", []):
-                    if inp == "src_selection":
-                        selection = self._get_box()
-                        if selection is None:
-                            return
-                        operation_inputs.append(selection)
-
-                    elif inp == "options":
-                        operation_inputs.append(operations.options.get(operation_path, {}))
-
-                self._operation_ui.Disable()
-
-                self._canvas.disable_threads()
-                try:
-                    structure = self._world.run_operation(operation["structure_callable"], self._canvas.dimension, *operation_inputs, create_undo=False)
-                except Exception as e:
-                    wx.MessageBox(f"Error running structure operation: {e}")
-                    self._world.restore_last_undo_point()
-                    self._canvas.enable_threads()
-                    return
-                self._canvas.enable_threads()
-
-                self._operation_ui.Enable()
-                if not isinstance(structure, Structure):
-                    wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
-                    return
-            else:
-                selection = self._get_box()
-                if selection is None:
-                    return
-                self._operation_ui.Disable()
-                structure = Structure.from_world(self._world, selection, self._canvas.dimension)
-                self._operation_ui.Enable()
-
-            if "dst_location_absolute" in features:
-                # trigger UI to show select box UI
-                self._select_destination_ui.setup(
-                    operation_path,
-                    operation["operation"],
-                    operation_input_definitions,
-                    structure,
-                    operations.options.get(operation_path, {})
-                )
-                self._enable_select_destination_ui(structure)
-            else:
-                # trigger UI to show select box multiple UI
-                raise NotImplementedError
-
-        else:
-            self._operation_ui.Disable()
-            self._run_main_operation(operation_path, operation["operation"], operation_input_definitions)
-            self._operation_ui.Enable()
-        evt.Skip()
-
-    def _destination_select_cancel(self):
-        self._enable_operation_ui()
-
-    def _destination_select_confirm(self, *args, **kwargs):
-        self._select_destination_ui.Disable()
-        self._run_main_operation(*args, **kwargs)
-        self._select_destination_ui.Enable()
-        self._enable_operation_ui()
-
-    def _run_main_operation(self, operation_path: str, operation: Callable, operation_input_definitions: List[str], options=None, structure=None):
-        operation_inputs = []
-        for inp in operation_input_definitions:
-            if inp == "src_selection":
-                selection = self._get_box()
-                if selection is None:
-                    return
-                operation_inputs.append(selection)
-            elif inp == "structure":
-                operation_inputs.append(structure)
-            elif inp == "options":
-                if options:
-                    operations.options[operation_path] = options
-                    operation_inputs.append(options)
-                else:
-                    operation_inputs.append(operations.options.get(operation_path, {}))
-
-        self._canvas.disable_threads()
-        try:
-            self._world.run_operation(operation, self._canvas.dimension, *operation_inputs)
-            self._update_buttons()
-        except Exception as e:
-            wx.MessageBox(f"Error running operation: {e}")
-            self._world.restore_last_undo_point()
-        self._canvas.enable_threads()
 
     def enable(self):
         if self._canvas is None:
             self.Update()
-            self._menu = SimplePanel(self)
-            self._menu.Hide()
-            self.add_object(self._menu, 0, wx.EXPAND)
-            self._menu.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_menu)
 
-            dim_label = wx.StaticText(self._menu, label="Dimension:")
-            self._dim_options = SimpleChoiceAny(self._menu)
-            self._dim_options.SetItems(dict(zip(self._world.world_wrapper.dimensions.values(), self._world.world_wrapper.dimensions.keys())))
-            self._dim_options.SetValue("overworld")
-            self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
-
-            sizer = wx.BoxSizer(wx.HORIZONTAL)
-            sizer.Add(dim_label, 0, wx.ALL, 5)
-            sizer.Add(self._dim_options, 0, wx.ALL, 5)
-            self._menu.add_object(sizer, 0)
-
-            def create_button(text, operation):
-                button = wx.Button(
-                    self._menu,
-                    label=text
-                )
-                button.Bind(wx.EVT_BUTTON, operation)
-                self._menu.add_object(button, 0)
-                self._menu_buttons.append(
-                    button
-                )
-                return button
-            self._undo_button = create_button('Undo', self._undo_event)
-            self._redo_button = create_button('Redo', self._redo_event)
-            self._save_button = create_button('Save', self._save_event)
-            create_button('Close', self._close_world)
-            self._update_buttons()
-
-            self._operation_ui = OperationUI(self._menu, self._world, self._run_operation)
-            self._menu.add_object(self._operation_ui, options=0)
-            self._operation_ui.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_operation)
-            self._operation_ui.Layout()
-            self._operation_ui.Fit()
             self._canvas = ControllableEditCanvas(self, self._world)
-            self._select_destination_ui = SelectDestinationUI(
-                self._menu,
-                self._destination_select_cancel,
-                self._destination_select_confirm,
-                self._canvas.structure_locations
-            )
-            self._menu.add_object(self._select_destination_ui, options=0)
-            self._select_destination_ui.Bind(wx.EVT_ENTER_WINDOW, self._steal_focus_destination)
-            self._select_destination_ui.Layout()
-            self._select_destination_ui.Fit()
-            self._select_destination_ui.Hide()
 
-            self.add_object(self._canvas, 0, wx.EXPAND)
+            self._file_panel = FilePanel(self._canvas, self._world, self._undo_event, self._redo_event, self._save_event, self._close_world)
+            self._select_options = SelectOptions(self._canvas)
+            self._operation_options = OperationUI(self._canvas, self._world, self._run_operation, self._run_main_operation)
+            self._tool_panel = ToolSelect(self._canvas)
+
+            self._canvas.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
+            self._canvas.Bind(EVT_DELETE, self._delete)
+            self._tool_panel.Bind(EVT_SELECT_TOOL_ENABLED, self.show_select_options)
+            self._tool_panel.Bind(EVT_OPERATION_TOOL_ENABLED, self.show_operation_options)
+
+            self._file_panel.Hide()
+            self._select_options.Hide()
+            self._operation_options.Hide()
+            self._tool_panel.Hide()
+
+            self.sizer.Add(self._canvas, 0, wx.EXPAND)
+
+            canvas_sizer = wx.BoxSizer(wx.VERTICAL)
+            self._canvas.SetSizer(canvas_sizer)
+            bottom_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
+            middle_sizer0 = wx.BoxSizer(wx.VERTICAL)
+            top_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
+            top_sizer0.AddStretchSpacer(1)
+            top_sizer0.Add(self._file_panel, 0, wx.EXPAND, 0)
+            canvas_sizer.Add(top_sizer0, 0, wx.EXPAND, 0)
+            middle_sizer0.AddStretchSpacer(1)
+            middle_sizer0.Add(self._select_options, 0, 0, 0)
+            middle_sizer0.Add(self._operation_options, 0, 0, 0)
+            middle_sizer0.AddStretchSpacer(1)
+            canvas_sizer.Add(middle_sizer0, 1, wx.EXPAND, 0)
+            bottom_sizer0.AddStretchSpacer(1)
+            bottom_sizer0.Add(self._tool_panel, 0, wx.EXPAND, 0)
+            bottom_sizer0.AddStretchSpacer(1)
+            canvas_sizer.Add(bottom_sizer0, 0, wx.EXPAND, 0)
+
             self._temp.Destroy()
-            self._menu.Show()
+            self._file_panel.Show()
+            self._select_options.Show()
+            self._tool_panel.Show()
 
-            self.GetParent().Layout()
-            self._menu.Layout()
-            self._menu.Fit()
-            self.Update()
-        self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
-        self._canvas.draw()
+            self.Layout()
         self._canvas.Update()
         self._canvas.enable()
-        self._change_dimension()
+        self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
+        self._canvas.draw()
+        self._file_panel.change_dimension()
 
     def disable(self):
         if self._canvas is not None:
@@ -426,40 +326,210 @@ class EditExtension(BaseWorldProgram):
                 return
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
 
+    def menu(self, menu: MenuData) -> MenuData:
+        menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save\tCtrl+s', lambda evt: self._save_world())
+        # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Undo\tCtrl+z', lambda evt: self._world.undo())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Redo\tCtrl+y', lambda evt: self._world.redo())
+        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy\tCtrl+c', lambda evt: self._copy())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste\tCtrl+v', lambda evt: self._paste())
+        menu.setdefault('&Help', {}).setdefault('control', {}).setdefault('Controls', lambda evt: self._help_controls())
+        return menu
+
+    @staticmethod
+    def _help_controls():
+        webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/plugins/programs/edit/readme.md")
+
+    def _on_resize(self, event):
+        if self._canvas is not None:
+            self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
+        event.Skip()
+
+    def _undo_event(self, _):
+        self._world.undo()
+        self._file_panel.update_buttons()
+
+    def _redo_event(self, _):
+        self._world.redo()
+        self._file_panel.update_buttons()
+
+    def _save_event(self, _):
+        self._save_world()
+
+    def _save_world(self):
+        self._canvas.disable_threads()
+
+        def save():
+            for chunk_index, chunk_count in self._world.save_iter():
+                yield 100 * chunk_index / chunk_count
+        show_loading_dialog(
+            lambda: save(),
+            f'Saving world.',
+            'Please wait.',
+            self
+        )
+        self._file_panel.update_buttons()
+        self._canvas.enable_threads()
+
+    def _get_box(self) -> Optional[Selection]:
+        box = self._canvas.selection_box
+        if box.select_state == 2:
+            return Selection(
+                (SubSelectionBox(
+                    box.min,
+                    box.max
+                ),)
+            )
+        else:
+            wx.MessageBox("You must select an area of the world before running this operation")
+            return None
+
+    def _run_operation(self, evt):
+        operation_path = self._operation_options.operation
+        operation = operations.operations[operation_path]
+        features = operation.get("features", [])
+        operation_input_definitions = operation.get("inputs", [])
+        if any(feature in features for feature in ("dst_location_absolute", )):
+            if "structure_callable" in operation:
+                operation_inputs = []
+                for inp in operation.get("structure_callable_inputs", []):
+                    if inp == "src_selection":
+                        selection = self._get_box()
+                        if selection is None:
+                            return
+                        operation_inputs.append(selection)
+
+                    elif inp == "options":
+                        operation_inputs.append(operations.options.get(operation_path, {}))
+
+                self._operation_options.Disable()
+
+                self._canvas.disable_threads()
+                try:
+                    structure = show_loading_dialog(
+                        lambda: operation["structure_callable"](self._world, self._canvas.dimension, *operation_inputs),
+                        f'Running structure operation for {operation["name"]}.',
+                        'Please wait for the operation to finish.',
+                        self
+                    )
+                except Exception as e:
+                    wx.MessageBox(f"Error running structure operation: {e}")
+                    self._world.restore_last_undo_point()
+                    self._canvas.enable_threads()
+                    return
+                self._canvas.enable_threads()
+
+                self._operation_options.Enable()
+                if not isinstance(structure, Structure):
+                    wx.MessageBox("Object returned from structure_callable was not a Structure. Aborting.")
+                    return
+            else:
+                selection = self._get_box()
+                if selection is None:
+                    return
+                self._operation_options.Disable()
+                structure = show_loading_dialog(
+                    lambda: Structure.from_world(self._world, selection, self._canvas.dimension),
+                    f'Running structure operation for {operation["name"]}.',
+                    'Copying structure from world.',
+                    self
+                )
+                self._operation_options.Enable()
+
+            if "dst_location_absolute" in features:
+                # trigger UI to show select box UI
+                self._operation_options.enable_select_destination_ui(
+                    operation_path,
+                    operation["operation"],
+                    operation_input_definitions,
+                    structure,
+                    operations.options.get(operation_path, {})
+                )
+            else:
+                # trigger UI to show select box multiple UI
+                raise NotImplementedError
+
+        else:
+            self._operation_options.Disable()
+            self._run_main_operation(operation_path, operation["operation"], operation_input_definitions)
+            self._operation_options.Enable()
+        evt.Skip()
+
+    def _run_main_operation(self, operation_path: str, operation: OperationType, operation_input_definitions: List[str], options=None, structure=None):
+        operation_inputs = []
+        for inp in operation_input_definitions:
+            if inp == "src_selection":
+                selection = self._get_box()
+                if selection is None:
+                    return
+                operation_inputs.append(selection)
+            elif inp == "structure":
+                operation_inputs.append(structure)
+            elif inp == "options":
+                if options:
+                    operations.options[operation_path] = options
+                    operation_inputs.append(options)
+                else:
+                    operation_inputs.append(operations.options.get(operation_path, {}))
+
+        self._canvas.disable_threads()
+        try:
+            show_loading_dialog(
+                lambda: operation(self._world, self._canvas.dimension, *operation_inputs),
+                f'Running Operation ?.',
+                'Please wait for the operation to finish.',
+                self
+            )
+            self._world.create_undo_point()
+            self._file_panel.update_buttons()
+        except Exception as e:
+            wx.MessageBox(f"Error running operation: {e}")
+            self._world.restore_last_undo_point()
+        self._canvas.enable_threads()
+
     def _copy(self):
         selection = self._get_box()
         if selection is None:
             return
-        structure = Structure.from_world(self._world, selection, self._canvas.dimension)
+        structure = show_loading_dialog(
+            lambda: Structure.from_world(self._world, selection, self._canvas.dimension),
+            f'Copying selection.',
+            '',
+            self
+        )
         structure_buffer.append(structure)
 
     def _paste(self):
-        structure = structure_buffer[-1]
-        self._select_destination_ui.setup(
-            None,
-            paste,
-            ["structure", "options"],
-            structure,
-            {}
+        if structure_buffer:
+            self.show_operation_options(None)
+            structure = structure_buffer[-1]
+            self._operation_options.enable_select_destination_ui(
+                None,
+                paste,
+                ["structure", "options"],
+                structure,
+                {}
+            )
+
+    def _delete(self, evt):
+        selection = self._get_box()
+        if selection is None:
+            return
+        show_loading_dialog(
+            lambda: fill(self._world, self._canvas.dimension, selection, {"fill_block": Block("universal_minecraft", "air")}),
+            f'Deleting selection.',
+            '',
+            self
         )
-        self._enable_select_destination_ui(structure)
-
-    def _on_dimension_change(self, evt):
-        self._change_dimension()
         evt.Skip()
 
-    def _change_dimension(self):
-        dimension = self._dim_options.GetAny()
-        self._canvas.dimension = dimension
+    def show_select_options(self, _):
+        self._operation_options.Hide()
+        self._select_options.enable()
+        self.Layout()
 
-    def _steal_focus_menu(self, evt):
-        self._menu.SetFocus()
-        evt.Skip()
-
-    def _steal_focus_operation(self, evt):
-        self._operation_ui.SetFocus()
-        evt.Skip()
-
-    def _steal_focus_destination(self, evt):
-        self._select_destination_ui.SetFocus()
-        evt.Skip()
+    def show_operation_options(self, _):
+        self._select_options.Hide()
+        self._operation_options.enable_operation_ui()
+        self.Layout()

@@ -4,6 +4,7 @@ import wx
 from amulet.operations.fill import fill
 from amulet.api.selection import Selection
 from amulet.api.block import Block
+from amulet.api.data_types import Dimension
 from amulet_map_editor.amulet_wx.block_select import BlockDefine
 from amulet_map_editor.amulet_wx.simple import SimpleDialog
 
@@ -13,12 +14,12 @@ if TYPE_CHECKING:
 
 def fill_(
     world: "World",
-    dimension: int,
+    dimension: Dimension,
     selection_box: Selection,
     options: dict
 ):
     if isinstance(options.get('fill_block'), Block):
-        fill(world, dimension, selection_box, options)
+        yield from fill(world, dimension, selection_box, options)
     else:
         wx.MessageBox('Please specify a block before running the fill operation')
 

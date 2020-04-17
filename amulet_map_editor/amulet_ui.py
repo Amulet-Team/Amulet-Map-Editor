@@ -30,6 +30,7 @@ class AmuletMainWindow(wx.Frame):
             | wx.CLIP_CHILDREN
             | wx.RESIZE_BORDER,
         )
+        self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)  # TODO: work out proper localisation
         icon = wx.Icon()
         icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.path.dirname(__file__), 'img', 'icon64.png'), wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
@@ -113,8 +114,8 @@ class AmuletMainWindow(wx.Frame):
         self._disable_enable()
 
     def _show_open_world(self):
-        self.Disable()
-        WorldSelectWindow(self._open_world, self.Enable)
+        select_world = WorldSelectWindow(self, self._open_world)
+        select_world.ShowModal()
 
     def _open_world(self, path: str):
         """Open a world panel add add it to the notebook"""
@@ -208,12 +209,20 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
         self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
         self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
 
+        self._help_button = wx.Button(self, label='Amulet Discord', size=(400, 70))
+        self._help_button.SetFont(button_font)
+        self._help_button.Bind(wx.EVT_BUTTON, self._discord)
+        self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
+
     def _show_world_select(self, evt):
-        self.Disable()
-        WorldSelectWindow(self._open_world_callback, self.Enable)
+        select_world = WorldSelectWindow(self, self._open_world_callback)
+        select_world.ShowModal()
 
     def _documentation(self, evt):
         webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/readme.md')
+
+    def _discord(self, evt):
+        webbrowser.open('https://discord.gg/BTm6jnf')
 
     def enable(self):
         self.GetGrandParent().create_menu()

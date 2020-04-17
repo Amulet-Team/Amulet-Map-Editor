@@ -16,9 +16,10 @@ class RenderSelection(TriMesh):
         self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
         self.verts = numpy.zeros((6*2*3*3, self._vert_len), dtype=numpy.float32)
 
-        self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), ('minecraft', 'missing_no'))
-        self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), ('minecraft', 'missing_no'))
-        self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), ('minecraft', 'missing_no'))
+        missing_no = texture_bounds.get(('minecraft', 'missing_no'), (0, 0, 0, 0))
+        self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
+        self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), missing_no)
+        self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), missing_no)
         self.verts[:, 9:12] = 1
         self.draw_count = 36
         self._draw_mode = GL_TRIANGLES
@@ -124,17 +125,21 @@ class RenderSelection(TriMesh):
         super()._setup()
         self.create_geometry()
 
-    def draw(self, transformation_matrix: numpy.ndarray):
+    def draw(self, transformation_matrix: numpy.ndarray, draw_corners=True):
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
+        draw_count = self.draw_count
+        if not draw_corners:
+            self.draw_count = 36
         super().draw(transformation_matrix)
 
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
-        draw_count = self.draw_count
         self.draw_count = 36
-        for start in range(0, draw_count, 36):
-            self.draw_start = start
-            super().draw(transformation_matrix)
+        super().draw(transformation_matrix)
+        if draw_corners:
+            for start in range(36, draw_count, 36):
+                self.draw_start = start
+                super().draw(transformation_matrix)
         self.draw_count = draw_count
         glEnable(GL_DEPTH_TEST)

@@ -3,11 +3,18 @@ import wx
 
 from .canvas import EditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimplePanel
+from amulet_map_editor.amulet_wx.simple import SimpleDialog
+from ..events import (
+    CameraMoveEvent,
+    BoxGreenCornerChangeEvent,
+    BoxBlueCornerChangeEvent,
+    BoxCoordsEnableEvent,
+    DeleteEvent
+)
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from .edit import EditExtension
+    from amulet_map_editor.plugins.programs.edit.edit import EditExtension
 
 
 key_map = {
@@ -77,7 +84,6 @@ class ControllableEditCanvas(EditCanvas):
             self._mouse_delta_x = 0
             self._mouse_delta_y = 0
             self._mouse_lock = True
-            self._collision_locations_cache = None
             self._change_box_location()
 
     def _process_inputs(self, evt):
@@ -110,7 +116,6 @@ class ControllableEditCanvas(EditCanvas):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
             if not self._mouse_lock and self._mouse_moved:
                 self._mouse_moved = False
-                self._collision_locations_cache = None
                 self._change_box_location()
             return
         self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + sin(self._camera[4]) * forward)
@@ -121,10 +126,10 @@ class ControllableEditCanvas(EditCanvas):
         if not -90 <= self._camera[3] <= 90:
             self._camera[3] = max(min(self._camera[3], 90), -90)
         self._camera[4] += self._camera_rotate_speed * yaw
-        self._collision_locations_cache = None
         self._transformation_matrix = None
         self._render_world.camera = self._camera
         self._change_box_location()
+        wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
 
     def _change_box_location(self):
         if self._select_style:
@@ -134,9 +139,14 @@ class ControllableEditCanvas(EditCanvas):
         if self._selection_box.select_state == 0:
             self._selection_box.point1 = self._selection_box.point2 = location
             self._selection_box.create_geometry()
+            x, y, z = self._selection_box.point1
+            wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
+            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
         elif self._selection_box.select_state == 1:
             self._selection_box.point2 = location
             self._selection_box.create_geometry()
+            x, y, z = self._selection_box.point2
+            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
         elif self._selection_box.select_state == 2:
             self._selection_box2.point1 = self._selection_box2.point2 = location
             self._selection_box2.create_geometry()
@@ -149,9 +159,14 @@ class ControllableEditCanvas(EditCanvas):
             self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
             self._selection_box.create_geometry()
             self._selection_box.select_state = 1
+            x, y, z = self._selection_box.point1
+            wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
+            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
+        wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
 
     def _box_click(self, evt):
-        self.box_select()
+        if self.select_mode == 0:
+            self.box_select()
         evt.Skip()
 
     def _toggle_selection_mode(self, evt):
@@ -164,6 +179,7 @@ class ControllableEditCanvas(EditCanvas):
         self._mouse_lock = False
 
     def _on_mouse_motion(self, evt):
+        self.SetFocus()
         if self._mouse_lock:
             mouse_x, mouse_y = evt.GetPosition()
             dx = mouse_x - self._last_mouse_x
@@ -203,14 +219,16 @@ class ControllableEditCanvas(EditCanvas):
         self._keys_pressed.add(key)
         if key == wx.WXK_ESCAPE:
             self._escape()
+        elif key == wx.WXK_DELETE:
+            wx.PostEvent(self, DeleteEvent())
         if event.ControlDown() and key != wx.WXK_CONTROL:
             if key == 71:
                 location = show_goto(self, *self._camera[:3])
                 if location:
                     self._camera[:3] = location
-                    self._collision_locations_cache = None
                     self._transformation_matrix = None
                     self._change_box_location()
+                    wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
         event.Skip()
 
     def _on_loss_focus(self, evt):

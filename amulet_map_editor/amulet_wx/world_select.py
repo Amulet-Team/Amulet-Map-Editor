@@ -277,19 +277,17 @@ class WorldSelectAndRecentUI(simple.SimplePanel):
         self._open_world_callback(path)
 
 
-class WorldSelectWindow(wx.Frame):
-    def __init__(self, open_world_callback: Callable[[str], None], close_callback: Callable[[], None]):
-        wx.Frame.__init__(
-            self,
-            None,
-            id=wx.ID_ANY,
+class WorldSelectWindow(wx.Dialog):
+    def __init__(self, parent: wx.Window, open_world_callback: Callable[[str], None]):
+        super().__init__(
+            parent,
             title="World Select",
-            pos=wx.DefaultPosition,
-            size=wx.Size(560, 400),
+            pos=wx.Point(0, 0),
+            size=wx.Size(*[int(s*0.99) for s in parent.GetSize()]),
             style=wx.CAPTION
             | wx.CLOSE_BOX
             | wx.MAXIMIZE_BOX
-            | wx.MAXIMIZE
+            # | wx.MAXIMIZE
             | wx.SYSTEM_MENU
             | wx.TAB_TRAVERSAL
             | wx.CLIP_CHILDREN
@@ -298,16 +296,18 @@ class WorldSelectWindow(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self._hide_event)
 
         self._open_world_callback = open_world_callback
-        self._close_callback = close_callback
         self.world_select = WorldSelectAndRecentUI(self, self._run_callback)
-        self.Show()
 
     def _run_callback(self, path):
-        self.Hide()
+        self._close()
         self._open_world_callback(path)
-        self._close_callback()
-        self.Destroy()
 
     def _hide_event(self, evt):
-        self._close_callback()
+        self._close()
         evt.Skip()
+
+    def _close(self):
+        if self.IsModal():
+            self.EndModal(0)
+        else:
+            self.Close()

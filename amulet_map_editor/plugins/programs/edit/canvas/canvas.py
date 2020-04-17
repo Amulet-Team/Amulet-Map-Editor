@@ -2,12 +2,13 @@ import wx
 from wx import glcanvas
 from OpenGL.GL import *
 import os
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import uuid
 import numpy
 import math
 
 import minecraft_model_reader
+from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
 
@@ -19,7 +20,7 @@ from amulet_map_editor import log
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from .edit import EditExtension
+    from amulet_map_editor.plugins.programs.edit.edit import EditExtension
 
 
 class EditCanvas(glcanvas.GLCanvas):
@@ -50,7 +51,7 @@ class EditCanvas(glcanvas.GLCanvas):
         self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
 
         self._load_resource_pack(
-            minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), 'amulet_resource_pack')),
+            minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), '..', 'amulet_resource_pack')),
             minecraft_model_reader.java_vanilla_latest,
             *[minecraft_model_reader.JavaRP(rp) for rp in os.listdir('resource_packs') if os.path.isdir(rp)],
             minecraft_model_reader.java_vanilla_fix
@@ -68,13 +69,16 @@ class EditCanvas(glcanvas.GLCanvas):
         )
 
         self._transformation_matrix: Optional[numpy.ndarray] = None
-        self._collision_locations_cache: Optional[numpy.ndarray] = None
         self._camera = [0, 150, 0, 90, 0]
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
         self._select_distance = 10
-        self._select_mode = 0  # 0 is normal box select, 1 is selection place
+        self._select_mode = 0  # 0 is normal box select, 1 is fixed box, 2 is selection place
+        # normal box select = draw box + draw box corners + accept box user inputs
+        # fixed box = draw box
+        # select destination = draw box + draw structure + accept destination user inputs
+
         self._select_style = 1  # 0 is select at fixed distance, 1 is select closest non-air
         self._selection_box = RenderSelection(
             self.context_identifier,
@@ -96,19 +100,27 @@ class EditCanvas(glcanvas.GLCanvas):
         self._gc_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
 
-        world_panel.Bind(wx.EVT_SIZE, self._on_resize)
+        self._rebuild_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
+
+    @property
+    def selection_box(self) -> RenderSelection:
+        return self._selection_box
 
     def enable(self):
+        # return
         self.SetCurrent(self._context)
         self._render_world.enable()
         self._draw_timer.Start(33)
         self._input_timer.Start(33)
         self._gc_timer.Start(10000)
+        self._rebuild_timer.Start(1000)
 
     def disable(self):
         self._draw_timer.Stop()
         self._input_timer.Stop()
         self._gc_timer.Stop()
+        self._rebuild_timer.Stop()
         self._render_world.disable()
 
     def disable_threads(self):
@@ -285,75 +297,80 @@ class EditCanvas(glcanvas.GLCanvas):
 
     def _collision_location_closest(self) -> numpy.ndarray:
         """Find the location of the closests non-air block"""
-        # TODO: optimise this
+        cx: Optional[int] = None
+        cz: Optional[int] = None
+        chunk: Optional[Chunk] = None
+        location = numpy.array([0, 0, 0], dtype=numpy.int32)
         for location in self._collision_locations():
-            try:
-                if self._render_world.world.get_block(*location, self._render_world.dimension).namespaced_name != 'universal_minecraft:air':
-                    return location
-            except IndexError:
-                continue
-            except ChunkLoadError:
-                continue
-        return self._collision_locations()[-1]
+            x, y, z = location
+            cx_ = x >> 4
+            cz_ = z >> 4
+            if cx is None or cx != cx_ or cz != cz_:
+                cx = cx_
+                cz = cz_
+                try:
+                    chunk = self._render_world.world.get_chunk(cx, cz)
+                except ChunkLoadError:
+                    chunk = None
+
+            if chunk is not None and self._render_world.world.palette[chunk.blocks[x%16, y, z%16]].namespaced_name != 'universal_minecraft:air':
+                return location
+        return location
 
     def _collision_location_distance(self, distance) -> numpy.ndarray:
         distance = distance ** 2
         locations = self._collision_locations()
         camera = numpy.array(self._camera[:3], dtype=numpy.int)
-        block = next((loc for loc in locations if sum((abs(loc - camera) + 0.5) ** 2) >= distance), None)
-        if block is None:
-            return locations[-1]
-        else:
-            return block
+        return next(
+            (loc for loc in locations if sum((abs(loc - camera) + 0.5) ** 2) >= distance),
+            numpy.array([0, 0, 0], dtype=numpy.int32)
+        )
 
-    def _collision_locations(self) -> numpy.ndarray:
-        if self._collision_locations_cache is None:
-            look_vector = numpy.array([0, 0, -1, 0])
-            if not self._mouse_lock:
-                screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
-                screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
-                screen_dy = atan(cos(screen_dx) * tan(self.fov/2) * self._mouse_delta_y/screen_y)
-                look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
-            look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
-            look_vector[abs(look_vector) < 0.000001] = 0.000001
-            dx, dy, dz = look_vector
-            max_distance = 100
+    def _collision_locations(self) -> Generator[numpy.ndarray, None, None]:
+        look_vector = numpy.array([0, 0, -1, 0])
+        if not self._mouse_lock:
+            screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
+            screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
+            screen_dy = atan(cos(screen_dx) * tan(self.fov/2) * self._mouse_delta_y/screen_y)
+            look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
+        look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
+        look_vector[abs(look_vector) < 0.000001] = 0.000001
+        dx, dy, dz = look_vector
+        max_distance = 100
 
-            vectors = numpy.array(
-                [
-                    look_vector / abs(dx),
-                    look_vector / abs(dy),
-                    look_vector / abs(dz)
-                ]
-            )
-            offsets = -numpy.eye(3)
+        vectors = numpy.array(
+            [
+                look_vector / abs(dx),
+                look_vector / abs(dy),
+                look_vector / abs(dz)
+            ]
+        )
+        offsets = -numpy.eye(3)
 
-            locations = set()
-            start: numpy.ndarray = numpy.array(self._camera[:3], numpy.float32) % 1
+        locations = set()
+        start: numpy.ndarray = numpy.array(self._camera[:3], numpy.float32) % 1
 
-            for axis in range(3):
-                location: numpy.ndarray = start.copy()
-                vector = vectors[axis]
-                offset = offsets[axis]
-                if vector[axis] > 0:
-                    location = location + vector * (1 - location[axis])
-                else:
-                    location = location + vector * location[axis]
-                while numpy.all(abs(location) < max_distance):
-                    locations.add(tuple(numpy.floor(location).astype(numpy.int)))
-                    locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
-                    location += vector
-            if locations:
-                self._collision_locations_cache = numpy.array(
-                    sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
-                ) + numpy.floor(self._camera[:3]).astype(numpy.int)
+        for axis in range(3):
+            location: numpy.ndarray = start.copy()
+            vector = vectors[axis]
+            offset = offsets[axis]
+            if vector[axis] > 0:
+                location = location + vector * (1 - location[axis])
             else:
-                self._collision_locations_cache = start.astype(numpy.int)
+                location = location + vector * location[axis]
+            while numpy.all(abs(location) < max_distance):
+                locations.add(tuple(numpy.floor(location).astype(numpy.int)))
+                locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
+                location += vector
+        if locations:
+            collision_locations = numpy.array(
+                sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
+            ) + numpy.floor(self._camera[:3]).astype(numpy.int)
+        else:
+            collision_locations = start.astype(numpy.int)
 
-        return self._collision_locations_cache
-
-    def _on_resize(self, event):
-        self.set_size(*event.GetSize())
+        for location in collision_locations:
+            yield location
 
     def set_size(self, width, height):
         glViewport(0, 0, width, height)
@@ -370,16 +387,20 @@ class EditCanvas(glcanvas.GLCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        if self._select_mode == 1 and self._structure is not None:
+        if self._select_mode == 2 and self._structure is not None:
             transform = numpy.eye(4, dtype=numpy.float32)
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
-        self._selection_box.draw(self.transformation_matrix)
-        if self._selection_box.select_state == 2:
+        self._selection_box.draw(self.transformation_matrix, self._select_mode == 0)
+        if self._selection_box.select_state == 2 and self.select_mode == 0:
             self._selection_box2.draw(self.transformation_matrix)
         self.SwapBuffers()
 
     def _gc(self, event):
         self._render_world.run_garbage_collector()
         event.Skip()
+
+    def _rebuild(self, evt):
+        self._render_world.chunk_manager.rebuild()
+        evt.Skip()

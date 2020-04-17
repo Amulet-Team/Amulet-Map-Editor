@@ -16,7 +16,7 @@ def _load_langauge(lang: str):
                 line = line.split('=', 1)
                 if len(line) != 2:
                     continue
-                _lang[line[0]] = line[1]
+                _lang[line[0].strip()] = line[1].strip()
 
 
 def load_language(lang: str):
