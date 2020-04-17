@@ -1,5 +1,5 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, List
+from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, List, Set
 import math
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
@@ -49,6 +49,7 @@ class ChunkGenerator(ThreadPoolExecutor):
         self._region_size = render_world.chunk_manager.region_size
         self._enabled = False
         self._generator: Optional[Future] = None
+        self._chunk_rebuilds: Set[Tuple[int, int]] = set()
 
     @property
     def render_world(self) -> "RenderWorld":
@@ -81,11 +82,11 @@ class ChunkGenerator(ThreadPoolExecutor):
                 for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     chunk_coords_ = (chunk_coords[0] + offset[0], chunk_coords[1] + offset[1])
                     if chunk_coords_ in self.render_world.chunk_manager:
-                        self.render_world.chunk_manager.chunk_rebuilds.add(chunk_coords_)
-            elif self.render_world.chunk_manager.chunk_rebuilds:
+                        self._chunk_rebuilds.add(chunk_coords_)
+            elif self._chunk_rebuilds:
                 # if a chunk was not found that needs rebuilding due to it changing but a previously
                 # identified neighbour chunk needs rebuilding do that.
-                chunk_coords = self.render_world.chunk_manager.chunk_rebuilds.pop()
+                chunk_coords = self._chunk_rebuilds.pop()
             else:
                 # if no chunks need rebuilding then find a new chunk to load.
                 chunk_coords = next(
@@ -97,8 +98,8 @@ class ChunkGenerator(ThreadPoolExecutor):
                 )
             if chunk_coords is not None:
                 # if chunk coords is in here then remove it so it doesn't get generated twice.
-                if chunk_coords in self.render_world.chunk_manager.chunk_rebuilds:
-                    self.render_world.chunk_manager.chunk_rebuilds.remove(chunk_coords)
+                if chunk_coords in self._chunk_rebuilds:
+                    self._chunk_rebuilds.remove(chunk_coords)
 
                 # generate the chunk
                 chunk = RenderChunk(
