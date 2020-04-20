@@ -13,7 +13,7 @@ from amulet.operations.paste import paste
 from amulet.operations.fill import fill
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
+from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny, SimplePanel
 from amulet_map_editor.plugins import operations
 from .operation_ui import OperationUI
 from .events import (
@@ -229,9 +229,9 @@ def show_loading_dialog(run: Callable[[], OperationReturnType], title: str, mess
     return obj
 
 
-class EditExtension(BaseWorldProgram):
+class EditExtension(SimplePanel, BaseWorldProgram):
     def __init__(self, parent, world: 'World'):
-        super().__init__(parent, wx.VERTICAL)
+        SimplePanel.__init__(self, parent, wx.VERTICAL)
         self._world = world
         self._canvas: Optional[ControllableEditCanvas] = None
         self._temp = wx.StaticText(self, label='Please wait while the renderer loads')

@@ -41,7 +41,7 @@ def load_extensions():
 
             if hasattr(module, 'export'):
                 export = getattr(module, 'export')
-                if 'ui' in export and issubclass(export['ui'], BaseWorldProgram):
+                if 'ui' in export and issubclass(export['ui'], BaseWorldProgram) and issubclass(export['ui'], wx.Window):
                     _extensions.append((export.get('name', 'missingno'), export['ui']))
 
 
@@ -118,7 +118,7 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
         self.GetGrandParent().create_menu()
 
 
-class BaseWorldProgram(SimplePanel):
+class BaseWorldProgram:
 
     def enable(self):
         """Run when the panel is shown/enabled"""
@@ -139,9 +139,10 @@ class BaseWorldProgram(SimplePanel):
         return menu
 
 
-class AboutExtension(BaseWorldProgram):
+class AboutExtension(SimplePanel, BaseWorldProgram):
     def __init__(self, container, world: 'World'):
-        super(AboutExtension, self).__init__(
+        SimplePanel.__init__(
+            self,
             container
         )
         self.world = world

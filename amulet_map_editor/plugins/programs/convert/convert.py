@@ -16,9 +16,10 @@ thread_pool_executor = ThreadPoolExecutor(max_workers=1)
 work_count = 0
 
 
-class ConvertExtension(BaseWorldProgram):
+class ConvertExtension(SimplePanel, BaseWorldProgram):
     def __init__(self, container, world: World):
-        super(ConvertExtension, self).__init__(
+        SimplePanel.__init__(
+            self,
             container
         )
         self.world = world
