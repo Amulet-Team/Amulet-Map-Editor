@@ -541,6 +541,8 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             '',
             self
         )
+        self._world.create_undo_point()
+        self._file_panel.update_buttons()
         return True
 
     def show_select_options(self, _):
