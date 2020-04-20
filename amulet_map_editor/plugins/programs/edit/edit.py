@@ -229,13 +229,16 @@ def show_loading_dialog(run: Callable[[], OperationReturnType], title: str, mess
     return obj
 
 
-class EditExtension(SimplePanel, BaseWorldProgram):
+class EditExtension(wx.Panel, BaseWorldProgram):
     def __init__(self, parent, world: 'World'):
-        SimplePanel.__init__(self, parent, wx.VERTICAL)
+        wx.Panel.__init__(self, parent)
+        self._sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self._sizer)
         self._world = world
         self._canvas: Optional[ControllableEditCanvas] = None
         self._temp = wx.StaticText(self, label='Please wait while the renderer loads')
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        self._sizer.Add(self._temp)
 
         self._file_panel: Optional[FilePanel] = None
         self._select_options: Optional[SelectOptions] = None
@@ -265,7 +268,7 @@ class EditExtension(SimplePanel, BaseWorldProgram):
             self._operation_options.Hide()
             self._tool_panel.Hide()
 
-            self.sizer.Add(self._canvas, 0, wx.EXPAND)
+            self._sizer.Add(self._canvas, 1, wx.EXPAND)
 
             canvas_sizer = wx.BoxSizer(wx.VERTICAL)
             self._canvas.SetSizer(canvas_sizer)
