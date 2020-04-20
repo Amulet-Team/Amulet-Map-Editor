@@ -74,6 +74,9 @@ a.datas += Tree(AMULET_MAP_EDITOR, 'amulet_map_editor', excludes=['*.pyc'])
 a.datas += Tree(MINECRAFT_MODEL_READER, 'minecraft_model_reader', excludes=['*.pyc'])
 a.datas += Tree(PYMCT_PATH, 'PyMCTranslate', excludes=['*.pyc', 'json'])
 
+for d in a.datas:
+    print("\t", d)
+
 pyz = PYZ(a.pure,
           a.zipped_data,
           cipher=block_cipher
