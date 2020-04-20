@@ -3,10 +3,12 @@ import os
 from typing import List, Dict, Callable, Union, Tuple, Any, Type, TYPE_CHECKING
 import importlib
 import pkgutil
+import traceback
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet import world_interface
 
+from amulet_map_editor import log
 from amulet_map_editor.amulet_wx.simple import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldUI
 
@@ -84,10 +86,14 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
         load_extensions()
         select = True
         for extension_name, extension in _extensions:
-            ext = extension(self, self.world)
-            self._extensions.append(ext)
-            self.AddPage(ext, extension_name, select)
-            select = False
+            try:
+                ext = extension(self, self.world)
+                self._extensions.append(ext)
+                self.AddPage(ext, extension_name, select)
+                select = False
+            except Exception as e:
+                log.exception(f'Failed to load extension {extension_name}\n{e}\n{traceback.format_exc()}')
+                continue
 
     def is_closeable(self) -> bool:
         """Check if all extensions are safe to be closed"""
