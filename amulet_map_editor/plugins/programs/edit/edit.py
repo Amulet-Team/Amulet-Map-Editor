@@ -35,14 +35,14 @@ if TYPE_CHECKING:
 
 
 class FilePanel(wx.Panel):
-    def __init__(self, canvas, world, undo_evt, redo_evt, save_evt, close_evt):
+    def __init__(self, canvas: ControllableEditCanvas, world, undo_evt, redo_evt, save_evt, close_evt):
         wx.Panel.__init__(self, canvas)
         self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self._location_label = wx.StaticText(self, label="x, y, z")
+        self._location_label = wx.StaticText(self, label=', '.join([str(s) for s in self._canvas().camera_location]))
         top_sizer.Add(self._location_label, 0, wx.ALL | wx.CENTER, 5)
 
         dim_label = wx.StaticText(self, label="Dimension:")

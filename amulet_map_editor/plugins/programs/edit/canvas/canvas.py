@@ -198,6 +198,10 @@ class EditCanvas(glcanvas.GLCanvas):
         self._render_world.dimension = dimension
 
     @property
+    def camera_location(self):
+        return self._camera[:3]
+
+    @property
     def camera_move_speed(self) -> float:
         """The speed that the camera moves at"""
         return self._camera_move_speed
