@@ -31,13 +31,6 @@ hidden.extend(collect_submodules('OpenGL'))
 hidden.extend(collect_submodules('OpenGL.GL'))
 hidden.extend(collect_submodules('OpenGL.GL.shaders'))
 
-datas = [
-    (AMULET_PATH, './amulet'),
-    (AMULET_MAP_EDITOR, './amulet_map_editor'),
-    (MINECRAFT_MODEL_READER, './minecraft_model_reader'),
- ]
-
-
 def load_module(path: str):
 
     spec = importlib.util.spec_from_file_location(
@@ -62,23 +55,11 @@ else:
     raise Exception("Couldn't location minify_json.py")
 
 mod.main(PYMCT_PATH)
-for path in os.listdir(PYMCT_PATH):
-    input_path = os.path.join(PYMCT_PATH, path)
-    if os.path.isdir(input_path):
-        if path not in ['__pycache__', 'json']:
-            datas.append(
-                (input_path, os.path.join('.', 'PyMCTranslate', path))
-            )
-    else:
-        datas.append(
-            (input_path, os.path.join('.', 'PyMCTranslate'))
-        )
-
 
 a = Analysis(['./main.py'],
              pathex=['.', 'amulet_map_editor'],
              binaries=[],
-             datas=datas,
+             datas=[],
              hiddenimports=hidden,
              hookspath=[],
              runtime_hooks=[],
@@ -87,8 +68,23 @@ a = Analysis(['./main.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-pyz = PYZ(a.pure, a.zipped_data,
-             cipher=block_cipher)
+
+a.datas += Tree(AMULET_PATH, 'amulet')
+a.datas += Tree(AMULET_MAP_EDITOR, 'amulet_map_editor')
+a.datas += Tree(MINECRAFT_MODEL_READER, 'minecraft_model_reader')
+
+for path in os.listdir(PYMCT_PATH):
+    input_path = os.path.join(PYMCT_PATH, path)
+    if os.path.isdir(input_path):
+        if path not in ['__pycache__', 'json']:
+            a.datas += Tree(input_path, 'PyMCTranslate')
+    else:
+        a.datas += [(input_path, os.path.join('.', 'PyMCTranslate'), 'DATA')]
+
+pyz = PYZ(a.pure,
+          a.zipped_data,
+          cipher=block_cipher
+)
 exe = EXE(pyz,
           a.scripts,
           [],
@@ -99,7 +95,8 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=True,
-          icon='icon.ico')
+          icon='icon.ico'
+)
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -107,7 +104,8 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='Amulet')
+               name='Amulet'
+)
 
 delete_files = [
     '**/transparrency_cache.json',
