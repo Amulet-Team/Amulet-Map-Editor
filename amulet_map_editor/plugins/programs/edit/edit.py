@@ -24,8 +24,7 @@ from .events import (
     EVT_OPERATION_TOOL_ENABLED,
     EVT_BOX_GREEN_CORNER_CHANGE,
     EVT_BOX_BLUE_CORNER_CHANGE,
-    EVT_BOX_COORDS_ENABLE,
-    EVT_DELETE
+    EVT_BOX_COORDS_ENABLE
 )
 
 from .canvas.controllable_canvas import ControllableEditCanvas
@@ -267,7 +266,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._tool_panel = ToolSelect(self._canvas)
 
             self._canvas.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
-            self._canvas.Bind(EVT_DELETE, self._delete)
             self._tool_panel.Bind(EVT_SELECT_TOOL_ENABLED, self.show_select_options)
             self._tool_panel.Bind(EVT_OPERATION_TOOL_ENABLED, self.show_operation_options)
 
@@ -345,7 +343,8 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy\tCtrl+c', lambda evt: self._copy())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste\tCtrl+v', lambda evt: self._paste())
-        menu.setdefault('&Edit', {}).setdefault('goto', {}).setdefault('Paste\tCtrl+g', lambda evt: self._file_panel.show_goto())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Delete\tDelete', lambda evt: self._delete())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Goto\tCtrl+g', lambda evt: self._file_panel.show_goto())
         menu.setdefault('&Help', {}).setdefault('control', {}).setdefault('Controls', lambda evt: self._help_controls())
         return menu
 

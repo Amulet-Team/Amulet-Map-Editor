@@ -8,8 +8,7 @@ from ..events import (
     CameraMoveEvent,
     BoxGreenCornerChangeEvent,
     BoxBlueCornerChangeEvent,
-    BoxCoordsEnableEvent,
-    DeleteEvent
+    BoxCoordsEnableEvent
 )
 
 if TYPE_CHECKING:
@@ -208,8 +207,6 @@ class ControllableEditCanvas(EditCanvas):
         self._keys_pressed.add(key)
         if key == wx.WXK_ESCAPE:
             self._escape()
-        elif key == wx.WXK_DELETE:
-            wx.PostEvent(self, DeleteEvent())
         event.Skip()
 
     def _on_loss_focus(self, evt):
