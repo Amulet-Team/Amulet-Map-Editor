@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 import wx
 
 from .canvas import EditCanvas
@@ -111,6 +111,17 @@ class ControllableEditCanvas(EditCanvas):
             yaw = 0
         self.move_camera_relative(forward, up, right, pitch, yaw)
         evt.Skip()
+
+    @property
+    def camera_location(self):
+        return self._camera[:3]
+
+    @camera_location.setter
+    def camera_location(self, location: Tuple[Union[int, float], Union[int, float], Union[int, float]]):
+        self._camera[:3] = location
+        self._transformation_matrix = None
+        self._change_box_location()
+        wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
 
     def move_camera_relative(self, forward, up, right, pitch, yaw):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
