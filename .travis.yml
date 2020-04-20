@@ -38,7 +38,11 @@ install:
   - pyinstaller -y Amulet.spec
 
 script:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then 7z a "${ZIPFILE_NAME}.zip" -r ./dist/* ; else zip -r "${ZIPFILE_NAME}.zip" "/dist/Amulet" -x "*/\.DS_Store" ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then 7z a "${ZIPFILE_NAME}.zip" -r ./dist/* ; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows"] ; then cd dist/ ; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows"] ; then zip -r "${ZIPFILE_NAME}.zip" "Amulet" -x "*/\.DS_Store" ; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows"] ; then cp "${ZIPFILE_NAME}.zip" ../ ; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows"] ; then cd .. ; fi
 
 deploy:
   - provider: releases
