@@ -340,7 +340,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Undo\tCtrl+z', lambda evt: self._world.undo())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Redo\tCtrl+y', lambda evt: self._world.redo())
-        # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
+        menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut\tCtrl+x', lambda evt: self._cut())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy\tCtrl+c', lambda evt: self._copy())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste\tCtrl+v', lambda evt: self._paste())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Delete\tDelete', lambda evt: self._delete())
@@ -499,10 +499,15 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._world.restore_last_undo_point()
         self._canvas.enable_threads()
 
-    def _copy(self):
+    def _cut(self) -> bool:
+        if self._copy():
+            return self._delete()
+        return False
+
+    def _copy(self) -> bool:
         selection = self._get_box()
         if selection is None:
-            return
+            return False
         structure = show_loading_dialog(
             lambda: Structure.from_world(self._world, selection, self._canvas.dimension),
             f'Copying selection.',
@@ -510,8 +515,9 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self
         )
         structure_buffer.append(structure)
+        return True
 
-    def _paste(self):
+    def _paste(self) -> bool:
         if structure_buffer:
             self.show_operation_options(None)
             structure = structure_buffer[-1]
@@ -522,18 +528,20 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                 structure,
                 {}
             )
+            return True
+        return False
 
-    def _delete(self, evt):
+    def _delete(self) -> bool:
         selection = self._get_box()
         if selection is None:
-            return
+            return False
         show_loading_dialog(
             lambda: fill(self._world, self._canvas.dimension, selection, {"fill_block": Block("universal_minecraft", "air")}),
             f'Deleting selection.',
             '',
             self
         )
-        evt.Skip()
+        return True
 
     def show_select_options(self, _):
         self._operation_options.Hide()
