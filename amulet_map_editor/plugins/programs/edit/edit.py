@@ -13,9 +13,9 @@ from amulet.operations.paste import paste
 from amulet.operations.fill import fill
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny, SimplePanel
+from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 from amulet_map_editor.plugins import operations
-from .operation_ui import OperationUI
+from amulet_map_editor.plugins.programs.edit.ui.tool.operation import OperationUI
 from .events import (
     EVT_CAMERA_MOVE,
     SelectToolEnabledEvent,
