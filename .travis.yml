@@ -30,7 +30,8 @@ before_install:
 install:
   - pip3 install --upgrade pip
   - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user --upgrade setuptools wheel ; else pip3 install --upgrade setuptools wheel ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user -r requirements.txt ; else pip3 install -r requirements.txt ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user -r requirements.txt ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then pip3 install -r requirements_linux.txt ; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install pypiwin32 ; fi
   - pip3 install pyinstaller>=3.5
   - wget https://raw.githubusercontent.com/gentlegiantJGC/PyMCTranslate/master/minify_json.py
