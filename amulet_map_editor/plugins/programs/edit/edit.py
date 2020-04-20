@@ -1,6 +1,5 @@
 import wx
-import weakref
-from typing import TYPE_CHECKING, Optional, List, Callable, Type, Any
+from typing import TYPE_CHECKING, Optional, List, Callable, Any
 from types import GeneratorType
 import webbrowser
 import time
@@ -13,202 +12,23 @@ from amulet.operations.paste import paste
 from amulet.operations.fill import fill
 
 from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 from amulet_map_editor.plugins import operations
-from amulet_map_editor.plugins.programs.edit.ui.tool.operation import OperationUI
+from .canvas.controllable_canvas import ControllableEditCanvas
+
+from .ui.file import FilePanel
+from amulet_map_editor.plugins.programs.edit.ui.tool_options.operation import OperationUI
+from amulet_map_editor.plugins.programs.edit.ui.tool_options.select import SelectOptions
+from amulet_map_editor.plugins.programs.edit.ui.tool import ToolSelect
+
 from .events import (
     EVT_CAMERA_MOVE,
-    SelectToolEnabledEvent,
     EVT_SELECT_TOOL_ENABLED,
-    OperationToolEnabledEvent,
-    EVT_OPERATION_TOOL_ENABLED,
-    EVT_BOX_GREEN_CORNER_CHANGE,
-    EVT_BOX_BLUE_CORNER_CHANGE,
-    EVT_BOX_COORDS_ENABLE
+    EVT_OPERATION_TOOL_ENABLED
 )
-
-from .canvas.controllable_canvas import ControllableEditCanvas
-from .ui.goto import show_goto
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-
-
-class FilePanel(wx.Panel):
-    def __init__(self, canvas: ControllableEditCanvas, world, undo_evt, redo_evt, save_evt, close_evt):
-        wx.Panel.__init__(self, canvas)
-        self._canvas = weakref.ref(canvas)
-        self._world = weakref.ref(world)
-
-        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        self._location_button = wx.Button(self, label=', '.join([f'{s:.2f}' for s in self._canvas().camera_location]))
-        self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.show_goto())
-
-        top_sizer.Add(self._location_button, 0, wx.ALL | wx.CENTER, 5)
-
-        dim_label = wx.StaticText(self, label="Dimension:")
-        self._dim_options = SimpleChoiceAny(self)
-        self._dim_options.SetItems(dict(zip(self._world().world_wrapper.dimensions.values(), self._world().world_wrapper.dimensions.keys())))
-        self._dim_options.SetValue("overworld")
-        self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
-
-        top_sizer.Add(dim_label, 0, wx.ALL | wx.CENTER, 5)
-        top_sizer.Add(self._dim_options, 0, wx.ALL | wx.CENTER, 5)
-
-        def create_button(text, operation):
-            button = wx.Button(self, label=text)
-            button.Bind(wx.EVT_BUTTON, operation)
-            top_sizer.Add(button, 0, wx.ALL, 5)
-            return button
-
-        self._undo_button: Optional[wx.Button] = create_button('Undo', undo_evt)
-        self._redo_button: Optional[wx.Button] = create_button('Redo', redo_evt)
-        self._save_button: Optional[wx.Button] = create_button('Save', save_evt)
-        create_button('Close', close_evt)
-        self.update_buttons()
-
-        self.SetSizer(top_sizer)
-        top_sizer.Fit(self)
-        self.Layout()
-
-    def update_buttons(self):
-        self._undo_button.SetLabel(f"Undo | {self._world().chunk_history_manager.undo_count}")
-        self._redo_button.SetLabel(f"Redo | {self._world().chunk_history_manager.redo_count}")
-        self._save_button.SetLabel(f"Save | {self._world().chunk_history_manager.unsaved_changes}")
-
-    def _on_dimension_change(self, evt):
-        self.change_dimension()
-        evt.Skip()
-
-    def change_dimension(self):
-        dimension = self._dim_options.GetAny()
-        self._canvas().dimension = dimension
-
-    def move_event(self, evt):
-        self._location_button.SetLabel(f'{evt.x:.2f}, {evt.y:.2f}, {evt.z:.2f}')
-        self.Layout()
-        self.GetParent().Layout()
-
-    def show_goto(self):
-        location = show_goto(self, *self._canvas().camera_location)
-        if location:
-            self._canvas().camera_location = location
-
-
-class SelectOptions(wx.Panel):
-    def __init__(self, canvas):
-        wx.Panel.__init__(self, canvas)
-        self._canvas = weakref.ref(canvas)
-        self._sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(self._sizer)
-
-        self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._z1: wx.SpinCtrl = self._add_row('z1', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._x1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-        self._y1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-        self._z1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-
-        self._x2: wx.SpinCtrl = self._add_row('x2', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._y2: wx.SpinCtrl = self._add_row('y2', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._z2: wx.SpinCtrl = self._add_row('z2', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._x2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-        self._y2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-        self._z2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-
-        self._x1.Disable()
-        self._y1.Disable()
-        self._z1.Disable()
-        self._x2.Disable()
-        self._y2.Disable()
-        self._z2.Disable()
-
-        self._x1.SetBackgroundColour((160, 215, 145))
-        self._y1.SetBackgroundColour((160, 215, 145))
-        self._z1.SetBackgroundColour((160, 215, 145))
-
-        self._x2.SetBackgroundColour((150, 150, 215))
-        self._y2.SetBackgroundColour((150, 150, 215))
-        self._z2.SetBackgroundColour((150, 150, 215))
-
-        self._canvas().Bind(EVT_BOX_GREEN_CORNER_CHANGE, self._green_corner_renderer_change)
-        self._canvas().Bind(EVT_BOX_BLUE_CORNER_CHANGE, self._blue_corner_renderer_change)
-        self._canvas().Bind(EVT_BOX_COORDS_ENABLE, self._enable_scrolls)
-
-    def enable(self):
-        self._canvas().select_mode = 0
-        self.Show()
-
-    def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._sizer.Add(sizer, 0, 0)
-        name_text = wx.StaticText(self, label=label)
-        sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
-        obj = wx_object(self, **kwargs)
-        sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
-        return obj
-
-    def _green_corner_input_change(self, _):
-        self._canvas().selection_box.point1 = [self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()]
-
-    def _blue_corner_input_change(self, _):
-        self._canvas().selection_box.point2 = [self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()]
-
-    def _green_corner_renderer_change(self, evt):
-        self._x1.SetValue(evt.x)
-        self._y1.SetValue(evt.y)
-        self._z1.SetValue(evt.z)
-
-    def _blue_corner_renderer_change(self, evt):
-        self._x2.SetValue(evt.x)
-        self._y2.SetValue(evt.y)
-        self._z2.SetValue(evt.z)
-
-    def _enable_scrolls(self, evt):
-        self._x1.Enable(evt.enabled)
-        self._y1.Enable(evt.enabled)
-        self._z1.Enable(evt.enabled)
-        self._x2.Enable(evt.enabled)
-        self._y2.Enable(evt.enabled)
-        self._z2.Enable(evt.enabled)
-
-
-"""
-SelectOptions
-OperationOptions
-    SelectOperationOptions
-    SelectAbsoluteLocationOptions
-    # SelectAbsoluteLocationMultipleOptions
-    # SelectCloneOptions
-"""
-
-
-class ToolSelect(wx.Panel):
-    def __init__(self, canvas):
-        wx.Panel.__init__(self, canvas)
-
-        self.select_button = wx.Button(self, label="Select")
-        self.select_button.Bind(wx.EVT_BUTTON, self._select_evt)
-        self.operation_button = wx.Button(self, label="Operation")
-        self.operation_button.Bind(wx.EVT_BUTTON, self._operation_evt)
-
-        # self.import_button = wx.Button(self, label="Import")
-        # self.export_button = wx.Button(self, label="Export")
-
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.select_button)
-        sizer.Add(self.operation_button)
-        self.SetSizer(sizer)
-        sizer.Fit(self)
-        self.Layout()
-
-    def _select_evt(self, evt):
-        wx.PostEvent(self, SelectToolEnabledEvent())
-
-    def _operation_evt(self, evt):
-        wx.PostEvent(self, OperationToolEnabledEvent())
-
+    
 
 def show_loading_dialog(run: Callable[[], OperationReturnType], title: str, message: str, parent: wx.Window) -> Any:
     dialog = wx.ProgressDialog(title, message, parent=parent, style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE)
