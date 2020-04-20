@@ -29,6 +29,7 @@ from .events import (
 )
 
 from .canvas.controllable_canvas import ControllableEditCanvas
+from .ui.goto import show_goto
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -42,8 +43,10 @@ class FilePanel(wx.Panel):
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self._location_label = wx.StaticText(self, label=', '.join([str(s) for s in self._canvas().camera_location]))
-        top_sizer.Add(self._location_label, 0, wx.ALL | wx.CENTER, 5)
+        self._location_button = wx.Button(self, label=', '.join([f'{s:.2f}' for s in self._canvas().camera_location]))
+        self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.show_goto())
+
+        top_sizer.Add(self._location_button, 0, wx.ALL | wx.CENTER, 5)
 
         dim_label = wx.StaticText(self, label="Dimension:")
         self._dim_options = SimpleChoiceAny(self)
@@ -84,9 +87,14 @@ class FilePanel(wx.Panel):
         self._canvas().dimension = dimension
 
     def move_event(self, evt):
-        self._location_label.SetLabel(f'{evt.x:.2f}, {evt.y:.2f}, {evt.z:.2f}')
+        self._location_button.SetLabel(f'{evt.x:.2f}, {evt.y:.2f}, {evt.z:.2f}')
         self.Layout()
         self.GetParent().Layout()
+
+    def show_goto(self):
+        location = show_goto(self, *self._canvas().camera_location)
+        if location:
+            self._canvas().camera_location = location
 
 
 class SelectOptions(wx.Panel):
@@ -337,6 +345,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         # menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Cut', lambda evt: self.world.save())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Copy\tCtrl+c', lambda evt: self._copy())
         menu.setdefault('&Edit', {}).setdefault('control', {}).setdefault('Paste\tCtrl+v', lambda evt: self._paste())
+        menu.setdefault('&Edit', {}).setdefault('goto', {}).setdefault('Paste\tCtrl+g', lambda evt: self._file_panel.show_goto())
         menu.setdefault('&Help', {}).setdefault('control', {}).setdefault('Controls', lambda evt: self._help_controls())
         return menu
 

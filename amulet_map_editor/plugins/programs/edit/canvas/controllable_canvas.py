@@ -32,28 +32,6 @@ key_map = {
 }
 
 
-def show_goto(parent, x: float, y: float, z: float) -> Optional[Tuple[float, float, float]]:
-    dialog = SimpleDialog(parent, 'Replace', wx.HORIZONTAL)
-    panel = dialog.custom_panel
-    x_text = wx.StaticText(panel, label='x:')
-    x = wx.SpinCtrlDouble(panel, min=-30000000, max=30000000, initial=x)
-    y_text = wx.StaticText(panel, label='y:')
-    y = wx.SpinCtrlDouble(panel, min=-30000000, max=30000000, initial=y)
-    z_text = wx.StaticText(panel, label='z:')
-    z = wx.SpinCtrlDouble(panel, min=-30000000, max=30000000, initial=z)
-    panel.add_object(x_text, 0, wx.CENTER | wx.ALL)
-    panel.add_object(x, 1, wx.CENTER | wx.ALL)
-    panel.add_object(y_text, 0, wx.CENTER | wx.ALL)
-    panel.add_object(y, 1, wx.CENTER | wx.ALL)
-    panel.add_object(z_text, 0, wx.CENTER | wx.ALL)
-    panel.add_object(z, 1, wx.CENTER | wx.ALL)
-
-    dialog.Fit()
-
-    if dialog.ShowModal() == wx.ID_OK:
-        return x.GetValue(), y.GetValue(), z.GetValue()
-
-
 class ControllableEditCanvas(EditCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
@@ -232,14 +210,6 @@ class ControllableEditCanvas(EditCanvas):
             self._escape()
         elif key == wx.WXK_DELETE:
             wx.PostEvent(self, DeleteEvent())
-        if event.ControlDown() and key != wx.WXK_CONTROL:
-            if key == 71:
-                location = show_goto(self, *self._camera[:3])
-                if location:
-                    self._camera[:3] = location
-                    self._transformation_matrix = None
-                    self._change_box_location()
-                    wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
         event.Skip()
 
     def _on_loss_focus(self, evt):
