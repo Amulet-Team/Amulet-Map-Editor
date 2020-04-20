@@ -69,17 +69,10 @@ a = Analysis(['./main.py'],
              cipher=block_cipher,
              noarchive=False)
 
-a.datas += Tree(AMULET_PATH, 'amulet')
-a.datas += Tree(AMULET_MAP_EDITOR, 'amulet_map_editor')
-a.datas += Tree(MINECRAFT_MODEL_READER, 'minecraft_model_reader')
-
-for path in os.listdir(PYMCT_PATH):
-    input_path = os.path.join(PYMCT_PATH, path)
-    if os.path.isdir(input_path):
-        if path not in ['__pycache__', 'json']:
-            a.datas += Tree(input_path, 'PyMCTranslate')
-    else:
-        a.datas += [(input_path, os.path.join('.', 'PyMCTranslate'), 'DATA')]
+a.datas += Tree(AMULET_PATH, 'amulet', excludes=['*.pyc'])
+a.datas += Tree(AMULET_MAP_EDITOR, 'amulet_map_editor', excludes=['*.pyc'])
+a.datas += Tree(MINECRAFT_MODEL_READER, 'minecraft_model_reader', excludes=['*.pyc'])
+a.datas += Tree(PYMCT_PATH, 'PyMCTranslate', excludes=['*.pyc', 'json'])
 
 pyz = PYZ(a.pure,
           a.zipped_data,
