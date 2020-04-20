@@ -75,7 +75,7 @@ a.datas += Tree(MINECRAFT_MODEL_READER, 'minecraft_model_reader', excludes=['*.p
 a.datas += Tree(PYMCT_PATH, 'PyMCTranslate', excludes=['*.pyc', 'json'])
 a.datas += [(os.path.join("PyMCTranslate", "build_number"), os.path.join(PYMCT_PATH, "build_number"), 'DATA')]
 
-for d in filter(lambda dt: 'PyMCTranslate' in td[0], a.datas):
+for d in filter(lambda dt: 'PyMCTranslate' in dt[0], a.datas):
     print("\t", d)
 
 pyz = PYZ(a.pure,
