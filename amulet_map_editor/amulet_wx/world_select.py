@@ -113,15 +113,18 @@ class WorldList(simple.SimplePanel):
 
         self.worlds = []
 
+        world_formats = []
         for world_path in world_dirs:
             if os.path.isdir(world_path):
                 try:
-                    world_format = world_interface.load_format(world_path)
-                    world_button = WorldUIButton(self, world_format, open_world_callback)
-                    self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
-                    self.worlds.append(world_button)
+                    world_formats.append(world_interface.load_format(world_path))
                 except Exception as e:
                     log.info(e)
+        for world_format in reversed(sorted(world_formats, key = lambda f: f.last_played)):
+            world_button = WorldUIButton(self, world_format, open_world_callback)
+            self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
+            self.worlds.append(world_button)
+
         self.Layout()
 
 
