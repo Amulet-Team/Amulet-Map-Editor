@@ -203,7 +203,8 @@ def _load_operations(path: str):
 
 def load_operations():
     operations.clear()
-    for path in [os.path.dirname(__file__), "plugins"]:
+    os.makedirs(os.path.join("plugins", "operations"), exist_ok=True)
+    for path in [os.path.dirname(__file__), os.path.join("plugins", "operations")]:
         _load_operations(path)
 
 
