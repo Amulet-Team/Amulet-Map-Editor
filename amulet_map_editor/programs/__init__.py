@@ -39,7 +39,7 @@ def load_extensions():
         _extensions.extend(_fixed_extensions)
         for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__))]):
             # load module and confirm that all required attributes are defined
-            module = importlib.import_module(f'amulet_map_editor.plugins.programs.{name}')
+            module = importlib.import_module(f'amulet_map_editor.programs.{name}')
 
             if hasattr(module, 'export'):
                 export = getattr(module, 'export')

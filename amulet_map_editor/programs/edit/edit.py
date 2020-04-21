@@ -11,21 +11,19 @@ from amulet.api.data_types import OperationType, OperationReturnType
 from amulet.operations.paste import paste
 from amulet.operations.fill import fill
 
-from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
+from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.plugins import operations
 from .canvas.controllable_canvas import ControllableEditCanvas
 
 from .ui.file import FilePanel
-from amulet_map_editor.plugins.programs.edit.ui.tool_options.operation import OperationUI
-from amulet_map_editor.plugins.programs.edit.ui.tool_options.select import SelectOptions
-from amulet_map_editor.plugins.programs.edit.ui.tool import ToolSelect
+from amulet_map_editor.programs.edit.ui.tool_options.operation import OperationUI
+from amulet_map_editor.programs.edit.ui.tool_options.select import SelectOptions
+from amulet_map_editor.programs.edit.ui.tool import ToolSelect
 
 from .events import (
     EVT_CAMERA_MOVE,
     EVT_SELECT_TOOL_ENABLED,
-    EVT_OPERATION_TOOL_ENABLED,
-    EVT_IMPORT_TOOL_ENABLED,
-    EVT_EXPORT_TOOL_ENABLED
+    EVT_OPERATION_TOOL_ENABLED
 )
 
 if TYPE_CHECKING:

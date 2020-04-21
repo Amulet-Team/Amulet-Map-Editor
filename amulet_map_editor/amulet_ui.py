@@ -5,10 +5,10 @@ import webbrowser
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
-from amulet_map_editor import lang, config, version, log, IMG_DIR
-from amulet_map_editor.plugins.programs import WorldManagerUI
+from amulet_map_editor import lang, version, log, IMG_DIR
+from amulet_map_editor.programs import WorldManagerUI
 from amulet_map_editor.amulet_wx import simple
-from amulet_map_editor.plugins.programs import BaseWorldUI
+from amulet_map_editor.programs import BaseWorldUI
 
 
 class AmuletMainWindow(wx.Frame):

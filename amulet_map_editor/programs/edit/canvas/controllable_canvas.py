@@ -1,9 +1,8 @@
-from typing import TYPE_CHECKING, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Tuple, Union
 import wx
 
 from .canvas import EditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.simple import SimpleDialog
 from ..events import (
     CameraMoveEvent,
     BoxGreenCornerChangeEvent,
@@ -13,7 +12,7 @@ from ..events import (
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from amulet_map_editor.plugins.programs.edit.edit import EditExtension
+    from amulet_map_editor.programs.edit.edit import EditExtension
 
 
 key_map = {

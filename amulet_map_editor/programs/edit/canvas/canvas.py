@@ -12,7 +12,7 @@ from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
 
-from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, asin, acos, tan, atan
+from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, tan, atan
 from amulet_map_editor.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
@@ -20,7 +20,7 @@ from amulet_map_editor import log
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from amulet_map_editor.plugins.programs.edit.edit import EditExtension
+    from amulet_map_editor.programs.edit.edit import EditExtension
 
 
 class EditCanvas(glcanvas.GLCanvas):

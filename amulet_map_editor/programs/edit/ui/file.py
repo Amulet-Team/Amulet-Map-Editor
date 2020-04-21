@@ -6,7 +6,7 @@ from .goto import show_goto
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
-    from amulet_map_editor.plugins.programs.edit.canvas.controllable_canvas import ControllableEditCanvas
+    from amulet_map_editor.programs.edit.canvas.controllable_canvas import ControllableEditCanvas
 
 
 class FilePanel(wx.Panel):

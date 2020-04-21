@@ -34,7 +34,7 @@ On the top are the worlds that you currently have open in Amulet to make it easy
 
 On the left are the different sub-programs contained within Amulet. The documentation for which can be found below.
 
-[Convert Program Documentation](plugins/programs/convert/readme.md)
+[Convert Program Documentation](programs/convert/readme.md)
 
-[Edit Program Documentation](plugins/programs/edit/readme.md)
+[Edit Program Documentation](programs/edit/readme.md)
 

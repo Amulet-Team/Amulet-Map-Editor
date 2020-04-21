@@ -9,7 +9,7 @@ from amulet.world_interface.formats import Format
 from amulet_map_editor import lang, log
 from amulet_map_editor.amulet_wx.simple import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
-from amulet_map_editor.plugins.programs import BaseWorldProgram, MenuData
+from amulet_map_editor.programs import BaseWorldProgram, MenuData
 
 
 thread_pool_executor = ThreadPoolExecutor(max_workers=1)

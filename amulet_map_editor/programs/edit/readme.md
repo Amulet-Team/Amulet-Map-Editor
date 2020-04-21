@@ -4,7 +4,7 @@
 
 The edit program is a 3D world editor with similarities to MCEdit Unified. The user can select an area and run various operations on that area.
 
-![edit](../../../../resource/img/edit.jpg)
+![edit](../../../resource/img/edit.jpg)
 
 ## Controls
 
