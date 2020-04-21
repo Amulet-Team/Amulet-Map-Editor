@@ -58,7 +58,8 @@ class FilePanel(wx.Panel):
 
     def change_dimension(self):
         dimension = self._dim_options.GetAny()
-        self._canvas().dimension = dimension
+        if dimension is not None:
+            self._canvas().dimension = dimension
 
     def move_event(self, evt):
         self._location_button.SetLabel(f'{evt.x:.2f}, {evt.y:.2f}, {evt.z:.2f}')

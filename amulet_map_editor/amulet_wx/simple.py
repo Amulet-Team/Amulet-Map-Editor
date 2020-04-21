@@ -1,6 +1,6 @@
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
-from typing import Iterable, Union, Any, List
+from typing import Iterable, Union, Any, List, Optional
 
 
 class SimpleSizer:
@@ -109,9 +109,10 @@ class SimpleChoiceAny(wx.Choice):
         if value in self._keys:
             self.SetSelection(self._keys.index(value))
 
-    def GetAny(self):
+    def GetAny(self) -> Optional[Any]:
         """Return the value currently selected in the form before it was converted to a string"""
-        return self._values[self.GetSelection()]
+        if self._values:
+            return self._values[self.GetSelection()]
 
 
 class SimpleDialog(wx.Dialog, SimpleSizer):

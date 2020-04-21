@@ -23,7 +23,9 @@ from amulet_map_editor.programs.edit.ui.tool import ToolSelect
 from .events import (
     EVT_CAMERA_MOVE,
     EVT_SELECT_TOOL_ENABLED,
-    EVT_OPERATION_TOOL_ENABLED
+    EVT_OPERATION_TOOL_ENABLED,
+    EVT_IMPORT_TOOL_ENABLED,
+    EVT_EXPORT_TOOL_ENABLED
 )
 
 if TYPE_CHECKING:
@@ -88,6 +90,8 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._canvas.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
             self._tool_panel.Bind(EVT_SELECT_TOOL_ENABLED, self.show_select_options)
             self._tool_panel.Bind(EVT_OPERATION_TOOL_ENABLED, self.show_operation_options)
+            self._tool_panel.Bind(EVT_IMPORT_TOOL_ENABLED, self.show_import_options)
+            self._tool_panel.Bind(EVT_EXPORT_TOOL_ENABLED, self.show_export_options)
 
             self._file_panel.Hide()
             self._select_options.Hide()
@@ -370,7 +374,22 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._select_options.enable()
         self.Layout()
 
-    def show_operation_options(self, _):
+    def _show_operation_options(self, enable: Callable):
         self._select_options.Hide()
-        self._operation_options.enable_operation_ui()
+        enable()
         self.Layout()
+
+    def show_operation_options(self, _):
+        self._show_operation_options(
+            self._operation_options.enable_operation_ui
+        )
+
+    def show_import_options(self, _):
+        self._show_operation_options(
+            self._operation_options.enable_import_ui
+        )
+
+    def show_export_options(self, _):
+        self._show_operation_options(
+            self._operation_options.enable_export_ui
+        )
