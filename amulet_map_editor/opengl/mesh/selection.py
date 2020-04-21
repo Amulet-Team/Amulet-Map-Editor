@@ -15,6 +15,7 @@ class RenderSelection(TriMesh):
         self._points: numpy.ndarray = numpy.zeros((2, 3))  # The points set using point1 and point2
         self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
         self.verts = numpy.zeros((6*2*3*3, self._vert_len), dtype=numpy.float32)
+        self._rebuild = True
 
         missing_no = texture_bounds.get(('minecraft', 'missing_no'), (0, 0, 0, 0))
         self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
@@ -49,6 +50,7 @@ class RenderSelection(TriMesh):
     def point1(self, val):
         self._points[0] = val
         self._bounds_ = None
+        self._rebuild = True
 
     @property
     def point2(self) -> numpy.ndarray:
@@ -58,6 +60,7 @@ class RenderSelection(TriMesh):
     def point2(self, val):
         self._points[1] = val
         self._bounds_ = None
+        self._rebuild = True
 
     @property
     def _bounds(self) -> numpy.ndarray:
@@ -107,7 +110,7 @@ class RenderSelection(TriMesh):
         _tri_face = numpy.array([0, 1, 2, 2, 3, 0] * 6, numpy.uint32).reshape((6, 6)) + numpy.arange(0, 24, 4).reshape((6, 1))
         return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
 
-    def create_geometry(self):
+    def _create_geometry(self):
         self._setup()
         if self.select_state >= 0:
             self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(self.min-0.005, self.max+0.005)
@@ -120,6 +123,8 @@ class RenderSelection(TriMesh):
 
     def draw(self, transformation_matrix: numpy.ndarray, draw_corners=True):
         self._setup()
+        if self._rebuild:
+            self._create_geometry()
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
         draw_count = self.draw_count
