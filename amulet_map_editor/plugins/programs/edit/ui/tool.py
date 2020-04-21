@@ -2,7 +2,9 @@ import wx
 
 from amulet_map_editor.plugins.programs.edit.events import (
     SelectToolEnabledEvent,
-    OperationToolEnabledEvent
+    OperationToolEnabledEvent,
+    ImportToolEnabledEvent,
+    ExportToolEnabledEvent
 )
 
 
@@ -15,12 +17,16 @@ class ToolSelect(wx.Panel):
         self.operation_button = wx.Button(self, label="Operation")
         self.operation_button.Bind(wx.EVT_BUTTON, self._operation_evt)
 
-        # self.import_button = wx.Button(self, label="Import")
-        # self.export_button = wx.Button(self, label="Export")
+        self.import_button = wx.Button(self, label="Import")
+        self.import_button.Bind(wx.EVT_BUTTON, self._import_evt)
+        self.export_button = wx.Button(self, label="Export")
+        self.export_button.Bind(wx.EVT_BUTTON, self._export_evt)
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.select_button)
         sizer.Add(self.operation_button)
+        sizer.Add(self.import_button)
+        sizer.Add(self.export_button)
         self.SetSizer(sizer)
         sizer.Fit(self)
         self.Layout()
@@ -30,3 +36,9 @@ class ToolSelect(wx.Panel):
 
     def _operation_evt(self, evt):
         wx.PostEvent(self, OperationToolEnabledEvent())
+
+    def _import_evt(self, evt):
+        wx.PostEvent(self, ImportToolEnabledEvent())
+
+    def _export_evt(self, evt):
+        wx.PostEvent(self, ExportToolEnabledEvent())

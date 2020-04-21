@@ -23,7 +23,9 @@ from amulet_map_editor.plugins.programs.edit.ui.tool import ToolSelect
 from .events import (
     EVT_CAMERA_MOVE,
     EVT_SELECT_TOOL_ENABLED,
-    EVT_OPERATION_TOOL_ENABLED
+    EVT_OPERATION_TOOL_ENABLED,
+    EVT_IMPORT_TOOL_ENABLED,
+    EVT_EXPORT_TOOL_ENABLED
 )
 
 if TYPE_CHECKING:
