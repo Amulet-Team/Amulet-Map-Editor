@@ -164,7 +164,7 @@ class AboutExtension(SimplePanel, BaseWorldProgram):
             ), 0, wx.ALL | wx.CENTER
         )
         self.add_object(
-            WorldUI(self, self.world.world_path), 0, wx.ALL | wx.CENTER
+            WorldUI(self, self.world.world_wrapper), 0, wx.ALL | wx.CENTER
         )
         self.add_object(
             wx.StaticText(

@@ -41,7 +41,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
             ), 0, wx.ALL|wx.CENTER
         )
         self._input.add_object(
-            WorldUI(self._input, self.world.world_path), 0, wx.ALL|wx.CENTER
+            WorldUI(self._input, self.world.world_wrapper), 0, wx.ALL|wx.CENTER
         )
 
         self._output = SimplePanel(self, wx.HORIZONTAL)
@@ -99,7 +99,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
             )
             return
         try:
-            out_world = world_interface.load_format(path)
+            out_world_format = world_interface.load_format(path)
             self.out_world_path = path
 
         except Exception:
@@ -108,7 +108,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
         for child in list(self._output.GetChildren())[1:]:
             child.Destroy()
         self._output.add_object(
-            WorldUI(self._output, self.out_world_path), 0
+            WorldUI(self._output, out_world_format), 0
         )
         self._output.Layout()
         self._output.Fit()

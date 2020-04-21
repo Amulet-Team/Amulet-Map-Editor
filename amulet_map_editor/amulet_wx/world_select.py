@@ -5,6 +5,7 @@ from sys import platform
 from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
+from amulet.world_interface.formats import Format
 from amulet_map_editor.amulet_wx import simple
 from amulet_map_editor import log
 
@@ -52,16 +53,14 @@ def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
 
 class WorldUI(simple.SimplePanel):
     # UI element that holds the world image, name and description
-    def __init__(self, parent: simple.SimplePanel, path: str):
+    def __init__(self, parent: simple.SimplePanel, world_format: Format):
         super(WorldUI, self).__init__(
             parent,
             wx.HORIZONTAL
         )
         self.SetWindowStyle(wx.TAB_TRAVERSAL|wx.BORDER_RAISED)
 
-        world = world_interface.load_format(path)
-
-        img, width = get_world_image(world.world_image_path)
+        img, width = get_world_image(world_format.world_image_path)
 
         self.img = wx.StaticBitmap(
             self,
@@ -77,9 +76,9 @@ class WorldUI(simple.SimplePanel):
             self,
             wx.ID_ANY,
             '\n'.join([
-                world.world_name,
-                world.game_version_string,
-                os.path.join(*os.path.normpath(path).split(os.sep)[-3:])
+                world_format.world_name,
+                world_format.game_version_string,
+                os.path.join(*os.path.normpath(world_format.world_path).split(os.sep)[-3:])
             ]),
             wx.DefaultPosition,
             wx.DefaultSize,
@@ -90,12 +89,12 @@ class WorldUI(simple.SimplePanel):
 
 class WorldUIButton(WorldUI):
     # a button that wraps around WorldUI so that WorldUI can be used without the button functionality
-    def __init__(self, parent: simple.SimplePanel, path: str, open_world_callback):
+    def __init__(self, parent: simple.SimplePanel, world_format: Format, open_world_callback):
         super(WorldUIButton, self).__init__(
             parent,
-            path
+            world_format
         )
-        self.path = path
+        self.path = world_format.world_path
         self.open_world_callback = open_world_callback
 
         self.Bind(wx.EVT_LEFT_UP, self._call_callback)
@@ -117,7 +116,8 @@ class WorldList(simple.SimplePanel):
         for world_path in world_dirs:
             if os.path.isdir(world_path):
                 try:
-                    world_button = WorldUIButton(self, world_path, open_world_callback)
+                    world_format = world_interface.load_format(world_path)
+                    world_button = WorldUIButton(self, world_format, open_world_callback)
                     self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
                     self.worlds.append(world_button)
                 except Exception as e:
@@ -173,7 +173,6 @@ class ScrollableWorldsUI(simple.SimpleScrollablePanel):
         self.Layout()
 
     def reload(self):
-        # might need to remove them from the sizer first
         for val in self.dirs.values():
             val.Destroy()
         self.dirs.clear()
