@@ -131,10 +131,10 @@ class RenderRegion(TriMesh):
         """Zero out the region of memory in the merged chunks related to a given chunk"""
         if chunk_coords in self._merged_chunk_locations:
             offset, size, translucent_offset, translucent_size = self._merged_chunk_locations.pop(chunk_coords)
-            glBindVertexArray(self._vao)
-            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
+            self._bind()
             glBufferSubData(GL_ARRAY_BUFFER, offset*4, size*4, numpy.zeros(size, dtype=numpy.float32))
             glBufferSubData(GL_ARRAY_BUFFER, translucent_offset*4, translucent_size*4, numpy.zeros(translucent_size, dtype=numpy.float32))
+            self._unbind()
 
     def rebuild(self):
         """If there are any chunks that have not been merged recreate the merged vertex table"""
@@ -167,7 +167,9 @@ class RenderRegion(TriMesh):
             self.draw_count = int(verts.size//self._vert_len)
             self._merged_chunk_locations = merged_locations
 
+            self._bind()
             self.change_verts(verts)
+            self._unbind()
             for chunk in self._manual_chunks.values():
                 chunk.unload()
             self._manual_chunks.clear()

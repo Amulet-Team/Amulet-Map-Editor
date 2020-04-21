@@ -48,14 +48,26 @@ class TriMesh:
             self._trm_mat_loc = glGetUniformLocation(self.shader, "transformation_matrix")
         return self._trm_mat_loc
 
+    def _bind(self):
+        """Bind the OpenGL data"""
+        glBindVertexArray(self._vao)
+        glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
+
+    @staticmethod
+    def _unbind():
+        """Unbind the OpenGL data"""
+        glBindVertexArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
+
     def _setup(self):
         """Setup OpenGL attributes if required"""
         if self._vao is None:  # if the opengl state has not been set
             self._vao = glGenVertexArrays(1)  # create the array
             self._vbo = glGenBuffers(1)  # and the buffer
+            self._bind()
             self.change_verts()
             self._setup_opengl_attrs()
-            glBindVertexArray(0)
+            self._unbind()
 
     def _setup_opengl_attrs(self):
         """Set up OpenGL vertex attributes"""
@@ -66,9 +78,7 @@ class TriMesh:
             attr_start += attr_count
 
     def change_verts(self, verts=None):
-        """Modify the vertices in OpenGL"""
-        glBindVertexArray(self._vao)
-        glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
+        """Modify the vertices in OpenGL. Requires binding and unbinding."""
         if verts is not None:
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, self.vertex_usage)
         else:
@@ -77,17 +87,20 @@ class TriMesh:
     def unload(self):
         """Unload all opengl data"""
         if self._vao is not None:
+            self._bind()
             glDeleteVertexArrays(1, self._vao)
             glDeleteBuffers(1, self._vbo)
             self._vao = None
             self._vbo = None
+            self._unbind()
 
     def draw(self, transformation_matrix: numpy.ndarray):
         self._setup()
+        self._bind()
         self._draw(transformation_matrix)
+        self._unbind()
 
     def _draw(self, transformation_matrix: numpy.ndarray):
         glUseProgram(self.shader)
         glUniformMatrix4fv(self.transform_location, 1, GL_FALSE, transformation_matrix)
-        glBindVertexArray(self._vao)
         glDrawArrays(self.draw_mode, self.draw_start, self.draw_count)
