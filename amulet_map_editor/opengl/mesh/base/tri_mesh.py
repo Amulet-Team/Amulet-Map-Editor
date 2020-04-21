@@ -84,6 +84,9 @@ class TriMesh:
 
     def draw(self, transformation_matrix: numpy.ndarray):
         self._setup()
+        self._draw(transformation_matrix)
+
+    def _draw(self, transformation_matrix: numpy.ndarray):
         glUseProgram(self.shader)
         glUniformMatrix4fv(self.transform_location, 1, GL_FALSE, transformation_matrix)
         glBindVertexArray(self._vao)

@@ -108,9 +108,7 @@ class RenderSelection(TriMesh):
         return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
 
     def create_geometry(self):
-        if self._vao is None:
-            self._setup()
-
+        self._setup()
         if self.select_state >= 0:
             self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(self.min-0.005, self.max+0.005)
             self.verts[:36, 3:5] /= 16
@@ -120,26 +118,22 @@ class RenderSelection(TriMesh):
 
         self.change_verts()
 
-    def _setup(self):
-        """Set up an empty VAO"""
-        super()._setup()
-        self.create_geometry()
-
     def draw(self, transformation_matrix: numpy.ndarray, draw_corners=True):
+        self._setup()
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
         draw_count = self.draw_count
         if not draw_corners:
             self.draw_count = 36
-        super().draw(transformation_matrix)
+        super()._draw(transformation_matrix)
 
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
         self.draw_count = 36
-        super().draw(transformation_matrix)
+        super()._draw(transformation_matrix)
         if draw_corners:
             for start in range(36, draw_count, 36):
                 self.draw_start = start
-                super().draw(transformation_matrix)
+                super()._draw(transformation_matrix)
         self.draw_count = draw_count
         glEnable(GL_DEPTH_TEST)
