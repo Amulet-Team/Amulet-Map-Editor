@@ -190,7 +190,7 @@ class EditCanvas(glcanvas.GLCanvas):
         self._select_mode = select_mode
 
     @property
-    def dimension(self) -> int:
+    def dimension(self) -> str:
         return self._render_world.dimension
 
     @dimension.setter

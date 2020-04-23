@@ -136,7 +136,7 @@ class RenderWorld(ResourcePackManager):
         super().__init__(context_identifier, resource_pack, texture, texture_bounds, translator)
         self._world = world
         self._camera = [0, 150, 0, 90, 0]
-        self._dimension = 0
+        self._dimension = "overworld"
         self._render_distance = 10
         self._garbage_distance = 20
         self._chunk_manager = ChunkManager(self.context_identifier)
@@ -184,7 +184,7 @@ class RenderWorld(ResourcePackManager):
         self._camera = value
 
     @property
-    def dimension(self) -> int:
+    def dimension(self) -> str:
         return self._dimension
 
     @dimension.setter

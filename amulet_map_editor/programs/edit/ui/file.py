@@ -7,10 +7,11 @@ from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.controllable_canvas import ControllableEditCanvas
+    from amulet.api.world import World
 
 
 class FilePanel(wx.Panel):
-    def __init__(self, canvas: 'ControllableEditCanvas', world, undo_evt, redo_evt, save_evt, close_evt):
+    def __init__(self, canvas: 'ControllableEditCanvas', world: 'World', undo_evt, redo_evt, save_evt, close_evt):
         wx.Panel.__init__(self, canvas)
         self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
@@ -24,7 +25,7 @@ class FilePanel(wx.Panel):
 
         dim_label = wx.StaticText(self, label="Dimension:")
         self._dim_options = SimpleChoiceAny(self)
-        self._dim_options.SetItems(dict(zip(self._world().world_wrapper.dimensions.values(), self._world().world_wrapper.dimensions.keys())))
+        self._dim_options.SetItems(self._world().world_wrapper.dimensions)
         self._dim_options.SetValue("overworld")
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
