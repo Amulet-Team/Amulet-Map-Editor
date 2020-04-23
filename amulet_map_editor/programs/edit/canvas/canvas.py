@@ -309,7 +309,7 @@ class EditCanvas(glcanvas.GLCanvas):
                 cx = cx_
                 cz = cz_
                 try:
-                    chunk = self._render_world.world.get_chunk(cx, cz)
+                    chunk = self._render_world.world.get_chunk(cx, cz, self.dimension)
                 except ChunkLoadError:
                     chunk = None
 
