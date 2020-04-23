@@ -7,8 +7,9 @@ from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 
 
 class ChunkManager:
-    def __init__(self, identifier: str, region_size=16):
-        self.context_identifier = identifier
+    def __init__(self, context_identifier: str, texture: int, region_size=16):
+        self.context_identifier = context_identifier
+        self._texture = texture
         self.region_size = region_size
         self._regions: Dict[Tuple[int, int], RenderRegion] = {}
         # added chunks are put in here and then processed on the next call of draw
@@ -39,7 +40,7 @@ class ChunkManager:
             render_chunk = self._chunk_temp.get()
             region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
             if region_coords not in self._regions:
-                self._regions[region_coords] = RenderRegion(region_coords[0], region_coords[1], self.region_size, self.context_identifier)
+                self._regions[region_coords] = RenderRegion(region_coords[0], region_coords[1], self.region_size, self.context_identifier, self._texture)
             self._regions[region_coords].add_render_chunk(render_chunk)
         self._chunk_temp_set.clear()
 
@@ -93,9 +94,9 @@ class ChunkManager:
 
 
 class RenderRegion(TriMesh):
-    def __init__(self, rx: int, rz: int, region_size: int, context_identifier: str):
+    def __init__(self, rx: int, rz: int, region_size: int, context_identifier: str, texture: int):
         """A group of RenderChunks to minimise the number of draw calls"""
-        super().__init__(context_identifier)
+        super().__init__(context_identifier, texture)
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
@@ -131,10 +132,12 @@ class RenderRegion(TriMesh):
         """Zero out the region of memory in the merged chunks related to a given chunk"""
         if chunk_coords in self._merged_chunk_locations:
             offset, size, translucent_offset, translucent_size = self._merged_chunk_locations.pop(chunk_coords)
-            self._bind()
+            glBindVertexArray(self._vao)
+            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
             glBufferSubData(GL_ARRAY_BUFFER, offset*4, size*4, numpy.zeros(size, dtype=numpy.float32))
             glBufferSubData(GL_ARRAY_BUFFER, translucent_offset*4, translucent_size*4, numpy.zeros(translucent_size, dtype=numpy.float32))
-            self._unbind()
+            glBindVertexArray(0)
+            glBindBuffer(GL_ARRAY_BUFFER, 0)
 
     def rebuild(self):
         """If there are any chunks that have not been merged recreate the merged vertex table"""

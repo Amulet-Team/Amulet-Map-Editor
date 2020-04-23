@@ -20,9 +20,10 @@ class SubRenderStructure(RenderChunkBuilder):
         structure_palette: BlockManager,
         chunk: Chunk,
         slices: Tuple[slice, slice, slice],
-        offset: numpy.ndarray
+        offset: numpy.ndarray,
+        texture: int
     ):
-        super().__init__(render_structure.context_identifier)
+        super().__init__(render_structure.context_identifier, texture)
         self._render_structure = weakref.ref(render_structure)
         self._structure_palette = structure_palette
         self._chunk = weakref.ref(chunk)
@@ -77,7 +78,7 @@ class RenderStructure(ResourcePackManager):
         offset = -self._structure.selection.min
         sections = []
         for chunk, slices, _ in self._structure.get_chunk_slices():
-            section = SubRenderStructure(self, self._structure.palette, chunk, slices, offset)
+            section = SubRenderStructure(self, self._structure.palette, chunk, slices, offset, self.texture)
             section.create_geometry()
             sections.append(section)
         self._sub_structures = sections

@@ -15,7 +15,7 @@ class TriMesh:
     )
     _vert_len = sum(_vertex_attrs)
 
-    def __init__(self, context_identifier: str):
+    def __init__(self, context_identifier: str, texture: int):
         """Create a new TriMesh.
         The object can be created from another thread so OpenGL
         variables cannot be set from here"""
@@ -24,6 +24,8 @@ class TriMesh:
         self._vbo = None  # vertex buffer object
         self._shader = None  # the shader program
         self._transform_location = None  # the reference within the shader program of the transformation matrix
+        self._texture_location = None  # the location of the texture in the shader
+        self._texture = texture
         self.verts = new_empty_verts()  # the vertices to draw
         self.draw_start = 0
         self.draw_count = 0  # the number of vertices to draw
@@ -46,6 +48,7 @@ class TriMesh:
             self._shader = get_shader(self.context_identifier, self.shader_name)
             glUseProgram(self._shader)
             self._transform_location = glGetUniformLocation(self._shader, "transformation_matrix")
+            self._texture_location = glGetUniformLocation(self._shader, "image")
             self._vao = glGenVertexArrays(1)  # create the array
             glBindVertexArray(self._vao)
             self._vbo = glGenBuffers(1)  # and the buffer
@@ -94,10 +97,10 @@ class TriMesh:
     def _draw(self, transformation_matrix: numpy.ndarray):
         glUseProgram(self._shader)
         glUniformMatrix4fv(self._transform_location, 1, GL_FALSE, transformation_matrix)
-        # glUniform1i(texture_shader_location, 0)
+        glUniform1i(self._texture_location, 0)
         glBindVertexArray(self._vao)
-        # glActiveTexture(GL_TEXTURE0)
-        # glBindTexture(GL_TEXTURE_2D, texture)
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self._texture)
 
         glDrawArrays(self.draw_mode, self.draw_start, self.draw_count)
 

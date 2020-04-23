@@ -8,9 +8,10 @@ from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 class RenderSelection(TriMesh):
     def __init__(self,
         context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]]
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        texture: int
     ):
-        super().__init__(context_identifier)
+        super().__init__(context_identifier, texture)
         self._select_state = 0  # number of points selected
         self._points: numpy.ndarray = numpy.zeros((2, 3))  # The points set using point1 and point2
         self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations

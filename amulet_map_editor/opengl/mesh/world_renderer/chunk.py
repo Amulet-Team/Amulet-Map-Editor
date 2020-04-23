@@ -16,10 +16,10 @@ if TYPE_CHECKING:
 
 
 class RenderChunk(RenderChunkBuilder):
-    def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: str):
+    def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: str, texture: int):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
-        super().__init__(render_world.context_identifier)
+        super().__init__(render_world.context_identifier, texture)
         self._render_world_ = weakref.ref(render_world)
         self._region_size = region_size
         self._coords = chunk_coords

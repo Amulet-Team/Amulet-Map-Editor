@@ -106,7 +106,8 @@ class ChunkGenerator(ThreadPoolExecutor):
                     self.render_world,
                     self._region_size,
                     chunk_coords,
-                    self.render_world.dimension
+                    self.render_world.dimension,
+                    self._render_world().texture
                 )
 
                 try:
@@ -139,7 +140,7 @@ class RenderWorld(ResourcePackManager):
         self._dimension = "overworld"
         self._render_distance = 10
         self._garbage_distance = 20
-        self._chunk_manager = ChunkManager(self.context_identifier)
+        self._chunk_manager = ChunkManager(self.context_identifier, self.texture)
         self._chunk_generator = ChunkGenerator(self)
 
     @property

@@ -13,12 +13,12 @@ class ResourcePackManager:
         self,
         context_identifier: Any,
         resource_pack: minecraft_model_reader.BaseRPHandler,
-        texture: Any,
+        texture: int,
         texture_bounds: Dict[Any, Tuple[float, float, float, float]],
         translator: PyMCTranslate.Version
     ):
         self.context_identifier = context_identifier
-        self._set_shader_texture(texture)
+        self._texture = texture
         self._resource_pack = resource_pack
         self._texture_bounds: Dict[Any, Tuple[float, float, float, float]] = texture_bounds
         self._resource_pack_translator = translator
@@ -34,15 +34,9 @@ class ResourcePackManager:
         self._texture_bounds = texture_bounds
         self._block_models.clear()
 
-    def _set_shader_texture(self, texture: Any):
-        vao = glGenVertexArrays(1)
-        glBindVertexArray(vao)
-        shader = shaders.get_shader(self.context_identifier, 'render_chunk')
-        glUseProgram(shader)
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, texture)
-        glUniform1i(glGetUniformLocation(shader, 'image'), 0)
-        glBindVertexArray(0)
+    @property
+    def texture(self) -> int:
+        return self._texture
 
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:

@@ -82,11 +82,13 @@ class EditCanvas(glcanvas.GLCanvas):
         self._select_style = 1  # 0 is select at fixed distance, 1 is select closest non-air
         self._selection_box = RenderSelection(
             self.context_identifier,
-            self._texture_bounds
+            self._texture_bounds,
+            self._gl_texture_atlas
         )
         self._selection_box2 = RenderSelection(
             self.context_identifier,
-            self._texture_bounds
+            self._texture_bounds,
+            self._gl_texture_atlas
         )
         self._structure: Optional[RenderStructure] = None
         self._structure_locations: List[numpy.ndarray] = []
@@ -149,6 +151,7 @@ class EditCanvas(glcanvas.GLCanvas):
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+        glBindTexture(GL_TEXTURE_2D, 0)
 
     def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
         self._resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
@@ -160,6 +163,7 @@ class EditCanvas(glcanvas.GLCanvas):
         )
         glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_atlas)
+        glBindTexture(GL_TEXTURE_2D, 0)
         log.info('Finished setting up texture atlas in OpenGL')
 
     @property
