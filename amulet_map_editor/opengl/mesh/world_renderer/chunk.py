@@ -37,9 +37,7 @@ class RenderChunk(RenderChunkBuilder):
         """Set up the opengl data which cannot be set up in another thread"""
         super()._setup()
         if self._rebuild:
-            self._bind()
             self.change_verts()
-            self._unbind()
             self._rebuild = False
 
     @property

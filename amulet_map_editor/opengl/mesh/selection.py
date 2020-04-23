@@ -119,15 +119,12 @@ class RenderSelection(TriMesh):
             self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(self.point1-0.01, self.point1+1.01)
             self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(self.point2-0.01, self.point2+1.01)
 
-        self._bind()
         self.change_verts()
-        self._unbind()
 
     def draw(self, transformation_matrix: numpy.ndarray, draw_corners=True):
         self._setup()
         if self._rebuild:
             self._create_geometry()
-        self._bind()
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
         draw_count = self.draw_count
@@ -145,4 +142,3 @@ class RenderSelection(TriMesh):
                 super()._draw(transformation_matrix)
         self.draw_count = draw_count
         glEnable(GL_DEPTH_TEST)
-        self._unbind()

@@ -167,9 +167,7 @@ class RenderRegion(TriMesh):
             self.draw_count = int(verts.size//self._vert_len)
             self._merged_chunk_locations = merged_locations
 
-            self._bind()
             self.change_verts(verts)
-            self._unbind()
             for chunk in self._manual_chunks.values():
                 chunk.unload()
             self._manual_chunks.clear()
