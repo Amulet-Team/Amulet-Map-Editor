@@ -119,9 +119,9 @@ class ChunkGenerator(ThreadPoolExecutor):
                     chunk
                 )
             delta_time = time.time() - start_time
-            if delta_time < 1/120:
+            if delta_time < 1/60:
                 # go to sleep so this thread doesn't lock up the main thread.
-                time.sleep(1/120-delta_time)
+                time.sleep(1/60-delta_time)
 
 
 class RenderWorld(ResourcePackManager):
