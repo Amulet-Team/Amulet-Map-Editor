@@ -1,6 +1,6 @@
 # Amulet Map Editor
 
-<a href="https://circleci.com/gh/Amulet-Team/Amulet-Map-Editor"><img alt="CircleCI" src="https://circleci.com/gh/Amulet-Team/Amulet-Map-Editor.svg"></a>
+<a href="https://github.com/Amulet-Team/Amulet-Map-Editor/releases"><img alt="TravisCI" src="https://travis-ci.org/Amulet-Team/Amulet-Map-Editor.svg"></a>
 [![Documentation Status](https://readthedocs.org/projects/amulet-map-editor/badge/?version=develop)](https://amulet-map-editor.readthedocs.io/en/develop/?badge=develop)
 
 A new Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
