@@ -6,6 +6,7 @@ import itertools
 import minecraft_model_reader
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from amulet.api.chunk.blocks import Blocks
+from amulet.api.data_types import Dimension
 
 from amulet_map_editor.opengl.mesh import new_empty_verts
 from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class RenderChunk(RenderChunkBuilder):
-    def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: str, texture: int):
+    def __init__(self, render_world: 'RenderWorld', region_size: int, chunk_coords: Tuple[int, int], dimension: Dimension, texture: int):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
         super().__init__(render_world.context_identifier, texture)
@@ -72,7 +73,7 @@ class RenderChunk(RenderChunkBuilder):
 
     @property
     def chunk(self) -> "Chunk":
-        return self._render_world.world.get_chunk(*self._coords, self._dimension)
+        return self._render_world.world.get_chunk(self.cx, self.cz, self._dimension)
 
     @property
     def chunk_state(self) -> int:
