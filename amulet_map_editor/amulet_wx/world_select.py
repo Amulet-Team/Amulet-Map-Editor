@@ -5,7 +5,7 @@ from sys import platform
 from typing import List, Dict, Tuple, Callable
 from amulet_map_editor import lang, config
 from amulet import world_interface
-from amulet.world_interface.formats import Format
+from amulet.world_interface.formats import WorldFormatWrapper
 from amulet_map_editor.amulet_wx import simple
 from amulet_map_editor import log
 
@@ -53,7 +53,7 @@ def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
 
 class WorldUI(simple.SimplePanel):
     # UI element that holds the world image, name and description
-    def __init__(self, parent: simple.SimplePanel, world_format: Format):
+    def __init__(self, parent: simple.SimplePanel, world_format: WorldFormatWrapper):
         super(WorldUI, self).__init__(
             parent,
             wx.HORIZONTAL
@@ -89,7 +89,7 @@ class WorldUI(simple.SimplePanel):
 
 class WorldUIButton(WorldUI):
     # a button that wraps around WorldUI so that WorldUI can be used without the button functionality
-    def __init__(self, parent: simple.SimplePanel, world_format: Format, open_world_callback):
+    def __init__(self, parent: simple.SimplePanel, world_format: WorldFormatWrapper, open_world_callback):
         super(WorldUIButton, self).__init__(
             parent,
             world_format

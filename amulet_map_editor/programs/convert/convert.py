@@ -4,7 +4,7 @@ import webbrowser
 
 from amulet import world_interface
 from amulet.api.world import World
-from amulet.world_interface.formats import Format
+from amulet.world_interface.formats import WorldFormatWrapper
 
 from amulet_map_editor import lang, log
 from amulet_map_editor.amulet_wx.simple import SimplePanel
@@ -135,7 +135,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
         try:
             out_world = world_interface.load_format(self.out_world_path)
             log.info(f'Converting world {self.world.world_path} to {out_world.world_path}')
-            out_world: Format
+            out_world: WorldFormatWrapper
             out_world.open()
             self.world.save(out_world, self._update_loading_bar)
             out_world.close()
