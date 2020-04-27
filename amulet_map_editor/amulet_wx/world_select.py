@@ -78,7 +78,7 @@ class WorldUI(simple.SimplePanel):
             '\n'.join([
                 world_format.world_name,
                 world_format.game_version_string,
-                os.path.join(*os.path.normpath(world_format.world_path).split(os.sep)[-3:])
+                os.path.join(*os.path.normpath(world_format.path).split(os.sep)[-3:])
             ]),
             wx.DefaultPosition,
             wx.DefaultSize,
@@ -94,7 +94,7 @@ class WorldUIButton(WorldUI):
             parent,
             world_format
         )
-        self.path = world_format.world_path
+        self.path = world_format.path
         self.open_world_callback = open_world_callback
 
         self.Bind(wx.EVT_LEFT_UP, self._call_callback)
