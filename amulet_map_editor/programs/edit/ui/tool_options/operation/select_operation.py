@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Callable, Dict
 
 from amulet_map_editor import log
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
-from amulet_map_editor.plugins import operations
+from amulet_map_editor import plugins
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -62,9 +62,9 @@ class BaseSelectOperationUI(SimplePanel):
             if "options" in operation.get("features", []):
                 pass  # TODO: implement this
             elif "wxoptions" in operation.get("features", []):
-                options = operation["wxoptions"](self, self._world(), operations.options.get(operation_path, {}))
+                options = operation["wxoptions"](self, self._world(), plugins.options.get(operation_path, {}))
                 if isinstance(options, dict):
-                    operations.options[operation_path] = options
+                    plugins.options[operation_path] = options
                 else:
                     log.error(f"Plugin {operation['name']} at {operation_path} did not return options in a valid format")
         evt.Skip()
@@ -72,5 +72,5 @@ class BaseSelectOperationUI(SimplePanel):
 
 class SelectOperationUI(BaseSelectOperationUI):
     @property
-    def _operations(self):
-        return operations.operations
+    def _operations(self) -> Dict[str, dict]:
+        return plugins.operations

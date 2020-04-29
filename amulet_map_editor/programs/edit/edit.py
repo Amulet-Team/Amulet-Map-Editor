@@ -12,7 +12,7 @@ from amulet.operations.paste import paste
 from amulet.operations.fill import fill
 
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.plugins import operations
+from amulet_map_editor import plugins
 from .canvas.controllable_canvas import ControllableEditCanvas
 
 from .ui.file import FilePanel
@@ -264,7 +264,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
     def _run_operation(self, evt):
         operation_path = self._operation_options.operation
-        operation = operations.operations[operation_path]
+        operation = plugins.all_operations[operation_path]
         features = operation.get("features", [])
         operation_input_definitions = operation.get("inputs", [])
         if any(feature in features for feature in ("dst_location_absolute",)):
@@ -279,7 +279,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
                     elif inp == "options":
                         operation_inputs.append(
-                            operations.options.get(operation_path, {})
+                            plugins.options.get(operation_path, {})
                         )
 
                 self._operation_options.Disable()
@@ -329,7 +329,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                     operation["operation"],
                     operation_input_definitions,
                     structure,
-                    operations.options.get(operation_path, {}),
+                    plugins.options.get(operation_path, {}),
                 )
             else:
                 # trigger UI to show select box multiple UI
@@ -362,10 +362,10 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                 operation_inputs.append(structure)
             elif inp == "options":
                 if options:
-                    operations.options[operation_path] = options
+                    plugins.options[operation_path] = options
                     operation_inputs.append(options)
                 else:
-                    operation_inputs.append(operations.options.get(operation_path, {}))
+                    operation_inputs.append(plugins.options.get(operation_path, {}))
 
         self._canvas.disable_threads()
         try:
@@ -380,7 +380,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._world.create_undo_point()
             self._file_panel.update_buttons()
         except Exception as e:
-            operation_info = operations.operations[operation_path]
+            operation_info = plugins.all_operations[operation_path]
             log.exception(
                 f'Error occurred while running operation: {operation_info["name"]} v{operation_info["v"]}'
             )

@@ -222,8 +222,61 @@ def _load_operations(operations: Dict[str, dict], path: str):
                     )
 
 
-def load_operations(paths: List[str]):
+def _load_operations_group(paths: List[str]):
     operations = {}
     for path in paths:
         _load_operations(operations, path)
     return operations
+
+
+all_operations: Dict[str, dict] = {}
+operations: Dict[str, dict] = {}
+export_operations: Dict[str, dict] = {}
+import_operations: Dict[str, dict] = {}
+options: Dict[str, dict] = {}
+
+
+def merge_operations():
+    all_operations.clear()
+    all_operations.update(operations)
+    all_operations.update(export_operations)
+    all_operations.update(import_operations)
+
+
+def load_operations():
+    global operations
+    os.makedirs(os.path.join("plugins", "operations"), exist_ok=True)
+    operations = _load_operations_group([
+        os.path.join(os.path.dirname(__file__), "operations"),
+        os.path.join("plugins", "operations")
+    ])
+    merge_operations()
+
+
+load_operations()
+
+
+def load_export_operations():
+    global export_operations
+    os.makedirs(os.path.join("plugins", "export_operations"), exist_ok=True)
+    export_operations = _load_operations_group([
+        os.path.join(os.path.dirname(__file__), "export_operations"),
+        os.path.join("plugins", "export_operations")
+    ])
+    merge_operations()
+
+
+load_export_operations()
+
+
+def load_import_operations():
+    global import_operations
+    os.makedirs(os.path.join("plugins", "import_operations"), exist_ok=True)
+    import_operations = _load_operations_group([
+        os.path.join(os.path.dirname(__file__), "import_operations"),
+        os.path.join("plugins", "import_operations")
+    ])
+    merge_operations()
+
+
+load_import_operations()
