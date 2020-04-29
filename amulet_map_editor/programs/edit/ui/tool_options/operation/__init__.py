@@ -53,6 +53,8 @@ class OperationUI(wx.Panel):
         self._select_destination_ui.Fit()
         self._select_destination_ui.Hide()
 
+        self._shown_ui = self._operation_ui
+
         self.SetSizer(middle_sizer)
         middle_sizer.Fit(self)
         self.Layout()
@@ -65,6 +67,7 @@ class OperationUI(wx.Panel):
 
     def _enable_operation_ui(self, ui: wx.Window):
         self._hide_all()
+        self._shown_ui = ui
         self.Show()
         ui.Show()
         self._canvas().select_mode = 1
@@ -102,4 +105,4 @@ class OperationUI(wx.Panel):
 
     @property
     def operation(self):
-        return self._operation_ui.operation
+        return self._shown_ui.operation
