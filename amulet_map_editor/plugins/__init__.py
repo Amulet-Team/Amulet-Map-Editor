@@ -59,7 +59,7 @@ from amulet import log
 from typing import Dict, List
 
 
-def _load_module(module_path: str):
+def _load_module_file(module_path: str):
     spec = importlib.util.spec_from_file_location(
         os.path.basename(module_path), module_path
     )
@@ -68,7 +68,7 @@ def _load_module(module_path: str):
     return mod
 
 
-def _load_module_dir(module_path):
+def _load_module_directory(module_path):
     import sys
 
     spec = importlib.util.spec_from_file_location(
@@ -200,7 +200,7 @@ def _load_operations(operations: Dict[str, dict], path: str):
             if fpath.endswith("__init__.py"):
                 continue
 
-            mod = _load_module(fpath)
+            mod = _load_module_file(fpath)
             if hasattr(mod, "export"):
                 plugin = getattr(mod, "export")
                 parse_export(plugin, operations, os.path.basename(fpath))
@@ -209,7 +209,7 @@ def _load_operations(operations: Dict[str, dict], path: str):
                     parse_export(plugin, operations, os.path.basename(fpath))
 
         for dpath in glob.iglob(os.path.join(path, "**", "__init__.py")):
-            mod = _load_module_dir(dpath)
+            mod = _load_module_directory(dpath)
             if hasattr(mod, "export"):
                 plugin = getattr(mod, "export")
                 parse_export(
