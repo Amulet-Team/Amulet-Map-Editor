@@ -1,7 +1,7 @@
 """
 >>> # Example plugin
 >>> from typing import List, Any, Callable, Dict, Optional
->>> from amulet.api.selection import Selection
+>>> from amulet.api.selection import SelectionGroup
 >>> from amulet.api.structure import Structure
 >>> from amulet.api.world import World
 >>> WX_OBJ = Any
@@ -43,7 +43,7 @@
 >>> # Input format
 >>> # a list of inputs to give to the plugin. World class and dimension are first and these follow
 >>> # possible inputs (max one from each group)
->>> {"src_selection": Selection}  # the user created selection
+>>> {"src_selection": SelectionGroup}  # the user created selection
 >>> {  # requires a dst_location feature to be enabled. Only valid in main inputs
 >>>     "structure": Structure  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
 >>> }

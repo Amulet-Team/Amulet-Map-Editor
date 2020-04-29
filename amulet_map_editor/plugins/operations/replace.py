@@ -3,7 +3,7 @@ import wx
 import numpy
 
 from amulet.api.block import Block
-from amulet.api.selection import Selection
+from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension
 from amulet_map_editor.amulet_wx.block_select import BlockDefine
 from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimplePanel
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 def replace(
     world: "World",
     dimension: Dimension,
-    selection: Selection,
+    selection: SelectionGroup,
     options: dict
 ):
     original_block_options: Tuple[str, Tuple[int, int, int], bool, str, str, Dict[str, str]] = options.get("original_block_options")

@@ -5,7 +5,7 @@ import webbrowser
 import time
 
 from amulet.api.block import Block
-from amulet.api.selection import Selection, SubSelectionBox
+from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.structure import Structure, structure_buffer
 from amulet.api.data_types import OperationType, OperationReturnType
 from amulet.operations.paste import paste
@@ -207,11 +207,11 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._file_panel.update_buttons()
         self._canvas.enable_threads()
 
-    def _get_box(self) -> Optional[Selection]:
+    def _get_box(self) -> Optional[SelectionGroup]:
         box = self._canvas.selection_box
         if box.select_state == 2:
-            return Selection(
-                (SubSelectionBox(
+            return SelectionGroup(
+                (SelectionBox(
                     box.min,
                     box.max
                 ),)
