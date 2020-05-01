@@ -21,7 +21,7 @@ def fill_(
     if isinstance(options.get('fill_block'), Block):
         yield from fill(world, dimension, selection_box, options)
     else:
-        wx.MessageBox('Please specify a block before running the fill operation')
+        raise Exception('Please specify a block before running the fill operation')
 
 
 def show_ui(parent, world: "World", options: dict) -> dict:

@@ -22,8 +22,7 @@ def replace(
     replacement_block: Block = options.get("replacement_block")
     if original_block_options is None or not isinstance(replacement_block, Block):
         # verify that the options are actually given
-        wx.MessageBox('Please specify the blocks before running the replace operation')
-        return
+        raise Exception('Please specify the blocks before running the replace operation')
 
     original_platform, original_version, original_blockstate, original_namespace, original_base_name, original_properties = original_block_options
     replacement_block_id = world.palette.get_add_block(replacement_block)

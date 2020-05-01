@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Optional, List, Callable, Any
 from types import GeneratorType
 import webbrowser
 import time
+import traceback
 
 from amulet.api.block import Block
 from amulet.api.selection import SelectionGroup, SelectionBox
@@ -295,6 +296,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                         self,
                     )
                 except Exception as e:
+                    log.error(f"Error running structure operation: {e}\n{traceback.format_exc()}")
                     wx.MessageBox(f"Error running structure operation: {e}")
                     self._world.restore_last_undo_point()
                     self._canvas.enable_threads()
@@ -303,6 +305,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
                 self._operation_options.Enable()
                 if not isinstance(structure, Structure):
+                    log.error("Object returned from structure_callable was not a Structure. Aborting.")
                     wx.MessageBox(
                         "Object returned from structure_callable was not a Structure. Aborting."
                     )
@@ -381,9 +384,10 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._file_panel.update_buttons()
         except Exception as e:
             operation_info = plugins.all_operations[operation_path]
-            log.exception(
+            log.error(
                 f'Error occurred while running operation: {operation_info["name"]} v{operation_info["v"]}'
             )
+            log.error(f"{e}\n{traceback.format_exc()}")
             wx.MessageBox(f"Error running operation: {e}")
             self._world.restore_last_undo_point()
         self._canvas.enable_threads()
