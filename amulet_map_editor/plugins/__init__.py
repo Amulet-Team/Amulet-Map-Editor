@@ -191,7 +191,7 @@ def parse_export(plugin: dict, operations_dict, path):
     if stop:
         return
 
-    operations_dict[plugin_name] = plugin
+    operations_dict[path] = plugin
 
 
 def _load_operations(operations: Dict[str, dict], path: str):
@@ -203,10 +203,10 @@ def _load_operations(operations: Dict[str, dict], path: str):
             mod = _load_module_file(fpath)
             if hasattr(mod, "export"):
                 plugin = getattr(mod, "export")
-                parse_export(plugin, operations, os.path.basename(fpath))
+                parse_export(plugin, operations, fpath)
             elif hasattr(mod, "exports"):
                 for plugin in getattr(mod, "exports"):
-                    parse_export(plugin, operations, os.path.basename(fpath))
+                    parse_export(plugin, operations, fpath)
 
         for dpath in glob.iglob(os.path.join(path, "**", "__init__.py")):
             mod = _load_module_directory(dpath)
@@ -230,53 +230,40 @@ def _load_operations_group(paths: List[str]):
 
 
 all_operations: Dict[str, dict] = {}
+internal_operations: Dict[str, dict] = {}
 operations: Dict[str, dict] = {}
 export_operations: Dict[str, dict] = {}
 import_operations: Dict[str, dict] = {}
+_meta: Dict[str, Dict[str, dict]] = {
+    'internal_operations': internal_operations,
+    'operations': operations,
+    'export_operations': export_operations,
+    'import_operations': import_operations
+}
+
 options: Dict[str, dict] = {}
 
 
 def merge_operations():
     all_operations.clear()
-    all_operations.update(operations)
-    all_operations.update(export_operations)
-    all_operations.update(import_operations)
+    for ops in _meta.values():
+        all_operations.update(ops)
 
 
-def load_operations():
-    global operations
-    os.makedirs(os.path.join("plugins", "operations"), exist_ok=True)
-    operations = _load_operations_group([
-        os.path.join(os.path.dirname(__file__), "operations"),
-        os.path.join("plugins", "operations")
+def _load_operation_name(name):
+    os.makedirs(os.path.join("plugins", name), exist_ok=True)
+    _meta[name].clear()
+    name_operations = _load_operations_group([
+        os.path.join(os.path.dirname(__file__), name),
+        os.path.join("plugins", name)
     ])
+    _meta[name].update(name_operations)
+
+
+def reload_operations():
+    for dir_name in _meta.keys():
+        _load_operation_name(dir_name)
     merge_operations()
 
 
-load_operations()
-
-
-def load_export_operations():
-    global export_operations
-    os.makedirs(os.path.join("plugins", "export_operations"), exist_ok=True)
-    export_operations = _load_operations_group([
-        os.path.join(os.path.dirname(__file__), "export_operations"),
-        os.path.join("plugins", "export_operations")
-    ])
-    merge_operations()
-
-
-load_export_operations()
-
-
-def load_import_operations():
-    global import_operations
-    os.makedirs(os.path.join("plugins", "import_operations"), exist_ok=True)
-    import_operations = _load_operations_group([
-        os.path.join(os.path.dirname(__file__), "import_operations"),
-        os.path.join("plugins", "import_operations")
-    ])
-    merge_operations()
-
-
-load_import_operations()
+reload_operations()
