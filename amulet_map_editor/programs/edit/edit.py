@@ -4,13 +4,11 @@ from types import GeneratorType
 import webbrowser
 import time
 import traceback
+import os
 
-from amulet.api.block import Block
 from amulet.api.selection import SelectionGroup, SelectionBox
-from amulet.api.structure import Structure, structure_buffer
+from amulet.api.structure import Structure
 from amulet.api.data_types import OperationType, OperationReturnType
-from amulet.operations.paste import paste
-from amulet.operations.fill import fill
 
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor import plugins
@@ -104,7 +102,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             )
             self._select_options = SelectOptions(self._canvas)
             self._operation_options = OperationUI(
-                self._canvas, self._world, self._run_operation, self._run_main_operation
+                self._canvas, self._world, self._run_operation_event, self._run_main_operation
             )
             self._tool_panel = ToolSelect(self._canvas)
 
@@ -263,8 +261,13 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             )
             return None
 
-    def _run_operation(self, evt):
-        operation_path = self._operation_options.operation
+    def _run_operation_event(self, evt):
+        self._run_operation()
+        evt.Skip()
+
+    def _run_operation(self, operation_path=None) -> Any:
+        if operation_path is None:
+            operation_path = self._operation_options.operation
         operation = plugins.all_operations[operation_path]
         features = operation.get("features", [])
         operation_input_definitions = operation.get("inputs", [])
@@ -340,11 +343,11 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
         else:
             self._operation_options.Disable()
-            self._run_main_operation(
+            out = self._run_main_operation(
                 operation_path, operation["operation"], operation_input_definitions
             )
             self._operation_options.Enable()
-        evt.Skip()
+            return out
 
     def _run_main_operation(
         self,
@@ -353,7 +356,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         operation_input_definitions: List[str],
         options=None,
         structure=None,
-    ):
+    ) -> Any:
         operation_inputs = []
         for inp in operation_input_definitions:
             if inp == "src_selection":
@@ -372,7 +375,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
         self._canvas.disable_threads()
         try:
-            show_loading_dialog(
+            out = show_loading_dialog(
                 lambda: operation(
                     self._world, self._canvas.dimension, *operation_inputs
                 ),
@@ -390,56 +393,21 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             log.error(f"{e}\n{traceback.format_exc()}")
             wx.MessageBox(f"Error running operation: {e}")
             self._world.restore_last_undo_point()
+            out = None
         self._canvas.enable_threads()
+        return out
 
     def _cut(self) -> bool:
-        if self._copy():
-            return self._delete()
-        return False
+        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'cut.py'))
 
     def _copy(self) -> bool:
-        selection = self._get_box()
-        if selection is None:
-            return False
-        structure = show_loading_dialog(
-            lambda: Structure.from_world(
-                self._world, selection, self._canvas.dimension
-            ),
-            f"Copying selection.",
-            "",
-            self,
-        )
-        structure_buffer.append(structure)
-        return True
+        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'copy.py'))
 
     def _paste(self) -> bool:
-        if structure_buffer:
-            self.show_operation_options(None)
-            structure = structure_buffer[-1]
-            self._operation_options.enable_select_destination_ui(
-                None, paste, ["structure", "options"], structure, {}
-            )
-            return True
-        return False
+        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'paste.py'))
 
     def _delete(self) -> bool:
-        selection = self._get_box()
-        if selection is None:
-            return False
-        show_loading_dialog(
-            lambda: fill(
-                self._world,
-                self._canvas.dimension,
-                selection,
-                {"fill_block": Block("universal_minecraft", "air")},
-            ),
-            f"Deleting selection.",
-            "",
-            self,
-        )
-        self._world.create_undo_point()
-        self._file_panel.update_buttons()
-        return True
+        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'delete.py'))
 
     def show_select_options(self, _):
         self._operation_options.Hide()
