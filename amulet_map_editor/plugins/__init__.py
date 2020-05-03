@@ -84,7 +84,7 @@ def _error(name, msg):
     log.error(f"Error loading plugin {name}. {msg}")
 
 
-def parse_export(plugin: dict, operations_dict, path):
+def parse_export(plugin: dict, operations_dict: Dict[str, dict], path: str):
     error = functools.partial(_error, path)
 
     if not isinstance(plugin, dict):
@@ -93,7 +93,6 @@ def parse_export(plugin: dict, operations_dict, path):
     if not isinstance(plugin.get("name", None), str):
         error('"name" in export must exist and be a string.')
         return
-    plugin_name = plugin["name"]
     structure_callable_options = ["options"]
     input_options = ["options"]
     dst_ui_enabled = False
@@ -194,7 +193,8 @@ def parse_export(plugin: dict, operations_dict, path):
     operations_dict[path] = plugin
 
 
-def _load_operations(operations: Dict[str, dict], path: str):
+def _load_operations(operations_: Dict[str, dict], path: str):
+    """load all operations from a specified directory"""
     if os.path.isdir(path):
         for fpath in glob.iglob(os.path.join(path, "*.py")):
             if fpath.endswith("__init__.py"):
@@ -203,30 +203,31 @@ def _load_operations(operations: Dict[str, dict], path: str):
             mod = _load_module_file(fpath)
             if hasattr(mod, "export"):
                 plugin = getattr(mod, "export")
-                parse_export(plugin, operations, fpath)
+                parse_export(plugin, operations_, fpath)
             elif hasattr(mod, "exports"):
                 for plugin in getattr(mod, "exports"):
-                    parse_export(plugin, operations, fpath)
+                    parse_export(plugin, operations_, fpath)
 
         for dpath in glob.iglob(os.path.join(path, "**", "__init__.py")):
             mod = _load_module_directory(dpath)
             if hasattr(mod, "export"):
                 plugin = getattr(mod, "export")
                 parse_export(
-                    plugin, operations, os.path.basename(os.path.dirname(dpath))
+                    plugin, operations_, os.path.basename(os.path.dirname(dpath))
                 )
             elif hasattr(mod, "exports"):
                 for plugin in getattr(mod, "exports"):
                     parse_export(
-                        plugin, operations, os.path.basename(os.path.dirname(dpath))
+                        plugin, operations_, os.path.basename(os.path.dirname(dpath))
                     )
 
 
-def _load_operations_group(paths: List[str]):
-    operations = {}
-    for path in paths:
-        _load_operations(operations, path)
-    return operations
+def _load_operations_group(dir_paths: List[str]):
+    """Load operations from a list of directory paths"""
+    operations_: Dict[str, dict] = {}
+    for dir_path in dir_paths:
+        _load_operations(operations_, dir_path)
+    return operations_
 
 
 all_operations: Dict[str, dict] = {}
@@ -240,29 +241,38 @@ _meta: Dict[str, Dict[str, dict]] = {
     'export_operations': export_operations,
     'import_operations': import_operations
 }
+_public = {
+    'operations',
+    'export_operations',
+    'import_operations'
+}
 
 options: Dict[str, dict] = {}
 
 
 def merge_operations():
+    """Merge all loaded operations into all_operations"""
     all_operations.clear()
     for ops in _meta.values():
         all_operations.update(ops)
 
 
-def _load_operation_name(name):
-    os.makedirs(os.path.join("plugins", name), exist_ok=True)
-    _meta[name].clear()
-    name_operations = _load_operations_group([
-        os.path.join(os.path.dirname(__file__), name),
-        os.path.join("plugins", name)
-    ])
-    _meta[name].update(name_operations)
+def _reload_operation_name(dir_name):
+    """reload all operations in a directory name."""
+    if dir_name in _public:
+        os.makedirs(os.path.join("plugins", dir_name), exist_ok=True)
+    _meta[dir_name].clear()
+    name_operations = _load_operations_group(
+        [os.path.join(os.path.dirname(__file__), dir_name)] +
+        [os.path.join("plugins", dir_name)] * (dir_name in _public)
+    )
+    _meta[dir_name].update(name_operations)
 
 
 def reload_operations():
+    """Reload all operations"""
     for dir_name in _meta.keys():
-        _load_operation_name(dir_name)
+        _reload_operation_name(dir_name)
     merge_operations()
 
 
