@@ -72,13 +72,14 @@ class SimpleChoice(wx.Choice):
 
 
 class SimpleChoiceAny(wx.Choice):
-    def __init__(self, parent, sort=True):
+    def __init__(self, parent, sort=True, reversed=False):
         super().__init__(
             parent
         )
         self._values: List[Any] = []
         self._keys: List[str] = []
         self._sorted = sort
+        self._reversed = reversed
 
     @property
     def values(self) -> List[Any]:
@@ -94,11 +95,15 @@ class SimpleChoiceAny(wx.Choice):
             items = [[str(value), key] for key, value in items.items()]
             if self._sorted:
                 items = sorted(items, key=lambda x: x[0])
+                if self._reversed:
+                    items = reversed(items)
             self._keys = [key for key, _ in items]
             self._values = [value for _, value in items]
         else:
             if self._sorted:
                 self._values = list(sorted(items))
+                if self._reversed:
+                    self._values = reversed(self._values)
             else:
                 self._values = list(items)
             self._keys = [str(v) for v in self._values]
