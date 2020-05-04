@@ -90,7 +90,6 @@ class TriMesh:
         if self._vao is not None:
             glDeleteVertexArrays(1, self._vao)
             self._vao = None
-            self._vbo = None
 
     def draw(self, transformation_matrix: numpy.ndarray):
         self._setup()
