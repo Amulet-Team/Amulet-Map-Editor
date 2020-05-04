@@ -2,70 +2,45 @@ from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleText, SimpleCh
 import wx
 import PyMCTranslate
 import amulet_nbt
-from typing import Tuple, List, Optional, Type, Dict
+from typing import Tuple, List, Optional, Type, Dict, Any
 from amulet.api.block import Block
 
 
-class VersionSelect(SimplePanel):
-    def __init__(
-            self,
-            parent,
-            translation_manager: PyMCTranslate.TranslationManager,
-            platform: str = None,
-            version: Tuple[int, int, int] = None,
-            blockstate: bool = None
-    ):
+class BaseSelect(SimplePanel):
+    def __init__(self, parent):
         super().__init__(parent)
 
-        self._translation_manager = translation_manager
-        self._platform_list: Optional[SimpleChoice] = None
-        self._version_list: Optional[SimpleChoiceAny] = None
-        self._blockstate_button: Optional[wx.CheckBox] = None
-        self._setup_ui()
-        self._populate_version(platform, version, blockstate)
-
-    @property
-    def options(self) -> Tuple[str, Tuple[int, int, int], bool]:
-        return self.platform, self.version, self.force_blockstate
-
-    def _populate_version(
-            self,
-            platform: str = None,
-            version: Tuple[int, int, int] = None,
-            blockstate: bool = None
-    ):
-        self._set_platform(platform=platform, version=version, blockstate=blockstate)
-
-    def _add_ui_element(self, label: str, obj: Type[wx.Control]) -> wx.Control:
+    def _add_ui_element(self, label: str, obj: Type[wx.Control], **kwargs) -> Any:
         panel = SimplePanel(self, wx.HORIZONTAL)
         self.add_object(panel, 0)
         text = SimpleText(panel, label)
         panel.add_object(text, 0, wx.CENTER | wx.ALL)
-        wx_obj = obj(panel)
+        wx_obj = obj(panel, **kwargs)
         panel.add_object(wx_obj, 0, wx.CENTER | wx.ALL)
         return wx_obj
 
-    def _setup_ui(self):
-        self._platform_list = self._add_ui_element("Platform", SimpleChoice)
-        self._version_list = self._add_ui_element("Version", SimpleChoiceAny)
-        self._blockstate_button = self._add_ui_element("Force Blockstate", wx.CheckBox)
 
-        self._platform_list.Bind(wx.EVT_CHOICE, self._update_version)
-        self._version_list.Bind(wx.EVT_CHOICE, self._update_blockstate)
+class PlatformSelect(BaseSelect):
+    def __init__(
+            self,
+            parent: wx.Window,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str = None
+    ):
+        super().__init__(parent)
+        self._translation_manager = translation_manager
+        self._platform_list: SimpleChoice = self._add_ui_element("Platform", SimpleChoice)
+        self._set_platform(platform)
+
+    @property
+    def options(self) -> str:
+        return self.platform
 
     @property
     def platform(self) -> str:
         return self._platform_list.GetCurrentString()
 
-    @property
-    def version(self) -> Tuple[int, int, int]:
-        return self._version_list.GetAny()
-
-    @property
-    def force_blockstate(self) -> bool:
-        return self._blockstate_button.GetValue()
-
-    def _set_platform(self, platform: str = None, **kwargs):
+    def _set_platform(self, platform: str = None):
         platforms = self._translation_manager.platforms()
         self._platform_list.SetItems(
             platforms
@@ -74,39 +49,99 @@ class VersionSelect(SimplePanel):
             self._platform_list.SetSelection(platforms.index(platform))
         else:
             self._platform_list.SetSelection(0)
-        self._set_version(**kwargs)
 
-    def _update_version(self, evt):
-        self._set_version()
-        evt.Skip()
+    def _set_platform_recursive(self, platform: str = None, **kwargs):
+        self._set_platform(platform)
+        self._set_version_recursive(**kwargs)
 
-    def _set_version(self, version: Tuple[int, int, int] = None, **kwargs):
+    def _set_version_recursive(self, version: Tuple[int, int, int] = None, **kwargs):
+        pass
+
+
+class VersionSelect(PlatformSelect):
+    def __init__(
+            self,
+            parent: wx.Window,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str = None,
+            version: Tuple[int, int, int] = None
+    ):
+        super().__init__(parent, translation_manager, platform)
+        self._version_list: Optional[SimpleChoiceAny] = self._add_ui_element("Version", SimpleChoiceAny)
+        self._platform_list.Bind(wx.EVT_CHOICE, self._on_platform_change)
+        self._set_version(version)
+
+    @property
+    def options(self) -> Tuple[str, Tuple[int, int, int]]:
+        return self.platform, self.version
+
+    @property
+    def version(self) -> Tuple[int, int, int]:
+        return self._version_list.GetAny()
+
+    def _set_version(self, version: Tuple[int, int, int] = None):
         self._version_list.SetItems(
             self._translation_manager.version_numbers(self.platform)
         )
         versions = self._version_list.values
         if version and version in versions:
             self._version_list.SetSelection(versions.index(version))
-        self._set_blockstate(**kwargs)
 
-    def _update_blockstate(self, evt):
-        self._set_blockstate()
+    def _on_platform_change(self, evt):
+        self._set_version_recursive()
         evt.Skip()
 
-    def _set_blockstate(self, blockstate: bool = None, **kwargs):
+    def _set_version_recursive(self, version: Tuple[int, int, int] = None, **kwargs):
+        self._set_version(version)
+        self._set_blockstate_recursive(**kwargs)
+
+    def _set_blockstate_recursive(self, blockstate: bool = None, **kwargs):
+        pass
+
+
+class SubVersionSelect(VersionSelect):
+    def __init__(
+            self,
+            parent: wx.Window,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str = None,
+            version: Tuple[int, int, int] = None,
+            blockstate: bool = None
+    ):
+        super().__init__(parent, translation_manager, platform, version)
+        self._blockstate_button: Optional[wx.CheckBox] = self._add_ui_element("Force Blockstate", wx.CheckBox)
+        self._version_list.Bind(wx.EVT_CHOICE, self._on_version_change)
+        self._set_blockstate(blockstate)
+
+    @property
+    def options(self) -> Tuple[str, Tuple[int, int, int], bool]:
+        return self.platform, self.version, self.force_blockstate
+
+    @property
+    def force_blockstate(self) -> bool:
+        return self._blockstate_button.GetValue()
+
+    def _set_blockstate(self, blockstate: bool = None):
         if self._translation_manager.get_version(self.platform, self.version).has_abstract_format:
             self._blockstate_button.Enable()
             if blockstate is not None:
                 self._blockstate_button.SetValue(blockstate)
         else:
             self._blockstate_button.Disable()
-        self._set_namespace(**kwargs)
 
-    def _set_namespace(self, namespace: str = None, **kwargs):
+    def _on_version_change(self, evt):
+        self._set_blockstate_recursive()
+        evt.Skip()
+
+    def _set_blockstate_recursive(self, blockstate: bool = None, **kwargs):
+        self._set_blockstate(blockstate)
+        self._set_namespace_recursive(**kwargs)
+
+    def _set_namespace_recursive(self, namespace: str = None, **kwargs):
         pass
 
 
-class BlockSelect(VersionSelect):
+class BlockSelect(SubVersionSelect):
     def __init__(
             self,
             parent,
@@ -117,8 +152,6 @@ class BlockSelect(VersionSelect):
             namespace: str = None,
             base_name: str = None
     ):
-        self._namespace_list: Optional[SimpleChoice] = None
-        self._base_name_list: Optional[SimpleChoice] = None
         super().__init__(
             parent,
             translation_manager,
@@ -126,37 +159,16 @@ class BlockSelect(VersionSelect):
             version,
             blockstate
         )
-        self._populate_block(platform, version, blockstate, namespace, base_name)
+        self._namespace_list: Optional[SimpleChoice] = self._add_ui_element("Namespace", SimpleChoice)
+        self._base_name_list: Optional[SimpleChoice] = self._add_ui_element("Base name", SimpleChoice)
+        self._blockstate_button.Bind(wx.EVT_CHECKBOX, self._on_sub_version_change)
+        self._set_namespace(namespace)
+        self._namespace_list.Bind(wx.EVT_CHOICE, self._on_namespace_change)
+        self._set_base_name(base_name)
 
     @property
     def options(self) -> Tuple[str, Tuple[int, int, int], bool, str, str]:
         return self.platform, self.version, self.force_blockstate, self.namespace, self.base_name
-
-    def _populate_version(
-            self,
-            platform: str = None,
-            version: Tuple[int, int, int] = None,
-            blockstate: bool = None
-    ):
-        pass
-
-    def _populate_block(
-            self,
-            platform: str = None,
-            version: Tuple[int, int, int] = None,
-            blockstate: bool = None,
-            namespace: str = None,
-            base_name: str = None
-    ):
-        self._set_platform(platform=platform, version=version, blockstate=blockstate, namespace=namespace, base_name=base_name)
-
-    def _setup_ui(self):
-        super()._setup_ui()
-        self._namespace_list = self._add_ui_element("Namespace", SimpleChoice)
-        self._base_name_list = self._add_ui_element("Base name", SimpleChoice)
-
-        self._blockstate_button.Bind(wx.EVT_CHECKBOX, self._update_namespace)
-        self._namespace_list.Bind(wx.EVT_CHOICE, self._update_base_name)
 
     @property
     def namespace(self) -> str:
@@ -166,11 +178,11 @@ class BlockSelect(VersionSelect):
     def base_name(self) -> str:
         return self._base_name_list.GetCurrentString()
 
-    def _update_namespace(self, evt):
-        self._set_namespace()
+    def _on_sub_version_change(self, evt):
+        self._set_namespace_recursive()
         evt.Skip()
 
-    def _set_namespace(self, namespace: str = None, **kwargs):
+    def _set_namespace(self, namespace: str = None):
         version = self._translation_manager.get_version(self.platform, self.version)
         namespaces = version.block.namespaces(self.force_blockstate)
         self._namespace_list.SetItems(
@@ -180,13 +192,16 @@ class BlockSelect(VersionSelect):
             self._namespace_list.SetSelection(namespaces.index(namespace))
         else:
             self._namespace_list.SetSelection(0)
-        self._set_base_name(**kwargs)
 
-    def _update_base_name(self, evt):
-        self._set_base_name()
+    def _set_namespace_recursive(self, namespace: str = None, **kwargs):
+        self._set_namespace(namespace)
+        self._set_base_name_recursive(**kwargs)
+
+    def _on_namespace_change(self, evt):
+        self._set_base_name_recursive()
         evt.Skip()
 
-    def _set_base_name(self, base_name: str = None, **kwargs):
+    def _set_base_name(self, base_name: str = None):
         version = self._translation_manager.get_version(self.platform, self.version)
         base_names = version.block.base_names(self.namespace, self.force_blockstate)
         self._base_name_list.SetItems(
@@ -196,6 +211,9 @@ class BlockSelect(VersionSelect):
             self._base_name_list.SetSelection(base_names.index(base_name))
         else:
             self._base_name_list.SetSelection(0)
+
+    def _set_base_name_recursive(self, base_name: str = None, **kwargs):
+        self._set_base_name(base_name)
         self._set_properties(**kwargs)
 
     def _set_properties(self, properties: Dict[str, str] = None):
@@ -215,9 +233,6 @@ class BlockDefine(BlockSelect):
             properties: Dict[str, str] = None,
             wildcard: bool = False
     ):
-        self._properties: List[SimplePanel] = []
-        self._wildcard = wildcard
-        self._properties_panel: Optional[SimplePanel] = None
         super().__init__(
             parent,
             translation_manager,
@@ -227,46 +242,16 @@ class BlockDefine(BlockSelect):
             namespace,
             base_name
         )
-        self._populate_properties(platform, version, blockstate, namespace, base_name, properties)
+        self._properties: List[SimplePanel] = []
+        self._wildcard = wildcard
+        self._base_name_list.Bind(wx.EVT_CHOICE, self._on_base_name_change)
+        self._properties_panel: Optional[SimplePanel] = SimplePanel(self, wx.VERTICAL)
+        self.add_object(self._properties_panel, 0)
+        self._set_properties(properties)
 
     @property
     def options(self) -> Tuple[str, Tuple[int, int, int], bool, str, str, Dict[str, str]]:
         return self.platform, self.version, self.force_blockstate, self.namespace, self.base_name, self.properties
-
-    def _populate_version(
-            self,
-            platform: str = None,
-            version: Tuple[int, int, int] = None,
-            blockstate: bool = None
-    ):
-        pass
-
-    def _populate_block(
-            self,
-            platform: str = None,
-            version: Tuple[int, int, int] = None,
-            blockstate: bool = None,
-            namespace: str = None,
-            base_name: str = None
-    ):
-        pass
-
-    def _populate_properties(
-            self,
-            platform: str = None,
-            version: Tuple[int, int, int] = None,
-            blockstate: bool = None,
-            namespace: str = None,
-            base_name: str = None,
-            properties: Dict[str, str] = None
-    ):
-        self._set_platform(platform=platform, version=version, blockstate=blockstate, namespace=namespace, base_name=base_name, properties=properties)
-
-    def _setup_ui(self):
-        super()._setup_ui()
-        self._base_name_list.Bind(wx.EVT_CHOICE, self._update_properties)
-        self._properties_panel = SimplePanel(self, wx.VERTICAL)
-        self.add_object(self._properties_panel, 0)
 
     @property
     def properties(self) -> Dict[str, str]:
@@ -309,7 +294,7 @@ class BlockDefine(BlockSelect):
         else:
             name_list.SetSelection(0)
 
-    def _update_properties(self, evt):
+    def _on_base_name_change(self, evt):
         self._set_properties()
         evt.Skip()
 
