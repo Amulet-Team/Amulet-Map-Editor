@@ -4,6 +4,7 @@ import wx
 import os
 from amulet_map_editor.amulet_wx.simple import SimpleDialog
 from amulet.api.block import BlockManager
+from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension
 from amulet.api.structure import Structure
 from amulet.structure_interface.construction import ConstructionFormatWrapper
@@ -44,7 +45,12 @@ def import_construction(
         selection = wrapper.selection
 
         global_palette = BlockManager()
-        chunks = {(cx, cz): wrapper.load_chunk(cx, cz, global_palette) for (cx, cz) in wrapper.all_chunk_coords()}
+        chunks = {}
+        for (cx, cz) in wrapper.all_chunk_coords():
+            try:
+                chunks[(cx, cz)] = wrapper.load_chunk(cx, cz, global_palette)
+            except ChunkLoadError:
+                pass
 
         wrapper.close()
         return Structure(
