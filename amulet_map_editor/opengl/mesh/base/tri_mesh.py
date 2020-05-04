@@ -84,8 +84,10 @@ class TriMesh:
 
     def unload(self):
         """Unload all opengl data"""
-        if self._vao is not None:
+        if self._vbo is not None:
             glDeleteBuffers(1, self._vbo)
+            self._vbo = None
+        if self._vao is not None:
             glDeleteVertexArrays(1, self._vao)
             self._vao = None
             self._vbo = None
