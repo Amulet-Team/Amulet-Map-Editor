@@ -67,7 +67,7 @@ class VersionSelect(PlatformSelect):
             version: Tuple[int, int, int] = None
     ):
         super().__init__(parent, translation_manager, platform)
-        self._version_list: Optional[SimpleChoiceAny] = self._add_ui_element("Version", SimpleChoiceAny)
+        self._version_list: Optional[SimpleChoiceAny] = self._add_ui_element("Version", SimpleChoiceAny, reverse=True)
         self._platform_list.Bind(wx.EVT_CHOICE, self._on_platform_change)
         self._set_version(version)
 
