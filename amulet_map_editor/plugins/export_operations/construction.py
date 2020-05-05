@@ -49,7 +49,8 @@ def show_ui(parent, world: "World", options: dict) -> dict:
     dialog.custom_panel.add_object(file_picker, 0)
     version_define = VersionSelect(
         dialog.custom_panel,
-        world.translation_manager
+        world.translation_manager,
+        options.get("platform", None) or world.world_wrapper.platform
     )
     dialog.custom_panel.add_object(version_define, 0)
     dialog.Fit()

@@ -29,7 +29,7 @@ def show_ui(parent, world: "World", options: dict) -> dict:
     block_define = BlockDefine(
         dialog.custom_panel,
         world.world_wrapper.translation_manager,
-        *options.get("fill_block_options", [])
+        *(options.get("fill_block_options", []) or [world.world_wrapper.platform])
     )
     dialog.custom_panel.add_object(block_define)
     dialog.Fit()

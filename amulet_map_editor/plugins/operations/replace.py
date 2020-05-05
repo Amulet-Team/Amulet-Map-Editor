@@ -63,8 +63,17 @@ def show_ui(parent, world: "World", options: dict) -> dict:
     horizontal_panel = SimplePanel(dialog.custom_panel, wx.HORIZONTAL)
     dialog.custom_panel.add_object(horizontal_panel)
 
-    original_block = BlockDefine(horizontal_panel, world.world_wrapper.translation_manager, *options.get("original_block_options", []), wildcard=True)
-    replacement_block = BlockDefine(horizontal_panel, world.world_wrapper.translation_manager, *options.get("replacement_block_options", []))
+    original_block = BlockDefine(
+        horizontal_panel,
+        world.world_wrapper.translation_manager,
+        *(options.get("original_block_options", []) or [world.world_wrapper.platform]),
+        wildcard=True
+    )
+    replacement_block = BlockDefine(
+        horizontal_panel,
+        world.world_wrapper.translation_manager,
+        *(options.get("replacement_block_options", []) or [world.world_wrapper.platform])
+    )
     horizontal_panel.add_object(original_block, 0)
     horizontal_panel.add_object(replacement_block, 0)
     dialog.Fit()
