@@ -124,13 +124,11 @@ class ControllableEditCanvas(EditCanvas):
         else:
             location = self._collision_location_distance(10)
         if self._selection_box.select_state == 0:
-            self._selection_box.point1 = self._selection_box.point2 = location
-            x, y, z = self._selection_box.point1
+            (x, y, z) = self._selection_box.point1 = self._selection_box.point2 = location
             wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
             wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
         elif self._selection_box.select_state == 1:
-            self._selection_box.point2 = location
-            x, y, z = self._selection_box.point2
+            (x, y, z) = self._selection_box.point2 = location
             wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
         elif self._selection_box.select_state == 2:
             self._selection_box2.point1 = self._selection_box2.point2 = location

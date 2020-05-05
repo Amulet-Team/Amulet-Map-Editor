@@ -49,9 +49,10 @@ class RenderSelection(TriMesh):
 
     @point1.setter
     def point1(self, val):
-        self._points[0] = val
-        self._bounds_ = None
-        self._rebuild = True
+        if not numpy.array_equal(self._points[0], val):
+            self._points[0] = val
+            self._bounds_ = None
+            self._rebuild = True
 
     @property
     def point2(self) -> numpy.ndarray:
@@ -59,9 +60,10 @@ class RenderSelection(TriMesh):
 
     @point2.setter
     def point2(self, val):
-        self._points[1] = val
-        self._bounds_ = None
-        self._rebuild = True
+        if not numpy.array_equal(self._points[1], val):
+            self._points[1] = val
+            self._bounds_ = None
+            self._rebuild = True
 
     @property
     def _bounds(self) -> numpy.ndarray:
@@ -121,6 +123,7 @@ class RenderSelection(TriMesh):
             self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(self.point2-0.01, self.point2+1.01)
 
         self.change_verts()
+        self._rebuild = False
 
     def draw(self, transformation_matrix: numpy.ndarray, draw_corners=True):
         self._setup()
