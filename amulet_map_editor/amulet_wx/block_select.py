@@ -25,10 +25,13 @@ class PlatformSelect(BaseSelect):
             self,
             parent: wx.Window,
             translation_manager: PyMCTranslate.TranslationManager,
-            platform: str = None
+            platform: str = None,
+            allow_universal: bool = True,
+            **kwargs
     ):
         super().__init__(parent)
         self._translation_manager = translation_manager
+        self._allow_universal = allow_universal
         self._platform_list: SimpleChoice = self._add_ui_element("Platform", SimpleChoice)
         self._set_platform(platform)
 
@@ -42,6 +45,8 @@ class PlatformSelect(BaseSelect):
 
     def _set_platform(self, platform: str = None):
         platforms = self._translation_manager.platforms()
+        if not self._allow_universal and "universal" in platforms:
+            platforms.remove("universal")
         self._platform_list.SetItems(
             platforms
         )
@@ -64,9 +69,15 @@ class VersionSelect(PlatformSelect):
             parent: wx.Window,
             translation_manager: PyMCTranslate.TranslationManager,
             platform: str = None,
-            version: Tuple[int, int, int] = None
+            version: Tuple[int, int, int] = None,
+            **kwargs
     ):
-        super().__init__(parent, translation_manager, platform)
+        super().__init__(
+            parent,
+            translation_manager,
+            platform,
+            **kwargs
+        )
         self._version_list: Optional[SimpleChoiceAny] = self._add_ui_element("Version", SimpleChoiceAny, reverse=True)
         self._platform_list.Bind(wx.EVT_CHOICE, self._on_platform_change)
         self._set_version(version)
@@ -106,9 +117,16 @@ class SubVersionSelect(VersionSelect):
             translation_manager: PyMCTranslate.TranslationManager,
             platform: str = None,
             version: Tuple[int, int, int] = None,
-            blockstate: bool = None
+            blockstate: bool = None,
+            **kwargs
     ):
-        super().__init__(parent, translation_manager, platform, version)
+        super().__init__(
+            parent,
+            translation_manager,
+            platform,
+            version,
+            **kwargs
+        )
         self._blockstate_button: Optional[wx.CheckBox] = self._add_ui_element("Force Blockstate", wx.CheckBox)
         self._version_list.Bind(wx.EVT_CHOICE, self._on_version_change)
         self._set_blockstate(blockstate)
@@ -150,14 +168,16 @@ class BlockSelect(SubVersionSelect):
             version: Tuple[int, int, int] = None,
             blockstate: bool = None,
             namespace: str = None,
-            base_name: str = None
+            base_name: str = None,
+            **kwargs
     ):
         super().__init__(
             parent,
             translation_manager,
             platform,
             version,
-            blockstate
+            blockstate,
+            **kwargs
         )
         self._namespace_list: Optional[SimpleChoice] = self._add_ui_element("Namespace", SimpleChoice)
         self._base_name_list: Optional[SimpleChoice] = self._add_ui_element("Base name", SimpleChoice)
@@ -231,7 +251,8 @@ class BlockDefine(BlockSelect):
             namespace: str = None,
             base_name: str = None,
             properties: Dict[str, str] = None,
-            wildcard: bool = False
+            wildcard: bool = False,
+            **kwargs
     ):
         super().__init__(
             parent,
@@ -240,7 +261,8 @@ class BlockDefine(BlockSelect):
             version,
             blockstate,
             namespace,
-            base_name
+            base_name,
+            **kwargs
         )
         self._properties: List[SimplePanel] = []
         self._wildcard = wildcard
