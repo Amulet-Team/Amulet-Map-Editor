@@ -95,9 +95,9 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._file_panel = FilePanel(
                 self._canvas,
                 self._world,
-                self._undo_event,
-                self._redo_event,
-                self._save_event,
+                self._undo,
+                self._redo,
+                self._save_world,
                 self._close_world,
             )
             self._select_options = SelectOptions(self._canvas)
@@ -188,10 +188,10 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         )
         # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
         menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
-            "Undo\tCtrl+z", lambda evt: self._world.undo()
+            "Undo\tCtrl+z", lambda evt: self._undo()
         )
         menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
-            "Redo\tCtrl+y", lambda evt: self._world.redo()
+            "Redo\tCtrl+y", lambda evt: self._redo()
         )
         menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
             "Cut\tCtrl+x", lambda evt: self._cut()
@@ -224,18 +224,15 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
 
-    def _undo_event(self, _):
+    def _undo(self, *_):
         self._world.undo()
         self._file_panel.update_buttons()
 
-    def _redo_event(self, _):
+    def _redo(self, *_):
         self._world.redo()
         self._file_panel.update_buttons()
 
-    def _save_event(self, _):
-        self._save_world()
-
-    def _save_world(self):
+    def _save_world(self, *_):
         self._canvas.disable_threads()
 
         def save():
