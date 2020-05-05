@@ -404,6 +404,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'copy.py'))
 
     def _paste(self) -> bool:
+        self.show_operation_options(None)
         return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'paste.py'))
 
     def _delete(self) -> bool:
