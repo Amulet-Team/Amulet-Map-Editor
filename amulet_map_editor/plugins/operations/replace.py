@@ -88,7 +88,7 @@ def show_ui(parent, world: "World", options: dict) -> dict:
                 replacement_block.block,
                 force_blockstate=replacement_block.force_blockstate
             )[0],
-            "replacement_block_options": original_block.options,
+            "replacement_block_options": replacement_block.options,
         }
     return options
 
