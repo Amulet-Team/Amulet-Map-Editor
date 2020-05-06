@@ -216,7 +216,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
     @staticmethod
     def _help_controls():
         webbrowser.open(
-            "https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/plugins/programs/edit/readme.md"
+            "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/edit/readme.md"
         )
 
     def _on_resize(self, event):

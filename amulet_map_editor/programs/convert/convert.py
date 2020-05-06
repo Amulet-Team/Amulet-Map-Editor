@@ -86,7 +86,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
         return menu
 
     def _help_controls(self):
-        webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/plugins/programs/convert/readme.md")
+        webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/convert/readme.md")
 
     def _show_world_select(self, evt):
         select_world = WorldSelectWindow(self, self._output_world_callback)

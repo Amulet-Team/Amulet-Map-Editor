@@ -218,7 +218,7 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
         select_world.ShowModal()
 
     def _documentation(self, evt):
-        webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/tree/master/amulet_map_editor/readme.md')
+        webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/readme.md')
 
     def _discord(self, evt):
         webbrowser.open('https://discord.gg/BTm6jnf')
