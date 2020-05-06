@@ -1,7 +1,9 @@
 from OpenGL.GL import *
+from OpenGL.error import GLError
 import numpy
 from amulet_map_editor.opengl.mesh import new_empty_verts
 from amulet_map_editor.opengl.shaders import get_shader
+from amulet_map_editor import log
 
 
 class TriMesh:
@@ -69,8 +71,18 @@ class TriMesh:
 
     def change_verts(self, verts=None):
         """Modify the vertices in OpenGL."""
-        glBindVertexArray(self._vao)
-        glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
+        log.debug(f'change_verts {self}')
+        try:
+            glBindVertexArray(self._vao)
+            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
+        except GLError:  # There seems to be errors randomly when binding the VBO
+            log.debug(f'Failed binding the OpenGL state for {self}. Trying to reload it.')
+            self.unload()
+            self._setup()
+            if verts is None:
+                return
+            glBindVertexArray(self._vao)
+            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
         self._change_verts(verts)
         glBindVertexArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
@@ -84,6 +96,7 @@ class TriMesh:
 
     def unload(self):
         """Unload all opengl data"""
+        log.debug(f'unload {self}')
         if self._vbo is not None:
             glDeleteBuffers(1, self._vbo)
             self._vbo = None
