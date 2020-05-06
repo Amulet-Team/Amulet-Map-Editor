@@ -23,6 +23,8 @@ In order to run Amulet from source, you will need to install the following packa
 
 The following can be easily installed using `python -m pip install -r requirements.txt`
 
+For linux run `python -m pip install -r requirements_linux.txt`
+
 - numpy
 - wxpython
 - pyopengl
