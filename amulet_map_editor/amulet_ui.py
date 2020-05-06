@@ -97,7 +97,6 @@ class AmuletMainWindow(wx.Frame):
 
     def _page_change(self, evt):
         self._disable_enable()
-        evt.Skip()
 
     def _disable_enable(self):
         current: BaseWorldUI = self.world_tab_holder.GetCurrentPage()

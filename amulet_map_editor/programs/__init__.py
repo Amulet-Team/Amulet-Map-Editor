@@ -114,7 +114,6 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
                 self._extensions[self.GetSelection()].enable()
                 self.GetGrandParent().create_menu()
             self._last_extension = self.GetSelection()
-        evt.Skip()
 
     def disable(self):
         self._extensions[self.GetSelection()].disable()
