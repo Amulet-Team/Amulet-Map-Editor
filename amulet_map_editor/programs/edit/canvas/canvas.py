@@ -96,9 +96,6 @@ class EditCanvas(glcanvas.GLCanvas):
         self._draw_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
 
-        self._input_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._process_inputs, self._input_timer)
-
         self._gc_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
 
@@ -317,7 +314,7 @@ class EditCanvas(glcanvas.GLCanvas):
                 except ChunkLoadError:
                     chunk = None
 
-            if chunk is not None and self._render_world.world.palette[chunk.blocks[x%16, y, z%16]].namespaced_name != 'universal_minecraft:air':
+            if chunk is not None and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]].namespaced_name != 'universal_minecraft:air':
                 return location
         return location
 

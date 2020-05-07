@@ -34,15 +34,18 @@ class ControllableEditCanvas(EditCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
         self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
+        self.Bind(wx.EVT_RIGHT_DCLICK, self._toggle_mouse_lock)
         self.Bind(wx.EVT_LEFT_UP, self._box_click)
         self.Bind(wx.EVT_RIGHT_UP, self._toggle_selection_mode)
-        self.Bind(wx.EVT_RIGHT_DCLICK, self._toggle_mouse_lock)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
         self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
         self.Bind(wx.EVT_KEY_UP, self._on_key_release)
         self.Bind(wx.EVT_MOUSEWHEEL, self._mouse_wheel)
         self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
+
+        self._input_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self._process_inputs, self._input_timer)
 
     def _mouse_wheel(self, evt):
         self._camera_move_speed += 0.2 * evt.GetWheelRotation() / evt.GetWheelDelta()
