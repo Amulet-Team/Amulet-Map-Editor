@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 import wx
 import numpy
 
-from amulet.operations.fill import fill
 from amulet.api.selection import SelectionGroup
 from amulet.api.block import Block
 from amulet.api.data_types import Dimension
