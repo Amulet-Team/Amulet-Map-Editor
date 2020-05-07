@@ -19,6 +19,7 @@ from amulet_map_editor.programs.edit.ui.tool_options.operation import OperationU
 from amulet_map_editor.programs.edit.ui.tool_options.select import SelectOptions
 from amulet_map_editor.programs.edit.ui.tool import ToolSelect
 from amulet_map_editor import log
+from .key_config import KeyConfigModal
 
 from .events import (
     EVT_CAMERA_MOVE,
@@ -187,31 +188,39 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             "Save\tCtrl+s", lambda evt: self._save_world()
         )
         # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
-        menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Undo\tCtrl+z", lambda evt: self._undo()
         )
-        menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Redo\tCtrl+y", lambda evt: self._redo()
         )
-        menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Cut\tCtrl+x", lambda evt: self._cut()
         )
-        menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Copy\tCtrl+c", lambda evt: self._copy()
         )
-        menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Paste\tCtrl+v", lambda evt: self._paste()
         )
-        menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Delete\tDelete", lambda evt: self._delete()
         )
-        menu.setdefault("&Edit", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Goto\tCtrl+g", lambda evt: self._file_panel.show_goto()
         )
-        menu.setdefault("&Help", {}).setdefault("control", {}).setdefault(
+        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
+            "Controls...", lambda evt: self._edit_controls()
+        )
+        menu.setdefault("&Help", {}).setdefault("help", {}).setdefault(
             "Controls", lambda evt: self._help_controls()
         )
         return menu
+
+    def _edit_controls(self):
+        key_config = KeyConfigModal(self)
+        if key_config.ShowModal() == wx.ID_OK:
+            self._canvas.set_key_binds(key_config.options)
 
     @staticmethod
     def _help_controls():

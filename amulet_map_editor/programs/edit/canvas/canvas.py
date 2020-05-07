@@ -25,7 +25,6 @@ if TYPE_CHECKING:
 
 class EditCanvas(glcanvas.GLCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
-        self._keys_pressed = set()
         attribs = (glcanvas.WX_GL_CORE_PROFILE, glcanvas.WX_GL_RGBA, glcanvas.WX_GL_DOUBLEBUFFER, glcanvas.WX_GL_DEPTH_SIZE, 24)
         super().__init__(world_panel, -1, size=world_panel.GetClientSize(), attribList=attribs)
         self._context = glcanvas.GLContext(self)  # setup the OpenGL context
@@ -111,13 +110,11 @@ class EditCanvas(glcanvas.GLCanvas):
         self.SetCurrent(self._context)
         self._render_world.enable()
         self._draw_timer.Start(33)
-        self._input_timer.Start(33)
         self._gc_timer.Start(10000)
         self._rebuild_timer.Start(1000)
 
     def disable(self):
         self._draw_timer.Stop()
-        self._input_timer.Stop()
         self._gc_timer.Stop()
         self._rebuild_timer.Stop()
         self._render_world.disable()

@@ -9,6 +9,7 @@ from ..events import (
     BoxBlueCornerChangeEvent,
     BoxCoordsEnableEvent
 )
+from ..key_config import serialise_key_event, KeybindDict
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -33,51 +34,105 @@ key_map = {
 class ControllableEditCanvas(EditCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
-        self.Bind(wx.EVT_MIDDLE_UP, self._toggle_mouse_lock)
-        self.Bind(wx.EVT_RIGHT_DCLICK, self._toggle_mouse_lock)
-        self.Bind(wx.EVT_LEFT_UP, self._box_click)
-        self.Bind(wx.EVT_RIGHT_UP, self._toggle_selection_mode)
+        self._persistent_actions = set()
+        self._key_binds = {}
+
+        self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
-        self.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
-        self.Bind(wx.EVT_KEY_UP, self._on_key_release)
-        self.Bind(wx.EVT_MOUSEWHEEL, self._mouse_wheel)
-        self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
+        self.Bind(wx.EVT_LEFT_DOWN, self._press)
+        self.Bind(wx.EVT_LEFT_UP, self._release)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self._press)
+        self.Bind(wx.EVT_MIDDLE_UP, self._release)
+        self.Bind(wx.EVT_RIGHT_DOWN, self._press)
+        self.Bind(wx.EVT_RIGHT_UP, self._release)
+        self.Bind(wx.EVT_KEY_DOWN, self._press)
+        self.Bind(wx.EVT_KEY_UP, self._release)
+        self.Bind(wx.EVT_MOUSEWHEEL, self._release)
 
         self._input_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._process_inputs, self._input_timer)
 
-    def _mouse_wheel(self, evt):
-        self._camera_move_speed += 0.2 * evt.GetWheelRotation() / evt.GetWheelDelta()
-        if self._camera_move_speed < 0.1:
-            self._camera_move_speed = 0.1
-        evt.Skip()
+    def enable(self):
+        super().enable()
+        self._input_timer.Start(33)
 
-    def _toggle_mouse_lock(self, evt):
+    def disable(self):
+        self._input_timer.Stop()
+        super().disable()
+
+    def set_key_binds(self, key_binds: KeybindDict):
+        self._key_binds = dict(zip(key_binds.values(), key_binds.keys()))
+
+    def _press(self, evt):
+        self._process_action(evt, True)
+
+    def _release(self, evt):
+        self._process_action(evt, False)
+
+    def _process_action(self, evt, press: bool):
+        key = serialise_key_event(evt)
+        if press:
+            print(key)
+        else:
+            print('\t', key)
+        if key is None:
+            return
+        if key in self._key_binds:
+            action = self._key_binds[key]
+            print(action)
+            if action in {"up", "down", "forwards", "backwards", "left", "right"}:
+                if press:
+                    self._persistent_actions.add(action)
+                elif action in self._persistent_actions:
+                    self._persistent_actions.remove(action)
+
+            elif not press:
+                if action == "box click":
+                    self._box_click()
+                elif action == "toggle selection mode":
+                    self._toggle_selection_mode()
+                elif action == "toggle mouse lock":
+                    self._toggle_mouse_lock()
+                elif action == "speed+":
+                    self._camera_move_speed += 0.2
+                elif action == "speed-":
+                    self._camera_move_speed -= 0.2
+                    if self._camera_move_speed < 0.1:
+                        self._camera_move_speed = 0.1
+        elif key[1] == wx.WXK_ESCAPE:
+            self._escape()
+        elif not press:
+            remove_actions = [self._key_binds[k] for k in self._key_binds if k[1] == key[1]]
+            for a in remove_actions:
+                if a in self._persistent_actions:
+                    self._persistent_actions.remove(a)
+
+    def _toggle_mouse_lock(self):
         self.SetFocus()
         if self._mouse_lock:
             self._release_mouse()
         else:
             self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-            self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
-            self._mouse_delta_x = 0
-            self._mouse_delta_y = 0
+            # self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
+            # self._mouse_delta_x = 0
+            # self._mouse_delta_y = 0
             self._mouse_lock = True
             self._change_box_location()
 
     def _process_inputs(self, evt):
         forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
-        if key_map['up'] in self._keys_pressed:
+        if 'up' in self._persistent_actions:
             up += 1
-        if key_map['down'] in self._keys_pressed:
+        if 'down' in self._persistent_actions:
             up -= 1
-        if key_map['forwards'] in self._keys_pressed:
+        if 'forwards' in self._persistent_actions:
             forward += 1
-        if key_map['backwards'] in self._keys_pressed:
+        if 'backwards' in self._persistent_actions:
             forward -= 1
-        if key_map['left'] in self._keys_pressed:
+        if 'left' in self._persistent_actions:
             right -= 1
-        if key_map['right'] in self._keys_pressed:
+        if 'right' in self._persistent_actions:
             right += 1
 
         if self._mouse_lock:
@@ -147,15 +202,13 @@ class ControllableEditCanvas(EditCanvas):
             wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
         wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
 
-    def _box_click(self, evt):
+    def _box_click(self):
         if self.select_mode == 0:
             self.box_select()
-        evt.Skip()
 
-    def _toggle_selection_mode(self, evt):
+    def _toggle_selection_mode(self):
         self._select_style = not self._select_style
         self._change_box_location()
-        evt.Skip()
 
     def _release_mouse(self):
         self.SetCursor(wx.NullCursor)
@@ -175,8 +228,8 @@ class ControllableEditCanvas(EditCanvas):
             # this check avoids using WarpPointer for events caused by WarpPointer
             if dx or dy:
                 self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
-            self._mouse_delta_x += dx
-            self._mouse_delta_y += dy
+                self._mouse_delta_x += dx
+                self._mouse_delta_y += dy
         else:
             mouse_x, mouse_y = evt.GetPosition()
             self._last_mouse_x, self._last_mouse_y = (
@@ -187,27 +240,10 @@ class ControllableEditCanvas(EditCanvas):
             self._mouse_delta_y = mouse_y - self._last_mouse_y
             self._mouse_moved = True
 
-    def _on_key_release(self, event):
-        key = event.GetUnicodeKey()
-        if key == wx.WXK_NONE:
-            key = event.GetKeyCode()
-        if key in self._keys_pressed:
-            self._keys_pressed.remove(key)
-        event.Skip()
-
-    def _on_key_press(self, event: wx.KeyEvent):
-        key = event.GetUnicodeKey()
-        if key == wx.WXK_NONE:
-            key = event.GetKeyCode()
-        self._keys_pressed.add(key)
-        if key == wx.WXK_ESCAPE:
-            self._escape()
-        event.Skip()
-
     def _on_loss_focus(self, evt):
         self._escape()
         evt.Skip()
 
     def _escape(self):
-        self._keys_pressed.clear()
+        self._persistent_actions.clear()
         self._release_mouse()
