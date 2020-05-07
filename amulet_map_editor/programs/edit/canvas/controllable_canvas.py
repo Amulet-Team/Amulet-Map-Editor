@@ -9,7 +9,7 @@ from ..events import (
     BoxBlueCornerChangeEvent,
     BoxCoordsEnableEvent
 )
-from ..key_config import serialise_key_event, KeybindDict
+from ..key_config import serialise_key_event, KeybindDict, DefaultKeys
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -36,6 +36,7 @@ class ControllableEditCanvas(EditCanvas):
         super().__init__(world_panel, world)
         self._persistent_actions = set()
         self._key_binds = {}
+        self.set_key_binds(DefaultKeys)
 
         self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)

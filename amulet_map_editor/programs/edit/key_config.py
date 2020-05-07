@@ -69,6 +69,8 @@ _presets: Dict[str, KeybindDict] = {
     }
 }
 
+DefaultKeys = _presets["right"]
+
 
 _mouse_events = {
     wx.EVT_LEFT_DOWN.evtType[0]: "ML",
@@ -125,11 +127,18 @@ class KeyConfigModal(SimpleDialog):
         return self._key_config.options
 
 
-class KeyConfig(SimpleScrollablePanel):
+class KeyConfig(wx.BoxSizer):
     def __init__(self, parent: wx.Window):
-        super().__init__(parent)
-        self._choice = SimpleChoice(self, list(_presets.keys()))
-        self.sizer.Add(self._choice)
+        super().__init__(wx.VERTICAL)
+        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.Add(top_sizer, 0, wx.EXPAND)
+        self._choice = SimpleChoice(parent, list(_presets.keys()))
+        top_sizer.Add(self._choice, 1, wx.ALL | wx.EXPAND, 5)
+        # some other buttons
+
+        self._options = SimpleScrollablePanel(parent)
+        self.Add(self._options, 1, wx.EXPAND)
+
 
     @property
     def options(self) -> Dict[str, SerialisedKeyType]:
