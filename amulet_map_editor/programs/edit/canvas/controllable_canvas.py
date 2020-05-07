@@ -114,9 +114,7 @@ class ControllableEditCanvas(EditCanvas):
             self._release_mouse()
         else:
             self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-            # self._last_mouse_x, self._last_mouse_y = evt.GetPosition()
-            # self._mouse_delta_x = 0
-            # self._mouse_delta_y = 0
+            self._mouse_delta_x = self._mouse_delta_y = self._last_mouse_x = self._last_mouse_y = 0
             self._mouse_lock = True
             self._change_box_location()
 
@@ -217,19 +215,27 @@ class ControllableEditCanvas(EditCanvas):
     def _on_mouse_motion(self, evt):
         self.SetFocus()
         if self._mouse_lock:
-            mouse_x, mouse_y = evt.GetPosition()
-            dx = mouse_x - self._last_mouse_x
-            dy = mouse_y - self._last_mouse_y
-            self._last_mouse_x, self._last_mouse_y = (
-                int(self.GetSize()[0] / 2),
-                int(self.GetSize()[1] / 2),
-            )
-            # only if location actually changed from the center, because WarpPointer may generate a mouse motion event
-            # this check avoids using WarpPointer for events caused by WarpPointer
-            if dx or dy:
+            if self._last_mouse_x == 0:
+                self._last_mouse_x, self._last_mouse_y = (
+                    int(self.GetSize()[0] / 2),
+                    int(self.GetSize()[1] / 2),
+                )
                 self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
-                self._mouse_delta_x += dx
-                self._mouse_delta_y += dy
+                self._mouse_delta_x = self._mouse_delta_y = 0
+            else:
+                mouse_x, mouse_y = evt.GetPosition()
+                dx = mouse_x - self._last_mouse_x
+                dy = mouse_y - self._last_mouse_y
+                self._last_mouse_x, self._last_mouse_y = (
+                    int(self.GetSize()[0] / 2),
+                    int(self.GetSize()[1] / 2),
+                )
+                # only if location actually changed from the center, because WarpPointer may generate a mouse motion event
+                # this check avoids using WarpPointer for events caused by WarpPointer
+                if dx or dy:
+                    self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
+                    self._mouse_delta_x += dx
+                    self._mouse_delta_y += dy
         else:
             mouse_x, mouse_y = evt.GetPosition()
             self._last_mouse_x, self._last_mouse_y = (
