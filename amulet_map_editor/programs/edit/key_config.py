@@ -2,7 +2,7 @@ import wx
 from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimpleScrollablePanel, SimpleChoice
 from typing import Dict, Tuple, Optional, Union
 
-ModifierKeyType = int
+ModifierKeyType = str
 KeyType = Union[int, str]
 ModifierType = Tuple[ModifierKeyType, ...]
 SerialisedKeyType = Tuple[ModifierType, KeyType]
@@ -13,15 +13,31 @@ MouseMiddle = "MM"
 MouseRight = "MR"
 MouseWheelScrollUp = "MWSU"
 MouseWheelScrollDown = "MWSD"
+Control = "CTRL"
+Shift = "SHIFT"
+Alt = "ALT"
+
+Space = "SPACE"
+PageUp = "PAGE_UP"
+PageDown = "PAGE_DOWN"
+
+key_string_map = {
+    wx.WXK_SHIFT: Shift,
+    wx.WXK_ALT: Alt,
+    wx.WXK_SPACE: Space,
+    wx.WXK_PAGEUP: PageUp,
+    wx.WXK_PAGEDOWN: PageDown
+}
+
 
 _presets: Dict[str, KeybindDict] = {
     "right": {
-        "up": ((), wx.WXK_SPACE),
-        "down": ((), wx.WXK_SHIFT),
-        "forwards": ((), ord("W")),
-        "backwards": ((), ord("S")),
-        "left": ((), ord("A")),
-        "right": ((), ord("D")),
+        "up": ((), Space),
+        "down": ((), Shift),
+        "forwards": ((), "W"),
+        "backwards": ((), "S"),
+        "left": ((), "A"),
+        "right": ((), "D"),
         "box click": ((), MouseLeft),
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), MouseMiddle),
@@ -29,25 +45,25 @@ _presets: Dict[str, KeybindDict] = {
         "speed-": ((), MouseWheelScrollDown)
     },
     "right_laptop": {
-        "up": ((), wx.WXK_SPACE),
-        "down": ((), wx.WXK_SHIFT),
-        "forwards": ((), ord("W")),
-        "backwards": ((), ord("S")),
-        "left": ((), ord("A")),
-        "right": ((), ord("D")),
+        "up": ((), Space),
+        "down": ((), Shift),
+        "forwards": ((), "W"),
+        "backwards": ((), "S"),
+        "left": ((), "A"),
+        "right": ((), "D"),
         "box click": ((), MouseLeft),
         "toggle selection mode": ((), MouseRight),
-        "toggle mouse lock": ((), ord("F")),
-        "speed+": ((), wx.WXK_PAGEUP),
-        "speed-": ((), wx.WXK_PAGEDOWN)
+        "toggle mouse lock": ((), "F"),
+        "speed+": ((), "."),
+        "speed-": ((), ",")
     },
     "left": {
-        "up": ((), wx.WXK_SPACE),
-        "down": ((), ord(';')),
-        "forwards": ((), ord("I")),
-        "backwards": ((), ord("K")),
-        "left": ((), ord("J")),
-        "right": ((), ord("L")),
+        "up": ((), Space),
+        "down": ((), ';'),
+        "forwards": ((), "I"),
+        "backwards": ((), "K"),
+        "left": ((), "J"),
+        "right": ((), "L"),
         "box click": ((), MouseLeft),
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), MouseMiddle),
@@ -55,17 +71,17 @@ _presets: Dict[str, KeybindDict] = {
         "speed-": ((), MouseWheelScrollDown)
     },
     "left_laptop": {
-        "up": ((), wx.WXK_SPACE),
-        "down": ((), ord(';')),
-        "forwards": ((), ord("I")),
-        "backwards": ((), ord("K")),
-        "left": ((), ord("J")),
-        "right": ((), ord("L")),
+        "up": ((), Space),
+        "down": ((), ';'),
+        "forwards": ((), "I"),
+        "backwards": ((), "K"),
+        "left": ((), "J"),
+        "right": ((), "L"),
         "box click": ((), MouseLeft),
         "toggle selection mode": ((), MouseRight),
-        "toggle mouse lock": ((), ord("H")),
-        "speed+": ((), wx.WXK_PAGEUP),
-        "speed-": ((), wx.WXK_PAGEDOWN)
+        "toggle mouse lock": ((), "H"),
+        "speed+": ((), "."),
+        "speed-": ((), ",")
     }
 }
 
@@ -73,12 +89,12 @@ DefaultKeys = _presets["right"]
 
 
 _mouse_events = {
-    wx.EVT_LEFT_DOWN.evtType[0]: "ML",
-    wx.EVT_LEFT_UP.evtType[0]: "ML",
-    wx.EVT_MIDDLE_DOWN.evtType[0]: "MM",
-    wx.EVT_MIDDLE_UP.evtType[0]: "MM",
-    wx.EVT_RIGHT_DOWN.evtType[0]: "MR",
-    wx.EVT_RIGHT_UP.evtType[0]: "MR"
+    wx.EVT_LEFT_DOWN.evtType[0]: MouseLeft,
+    wx.EVT_LEFT_UP.evtType[0]: MouseLeft,
+    wx.EVT_MIDDLE_DOWN.evtType[0]: MouseMiddle,
+    wx.EVT_MIDDLE_UP.evtType[0]: MouseMiddle,
+    wx.EVT_RIGHT_DOWN.evtType[0]: MouseRight,
+    wx.EVT_RIGHT_UP.evtType[0]: MouseRight
 }
 
 
@@ -87,26 +103,29 @@ def serialise_key_event(evt: Union[wx.KeyEvent, wx.MouseEvent]) -> Optional[Seri
         modifier = []
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
         if key == wx.WXK_CONTROL:
-            print('key == ctrl')
             return
         if evt.ControlDown():
             if key in (wx.WXK_SHIFT, wx.WXK_ALT):
-                print('key == shift | alt')
                 return  # if control is pressed the real key must not be a modifier
 
-            modifier.append(wx.WXK_CONTROL)
+            modifier.append(Control)
             if evt.ShiftDown():
-                modifier.append(wx.WXK_SHIFT)
+                modifier.append(Shift)
             if evt.AltDown():
-                modifier.append(wx.WXK_ALT)
-        return tuple(modifier), int(key)
+                modifier.append(Alt)
+
+        if 33 <= key <= 126:
+            key = chr(key).upper()
+        elif key in key_string_map:
+            key = key_string_map[key]
+        return tuple(modifier), key
     elif isinstance(evt, wx.MouseEvent):
         key = evt.GetEventType()
         if key in wx.EVT_MOUSEWHEEL.evtType:
             if evt.GetWheelRotation() < 0:
-                return (), "MWSD"
+                return (), MouseWheelScrollDown
             elif evt.GetWheelRotation() > 0:
-                return (), "MWSU"
+                return (), MouseWheelScrollUp
         elif key in _mouse_events:
             return (), _mouse_events[key]
 

@@ -73,15 +73,10 @@ class ControllableEditCanvas(EditCanvas):
 
     def _process_action(self, evt, press: bool):
         key = serialise_key_event(evt)
-        if press:
-            print(key)
-        else:
-            print('\t', key)
         if key is None:
             return
         if key in self._key_binds:
             action = self._key_binds[key]
-            print(action)
             if action in {"up", "down", "forwards", "backwards", "left", "right"}:
                 if press:
                     self._persistent_actions.add(action)
