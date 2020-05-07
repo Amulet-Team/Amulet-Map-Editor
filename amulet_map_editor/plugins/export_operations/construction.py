@@ -41,19 +41,19 @@ def export_construction(
 def show_ui(parent, world: "World", options: dict) -> dict:
     dialog = SimpleDialog(parent, 'Export Construction')
     file_picker = wx.FilePickerCtrl(
-        dialog.custom_panel,
+        dialog,
         path=options.get('path', ''),
         wildcard="Construction file (*.construction)|*.construction",
         style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT
     )
-    dialog.custom_panel.add_object(file_picker, 0)
+    dialog.sizer.Add(file_picker, 0, wx.ALL, 5)
     version_define = VersionSelect(
-        dialog.custom_panel,
+        dialog,
         world.translation_manager,
         options.get("platform", None) or world.world_wrapper.platform,
         allow_universal=False
     )
-    dialog.custom_panel.add_object(version_define, 0)
+    dialog.sizer.Add(version_define, 0)
     dialog.Fit()
 
     if dialog.ShowModal() == wx.ID_OK:

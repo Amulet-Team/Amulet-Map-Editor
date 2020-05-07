@@ -59,23 +59,21 @@ def replace(
 
 
 def show_ui(parent, world: "World", options: dict) -> dict:
-    dialog = SimpleDialog(parent, 'Replace')
-    horizontal_panel = SimplePanel(dialog.custom_panel, wx.HORIZONTAL)
-    dialog.custom_panel.add_object(horizontal_panel)
+    dialog = SimpleDialog(parent, 'Replace', wx.HORIZONTAL)
 
     original_block = BlockDefine(
-        horizontal_panel,
+        dialog,
         world.world_wrapper.translation_manager,
         *(options.get("original_block_options", []) or [world.world_wrapper.platform]),
         wildcard=True
     )
     replacement_block = BlockDefine(
-        horizontal_panel,
+        dialog,
         world.world_wrapper.translation_manager,
         *(options.get("replacement_block_options", []) or [world.world_wrapper.platform])
     )
-    horizontal_panel.add_object(original_block, 0)
-    horizontal_panel.add_object(replacement_block, 0)
+    dialog.sizer.Add(original_block, 0)
+    dialog.sizer.Add(replacement_block, 0)
     dialog.Fit()
 
     if dialog.ShowModal() == wx.ID_OK:

@@ -128,12 +128,12 @@ class SimpleDialog(wx.Dialog):
             title=title,
             style=wx.CAPTION | wx.RESIZE_BORDER
         )
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(self.sizer)
-        self.custom_panel = SimplePanel(self, sizer_dir)
-        self.sizer.Add(self.custom_panel)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+        self.sizer = wx.BoxSizer(sizer_dir)
+        sizer.Add(self.sizer, 0, wx.EXPAND)
         bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer.Add(bottom_sizer, 0, wx.EXPAND)
+        sizer.Add(bottom_sizer, 0, wx.EXPAND)
         bottom_sizer.AddStretchSpacer()
         button_sizer = self.CreateButtonSizer(wx.OK | wx.CANCEL)
         bottom_sizer.Add(button_sizer, flag=wx.ALL, border=5)

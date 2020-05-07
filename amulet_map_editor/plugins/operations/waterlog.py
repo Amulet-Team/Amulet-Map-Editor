@@ -48,11 +48,11 @@ def waterlog(
 def show_ui(parent, world: "World", options: dict) -> dict:
     dialog = SimpleDialog(parent, 'Waterlog')
     block_define = BlockDefine(
-        dialog.custom_panel,
+        dialog,
         world.world_wrapper.translation_manager,
         *(options.get("fill_block_options", []) or [world.world_wrapper.platform])
     )
-    dialog.custom_panel.add_object(block_define)
+    dialog.sizer.Add(block_define)
     dialog.Fit()
     if dialog.ShowModal() == wx.ID_OK:
         options = {
