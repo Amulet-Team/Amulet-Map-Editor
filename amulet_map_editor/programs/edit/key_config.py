@@ -38,8 +38,8 @@ _presets: Dict[str, KeybindDict] = {
         "box click": ((), MouseLeft),
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), ord("F")),
-        "speed+": ((), wx.WXK_UP),
-        "speed-": ((), wx.WXK_DOWN)
+        "speed+": ((), wx.WXK_PAGEUP),
+        "speed-": ((), wx.WXK_PAGEDOWN)
     },
     "left": {
         "up": ((), wx.WXK_SPACE),
@@ -64,8 +64,8 @@ _presets: Dict[str, KeybindDict] = {
         "box click": ((), MouseLeft),
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), ord("H")),
-        "speed+": ((), wx.WXK_UP),
-        "speed-": ((), wx.WXK_DOWN)
+        "speed+": ((), wx.WXK_PAGEUP),
+        "speed-": ((), wx.WXK_PAGEDOWN)
     }
 }
 
