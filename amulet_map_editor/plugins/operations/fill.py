@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 def fill_(
     world: "World",
     dimension: Dimension,
-    selection_box: SelectionGroup,
+    selection: SelectionGroup,
     options: dict
 ):
     if isinstance(options.get('fill_block'), Block):
-        yield from fill(world, dimension, selection_box, options)
+        yield from fill(world, dimension, selection, options)
     else:
         raise Exception('Please specify a block before running the fill operation')
 

@@ -12,12 +12,12 @@ if TYPE_CHECKING:
 def delete(
     world: "World",
     dimension: Dimension,
-    selection_box: SelectionGroup
+    selection: SelectionGroup
 ):
     yield from fill(
         world,
         dimension,
-        selection_box,
+        selection,
         {
             "fill_block": world.translation_manager.get_version(
                 'java', (1, 15, 2)
