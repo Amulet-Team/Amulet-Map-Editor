@@ -1,6 +1,6 @@
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
-from typing import Iterable, Union, Any, List, Optional
+from typing import Iterable, Union, Any, List, Optional, Tuple, Sequence, Dict
 
 
 class SimpleSizer:
@@ -17,7 +17,7 @@ class SimpleSizer:
 
 
 class SimplePanel(wx.Panel, SimpleSizer):
-    def __init__(self, parent, sizer_dir=wx.VERTICAL):
+    def __init__(self, parent: wx.Window, sizer_dir=wx.VERTICAL):
         wx.Panel.__init__(
             self,
             parent,
@@ -31,7 +31,7 @@ class SimplePanel(wx.Panel, SimpleSizer):
 
 
 class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
-    def __init__(self, parent, sizer_dir=wx.VERTICAL):
+    def __init__(self, parent: wx.Window, sizer_dir=wx.VERTICAL):
         ScrolledPanel.__init__(
             self,
             parent,
@@ -47,7 +47,7 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
 
 
 class SimpleText(wx.StaticText):
-    def __init__(self, parent, text):
+    def __init__(self, parent: wx.Window, text):
         super().__init__(
             parent,
             wx.ID_ANY,
@@ -59,7 +59,7 @@ class SimpleText(wx.StaticText):
 
 
 class SimpleChoice(wx.Choice):
-    def __init__(self, parent, choices=(), default=None):
+    def __init__(self, parent: wx.Window, choices: Sequence[str] = (), default: Optional[str] = None):
         super().__init__(
             parent,
             choices=choices
@@ -74,8 +74,11 @@ class SimpleChoice(wx.Choice):
         return self.GetString(self.GetSelection())
 
 
+StringableType = Any
+
+
 class SimpleChoiceAny(wx.Choice):
-    def __init__(self, parent, sort=True, reverse=False):
+    def __init__(self, parent: wx.Window, sort=True, reverse=False):
         super().__init__(
             parent
         )
@@ -88,7 +91,7 @@ class SimpleChoiceAny(wx.Choice):
     def values(self) -> List[Any]:
         return self._values
 
-    def SetItems(self, items: Union[Iterable, dict], default=None):
+    def SetItems(self, items: Union[Iterable[StringableType], Dict[StringableType, Any]], default: StringableType = None):
         """Set items. Does not have to be strings.
         If items is a dictionary the string of the values are show to the user and the key is returned from GetAny
         If it is just an iterable the string of the values are shown and the raw equivalent input is returned."""
@@ -127,7 +130,7 @@ class SimpleChoiceAny(wx.Choice):
 
 
 class SimpleDialog(wx.Dialog):
-    def __init__(self, parent, title, sizer_dir=wx.VERTICAL):
+    def __init__(self, parent: wx.Window, title, sizer_dir=wx.VERTICAL):
         wx.Dialog.__init__(
             self,
             parent,
