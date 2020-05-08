@@ -10,16 +10,18 @@ from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.structure import Structure
 from amulet.api.data_types import OperationType, OperationReturnType
 
+from amulet_map_editor import log, config
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor import plugins
-from .canvas.controllable_canvas import ControllableEditCanvas
+from amulet_map_editor.amulet_wx.key_config import KeyConfigModal
 
+
+from .canvas.controllable_canvas import ControllableEditCanvas
 from .ui.file import FilePanel
-from amulet_map_editor.programs.edit.ui.tool_options.operation import OperationUI
-from amulet_map_editor.programs.edit.ui.tool_options.select import SelectOptions
-from amulet_map_editor.programs.edit.ui.tool import ToolSelect
-from amulet_map_editor import log
-from .key_config import KeyConfigModal
+from .ui.tool_options.operation import OperationUI
+from .ui.tool_options.select import SelectOptions
+from .ui.tool import ToolSelect
+from .key_config import DefaultKeys, DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 
 from .events import (
     EVT_CAMERA_MOVE,
@@ -79,6 +81,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._temp = wx.StaticText(self, label="Please wait while the renderer loads")
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp)
+        self._keybind_id = DefaultKeybindGroupId
 
         self._file_panel: Optional[FilePanel] = None
         self._select_options: Optional[SelectOptions] = None
@@ -92,6 +95,8 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self.Update()
 
             self._canvas = ControllableEditCanvas(self, self._world)
+
+            self._canvas.set_key_binds(DefaultKeys)  # TODO: have this read from the config file
 
             self._file_panel = FilePanel(
                 self._canvas,
@@ -218,9 +223,11 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         return menu
 
     def _edit_controls(self):
-        key_config = KeyConfigModal(self)
+        key_config = KeyConfigModal(self, self._keybind_id, KeybindKeys, PresetKeybinds, {})
         if key_config.ShowModal() == wx.ID_OK:
-            self._canvas.set_key_binds(key_config.options)
+            user_keybinds, self._keybind_id, keybinds = key_config.options
+            # TODO: store user keybinds in the config
+            self._canvas.set_key_binds(keybinds)
 
     @staticmethod
     def _help_controls():
