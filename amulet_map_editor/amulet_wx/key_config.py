@@ -31,7 +31,95 @@ key_string_map = {
     wx.WXK_ALT: Alt,
     wx.WXK_SPACE: Space,
     wx.WXK_PAGEUP: PageUp,
-    wx.WXK_PAGEDOWN: PageDown
+    wx.WXK_PAGEDOWN: PageDown,
+    wx.WXK_BACK: "BACK",
+    wx.WXK_TAB: "TAB",
+    wx.WXK_RETURN: "RETURN",
+    wx.WXK_ESCAPE: "ESCAPE",
+    wx.WXK_DELETE: "DELETE",
+    wx.WXK_START: "START",
+    wx.WXK_MENU: "MENU",
+    wx.WXK_PAUSE: "PAUSE",
+    wx.WXK_CAPITAL: "CAPITAL",
+    wx.WXK_END: "END",
+    wx.WXK_HOME: "HOME",
+    wx.WXK_LEFT: "LEFT",
+    wx.WXK_UP: "UP",
+    wx.WXK_RIGHT: "RIGHT",
+    wx.WXK_DOWN: "DOWN",
+    wx.WXK_SELECT: "SELECT",
+    wx.WXK_PRINT: "PRINT",
+    wx.WXK_EXECUTE: "EXECUTE",
+    wx.WXK_SNAPSHOT: "SNAPSHOT",
+    wx.WXK_INSERT: "INSERT",
+    wx.WXK_HELP: "HELP",
+    wx.WXK_NUMPAD0: "NUMPAD0",
+    wx.WXK_NUMPAD1: "NUMPAD1",
+    wx.WXK_NUMPAD2: "NUMPAD2",
+    wx.WXK_NUMPAD3: "NUMPAD3",
+    wx.WXK_NUMPAD4: "NUMPAD4",
+    wx.WXK_NUMPAD5: "NUMPAD5",
+    wx.WXK_NUMPAD6: "NUMPAD6",
+    wx.WXK_NUMPAD7: "NUMPAD7",
+    wx.WXK_NUMPAD8: "NUMPAD8",
+    wx.WXK_NUMPAD9: "NUMPAD9",
+    wx.WXK_MULTIPLY: "MULTIPLY",
+    wx.WXK_ADD: "ADD",
+    wx.WXK_SEPARATOR: "SEPARATOR",
+    wx.WXK_SUBTRACT: "SUBTRACT",
+    wx.WXK_DECIMAL: "DECIMAL",
+    wx.WXK_DIVIDE: "DIVIDE",
+    wx.WXK_F1: "F1",
+    wx.WXK_F2: "F2",
+    wx.WXK_F3: "F3",
+    wx.WXK_F4: "F4",
+    wx.WXK_F5: "F5",
+    wx.WXK_F6: "F6",
+    wx.WXK_F7: "F7",
+    wx.WXK_F8: "F8",
+    wx.WXK_F9: "F9",
+    wx.WXK_F10: "F10",
+    wx.WXK_F11: "F11",
+    wx.WXK_F12: "F12",
+    wx.WXK_F13: "F13",
+    wx.WXK_F14: "F14",
+    wx.WXK_F15: "F15",
+    wx.WXK_F16: "F16",
+    wx.WXK_F17: "F17",
+    wx.WXK_F18: "F18",
+    wx.WXK_F19: "F19",
+    wx.WXK_F20: "F20",
+    wx.WXK_F21: "F21",
+    wx.WXK_F22: "F22",
+    wx.WXK_F23: "F23",
+    wx.WXK_F24: "F24",
+    wx.WXK_NUMLOCK: "NUMLOCK",
+    wx.WXK_SCROLL: "SCROLL",
+    wx.WXK_NUMPAD_SPACE: "NUMPAD_SPACE",
+    wx.WXK_NUMPAD_TAB: "NUMPAD_TAB",
+    wx.WXK_NUMPAD_ENTER: "NUMPAD_ENTER",
+    wx.WXK_NUMPAD_F1: "NUMPAD_F1",
+    wx.WXK_NUMPAD_F2: "NUMPAD_F2",
+    wx.WXK_NUMPAD_F3: "NUMPAD_F3",
+    wx.WXK_NUMPAD_F4: "NUMPAD_F4",
+    wx.WXK_NUMPAD_HOME: "NUMPAD_HOME",
+    wx.WXK_NUMPAD_LEFT: "NUMPAD_LEFT",
+    wx.WXK_NUMPAD_UP: "NUMPAD_UP",
+    wx.WXK_NUMPAD_RIGHT: "NUMPAD_RIGHT",
+    wx.WXK_NUMPAD_DOWN: "NUMPAD_DOWN",
+    wx.WXK_NUMPAD_PAGEUP: "NUMPAD_PAGEUP",
+    wx.WXK_NUMPAD_PAGEDOWN: "NUMPAD_PAGEDOWN",
+    wx.WXK_NUMPAD_END: "NUMPAD_END",
+    wx.WXK_NUMPAD_BEGIN: "NUMPAD_BEGIN",
+    wx.WXK_NUMPAD_INSERT: "NUMPAD_INSERT",
+    wx.WXK_NUMPAD_DELETE: "NUMPAD_DELETE",
+    wx.WXK_NUMPAD_EQUAL: "NUMPAD_EQUAL",
+    wx.WXK_NUMPAD_MULTIPLY: "NUMPAD_MULTIPLY",
+    wx.WXK_NUMPAD_ADD: "NUMPAD_ADD",
+    wx.WXK_NUMPAD_SEPARATOR: "NUMPAD_SEPARATOR",
+    wx.WXK_NUMPAD_SUBTRACT: "NUMPAD_SUBTRACT",
+    wx.WXK_NUMPAD_DECIMAL: "NUMPAD_DECIMAL",
+    wx.WXK_NUMPAD_DIVIDE: "NUMPAD_DIVIDE",
 }
 
 
@@ -65,6 +153,8 @@ def serialise_key_event(evt: Union[wx.KeyEvent, wx.MouseEvent]) -> Optional[Seri
             key = chr(key).upper()
         elif key in key_string_map:
             key = key_string_map[key]
+        else:
+            key = f"UNKNOWN KEY {key}"
         return tuple(modifier), key
     elif isinstance(evt, wx.MouseEvent):
         key = evt.GetEventType()
@@ -79,6 +169,29 @@ def serialise_key_event(evt: Union[wx.KeyEvent, wx.MouseEvent]) -> Optional[Seri
 
 def stringify_key(key: SerialisedKeyType) -> str:
     return " + ".join([str(s) for s in key[0] + (key[1],)])
+
+
+class KeyCatcher(wx.Dialog):
+    def __init__(self, parent: wx.Window, action: str):
+        super().__init__(parent, title=f"Press the key you want assigned to {action}")
+
+        self._key = ((), 'NONE')
+
+        self.Bind(wx.EVT_LEFT_DOWN, self._on_key)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self._on_key)
+        self.Bind(wx.EVT_RIGHT_DOWN, self._on_key)
+        self.Bind(wx.EVT_KEY_DOWN, self._on_key)
+        self.Bind(wx.EVT_MOUSEWHEEL, self._on_key)
+
+    def _on_key(self, evt):
+        key = serialise_key_event(evt)
+        if key is not None:
+            self._key = key
+            self.EndModal(1)
+
+    @property
+    def key(self) -> SerialisedKeyType:
+        return self._key
 
 
 class KeyConfigDialog(SimpleDialog):
@@ -153,7 +266,7 @@ class KeyConfig(wx.BoxSizer):
                 0, wx.ALIGN_CENTER
             )
             self._key_buttons[action] = button = wx.Button(self._options)
-            button.Bind(wx.EVT_BUTTON, lambda evt: self._modify_button(action))
+            button.Bind(wx.EVT_BUTTON, lambda evt, a=action: self._modify_button(a))
             grid_sizer.Add(button, 0, wx.EXPAND)
         self._rebuild_buttons()
 
@@ -171,7 +284,7 @@ class KeyConfig(wx.BoxSizer):
         for action in self._entries:
             self._key_buttons[action].SetLabel(
                 stringify_key(
-                    group.get(action, ((), None))
+                    group.get(action, ((), 'NONE'))
                 )
             )
 
@@ -241,9 +354,12 @@ class KeyConfig(wx.BoxSizer):
                 self._create_new_group()
             else:
                 return
-        if self._choice.GetCurrentString() in self._user_keybinds:
-            pass
-            # TODO: capture user input
+        group_name = self._choice.GetCurrentString()
+        if group_name in self._user_keybinds:
+            catcher = KeyCatcher(self._options, action)
+            catcher.ShowModal()
+            self._user_keybinds[group_name][action] = catcher.key
+            self._rebuild_buttons()
 
     def _on_group_change(self, evt):
         self._rebuild_buttons()
