@@ -250,10 +250,12 @@ class RecentWorldUI(simple.SimplePanel):
         self.rebuild()
 
     def rebuild(self, new_world: str = None):
-        recent_worlds = config.get('recent_worlds')
+        meta: dict = config.get("amulet_meta", {})
+        recent_worlds: list = meta.setdefault('recent_worlds', [])
         if new_world is not None:
-            if new_world not in recent_worlds:
-                recent_worlds.insert(0, new_world)
+            while new_world in recent_worlds:
+                recent_worlds.remove(new_world)
+            recent_worlds.insert(0, new_world)
             while len(recent_worlds) > 5:
                 recent_worlds.pop(5)
         if self._world_list is not None:
@@ -261,6 +263,7 @@ class RecentWorldUI(simple.SimplePanel):
         self._world_list = WorldList(self, recent_worlds, self._open_world_callback)
         self.add_object(self._world_list, 1, wx.EXPAND)
         self.Layout()
+        config.put("amulet_meta", meta)
 
 
 class WorldSelectAndRecentUI(simple.SimplePanel):

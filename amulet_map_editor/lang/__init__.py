@@ -27,7 +27,7 @@ def load_language(lang: str):
         _load_langauge(lang)
 
 
-load_language(config.get('lang'))
+load_language(config.get("amulet_meta", {}).get('lang', default_lang))
 
 
 def get(key):
