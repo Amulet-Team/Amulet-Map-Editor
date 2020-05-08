@@ -60,7 +60,7 @@ def show_loading_dialog(
                         if len(progress) >= 1:
                             progress = progress[0]
                     if isinstance(progress, (int, float)) and isinstance(message, str):
-                        dialog.Update(min(max(0, progress), 99.99), message)
+                        dialog.Update(min(99.99, max(0, progress)), message)
             except StopIteration as e:
                 obj = e.value
     except Exception as e:

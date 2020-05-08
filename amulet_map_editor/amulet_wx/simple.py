@@ -1,6 +1,6 @@
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
-from typing import Iterable, Union, Any, List, Optional, Tuple, Sequence, Dict
+from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
 
 
 class SimpleSizer:

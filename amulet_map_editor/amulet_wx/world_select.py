@@ -40,7 +40,7 @@ def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
             image_path,
             wx.BITMAP_TYPE_ANY
         )
-        width = min((img.Width / img.Height) * 128, 300)
+        width = min((img.GetWidth() / img.GetHeight()) * 128, 300)
 
         world_images[image_path] = (
             os.stat(image_path)[8],

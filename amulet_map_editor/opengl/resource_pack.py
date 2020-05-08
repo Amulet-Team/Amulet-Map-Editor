@@ -1,11 +1,8 @@
-from OpenGL.GL import *
 from typing import Any, Dict, Tuple
 
 import minecraft_model_reader
 import PyMCTranslate
 from amulet.api.block import BlockManager
-
-from amulet_map_editor.opengl import shaders
 
 
 class ResourcePackManager:
