@@ -31,14 +31,11 @@ class SimplePanel(wx.Panel, SimpleSizer):
 
 
 class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
-    def __init__(self, parent: wx.Window, sizer_dir=wx.VERTICAL):
+    def __init__(self, parent: wx.Window, sizer_dir=wx.VERTICAL, **kwargs):
         ScrolledPanel.__init__(
             self,
             parent,
-            wx.ID_ANY,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            wx.TAB_TRAVERSAL,
+            **kwargs
         )
         SimpleSizer.__init__(self, sizer_dir)
         self.SetSizer(self.sizer)
@@ -140,7 +137,7 @@ class SimpleDialog(wx.Dialog):
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
         self.sizer = wx.BoxSizer(sizer_dir)
-        sizer.Add(self.sizer, 0, wx.EXPAND)
+        sizer.Add(self.sizer, 1, wx.EXPAND)
         bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(bottom_sizer, 0, wx.EXPAND)
         bottom_sizer.AddStretchSpacer()

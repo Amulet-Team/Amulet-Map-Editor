@@ -13,7 +13,7 @@ from amulet.api.data_types import OperationType, OperationReturnType
 from amulet_map_editor import log, config
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor import plugins
-from amulet_map_editor.amulet_wx.key_config import KeyConfigModal
+from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
 
 
 from .canvas.controllable_canvas import ControllableEditCanvas
@@ -223,7 +223,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         return menu
 
     def _edit_controls(self):
-        key_config = KeyConfigModal(self, self._keybind_id, KeybindKeys, PresetKeybinds, {})
+        key_config = KeyConfigDialog(self, self._keybind_id, KeybindKeys, PresetKeybinds, {})
         if key_config.ShowModal() == wx.ID_OK:
             user_keybinds, self._keybind_id, keybinds = key_config.options
             # TODO: store user keybinds in the config
