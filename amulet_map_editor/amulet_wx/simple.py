@@ -59,13 +59,16 @@ class SimpleText(wx.StaticText):
 
 
 class SimpleChoice(wx.Choice):
-    def __init__(self, parent, choices=()):
+    def __init__(self, parent, choices=(), default=None):
         super().__init__(
             parent,
             choices=choices
         )
         if choices:
-            self.SetSelection(0)
+            if default is not None and default in choices:
+                self.SetSelection(choices.index(default))
+            else:
+                self.SetSelection(0)
 
     def GetCurrentString(self) -> str:
         return self.GetString(self.GetSelection())
@@ -85,7 +88,7 @@ class SimpleChoiceAny(wx.Choice):
     def values(self) -> List[Any]:
         return self._values
 
-    def SetItems(self, items: Union[Iterable, dict]):
+    def SetItems(self, items: Union[Iterable, dict], default=None):
         """Set items. Does not have to be strings.
         If items is a dictionary the string of the values are show to the user and the key is returned from GetAny
         If it is just an iterable the string of the values are shown and the raw equivalent input is returned."""
@@ -108,7 +111,10 @@ class SimpleChoiceAny(wx.Choice):
                 self._values = list(items)
             self._keys = [str(v) for v in self._values]
         super().SetItems(self._keys)
-        self.SetSelection(0)
+        if default is not None and default in self._values:
+            self.SetSelection(self._values.index(default))
+        else:
+            self.SetSelection(0)
 
     def SetValue(self, value: Any):
         if value in self._keys:
