@@ -112,7 +112,13 @@ class TriMesh:
         glUseProgram(self._shader)
         glUniformMatrix4fv(self._transform_location, 1, GL_FALSE, transformation_matrix)
         glUniform1i(self._texture_location, 0)
-        glBindVertexArray(self._vao)
+        try:
+            glBindVertexArray(self._vao)
+        except GLError:  # There seems to be errors randomly when binding the VBO
+            log.debug(f'Failed binding the OpenGL state for {self}. Trying to reload it.')
+            self.unload()
+            self._setup()
+            glBindVertexArray(self._vao)
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self._texture)
 
