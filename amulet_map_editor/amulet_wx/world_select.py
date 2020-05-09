@@ -119,14 +119,17 @@ class WorldList(simple.SimplePanel):
                 try:
                     world_formats.append(world_interface.load_format(world_path))
                 except Exception as e:
-                    log.info(e)
+                    log.info(f"Could not find loader for {world_path} {e}")
         if sort:
             world_formats = reversed(sorted(world_formats, key=lambda f: f.last_played))
 
         for world_format in world_formats:
-            world_button = WorldUIButton(self, world_format, open_world_callback)
-            self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
-            self.worlds.append(world_button)
+            try:
+                world_button = WorldUIButton(self, world_format, open_world_callback)
+                self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
+                self.worlds.append(world_button)
+            except Exception as e:
+                log.info(f"Failed to display world button for {world_format.world_path} {e}")
 
         self.Layout()
 
