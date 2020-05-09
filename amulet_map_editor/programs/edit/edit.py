@@ -10,7 +10,7 @@ from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.structure import Structure
 from amulet.api.data_types import OperationType, OperationReturnType
 
-from amulet_map_editor import log, config
+from amulet_map_editor import log, CONFIG
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor import plugins
 from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog

@@ -1,4 +1,4 @@
-from .util.config import config
+from .util.config import CONFIG
 from .util.log import log
 from . import lang
 import os

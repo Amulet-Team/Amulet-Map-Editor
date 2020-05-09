@@ -49,4 +49,4 @@ class Config:
             json.dump(self._config, f)
 
 
-config = Config()
+CONFIG = Config()

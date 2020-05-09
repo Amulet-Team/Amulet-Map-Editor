@@ -3,7 +3,7 @@ import wx
 import glob
 from sys import platform
 from typing import List, Dict, Tuple, Callable
-from amulet_map_editor import lang, config
+from amulet_map_editor import lang, CONFIG
 from amulet import world_interface
 from amulet.world_interface.formats import WorldFormatWrapper
 from amulet_map_editor.amulet_wx import simple
@@ -253,7 +253,7 @@ class RecentWorldUI(simple.SimplePanel):
         self.rebuild()
 
     def rebuild(self, new_world: str = None):
-        meta: dict = config.get("amulet_meta", {})
+        meta: dict = CONFIG.get("amulet_meta", {})
         recent_worlds: list = meta.setdefault('recent_worlds', [])
         if new_world is not None:
             while new_world in recent_worlds:
@@ -266,7 +266,7 @@ class RecentWorldUI(simple.SimplePanel):
         self._world_list = WorldList(self, recent_worlds, self._open_world_callback, sort=False)
         self.add_object(self._world_list, 1, wx.EXPAND)
         self.Layout()
-        config.put("amulet_meta", meta)
+        CONFIG.put("amulet_meta", meta)
 
 
 class WorldSelectAndRecentUI(simple.SimplePanel):
