@@ -106,7 +106,7 @@ class WorldUIButton(WorldUI):
 
 
 class WorldList(simple.SimplePanel):
-    def __init__(self, parent, world_dirs, open_world_callback):
+    def __init__(self, parent, world_dirs, open_world_callback, sort=True):
         super(WorldList, self).__init__(
             parent
         )
@@ -120,7 +120,10 @@ class WorldList(simple.SimplePanel):
                     world_formats.append(world_interface.load_format(world_path))
                 except Exception as e:
                     log.info(e)
-        for world_format in reversed(sorted(world_formats, key = lambda f: f.last_played)):
+        if sort:
+            world_formats = reversed(sorted(world_formats, key=lambda f: f.last_played))
+
+        for world_format in world_formats:
             world_button = WorldUIButton(self, world_format, open_world_callback)
             self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
             self.worlds.append(world_button)
@@ -260,7 +263,7 @@ class RecentWorldUI(simple.SimplePanel):
                 recent_worlds.pop(5)
         if self._world_list is not None:
             self._world_list.Destroy()
-        self._world_list = WorldList(self, recent_worlds, self._open_world_callback)
+        self._world_list = WorldList(self, recent_worlds, self._open_world_callback, sort=False)
         self.add_object(self._world_list, 1, wx.EXPAND)
         self.Layout()
         config.put("amulet_meta", meta)
