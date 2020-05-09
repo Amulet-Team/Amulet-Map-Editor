@@ -34,6 +34,8 @@ from .events import (
 if TYPE_CHECKING:
     from amulet.api.world import World
 
+EDIT_CONFIG_ID = "amulet_edit"
+
 
 def show_loading_dialog(
     run: Callable[[], OperationReturnType], title: str, message: str, parent: wx.Window
@@ -81,7 +83,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._temp = wx.StaticText(self, label="Please wait while the renderer loads")
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp)
-        self._keybind_id = DefaultKeybindGroupId
 
         self._file_panel: Optional[FilePanel] = None
         self._select_options: Optional[SelectOptions] = None
@@ -96,7 +97,9 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             self._canvas = ControllableEditCanvas(self, self._world)
 
-            self._canvas.set_key_binds(DefaultKeys)  # TODO: have this read from the config file
+            self._canvas.set_key_binds(
+                CONFIG.get(EDIT_CONFIG_ID, DefaultKeys)
+            )
 
             self._file_panel = FilePanel(
                 self._canvas,
@@ -223,10 +226,15 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         return menu
 
     def _edit_controls(self):
-        key_config = KeyConfigDialog(self, self._keybind_id, KeybindKeys, PresetKeybinds, {})
+        edit_config = CONFIG.get(EDIT_CONFIG_ID, {})
+        keybind_id = edit_config.get("keybind_group", DefaultKeybindGroupId)
+        user_keybinds = edit_config.get("user_keybinds", {})
+        key_config = KeyConfigDialog(self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds)
         if key_config.ShowModal() == wx.ID_OK:
-            user_keybinds, self._keybind_id, keybinds = key_config.options
-            # TODO: store user keybinds in the config
+            user_keybinds, keybind_id, keybinds = key_config.options
+            edit_config["user_keybinds"] = user_keybinds
+            edit_config["keybind_group"] = keybind_id
+            CONFIG.put(EDIT_CONFIG_ID, edit_config)
             self._canvas.set_key_binds(keybinds)
 
     @staticmethod
