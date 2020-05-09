@@ -8,7 +8,7 @@ from amulet.world_interface.formats import WorldFormatWrapper
 
 from amulet_map_editor import lang, log
 from amulet_map_editor.amulet_wx.simple import SimplePanel
-from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow, WorldUI
+from amulet_map_editor.amulet_wx.world_select import WorldSelectDialog, WorldUI
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 
 
@@ -89,7 +89,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
         webbrowser.open("https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/convert/readme.md")
 
     def _show_world_select(self, evt):
-        select_world = WorldSelectWindow(self, self._output_world_callback)
+        select_world = WorldSelectDialog(self, self._output_world_callback)
         select_world.ShowModal()
 
     def _output_world_callback(self, path):

@@ -4,7 +4,7 @@ from typing import Dict
 import webbrowser
 
 from amulet.api.errors import LoaderNoneMatched
-from amulet_map_editor.amulet_wx.world_select import WorldSelectWindow
+from amulet_map_editor.amulet_wx.world_select import WorldSelectDialog
 from amulet_map_editor import lang, version, log, IMG_DIR
 from amulet_map_editor.programs import WorldManagerUI
 from amulet_map_editor.amulet_wx import simple
@@ -113,7 +113,7 @@ class AmuletMainWindow(wx.Frame):
         self._disable_enable()
 
     def _show_open_world(self):
-        select_world = WorldSelectWindow(self, self._open_world)
+        select_world = WorldSelectDialog(self, self._open_world)
         select_world.ShowModal()
 
     def _open_world(self, path: str):
@@ -214,7 +214,7 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
         self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
 
     def _show_world_select(self, evt):
-        select_world = WorldSelectWindow(self, self._open_world_callback)
+        select_world = WorldSelectDialog(self, self._open_world_callback)
         select_world.ShowModal()
 
     def _documentation(self, evt):

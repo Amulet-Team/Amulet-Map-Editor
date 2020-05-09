@@ -285,7 +285,7 @@ class WorldSelectAndRecentUI(simple.SimplePanel):
         self._open_world_callback(path)
 
 
-class WorldSelectWindow(wx.Dialog):
+class WorldSelectDialog(wx.Dialog):
     def __init__(self, parent: wx.Window, open_world_callback: Callable[[str], None]):
         super().__init__(
             parent,
