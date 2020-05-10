@@ -293,7 +293,21 @@ class EditCanvas(glcanvas.GLCanvas):
     def selection(self) -> Optional[numpy.ndarray]:
         return numpy.array([self._selection_box.min, self._selection_box.max])
 
-    def _collision_location_closest(self) -> numpy.ndarray:
+    def ray_collision(self):
+        vector_start = self._camera[:3]
+        direction_vector = self._look_vector()
+        min_point = self._selection_box.min
+        max_point = self._selection_box.max
+
+        point_array = max_point.copy()
+        numpy.putmask(point_array, direction_vector > 0, min_point)
+
+        t = (point_array - vector_start) / direction_vector
+
+        t_max = numpy.where(t == t.max())[0][0]
+        return t_max
+
+    def _collision_location_closest(self, include_selection_boxes=True) -> numpy.ndarray:
         """Find the location of the closests non-air block"""
         cx: Optional[int] = None
         cz: Optional[int] = None
@@ -301,6 +315,28 @@ class EditCanvas(glcanvas.GLCanvas):
         location = numpy.array([0, 0, 0], dtype=numpy.int32)
         for location in self._collision_locations():
             x, y, z = location
+
+            if include_selection_boxes and self._selection_box and self._selection_box.select_state == 2:
+                min_point = self._selection_box.min
+                max_point = self._selection_box.max
+                intersecting = numpy.logical_and(
+                    numpy.less_equal(min_point, location),
+                    numpy.greater_equal(max_point, location)
+                ).all()
+
+                if intersecting:
+                    hit_face = self.ray_collision()
+                    faces = ["+X", '+Y', '+Z']
+                    look_directions = numpy.sign(self._look_vector())
+                    if look_directions[0] == 1:
+                        faces[0] = "-X"
+                    if look_directions[1] == 1:
+                        faces[1] = "-Y"
+                    if look_directions[2] == 1:
+                        faces[2] = "-Z"
+                    print(faces[hit_face])
+                    return
+
             cx_ = x >> 4
             cz_ = z >> 4
             if cx is None or cx != cx_ or cz != cz_:
@@ -324,15 +360,19 @@ class EditCanvas(glcanvas.GLCanvas):
             numpy.array([0, 0, 0], dtype=numpy.int32)
         )
 
-    def _collision_locations(self) -> Generator[numpy.ndarray, None, None]:
+    def _look_vector(self) -> numpy.ndarray:
         look_vector = numpy.array([0, 0, -1, 0])
         if not self._mouse_lock:
-            screen_x, screen_y = numpy.array(self.GetSize(), numpy.int)/2
+            screen_x, screen_y = numpy.array(self.GetSize(), numpy.int) / 2
             screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
-            screen_dy = atan(cos(screen_dx) * tan(self.fov/2) * self._mouse_delta_y/screen_y)
+            screen_dy = atan(cos(screen_dx) * tan(self.fov / 2) * self._mouse_delta_y / screen_y)
             look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
         look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
         look_vector[abs(look_vector) < 0.000001] = 0.000001
+        return look_vector
+
+    def _collision_locations(self) -> Generator[numpy.ndarray, None, None]:
+        look_vector = self._look_vector()
         dx, dy, dz = look_vector
         max_distance = 100
 
