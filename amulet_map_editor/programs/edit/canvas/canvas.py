@@ -11,6 +11,7 @@ import minecraft_model_reader
 from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
+from amulet.api.data_types import PointCoordinatesAny
 
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, tan, atan
 from amulet_map_editor.opengl.mesh.selection import RenderSelection
@@ -68,7 +69,7 @@ class EditCanvas(glcanvas.GLCanvas):
         )
 
         self._transformation_matrix: Optional[numpy.ndarray] = None
-        self._camera = [0, 150, 0, 90, 0]
+        self._camera: List[int, float] = [0, 150, 0, 90, 0]
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
@@ -430,9 +431,10 @@ class EditCanvas(glcanvas.GLCanvas):
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
-        self._selection_box.draw(self.transformation_matrix, self._select_mode == 0)
+        camera_position: PointCoordinatesAny = tuple(self._camera[:3])
+        self._selection_box.draw(self.transformation_matrix, self._select_mode == 0, camera_position)
         if self._selection_box.select_state == 2 and self.select_mode == 0:
-            self._selection_box2.draw(self.transformation_matrix)
+            self._selection_box2.draw(self.transformation_matrix, camera_position=camera_position)
         self.SwapBuffers()
 
     def _gc(self, event):

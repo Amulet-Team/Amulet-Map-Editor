@@ -7,10 +7,10 @@ from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
 
 class RenderSelection(TriMesh):
     def __init__(self,
-        context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        texture: int
-    ):
+                 context_identifier: str,
+                 texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+                 texture: int
+                 ):
         super().__init__(context_identifier, texture)
         self._select_state = 0  # number of points selected
         self._points: numpy.ndarray = numpy.zeros((2, 3))  # The points set using point1 and point2
@@ -26,6 +26,11 @@ class RenderSelection(TriMesh):
         self.verts[:, 9:12] = 1
         self.draw_count = 36
         self._draw_mode = GL_TRIANGLES
+
+    def __contains__(self, position: BlockCoordinatesAny):
+        point = numpy.array(position)
+        m = self.min
+        return numpy.all(self.min <= point) and numpy.all(point < self.max)
 
     @property
     def vertex_usage(self):
@@ -91,7 +96,7 @@ class RenderSelection(TriMesh):
                 )
             )
         )
-        _cube_face_lut = numpy.array([  # This maps to the verticies used (defined in cube_vert_lut)
+        _cube_face_lut = numpy.array([  # This maps to the vertices used (defined in cube_vert_lut)
             0, 4, 5, 1,  # down
             0, 1, 3, 2,  # west
             4, 0, 2, 6,  # north
@@ -126,11 +131,12 @@ class RenderSelection(TriMesh):
         self._volume = numpy.product(self.max - self.min)
         self._rebuild = False
 
-    def draw(self, transformation_matrix: numpy.ndarray, active=True):
+    def draw(self, transformation_matrix: numpy.ndarray, active=True, camera_position: PointCoordinatesAny = None):
         """
         Draw the selection box
         :param transformation_matrix: 4x4 transformation matrix for the camera
         :param active: If the selection box is the active selection (draw corner boxes)
+        :param camera_position: The position of the camera. Used to flip draw direction if camera inside box.
         :return:
         """
         self._setup()
@@ -138,6 +144,11 @@ class RenderSelection(TriMesh):
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
+
+        if camera_position is not None and camera_position in self:
+            glCullFace(GL_FRONT)
+        else:
+            glCullFace(GL_BACK)
 
         if active and self._volume > 1:
             draw_count = self.draw_count = 108
@@ -152,3 +163,4 @@ class RenderSelection(TriMesh):
             self.draw_start = start
             super()._draw(transformation_matrix)
         glEnable(GL_DEPTH_TEST)
+        glCullFace(GL_BACK)
