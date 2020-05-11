@@ -1,8 +1,9 @@
 import numpy
 from OpenGL.GL import *
 import itertools
-from typing import Tuple, Dict, Any, Optional
 from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
+from typing import Tuple, Dict, Any, Optional, List
+from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny, PointCoordinatesNDArray
 
 
 class RenderSelection(TriMesh):
@@ -31,6 +32,36 @@ class RenderSelection(TriMesh):
         point = numpy.array(position)
         m = self.min
         return numpy.all(self.min <= point) and numpy.all(point < self.max)
+
+    def intersects_vector(self, origin: PointCoordinatesNDArray, vector: PointCoordinatesNDArray) -> Optional[float]:
+        """
+        Determine if a look vector from a given point collides with this selection box.
+        :param origin: Location of the origin of the vector
+        :param vector: The look vector
+        :return: Multiplier of the vector to the collision location. None if it does not collide
+        """
+        # Logic based on https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+        (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort((self._bounds - origin) / vector, axis=0)
+
+        if tmin > tymax or tymin > tmax:
+            return None
+
+        if tymin > tmin:
+            tmin = tymin
+
+        if tymax < tmax:
+            tmax = tymax
+
+        if tmin > tzmax or tzmin > tmax:
+            return None
+
+        if tzmin > tmin:
+            tmin = tzmin
+
+        if tzmax < tmax:
+            tmax = tzmax
+
+        return tmin if tmin >= 0 else tmax
 
     @property
     def vertex_usage(self):
