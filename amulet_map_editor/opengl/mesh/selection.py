@@ -17,6 +17,7 @@ class RenderSelection(TriMesh):
         self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
         self.verts = numpy.zeros((6*2*3*3, self._vert_len), dtype=numpy.float32)
         self._rebuild = True
+        self._volume = 1
 
         missing_no = texture_bounds.get(('minecraft', 'missing_no'), (0, 0, 0, 0))
         self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
@@ -41,7 +42,6 @@ class RenderSelection(TriMesh):
     @select_state.setter
     def select_state(self, value: int):
         self._select_state = value
-        self.draw_count = 36 * (2 * bool(self._select_state) + 1)
 
     @property
     def point1(self) -> numpy.ndarray:
@@ -123,26 +123,32 @@ class RenderSelection(TriMesh):
             self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(self.point2-0.01, self.point2+1.01)
 
         self.change_verts()
+        self._volume = numpy.product(self.max - self.min)
         self._rebuild = False
 
-    def draw(self, transformation_matrix: numpy.ndarray, draw_corners=True):
+    def draw(self, transformation_matrix: numpy.ndarray, active=True):
+        """
+        Draw the selection box
+        :param transformation_matrix: 4x4 transformation matrix for the camera
+        :param active: If the selection box is the active selection (draw corner boxes)
+        :return:
+        """
         self._setup()
         if self._rebuild:
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
-        draw_count = self.draw_count
-        if not draw_corners:
-            self.draw_count = 36
+
+        if active and self._volume > 1:
+            draw_count = self.draw_count = 108
+        else:
+            draw_count = self.draw_count = 36
         super()._draw(transformation_matrix)
 
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
         self.draw_count = 36
-        super()._draw(transformation_matrix)
-        if draw_corners:
-            for start in range(36, draw_count, 36):
-                self.draw_start = start
-                super()._draw(transformation_matrix)
-        self.draw_count = draw_count
+        for start in range(0, draw_count, 36):
+            self.draw_start = start
+            super()._draw(transformation_matrix)
         glEnable(GL_DEPTH_TEST)
