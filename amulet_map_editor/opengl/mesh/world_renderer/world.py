@@ -13,6 +13,7 @@ from amulet_map_editor import log
 from .chunk import RenderChunk
 from .region import ChunkManager
 from amulet_map_editor.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -124,7 +125,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                 time.sleep(1/60-delta_time)
 
 
-class RenderWorld(ResourcePackManager):
+class RenderWorld(ResourcePackManager, Drawable):
     def __init__(
         self,
         context_identifier: Any,
