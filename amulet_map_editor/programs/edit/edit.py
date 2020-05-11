@@ -97,8 +97,17 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             self._canvas = ControllableEditCanvas(self, self._world)
 
+            config = CONFIG.get(EDIT_CONFIG_ID, {})
+            user_keybinds = config.get("user_keybinds", {})
+            group = config.get("keybind_group", DefaultKeybindGroupId)
+            if group in user_keybinds:
+                keybinds = user_keybinds[group]
+            elif group in PresetKeybinds:
+                keybinds = PresetKeybinds[group]
+            else:
+                keybinds = DefaultKeys
             self._canvas.set_key_binds(
-                CONFIG.get(EDIT_CONFIG_ID, DefaultKeys)
+                keybinds
             )
 
             self._file_panel = FilePanel(
