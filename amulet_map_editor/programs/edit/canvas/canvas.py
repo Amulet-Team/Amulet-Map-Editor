@@ -69,7 +69,7 @@ class EditCanvas(glcanvas.GLCanvas):
         )
 
         self._transformation_matrix: Optional[numpy.ndarray] = None
-        self._camera: List[int, float] = [0, 150, 0, 90, 0]
+        self._camera: List[int, float] = [0, 100, 0, 45, 45]
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
@@ -352,7 +352,12 @@ class EditCanvas(glcanvas.GLCanvas):
                 return location
         return location
 
-    def _collision_location_distance(self, distance) -> numpy.ndarray:
+    def _collision_location_distance(self, distance: int) -> numpy.ndarray:
+        """
+        The first block location along the camera's look vector that is further away than `distance`.
+        :param distance: The distance between the block and the camera.
+        :return: [x, y, z] numpy array
+        """
         distance = distance ** 2
         locations = self._collision_locations()
         camera = numpy.array(self._camera[:3], dtype=numpy.int)
@@ -362,6 +367,10 @@ class EditCanvas(glcanvas.GLCanvas):
         )
 
     def _look_vector(self) -> numpy.ndarray:
+        """
+        The x,y,z vector for the direction the camera is facing
+        :return: [x, y, z] numpy float array ranging from -1 to 1
+        """
         look_vector = numpy.array([0, 0, -1, 0])
         if not self._mouse_lock:
             screen_x, screen_y = numpy.array(self.GetSize(), numpy.int) / 2
@@ -372,10 +381,16 @@ class EditCanvas(glcanvas.GLCanvas):
         look_vector[abs(look_vector) < 0.000001] = 0.000001
         return look_vector
 
-    def _collision_locations(self) -> Generator[numpy.ndarray, None, None]:
+    def _collision_locations(self, max_distance=100) -> Generator[numpy.ndarray, None, None]:
+        """
+        The block locations that the camera's look vector passes through.
+        :param max_distance: The maximum distance along the look vector to traverse.
+        :return: A generator of [x, y, z] numpy arrays
+        """
+        # TODO: optimise this
+
         look_vector = self._look_vector()
         dx, dy, dz = look_vector
-        max_distance = 100
 
         vectors = numpy.array(
             [
