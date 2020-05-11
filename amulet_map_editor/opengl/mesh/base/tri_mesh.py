@@ -6,7 +6,12 @@ from amulet_map_editor.opengl.shaders import get_shader
 from amulet_map_editor import log
 
 
-class TriMesh:
+class Drawable:
+    def draw(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class TriMesh(Drawable):
     """The base class for a triangular face mesh.
     Implements the base logic to set up and unload OpenGL."""
     _vertex_attrs = (
