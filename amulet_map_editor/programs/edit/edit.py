@@ -277,14 +277,9 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._canvas.enable_threads()
 
     def _get_box(self) -> Optional[SelectionGroup]:
-        box = self._canvas.selection_box
-        if box.select_state == 2:
-            return SelectionGroup(
-                (SelectionBox(
-                    box.min,
-                    box.max
-                ),)
-            )
+        group = self._canvas.selection_group
+        if group.selection_boxes:
+            return group
         else:
             wx.MessageBox(
                 "You must select an area of the world before running this operation"

@@ -1,39 +1,31 @@
 import wx
-from wx import glcanvas
 from OpenGL.GL import *
 import os
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
-import uuid
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator, Union
 import numpy
-import math
 
 import minecraft_model_reader
 from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import PointCoordinatesAny
+from amulet.api.data_types import PointCoordinatesAny, PointCoordinatesNDArray
+from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, tan, atan
-from amulet_map_editor.opengl.mesh.selection import RenderSelection
+from amulet_map_editor.opengl.mesh.selection import RenderSelection, RenderSelectionGroup
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
+from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
+from ..events import CameraMoveEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from amulet_map_editor.programs.edit.edit import EditExtension
 
 
-class EditCanvas(glcanvas.GLCanvas):
-    def __init__(self, world_panel: 'EditExtension', world: 'World'):
-        attribs = (glcanvas.WX_GL_CORE_PROFILE, glcanvas.WX_GL_RGBA, glcanvas.WX_GL_DOUBLEBUFFER, glcanvas.WX_GL_DEPTH_SIZE, 24)
-        super().__init__(world_panel, -1, size=world_panel.GetClientSize(), attribList=attribs)
-        self._context = glcanvas.GLContext(self)  # setup the OpenGL context
-        self.SetCurrent(self._context)
-        self.context_identifier = str(uuid.uuid4())  # create a UUID for the context. Used to get shaders
-        self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
-        self._setup_opengl()  # set some OpenGL states
-
+class EditCanvas(BaseCanvas):
+    def __init__(self, parent: wx.Window, world: 'World'):
+        super().__init__(parent)
         self._last_mouse_x = 0
         self._last_mouse_y = 0
         self._mouse_delta_x = 0
@@ -68,8 +60,7 @@ class EditCanvas(glcanvas.GLCanvas):
             self._resource_pack_translator
         )
 
-        self._transformation_matrix: Optional[numpy.ndarray] = None
-        self._camera: List[int, float] = [0, 100, 0, 45, 45]
+        self._camera: List[float] = [0.0, 100.0, 0.0, 45.0, 45.0]
         self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
@@ -80,12 +71,7 @@ class EditCanvas(glcanvas.GLCanvas):
         # select destination = draw box + draw structure + accept destination user inputs
 
         self._select_style = 1  # 0 is select at fixed distance, 1 is select closest non-air
-        self._selection_box = RenderSelection(
-            self.context_identifier,
-            self._texture_bounds,
-            self._gl_texture_atlas
-        )
-        self._selection_box2 = RenderSelection(
+        self._selection_group = RenderSelectionGroup(
             self.context_identifier,
             self._texture_bounds,
             self._gl_texture_atlas
@@ -103,8 +89,12 @@ class EditCanvas(glcanvas.GLCanvas):
         self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
 
     @property
-    def selection_box(self) -> RenderSelection:
-        return self._selection_box
+    def selection_group(self) -> SelectionGroup:
+        return self._selection_group.create_selection_group()
+
+    @property
+    def selection_box(self) -> Optional[RenderSelection]:
+        return self._selection_group.active_selection
 
     def enable(self):
         # return
@@ -128,25 +118,10 @@ class EditCanvas(glcanvas.GLCanvas):
 
     def close(self):
         self._render_world.close()
-        glDeleteTextures([self._gl_texture_atlas])
+        super()._close()
 
     def is_closeable(self):
         return self._render_world.is_closeable()
-
-    def _setup_opengl(self):
-        glClearColor(0.5, 0.66, 1.0, 1.0)
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_CULL_FACE)
-        glDepthFunc(GL_LEQUAL)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        glBindTexture(GL_TEXTURE_2D, 0)
 
     def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
         self._resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
@@ -197,6 +172,17 @@ class EditCanvas(glcanvas.GLCanvas):
         self._render_world.dimension = dimension
 
     @property
+    def camera_location(self) -> Tuple[float, float, float]:
+        return tuple(self._camera[:3])
+
+    @camera_location.setter
+    def camera_location(self, location: Tuple[Union[int, float], Union[int, float], Union[int, float]]):
+        self._camera[:3] = location
+        self._transformation_matrix = None
+        self._change_box_location()
+        wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
+
+    @property
     def camera_move_speed(self) -> float:
         """The speed that the camera moves at"""
         return self._camera_move_speed
@@ -232,73 +218,29 @@ class EditCanvas(glcanvas.GLCanvas):
         self._projection[1] = aspect_ratio
         self._transformation_matrix = None
 
-    @staticmethod
-    def rotation_matrix(pitch, yaw):
-        c = cos(yaw)
-        s = sin(yaw)
+    def _change_box_location(self):
+        if self._select_style:
+            position, box_index = self._collision_location_closest()
+        else:
+            position, box_index = self._collision_location_distance(10)
 
-        y_rot = numpy.array(
-            [
-                [c, 0, -s, 0],
-                [0, 1, 0, 0],
-                [s, 0, c, 0],
-                [0, 0, 0, 1]
-            ],
-            dtype=numpy.float32
-        )
+        self._selection_group.update_position(position, box_index)
 
-        # rotations
-        c = cos(pitch)
-        s = sin(pitch)
-
-        x_rot = numpy.array(
-            [
-                [1, 0, 0, 0],
-                [0, c, s, 0],
-                [0, -s, c, 0],
-                [0, 0, 0, 1]
-            ],
-            dtype=numpy.float32
-        )
-
-        return numpy.matmul(y_rot, x_rot)
-
-    def projection_matrix(self):
-        # camera projection
-        fovy, aspect, z_near, z_far = self._projection
-        fovy = math.radians(fovy)
-        f = 1 / math.tan(fovy / 2)
-        return numpy.array(
-            [
-                [f / aspect, 0, 0, 0],
-                [0, f, 0, 0],
-                [0, 0, (z_far + z_near) / (z_near - z_far), -1],
-                [0, 0, (2 * z_far * z_near) / (z_near - z_far), 0]
-            ],
-            dtype=numpy.float32
-        )
-
-    @property
-    def transformation_matrix(self) -> numpy.ndarray:
-        # camera translation
-        if self._transformation_matrix is None:
-            transformation_matrix = numpy.eye(4, dtype=numpy.float32)
-            transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
-
-            transformation_matrix = numpy.matmul(transformation_matrix, self.rotation_matrix(*self._camera[3:5]))
-            self._transformation_matrix = numpy.matmul(transformation_matrix, self.projection_matrix())
-
-        return self._transformation_matrix
-
-    @property
-    def selection(self) -> Optional[numpy.ndarray]:
-        return numpy.array([self._selection_box.min, self._selection_box.max])
+        # if self._selection_box.select_state == 0:
+        #     (x, y, z) = self._selection_box.point1 = self._selection_box.point2 = location
+        #     wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
+        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
+        # elif self._selection_box.select_state == 1:
+        #     (x, y, z) = self._selection_box.point2 = location
+        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
+        # elif self._selection_box.select_state == 2:
+        #     self._selection_box2.point1 = self._selection_box2.point2 = location
 
     def ray_collision(self):
-        vector_start = self._camera[:3]
+        vector_start = self.camera_location
         direction_vector = self._look_vector()
-        min_point = self._selection_box.min
-        max_point = self._selection_box.max
+        min_point = self.selection_box.min
+        max_point = self.selection_box.max
 
         point_array = max_point.copy()
         numpy.putmask(point_array, direction_vector > 0, min_point)
@@ -308,36 +250,39 @@ class EditCanvas(glcanvas.GLCanvas):
         t_max = numpy.where(t == t.max())[0][0]
         return t_max
 
-    def _collision_location_closest(self, include_selection_boxes=True) -> numpy.ndarray:
-        """Find the location of the closests non-air block"""
+    def _collision_location_closest(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+        """Find the location of the closests non-air block or selection box"""
         cx: Optional[int] = None
         cz: Optional[int] = None
         chunk: Optional[Chunk] = None
+
+        box_index, nearest_selection_box = self._selection_group.closest_intersection(self.camera_location, self._look_vector())
+
         location = numpy.array([0, 0, 0], dtype=numpy.int32)
         for location in self._collision_locations():
+            if nearest_selection_box and nearest_selection_box.in_boundary(location):
+                return location, box_index
+                # min_point = self.selection_box.min
+                # max_point = self.selection_box.max
+                # intersecting = numpy.logical_and(
+                #     numpy.less_equal(min_point, location),
+                #     numpy.greater_equal(max_point, location)
+                # ).all()
+                #
+                # if intersecting:
+                #     hit_face = self.ray_collision()
+                #     faces = ["+X", '+Y', '+Z']
+                #     look_directions = numpy.sign(self._look_vector())
+                #     if look_directions[0] == 1:
+                #         faces[0] = "-X"
+                #     if look_directions[1] == 1:
+                #         faces[1] = "-Y"
+                #     if look_directions[2] == 1:
+                #         faces[2] = "-Z"
+                #     print(faces[hit_face])
+                #     return numpy.array([0, 0, 0], dtype=numpy.int32)
+
             x, y, z = location
-
-            if include_selection_boxes and self._selection_box and self._selection_box.select_state == 2:
-                min_point = self._selection_box.min
-                max_point = self._selection_box.max
-                intersecting = numpy.logical_and(
-                    numpy.less_equal(min_point, location),
-                    numpy.greater_equal(max_point, location)
-                ).all()
-
-                if intersecting:
-                    hit_face = self.ray_collision()
-                    faces = ["+X", '+Y', '+Z']
-                    look_directions = numpy.sign(self._look_vector())
-                    if look_directions[0] == 1:
-                        faces[0] = "-X"
-                    if look_directions[1] == 1:
-                        faces[1] = "-Y"
-                    if look_directions[2] == 1:
-                        faces[2] = "-Z"
-                    print(faces[hit_face])
-                    return
-
             cx_ = x >> 4
             cz_ = z >> 4
             if cx is None or cx != cx_ or cz != cz_:
@@ -349,27 +294,24 @@ class EditCanvas(glcanvas.GLCanvas):
                     chunk = None
 
             if chunk is not None and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]].namespaced_name != 'universal_minecraft:air':
-                return location
-        return location
+                return location, None
+        return location, None
 
-    def _collision_location_distance(self, distance: int) -> numpy.ndarray:
+    def _collision_location_distance(self, distance: int) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
         """
         The first block location along the camera's look vector that is further away than `distance`.
         :param distance: The distance between the block and the camera.
-        :return: [x, y, z] numpy array
+        :return: (x, y, z) numpy array, selection box index
         """
-        distance = distance ** 2
-        locations = self._collision_locations()
-        camera = numpy.array(self._camera[:3], dtype=numpy.int)
-        return next(
-            (loc for loc in locations if sum((abs(loc - camera) + 0.5) ** 2) >= distance),
-            numpy.array([0, 0, 0], dtype=numpy.int32)
-        )
+        look_vector = self._look_vector()
+        position = numpy.array(self.camera_location, dtype=numpy.int) + numpy.floor(look_vector*distance).astype(numpy.int)
+        box = next((index for index, box in enumerate(self._selection_group) if box.in_boundary(position)), None)
+        return position, box
 
     def _look_vector(self) -> numpy.ndarray:
         """
         The x,y,z vector for the direction the camera is facing
-        :return: [x, y, z] numpy float array ranging from -1 to 1
+        :return: (x, y, z) numpy float array ranging from -1 to 1
         """
         look_vector = numpy.array([0, 0, -1, 0])
         if not self._mouse_lock:
@@ -385,7 +327,7 @@ class EditCanvas(glcanvas.GLCanvas):
         """
         The block locations that the camera's look vector passes through.
         :param max_distance: The maximum distance along the look vector to traverse.
-        :return: A generator of [x, y, z] numpy arrays
+        :return: A generator of (x, y, z) numpy arrays
         """
         # TODO: optimise this
 
@@ -402,7 +344,7 @@ class EditCanvas(glcanvas.GLCanvas):
         offsets = -numpy.eye(3)
 
         locations = set()
-        start: numpy.ndarray = numpy.array(self._camera[:3], numpy.float32) % 1
+        start: numpy.ndarray = numpy.array(self.camera_location, numpy.float32) % 1
 
         for axis in range(3):
             location: numpy.ndarray = start.copy()
@@ -419,7 +361,7 @@ class EditCanvas(glcanvas.GLCanvas):
         if locations:
             collision_locations = numpy.array(
                 sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
-            ) + numpy.floor(self._camera[:3]).astype(numpy.int)
+            ) + numpy.floor(self.camera_location).astype(numpy.int)
         else:
             collision_locations = start.astype(numpy.int)
 
@@ -446,10 +388,7 @@ class EditCanvas(glcanvas.GLCanvas):
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
-        camera_position: PointCoordinatesAny = tuple(self._camera[:3])
-        self._selection_box.draw(self.transformation_matrix, self._select_mode == 0, camera_position)
-        if self._selection_box.select_state == 2 and self.select_mode == 0:
-            self._selection_box2.draw(self.transformation_matrix, camera_position=camera_position)
+        self._selection_group.draw(self.transformation_matrix, self._select_mode == 0, tuple(self.camera_location))
         self.SwapBuffers()
 
     def _gc(self, event):

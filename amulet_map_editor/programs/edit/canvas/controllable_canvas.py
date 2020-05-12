@@ -51,7 +51,7 @@ class ControllableEditCanvas(EditCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
 
         self._input_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._process_inputs, self._input_timer)
+        self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
 
     def enable(self):
         super().enable()
@@ -113,7 +113,7 @@ class ControllableEditCanvas(EditCanvas):
             self._mouse_lock = True
             self._change_box_location()
 
-    def _process_inputs(self, evt):
+    def _process_persistent_inputs(self, evt):
         forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
         if 'up' in self._persistent_actions:
             up += 1
@@ -139,17 +139,6 @@ class ControllableEditCanvas(EditCanvas):
         self.move_camera_relative(forward, up, right, pitch, yaw)
         evt.Skip()
 
-    @property
-    def camera_location(self):
-        return self._camera[:3]
-
-    @camera_location.setter
-    def camera_location(self, location: Tuple[Union[int, float], Union[int, float], Union[int, float]]):
-        self._camera[:3] = location
-        self._transformation_matrix = None
-        self._change_box_location()
-        wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
-
     def move_camera_relative(self, forward, up, right, pitch, yaw):
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
             if not self._mouse_lock and self._mouse_moved:
@@ -169,31 +158,17 @@ class ControllableEditCanvas(EditCanvas):
         self._change_box_location()
         wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
 
-    def _change_box_location(self):
-        if self._select_style:
-            location = self._collision_location_closest()
-        else:
-            location = self._collision_location_distance(10)
-        if self._selection_box.select_state == 0:
-            (x, y, z) = self._selection_box.point1 = self._selection_box.point2 = location
-            wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
-            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
-        elif self._selection_box.select_state == 1:
-            (x, y, z) = self._selection_box.point2 = location
-            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
-        elif self._selection_box.select_state == 2:
-            self._selection_box2.point1 = self._selection_box2.point2 = location
-
-    def box_select(self):
-        if self._selection_box.select_state <= 1:
-            self._selection_box.select_state += 1
-        elif self._selection_box.select_state == 2:
-            self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
-            self._selection_box.select_state = 1
-            x, y, z = self._selection_box.point1
-            wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
-            wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
-        wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
+    def box_select(self, add_modifier: bool = False):
+        self._selection_group.box_click(add_modifier)
+        # if self._selection_box.select_state <= 1:
+        #     self._selection_box.select_state += 1
+        # elif self._selection_box.select_state == 2:
+        #     self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
+        #     self._selection_box.select_state = 1
+        #     x, y, z = self._selection_box.point1
+        #     wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
+        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
+        # wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
 
     def _box_click(self):
         if self.select_mode == 0:
