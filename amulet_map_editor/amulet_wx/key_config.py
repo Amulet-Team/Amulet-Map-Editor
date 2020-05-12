@@ -2,7 +2,7 @@ import wx
 from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimpleScrollablePanel, SimpleChoice
 from typing import Dict, Tuple, Optional, Union, Sequence
 
-from amulet_map_editor.amulet_wx.icon import ADD, SUBTRACT, EDIT
+from amulet_map_editor.amulet_wx.icon import ADD_ICON, SUBTRACT_ICON, EDIT_ICON
 
 ModifierKeyType = str
 KeyType = Union[int, str]
@@ -25,6 +25,94 @@ Alt = "ALT"
 Space = "SPACE"
 PageUp = "PAGE_UP"
 PageDown = "PAGE_DOWN"
+Back = "BACK"
+Tab = "TAB"
+Return = "RETURN"
+Escape = "ESCAPE"
+Delete = "DELETE"
+Start = "START"
+Menu = "MENU"
+Pause = "PAUSE"
+Capital = "CAPITAL"
+End = "END"
+Home = "HOME"
+Left = "LEFT"
+Up = "UP"
+Right = "RIGHT"
+Down = "DOWN"
+Select = "SELECT"
+Print = "PRINT"
+Execute = "EXECUTE"
+Snapshot = "SNAPSHOT"
+Insert = "INSERT"
+Help = "HELP"
+Numpad0 = "NUMPAD0"
+Numpad1 = "NUMPAD1"
+Numpad2 = "NUMPAD2"
+Numpad3 = "NUMPAD3"
+Numpad4 = "NUMPAD4"
+Numpad5 = "NUMPAD5"
+Numpad6 = "NUMPAD6"
+Numpad7 = "NUMPAD7"
+Numpad8 = "NUMPAD8"
+Numpad9 = "NUMPAD9"
+Multiply = "MULTIPLY"
+Add = "ADD"
+Separator = "SEPARATOR"
+Subtract = "SUBTRACT"
+Decimal = "DECIMAL"
+Divide = "DIVIDE"
+F1 = "F1"
+F2 = "F2"
+F3 = "F3"
+F4 = "F4"
+F5 = "F5"
+F6 = "F6"
+F7 = "F7"
+F8 = "F8"
+F9 = "F9"
+F10 = "F10"
+F11 = "F11"
+F12 = "F12"
+F13 = "F13"
+F14 = "F14"
+F15 = "F15"
+F16 = "F16"
+F17 = "F17"
+F18 = "F18"
+F19 = "F19"
+F20 = "F20"
+F21 = "F21"
+F22 = "F22"
+F23 = "F23"
+F24 = "F24"
+Numlock = "NUMLOCK"
+Scroll = "SCROLL"
+Numpad_Space = "NUMPAD_SPACE"
+Numpad_Tab = "NUMPAD_TAB"
+Numpad_Enter = "NUMPAD_ENTER"
+Numpad_F1 = "NUMPAD_F1"
+Numpad_F2 = "NUMPAD_F2"
+Numpad_F3 = "NUMPAD_F3"
+Numpad_F4 = "NUMPAD_F4"
+Numpad_Home = "NUMPAD_HOME"
+Numpad_Left = "NUMPAD_LEFT"
+Numpad_Up = "NUMPAD_UP"
+Numpad_Right = "NUMPAD_RIGHT"
+Numpad_Down = "NUMPAD_DOWN"
+Numpad_Pageup = "NUMPAD_PAGEUP"
+Numpad_Pagedown = "NUMPAD_PAGEDOWN"
+Numpad_End = "NUMPAD_END"
+Numpad_Begin = "NUMPAD_BEGIN"
+Numpad_Insert = "NUMPAD_INSERT"
+Numpad_Delete = "NUMPAD_DELETE"
+Numpad_Equal = "NUMPAD_EQUAL"
+Numpad_Multiply = "NUMPAD_MULTIPLY"
+Numpad_Add = "NUMPAD_ADD"
+Numpad_Separator = "NUMPAD_SEPARATOR"
+Numpad_Subtract = "NUMPAD_SUBTRACT"
+Numpad_Decimal = "NUMPAD_DECIMAL"
+Numpad_Divide = "NUMPAD_DIVIDE"
 
 key_string_map = {
     wx.WXK_SHIFT: Shift,
@@ -32,94 +120,94 @@ key_string_map = {
     wx.WXK_SPACE: Space,
     wx.WXK_PAGEUP: PageUp,
     wx.WXK_PAGEDOWN: PageDown,
-    wx.WXK_BACK: "BACK",
-    wx.WXK_TAB: "TAB",
-    wx.WXK_RETURN: "RETURN",
-    wx.WXK_ESCAPE: "ESCAPE",
-    wx.WXK_DELETE: "DELETE",
-    wx.WXK_START: "START",
-    wx.WXK_MENU: "MENU",
-    wx.WXK_PAUSE: "PAUSE",
-    wx.WXK_CAPITAL: "CAPITAL",
-    wx.WXK_END: "END",
-    wx.WXK_HOME: "HOME",
-    wx.WXK_LEFT: "LEFT",
-    wx.WXK_UP: "UP",
-    wx.WXK_RIGHT: "RIGHT",
-    wx.WXK_DOWN: "DOWN",
-    wx.WXK_SELECT: "SELECT",
-    wx.WXK_PRINT: "PRINT",
-    wx.WXK_EXECUTE: "EXECUTE",
-    wx.WXK_SNAPSHOT: "SNAPSHOT",
-    wx.WXK_INSERT: "INSERT",
-    wx.WXK_HELP: "HELP",
-    wx.WXK_NUMPAD0: "NUMPAD0",
-    wx.WXK_NUMPAD1: "NUMPAD1",
-    wx.WXK_NUMPAD2: "NUMPAD2",
-    wx.WXK_NUMPAD3: "NUMPAD3",
-    wx.WXK_NUMPAD4: "NUMPAD4",
-    wx.WXK_NUMPAD5: "NUMPAD5",
-    wx.WXK_NUMPAD6: "NUMPAD6",
-    wx.WXK_NUMPAD7: "NUMPAD7",
-    wx.WXK_NUMPAD8: "NUMPAD8",
-    wx.WXK_NUMPAD9: "NUMPAD9",
-    wx.WXK_MULTIPLY: "MULTIPLY",
-    wx.WXK_ADD: "ADD",
-    wx.WXK_SEPARATOR: "SEPARATOR",
-    wx.WXK_SUBTRACT: "SUBTRACT",
-    wx.WXK_DECIMAL: "DECIMAL",
-    wx.WXK_DIVIDE: "DIVIDE",
-    wx.WXK_F1: "F1",
-    wx.WXK_F2: "F2",
-    wx.WXK_F3: "F3",
-    wx.WXK_F4: "F4",
-    wx.WXK_F5: "F5",
-    wx.WXK_F6: "F6",
-    wx.WXK_F7: "F7",
-    wx.WXK_F8: "F8",
-    wx.WXK_F9: "F9",
-    wx.WXK_F10: "F10",
-    wx.WXK_F11: "F11",
-    wx.WXK_F12: "F12",
-    wx.WXK_F13: "F13",
-    wx.WXK_F14: "F14",
-    wx.WXK_F15: "F15",
-    wx.WXK_F16: "F16",
-    wx.WXK_F17: "F17",
-    wx.WXK_F18: "F18",
-    wx.WXK_F19: "F19",
-    wx.WXK_F20: "F20",
-    wx.WXK_F21: "F21",
-    wx.WXK_F22: "F22",
-    wx.WXK_F23: "F23",
-    wx.WXK_F24: "F24",
-    wx.WXK_NUMLOCK: "NUMLOCK",
-    wx.WXK_SCROLL: "SCROLL",
-    wx.WXK_NUMPAD_SPACE: "NUMPAD_SPACE",
-    wx.WXK_NUMPAD_TAB: "NUMPAD_TAB",
-    wx.WXK_NUMPAD_ENTER: "NUMPAD_ENTER",
-    wx.WXK_NUMPAD_F1: "NUMPAD_F1",
-    wx.WXK_NUMPAD_F2: "NUMPAD_F2",
-    wx.WXK_NUMPAD_F3: "NUMPAD_F3",
-    wx.WXK_NUMPAD_F4: "NUMPAD_F4",
-    wx.WXK_NUMPAD_HOME: "NUMPAD_HOME",
-    wx.WXK_NUMPAD_LEFT: "NUMPAD_LEFT",
-    wx.WXK_NUMPAD_UP: "NUMPAD_UP",
-    wx.WXK_NUMPAD_RIGHT: "NUMPAD_RIGHT",
-    wx.WXK_NUMPAD_DOWN: "NUMPAD_DOWN",
-    wx.WXK_NUMPAD_PAGEUP: "NUMPAD_PAGEUP",
-    wx.WXK_NUMPAD_PAGEDOWN: "NUMPAD_PAGEDOWN",
-    wx.WXK_NUMPAD_END: "NUMPAD_END",
-    wx.WXK_NUMPAD_BEGIN: "NUMPAD_BEGIN",
-    wx.WXK_NUMPAD_INSERT: "NUMPAD_INSERT",
-    wx.WXK_NUMPAD_DELETE: "NUMPAD_DELETE",
-    wx.WXK_NUMPAD_EQUAL: "NUMPAD_EQUAL",
-    wx.WXK_NUMPAD_MULTIPLY: "NUMPAD_MULTIPLY",
-    wx.WXK_NUMPAD_ADD: "NUMPAD_ADD",
-    wx.WXK_NUMPAD_SEPARATOR: "NUMPAD_SEPARATOR",
-    wx.WXK_NUMPAD_SUBTRACT: "NUMPAD_SUBTRACT",
-    wx.WXK_NUMPAD_DECIMAL: "NUMPAD_DECIMAL",
-    wx.WXK_NUMPAD_DIVIDE: "NUMPAD_DIVIDE",
+    wx.WXK_BACK: Back,
+    wx.WXK_TAB: Tab,
+    wx.WXK_RETURN: Return,
+    wx.WXK_ESCAPE: Escape,
+    wx.WXK_DELETE: Delete,
+    wx.WXK_START: Start,
+    wx.WXK_MENU: Menu,
+    wx.WXK_PAUSE: Pause,
+    wx.WXK_CAPITAL: Capital,
+    wx.WXK_END: End,
+    wx.WXK_HOME: Home,
+    wx.WXK_LEFT: Left,
+    wx.WXK_UP: Up,
+    wx.WXK_RIGHT: Right,
+    wx.WXK_DOWN: Down,
+    wx.WXK_SELECT: Select,
+    wx.WXK_PRINT: Print,
+    wx.WXK_EXECUTE: Execute,
+    wx.WXK_SNAPSHOT: Snapshot,
+    wx.WXK_INSERT: Insert,
+    wx.WXK_HELP: Help,
+    wx.WXK_NUMPAD0: Numpad0,
+    wx.WXK_NUMPAD1: Numpad1,
+    wx.WXK_NUMPAD2: Numpad2,
+    wx.WXK_NUMPAD3: Numpad3,
+    wx.WXK_NUMPAD4: Numpad4,
+    wx.WXK_NUMPAD5: Numpad5,
+    wx.WXK_NUMPAD6: Numpad6,
+    wx.WXK_NUMPAD7: Numpad7,
+    wx.WXK_NUMPAD8: Numpad8,
+    wx.WXK_NUMPAD9: Numpad9,
+    wx.WXK_MULTIPLY: Multiply,
+    wx.WXK_ADD: Add,
+    wx.WXK_SEPARATOR: Separator,
+    wx.WXK_SUBTRACT: Subtract,
+    wx.WXK_DECIMAL: Decimal,
+    wx.WXK_DIVIDE: Divide,
+    wx.WXK_F1: F1,
+    wx.WXK_F2: F2,
+    wx.WXK_F3: F3,
+    wx.WXK_F4: F4,
+    wx.WXK_F5: F5,
+    wx.WXK_F6: F6,
+    wx.WXK_F7: F7,
+    wx.WXK_F8: F8,
+    wx.WXK_F9: F9,
+    wx.WXK_F10: F10,
+    wx.WXK_F11: F11,
+    wx.WXK_F12: F12,
+    wx.WXK_F13: F13,
+    wx.WXK_F14: F14,
+    wx.WXK_F15: F15,
+    wx.WXK_F16: F16,
+    wx.WXK_F17: F17,
+    wx.WXK_F18: F18,
+    wx.WXK_F19: F19,
+    wx.WXK_F20: F20,
+    wx.WXK_F21: F21,
+    wx.WXK_F22: F22,
+    wx.WXK_F23: F23,
+    wx.WXK_F24: F24,
+    wx.WXK_NUMLOCK: Numlock,
+    wx.WXK_SCROLL: Scroll,
+    wx.WXK_NUMPAD_SPACE: Numpad_Space,
+    wx.WXK_NUMPAD_TAB: Numpad_Tab,
+    wx.WXK_NUMPAD_ENTER: Numpad_Enter,
+    wx.WXK_NUMPAD_F1: Numpad_F1,
+    wx.WXK_NUMPAD_F2: Numpad_F2,
+    wx.WXK_NUMPAD_F3: Numpad_F3,
+    wx.WXK_NUMPAD_F4: Numpad_F4,
+    wx.WXK_NUMPAD_HOME: Numpad_Home,
+    wx.WXK_NUMPAD_LEFT: Numpad_Left,
+    wx.WXK_NUMPAD_UP: Numpad_Up,
+    wx.WXK_NUMPAD_RIGHT: Numpad_Right,
+    wx.WXK_NUMPAD_DOWN: Numpad_Down,
+    wx.WXK_NUMPAD_PAGEUP: Numpad_Pageup,
+    wx.WXK_NUMPAD_PAGEDOWN: Numpad_Pagedown,
+    wx.WXK_NUMPAD_END: Numpad_End,
+    wx.WXK_NUMPAD_BEGIN: Numpad_Begin,
+    wx.WXK_NUMPAD_INSERT: Numpad_Insert,
+    wx.WXK_NUMPAD_DELETE: Numpad_Delete,
+    wx.WXK_NUMPAD_EQUAL: Numpad_Equal,
+    wx.WXK_NUMPAD_MULTIPLY: Numpad_Multiply,
+    wx.WXK_NUMPAD_ADD: Numpad_Add,
+    wx.WXK_NUMPAD_SEPARATOR: Numpad_Separator,
+    wx.WXK_NUMPAD_SUBTRACT: Numpad_Subtract,
+    wx.WXK_NUMPAD_DECIMAL: Numpad_Decimal,
+    wx.WXK_NUMPAD_DIVIDE: Numpad_Divide,
 }
 
 
@@ -242,15 +330,15 @@ class KeyConfig(wx.BoxSizer):
         self._choice.Bind(wx.EVT_CHOICE, self._on_group_change)
         top_sizer.Add(self._choice, 1, wx.ALL | wx.EXPAND, 5)
 
-        add = wx.BitmapButton(parent, bitmap=ADD)
+        add = wx.BitmapButton(parent, bitmap=ADD_ICON)
         add.Bind(wx.EVT_BUTTON, lambda evt: self._create_new_group())
         top_sizer.Add(add, 0, wx.ALL, 5)
 
-        self._delete = wx.BitmapButton(parent, bitmap=SUBTRACT)
+        self._delete = wx.BitmapButton(parent, bitmap=SUBTRACT_ICON)
         self._delete.Bind(wx.EVT_BUTTON, lambda evt: self._delete_group())
         top_sizer.Add(self._delete, 0, wx.ALL, 5)
 
-        self._rename = wx.BitmapButton(parent, bitmap=EDIT)
+        self._rename = wx.BitmapButton(parent, bitmap=EDIT_ICON)
         self._rename.Bind(wx.EVT_BUTTON, lambda evt: self._rename_group())
         top_sizer.Add(self._rename, 0, wx.ALL, 5)
 

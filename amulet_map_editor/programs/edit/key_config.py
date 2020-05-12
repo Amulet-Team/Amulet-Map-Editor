@@ -11,6 +11,9 @@ from amulet_map_editor.amulet_wx.key_config import (
     MouseMiddle,
     MouseWheelScrollUp,
     MouseWheelScrollDown,
+    Control,
+    Numpad_Add,
+    Numpad_Subtract,
 )
 
 
@@ -26,6 +29,11 @@ KeybindKeys: List[KeybindIdType] = [
     "toggle mouse lock",
     "speed+",
     "speed-",
+    "selection distance +",
+    "selection distance -",
+    "deselect boxes",
+    "add box modifier",
+    "remove box",
 ]
 
 
@@ -41,7 +49,12 @@ PresetKeybinds: KeybindContainer = {
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), MouseMiddle),
         "speed+": ((), MouseWheelScrollUp),
-        "speed-": ((), MouseWheelScrollDown)
+        "speed-": ((), MouseWheelScrollDown),
+        "selection distance +": ((), "R"),
+        "selection distance -": ((), "F"),
+        "deselect boxes": ((Control, ), "D"),
+        "add box modifier": ((), Numpad_Add),
+        "remove box": ((), Numpad_Subtract),
     },
     "right_laptop": {
         "up": ((), Space),
@@ -54,7 +67,12 @@ PresetKeybinds: KeybindContainer = {
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), "F"),
         "speed+": ((), "."),
-        "speed-": ((), ",")
+        "speed-": ((), ","),
+        "selection distance +": ((), "R"),
+        "selection distance -": ((), "F"),
+        "deselect boxes": ((Control, ), "D"),
+        "add box modifier": ((), Numpad_Add),
+        "remove box": ((), Numpad_Subtract),
     },
     "left": {
         "up": ((), Space),
@@ -67,7 +85,12 @@ PresetKeybinds: KeybindContainer = {
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), MouseMiddle),
         "speed+": ((), MouseWheelScrollUp),
-        "speed-": ((), MouseWheelScrollDown)
+        "speed-": ((), MouseWheelScrollDown),
+        "selection distance +": ((), "Y"),
+        "selection distance -": ((), "H"),
+        "deselect boxes": ((Control, ), "D"),
+        "add box modifier": ((), Numpad_Add),
+        "remove box": ((), Numpad_Subtract),
     },
     "left_laptop": {
         "up": ((), Space),
@@ -80,7 +103,12 @@ PresetKeybinds: KeybindContainer = {
         "toggle selection mode": ((), MouseRight),
         "toggle mouse lock": ((), "H"),
         "speed+": ((), "."),
-        "speed-": ((), ",")
+        "speed-": ((), ","),
+        "selection distance +": ((), "Y"),
+        "selection distance -": ((), "H"),
+        "deselect boxes": ((Control, ), "D"),
+        "add box modifier": ((), Numpad_Add),
+        "remove box": ((), Numpad_Subtract),
     }
 }
 

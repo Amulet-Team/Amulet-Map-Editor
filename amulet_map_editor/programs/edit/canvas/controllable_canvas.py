@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 import wx
 
 from .canvas import EditCanvas
@@ -7,7 +7,7 @@ from ..events import (
     CameraMoveEvent,
     BoxGreenCornerChangeEvent,
     BoxBlueCornerChangeEvent,
-    BoxCoordsEnableEvent
+    BoxCoordsEnableEvent,
 )
 from amulet_map_editor.amulet_wx.key_config import serialise_key_event, KeybindGroup
 
@@ -76,13 +76,31 @@ class ControllableEditCanvas(EditCanvas):
             return
         if key in self._key_binds:
             action = self._key_binds[key]
-            if action in {"up", "down", "forwards", "backwards", "left", "right"}:
+            if action in {
+                "up",
+                "down",
+                "forwards",
+                "backwards",
+                "left",
+                "right",
+                "add box modifier",
+            }:
                 if press:
                     self._persistent_actions.add(action)
                 elif action in self._persistent_actions:
                     self._persistent_actions.remove(action)
 
-            elif not press:
+            elif press:  # run once on button release
+                if action == "selection distance +":
+                    self.select_distance += 1
+                elif action == "selection distance -":
+                    if self.select_distance > 1:
+                        self.select_distance -= 1
+                elif action == "deselect boxes":
+                    self._selection_group.deselect()
+                elif action == "remove box":
+                    self._selection_group.delete_active()
+            else:  # run once on button press and frequently until released
                 if action == "box click":
                     self._box_click()
                 elif action == "toggle selection mode":
@@ -95,6 +113,7 @@ class ControllableEditCanvas(EditCanvas):
                     self._camera_move_speed -= 0.2
                     if self._camera_move_speed < 0.1:
                         self._camera_move_speed = 0.1
+
         elif key[1] == wx.WXK_ESCAPE:
             self._escape()
         elif not press:
@@ -159,7 +178,8 @@ class ControllableEditCanvas(EditCanvas):
         wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
 
     def box_select(self, add_modifier: bool = False):
-        self._selection_group.box_click(add_modifier)
+        position = self._selection_group.box_click(add_modifier)
+
         # if self._selection_box.select_state <= 1:
         #     self._selection_box.select_state += 1
         # elif self._selection_box.select_state == 2:
@@ -172,7 +192,7 @@ class ControllableEditCanvas(EditCanvas):
 
     def _box_click(self):
         if self.select_mode == 0:
-            self.box_select()
+            self.box_select("add box modifier" in self._persistent_actions)
 
     def _toggle_selection_mode(self):
         self._select_style = not self._select_style

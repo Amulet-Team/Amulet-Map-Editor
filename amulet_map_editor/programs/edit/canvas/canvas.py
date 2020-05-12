@@ -8,10 +8,10 @@ import minecraft_model_reader
 from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import PointCoordinatesAny, PointCoordinatesNDArray
+from amulet.api.data_types import PointCoordinatesNDArray
 from amulet.api.selection import SelectionGroup
 
-from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, sin, cos, tan, atan
+from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, cos, tan, atan
 from amulet_map_editor.opengl.mesh.selection import RenderSelection, RenderSelectionGroup
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
@@ -21,6 +21,13 @@ from ..events import CameraMoveEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World
+
+STYLE_DISTANCE = 0  # select at fixed distance
+STYLE_CLOSEST = 1  # select closest non-air
+
+MODE_NORMAL = 0  # normal selection
+MODE_DISABLED = 1  # non-interactive selection boxes
+MODE_STRUCTURE = 2  # MODE_DISABLED and draw structure if exists
 
 
 class EditCanvas(BaseCanvas):
@@ -65,12 +72,9 @@ class EditCanvas(BaseCanvas):
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
         self._select_distance = 10
-        self._select_mode = 0  # 0 is normal box select, 1 is fixed box, 2 is selection place
-        # normal box select = draw box + draw box corners + accept box user inputs
-        # fixed box = draw box
-        # select destination = draw box + draw structure + accept destination user inputs
+        self._select_mode = MODE_NORMAL
 
-        self._select_style = 1  # 0 is select at fixed distance, 1 is select closest non-air
+        self._select_style = STYLE_CLOSEST
         self._selection_group = RenderSelectionGroup(
             self.context_identifier,
             self._texture_bounds,
@@ -93,11 +97,10 @@ class EditCanvas(BaseCanvas):
         return self._selection_group.create_selection_group()
 
     @property
-    def selection_box(self) -> Optional[RenderSelection]:
+    def active_selection(self) -> Optional[RenderSelection]:
         return self._selection_group.active_selection
 
     def enable(self):
-        # return
         self.SetCurrent(self._context)
         self._render_world.enable()
         self._draw_timer.Start(33)
@@ -154,6 +157,15 @@ class EditCanvas(BaseCanvas):
     @property
     def structure_locations(self) -> List[numpy.ndarray]:
         return self._structure_locations
+
+    @property
+    def select_distance(self) -> int:
+        return self._select_distance
+
+    @select_distance.setter
+    def select_distance(self, distance: int):
+        self._select_distance = distance
+        self._change_box_location()
 
     @property
     def select_mode(self) -> int:
@@ -219,10 +231,13 @@ class EditCanvas(BaseCanvas):
         self._transformation_matrix = None
 
     def _change_box_location(self):
-        if self._select_style:
-            position, box_index = self._collision_location_closest()
+        if self._selection_group.active_selection and 1 <= self._selection_group.active_selection.unlock_count <= 2:
+            position = self._box_location_resize()
+            box_index = None
+        elif self._select_style == STYLE_CLOSEST:
+            position, box_index = self._box_location_closest()
         else:
-            position, box_index = self._collision_location_distance(10)
+            position, box_index = self._box_location_distance(self.select_distance)
 
         self._selection_group.update_position(position, box_index)
 
@@ -239,8 +254,8 @@ class EditCanvas(BaseCanvas):
     def ray_collision(self):
         vector_start = self.camera_location
         direction_vector = self._look_vector()
-        min_point = self.selection_box.min
-        max_point = self.selection_box.max
+        min_point = self.active_selection.min
+        max_point = self.active_selection.max
 
         point_array = max_point.copy()
         numpy.putmask(point_array, direction_vector > 0, min_point)
@@ -250,7 +265,7 @@ class EditCanvas(BaseCanvas):
         t_max = numpy.where(t == t.max())[0][0]
         return t_max
 
-    def _collision_location_closest(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+    def _box_location_closest(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
         """Find the location of the closests non-air block or selection box"""
         cx: Optional[int] = None
         cz: Optional[int] = None
@@ -262,25 +277,6 @@ class EditCanvas(BaseCanvas):
         for location in self._collision_locations():
             if nearest_selection_box and nearest_selection_box.in_boundary(location):
                 return location, box_index
-                # min_point = self.selection_box.min
-                # max_point = self.selection_box.max
-                # intersecting = numpy.logical_and(
-                #     numpy.less_equal(min_point, location),
-                #     numpy.greater_equal(max_point, location)
-                # ).all()
-                #
-                # if intersecting:
-                #     hit_face = self.ray_collision()
-                #     faces = ["+X", '+Y', '+Z']
-                #     look_directions = numpy.sign(self._look_vector())
-                #     if look_directions[0] == 1:
-                #         faces[0] = "-X"
-                #     if look_directions[1] == 1:
-                #         faces[1] = "-Y"
-                #     if look_directions[2] == 1:
-                #         faces[2] = "-Z"
-                #     print(faces[hit_face])
-                #     return numpy.array([0, 0, 0], dtype=numpy.int32)
 
             x, y, z = location
             cx_ = x >> 4
@@ -297,7 +293,7 @@ class EditCanvas(BaseCanvas):
                 return location, None
         return location, None
 
-    def _collision_location_distance(self, distance: int) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+    def _box_location_distance(self, distance: int) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
         """
         The first block location along the camera's look vector that is further away than `distance`.
         :param distance: The distance between the block and the camera.
@@ -307,6 +303,14 @@ class EditCanvas(BaseCanvas):
         position = numpy.array(self.camera_location, dtype=numpy.int) + numpy.floor(look_vector*distance).astype(numpy.int)
         box = next((index for index, box in enumerate(self._selection_group) if box.in_boundary(position)), None)
         return position, box
+
+    def _box_location_resize(self) -> PointCoordinatesNDArray:
+        """
+        The location to display the box corner when the box is being resized in 1-2 dimensions.
+        :return:
+        """
+        # Based on the start location pick the point
+        raise NotImplementedError
 
     def _look_vector(self) -> numpy.ndarray:
         """
@@ -383,12 +387,12 @@ class EditCanvas(BaseCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        if self._select_mode == 2 and self._structure is not None:
+        if self._select_mode == MODE_STRUCTURE and self._structure is not None:
             transform = numpy.eye(4, dtype=numpy.float32)
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
-        self._selection_group.draw(self.transformation_matrix, self._select_mode == 0, tuple(self.camera_location))
+        self._selection_group.draw(self.transformation_matrix, self._select_mode == MODE_NORMAL, tuple(self.camera_location))
         self.SwapBuffers()
 
     def _gc(self, event):

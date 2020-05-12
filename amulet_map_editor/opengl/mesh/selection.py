@@ -5,7 +5,7 @@ from typing import Tuple, Dict, Any, Optional, List
 
 from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh, Drawable
 from amulet.api.selection import SelectionGroup, SelectionBox
-from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
+from amulet.api.data_types import BlockCoordinatesAny, BlockCoordinatesNDArray, PointCoordinatesAny
 
 
 class RenderSelectionGroup(Drawable):
@@ -18,7 +18,7 @@ class RenderSelectionGroup(Drawable):
         self._texture_bounds = texture_bounds
         self._texture = texture
         self._boxes: List[RenderSelection] = []
-        self._active = None
+        self._active: Optional[int] = None
         self._temp_box = self._new_render_selection()
 
 
@@ -44,9 +44,21 @@ class RenderSelectionGroup(Drawable):
         self._active = len(self._boxes) - 1  # and make it active
 
     def deselect(self):
-        self._boxes.clear()
-        self._add_render_selection()
-        self._active = 0
+        while self._boxes:
+            box = self._boxes.pop()
+            box.unload()
+        self._active = None
+
+    def delete_active(self):
+        if self._active is not None:
+            box = self._boxes.pop(self._active)
+            box.unload()
+            if self._boxes:
+                self._active -= 1
+                if self._active < 0:
+                    self._active = 0
+            else:
+                self._active = None
 
     def update_position(self, position: PointCoordinatesAny, box_index: Optional[int]):
         self._last_position = position
@@ -55,7 +67,7 @@ class RenderSelectionGroup(Drawable):
         if self._boxes:
             self.active_selection.set_active_point(position)
 
-    def box_click(self, add_modifier: bool = False):
+    def box_click(self, add_modifier: bool = False) -> Optional[BlockCoordinatesNDArray]:
         active_selection = self.active_selection
         if active_selection is None:  # if there is no active selection
             self._merge_temp_box()
@@ -63,6 +75,7 @@ class RenderSelectionGroup(Drawable):
             if active_selection.is_static:  # if it is is_static
                 if self._hover_box == self._active:  # if the cursor was hovering over the current selection
                     active_selection.unlock(self._last_position)  # unlock it
+                    return self._last_position
                 elif self._hover_box is not None:  # if hovering over a different selected box
                     self._active = self._hover_box  #  activate that selection box
                 else:  # if no hovered selection box
@@ -90,15 +103,6 @@ class RenderSelectionGroup(Drawable):
     def active_selection(self) -> Optional["RenderSelection"]:
         if self._active is not None:
             return self._boxes[self._active]
-
-    @property
-    def active(self) -> Optional[int]:
-        return self._active
-
-    @active.setter
-    def active(self, index: int):
-        assert isinstance(index, int) and 0 <= index < len(self._boxes)
-        self._active = index
 
     def draw(self, transformation_matrix: numpy.ndarray, active: bool, camera_position: PointCoordinatesAny):
         for index, box in enumerate(self._boxes):
@@ -159,6 +163,14 @@ class RenderSelection(TriMesh):
     @property
     def is_dynamic(self) -> bool:
         return numpy.any(self._free_edges)
+
+    @property
+    def unlock_count(self) -> int:
+        """
+        The number of dimensions that the box is being resized in.
+        :return: 0-3
+        """
+        return numpy.count_nonzero(self._free_edges)
 
     def __contains__(self, position: BlockCoordinatesAny) -> bool:
         """

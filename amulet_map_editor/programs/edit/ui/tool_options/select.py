@@ -66,10 +66,10 @@ class SelectOptions(wx.Panel):
         return obj
 
     def _green_corner_input_change(self, _):
-        self._canvas().selection_box.point1 = [self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()]
+        self._canvas().active_selection.point1 = [self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()]
 
     def _blue_corner_input_change(self, _):
-        self._canvas().selection_box.point2 = [self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()]
+        self._canvas().active_selection.point2 = [self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()]
 
     def _green_corner_renderer_change(self, evt):
         self._x1.SetValue(evt.x)
