@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 import wx
+import numpy
 
 from .canvas import EditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
@@ -93,9 +94,12 @@ class ControllableEditCanvas(EditCanvas):
             elif press:  # run once on button release
                 if action == "selection distance +":
                     self.select_distance += 1
+                    self.select_distance2 += 1
                 elif action == "selection distance -":
                     if self.select_distance > 1:
                         self.select_distance -= 1
+                    if self.select_distance2 > 1:
+                        self.select_distance2 -= 1
                 elif action == "deselect boxes":
                     self._selection_group.deselect()
                 elif action == "remove box":
@@ -103,9 +107,7 @@ class ControllableEditCanvas(EditCanvas):
             else:  # run once on button press and frequently until released
                 if action == "box click":
                     self._box_click()
-                elif action == "toggle selection mode":
-                    self._toggle_selection_mode()
-                elif action == "toggle mouse lock":
+                elif action == "toggle mouse mode":
                     self._toggle_mouse_lock()
                 elif action == "speed+":
                     self._camera_move_speed += 0.2
@@ -179,6 +181,8 @@ class ControllableEditCanvas(EditCanvas):
 
     def box_select(self, add_modifier: bool = False):
         position = self._selection_group.box_click(add_modifier)
+        if position is not None:
+            self.select_distance2 = int(numpy.linalg.norm(position - self.camera_location))
 
         # if self._selection_box.select_state <= 1:
         #     self._selection_box.select_state += 1
@@ -193,10 +197,6 @@ class ControllableEditCanvas(EditCanvas):
     def _box_click(self):
         if self.select_mode == 0:
             self.box_select("add box modifier" in self._persistent_actions)
-
-    def _toggle_selection_mode(self):
-        self._select_style = not self._select_style
-        self._change_box_location()
 
     def _release_mouse(self):
         self.SetCursor(wx.NullCursor)

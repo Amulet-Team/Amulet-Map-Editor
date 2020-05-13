@@ -22,9 +22,6 @@ from ..events import CameraMoveEvent
 if TYPE_CHECKING:
     from amulet.api.world import World
 
-STYLE_DISTANCE = 0  # select at fixed distance
-STYLE_CLOSEST = 1  # select closest non-air
-
 MODE_NORMAL = 0  # normal selection
 MODE_DISABLED = 1  # non-interactive selection boxes
 MODE_STRUCTURE = 2  # MODE_DISABLED and draw structure if exists
@@ -72,9 +69,9 @@ class EditCanvas(BaseCanvas):
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
         self._select_distance = 10
+        self._select_distance2 = 10
         self._select_mode = MODE_NORMAL
 
-        self._select_style = STYLE_CLOSEST
         self._selection_group = RenderSelectionGroup(
             self.context_identifier,
             self._texture_bounds,
@@ -168,6 +165,15 @@ class EditCanvas(BaseCanvas):
         self._change_box_location()
 
     @property
+    def select_distance2(self) -> int:
+        return self._select_distance2
+
+    @select_distance2.setter
+    def select_distance2(self, distance: int):
+        self._select_distance2 = distance
+        self._change_box_location()
+
+    @property
     def select_mode(self) -> int:
         return self._select_mode
 
@@ -231,13 +237,12 @@ class EditCanvas(BaseCanvas):
         self._transformation_matrix = None
 
     def _change_box_location(self):
-        if self._selection_group.active_selection and 1 <= self._selection_group.active_selection.unlock_count <= 2:
-            position = self._box_location_resize()
-            box_index = None
-        elif self._select_style == STYLE_CLOSEST:
-            position, box_index = self._box_location_closest()
-        else:
+        if self._selection_group.active_selection and self._selection_group.active_selection.being_resized:
+            position, box_index = self._box_location_distance(self.select_distance2)
+        elif self._mouse_lock:
             position, box_index = self._box_location_distance(self.select_distance)
+        else:
+            position, box_index = self._box_location_closest()
 
         self._selection_group.update_position(position, box_index)
 
@@ -303,14 +308,6 @@ class EditCanvas(BaseCanvas):
         position = numpy.array(self.camera_location, dtype=numpy.int) + numpy.floor(look_vector*distance).astype(numpy.int)
         box = next((index for index, box in enumerate(self._selection_group) if box.in_boundary(position)), None)
         return position, box
-
-    def _box_location_resize(self) -> PointCoordinatesNDArray:
-        """
-        The location to display the box corner when the box is being resized in 1-2 dimensions.
-        :return:
-        """
-        # Based on the start location pick the point
-        raise NotImplementedError
 
     def _look_vector(self) -> numpy.ndarray:
         """

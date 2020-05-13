@@ -124,6 +124,7 @@ class RenderSelectionGroup(Drawable):
             if box.is_static:
                 mult = box.intersects_vector(origin, vector)
                 if mult is not None and mult < multiplier:
+                    multiplier = mult
                     index_return = index
                     box_return = box
         return index_return, box_return
@@ -141,6 +142,7 @@ class RenderSelection(TriMesh):
                  texture: int
                  ):
         super().__init__(context_identifier, texture)
+        self._being_resized = False
         self._free_edges = numpy.array([[False, False, False], [True, True, True]], dtype=numpy.bool)  # which edges can be moved by a call to set_active_point
         self._points: numpy.ndarray = numpy.zeros((2, 3), dtype=numpy.int)  # The points set using point1 and point2
         self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
@@ -165,12 +167,12 @@ class RenderSelection(TriMesh):
         return numpy.any(self._free_edges)
 
     @property
-    def unlock_count(self) -> int:
+    def being_resized(self) -> bool:
         """
-        The number of dimensions that the box is being resized in.
-        :return: 0-3
+        Is the selection being modified.
+        :return:
         """
-        return numpy.count_nonzero(self._free_edges)
+        return self._being_resized
 
     def __contains__(self, position: BlockCoordinatesAny) -> bool:
         """
@@ -234,6 +236,7 @@ class RenderSelection(TriMesh):
         :return:
         """
         self._free_edges[:] = False
+        self._being_resized = False
 
     def unlock(self, position: BlockCoordinatesAny):
         """
@@ -248,6 +251,7 @@ class RenderSelection(TriMesh):
         if self.in_boundary(position):
             self._free_edges[:] = position == self._points
             self._free_edges[1, self._free_edges[0]] = False
+            self._being_resized = True
 
     def _mark_recreate(self):
         self._bounds_ = None
