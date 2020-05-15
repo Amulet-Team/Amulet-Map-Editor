@@ -8,12 +8,10 @@ from amulet_map_editor.amulet_wx.key_config import (
     Shift,
     MouseLeft,
     MouseRight,
-    MouseMiddle,
     MouseWheelScrollUp,
     MouseWheelScrollDown,
     Control,
     Numpad_Add,
-    Numpad_Subtract,
 )
 
 
@@ -50,9 +48,9 @@ PresetKeybinds: KeybindContainer = {
         "speed-": ((), MouseWheelScrollDown),
         "selection distance +": ((), "R"),
         "selection distance -": ((), "F"),
-        "deselect boxes": ((Control, ), "D"),
+        "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((), Numpad_Subtract),
+        "remove box": ((Control, ), "D"),
     },
     "right_laptop": {
         "up": ((), Space),
@@ -67,9 +65,9 @@ PresetKeybinds: KeybindContainer = {
         "speed-": ((), ","),
         "selection distance +": ((), "R"),
         "selection distance -": ((), "F"),
-        "deselect boxes": ((Control, ), "D"),
+        "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((), Numpad_Subtract),
+        "remove box": ((Control, ), "D"),
     },
     "left": {
         "up": ((), Space),
@@ -84,9 +82,9 @@ PresetKeybinds: KeybindContainer = {
         "speed-": ((), MouseWheelScrollDown),
         "selection distance +": ((), "Y"),
         "selection distance -": ((), "H"),
-        "deselect boxes": ((Control, ), "D"),
+        "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((), Numpad_Subtract),
+        "remove box": ((Control, ), "D"),
     },
     "left_laptop": {
         "up": ((), Space),
@@ -101,9 +99,9 @@ PresetKeybinds: KeybindContainer = {
         "speed-": ((), ","),
         "selection distance +": ((), "Y"),
         "selection distance -": ((), "H"),
-        "deselect boxes": ((Control, ), "D"),
+        "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((), Numpad_Subtract),
+        "remove box": ((Control, ), "D"),
     }
 }
 
