@@ -1,15 +1,18 @@
 import wx
 from concurrent.futures import ThreadPoolExecutor
 import webbrowser
+from typing import TYPE_CHECKING
 
 from amulet import world_interface
 from amulet.api.world import World
-from amulet.world_interface.formats import WorldFormatWrapper
 
 from amulet_map_editor import lang, log
 from amulet_map_editor.amulet_wx.simple import SimplePanel
 from amulet_map_editor.amulet_wx.world_select import WorldSelectDialog, WorldUI
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
+
+if TYPE_CHECKING:
+    from amulet.api.wrapper import WorldFormatWrapper
 
 
 thread_pool_executor = ThreadPoolExecutor(max_workers=1)
