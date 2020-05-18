@@ -27,11 +27,13 @@ class PlatformSelect(BaseSelect):
             translation_manager: PyMCTranslate.TranslationManager,
             platform: str = None,
             allow_universal: bool = True,
+            allow_vanilla: bool = True,
             **kwargs
     ):
         super().__init__(parent)
         self._translation_manager = translation_manager
         self._allow_universal = allow_universal
+        self._allow_vanilla = allow_vanilla
         self._platform_list: SimpleChoice = self._add_ui_element("Platform", SimpleChoice)
         self._set_platform(platform)
 
@@ -45,8 +47,10 @@ class PlatformSelect(BaseSelect):
 
     def _set_platform(self, platform: str = None):
         platforms = self._translation_manager.platforms()
-        if not self._allow_universal and "universal" in platforms:
-            platforms.remove("universal")
+        if not self._allow_universal:
+            platforms = [p for p in platforms if p != "universal"]
+        if not self._allow_vanilla:
+            platforms = [p for p in platforms if p == "universal"]
         self._platform_list.SetItems(
             platforms
         )
@@ -70,6 +74,8 @@ class VersionSelect(PlatformSelect):
             translation_manager: PyMCTranslate.TranslationManager,
             platform: str = None,
             version: Tuple[int, int, int] = None,
+            allow_numerical: bool = True,
+            allow_blockstate: bool = True,
             **kwargs
     ):
         super().__init__(
@@ -78,6 +84,8 @@ class VersionSelect(PlatformSelect):
             platform,
             **kwargs
         )
+        self._allow_numerical = allow_numerical
+        self._allow_blockstate = allow_blockstate
         self._version_list: Optional[SimpleChoiceAny] = self._add_ui_element("Version", SimpleChoiceAny, reverse=True)
         self._platform_list.Bind(wx.EVT_CHOICE, self._on_platform_change)
         self._set_version(version)
@@ -91,8 +99,13 @@ class VersionSelect(PlatformSelect):
         return self._version_list.GetAny()
 
     def _set_version(self, version: Tuple[int, int, int] = None):
+        versions = self._translation_manager.version_numbers(self.platform)
+        if not self._allow_blockstate:
+            versions = [v for v in versions if v < (1, 13, 0)]
+        if not self._allow_numerical:
+            versions = [v for v in versions if v >= (1, 13, 0)]
         self._version_list.SetItems(
-            self._translation_manager.version_numbers(self.platform)
+            versions
         )
         versions = self._version_list.values
         if version and version in versions:
