@@ -110,11 +110,9 @@ class ControllableEditCanvas(EditCanvas):
                 elif action == "toggle mouse mode":
                     self._toggle_mouse_lock()
                 elif action == "speed+":
-                    self._camera_move_speed += 0.2
+                    self._camera_move_speed *= 1.1
                 elif action == "speed-":
-                    self._camera_move_speed -= 0.2
-                    if self._camera_move_speed < 0.1:
-                        self._camera_move_speed = 0.1
+                    self._camera_move_speed /= 1.1
 
         elif key[1] == wx.WXK_ESCAPE:
             self._escape()
