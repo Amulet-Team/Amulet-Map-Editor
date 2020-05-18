@@ -328,6 +328,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                     wx.MessageBox(f"Error running structure operation: {e}")
                     self._world.restore_last_undo_point()
                     self._canvas.enable_threads()
+                    self._operation_options.Enable()
                     return
                 self._canvas.enable_threads()
 
