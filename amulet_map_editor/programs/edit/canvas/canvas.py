@@ -65,7 +65,6 @@ class EditCanvas(BaseCanvas):
         )
 
         self._camera: List[float] = [0.0, 100.0, 0.0, 45.0, 45.0]
-        self._projection = [70.0, 4 / 3, 0.1, 1000.0]
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
         self._select_distance = 10
@@ -217,24 +216,6 @@ class EditCanvas(BaseCanvas):
     @camera_rotate_speed.setter
     def camera_rotate_speed(self, val: float):
         self._camera_rotate_speed = val
-
-    @property
-    def fov(self) -> float:
-        return self._projection[0]
-
-    @fov.setter
-    def fov(self, fov: float):
-        self._projection[0] = fov
-        self._transformation_matrix = None
-
-    @property
-    def aspect_ratio(self) -> float:
-        return self._projection[1]
-
-    @aspect_ratio.setter
-    def aspect_ratio(self, aspect_ratio: float):
-        self._projection[1] = aspect_ratio
-        self._transformation_matrix = None
 
     def _change_box_location(self):
         if self._selection_group.active_selection and self._selection_group.active_selection.being_resized:

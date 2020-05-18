@@ -11,6 +11,7 @@ class BaseCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: wx.Window):
         attribs = (glcanvas.WX_GL_CORE_PROFILE, glcanvas.WX_GL_RGBA, glcanvas.WX_GL_DOUBLEBUFFER, glcanvas.WX_GL_DEPTH_SIZE, 24)
         super().__init__(parent, -1, size=parent.GetClientSize(), attribList=attribs)
+        self._projection = [70.0, 4 / 3, 0.1, 10000.0]
         self._context = glcanvas.GLContext(self)  # setup the OpenGL context
         self.SetCurrent(self._context)
         self.context_identifier = str(uuid.uuid4())  # create a UUID for the context. Used to get shaders
@@ -36,6 +37,24 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     def _close(self):
         glDeleteTextures([self._gl_texture_atlas])
+
+    @property
+    def fov(self) -> float:
+        return self._projection[0]
+
+    @fov.setter
+    def fov(self, fov: float):
+        self._projection[0] = fov
+        self._transformation_matrix = None
+
+    @property
+    def aspect_ratio(self) -> float:
+        return self._projection[1]
+
+    @aspect_ratio.setter
+    def aspect_ratio(self, aspect_ratio: float):
+        self._projection[1] = aspect_ratio
+        self._transformation_matrix = None
 
     @staticmethod
     def rotation_matrix(pitch, yaw):
