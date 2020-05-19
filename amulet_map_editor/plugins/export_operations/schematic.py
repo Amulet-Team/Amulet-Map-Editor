@@ -18,6 +18,7 @@ def export_schematic(
     selection: SelectionGroup,
     options: dict
 ):
+    assert len(selection.selection_boxes) == 1, "The schematic format only supports a single selection box."
     path, platform = options.get('path', None), options.get('platform', None)
     if isinstance(path, str) and path.endswith('.schematic') and platform:
         wrapper = SchematicFormatWrapper(path, 'w')
