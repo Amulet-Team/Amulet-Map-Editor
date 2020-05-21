@@ -28,12 +28,14 @@ class PlatformSelect(BaseSelect):
             platform: str = None,
             allow_universal: bool = True,
             allow_vanilla: bool = True,
+            allowed_platforms: Tuple[str, ...] = None,
             **kwargs
     ):
         super().__init__(parent)
         self._translation_manager = translation_manager
         self._allow_universal = allow_universal
         self._allow_vanilla = allow_vanilla
+        self._allowed_platforms = allowed_platforms
         self._platform_list: SimpleChoice = self._add_ui_element("Platform", SimpleChoice)
         self._set_platform(platform)
 
@@ -47,6 +49,8 @@ class PlatformSelect(BaseSelect):
 
     def _set_platform(self, platform: str = None):
         platforms = self._translation_manager.platforms()
+        if self._allowed_platforms is not None:
+            platforms = [p for p in platforms if p in self._allowed_platforms]
         if not self._allow_universal:
             platforms = [p for p in platforms if p != "universal"]
         if not self._allow_vanilla:
