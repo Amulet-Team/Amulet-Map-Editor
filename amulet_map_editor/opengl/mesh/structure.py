@@ -11,6 +11,7 @@ from amulet.api.block import BlockManager
 
 from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.opengl.mesh.selection import RenderSelectionGroupStatic
 
 
 class SubRenderStructure(RenderChunkBuilder):
@@ -68,6 +69,7 @@ class RenderStructure(ResourcePackManager):
         super().__init__(context_identifier, resource_pack, texture, texture_bounds, translator)
         self._structure = structure
         self._sub_structures = []
+        self._selection = RenderSelectionGroupStatic(context_identifier, texture_bounds, texture, structure.selection)
         self._create_geometry()  # TODO: move this to a different thread
 
     @property
@@ -89,3 +91,4 @@ class RenderStructure(ResourcePackManager):
             reverse=True
         ):
             chunk.draw(transformation_matrix)
+        self._selection.draw(transformation_matrix)

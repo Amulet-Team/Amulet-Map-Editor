@@ -370,7 +370,7 @@ class EditCanvas(BaseCanvas):
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
-        self._selection_group.draw(self.transformation_matrix, self._select_mode == MODE_NORMAL, tuple(self.camera_location))
+        self._selection_group.draw(self.transformation_matrix, tuple(self.camera_location), self._select_mode == MODE_NORMAL)
         self.SwapBuffers()
 
     def _gc(self, event):

@@ -8,30 +8,60 @@ from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.data_types import BlockCoordinatesAny, BlockCoordinatesNDArray, PointCoordinatesAny
 
 
-class RenderSelectionGroup(Drawable):
+class RenderSelectionGroupStatic(Drawable):
     def __init__(self,
                  context_identifier: str,
                  texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-                 texture: int
+                 texture: int,
+                 selection: SelectionGroup = None
                  ):
         self._context_identifier = context_identifier
         self._texture_bounds = texture_bounds
         self._texture = texture
         self._boxes: List[RenderSelection] = []
-        self._active: Optional[int] = None
-        self._temp_box = self._new_render_selection()
-
-
-        self._last_position = numpy.array([0, 0, 0], dtype=numpy.int)
-        self._hover_box: Optional[int] = None
+        if selection:
+            for box in selection.selection_boxes:
+                render_box = self._new_render_selection()
+                render_box.point1 = numpy.array(box.min) - selection.min
+                render_box.point2 = numpy.array(box.max) - selection.min - 1
+                self._boxes.append(render_box)
 
     def _new_render_selection(self):
         return RenderSelection(self._context_identifier, self._texture_bounds, self._texture)
 
-    def _add_render_selection(self):
-        self._boxes.append(
-            self._new_render_selection()
-        )
+    def __iter__(self):
+        for box in self._boxes:
+            if box.is_static:
+                yield box
+
+    def __contains__(self, position: BlockCoordinatesAny):
+        return any(position in box for box in self._boxes)
+
+    def __getitem__(self, index: int) -> "RenderSelection":
+        return self._boxes[index]
+
+    def create_selection_group(self) -> SelectionGroup:
+        return SelectionGroup([
+            SelectionBox(box.min, box.max) for box in self._boxes if box.is_static
+        ])
+
+    def draw(self, transformation_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
+        for index, box in enumerate(self._boxes):
+            box.draw(transformation_matrix, camera_position)
+
+
+class RenderSelectionGroup(RenderSelectionGroupStatic):
+    def __init__(self,
+                 context_identifier: str,
+                 texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+                 texture: int
+                 ):
+        super().__init__(context_identifier, texture_bounds, texture)
+        self._active: Optional[int] = None
+        self._temp_box = self._new_render_selection()
+
+        self._last_position = numpy.array([0, 0, 0], dtype=numpy.int)
+        self._hover_box: Optional[int] = None
 
     def _merge_temp_box(self):
         """
@@ -88,27 +118,16 @@ class RenderSelectionGroup(Drawable):
             else:
                 active_selection.lock()
 
-    def __iter__(self):
-        for box in self._boxes:
-            if box.is_static:
-                yield box
-
-    def __contains__(self, position: BlockCoordinatesAny):
-        return any(position in box for box in self._boxes)
-
-    def __getitem__(self, index: int) -> "RenderSelection":
-        return self._boxes[index]
-
     @property
     def active_selection(self) -> Optional["RenderSelection"]:
         if self._active is not None:
             return self._boxes[self._active]
 
-    def draw(self, transformation_matrix: numpy.ndarray, active: bool, camera_position: PointCoordinatesAny):
+    def draw(self, transformation_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None, active: bool = False):
         for index, box in enumerate(self._boxes):
-            box.draw(transformation_matrix, active and index == self._active, camera_position)
+            box.draw(transformation_matrix, camera_position, active and index == self._active)
         if self.active_selection is None or self.active_selection.is_static:
-            self._temp_box.draw(transformation_matrix, False, camera_position=camera_position)
+            self._temp_box.draw(transformation_matrix, camera_position)
 
     def closest_intersection(self, origin: PointCoordinatesAny, vector: PointCoordinatesAny) -> Tuple[Optional[int], Optional["RenderSelection"]]:
         """
@@ -128,11 +147,6 @@ class RenderSelectionGroup(Drawable):
                     index_return = index
                     box_return = box
         return index_return, box_return
-
-    def create_selection_group(self) -> SelectionGroup:
-        return SelectionGroup([
-            SelectionBox(box.min, box.max) for box in self._boxes if box.is_static
-        ])
 
 
 class RenderSelection(TriMesh):
@@ -340,12 +354,12 @@ class RenderSelection(TriMesh):
         self._volume = numpy.product(self.max - self.min)
         self._rebuild = False
 
-    def draw(self, transformation_matrix: numpy.ndarray, active=False, camera_position: PointCoordinatesAny = None):
+    def draw(self, transformation_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None, active=False):
         """
         Draw the selection box
         :param transformation_matrix: 4x4 transformation matrix for the camera
-        :param active: If the selection box is the active selection (draw corner boxes)
         :param camera_position: The position of the camera. Used to flip draw direction if camera inside box.
+        :param active: If the selection box is the active selection (draw corner boxes)
         :return:
         """
         self._setup()
