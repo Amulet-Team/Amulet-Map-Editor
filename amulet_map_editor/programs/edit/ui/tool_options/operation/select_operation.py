@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Callable, Dict
 
 from amulet_map_editor import log
 from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleChoiceAny
-from amulet_map_editor import plugins
+from amulet_map_editor.programs.edit import plugins
 
 if TYPE_CHECKING:
     from amulet.api.world import World
