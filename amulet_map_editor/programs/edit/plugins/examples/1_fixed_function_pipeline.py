@@ -19,6 +19,5 @@ def operation(world: World, dimension: Dimension, selection: SelectionGroup, opt
 
 export = {  # This is what the program will actually look for. It describes how the operation will work
     "name": "Fixed Function Pipeline Example 1",  # the name of the plugin
-    "mode": "fixed",  # specify that the operation is using the fixed function pipeline
     "operation": operation,  # the actual function to call when running the plugin
 }

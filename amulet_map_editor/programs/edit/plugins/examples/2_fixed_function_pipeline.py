@@ -27,6 +27,5 @@ def operation(world: World, dimension: Dimension, selection: SelectionGroup, opt
 
 export = {
     "name": "Fixed Function Pipeline Example 2",
-    "mode": "fixed",
     "operation": operation,
 }
