@@ -25,9 +25,8 @@ def operation(world: World, dimension: Dimension, selection: SelectionGroup, opt
     return 'hello'  # This will not actually do anything but is allowed
 
 
-export = {  # This is what the program will actually look for. It describes how the operation will work
-    "v": 2,  # the version number of the plugin system
-    "name": "Plugin Name",  # the name of the plugin
-    "mode": "fixed",  # specify that the operation is using the fixed function pipeline
-    "operation": operation,  # the actual function to call when running the plugin
+export = {
+    "name": "Fixed Function Pipeline Example 2",
+    "mode": "fixed",
+    "operation": operation,
 }

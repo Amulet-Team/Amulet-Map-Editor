@@ -51,8 +51,7 @@ def operation(world: World, dimension: Dimension, selection: SelectionGroup, opt
 
 
 export = {
-    "v": 2,
-    "name": "Plugin Name",
+    "name": "Fixed Function Pipeline Example 3",
     "mode": "fixed",
     "operation": operation,
     "options": operation_options  # The options you defined above should be added here to show in the UI
