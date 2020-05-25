@@ -1,62 +1,85 @@
-"""
->>> # Example plugin
->>> from typing import List, Any, Callable, Dict, Optional
->>> from amulet.api.selection import SelectionGroup
->>> from amulet.api.structure import Structure
->>> from amulet.api.world import World
->>> WX_OBJ = Any
->>> Dimension = Any
->>> Options = Dict
->>> Destination = {"x": int, "y": int, "z": int}
->>>
->>> def show_ui(parent, world: World, options: dict) -> dict:  # see below. Only needed if using wxoptions
->>>     # create a UI and show it (probably best using wx.Dialog)
->>>     # build the UI using the options that were returned last time (or an empty dictionary if it is the first)
->>>     # and return the options how you wish
->>>
->>> export = {
->>>     # required
->>>     "v": 1,  # a version 1 plugin
->>>     "name": "Plugin Name",  # the name of the plugin
->>>     "features": List[str], # a list of features that enable functionality in the UI
->>>         # the valid options are: (any invalid options will cause the operation to fail to load)
->>>         "src_selection"  # The user is required to select an area before running the plugin. They will be prompted if they do not.
->>>         "dst_location_absolute"  # This enables a UI to select a destination location. It also enables an optional callable and inputs at structure_callable.
->>>         # If the callable is defined it will be run. If not the selection is extracted and used.
->>>         # After the function has run the user will be shown a UI to pick a destination location for the Structure that was returned.
->>>         # TODO: "options"  # a simple system to create a UI to be shown to the user. Enables "options" key
->>>         "wxoptions"  # enables "wxoptions" key storing a callable allowing direct use of wx
->>>
->>>     "options": dict,  # requires "options" in features. A simple system of defining options from which a simple UI can be created
->>>     "wxoptions": Callable[[WX_OBJ, World, Options], Options],  # a more complex system allowing users to work directly with wx
->>>
->>>     # if one of the dst_location options is enabled the following is valid
->>>     "structure_callable_inputs": List[str],  # see inputs below
->>>     "structure_callable": Callable[[World, Dimension, ...], Structure]  # World and Dimension are always the first two inputs. Above inputs follow.
->>>     # this function is run before selecting the destination locations and returns a Structure for use there
->>>
->>>     "inputs": List[str],  # see inputs below
->>>     "operation": Callable[[World, Dimension, ...], Optional[Any]],  # the actual function to call when running the plugin
->>>       # World and Dimension are always the first two inputs. Above inputs follow.
->>> }
->>>
->>> # Input format
->>> # a list of inputs to give to the plugin. World class and dimension are first and these follow
->>> # possible inputs (max one from each group)
->>> {"src_selection": SelectionGroup}  # the user created selection
->>> {  # requires a dst_location feature to be enabled. Only valid in main inputs
->>>     "structure": Structure  # an extracted Structure as returned by structure_callable or the area of the World selected by src_box
->>> }
->>> {
->>>     "options": dict,  # "options" or "wxoptions" feature must be enabled
->>> }
-"""
-import functools
 import os
 import glob
 import importlib.util
 from amulet import log
-from typing import Dict, List
+from typing import Dict, List, TYPE_CHECKING, Callable, Any
+import wx
+
+if TYPE_CHECKING:
+    from ..canvas import ControllableEditCanvas
+    from amulet.api.world import World
+
+
+PathType = str
+OperationStorageType = Dict[PathType, "OperationLoader"]
+
+
+class OperationUI:
+    """The base class that all operations must inherit from."""
+    pass
+
+
+class FixedFunctionUI(OperationUI):
+    def __init__(self, parent: wx.Window, canvas: "ControllableEditCanvas", world: "World", operation: Callable, options: Dict[str, Any]):
+        super().__init__()
+        # TODO
+
+
+class OperationLoadException(Exception):
+    pass
+
+
+class OperationLoader:
+    """A class to handle loading and reloading operations from their python modules/packages"""
+    def __init__(
+            self,
+            export_dict: dict,
+            path: str
+    ):
+        self._path = path
+        self._name = ""
+        self._ui = None
+        self._load(export_dict)
+
+    def _load(self, export_dict: dict):
+        if not isinstance(export_dict, dict):
+            raise OperationLoadException("Export must be a dictionary.")
+
+        if "name" in export_dict:
+            self._name = export_dict["name"]
+            if not isinstance(self.name, str):
+                raise OperationLoadException('"name" in export must exist and be a string.')
+        else:
+            raise OperationLoadException('"name" is not defined in export.')
+
+        mode = export_dict.get("mode", "fixed")
+        if not isinstance(mode, str):
+            raise OperationLoadException('"name" in export is not a string.')
+
+        if mode == "fixed":
+            operation = export_dict.get("operation", None)
+            if not callable(operation):
+                raise OperationLoadException('"operation" in export must be callable.')
+            if operation.__code__.co_argcount != 4:
+                raise OperationLoadException('"operation" function in export must have 4 inputs.')
+            options = export_dict.get("options", {})
+            if not isinstance(options, dict):
+                raise OperationLoadException('"operation" in export must be a dictionary if defined.')
+            self._ui = lambda parent, canvas, world: FixedFunctionUI(parent, canvas, world, operation, options)
+        elif mode == "dynamic":
+            operation = export_dict.get("operation", None)
+            if not issubclass(operation, OperationUI):
+                raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
+            self._ui = operation
+        else:
+            raise OperationLoadException('"mode" in export must be either "fixed" or "dynamic".')
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    def setup_ui(self, parent: wx.Window, canvas: "ControllableEditCanvas", world: "World"):
+        self._ui(parent, canvas, world)
 
 
 def _load_module_file(module_path: str):
@@ -80,120 +103,16 @@ def _load_module_directory(module_path):
     return mod
 
 
-def _error(name, msg):
-    log.error(f"Error loading plugin {name}. {msg}")
+def parse_export(plugin: dict, operations_dict: Dict[str, OperationLoader], path: str):
+    try:
+        operations_dict[path] = OperationLoader(plugin, path)
+    except OperationLoadException as e:
+        log.error(f"Error loading plugin {path}. {e}")
+    except Exception as e:
+        log.error(f"Exception loading plugin {path}. {e}")
 
 
-def parse_export(plugin: dict, operations_dict: Dict[str, dict], path: str):
-    error = functools.partial(_error, path)
-
-    if not isinstance(plugin, dict):
-        error("Export must be a dictionary.")
-        return
-    if not isinstance(plugin.get("name", None), str):
-        error('"name" in export must exist and be a string.')
-        return
-    structure_callable_options = ["options"]
-    input_options = ["options"]
-    dst_ui_enabled = False
-    features = plugin.get("features", [])
-    feature_index = 0
-    stop = False
-
-    while feature_index < len(features):
-        feature = features[feature_index]
-        feature_index += 1
-        if feature == "src_selection":
-            structure_callable_options.append("src_selection")
-            input_options.append("src_selection")
-        elif feature == "wxoptions":
-            if "wxoptions" not in plugin:
-                error(
-                    '"wxoptions" key must be defined if wxoptions feature is enabled.'
-                )
-                stop = True
-                break
-            elif not callable(plugin["wxoptions"]):
-                error('"wxoptions" must be callable.')
-                stop = True
-                break
-            elif "options" in features:
-                error(
-                    "Only one of options and wxoptions features may be enabled at once."
-                )
-                stop = True
-                break
-        elif feature == "options":
-            if "options" not in plugin:
-                error('"options" key must be defined if options feature is enabled.')
-                stop = True
-                break
-            elif "wxoptions" in features:
-                error(
-                    "Only one of options and wxoptions features may be enabled at once."
-                )
-                stop = True
-                break
-        elif feature == "dst_location_absolute":
-            if dst_ui_enabled:
-                error("Only one dst_location feature can be enabled at once")
-            dst_ui_enabled = True
-            input_options.append("dst_location")
-            input_options.append("structure")
-    if stop:
-        return
-
-    if dst_ui_enabled:
-        if "structure_callable" in plugin:
-            if not callable(plugin["structure_callable"]):
-                error('"structure_callable" must be a callable if defined.')
-                return
-            structure_callable_enabled = True
-        else:
-            if "src_selection" not in features:
-                features.append("src_selection")
-            structure_callable_enabled = False
-    else:
-        structure_callable_enabled = False
-
-    plugin_operations = [
-        (
-            "operation",
-            plugin.get("operation", None),
-            plugin.get("inputs", []),
-            input_options,
-        )
-    ]
-    if structure_callable_enabled:
-        plugin_operations.append(
-            (
-                "structure_callable",
-                plugin.get("structure_callable", None),
-                plugin.get("structure_callable_inputs", []),
-                structure_callable_options,
-            )
-        )
-    for name, operation, inputs, options in plugin_operations:
-        if not callable(operation):
-            error(f'"{name}" in export must exist and be a function.')
-            stop = True
-            return
-        if not isinstance(inputs, list):
-            error(f'"{name}" inputs in export must be a list.')
-            stop = True
-            return
-        for inp in inputs:
-            if inp not in options:
-                error(f'"{inp}" is not a supported input for "{name}"')
-                stop = True
-                return
-    if stop:
-        return
-
-    operations_dict[path] = plugin
-
-
-def _load_operations(operations_: Dict[str, dict], path: str):
+def _load_operations(operations_: OperationStorageType, path: str):
     """load all operations from a specified directory"""
     if os.path.isdir(path):
         for fpath in glob.iglob(os.path.join(path, "*.py")):
@@ -224,18 +143,18 @@ def _load_operations(operations_: Dict[str, dict], path: str):
 
 def _load_operations_group(dir_paths: List[str]):
     """Load operations from a list of directory paths"""
-    operations_: Dict[str, dict] = {}
+    operations_: OperationStorageType = {}
     for dir_path in dir_paths:
         _load_operations(operations_, dir_path)
     return operations_
 
 
-all_operations: Dict[str, dict] = {}
-internal_operations: Dict[str, dict] = {}
-operations: Dict[str, dict] = {}
-export_operations: Dict[str, dict] = {}
-import_operations: Dict[str, dict] = {}
-_meta: Dict[str, Dict[str, dict]] = {
+all_operations: OperationStorageType = {}
+internal_operations: OperationStorageType = {}
+operations: OperationStorageType = {}
+export_operations: OperationStorageType = {}
+import_operations: OperationStorageType = {}
+_meta: Dict[str, OperationStorageType] = {
     'internal_operations': internal_operations,
     'operations': operations,
     'export_operations': export_operations,
@@ -247,7 +166,7 @@ _public = {
     'import_operations'
 }
 
-options: Dict[str, dict] = {}
+plugin_options: Dict[str, dict] = {}
 
 
 def merge_operations():

@@ -62,9 +62,9 @@ class BaseSelectOperationUI(SimplePanel):
             if "options" in operation.get("features", []):
                 pass  # TODO: implement this
             elif "wxoptions" in operation.get("features", []):
-                options = operation["wxoptions"](self, self._world(), plugins.options.get(operation_path, {}))
+                options = operation["wxoptions"](self, self._world(), plugins.plugin_options.get(operation_path, {}))
                 if isinstance(options, dict):
-                    plugins.options[operation_path] = options
+                    plugins.plugin_options[operation_path] = options
                 else:
                     log.error(f"Plugin {operation['name']} at {operation_path} did not return options in a valid format")
         evt.Skip()

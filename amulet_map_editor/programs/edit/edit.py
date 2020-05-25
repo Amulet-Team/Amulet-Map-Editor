@@ -308,7 +308,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
                     elif inp == "options":
                         operation_inputs.append(
-                            plugins.options.get(operation_path, {})
+                            plugins.plugin_options.get(operation_path, {})
                         )
 
                 self._operation_options.Disable()
@@ -361,7 +361,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                     operation["operation"],
                     operation_input_definitions,
                     structure,
-                    plugins.options.get(operation_path, {}),
+                    plugins.plugin_options.get(operation_path, {}),
                 )
             else:
                 # trigger UI to show select box multiple UI
@@ -394,10 +394,10 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                 operation_inputs.append(structure)
             elif inp == "options":
                 if options:
-                    plugins.options[operation_path] = options
+                    plugins.plugin_options[operation_path] = options
                     operation_inputs.append(options)
                 else:
-                    operation_inputs.append(plugins.options.get(operation_path, {}))
+                    operation_inputs.append(plugins.plugin_options.get(operation_path, {}))
 
         self._canvas.disable_threads()
         try:
