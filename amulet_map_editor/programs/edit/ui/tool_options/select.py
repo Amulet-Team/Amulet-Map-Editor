@@ -2,12 +2,6 @@ from typing import TYPE_CHECKING, Type, Any
 import wx
 import weakref
 
-from amulet_map_editor.programs.edit.events import (
-    EVT_BOX_GREEN_CORNER_CHANGE,
-    EVT_BOX_BLUE_CORNER_CHANGE,
-    EVT_BOX_COORDS_ENABLE
-)
-
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 

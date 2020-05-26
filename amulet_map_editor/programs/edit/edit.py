@@ -1,18 +1,14 @@
 import wx
-from typing import TYPE_CHECKING, Optional, List, Callable, Any
+from typing import TYPE_CHECKING, Optional, Callable, Any
 from types import GeneratorType
 import webbrowser
 import time
-import traceback
-import os
 
 from amulet.api.selection import SelectionGroup
-from amulet.api.structure import Structure
-from amulet.api.data_types import OperationType, OperationReturnType
+from amulet.api.data_types import OperationReturnType
 
-from amulet_map_editor import log, CONFIG
+from amulet_map_editor import CONFIG
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.programs.edit import plugins
 from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
 
 
@@ -23,7 +19,7 @@ from .ui.tool_options.select import SelectOptions
 from .ui.tool import ToolSelect
 from .key_config import DefaultKeys, DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 
-from .events import (
+from amulet_map_editor.programs.edit.canvas.events import (
     EVT_CAMERA_MOVE,
     EVT_SELECT_TOOL_ENABLED,
     EVT_OPERATION_TOOL_ENABLED,

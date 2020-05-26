@@ -4,11 +4,8 @@ import numpy
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from ..events import (
+from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
-    BoxGreenCornerChangeEvent,
-    BoxBlueCornerChangeEvent,
-    BoxCoordsEnableEvent,
 )
 from amulet_map_editor.amulet_wx.key_config import serialise_key_event, KeybindGroup
 

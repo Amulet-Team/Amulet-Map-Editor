@@ -17,7 +17,7 @@ from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
-from ..events import CameraMoveEvent
+from amulet_map_editor.programs.edit.canvas.events import CameraMoveEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World

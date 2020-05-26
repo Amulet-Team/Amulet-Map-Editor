@@ -1,6 +1,6 @@
 import wx
 
-from amulet_map_editor.programs.edit.events import (
+from amulet_map_editor.programs.edit.canvas.events import (
     SelectToolEnabledEvent,
     OperationToolEnabledEvent,
     ImportToolEnabledEvent,
