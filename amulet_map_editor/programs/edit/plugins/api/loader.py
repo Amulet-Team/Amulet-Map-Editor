@@ -12,7 +12,7 @@ from .operation_ui import OperationUI
 from .data_types import OperationStorageType
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.canvas import ControllableEditCanvas
+    from amulet_map_editor.programs.edit.canvas import EditCanvas
     from amulet.api.world import World
 
 
@@ -34,7 +34,7 @@ class OperationLoader:
     ):
         self._path = path
         self._name = ""
-        self._ui: Optional[Callable[[wx.Window, "ControllableEditCanvas", "World"], OperationUI]] = None
+        self._ui: Optional[Callable[[wx.Window, "EditCanvas", "World"], OperationUI]] = None
         self._load(export_dict)
 
     def _load(self, export_dict: dict):
@@ -89,7 +89,7 @@ class OperationLoader:
     def name(self) -> str:
         return self._name
 
-    def setup_ui(self, parent: wx.Window, canvas: "ControllableEditCanvas", world: "World"):
+    def setup_ui(self, parent: wx.Window, canvas: "EditCanvas", world: "World"):
         self._ui(parent, canvas, world)
 
 

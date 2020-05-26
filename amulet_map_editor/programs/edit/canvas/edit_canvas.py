@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import wx
 import numpy
 
-from .canvas import EditCanvas
+from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
 from ..events import (
     CameraMoveEvent,
@@ -32,7 +32,7 @@ key_map = {
 }
 
 
-class ControllableEditCanvas(EditCanvas):
+class EditCanvas(BaseEditCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
         self._persistent_actions = set()

@@ -9,11 +9,11 @@ from amulet_map_editor.programs.edit.events import (
 )
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.canvas.controllable_canvas import ControllableEditCanvas
+    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
 class SelectOptions(wx.Panel):
-    def __init__(self, canvas: 'ControllableEditCanvas'):
+    def __init__(self, canvas: 'EditCanvas'):
         wx.Panel.__init__(self, canvas)
         self._canvas = weakref.ref(canvas)
         self._sizer = wx.BoxSizer(wx.VERTICAL)

@@ -27,7 +27,7 @@ MODE_DISABLED = 1  # non-interactive selection boxes
 MODE_STRUCTURE = 2  # MODE_DISABLED and draw structure if exists
 
 
-class EditCanvas(BaseCanvas):
+class BaseEditCanvas(BaseCanvas):
     def __init__(self, parent: wx.Window, world: 'World'):
         super().__init__(parent)
         self._last_mouse_x = 0

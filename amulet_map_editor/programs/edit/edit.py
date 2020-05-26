@@ -16,7 +16,7 @@ from amulet_map_editor.programs.edit import plugins
 from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
 
 
-from .canvas.controllable_canvas import ControllableEditCanvas
+from .canvas.edit_canvas import EditCanvas
 from .ui.file import FilePanel
 from .ui.tool_options.operation import OperationUI
 from .ui.tool_options.select import SelectOptions
@@ -79,7 +79,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
         self._world = world
-        self._canvas: Optional[ControllableEditCanvas] = None
+        self._canvas: Optional[EditCanvas] = None
         self._temp = wx.StaticText(self, label="Please wait while the renderer loads")
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp)
@@ -95,7 +95,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         if self._canvas is None:
             self.Update()
 
-            self._canvas = ControllableEditCanvas(self, self._world)
+            self._canvas = EditCanvas(self, self._world)
 
             config = CONFIG.get(EDIT_CONFIG_ID, {})
             user_keybinds = config.get("user_keybinds", {})

@@ -6,12 +6,12 @@ from .goto import show_goto
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.canvas.controllable_canvas import ControllableEditCanvas
+    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
     from amulet.api.world import World
 
 
 class FilePanel(wx.Panel):
-    def __init__(self, canvas: 'ControllableEditCanvas', world: 'World', undo_evt, redo_evt, save_evt, close_evt):
+    def __init__(self, canvas: 'EditCanvas', world: 'World', undo_evt, redo_evt, save_evt, close_evt):
         wx.Panel.__init__(self, canvas)
         self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
