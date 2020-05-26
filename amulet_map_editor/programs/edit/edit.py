@@ -290,151 +290,36 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._run_operation()
         evt.Skip()
 
-    def _run_operation(self, operation_path=None) -> Any:
-        if operation_path is None:
-            operation_path = self._operation_options.operation
-        operation = plugins.all_operations[operation_path]
-        features = operation.get("features", [])
-        operation_input_definitions = operation.get("inputs", [])
-        if any(feature in features for feature in ("dst_location_absolute",)):
-            if "structure_callable" in operation:
-                operation_inputs = []
-                for inp in operation.get("structure_callable_inputs", []):
-                    if inp == "src_selection":
-                        selection = self._get_box()
-                        if selection is None:
-                            return
-                        operation_inputs.append(selection)
-
-                    elif inp == "options":
-                        operation_inputs.append(
-                            plugins.plugin_options.get(operation_path, {})
-                        )
-
-                self._operation_options.Disable()
-
-                self._canvas.disable_threads()
-                try:
-                    structure = show_loading_dialog(
-                        lambda: operation["structure_callable"](
-                            self._world, self._canvas.dimension, *operation_inputs
-                        ),
-                        f'Running structure operation for {operation["name"]}.',
-                        "Please wait for the operation to finish.",
-                        self,
-                    )
-                except Exception as e:
-                    log.error(f"Error running structure operation: {e}\n{traceback.format_exc()}")
-                    wx.MessageBox(f"Error running structure operation: {e}")
-                    self._world.restore_last_undo_point()
-                    self._canvas.enable_threads()
-                    self._operation_options.Enable()
-                    return
-                self._canvas.enable_threads()
-
-                self._operation_options.Enable()
-                if not isinstance(structure, Structure):
-                    log.error("Object returned from structure_callable was not a Structure. Aborting.")
-                    wx.MessageBox(
-                        "Object returned from structure_callable was not a Structure. Aborting."
-                    )
-                    return
-            else:
-                selection = self._get_box()
-                if selection is None:
-                    return
-                self._operation_options.Disable()
-                structure = show_loading_dialog(
-                    lambda: Structure.from_world(
-                        self._world, selection, self._canvas.dimension
-                    ),
-                    f'Running structure operation for {operation["name"]}.',
-                    "Copying structure from world.",
-                    self,
-                )
-                self._operation_options.Enable()
-
-            if "dst_location_absolute" in features:
-                # trigger UI to show select box UI
-                self._operation_options.enable_select_destination_ui(
-                    operation_path,
-                    operation["operation"],
-                    operation_input_definitions,
-                    structure,
-                    plugins.plugin_options.get(operation_path, {}),
-                )
-            else:
-                # trigger UI to show select box multiple UI
-                raise NotImplementedError
-
-        else:
-            self._operation_options.Disable()
-            out = self._run_main_operation(
-                operation_path, operation["operation"], operation_input_definitions
-            )
-            self._operation_options.Enable()
-            return out
-
-    def _run_main_operation(
-        self,
-        operation_path: str,
-        operation: OperationType,
-        operation_input_definitions: List[str],
-        options=None,
-        structure=None,
-    ) -> Any:
-        operation_inputs = []
-        for inp in operation_input_definitions:
-            if inp == "src_selection":
-                selection = self._get_box()
-                if selection is None:
-                    return
-                operation_inputs.append(selection)
-            elif inp == "structure":
-                operation_inputs.append(structure)
-            elif inp == "options":
-                if options:
-                    plugins.plugin_options[operation_path] = options
-                    operation_inputs.append(options)
-                else:
-                    operation_inputs.append(plugins.plugin_options.get(operation_path, {}))
-
+    def run_operation(self, operation: Callable[[], None], title="", msg="") -> Any:
         self._canvas.disable_threads()
         try:
             out = show_loading_dialog(
-                lambda: operation(
-                    self._world, self._canvas.dimension, *operation_inputs
-                ),
-                f"Running Operation ?.",
-                "Please wait for the operation to finish.",
+                operation,
+                title,
+                msg,
                 self,
             )
             self._world.create_undo_point()
             self._file_panel.update_buttons()
         except Exception as e:
-            operation_info = plugins.all_operations[operation_path]
-            log.error(
-                f'Error occurred while running operation: {operation_info["name"]} v{operation_info["v"]}'
-            )
-            log.error(f"{e}\n{traceback.format_exc()}")
-            wx.MessageBox(f"Error running operation: {e}")
-            self._world.restore_last_undo_point()
-            out = None
+            self._canvas.enable_threads()
+            raise e
         self._canvas.enable_threads()
         return out
 
-    def _cut(self) -> bool:
-        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'cut.py'))
-
-    def _copy(self) -> bool:
-        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'copy.py'))
-
-    def _paste(self) -> bool:
-        self.show_operation_options(None)
-        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'paste.py'))
-
-    def _delete(self) -> bool:
-        return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'delete.py'))
+    # TODO
+    # def _cut(self) -> bool:
+    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'cut.py'))
+    #
+    # def _copy(self) -> bool:
+    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'copy.py'))
+    #
+    # def _paste(self) -> bool:
+    #     self.show_operation_options(None)
+    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'paste.py'))
+    #
+    # def _delete(self) -> bool:
+    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'delete.py'))
 
     def show_select_options(self, _):
         self._operation_options.Hide()
