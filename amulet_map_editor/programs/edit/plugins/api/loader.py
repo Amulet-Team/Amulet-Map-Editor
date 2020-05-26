@@ -16,6 +16,10 @@ if TYPE_CHECKING:
     from amulet.api.world import World
 
 
+STOCK_PLUGINS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "stock_plugins"))
+CUSTOM_PLUGINS_DIR = os.path.abspath("plugins")
+
+
 class OperationLoadException(Exception):
     """Exception for internal use"""
     pass
@@ -189,8 +193,8 @@ def _reload_operation_name(dir_name):
         os.makedirs(os.path.join("plugins", dir_name), exist_ok=True)
     _meta[dir_name].clear()
     name_operations = _load_operations_group(
-        [os.path.join(os.path.dirname(__file__), dir_name)] +
-        [os.path.join("plugins", dir_name)] * (dir_name in _public)
+        [os.path.join(STOCK_PLUGINS_DIR, dir_name)] +
+        [os.path.join(CUSTOM_PLUGINS_DIR, dir_name)] * (dir_name in _public)
     )
     _meta[dir_name].update(name_operations)
 
