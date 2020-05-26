@@ -1,12 +1,33 @@
 import pickle
-from typing import Any
+from typing import Any, TYPE_CHECKING
 import os
+import wx
+import weakref
+
+if TYPE_CHECKING:
+    from amulet_map_editor.programs.edit.canvas.controllable_canvas import ControllableEditCanvas
+    from amulet.api.world import World
 
 
 class OperationUI:
     """The base class that all operations must inherit from."""
-    def __init__(self, options_path: str):
+    def __init__(self, parent: wx.Window, canvas: "ControllableEditCanvas", world: "World", options_path: str):
+        self._parent = weakref.ref(parent)
+        self._canvas = weakref.ref(canvas)
+        self._world = weakref.ref(world)
         self._options_path = options_path
+
+    @property
+    def parent(self) -> wx.Window:
+        return self._parent()
+
+    @property
+    def canvas(self) -> "ControllableEditCanvas":
+        return self._canvas()
+
+    @property
+    def world(self) -> "World":
+        return self._world()
 
     def _load_options(self, default=None) -> Any:
         """Load previously saved options from disk or return the default options."""

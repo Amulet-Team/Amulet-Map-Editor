@@ -22,5 +22,5 @@ class OperationSuccessful(Exception):
 
 class FixedFunctionUI(OperationUI):
     def __init__(self, parent: wx.Window, canvas: "ControllableEditCanvas", world: "World", options_path: str, operation: Callable, options: Dict[str, Any]):
-        super().__init__(options_path)
+        super().__init__(parent, canvas, world, options_path)
         # TODO
