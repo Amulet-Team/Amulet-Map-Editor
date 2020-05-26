@@ -2,8 +2,10 @@ import os
 import glob
 import importlib.util
 from amulet import log
-from typing import Dict, List, TYPE_CHECKING
+from typing import Dict, List, TYPE_CHECKING, Callable, Optional, Type
 import wx
+import struct
+import hashlib
 
 from .fixed_pipeline import FixedFunctionUI
 from .operation_ui import OperationUI
@@ -28,7 +30,7 @@ class OperationLoader:
     ):
         self._path = path
         self._name = ""
-        self._ui = None
+        self._ui: Optional[Callable[[wx.Window, "ControllableEditCanvas", "World"], OperationUI]] = None
         self._load(export_dict)
 
     def _load(self, export_dict: dict):
@@ -41,6 +43,21 @@ class OperationLoader:
                 raise OperationLoadException('"name" in export must exist and be a string.')
         else:
             raise OperationLoadException('"name" is not defined in export.')
+
+        options_path = os.path.abspath(
+            os.path.join(
+                "config",
+                "edit_plugins",
+                f"""{self._name}_{
+                    struct.unpack(
+                        "H",
+                        hashlib.sha1(
+                            self._path.encode('utf-8')
+                        ).digest()[:2]
+                    )[0]
+                }"""  # generate a file name that identifiable to the operation but "unique" to the path
+            )
+        )
 
         mode = export_dict.get("mode", "fixed")
         if not isinstance(mode, str):
@@ -55,12 +72,12 @@ class OperationLoader:
             options = export_dict.get("options", {})
             if not isinstance(options, dict):
                 raise OperationLoadException('"operation" in export must be a dictionary if defined.')
-            self._ui = lambda parent, canvas, world: FixedFunctionUI(parent, canvas, world, operation, options)
+            self._ui = lambda parent, canvas, world: FixedFunctionUI(parent, canvas, world, options_path, operation, options)
         elif mode == "dynamic":
-            operation = export_dict.get("operation", None)
+            operation: Type[OperationUI] = export_dict.get("operation", None)
             if not issubclass(operation, OperationUI):
                 raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
-            self._ui = operation
+            self._ui = lambda parent, canvas, world: operation(parent, canvas, world, options_path)
         else:
             raise OperationLoadException('"mode" in export must be either "fixed" or "dynamic".')
 
