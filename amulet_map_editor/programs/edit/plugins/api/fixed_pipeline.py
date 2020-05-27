@@ -4,7 +4,7 @@ from typing import Callable, Dict, Any, TYPE_CHECKING
 from .operation_ui import OperationUI
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
     from amulet.api.world import World
 
 
@@ -21,6 +21,6 @@ class OperationSuccessful(Exception):
 
 
 class FixedFunctionUI(OperationUI):
-    def __init__(self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str, operation: Callable, options: Dict[str, Any]):
+    def __init__(self, parent: wx.Window, canvas: "ControllableEditCanvas", world: "World", options_path: str, operation: Callable, options: Dict[str, Any]):
         super().__init__(parent, canvas, world, options_path)
         # TODO

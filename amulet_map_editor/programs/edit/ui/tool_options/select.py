@@ -3,11 +3,11 @@ import wx
 import weakref
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
 
 
 class SelectOptions(wx.Panel):
-    def __init__(self, canvas: 'EditCanvas'):
+    def __init__(self, canvas: 'ControllableEditCanvas'):
         wx.Panel.__init__(self, canvas)
         self._canvas = weakref.ref(canvas)
         self._sizer = wx.BoxSizer(wx.VERTICAL)

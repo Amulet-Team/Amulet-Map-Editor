@@ -5,13 +5,13 @@ import wx
 import weakref
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
     from amulet.api.world import World
 
 
 class OperationUI:
     """The base class that all operations must inherit from."""
-    def __init__(self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str):
+    def __init__(self, parent: wx.Window, canvas: "ControllableEditCanvas", world: "World", options_path: str):
         self._parent = weakref.ref(parent)
         self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
@@ -22,7 +22,7 @@ class OperationUI:
         return self._parent()
 
     @property
-    def canvas(self) -> "EditCanvas":
+    def canvas(self) -> "ControllableEditCanvas":
         return self._canvas()
 
     @property

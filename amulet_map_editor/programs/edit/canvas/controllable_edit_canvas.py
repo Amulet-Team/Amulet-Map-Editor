@@ -29,7 +29,7 @@ key_map = {
 }
 
 
-class EditCanvas(BaseEditCanvas):
+class ControllableEditCanvas(BaseEditCanvas):
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
         self._persistent_actions = set()
