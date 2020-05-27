@@ -91,13 +91,17 @@ class BaseEditCanvas(BaseCanvas):
 
     @property
     def selection_group(self) -> SelectionGroup:
+        """Create a SelectionGroup class from the selected boxes."""
         return self._selection_group.create_selection_group()
 
     @property
     def active_selection(self) -> Optional[RenderSelection]:
+        """Get the selection box that is currently active.
+        May be None if no selection box exists."""
         return self._selection_group.active_selection
 
     def enable(self):
+        """Enable the canvas and start it working."""
         self.SetCurrent(self._context)
         self._render_world.enable()
         self._draw_timer.Start(33)
@@ -105,22 +109,28 @@ class BaseEditCanvas(BaseCanvas):
         self._rebuild_timer.Start(1000)
 
     def disable(self):
+        """Disable the canvas and unload all geometry."""
         self._draw_timer.Stop()
         self._gc_timer.Stop()
         self._rebuild_timer.Stop()
         self._render_world.disable()
 
     def disable_threads(self):
+        """Stop the generation of new chunk geometry.
+        Makes it safe to modify the world data."""
         self._render_world.chunk_generator.stop()
 
     def enable_threads(self):
+        """Start the generation of new chunk geometry."""
         self._render_world.chunk_generator.start()
 
     def close(self):
+        """Close and destroy the canvas and all contained data."""
         self._render_world.close()
         super()._close()
 
     def is_closeable(self):
+        """Check that the canvas and contained data is safe to be closed."""
         return self._render_world.is_closeable()
 
     def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
@@ -128,6 +138,7 @@ class BaseEditCanvas(BaseCanvas):
         self._create_atlas()
 
     def _create_atlas(self):
+        """Create and bind the atlas texture."""
         texture_atlas, self._texture_bounds, width, height = textureatlas.create_atlas(
             self._resource_pack.textures
         )
@@ -137,7 +148,7 @@ class BaseEditCanvas(BaseCanvas):
         log.info('Finished setting up texture atlas in OpenGL')
 
     @property
-    def structure(self) -> RenderStructure:
+    def structure(self) -> Optional[RenderStructure]:
         return self._structure
 
     @structure.setter
