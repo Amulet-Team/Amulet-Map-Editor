@@ -1,11 +1,6 @@
 import wx
-from typing import TYPE_CHECKING, Optional, Callable, Any
-from types import GeneratorType
+from typing import TYPE_CHECKING, Optional
 import webbrowser
-import time
-
-from amulet.api.selection import SelectionGroup
-from amulet.api.data_types import OperationReturnType
 
 from amulet_map_editor import CONFIG
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
@@ -13,60 +8,12 @@ from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
 
 
 from .canvas.edit_canvas import EditCanvas
-from .ui.file import FilePanel
-from .ui.tool_options.operation import OperationUI
-from .ui.tool_options.select import SelectOptions
-from .ui.tool import ToolSelect
-from .key_config import DefaultKeys, DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
-
-from amulet_map_editor.programs.edit.canvas.events import (
-    EVT_CAMERA_MOVE,
-    EVT_SELECT_TOOL_ENABLED,
-    EVT_OPERATION_TOOL_ENABLED,
-    EVT_IMPORT_TOOL_ENABLED,
-    EVT_EXPORT_TOOL_ENABLED,
-)
+from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 
 if TYPE_CHECKING:
     from amulet.api.world import World
 
 EDIT_CONFIG_ID = "amulet_edit"
-
-
-def show_loading_dialog(
-    run: Callable[[], OperationReturnType], title: str, message: str, parent: wx.Window
-) -> Any:
-    dialog = wx.ProgressDialog(
-        title,
-        message,
-        parent=parent,
-        style=wx.PD_APP_MODAL
-        | wx.PD_ELAPSED_TIME
-        | wx.PD_REMAINING_TIME
-        | wx.PD_AUTO_HIDE,
-    )
-    t = time.time()
-    try:
-        obj = run()
-        if isinstance(obj, GeneratorType):
-            try:
-                while True:
-                    progress = next(obj)
-                    if isinstance(progress, (list, tuple)):
-                        if len(progress) >= 2:
-                            message = progress[1]
-                        if len(progress) >= 1:
-                            progress = progress[0]
-                    if isinstance(progress, (int, float)) and isinstance(message, str):
-                        dialog.Update(min(99.99, max(0, progress)), message)
-            except StopIteration as e:
-                obj = e.value
-    except Exception as e:
-        dialog.Destroy()
-        raise e
-    time.sleep(max(0.2 - time.time() + t, 0))
-    dialog.Destroy()
-    return obj
 
 
 class EditExtension(wx.Panel, BaseWorldProgram):
@@ -80,11 +27,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp)
 
-        self._file_panel: Optional[FilePanel] = None
-        self._select_options: Optional[SelectOptions] = None
-        self._operation_options: Optional[OperationUI] = None
-        self._tool_panel: Optional[ToolSelect] = None
-
         self.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
@@ -92,78 +34,15 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self.Update()
 
             self._canvas = EditCanvas(self, self._world)
-
-            config = CONFIG.get(EDIT_CONFIG_ID, {})
-            user_keybinds = config.get("user_keybinds", {})
-            group = config.get("keybind_group", DefaultKeybindGroupId)
-            if group in user_keybinds:
-                keybinds = user_keybinds[group]
-            elif group in PresetKeybinds:
-                keybinds = PresetKeybinds[group]
-            else:
-                keybinds = DefaultKeys
-            self._canvas.set_key_binds(
-                keybinds
-            )
-
-            self._file_panel = FilePanel(
-                self._canvas,
-                self._world,
-                self._undo,
-                self._redo,
-                self._save_world,
-                self._close_world,
-            )
-            self._select_options = SelectOptions(self._canvas)
-            self._operation_options = OperationUI(
-                self._canvas, self._world, self._run_operation_event, self._run_main_operation
-            )
-            self._tool_panel = ToolSelect(self._canvas)
-
-            self._canvas.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
-            self._tool_panel.Bind(EVT_SELECT_TOOL_ENABLED, self.show_select_options)
-            self._tool_panel.Bind(
-                EVT_OPERATION_TOOL_ENABLED, self.show_operation_options
-            )
-            self._tool_panel.Bind(EVT_IMPORT_TOOL_ENABLED, self.show_import_options)
-            self._tool_panel.Bind(EVT_EXPORT_TOOL_ENABLED, self.show_export_options)
-
-            self._file_panel.Hide()
-            self._select_options.Hide()
-            self._operation_options.Hide()
-            self._tool_panel.Hide()
-
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
 
-            canvas_sizer = wx.BoxSizer(wx.VERTICAL)
-            self._canvas.SetSizer(canvas_sizer)
-            bottom_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
-            middle_sizer0 = wx.BoxSizer(wx.VERTICAL)
-            top_sizer0 = wx.BoxSizer(wx.HORIZONTAL)
-            top_sizer0.AddStretchSpacer(1)
-            top_sizer0.Add(self._file_panel, 0, wx.EXPAND, 0)
-            canvas_sizer.Add(top_sizer0, 0, wx.EXPAND, 0)
-            middle_sizer0.AddStretchSpacer(1)
-            middle_sizer0.Add(self._select_options, 0, 0, 0)
-            middle_sizer0.Add(self._operation_options, 0, 0, 0)
-            middle_sizer0.AddStretchSpacer(1)
-            canvas_sizer.Add(middle_sizer0, 1, wx.EXPAND, 0)
-            bottom_sizer0.AddStretchSpacer(1)
-            bottom_sizer0.Add(self._tool_panel, 0, wx.EXPAND, 0)
-            bottom_sizer0.AddStretchSpacer(1)
-            canvas_sizer.Add(bottom_sizer0, 0, wx.EXPAND, 0)
-
             self._temp.Destroy()
-            self._file_panel.Show()
-            self._select_options.Show()
-            self._tool_panel.Show()
 
             self.Layout()
         self._canvas.Update()
         self._canvas.enable()
         self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
         self._canvas.draw()
-        self._file_panel.change_dimension()
 
     def disable(self):
         if self._canvas is not None:
@@ -191,36 +70,36 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             )
             response = msg.ShowModal()
             if response == wx.ID_YES:
-                self._save_world()
+                self._canvas.save()
             elif response == wx.ID_CANCEL:
                 return
         self.GetGrandParent().GetParent().close_world(self._world.world_path)
 
     def menu(self, menu: MenuData) -> MenuData:
         menu.setdefault("&File", {}).setdefault("system", {}).setdefault(
-            "Save\tCtrl+s", lambda evt: self._save_world()
+            "Save\tCtrl+s", lambda evt: self._canvas.save()
         )
         # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Undo\tCtrl+z", lambda evt: self._undo()
+            "Undo\tCtrl+z", lambda evt: self._canvas.undo()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Redo\tCtrl+y", lambda evt: self._redo()
+            "Redo\tCtrl+y", lambda evt: self._canvas.redo()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Cut\tCtrl+x", lambda evt: self._cut()
+            "Cut\tCtrl+x", lambda evt: self._canvas.cut()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Copy\tCtrl+c", lambda evt: self._copy()
+            "Copy\tCtrl+c", lambda evt: self._canvas.copy()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Paste\tCtrl+v", lambda evt: self._paste()
+            "Paste\tCtrl+v", lambda evt: self._canvas.paste()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Delete\tDelete", lambda evt: self._delete()
+            "Delete\tDelete", lambda evt: self._canvas.delete()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Goto\tCtrl+g", lambda evt: self._file_panel.show_goto()
+            "Goto\tCtrl+g", lambda evt: self._canvas.goto()
         )
         menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
             "Controls...", lambda evt: self._edit_controls()
@@ -253,56 +132,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
 
-    def _undo(self, *_):
-        self._world.undo()
-        self._file_panel.update_buttons()
-
-    def _redo(self, *_):
-        self._world.redo()
-        self._file_panel.update_buttons()
-
-    def _save_world(self, *_):
-        self._canvas.disable_threads()
-
-        def save():
-            for chunk_index, chunk_count in self._world.save_iter():
-                yield 100 * chunk_index / chunk_count
-
-        show_loading_dialog(lambda: save(), f"Saving world.", "Please wait.", self)
-        self._file_panel.update_buttons()
-        self._canvas.enable_threads()
-
-    def _get_box(self) -> Optional[SelectionGroup]:
-        group = self._canvas.selection_group
-        if group.selection_boxes:
-            return group
-        else:
-            wx.MessageBox(
-                "You must select an area of the world before running this operation"
-            )
-            return None
-
-    def _run_operation_event(self, evt):
-        self._run_operation()
-        evt.Skip()
-
-    def run_operation(self, operation: Callable[[], None], title="", msg="") -> Any:
-        self._canvas.disable_threads()
-        try:
-            out = show_loading_dialog(
-                operation,
-                title,
-                msg,
-                self,
-            )
-            self._world.create_undo_point()
-            self._file_panel.update_buttons()
-        except Exception as e:
-            self._canvas.enable_threads()
-            raise e
-        self._canvas.enable_threads()
-        return out
-
     # TODO
     # def _cut(self) -> bool:
     #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'cut.py'))
@@ -317,21 +146,21 @@ class EditExtension(wx.Panel, BaseWorldProgram):
     # def _delete(self) -> bool:
     #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'delete.py'))
 
-    def show_select_options(self, _):
-        self._operation_options.Hide()
-        self._select_options.enable()
-        self.Layout()
+    # def show_select_options(self, _):
+    #     self._operation_options.Hide()
+    #     self._select_options.enable()
+    #     self.Layout()
 
-    def _show_operation_options(self, enable: Callable):
-        self._select_options.Hide()
-        enable()
-        self.Layout()
+    # def _show_operation_options(self, enable: Callable):
+    #     self._select_options.Hide()
+    #     enable()
+    #     self.Layout()
 
-    def show_operation_options(self, _):
-        self._show_operation_options(self._operation_options.enable_operation_ui)
-
-    def show_import_options(self, _):
-        self._show_operation_options(self._operation_options.enable_import_ui)
-
-    def show_export_options(self, _):
-        self._show_operation_options(self._operation_options.enable_export_ui)
+    # def show_operation_options(self, _):
+    #     self._show_operation_options(self._operation_options.enable_operation_ui)
+    #
+    # def show_import_options(self, _):
+    #     self._show_operation_options(self._operation_options.enable_import_ui)
+    #
+    # def show_export_options(self, _):
+    #     self._show_operation_options(self._operation_options.enable_export_ui)

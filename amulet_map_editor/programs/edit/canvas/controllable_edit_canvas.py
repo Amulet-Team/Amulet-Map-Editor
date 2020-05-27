@@ -4,19 +4,15 @@ import numpy
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.programs.edit.canvas.events import (
-    CameraMoveEvent,
-)
 from amulet_map_editor.amulet_wx.key_config import serialise_key_event, KeybindGroup, ActionLookupType
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-    from amulet_map_editor.programs.edit.edit import EditExtension
 
 
 class ControllableEditCanvas(BaseEditCanvas):
     """Adds the user interaction logic to BaseEditCanvas"""
-    def __init__(self, world_panel: 'EditExtension', world: 'World'):
+    def __init__(self, world_panel: wx.Window, world: 'World'):
         super().__init__(world_panel, world)
         self._last_mouse_x = 0
         self._last_mouse_y = 0

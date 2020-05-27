@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Optional
 import wx
 import weakref
 
-from .goto import show_goto
+from .base_ui import BaseUI
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
@@ -10,22 +10,21 @@ if TYPE_CHECKING:
     from amulet.api.world import World
 
 
-class FilePanel(wx.Panel):
-    def __init__(self, canvas: 'EditCanvas', world: 'World', undo_evt, redo_evt, save_evt, close_evt):
+class FilePanel(wx.Panel, BaseUI):
+    def __init__(self, canvas: 'EditCanvas'):
         wx.Panel.__init__(self, canvas)
-        self._canvas = weakref.ref(canvas)
-        self._world = weakref.ref(world)
+        BaseUI.__init__(self, canvas)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self._location_button = wx.Button(self, label=', '.join([f'{s:.2f}' for s in self._canvas().camera_location]))
-        self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.show_goto())
+        self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
 
         top_sizer.Add(self._location_button, 0, wx.ALL | wx.CENTER, 5)
 
         dim_label = wx.StaticText(self, label="Dimension:")
         self._dim_options = SimpleChoiceAny(self)
-        self._dim_options.SetItems(self._world().world_wrapper.dimensions)
+        self._dim_options.SetItems(self.canvas.world.world_wrapper.dimensions)
         self._dim_options.SetValue("overworld")
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
@@ -38,10 +37,10 @@ class FilePanel(wx.Panel):
             top_sizer.Add(button, 0, wx.ALL, 5)
             return button
 
-        self._undo_button: Optional[wx.Button] = create_button('Undo', undo_evt)
-        self._redo_button: Optional[wx.Button] = create_button('Redo', redo_evt)
-        self._save_button: Optional[wx.Button] = create_button('Save', save_evt)
-        create_button('Close', close_evt)
+        self._undo_button: Optional[wx.Button] = create_button('Undo', lambda evt: self.canvas.undo())
+        self._redo_button: Optional[wx.Button] = create_button('Redo', lambda evt: self.canvas.redo())
+        self._save_button: Optional[wx.Button] = create_button('Save', lambda evt: self.canvas.save())
+        create_button('Close', lambda evt: self.canvas.close())
         self.update_buttons()
 
         self.SetSizer(top_sizer)
@@ -49,9 +48,9 @@ class FilePanel(wx.Panel):
         self.Layout()
 
     def update_buttons(self):
-        self._undo_button.SetLabel(f"Undo | {self._world().chunk_history_manager.undo_count}")
-        self._redo_button.SetLabel(f"Redo | {self._world().chunk_history_manager.redo_count}")
-        self._save_button.SetLabel(f"Save | {self._world().chunk_history_manager.unsaved_changes}")
+        self._undo_button.SetLabel(f"Undo | {self.canvas.world.chunk_history_manager.undo_count}")
+        self._redo_button.SetLabel(f"Redo | {self.canvas.world.chunk_history_manager.redo_count}")
+        self._save_button.SetLabel(f"Save | {self.canvas.world.chunk_history_manager.unsaved_changes}")
 
     def _on_dimension_change(self, evt):
         self.change_dimension()
@@ -60,14 +59,9 @@ class FilePanel(wx.Panel):
     def change_dimension(self):
         dimension = self._dim_options.GetAny()
         if dimension is not None:
-            self._canvas().dimension = dimension
+            self.canvas.dimension = dimension
 
     def move_event(self, evt):
         self._location_button.SetLabel(f'{evt.x:.2f}, {evt.y:.2f}, {evt.z:.2f}')
         self.Layout()
         self.GetParent().Layout()
-
-    def show_goto(self):
-        location = show_goto(self, *self._canvas().camera_location)
-        if location:
-            self._canvas().camera_location = location

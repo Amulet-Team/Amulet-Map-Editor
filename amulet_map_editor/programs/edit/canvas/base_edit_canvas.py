@@ -1,8 +1,9 @@
 import wx
 from OpenGL.GL import *
 import os
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator, Union
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
+import weakref
 
 import minecraft_model_reader
 from amulet.api.chunk import Chunk
@@ -33,6 +34,7 @@ class BaseEditCanvas(BaseCanvas):
     All the user interaction code is implemented in ControllableEditCanvas to make them easier to read."""
     def __init__(self, parent: wx.Window, world: 'World'):
         super().__init__(parent)
+        self._world = weakref.ref(world)
         self._mouse_delta_x = 0
         self._mouse_delta_y = 0
         self._mouse_lock = False
@@ -88,6 +90,10 @@ class BaseEditCanvas(BaseCanvas):
 
         self._rebuild_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
+
+    @property
+    def world(self) -> "World":
+        return self._world()
 
     @property
     def selection_group(self) -> SelectionGroup:
