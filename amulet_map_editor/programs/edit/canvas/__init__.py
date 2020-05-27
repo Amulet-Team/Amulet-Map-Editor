@@ -1,2 +1,2 @@
 from .base_edit_canvas import BaseEditCanvas
-from .controllable_edit_canvas import ControllableEditCanvas
+from .edit_canvas import EditCanvas
