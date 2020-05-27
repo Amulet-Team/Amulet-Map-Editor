@@ -3,7 +3,7 @@ from amulet_map_editor.amulet_wx.key_config import (
     KeybindContainer,
     KeybindGroup,
     KeybindGroupIdType,
-    KeybindIdType,
+    KeyActionType,
     Space,
     Shift,
     MouseLeft,
@@ -15,7 +15,7 @@ from amulet_map_editor.amulet_wx.key_config import (
 )
 
 
-KeybindKeys: List[KeybindIdType] = [
+KeybindKeys: List[KeyActionType] = [
     "up",
     "down",
     "forwards",

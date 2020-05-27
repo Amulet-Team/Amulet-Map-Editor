@@ -28,6 +28,8 @@ MODE_STRUCTURE = 2  # MODE_DISABLED and draw structure if exists
 
 
 class BaseEditCanvas(BaseCanvas):
+    """Adds base logic for drawing everything related to the edit program to the BaseCanvas.
+    All the user interaction code is implemented in ControllableEditCanvas to make them easier to read."""
     def __init__(self, parent: wx.Window, world: 'World'):
         super().__init__(parent)
         self._last_mouse_x = 0
@@ -35,7 +37,6 @@ class BaseEditCanvas(BaseCanvas):
         self._mouse_delta_x = 0
         self._mouse_delta_y = 0
         self._mouse_lock = False
-        self._mouse_moved = False
 
         # load the resource packs
         os.makedirs('resource_packs', exist_ok=True)

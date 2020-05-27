@@ -7,10 +7,11 @@ from amulet_map_editor.amulet_wx.icon import ADD_ICON, SUBTRACT_ICON, EDIT_ICON
 ModifierKeyType = str
 KeyType = Union[int, str]
 KeybindGroupIdType = str
-KeybindIdType = str
+KeyActionType = str
 ModifierType = Tuple[ModifierKeyType, ...]
 SerialisedKeyType = Tuple[ModifierType, KeyType]
-KeybindGroup = Dict[KeybindIdType, SerialisedKeyType]
+KeybindGroup = Dict[KeyActionType, SerialisedKeyType]
+ActionLookupType = Dict[SerialisedKeyType, KeyActionType]
 KeybindContainer = Dict[KeybindGroupIdType, KeybindGroup]
 
 MouseLeft = "MOUSE_LEFT"
@@ -287,7 +288,7 @@ class KeyConfigDialog(SimpleDialog):
             self,
             parent: wx.Window,
             selected_group: KeybindGroupIdType,
-            entries: Sequence[KeybindIdType],
+            entries: Sequence[KeyActionType],
             fixed_keybinds: KeybindContainer,
             user_keybinds: KeybindContainer
     ):
@@ -311,7 +312,7 @@ class KeyConfig(wx.BoxSizer):
             self,
             parent: wx.Window,
             selected_group: KeybindGroupIdType,
-            entries: Sequence[KeybindIdType],
+            entries: Sequence[KeyActionType],
             fixed_keybinds: KeybindContainer,
             user_keybinds: KeybindContainer
     ):

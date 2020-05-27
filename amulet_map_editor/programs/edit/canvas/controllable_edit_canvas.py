@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Set
 import wx
 import numpy
 
@@ -7,37 +7,25 @@ from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
 from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
 )
-from amulet_map_editor.amulet_wx.key_config import serialise_key_event, KeybindGroup
+from amulet_map_editor.amulet_wx.key_config import serialise_key_event, KeybindGroup, ActionLookupType
 
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet_map_editor.programs.edit.edit import EditExtension
 
 
-key_map = {
-    'up': wx.WXK_SPACE,
-    'down': wx.WXK_SHIFT,
-    'forwards': 87,
-    'backwards': 83,
-    'left': 65,
-    'right': 68,
-
-    'look_left': 74,
-    'look_right': 76,
-    'look_up': 73,
-    'look_down': 75,
-}
-
-
 class ControllableEditCanvas(BaseEditCanvas):
+    """Adds the user interaction logic to BaseEditCanvas"""
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
-        self._persistent_actions = set()
-        self._key_binds = {}
+        self._mouse_moved = False  # has the mouse position changed since the last frame
+        self._persistent_actions: Set[str] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
+        self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
 
         self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
+        # key press actions
         self.Bind(wx.EVT_LEFT_DOWN, self._press)
         self.Bind(wx.EVT_LEFT_UP, self._release)
         self.Bind(wx.EVT_MIDDLE_DOWN, self._press)
@@ -48,6 +36,7 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(wx.EVT_KEY_UP, self._release)
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
 
+        # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
 
@@ -63,12 +52,15 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._key_binds = dict(zip(key_binds.values(), key_binds.keys()))
 
     def _press(self, evt):
+        """Event to handle a number of different key presses"""
         self._process_action(evt, True)
 
     def _release(self, evt):
+        """Event to handle a number of different key releases"""
         self._process_action(evt, False)
 
     def _process_action(self, evt, press: bool):
+        """Logic to handle a key being pressed or released."""
         key = serialise_key_event(evt)
         if key is None:
             return
@@ -103,7 +95,8 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._selection_group.delete_active()
             else:  # run once on button press and frequently until released
                 if action == "box click":
-                    self._box_click()
+                    if self.select_mode == 0:
+                        self.box_select("add box modifier" in self._persistent_actions)
                 elif action == "toggle mouse mode":
                     self._toggle_mouse_lock()
                 elif action == "speed+":
@@ -119,17 +112,23 @@ class ControllableEditCanvas(BaseEditCanvas):
                 if a in self._persistent_actions:
                     self._persistent_actions.remove(a)
 
-    def _toggle_mouse_lock(self):
-        self.SetFocus()
-        if self._mouse_lock:
-            self._release_mouse()
-        else:
-            self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-            self._mouse_delta_x = self._mouse_delta_y = self._last_mouse_x = self._last_mouse_y = 0
-            self._mouse_lock = True
-            self._change_box_location()
+    def box_select(self, add_modifier: bool = False):
+        position = self._selection_group.box_click(add_modifier)
+        if position is not None:
+            self.select_distance2 = int(numpy.linalg.norm(position - self.camera_location))
+
+        # if self._selection_box.select_state <= 1:
+        #     self._selection_box.select_state += 1
+        # elif self._selection_box.select_state == 2:
+        #     self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
+        #     self._selection_box.select_state = 1
+        #     x, y, z = self._selection_box.point1
+        #     wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
+        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
+        # wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
 
     def _process_persistent_inputs(self, evt):
+        """Handle actions run by keys that are being held down."""
         forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
         if 'up' in self._persistent_actions:
             up += 1
@@ -156,6 +155,7 @@ class ControllableEditCanvas(BaseEditCanvas):
         evt.Skip()
 
     def move_camera_relative(self, forward, up, right, pitch, yaw):
+        """Move the camera relative to its current location."""
         if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
             if not self._mouse_lock and self._mouse_moved:
                 self._mouse_moved = False
@@ -174,30 +174,24 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._change_box_location()
         wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
 
-    def box_select(self, add_modifier: bool = False):
-        position = self._selection_group.box_click(add_modifier)
-        if position is not None:
-            self.select_distance2 = int(numpy.linalg.norm(position - self.camera_location))
-
-        # if self._selection_box.select_state <= 1:
-        #     self._selection_box.select_state += 1
-        # elif self._selection_box.select_state == 2:
-        #     self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
-        #     self._selection_box.select_state = 1
-        #     x, y, z = self._selection_box.point1
-        #     wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
-        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
-        # wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
-
-    def _box_click(self):
-        if self.select_mode == 0:
-            self.box_select("add box modifier" in self._persistent_actions)
+    def _toggle_mouse_lock(self):
+        """Toggle mouse selection mode."""
+        self.SetFocus()
+        if self._mouse_lock:
+            self._release_mouse()
+        else:
+            self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
+            self._mouse_delta_x = self._mouse_delta_y = self._last_mouse_x = self._last_mouse_y = 0
+            self._mouse_lock = True
+            self._change_box_location()
 
     def _release_mouse(self):
+        """Release the mouse"""
         self.SetCursor(wx.NullCursor)
         self._mouse_lock = False
 
     def _on_mouse_motion(self, evt):
+        """Event fired when the mouse is moved."""
         self.SetFocus()
         if self._mouse_lock:
             if self._last_mouse_x == 0:
@@ -232,9 +226,11 @@ class ControllableEditCanvas(BaseEditCanvas):
             self._mouse_moved = True
 
     def _on_loss_focus(self, evt):
+        """Event fired when the user tabs out of the window."""
         self._escape()
         evt.Skip()
 
     def _escape(self):
+        """Release the mouse and remove all key presses to the camera doesn't fly off into the distance."""
         self._persistent_actions.clear()
         self._release_mouse()
