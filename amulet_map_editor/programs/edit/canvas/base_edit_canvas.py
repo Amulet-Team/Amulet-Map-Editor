@@ -11,13 +11,14 @@ from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import PointCoordinatesNDArray
 from amulet.api.selection import SelectionGroup
 
+from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, cos, tan, atan
 from amulet_map_editor.opengl.mesh.selection import RenderSelection, RenderSelectionGroup
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
-from amulet_map_editor.programs.edit.canvas.events import CameraMoveEvent
+from amulet_map_editor.programs.edit.canvas.events import CameraMoveEvent, CameraRotateEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -32,8 +33,6 @@ class BaseEditCanvas(BaseCanvas):
     All the user interaction code is implemented in ControllableEditCanvas to make them easier to read."""
     def __init__(self, parent: wx.Window, world: 'World'):
         super().__init__(parent)
-        self._last_mouse_x = 0
-        self._last_mouse_y = 0
         self._mouse_delta_x = 0
         self._mouse_delta_y = 0
         self._mouse_lock = False
@@ -65,7 +64,8 @@ class BaseEditCanvas(BaseCanvas):
             self._resource_pack_translator
         )
 
-        self._camera: List[float] = [0.0, 100.0, 0.0, 45.0, 45.0]
+        self._camera_location: CameraLocationType = (0.0, 100.0, 0.0)
+        self._camera_rotation: CameraRotationType = (45.0, 45.0)
         self._camera_move_speed = 2
         self._camera_rotate_speed = 2
         self._select_distance = 10
@@ -190,15 +190,28 @@ class BaseEditCanvas(BaseCanvas):
         self._render_world.dimension = dimension
 
     @property
-    def camera_location(self) -> Tuple[float, float, float]:
-        return tuple(self._camera[:3])
+    def camera_location(self) -> CameraLocationType:
+        return self._camera_location
 
     @camera_location.setter
-    def camera_location(self, location: Tuple[Union[int, float], Union[int, float], Union[int, float]]):
-        self._camera[:3] = location
+    def camera_location(self, location: CameraLocationType):
+        assert len(location) == 3 and all(isinstance(v, (int, float)) for v in location), "format for camera_location is invalid"
+        self._camera_location = location
         self._transformation_matrix = None
         self._change_box_location()
-        wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
+        wx.PostEvent(self, CameraMoveEvent(location=self.camera_location))
+
+    @property
+    def camera_rotation(self) -> CameraRotationType:
+        return self._camera_rotation
+
+    @camera_rotation.setter
+    def camera_rotation(self, rotation: CameraRotationType):
+        assert len(rotation) == 2 and all(isinstance(v, (int, float)) for v in rotation), "format for camera_rotation is invalid"
+        self._camera_rotation = rotation
+        self._transformation_matrix = None
+        self._change_box_location()
+        wx.PostEvent(self, CameraRotateEvent(rotation=self.camera_rotation))
 
     @property
     def camera_move_speed(self) -> float:
@@ -302,7 +315,7 @@ class BaseEditCanvas(BaseCanvas):
             screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
             screen_dy = atan(cos(screen_dx) * tan(self.fov / 2) * self._mouse_delta_y / screen_y)
             look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
-        look_vector = numpy.matmul(self.rotation_matrix(*self._camera[3:5]), look_vector)[:3]
+        look_vector = numpy.matmul(self.rotation_matrix(*self.camera_rotation), look_vector)[:3]
         look_vector[abs(look_vector) < 0.000001] = 0.000001
         return look_vector
 

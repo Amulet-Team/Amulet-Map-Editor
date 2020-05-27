@@ -18,6 +18,8 @@ class ControllableEditCanvas(BaseEditCanvas):
     """Adds the user interaction logic to BaseEditCanvas"""
     def __init__(self, world_panel: 'EditExtension', world: 'World'):
         super().__init__(world_panel, world)
+        self._last_mouse_x = 0
+        self._last_mouse_y = 0
         self._mouse_moved = False  # has the mouse position changed since the last frame
         self._persistent_actions: Set[str] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
         self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
@@ -161,18 +163,18 @@ class ControllableEditCanvas(BaseEditCanvas):
                 self._mouse_moved = False
                 self._change_box_location()
             return
-        self._camera[0] += self._camera_move_speed * (cos(self._camera[4]) * right + sin(self._camera[4]) * forward)
-        self._camera[1] += self._camera_move_speed * up
-        self._camera[2] += self._camera_move_speed * (sin(self._camera[4]) * right - cos(self._camera[4]) * forward)
+        x, y, z = self.camera_location
+        rx, ry = self.camera_rotation
+        x += self._camera_move_speed * (cos(ry) * right + sin(ry) * forward)
+        y += self._camera_move_speed * up
+        z += self._camera_move_speed * (sin(ry) * right - cos(ry) * forward)
 
-        self._camera[3] += self._camera_rotate_speed * pitch
-        if not -90 <= self._camera[3] <= 90:
-            self._camera[3] = max(min(self._camera[3], 90), -90)
-        self._camera[4] += self._camera_rotate_speed * yaw
-        self._transformation_matrix = None
-        self._render_world.camera = self._camera
-        self._change_box_location()
-        wx.PostEvent(self, CameraMoveEvent(x=self._camera[0], y=self._camera[1], z=self._camera[2], rx=self._camera[3], ry=self._camera[4]))
+        rx += self._camera_rotate_speed * pitch
+        if not -90 <= rx <= 90:
+            rx = max(min(rx, 90), -90)
+        ry += self._camera_rotate_speed * yaw
+        self.camera_location = self._render_world.camera_location = (x, y, z)
+        self.camera_rotation = self._render_world.camera_rotation = (rx, ry)
 
     def _toggle_mouse_lock(self):
         """Toggle mouse selection mode."""

@@ -2,6 +2,7 @@ from wx.lib import newevent
 
 
 CameraMoveEvent, EVT_CAMERA_MOVE = newevent.NewEvent()
+CameraRotateEvent, EVT_CAMERA_ROTATE = newevent.NewEvent()
 
 ToolChangeEvent, EVT_TOOL_CHANGE = newevent.NewEvent()
 
