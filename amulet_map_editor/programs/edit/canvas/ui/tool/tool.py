@@ -38,6 +38,7 @@ class Tool(wx.BoxSizer, BaseUI):
         self.canvas.Bind(EVT_TOOL_CHANGE, lambda evt: self._enable_tool(evt.tool))
 
         self.register_tool("Select", SelectOptions)
+        self._enable_tool("Select")
         self.register_tool("Operation", SelectOperationUI)
         self.register_tool("Import", SelectImportOperationUI)
         self.register_tool("Export", SelectExportOperationUI)
@@ -46,16 +47,26 @@ class Tool(wx.BoxSizer, BaseUI):
         assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(tool_cls, BaseToolUI)
         self._tool_select.register_tool(name)
         tool = tool_cls(self.canvas)
-        tool.Hide()
+        if isinstance(tool, wx.Window):
+            tool.Hide()
+        elif isinstance(tool, wx.Sizer):
+            tool.ShowItems(show=False)
         self._tools[name] = tool
         self._tool_option_sizer.Add(tool, 1, wx.EXPAND, 0)
 
     def _enable_tool(self, tool: str):
         if tool in self._tools:
             if self._active_tool is not None:
-                self._active_tool.Hide()
+                if isinstance(self._active_tool, wx.Window):
+                    self._active_tool.Hide()
+                elif isinstance(self._active_tool, wx.Sizer):
+                    self._active_tool.ShowItems(show=False)
             self._active_tool = self._tools[tool]
-            self._active_tool.Show()
+            if isinstance(self._active_tool, wx.Window):
+                self._active_tool.Show()
+            elif isinstance(self._active_tool, wx.Sizer):
+                self._active_tool.ShowItems(show=True)
+            self.canvas.Layout()
 
 
 class ToolSelect(wx.Panel, BaseUI):

@@ -8,7 +8,7 @@ import struct
 import hashlib
 
 from .fixed_pipeline import FixedFunctionUI
-from .operation_ui import OperationUI
+from .operation_ui import OperationUI, OperationUIType
 from .data_types import OperationStorageType
 
 if TYPE_CHECKING:
@@ -81,8 +81,8 @@ class OperationLoader:
             operation: Type[OperationUI] = export_dict.get("operation", None)
             if not issubclass(operation, OperationUI):
                 raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
-            if not issubclass(operation, wx.Window):
-                raise OperationLoadException('"operation" must be a subclass of wx.Window.')
+            if not issubclass(operation, (wx.Window, wx.Sizer)):
+                raise OperationLoadException('"operation" must be a subclass of wx.Window or wx.Sizer.')
             self._ui = lambda parent, canvas, world: operation(parent, canvas, world, options_path)
         else:
             raise OperationLoadException('"mode" in export must be either "fixed" or "dynamic".')
@@ -91,8 +91,8 @@ class OperationLoader:
     def name(self) -> str:
         return self._name
 
-    def setup_ui(self, parent: wx.Window, canvas: "EditCanvas", world: "World"):
-        self._ui(parent, canvas, world)
+    def __call__(self, parent: wx.Window, canvas: "EditCanvas", world: "World") -> OperationUIType:
+        return self._ui(parent, canvas, world)
 
 
 def _load_module_file(module_path: str):
@@ -178,8 +178,6 @@ _public = {
     'export_operations',
     'import_operations'
 }
-
-plugin_options: Dict[str, dict] = {}
 
 
 def merge_operations():

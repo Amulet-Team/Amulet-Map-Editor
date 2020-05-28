@@ -1,5 +1,5 @@
 import pickle
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Union
 import os
 import wx
 import weakref
@@ -7,6 +7,8 @@ import weakref
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
     from amulet.api.world import World
+
+OperationUIType = Union[wx.Window, wx.Sizer, "OperationUI"]
 
 
 class OperationUI:
@@ -28,6 +30,11 @@ class OperationUI:
     @property
     def world(self) -> "World":
         return self._world()
+
+    def unload(self):
+        """Unbind any events that have been set up and make safe to destroy the UI.
+        The UI will be destroyed from externally."""
+        raise NotImplementedError
 
     def _load_options(self, default=None) -> Any:
         """Load previously saved options from disk or return the default options."""
