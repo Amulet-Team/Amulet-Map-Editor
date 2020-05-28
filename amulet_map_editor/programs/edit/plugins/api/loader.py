@@ -81,6 +81,8 @@ class OperationLoader:
             operation: Type[OperationUI] = export_dict.get("operation", None)
             if not issubclass(operation, OperationUI):
                 raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
+            if not issubclass(operation, wx.Window):
+                raise OperationLoadException('"operation" must be a subclass of wx.Window.')
             self._ui = lambda parent, canvas, world: operation(parent, canvas, world, options_path)
         else:
             raise OperationLoadException('"mode" in export must be either "fixed" or "dynamic".')

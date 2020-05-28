@@ -6,6 +6,7 @@ from amulet_map_editor import CONFIG
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
 
+EDIT_CONFIG_ID = "amulet_edit"
 
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
@@ -13,7 +14,7 @@ from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 if TYPE_CHECKING:
     from amulet.api.world import World
 
-EDIT_CONFIG_ID = "amulet_edit"
+
 
 
 class EditExtension(wx.Panel, BaseWorldProgram):

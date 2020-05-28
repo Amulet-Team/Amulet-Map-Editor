@@ -1,13 +1,11 @@
 from typing import TYPE_CHECKING, Optional
 import wx
-import weakref
 
 from .base_ui import BaseUI
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
-    from amulet.api.world import World
 
 
 class FilePanel(wx.Panel, BaseUI):

@@ -1,15 +1,16 @@
 from typing import TYPE_CHECKING, Type, Any
 import wx
-import weakref
+
+from .base_tool_ui import BaseToolUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
-class SelectOptions(wx.Panel):
+class SelectOptions(wx.Panel, BaseToolUI):
     def __init__(self, canvas: 'EditCanvas'):
         wx.Panel.__init__(self, canvas)
-        self._canvas = weakref.ref(canvas)
+        BaseToolUI.__init__(self, canvas)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
 
@@ -47,7 +48,7 @@ class SelectOptions(wx.Panel):
         # self._canvas().Bind(EVT_BOX_COORDS_ENABLE, self._enable_scrolls)
 
     def enable(self):
-        self._canvas().select_mode = 0
+        self.canvas.select_mode = 0
         self.Show()
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
