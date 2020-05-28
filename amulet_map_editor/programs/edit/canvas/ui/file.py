@@ -8,31 +8,27 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
-class FilePanel(wx.Panel, BaseUI):
+class FilePanel(wx.BoxSizer, BaseUI):
     def __init__(self, canvas: 'EditCanvas'):
-        wx.Panel.__init__(self, canvas)
+        wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         BaseUI.__init__(self, canvas)
 
-        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        self._location_button = wx.Button(self, label=', '.join([f'{s:.2f}' for s in self._canvas().camera_location]))
+        self._location_button = wx.Button(canvas, label=', '.join([f'{s:.2f}' for s in self._canvas().camera_location]))
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
 
-        top_sizer.Add(self._location_button, 0, wx.ALL | wx.CENTER, 5)
+        self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
-        dim_label = wx.StaticText(self, label="Dimension:")
-        self._dim_options = SimpleChoiceAny(self)
+        self._dim_options = SimpleChoiceAny(canvas)
         self._dim_options.SetItems(self.canvas.world.world_wrapper.dimensions)
         self._dim_options.SetValue("overworld")
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
-        top_sizer.Add(dim_label, 0, wx.ALL | wx.CENTER, 5)
-        top_sizer.Add(self._dim_options, 0, wx.ALL | wx.CENTER, 5)
+        self.Add(self._dim_options, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
         def create_button(text, operation):
-            button = wx.Button(self, label=text)
+            button = wx.Button(canvas, label=text)
             button.Bind(wx.EVT_BUTTON, operation)
-            top_sizer.Add(button, 0, wx.ALL, 5)
+            self.Add(button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
             return button
 
         self._undo_button: Optional[wx.Button] = create_button('Undo', lambda evt: self.canvas.undo())
@@ -41,8 +37,7 @@ class FilePanel(wx.Panel, BaseUI):
         create_button('Close', lambda evt: self.canvas.close())
         self.update_buttons()
 
-        self.SetSizer(top_sizer)
-        top_sizer.Fit(self)
+        # self.Fit(self)
         self.Layout()
 
     def update_buttons(self):
@@ -60,6 +55,7 @@ class FilePanel(wx.Panel, BaseUI):
             self.canvas.dimension = dimension
 
     def move_event(self, evt):
-        self._location_button.SetLabel(f'{evt.x:.2f}, {evt.y:.2f}, {evt.z:.2f}')
+        x, y, z = evt.location
+        self._location_button.SetLabel(f'{x:.2f}, {y:.2f}, {z:.2f}')
         self.Layout()
-        self.GetParent().Layout()
+        self.canvas.Layout()
