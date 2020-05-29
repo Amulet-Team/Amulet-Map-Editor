@@ -38,6 +38,7 @@ class BaseEditCanvas(BaseCanvas):
     All the user interaction code is implemented in ControllableEditCanvas to make them easier to read."""
     def __init__(self, parent: wx.Window, world: 'World'):
         super().__init__(parent)
+        self.Hide()
         self._world = weakref.ref(world)
         self._mouse_delta_x = 0
         self._mouse_delta_y = 0

@@ -36,6 +36,8 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self.Bind(wx.EVT_SIZE, self._on_resize)
             self._canvas.Bind(EVT_EDIT_CLOSE, self._on_close)
             self._temp.Destroy()
+            self._canvas.Show()
+            self._canvas.draw()
 
             self.Layout()
         self._canvas.Update()
