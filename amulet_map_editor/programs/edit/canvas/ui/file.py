@@ -3,6 +3,13 @@ import wx
 
 from .base_ui import BaseUI
 from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
+from amulet_map_editor.programs.edit.canvas.events import (
+    EVT_CAMERA_MOVE,
+    EVT_UNDO,
+    EVT_REDO,
+    EVT_CREATE_UNDO,
+    EVT_SAVE
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
@@ -15,6 +22,7 @@ class FilePanel(wx.BoxSizer, BaseUI):
 
         self._location_button = wx.Button(canvas, label=', '.join([f'{s:.2f}' for s in self._canvas().camera_location]))
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
+        self.canvas.Bind(EVT_CAMERA_MOVE, self._on_camera_move)
 
         self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
@@ -32,29 +40,34 @@ class FilePanel(wx.BoxSizer, BaseUI):
             return button
 
         self._undo_button: Optional[wx.Button] = create_button('Undo', lambda evt: self.canvas.undo())
+        self.canvas.Bind(EVT_UNDO, self._on_update_buttons)
         self._redo_button: Optional[wx.Button] = create_button('Redo', lambda evt: self.canvas.redo())
+        self.canvas.Bind(EVT_REDO, self._on_update_buttons)
         self._save_button: Optional[wx.Button] = create_button('Save', lambda evt: self.canvas.save())
+        self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
+        self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
         create_button('Close', lambda evt: self.canvas.close())
-        self.update_buttons()
+        self._update_buttons()
 
         # self.Fit(self)
         self.Layout()
 
-    def update_buttons(self):
+    def _on_update_buttons(self, evt):
+        self._update_buttons()
+        evt.Skip()
+
+    def _update_buttons(self):
         self._undo_button.SetLabel(f"Undo | {self.canvas.world.chunk_history_manager.undo_count}")
         self._redo_button.SetLabel(f"Redo | {self.canvas.world.chunk_history_manager.redo_count}")
         self._save_button.SetLabel(f"Save | {self.canvas.world.chunk_history_manager.unsaved_changes}")
 
     def _on_dimension_change(self, evt):
-        self.change_dimension()
-        evt.Skip()
-
-    def change_dimension(self):
         dimension = self._dim_options.GetAny()
         if dimension is not None:
             self.canvas.dimension = dimension
+        evt.Skip()
 
-    def move_event(self, evt):
+    def _on_camera_move(self, evt):
         x, y, z = evt.location
         self._location_button.SetLabel(f'{x:.2f}, {y:.2f}, {z:.2f}')
         self.Layout()

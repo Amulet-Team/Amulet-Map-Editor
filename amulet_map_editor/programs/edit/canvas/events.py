@@ -8,6 +8,7 @@ ToolChangeEvent, EVT_TOOL_CHANGE = newevent.NewEvent()
 
 UndoEvent, EVT_UNDO = newevent.NewEvent()
 RedoEvent, EVT_REDO = newevent.NewEvent()
+CreateUndoEvent, EVT_CREATE_UNDO = newevent.NewEvent()
 SaveEvent, EVT_SAVE = newevent.NewEvent()
 
 BoxGreenCornerChangeEvent, EVT_BOX_GREEN_CORNER_CHANGE = newevent.NewEvent()

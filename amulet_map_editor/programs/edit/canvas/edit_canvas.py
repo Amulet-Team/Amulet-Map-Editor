@@ -12,7 +12,10 @@ from amulet_map_editor.programs.edit.canvas.ui.goto import show_goto
 from amulet_map_editor.programs.edit.canvas.ui.tool import Tool
 
 from amulet_map_editor.programs.edit.canvas.events import (
-    EVT_CAMERA_MOVE,
+    UndoEvent,
+    RedoEvent,
+    CreateUndoEvent,
+    SaveEvent,
 )
 from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
@@ -74,14 +77,12 @@ class EditCanvas(ControllableEditCanvas):
             keybinds
         )
 
-        self._file_panel = FilePanel(self)
-        self.Bind(EVT_CAMERA_MOVE, self._file_panel.move_event)
-
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
         file_sizer = wx.BoxSizer(wx.HORIZONTAL)
         file_sizer.AddStretchSpacer(1)
+        self._file_panel = FilePanel(self)
         file_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
         canvas_sizer.Add(file_sizer, 0, wx.EXPAND, 0)
 
@@ -98,7 +99,7 @@ class EditCanvas(ControllableEditCanvas):
                 self,
             )
             self._world.create_undo_point()
-            self._file_panel.update_buttons()
+            wx.PostEvent(self, CreateUndoEvent())
         except Exception as e:
             self._canvas.enable_threads()
             raise e
@@ -107,11 +108,11 @@ class EditCanvas(ControllableEditCanvas):
 
     def undo(self):
         self.world.undo()
-        self._file_panel.update_buttons()
+        wx.PostEvent(self, UndoEvent())
 
     def redo(self):
         self.world.redo()
-        self._file_panel.update_buttons()
+        wx.PostEvent(self, RedoEvent())
 
     def cut(self):
         pass
@@ -138,7 +139,7 @@ class EditCanvas(ControllableEditCanvas):
                 yield chunk_index / chunk_count
 
         show_loading_dialog(lambda: save(), f"Saving world.", "Please wait.", self)
-        self._file_panel.update_buttons()
+        wx.PostEvent(self, SaveEvent())
         self.enable_threads()
 
     def close(self):
