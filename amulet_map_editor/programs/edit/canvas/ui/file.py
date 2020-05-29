@@ -20,7 +20,7 @@ class FilePanel(wx.BoxSizer, BaseUI):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         BaseUI.__init__(self, canvas)
 
-        self._location_button = wx.Button(canvas, label=', '.join([f'{s:.2f}' for s in self._canvas().camera_location]))
+        self._location_button = wx.Button(canvas, label=', '.join([f'{s:.2f}' for s in self.canvas.camera_location]))
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
         self.canvas.Bind(EVT_CAMERA_MOVE, self._on_camera_move)
 

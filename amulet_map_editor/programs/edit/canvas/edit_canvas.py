@@ -90,7 +90,7 @@ class EditCanvas(ControllableEditCanvas):
         canvas_sizer.Add(tool_sizer, 1, wx.EXPAND, 0)
 
     def run_operation(self, operation: Callable[[], None], title="", msg="") -> Any:
-        self._canvas.disable_threads()
+        self.disable_threads()
         try:
             out = show_loading_dialog(
                 operation,
@@ -101,9 +101,9 @@ class EditCanvas(ControllableEditCanvas):
             self._world.create_undo_point()
             wx.PostEvent(self, CreateUndoEvent())
         except Exception as e:
-            self._canvas.enable_threads()
+            self.enable_threads()
             raise e
-        self._canvas.enable_threads()
+        self.enable_threads()
         return out
 
     def undo(self):
