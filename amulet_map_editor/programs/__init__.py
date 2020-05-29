@@ -62,8 +62,9 @@ class BaseWorldUI:
 
 
 class WorldManagerUI(wx.Notebook, BaseWorldUI):
-    def __init__(self, parent, path):
+    def __init__(self, parent: wx.Window, path: str):
         super().__init__(parent, style=wx.NB_LEFT)
+        self._path = path
         self._finished = False
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
         try:
@@ -76,6 +77,10 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
         self._last_extension: int = -1
         self._load_extensions()
         self._finished = True
+
+    @property
+    def path(self) -> str:
+        return self._path
 
     def menu(self, menu: MenuData) -> MenuData:
         menu.setdefault('&File', {}).setdefault('exit', {}).setdefault('Close World', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
