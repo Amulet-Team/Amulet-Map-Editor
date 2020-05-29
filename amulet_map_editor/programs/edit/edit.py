@@ -1,13 +1,13 @@
 import wx
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Callable
 import webbrowser
-
-from amulet_map_editor import CONFIG
-from amulet_map_editor.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
 
 EDIT_CONFIG_ID = "amulet_edit"
 
+from amulet_map_editor import CONFIG, log
+from amulet_map_editor.programs import BaseWorldProgram, MenuData
+from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
+from amulet_map_editor.programs.edit.canvas.events import EVT_EDIT_CLOSE
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 
@@ -15,20 +15,17 @@ if TYPE_CHECKING:
     from amulet.api.world import World
 
 
-
-
 class EditExtension(wx.Panel, BaseWorldProgram):
-    def __init__(self, parent, world: "World"):
+    def __init__(self, parent, world: "World", close_self_callback: Callable[[], None]):
         wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
         self._world = world
         self._canvas: Optional[EditCanvas] = None
+        self._close_self_callback = close_self_callback
         self._temp = wx.StaticText(self, label="Please wait while the renderer loads")
         self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp)
-
-        self.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
         if self._canvas is None:
@@ -36,7 +33,8 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             self._canvas = EditCanvas(self, self._world)
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
-
+            self.Bind(wx.EVT_SIZE, self._on_resize)
+            self._canvas.Bind(EVT_EDIT_CLOSE, self._on_close)
             self._temp.Destroy()
 
             self.Layout()
@@ -49,32 +47,59 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         if self._canvas is not None:
             self._canvas.disable()
 
+    def _on_close(self, evt: EVT_EDIT_CLOSE):
+        if self.is_closeable():
+            self._close_self_callback()
+        evt.Skip()
+
     def close(self):
+        """Fully close the UI. Called when destroying the UI."""
         self.disable()
         if self._canvas is not None:
             self._canvas.close()
 
-    def is_closeable(self):
+    def is_closeable(self) -> bool:
+        """
+        Check if it is safe to close the UI.
+        :return: True if the program can be closed, False otherwise
+        """
         if self._canvas is not None:
-            return self._canvas.is_closeable() and not bool(
-                self._world.chunk_history_manager.unsaved_changes
-            )
+            if self._canvas.is_closeable():
+                return self._check_close_world()
+            log.info(f"The canvas in edit for world {self._world.world_wrapper.world_name} was not closeable for some reason.")
+            return False
         return not bool(self._world.chunk_history_manager.unsaved_changes)
 
-    def _close_world(self, _):
+    def _check_close_world(self) -> bool:
+        """
+        Check if it is safe to close the world and prompt the user if it is not.
+        :return: True if the world can be closed, False otherwise
+        """
         unsaved_changes = self._world.chunk_history_manager.unsaved_changes
         if unsaved_changes:
             msg = wx.MessageDialog(
                 self,
-                f"There {'is' if unsaved_changes == 1 else 'are'} {unsaved_changes} unsaved change{'s' if unsaved_changes >= 2 else ''}. Would you like to save?",
+                f"""There {
+                    'is' if unsaved_changes == 1 else 'are'
+                } {unsaved_changes} unsaved change{
+                    's' if unsaved_changes >= 2 else ''
+                } in {
+                    self._world.world_wrapper.world_name
+                }. Would you like to save?""",
                 style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT,
             )
             response = msg.ShowModal()
             if response == wx.ID_YES:
                 self._canvas.save()
+                return True
+            elif response == wx.ID_NO:
+                return True
             elif response == wx.ID_CANCEL:
-                return
-        self.GetGrandParent().GetParent().close_world(self._world.world_path)
+                log.info(f"""Aborting closing world {
+                    self._world.world_wrapper.world_name
+                } because the user pressed cancel.""")
+                return False
+        return True
 
     def menu(self, menu: MenuData) -> MenuData:
         menu.setdefault("&File", {}).setdefault("system", {}).setdefault(

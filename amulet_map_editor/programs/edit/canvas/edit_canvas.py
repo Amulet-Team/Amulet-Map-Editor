@@ -16,6 +16,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     RedoEvent,
     CreateUndoEvent,
     SaveEvent,
+    EditCloseEvent,
 )
 from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
@@ -143,4 +144,4 @@ class EditCanvas(ControllableEditCanvas):
         self.enable_threads()
 
     def close(self):
-        pass
+        wx.PostEvent(self, EditCloseEvent())

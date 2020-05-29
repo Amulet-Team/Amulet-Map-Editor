@@ -1,7 +1,7 @@
 import wx
 from wx.lib.agw import flatnotebook
 import os
-from typing import Dict
+from typing import Dict, Union
 import webbrowser
 
 from amulet.api.errors import LoaderNoneMatched
@@ -10,8 +10,10 @@ from amulet_map_editor import lang, version, log, IMG_DIR
 from amulet_map_editor.programs import WorldManagerUI
 from amulet_map_editor.programs import BaseWorldUI
 
-NOTEBOOK_MENU_STYLE =  flatnotebook.FNB_NO_X_BUTTON | flatnotebook.FNB_HIDE_ON_SINGLE_TAB | flatnotebook.FNB_NAV_BUTTONS_WHEN_NEEDED
+NOTEBOOK_MENU_STYLE = flatnotebook.FNB_NO_X_BUTTON | flatnotebook.FNB_HIDE_ON_SINGLE_TAB | flatnotebook.FNB_NAV_BUTTONS_WHEN_NEEDED
 NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
+
+CLOSEABLE_PAGE_TYPE = Union[WorldManagerUI]
 
 
 class AmuletMainWindow(wx.Frame):
@@ -38,7 +40,7 @@ class AmuletMainWindow(wx.Frame):
         icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.path.dirname(__file__), 'img', 'icon64.png'), wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
 
-        self._open_worlds: Dict[str, BaseWorldUI] = {}
+        self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}
 
         self.world_tab_holder = flatnotebook.FlatNotebook(
             self,
@@ -118,7 +120,6 @@ class AmuletMainWindow(wx.Frame):
             self._last_page.enable()
 
     def _add_world_tab(self, obj, obj_name):
-        # TODO: find a way for the tab to be optionally closeable
         self.world_tab_holder.AddPage(obj, obj_name, True)
         self._disable_enable()
 
@@ -135,7 +136,7 @@ class AmuletMainWindow(wx.Frame):
             self._disable_enable()
         else:
             try:
-                world = WorldManagerUI(self.world_tab_holder, path)
+                world = WorldManagerUI(self.world_tab_holder, path, lambda: self.close_world(path))
             except LoaderNoneMatched as e:
                 log.error(e)
                 wx.MessageBox(str(e))
@@ -152,20 +153,24 @@ class AmuletMainWindow(wx.Frame):
             )
 
     def _on_page_close(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
-        page: WorldManagerUI = self.world_tab_holder.GetCurrentPage()
-        path = page.path
-        page.disable()
-        page.close()
-        self._last_page = None
-        del self._open_worlds[path]
-
+        page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetCurrentPage()
+        if page.is_closeable():
+            path = page.path
+            page.disable()
+            page.close()
+            self._last_page = None
+            del self._open_worlds[path]
+        else:
+            evt.Veto()
 
     def _on_close_app(self, evt):
         close = True
-        for path, world in list(self._open_worlds.items()):
-            if world.is_closeable():
+        for path, page in list(self._open_worlds.items()):
+            page: CLOSEABLE_PAGE_TYPE
+            if page.is_closeable():
                 self.close_world(path)
             else:
+                log.info(f"{page.world_name} cannot be closed.")
                 close = False
         if close:
             evt.Skip()

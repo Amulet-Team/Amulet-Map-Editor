@@ -1,7 +1,7 @@
 import wx
 from concurrent.futures import ThreadPoolExecutor
 import webbrowser
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 from amulet import world_interface
 from amulet.api.world import World
@@ -20,12 +20,13 @@ work_count = 0
 
 
 class ConvertExtension(SimplePanel, BaseWorldProgram):
-    def __init__(self, container, world: World):
+    def __init__(self, container, world: World, close_self_callback: Callable[[], None]):
         SimplePanel.__init__(
             self,
             container
         )
         self.world = world
+        self._close_self_callback = close_self_callback
 
         self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
         self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
@@ -160,4 +161,4 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
         return work_count == 0
 
     def _close_world(self, evt):
-        self.GetGrandParent().GetParent().close_world(self.world.world_path)
+        self._close_self_callback()
