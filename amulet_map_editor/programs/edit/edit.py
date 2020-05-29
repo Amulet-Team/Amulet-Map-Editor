@@ -52,7 +52,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
     def _on_close(self, evt: EVT_EDIT_CLOSE):
         if self.is_closeable():
             self._close_self_callback()
-        evt.Skip()
 
     def close(self):
         """Fully close the UI. Called when destroying the UI."""
