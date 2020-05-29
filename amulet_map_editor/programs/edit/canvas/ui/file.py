@@ -62,10 +62,19 @@ class FilePanel(wx.BoxSizer, BaseUI):
         self._save_button.SetLabel(f"Save | {self.canvas.world.chunk_history_manager.unsaved_changes}")
 
     def _on_dimension_change(self, evt):
+        """Run when the dimension selection is changed by the user."""
         dimension = self._dim_options.GetAny()
         if dimension is not None:
             self.canvas.dimension = dimension
         evt.Skip()
+
+    def _change_dimension(self, evt):
+        """Run when the dimension attribute in the canvas is changed.
+        This is run when the user changes the attribute and when it is changed manually in code."""
+        dimension = evt.dimension
+        index = self._dim_options.FindString(dimension)
+        if not (index == wx.NOT_FOUND or index == self._dim_options.GetSelection()):
+            self._dim_options.SetSelection(index)
 
     def _on_camera_move(self, evt):
         x, y, z = evt.location

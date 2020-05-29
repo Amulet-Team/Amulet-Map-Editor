@@ -8,6 +8,7 @@ import weakref
 import minecraft_model_reader
 import PyMCTranslate
 from amulet.api.block import BlockManager
+from amulet.api.data_types import Dimension
 
 from amulet_map_editor import log
 from .chunk import RenderChunk
@@ -139,7 +140,7 @@ class RenderWorld(ResourcePackManager, Drawable):
         self._world = world
         self._camera_location: CameraLocationType = (0, 150, 0)
         self._camera_rotation: CameraRotationType = (90, 0)
-        self._dimension = "overworld"
+        self._dimension: Dimension = "overworld"
         self._render_distance = 10
         self._garbage_distance = 20
         self._chunk_manager = ChunkManager(self.context_identifier, self.texture)
@@ -195,11 +196,11 @@ class RenderWorld(ResourcePackManager, Drawable):
         self._camera_rotation = value
 
     @property
-    def dimension(self) -> str:
+    def dimension(self) -> Dimension:
         return self._dimension
 
     @dimension.setter
-    def dimension(self, dimension: int):
+    def dimension(self, dimension: Dimension):
         self._chunk_generator.stop()
         self._dimension = dimension
         self.run_garbage_collector(True)

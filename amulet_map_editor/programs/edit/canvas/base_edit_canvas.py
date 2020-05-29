@@ -9,7 +9,7 @@ import minecraft_model_reader
 from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import PointCoordinatesNDArray
+from amulet.api.data_types import PointCoordinatesNDArray, Dimension
 from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
@@ -19,7 +19,11 @@ from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
-from amulet_map_editor.programs.edit.canvas.events import CameraMoveEvent, CameraRotateEvent
+from amulet_map_editor.programs.edit.canvas.events import (
+    CameraMoveEvent,
+    CameraRotateEvent,
+    DimensionChangeEvent,
+)
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -199,12 +203,13 @@ class BaseEditCanvas(BaseCanvas):
         self._select_mode = select_mode
 
     @property
-    def dimension(self) -> str:
+    def dimension(self) -> Dimension:
         return self._render_world.dimension
 
     @dimension.setter
-    def dimension(self, dimension: int):
+    def dimension(self, dimension: Dimension):
         self._render_world.dimension = dimension
+        wx.PostEvent(self, DimensionChangeEvent(dimension=dimension))
 
     @property
     def camera_location(self) -> CameraLocationType:
