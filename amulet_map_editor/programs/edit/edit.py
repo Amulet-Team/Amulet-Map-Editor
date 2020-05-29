@@ -19,6 +19,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
     def __init__(self, parent, world: "World", close_self_callback: Callable[[], None]):
         wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetBackgroundColour(tuple(int(v*255) for v in EditCanvas.background_colour))
         self.SetSizer(self._sizer)
         self._world = world
         self._canvas: Optional[EditCanvas] = None

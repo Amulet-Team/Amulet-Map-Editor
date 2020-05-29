@@ -36,8 +36,12 @@ MODE_STRUCTURE = 2  # MODE_DISABLED and draw structure if exists
 class BaseEditCanvas(BaseCanvas):
     """Adds base logic for drawing everything related to the edit program to the BaseCanvas.
     All the user interaction code is implemented in ControllableEditCanvas to make them easier to read."""
+
+    background_colour = (0.5, 0.66, 1.0)
+
     def __init__(self, parent: wx.Window, world: 'World'):
         super().__init__(parent)
+        glClearColor(*self.background_colour, 1.0)
         self.Hide()
         self._world = weakref.ref(world)
         self._mouse_delta_x = 0

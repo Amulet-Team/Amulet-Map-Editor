@@ -22,7 +22,6 @@ class BaseCanvas(glcanvas.GLCanvas):
         self._transformation_matrix: Optional[numpy.ndarray] = None
 
     def _setup_opengl(self):
-        glClearColor(0.5, 0.66, 1.0, 1.0)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glDepthFunc(GL_LEQUAL)
