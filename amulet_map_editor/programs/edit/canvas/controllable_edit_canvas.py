@@ -154,10 +154,10 @@ class ControllableEditCanvas(BaseEditCanvas):
 
     def move_camera_relative(self, forward, up, right, pitch, yaw):
         """Move the camera relative to its current location."""
-        if (forward, up, right, pitch, yaw) == (0, 0, 0, 0, 0):
+        if not any((forward, up, right, pitch, yaw)):
             if not self._mouse_lock and self._mouse_moved:
                 self._mouse_moved = False
-                self._change_box_location()
+                self._selection_moved = True
             return
         x, y, z = self.camera_location
         rx, ry = self.camera_rotation
@@ -181,7 +181,7 @@ class ControllableEditCanvas(BaseEditCanvas):
             self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
             self._mouse_delta_x = self._mouse_delta_y = self._last_mouse_x = self._last_mouse_y = 0
             self._mouse_lock = True
-            self._change_box_location()
+        self._selection_moved = True
 
     def _release_mouse(self):
         """Release the mouse"""

@@ -78,6 +78,7 @@ class BaseEditCanvas(BaseCanvas):
         self._select_distance2 = 10
         self._select_mode = MODE_NORMAL
 
+        self._selection_moved = True  # has the selection point moved and does the box need rebuilding
         self._selection_group = RenderSelectionGroup(
             self.context_identifier,
             self._texture_bounds,
@@ -183,7 +184,7 @@ class BaseEditCanvas(BaseCanvas):
     @select_distance.setter
     def select_distance(self, distance: int):
         self._select_distance = distance
-        self._change_box_location()
+        self._selection_moved = True
 
     @property
     def select_distance2(self) -> int:
@@ -192,7 +193,7 @@ class BaseEditCanvas(BaseCanvas):
     @select_distance2.setter
     def select_distance2(self, distance: int):
         self._select_distance2 = distance
-        self._change_box_location()
+        self._selection_moved = True
 
     @property
     def select_mode(self) -> int:
@@ -201,6 +202,7 @@ class BaseEditCanvas(BaseCanvas):
     @select_mode.setter
     def select_mode(self, select_mode: int):
         self._select_mode = select_mode
+        self._selection_moved = True
 
     @property
     def dimension(self) -> Dimension:
@@ -220,7 +222,7 @@ class BaseEditCanvas(BaseCanvas):
         assert len(location) == 3 and all(isinstance(v, (int, float)) for v in location), "format for camera_location is invalid"
         self._camera_location = location
         self._transformation_matrix = None
-        self._change_box_location()
+        self._selection_moved = True
         wx.PostEvent(self, CameraMoveEvent(location=self.camera_location))
 
     @property
@@ -232,7 +234,7 @@ class BaseEditCanvas(BaseCanvas):
         assert len(rotation) == 2 and all(isinstance(v, (int, float)) for v in rotation), "format for camera_rotation is invalid"
         self._camera_rotation = rotation
         self._transformation_matrix = None
-        self._change_box_location()
+        self._selection_moved = True
         wx.PostEvent(self, CameraRotateEvent(rotation=self.camera_rotation))
 
     @property
@@ -262,16 +264,6 @@ class BaseEditCanvas(BaseCanvas):
             position, box_index = self._box_location_closest()
 
         self._selection_group.update_position(position, box_index)
-
-        # if self._selection_box.select_state == 0:
-        #     (x, y, z) = self._selection_box.point1 = self._selection_box.point2 = location
-        #     wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
-        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
-        # elif self._selection_box.select_state == 1:
-        #     (x, y, z) = self._selection_box.point2 = location
-        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
-        # elif self._selection_box.select_state == 2:
-        #     self._selection_box2.point1 = self._selection_box2.point2 = location
 
     def ray_collision(self):
         vector_start = self.camera_location
@@ -406,6 +398,9 @@ class BaseEditCanvas(BaseCanvas):
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
+        if self._selection_moved:
+            self._selection_moved = False
+            self._change_box_location()
         self._selection_group.draw(self.transformation_matrix, tuple(self.camera_location), self._select_mode == MODE_NORMAL)
         self.SwapBuffers()
 
