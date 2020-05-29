@@ -7,12 +7,12 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
-class SelectOptions(wx.Panel, BaseToolUI):
+class SelectOptions(wx.BoxSizer, BaseToolUI):
     def __init__(self, canvas: 'EditCanvas'):
-        wx.Panel.__init__(self, canvas)
+        wx.BoxSizer.__init__(self, wx.VERTICAL)
         BaseToolUI.__init__(self, canvas)
-        self._sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(self._sizer)
+
+        self.Add(wx.Panel(canvas))
 
         # self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
         # self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
@@ -53,7 +53,7 @@ class SelectOptions(wx.Panel, BaseToolUI):
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._sizer.Add(sizer, 0, 0)
+        self.Add(sizer, 0, 0)
         name_text = wx.StaticText(self, label=label)
         sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
         obj = wx_object(self, **kwargs)
