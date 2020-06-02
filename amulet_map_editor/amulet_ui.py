@@ -155,14 +155,15 @@ class AmuletMainWindow(wx.Frame):
 
     def _on_page_close(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
         page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetCurrentPage()
-        if page.is_closeable():
-            path = page.path
-            page.disable()
-            page.close()
-            self._last_page = None
-            del self._open_worlds[path]
-        else:
-            evt.Veto()
+        if page is not self._main_menu:
+            if page.is_closeable():
+                path = page.path
+                page.disable()
+                page.close()
+                self._last_page = None
+                del self._open_worlds[path]
+            else:
+                evt.Veto()
 
     def _on_close_app(self, evt):
         close = True
