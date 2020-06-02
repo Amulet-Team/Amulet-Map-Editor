@@ -15,18 +15,6 @@ if TYPE_CHECKING:
 FixedOperationType = Callable[["World", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType]
 
 
-class OperationError(Exception):
-    """Error to raise if something went wrong when running the operation.
-    Eg. if the operation requires something it is not given"""
-    pass
-
-
-class OperationSuccessful(Exception):
-    """raise this if you want to exit the operation without creating an undo point.
-    Any changes to the world since the last undo point will be reverted."""
-    pass
-
-
 class FixedFunctionUI(wx.Panel, OperationUI):
     def __init__(
             self,

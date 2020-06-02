@@ -2,14 +2,16 @@ import wx
 from typing import TYPE_CHECKING, Callable, Any
 from types import GeneratorType
 import time
+import traceback
 
 from amulet.api.data_types import OperationReturnType
 
-from amulet_map_editor import CONFIG
+from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs.edit.edit import EDIT_CONFIG_ID
 from amulet_map_editor.programs.edit.key_config import DefaultKeys, DefaultKeybindGroupId, PresetKeybinds
 from amulet_map_editor.programs.edit.canvas.ui.goto import show_goto
 from amulet_map_editor.programs.edit.canvas.ui.tool import Tool
+from amulet_map_editor.programs.edit.plugins import OperationError, OperationSuccessful, OperationSilentAbort
 
 from amulet_map_editor.programs.edit.canvas.events import (
     UndoEvent,
@@ -90,7 +92,7 @@ class EditCanvas(ControllableEditCanvas):
         tool_sizer = Tool(self)
         canvas_sizer.Add(tool_sizer, 1, wx.EXPAND, 0)
 
-    def run_operation(self, operation: Callable[[], None], title="", msg="") -> Any:
+    def run_operation(self, operation: Callable[[], None], title="", msg="", create_backup=True) -> Any:
         self.disable_threads()
         try:
             out = show_loading_dialog(
@@ -99,9 +101,26 @@ class EditCanvas(ControllableEditCanvas):
                 msg,
                 self,
             )
-            self.world.create_undo_point()
-            wx.PostEvent(self, CreateUndoEvent())
+            if create_backup:
+                self.world.create_undo_point()
+                wx.PostEvent(self, CreateUndoEvent())
+        except OperationError as e:
+            msg = f"Error running operation: {e}"
+            log.info(msg)
+            wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
+            self.enable_threads()
+            raise e
+        except OperationSuccessful as e:
+            msg = str(e)
+            log.info(msg)
+            wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
+            self.enable_threads()
+            raise e
+        except OperationSilentAbort as e:
+            self.enable_threads()
+            raise e
         except Exception as e:
+            log.error(traceback.format_exc())
             self.enable_threads()
             raise e
         self.enable_threads()
