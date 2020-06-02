@@ -99,7 +99,7 @@ class EditCanvas(ControllableEditCanvas):
                 msg,
                 self,
             )
-            self._world.create_undo_point()
+            self.world.create_undo_point()
             wx.PostEvent(self, CreateUndoEvent())
         except Exception as e:
             self.enable_threads()
@@ -136,7 +136,7 @@ class EditCanvas(ControllableEditCanvas):
         self.disable_threads()
 
         def save():
-            for chunk_index, chunk_count in self._world.save_iter():
+            for chunk_index, chunk_count in self.world.save_iter():
                 yield chunk_index / chunk_count
 
         show_loading_dialog(lambda: save(), f"Saving world.", "Please wait.", self)
