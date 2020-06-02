@@ -1,6 +1,8 @@
 import wx
 from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
 
+from amulet_map_editor.amulet_wx.validators import IntValidator, FloatValidator
+
 from amulet.api.data_types import OperationType
 from .operation_ui import OperationUI
 
@@ -119,6 +121,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
                 )
             else:
                 return  # should not get here
+            option.SetValidator(IntValidator())
             sizer.Add(option)
             self._options[option_name] = option
 
@@ -147,7 +150,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
                     initial=options[0],
                 )
             else:
-                return # should not get here
+                return  # should not get here
             sizer.Add(option)
             self._options[option_name] = option
 
