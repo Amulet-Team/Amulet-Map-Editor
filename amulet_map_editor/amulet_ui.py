@@ -127,6 +127,7 @@ class AmuletMainWindow(wx.Frame):
     def _show_open_world(self):
         select_world = WorldSelectDialog(self, self._open_world)
         select_world.ShowModal()
+        select_world.Destroy()
 
     def _open_world(self, path: str):
         """Open a world panel add add it to the notebook"""
@@ -242,6 +243,7 @@ class AmuletMainMenu(wx.Panel, BaseWorldUI):
     def _show_world_select(self, evt):
         select_world = WorldSelectDialog(self, self._open_world_callback)
         select_world.ShowModal()
+        select_world.Destroy()
 
     def _documentation(self, evt):
         webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/readme.md')

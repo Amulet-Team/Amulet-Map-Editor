@@ -95,6 +95,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
     def _show_world_select(self, evt):
         select_world = WorldSelectDialog(self, self._output_world_callback)
         select_world.ShowModal()
+        select_world.Destroy()
 
     def _output_world_callback(self, path):
         if path == self.world.world_path:
