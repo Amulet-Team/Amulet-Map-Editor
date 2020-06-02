@@ -1,14 +1,18 @@
 import wx
 from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
 
-from amulet_map_editor.amulet_wx.validators import IntValidator, FloatValidator
+from amulet_map_editor.amulet_wx.validators import IntValidator
 
-from amulet.api.data_types import OperationType
+from amulet.api.data_types import OperationReturnType
 from .operation_ui import OperationUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
     from amulet.api.world import World
+    from amulet.api.data_types import Dimension
+    from amulet.api.selection import SelectionGroup
+
+FixedOperationType = Callable[["World", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType]
 
 
 class OperationError(Exception):
@@ -30,7 +34,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
             canvas: "EditCanvas",
             world: "World",
             options_path: str,
-            operation: OperationType,
+            operation: FixedOperationType,
             options: Dict[str, Any]
     ):
         wx.Panel.__init__(self, parent)
@@ -46,7 +50,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
-        self._options = {}
+        self._options: Dict[str, wx.Window] = {}
         self._create_options(options)
 
         self.Layout()
@@ -63,7 +67,8 @@ class FixedFunctionUI(wx.Panel, OperationUI):
             "float": self._create_float,
             "str": self._create_string,
             "str_choice": self._create_str_choice,
-            "file": self._create_file_picker,
+            "file_open": self._create_file_open_picker,
+            "file_save": self._create_file_save_picker,
             "directory": self._create_directory_picker
         }
         for option_name, option in options.items():
@@ -81,7 +86,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
     def _create_horizontal_options_sizer(self, label) -> wx.BoxSizer:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         label = wx.StaticText(self, label=label)
-        sizer.Add(label, 0, wx.RIGHT, 5)
+        sizer.Add(label, 0, wx.RIGHT | wx.ALIGN_CENTER_VERTICAL, 5)
         self._options_sizer.Add(sizer, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         return sizer
 
@@ -169,14 +174,24 @@ class FixedFunctionUI(wx.Panel, OperationUI):
             return
         sizer = self._create_horizontal_options_sizer(option_name)
         option = wx.Choice(self, choices=options)
+        option.SetSelection(0)
         sizer.Add(option)
         self._options[option_name] = option
 
-    def _create_file_picker(self, option_name: str, options: Sequence):
+    def _create_file_save_picker(self, option_name: str, options: Sequence):
         sizer = self._create_horizontal_options_sizer(option_name)
         option = wx.FilePickerCtrl(
             self,
-            style=wx.FLP_SAVE
+            style=wx.FLP_SAVE | wx.FLP_USE_TEXTCTRL
+        )
+        sizer.Add(option)
+        self._options[option_name] = option
+
+    def _create_file_open_picker(self, option_name: str, options: Sequence):
+        sizer = self._create_horizontal_options_sizer(option_name)
+        option = wx.FilePickerCtrl(
+            self,
+            style=wx.FLP_OPEN | wx.FLP_USE_TEXTCTRL
         )
         sizer.Add(option)
         self._options[option_name] = option
@@ -185,17 +200,37 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         sizer = self._create_horizontal_options_sizer(option_name)
         option = wx.DirPickerCtrl(
             self,
-            style=0
+            style=wx.DIRP_USE_TEXTCTRL
         )
         sizer.Add(option)
         self._options[option_name] = option
 
-    def _get_values(self):
-        return {}  # TODO
+    def _get_values(self) -> Dict[str, Any]:
+        options = {}
+        for key, window in self._options.items():
+            if isinstance(
+                    window,
+                    (
+                        wx.CheckBox,
+                        wx.SpinCtrl,
+                        wx.SpinCtrlDouble,
+                        wx.TextCtrl,
+
+                    )
+            ):
+                options[key] = window.GetValue()
+            elif isinstance(window, wx.Choice):
+                options[key] = window.GetString(window.GetSelection())
+            elif isinstance(window, (wx.FilePickerCtrl, wx.DirPickerCtrl)):
+                options[key] = window.GetPath()
+        return options
 
     def _run_operation(self, evt):
-        return
-        # self.canvas.run_operation(
-        #
-        # )
-        # self._operation(self.world, self.canvas.dimension, self._get_values())
+        self.canvas.run_operation(
+            lambda: self._operation(
+                self.world,
+                self.canvas.dimension,
+                self.canvas.selection_group,
+                self._get_values()
+            )
+        )

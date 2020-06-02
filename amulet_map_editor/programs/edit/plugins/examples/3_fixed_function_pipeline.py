@@ -35,7 +35,8 @@ operation_options = {  # options is a dictionary where the key is the descriptio
     "Text choice": ["str_choice", "choice 1", "choice 2", "choice 3"],
 
     # OS examples
-    "File picker": ["file"],  # UI to pick a file
+    "File Open picker": ["file_open"],  # UI to pick an existing file
+    "File Save picker": ["file_save"],  # UI to pick a file to save to
     "Folder picker": ["directory"]  # UI to pick a directory
 }
 
