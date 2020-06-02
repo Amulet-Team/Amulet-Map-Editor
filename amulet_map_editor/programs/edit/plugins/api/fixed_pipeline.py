@@ -35,6 +35,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         OperationUI.__init__(self, parent, canvas, world, options_path)
         self._operation = operation
 
+        self.Hide()
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
         self._options_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -46,11 +47,8 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         self._options = {}
         self._create_options(options)
 
-        self.Fit()
         self.Layout()
-        self.GetParent().Fit()
-        self.GetParent().Layout()
-        self.GetTopLevelParent().Fit()
+        self.Show()
 
     def unload(self):
         pass

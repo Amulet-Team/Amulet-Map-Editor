@@ -18,11 +18,9 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         self._operation_choice = SimpleChoiceAny(self.canvas)
         self._operation_choice.SetItems({key: value.name for key, value in self._operations.items()})
         self._operation_choice.Bind(wx.EVT_CHOICE, self._on_operation_change)
-        self.AddStretchSpacer(1)
         self.Add(self._operation_choice)
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
         self.Add(self._operation_sizer)
-        self.AddStretchSpacer(1)
 
         self._operation_change()
 
@@ -47,3 +45,4 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
                 self._operation_sizer.GetItem(self._active_operation).DeleteWindows()
             self._active_operation = operation(self.canvas, self.canvas, self.canvas.world)
             self._operation_sizer.Add(self._active_operation, 1, wx.EXPAND)
+            self.Layout()
