@@ -78,12 +78,12 @@ class OperationLoader:
                 raise OperationLoadException('"operation" in export must be a dictionary if defined.')
             self._ui = lambda parent, canvas, world: FixedFunctionUI(parent, canvas, world, options_path, operation, options)
         elif mode == "dynamic":
-            operation: Type[OperationUI] = export_dict.get("operation", None)
-            if not issubclass(operation, OperationUI):
+            operation_ui: Type[OperationUI] = export_dict.get("operation", None)
+            if not issubclass(operation_ui, OperationUI):
                 raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
-            if not issubclass(operation, (wx.Window, wx.Sizer)):
+            if not issubclass(operation_ui, (wx.Window, wx.Sizer)):
                 raise OperationLoadException('"operation" must be a subclass of wx.Window or wx.Sizer.')
-            self._ui = lambda parent, canvas, world: operation(parent, canvas, world, options_path)
+            self._ui = lambda parent, canvas, world: operation_ui(parent, canvas, world, options_path)
         else:
             raise OperationLoadException('"mode" in export must be either "fixed" or "dynamic".')
 
