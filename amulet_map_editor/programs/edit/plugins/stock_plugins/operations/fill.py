@@ -2,56 +2,70 @@ from typing import TYPE_CHECKING
 import wx
 
 from amulet.operations.fill import fill
-from amulet.api.selection import SelectionGroup
-from amulet.api.block import Block
-from amulet.api.data_types import Dimension
 from amulet_map_editor.amulet_wx.block_select import BlockDefine
-from amulet_map_editor.amulet_wx.simple import SimpleDialog
+from amulet_map_editor.programs.edit.plugins import OperationUI
 
 if TYPE_CHECKING:
     from amulet.api.world import World
+    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
-def fill_(
-    world: "World",
-    dimension: Dimension,
-    selection: SelectionGroup,
-    options: dict
-):
-    if isinstance(options.get('fill_block'), Block):
-        yield from fill(world, dimension, selection, options)
-    else:
-        raise Exception('Please specify a block before running the fill operation')
+class Fill(wx.Panel, OperationUI):
+    def __init__(
+            self,
+            parent: wx.Window,
+            canvas: "EditCanvas",
+            world: "World",
+            options_path: str
+    ):
+        wx.Panel.__init__(self, parent)
+        OperationUI.__init__(self, parent, canvas, world, options_path)
 
+        self._sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self._sizer)
 
-def show_ui(parent, world: "World", options: dict) -> dict:
-    dialog = SimpleDialog(parent, 'Fill')
-    block_define = BlockDefine(
-        dialog,
-        world.world_wrapper.translation_manager,
-        *(options.get("fill_block_options", []) or [world.world_wrapper.platform])
-    )
-    dialog.sizer.Add(block_define, 1)
-    dialog.Fit()
-    if dialog.ShowModal() == wx.ID_OK:
-        options = {
-            "fill_block": world.world_wrapper.translation_manager.get_version(
-                block_define.platform,
-                block_define.version
-            ).block.to_universal(
-                block_define.block,
-                force_blockstate=block_define.force_blockstate
-            )[0],
-            "fill_block_options": block_define.options
-        }
-    return options
+        options = self._load_options({})
+
+        self._block_define = BlockDefine(
+            self,
+            world.world_wrapper.translation_manager,
+            *(options.get("fill_block_options", []) or [world.world_wrapper.platform])
+        )
+        self._sizer.Add(self._block_define, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+
+        self._run_button = wx.Button(self, label="Run Operation")
+        self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
+        self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+
+        self.Layout()
+
+    def _get_fill_block(self):
+        return self.world.world_wrapper.translation_manager.get_version(
+            self._block_define.platform,
+            self._block_define.version
+        ).block.to_universal(
+            self._block_define.block,
+            force_blockstate=self._block_define.force_blockstate
+        )[0]
+
+    def unload(self):
+        self._save_options({
+            "fill_block": self._get_fill_block(),
+            "fill_block_options": self._block_define.options
+        })
+
+    def _run_operation(self, _):
+        self.canvas.run_operation(
+            lambda: fill(
+                self.world,
+                self.canvas.dimension,
+                self.canvas.selection_group,
+                self._get_fill_block()
+            )
+        )
 
 
 export = {
-    "v": 1,  # a version 1 plugin
     "name": "Fill",  # the name of the plugin
-    "features": ["src_selection", "wxoptions"],
-    "inputs": ["src_selection", "options"],  # the inputs to give to the plugin
-    "operation": fill_,  # the actual function to call when running the plugin
-    "wxoptions": show_ui
+    "operation": Fill,  # the actual function to call when running the plugin
 }
