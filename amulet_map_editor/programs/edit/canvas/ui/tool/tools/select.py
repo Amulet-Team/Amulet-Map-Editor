@@ -49,7 +49,9 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
 
     def enable(self):
         self.canvas.select_mode = 0
-        self.Show()
+
+    def disable(self):
+        pass
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)

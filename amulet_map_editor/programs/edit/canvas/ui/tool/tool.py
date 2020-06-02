@@ -57,6 +57,7 @@ class Tool(wx.BoxSizer, BaseUI):
     def _enable_tool(self, tool: str):
         if tool in self._tools:
             if self._active_tool is not None:
+                self._active_tool.disable()
                 if isinstance(self._active_tool, wx.Window):
                     self._active_tool.Hide()
                 elif isinstance(self._active_tool, wx.Sizer):
@@ -66,6 +67,7 @@ class Tool(wx.BoxSizer, BaseUI):
                 self._active_tool.Show()
             elif isinstance(self._active_tool, wx.Sizer):
                 self._active_tool.ShowItems(show=True)
+            self._active_tool.enable()
             self.canvas.Layout()
 
 

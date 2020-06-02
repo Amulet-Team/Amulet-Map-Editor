@@ -22,7 +22,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
         self.Add(self._operation_sizer)
 
-        self._operation_change()
+        # self._operation_change()
 
     @property
     def _operations(self) -> OperationStorageType:
@@ -36,13 +36,26 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         self._operation_change()
         evt.Skip()
 
+    def _unload_active_operation(self):
+        if self._active_operation is not None:
+            self._active_operation.unload()
+            if isinstance(self._active_operation, wx.Window):
+                self._active_operation.Destroy()
+            elif isinstance(self._active_operation, wx.Sizer):
+                self._operation_sizer.GetItem(self._active_operation).DeleteWindows()
+            self._active_operation = None
+
     def _operation_change(self):
         operation_path = self._operation_choice.GetAny()
         if operation_path:
             operation = self._operations[operation_path]
-            if self._active_operation is not None:
-                self._active_operation.unload()
-                self._operation_sizer.GetItem(self._active_operation).DeleteWindows()
+            self.disable()
             self._active_operation = operation(self.canvas, self.canvas, self.canvas.world)
             self._operation_sizer.Add(self._active_operation, 1, wx.EXPAND)
             self.Layout()
+
+    def enable(self):
+        self._operation_change()
+
+    def disable(self):
+        self._unload_active_operation()
