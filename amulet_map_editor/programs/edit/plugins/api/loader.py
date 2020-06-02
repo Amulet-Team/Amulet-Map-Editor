@@ -63,29 +63,28 @@ class OperationLoader:
             )
         )
 
-        mode = export_dict.get("mode", "fixed")
-        if not isinstance(mode, str):
-            raise OperationLoadException('"name" in export is not a string.')
+        if "operation" in export_dict:
+            if issubclass(export_dict["operation"], (wx.Window, wx.Sizer)):
+                operation_ui: Type[OperationUI] = export_dict.get("operation", None)
+                if not issubclass(operation_ui, OperationUI):
+                    raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
+                self._ui = lambda parent, canvas, world: operation_ui(parent, canvas, world, options_path)
 
-        if mode == "fixed":
-            operation = export_dict.get("operation", None)
-            if not callable(operation):
-                raise OperationLoadException('"operation" in export must be callable.')
-            if operation.__code__.co_argcount != 4:
-                raise OperationLoadException('"operation" function in export must have 4 inputs.')
-            options = export_dict.get("options", {})
-            if not isinstance(options, dict):
-                raise OperationLoadException('"operation" in export must be a dictionary if defined.')
-            self._ui = lambda parent, canvas, world: FixedFunctionUI(parent, canvas, world, options_path, operation, options)
-        elif mode == "dynamic":
-            operation_ui: Type[OperationUI] = export_dict.get("operation", None)
-            if not issubclass(operation_ui, OperationUI):
-                raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
-            if not issubclass(operation_ui, (wx.Window, wx.Sizer)):
-                raise OperationLoadException('"operation" must be a subclass of wx.Window or wx.Sizer.')
-            self._ui = lambda parent, canvas, world: operation_ui(parent, canvas, world, options_path)
+            elif callable(export_dict["operation"]):
+                operation = export_dict.get("operation", None)
+                if not callable(operation):
+                    raise OperationLoadException('"operation" in export must be callable.')
+                if operation.__code__.co_argcount != 4:
+                    raise OperationLoadException('"operation" function in export must have 4 inputs.')
+                options = export_dict.get("options", {})
+                if not isinstance(options, dict):
+                    raise OperationLoadException('"operation" in export must be a dictionary if defined.')
+                self._ui = lambda parent, canvas, world: FixedFunctionUI(parent, canvas, world, options_path, operation, options)
+
+            else:
+                raise OperationLoadException('"operation" in export must be a callable, or a subclass of wx.Window or wx.Sizer.')
         else:
-            raise OperationLoadException('"mode" in export must be either "fixed" or "dynamic".')
+            raise OperationLoadException('"operation" is not present in export.')
 
     @property
     def name(self) -> str:

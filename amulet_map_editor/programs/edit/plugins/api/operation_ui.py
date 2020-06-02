@@ -46,6 +46,6 @@ class OperationUI:
 
     def _save_options(self, options: Any):
         """Save the given options to disk so that they persist in the next session."""
-        os.makedirs(os.path.basename(self._options_path), exist_ok=True)
+        os.makedirs(os.path.dirname(self._options_path), exist_ok=True)
         with open(self._options_path, "wb") as f:
             return pickle.dump(options, f)
