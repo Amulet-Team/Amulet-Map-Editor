@@ -6,6 +6,7 @@ from typing import Dict, List, TYPE_CHECKING, Callable, Optional, Type
 import wx
 import struct
 import hashlib
+import inspect
 
 from .fixed_pipeline import FixedFunctionUI
 from .operation_ui import OperationUI, OperationUIType
@@ -64,7 +65,7 @@ class OperationLoader:
         )
 
         if "operation" in export_dict:
-            if issubclass(export_dict["operation"], (wx.Window, wx.Sizer)):
+            if inspect.isclass(export_dict["operation"]) and issubclass(export_dict["operation"], (wx.Window, wx.Sizer)):
                 operation_ui: Type[OperationUI] = export_dict.get("operation", None)
                 if not issubclass(operation_ui, OperationUI):
                     raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
