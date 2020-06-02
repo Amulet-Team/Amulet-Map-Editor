@@ -1,4 +1,5 @@
 import wx
+import wx.lib.inspection
 from wx.lib.agw import flatnotebook
 import os
 from typing import Dict, Union
@@ -210,6 +211,7 @@ class AmuletMainMenu(wx.Panel, BaseWorldUI):
             (0, 0),
             (64, 64)
         )
+        icon2.Bind(wx.EVT_LEFT_DOWN, lambda evt: wx.lib.inspection.InspectionTool().Show())
         name_sizer.Add(icon, flag=wx.CENTER)
 
         amulet_converter = wx.StaticText(self, label='Amulet')
