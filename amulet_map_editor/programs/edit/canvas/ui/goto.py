@@ -1,6 +1,6 @@
 from typing import Optional, Tuple
 import wx
-from amulet_map_editor.amulet_wx.simple import SimpleDialog
+from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
 
 
 def show_goto(parent, x: float, y: float, z: float) -> Optional[Tuple[float, float, float]]:

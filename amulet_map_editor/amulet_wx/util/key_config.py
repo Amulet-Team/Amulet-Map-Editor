@@ -1,5 +1,5 @@
 import wx
-from amulet_map_editor.amulet_wx.simple import SimpleDialog, SimpleScrollablePanel, SimpleChoice
+from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog, SimpleScrollablePanel, SimpleChoice
 from typing import Dict, Tuple, Optional, Union, Sequence
 
 from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, EDIT_ICON

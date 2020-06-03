@@ -1,4 +1,4 @@
-from amulet_map_editor.amulet_wx.simple import SimpleChoice, SimpleChoiceAny
+from amulet_map_editor.amulet_wx.ui.simple import SimpleChoice, SimpleChoiceAny
 import wx
 import PyMCTranslate
 import amulet_nbt

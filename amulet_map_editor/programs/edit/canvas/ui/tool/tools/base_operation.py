@@ -1,7 +1,7 @@
 import wx
 from typing import TYPE_CHECKING, Optional
 
-from amulet_map_editor.amulet_wx.simple import SimpleChoiceAny
+from amulet_map_editor.amulet_wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.programs.edit.plugins import OperationUIType, OperationStorageType
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 

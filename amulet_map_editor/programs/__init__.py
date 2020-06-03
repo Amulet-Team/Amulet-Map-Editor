@@ -9,7 +9,7 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet import world_interface
 
 from amulet_map_editor import log
-from amulet_map_editor.amulet_wx.simple import SimplePanel
+from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 from amulet_map_editor.amulet_wx.ui.select_world import WorldUI
 
 if TYPE_CHECKING:

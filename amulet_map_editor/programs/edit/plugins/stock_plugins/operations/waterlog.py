@@ -6,7 +6,7 @@ from amulet.api.selection import SelectionGroup
 from amulet.api.block import Block
 from amulet.api.data_types import Dimension
 from amulet_map_editor.amulet_wx.ui.select_block import BlockDefine
-from amulet_map_editor.amulet_wx.simple import SimpleDialog
+from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
 
 if TYPE_CHECKING:
     from amulet.api.world import World

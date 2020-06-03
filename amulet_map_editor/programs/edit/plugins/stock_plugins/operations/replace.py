@@ -5,7 +5,7 @@ import numpy
 from amulet.api.block import Block
 from amulet_map_editor.amulet_wx.ui.select_block import BlockDefine
 from amulet_map_editor.programs.edit.plugins import OperationUI
-from amulet_map_editor.amulet_wx.simple import SimpleScrollablePanel
+from amulet_map_editor.amulet_wx.ui.simple import SimpleScrollablePanel
 
 if TYPE_CHECKING:
     from amulet.api.world import World

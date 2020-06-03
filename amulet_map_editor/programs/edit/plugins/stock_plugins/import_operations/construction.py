@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import wx
 
 import os
-from amulet_map_editor.amulet_wx.simple import SimpleDialog
+from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
 from amulet.api.block import BlockManager
 from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension

@@ -7,7 +7,7 @@ from amulet import world_interface
 from amulet.api.world import World
 
 from amulet_map_editor import lang, log
-from amulet_map_editor.amulet_wx.simple import SimplePanel
+from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 

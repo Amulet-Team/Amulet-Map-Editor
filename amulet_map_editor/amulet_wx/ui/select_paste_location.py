@@ -3,7 +3,7 @@ import numpy
 from typing import Optional, List, Callable, Type, Any
 
 from amulet.api.structure import Structure
-from amulet_map_editor.amulet_wx.simple import SimplePanel
+from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 from amulet_map_editor.amulet_wx.util.validators import IntValidator
 
 
