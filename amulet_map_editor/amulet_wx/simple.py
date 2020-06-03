@@ -48,6 +48,7 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
 
 
 class SimpleChoice(wx.Choice):
+    """A wrapper for wx.Choice that sets up the UI for you."""
     def __init__(self, parent: wx.Window, choices: Sequence[str] = (), default: Optional[str] = None):
         super().__init__(
             parent,
@@ -67,6 +68,7 @@ StringableType = Any
 
 
 class SimpleChoiceAny(wx.Choice):
+    """An extension for wx.Choice that enables showing and returning objects that are not strings."""
     def __init__(self, parent: wx.Window, sort=True, reverse=False):
         super().__init__(
             parent
@@ -119,6 +121,7 @@ class SimpleChoiceAny(wx.Choice):
 
 
 class SimpleDialog(wx.Dialog):
+    """A dialog with ok and cancel buttons set up."""
     def __init__(self, parent: wx.Window, title, sizer_dir=wx.VERTICAL):
         wx.Dialog.__init__(
             self,
