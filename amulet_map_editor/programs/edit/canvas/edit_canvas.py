@@ -92,8 +92,16 @@ class EditCanvas(ControllableEditCanvas):
         tool_sizer = Tool(self)
         canvas_sizer.Add(tool_sizer, 1, wx.EXPAND, 0)
 
-    def run_operation(self, operation: Callable[[], OperationReturnType], title="", msg="", create_backup=True) -> Any:
+    def run_operation(
+            self,
+            operation: Callable[[], OperationReturnType],
+            title="",
+            msg="",
+            throw_exceptions=False
+    ) -> Any:
         self.disable_threads()
+        err = None
+        out = None
         try:
             out = show_loading_dialog(
                 operation,
@@ -101,29 +109,32 @@ class EditCanvas(ControllableEditCanvas):
                 msg,
                 self,
             )
-            if create_backup:
-                self.world.create_undo_point()
-                wx.PostEvent(self, CreateUndoEvent())
+            self.world.create_undo_point()
+            wx.PostEvent(self, CreateUndoEvent())
         except OperationError as e:
             msg = f"Error running operation: {e}"
             log.info(msg)
+            self.world.restore_last_undo_point()
             wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
-            self.enable_threads()
-            raise e
+            err = e
         except OperationSuccessful as e:
             msg = str(e)
             log.info(msg)
+            self.world.restore_last_undo_point()
             wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
-            self.enable_threads()
-            raise e
+            err = e
         except OperationSilentAbort as e:
-            self.enable_threads()
-            raise e
+            self.world.restore_last_undo_point()
+            err = e
         except Exception as e:
+            self.world.restore_last_undo_point()
             log.error(traceback.format_exc())
-            self.enable_threads()
-            raise e
+            wx.MessageDialog(self, f"Exception running operation: {e}\nSee the console for more details", style=wx.OK).ShowModal()
+            err = e
+
         self.enable_threads()
+        if err is not None and throw_exceptions:
+            raise err
         return out
 
     def undo(self):
