@@ -1,3 +1,6 @@
+"""A collection of classes for wx objects to abstract away
+the repeated code and make working with wx a bit more simple."""
+
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
@@ -31,6 +34,7 @@ class SimplePanel(wx.Panel, SimpleSizer):
 
 
 class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
+    """A scrolled panel that automatically sets itself up."""
     def __init__(self, parent: wx.Window, sizer_dir=wx.VERTICAL, **kwargs):
         ScrolledPanel.__init__(
             self,
@@ -41,18 +45,6 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
         self.SetSizer(self.sizer)
         self.SetupScrolling()
         self.SetAutoLayout(1)
-
-
-class SimpleText(wx.StaticText):
-    def __init__(self, parent: wx.Window, text):
-        super().__init__(
-            parent,
-            wx.ID_ANY,
-            text,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0
-        )
 
 
 class SimpleChoice(wx.Choice):

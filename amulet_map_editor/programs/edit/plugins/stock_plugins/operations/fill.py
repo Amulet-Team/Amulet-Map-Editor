@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import wx
 
 from amulet.operations.fill import fill
-from amulet_map_editor.amulet_wx.select_block import BlockDefine
+from amulet_map_editor.amulet_wx.ui.select_block import BlockDefine
 from amulet_map_editor.programs.edit.plugins import OperationUI
 
 if TYPE_CHECKING:

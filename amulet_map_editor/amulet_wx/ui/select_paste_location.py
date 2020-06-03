@@ -4,7 +4,7 @@ from typing import Optional, List, Callable, Type, Any
 
 from amulet.api.structure import Structure
 from amulet_map_editor.amulet_wx.simple import SimplePanel
-from amulet_map_editor.amulet_wx.validators import IntValidator
+from amulet_map_editor.amulet_wx.util.validators import IntValidator
 
 
 class SelectDestinationUI(SimplePanel):

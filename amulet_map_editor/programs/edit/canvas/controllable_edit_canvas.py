@@ -4,7 +4,7 @@ import numpy
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.key_config import serialise_key_event, KeybindGroup, ActionLookupType
+from amulet_map_editor.amulet_wx.util.key_config import serialise_key_event, KeybindGroup, ActionLookupType
 
 if TYPE_CHECKING:
     from amulet.api.world import World

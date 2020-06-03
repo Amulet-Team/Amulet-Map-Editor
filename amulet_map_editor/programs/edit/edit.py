@@ -6,7 +6,7 @@ EDIT_CONFIG_ID = "amulet_edit"
 
 from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.key_config import KeyConfigDialog
+from amulet_map_editor.amulet_wx.util.key_config import KeyConfigDialog
 from amulet_map_editor.programs.edit.canvas.events import EVT_EDIT_CLOSE
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys

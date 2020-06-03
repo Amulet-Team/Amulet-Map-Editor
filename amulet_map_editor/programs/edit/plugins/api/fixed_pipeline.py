@@ -1,7 +1,7 @@
 import wx
 from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
 
-from amulet_map_editor.amulet_wx.validators import IntValidator
+from amulet_map_editor.amulet_wx.util.validators import IntValidator
 
 from amulet.api.data_types import OperationReturnType
 from .operation_ui import OperationUI
@@ -9,8 +9,6 @@ from .operation_ui import OperationUI
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
     from amulet.api.world import World
-    from amulet.api.data_types import Dimension
-    from amulet.api.selection import SelectionGroup
 
 FixedOperationType = Callable[["World", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType]
 
