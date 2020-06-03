@@ -20,6 +20,17 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._persistent_actions: Set[str] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
         self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
 
+        # timer to deal with persistent actions
+        self._input_timer = wx.Timer(self)
+        self._bind_controllable_events()
+
+    def reset_bound_events(self):
+        """Unbind all events and re-bind the default events.
+        We are allowing users to bind custom events so we should have a way to reset what is bound."""
+        super().reset_bound_events()
+        self._bind_controllable_events()
+
+    def _bind_controllable_events(self):
         self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
@@ -34,8 +45,6 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(wx.EVT_KEY_UP, self._release)
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
 
-        # timer to deal with persistent actions
-        self._input_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
 
     def enable(self):

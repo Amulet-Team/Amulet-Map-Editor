@@ -1,7 +1,7 @@
 import wx
 from OpenGL.GL import *
 import os
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator, Set
 import numpy
 import weakref
 
@@ -43,6 +43,9 @@ class BaseEditCanvas(BaseCanvas):
         super().__init__(parent)
         glClearColor(*self.background_colour, 1.0)
         self.Hide()
+
+        self._bound_events: Set[wx.PyEventBinder] = set()
+
         self._world = weakref.ref(world)
         self._mouse_delta_x = 0
         self._mouse_delta_y = 0
@@ -93,13 +96,26 @@ class BaseEditCanvas(BaseCanvas):
         self._structure_locations: List[numpy.ndarray] = []
 
         self._draw_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
-
         self._gc_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
-
         self._rebuild_timer = wx.Timer(self)
+        self._bind_base_events()
+
+    def reset_bound_events(self):
+        """Unbind all events and re-bind the default events.
+        We are allowing users to bind custom events so we should have a way to reset what is bound."""
+        for event in self._bound_events:
+            self.Unbind(event)
+            self._bind_base_events()
+
+    def _bind_base_events(self):
+        self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
+        self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
         self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
+
+    def Bind(self, event, handler, source=None, id=wx.ID_ANY, id2=wx.ID_ANY):
+        """Bind an event to the canvas."""
+        self._bound_events.add(event)
+        super().Bind(event, handler, source, id, id2)
 
     @property
     def world(self) -> "World":
