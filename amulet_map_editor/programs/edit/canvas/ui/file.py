@@ -78,6 +78,8 @@ class FilePanel(wx.BoxSizer, BaseUI):
 
     def _on_camera_move(self, evt):
         x, y, z = evt.location
-        self._location_button.SetLabel(f'{x:.2f}, {y:.2f}, {z:.2f}')
-        self.Layout()
-        self.canvas.Layout()
+        label = f'{x:.2f}, {y:.2f}, {z:.2f}'
+        old_label = self._location_button.GetLabel()
+        self._location_button.SetLabel(label)
+        if len(label) != len(old_label):
+            self.canvas.Layout()
