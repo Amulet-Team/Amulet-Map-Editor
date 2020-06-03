@@ -4,6 +4,7 @@ from typing import Optional, List, Callable, Type, Any
 
 from amulet.api.structure import Structure
 from amulet_map_editor.amulet_wx.simple import SimplePanel
+from amulet_map_editor.amulet_wx.validators import IntValidator
 
 
 class SelectDestinationUI(SimplePanel):
@@ -22,6 +23,8 @@ class SelectDestinationUI(SimplePanel):
         self._x: wx.SpinCtrl = self._add_row('x', wx.SpinCtrl, min=-30000000, max=30000000)
         self._y: wx.SpinCtrl = self._add_row('y', wx.SpinCtrl, min=-30000000, max=30000000)
         self._z: wx.SpinCtrl = self._add_row('z', wx.SpinCtrl, min=-30000000, max=30000000)
+        for ui in (self._x, self._y, self._z):
+            ui.SetValidator(IntValidator())
         self._copy_air: wx.CheckBox = self._add_row('Copy Air', wx.CheckBox)
         self._x.Bind(wx.EVT_SPINCTRL, self._on_location_change)
         self._y.Bind(wx.EVT_SPINCTRL, self._on_location_change)
