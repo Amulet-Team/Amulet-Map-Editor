@@ -159,36 +159,3 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         if self._canvas is not None:
             self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
         event.Skip()
-
-    # TODO
-    # def _cut(self) -> bool:
-    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'cut.py'))
-    #
-    # def _copy(self) -> bool:
-    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'copy.py'))
-    #
-    # def _paste(self) -> bool:
-    #     self.show_operation_options(None)
-    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'paste.py'))
-    #
-    # def _delete(self) -> bool:
-    #     return self._run_operation(os.path.join(os.path.dirname(plugins.__file__), 'internal_operations', 'delete.py'))
-
-    # def show_select_options(self, _):
-    #     self._operation_options.Hide()
-    #     self._select_options.enable()
-    #     self.Layout()
-
-    # def _show_operation_options(self, enable: Callable):
-    #     self._select_options.Hide()
-    #     enable()
-    #     self.Layout()
-
-    # def show_operation_options(self, _):
-    #     self._show_operation_options(self._operation_options.enable_operation_ui)
-    #
-    # def show_import_options(self, _):
-    #     self._show_operation_options(self._operation_options.enable_import_ui)
-    #
-    # def show_export_options(self, _):
-    #     self._show_operation_options(self._operation_options.enable_export_ui)

@@ -12,6 +12,10 @@ from amulet_map_editor.programs.edit.key_config import DefaultKeys, DefaultKeybi
 from amulet_map_editor.programs.edit.canvas.ui.goto import show_goto
 from amulet_map_editor.programs.edit.canvas.ui.tool import Tool
 from amulet_map_editor.programs.edit.plugins import OperationError, OperationSuccessful, OperationSilentAbort
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.cut import cut
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.copy import copy
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.delete import delete
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.paste import paste
 
 from amulet_map_editor.programs.edit.canvas.events import (
     UndoEvent,
@@ -146,16 +150,34 @@ class EditCanvas(ControllableEditCanvas):
         wx.PostEvent(self, RedoEvent())
 
     def cut(self):
-        pass
+        self.run_operation(
+            lambda: cut(
+                self.world,
+                self.dimension,
+                self.selection_group
+            )
+        )
 
     def copy(self):
-        pass
+        self.run_operation(
+            lambda: copy(
+                self.world,
+                self.dimension,
+                self.selection_group
+            )
+        )
 
     def paste(self):
         pass
 
     def delete(self):
-        pass
+        self.run_operation(
+            lambda: delete(
+                self.world,
+                self.dimension,
+                self.selection_group
+            )
+        )
 
     def goto(self):
         location = show_goto(self, *self.camera_location)
