@@ -29,13 +29,17 @@ class Replace(SimpleScrollablePanel, OperationUI):
             self,
             world.world_wrapper.translation_manager,
             *(options.get("original_block_options", []) or [world.world_wrapper.platform]),
-            wildcard=True
+            wildcard=True,
+            style=wx.BORDER_SIMPLE,
+            properties_style=wx.BORDER_SIMPLE
         )
         self._sizer.Add(self._original_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self._replacement_block = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
-            *(options.get("replacement_block_options", []) or [world.world_wrapper.platform])
+            *(options.get("replacement_block_options", []) or [world.world_wrapper.platform]),
+            style=wx.BORDER_SIMPLE,
+            properties_style=wx.BORDER_SIMPLE
         )
         self._sizer.Add(self._replacement_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 

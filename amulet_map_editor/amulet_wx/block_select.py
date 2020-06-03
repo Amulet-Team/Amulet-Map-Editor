@@ -1,4 +1,4 @@
-from amulet_map_editor.amulet_wx.simple import SimplePanel, SimpleText, SimpleChoice, SimpleChoiceAny
+from amulet_map_editor.amulet_wx.simple import SimpleChoice, SimpleChoiceAny
 import wx
 import PyMCTranslate
 import amulet_nbt
@@ -6,17 +6,19 @@ from typing import Tuple, List, Optional, Type, Dict, Any
 from amulet.api.block import Block
 
 
-class BaseSelect(SimplePanel):
-    def __init__(self, parent):
-        super().__init__(parent)
+class BaseSelect(wx.Panel):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        self._sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self._sizer)
 
     def _add_ui_element(self, label: str, obj: Type[wx.Control], **kwargs) -> Any:
-        panel = SimplePanel(self, wx.HORIZONTAL)
-        self.add_object(panel, 0)
-        text = SimpleText(panel, label)
-        panel.add_object(text, 0, wx.CENTER | wx.ALL)
-        wx_obj = obj(panel, **kwargs)
-        panel.add_object(wx_obj, 0, wx.CENTER | wx.ALL)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._sizer.Add(sizer, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        text = wx.StaticText(self, label=label)
+        sizer.Add(text, 0, wx.CENTER | wx.LEFT | wx.RIGHT, 5)
+        wx_obj = obj(self, **kwargs)
+        sizer.Add(wx_obj, 0, wx.CENTER | wx.BOTTOM | wx.TOP | wx.RIGHT, 5)
         return wx_obj
 
 
@@ -31,7 +33,7 @@ class PlatformSelect(BaseSelect):
             allowed_platforms: Tuple[str, ...] = None,
             **kwargs
     ):
-        super().__init__(parent)
+        super().__init__(parent, **kwargs)
         self._translation_manager = translation_manager
         self._allow_universal = allow_universal
         self._allow_vanilla = allow_vanilla
@@ -269,6 +271,7 @@ class BlockDefine(BlockSelect):
             base_name: str = None,
             properties: Dict[str, str] = None,
             wildcard: bool = False,
+            properties_style=0,
             **kwargs
     ):
         super().__init__(
@@ -281,11 +284,13 @@ class BlockDefine(BlockSelect):
             base_name,
             **kwargs
         )
-        self._properties: List[SimplePanel] = []
+        self._properties: Dict[str, SimpleChoice] = {}
         self._wildcard = wildcard
         self._base_name_list.Bind(wx.EVT_CHOICE, self._on_base_name_change)
-        self._properties_panel: Optional[SimplePanel] = SimplePanel(self, wx.VERTICAL)
-        self.add_object(self._properties_panel, 0)
+        self._properties_panel: wx.Panel = wx.Panel(self, wx.VERTICAL, style=properties_style)
+        properties_sizer = wx.BoxSizer(wx.VERTICAL)
+        self._properties_panel.SetSizer(properties_sizer)
+        self._sizer.Add(self._properties_panel, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM, 5)
         self._set_properties(properties)
 
     @property
@@ -295,8 +300,8 @@ class BlockDefine(BlockSelect):
     @property
     def properties(self) -> Dict[str, str]:
         return {
-            prop.GetChildren()[0].GetLabel(): prop.GetChildren()[1].GetString(prop.GetChildren()[1].GetSelection())
-            for prop in self._properties
+            property_name: ui.GetString(ui.GetSelection())
+            for property_name, ui in self._properties.items()
         }
 
     @property
@@ -311,19 +316,20 @@ class BlockDefine(BlockSelect):
             )
 
     def _clear_properties(self):
-        for prop in self._properties:
-            prop.Destroy()
+        for child in self._properties_panel.GetChildren():
+            child.Destroy()
         self._properties.clear()
         self._properties_panel.Layout()
 
     def _add_property(self, property_name: str, property_values: List[str], default: str = None):
-        prop_panel = SimplePanel(self._properties_panel, wx.HORIZONTAL)
-        self._properties.append(prop_panel)
-        self._properties_panel.add_object(prop_panel, 0)
-        name_text = SimpleText(prop_panel, property_name)
-        prop_panel.add_object(name_text, 0, wx.CENTER | wx.ALL)
-        name_list = SimpleChoice(prop_panel)
-        prop_panel.add_object(name_list, 0, wx.CENTER | wx.ALL)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._properties_panel.GetSizer().Add(sizer, 0, wx.ALL, 5)
+        name_text = wx.StaticText(self._properties_panel, label=property_name)
+        sizer.Add(name_text, 0, wx.CENTER | wx.RIGHT, 5)
+        name_list = SimpleChoice(self._properties_panel)
+        sizer.Add(name_list, 0, wx.CENTER, 5)
+
+        self._properties[property_name] = name_list
 
         if self._wildcard:
             property_values.insert(0, "*")

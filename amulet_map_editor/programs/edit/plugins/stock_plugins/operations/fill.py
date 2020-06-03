@@ -29,7 +29,9 @@ class Fill(wx.Panel, OperationUI):
         self._block_define = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
-            *(options.get("fill_block_options", []) or [world.world_wrapper.platform])
+            *(options.get("fill_block_options", []) or [world.world_wrapper.platform]),
+            style=wx.BORDER_SIMPLE,
+            properties_style=wx.BORDER_SIMPLE
         )
         self._sizer.Add(self._block_define, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
