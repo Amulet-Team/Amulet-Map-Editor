@@ -10,7 +10,7 @@ from amulet import world_interface
 
 from amulet_map_editor import log
 from amulet_map_editor.amulet_wx.simple import SimplePanel
-from amulet_map_editor.amulet_wx.world_select import WorldUI
+from amulet_map_editor.amulet_wx.select_world import WorldUI
 
 if TYPE_CHECKING:
     from amulet.api.world import World

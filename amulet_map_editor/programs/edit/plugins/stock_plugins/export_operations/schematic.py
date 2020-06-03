@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 import wx
 
-from amulet_map_editor.amulet_wx.block_select import PlatformSelect
+from amulet_map_editor.amulet_wx.select_block import PlatformSelect
 from amulet_map_editor.amulet_wx.simple import SimpleDialog
 from amulet.api.selection import SelectionGroup
 from amulet.api.errors import ChunkLoadError
