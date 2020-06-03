@@ -92,7 +92,7 @@ class EditCanvas(ControllableEditCanvas):
         tool_sizer = Tool(self)
         canvas_sizer.Add(tool_sizer, 1, wx.EXPAND, 0)
 
-    def run_operation(self, operation: Callable[[], None], title="", msg="", create_backup=True) -> Any:
+    def run_operation(self, operation: Callable[[], OperationReturnType], title="", msg="", create_backup=True) -> Any:
         self.disable_threads()
         try:
             out = show_loading_dialog(

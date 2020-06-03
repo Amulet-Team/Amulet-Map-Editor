@@ -1,101 +1,121 @@
-from typing import TYPE_CHECKING, Tuple, Dict
+from typing import TYPE_CHECKING
 import wx
 import numpy
 
 from amulet.api.block import Block
-from amulet.api.selection import SelectionGroup
-from amulet.api.data_types import Dimension
 from amulet_map_editor.amulet_wx.block_select import BlockDefine
-from amulet_map_editor.amulet_wx.simple import SimpleDialog
+from amulet_map_editor.programs.edit.plugins import OperationUI
+from amulet_map_editor.amulet_wx.simple import SimpleScrollablePanel
 
 if TYPE_CHECKING:
     from amulet.api.world import World
+    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
-def replace(
-    world: "World",
-    dimension: Dimension,
-    selection: SelectionGroup,
-    options: dict
-):
-    original_block_options: Tuple[str, Tuple[int, int, int], bool, str, str, Dict[str, str]] = options.get("original_block_options")
-    replacement_block: Block = options.get("replacement_block")
-    if original_block_options is None or not isinstance(replacement_block, Block):
-        # verify that the options are actually given
-        raise Exception('Please specify the blocks before running the replace operation')
+class Replace(SimpleScrollablePanel, OperationUI):
+    def __init__(
+            self,
+            parent: wx.Window,
+            canvas: "EditCanvas",
+            world: "World",
+            options_path: str
+    ):
+        SimpleScrollablePanel.__init__(self, parent)
+        OperationUI.__init__(self, parent, canvas, world, options_path)
 
-    original_platform, original_version, original_blockstate, original_namespace, original_base_name, original_properties = original_block_options
-    replacement_block_id = world.palette.get_add_block(replacement_block)
+        options = self._load_options({})
 
-    original_block_matches = []
-    universal_block_count = 0
+        self._original_block = BlockDefine(
+            self,
+            world.world_wrapper.translation_manager,
+            *(options.get("original_block_options", []) or [world.world_wrapper.platform]),
+            wildcard=True
+        )
+        self._sizer.Add(self._original_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._replacement_block = BlockDefine(
+            self,
+            world.world_wrapper.translation_manager,
+            *(options.get("replacement_block_options", []) or [world.world_wrapper.platform])
+        )
+        self._sizer.Add(self._replacement_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
-    iter_count = len(list(world.get_chunk_slices(selection, dimension)))
-    count = 0
+        self._run_button = wx.Button(self, label="Run Operation")
+        self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
+        self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
-    for chunk, slices, _ in world.get_chunk_slices(selection, dimension):
-        if universal_block_count < len(world.palette):
-            for universal_block_id in range(universal_block_count, len(world.palette)):
-                version_block = world.translation_manager.get_version(
-                    original_platform,
-                    original_version
-                ).block.from_universal(
-                    world.palette[universal_block_id],
-                    force_blockstate=original_blockstate
-                )[0]
-                if version_block.namespace == original_namespace and \
-                    version_block.base_name == original_base_name\
-                    and all(original_properties.get(prop) in ['*', val.to_snbt()] for prop, val in version_block.properties.items()):
-                    original_block_matches.append(universal_block_id)
+        self.Layout()
 
-            universal_block_count = len(world.palette)
-        blocks = chunk.blocks[slices]
-        blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
-        chunk.blocks[slices] = blocks
-        chunk.changed = True
+    def _get_replacement_block(self) -> Block:
+        return self.world.translation_manager.get_version(
+            self._replacement_block.platform,
+            self._replacement_block.version
+        ).block.to_universal(
+            self._replacement_block.block,
+            force_blockstate=self._replacement_block.force_blockstate
+        )[0]
 
-        count += 1
-        yield 100 * count / iter_count
+    def unload(self):
+        self._save_options({
+            "original_block_options": self._original_block.options,
+            "replacement_block": self._get_replacement_block(),
+            "replacement_block_options": self._replacement_block.options,
+        })
 
+    def _run_operation(self, _):
+        self.canvas.run_operation(
+            lambda: self._replace()
+        )
 
-def show_ui(parent, world: "World", options: dict) -> dict:
-    dialog = SimpleDialog(parent, 'Replace', wx.HORIZONTAL)
+    def _replace(self):
+        world = self.world
+        selection = self.canvas.selection_group
+        dimension = self.canvas.dimension
 
-    original_block = BlockDefine(
-        dialog,
-        world.world_wrapper.translation_manager,
-        *(options.get("original_block_options", []) or [world.world_wrapper.platform]),
-        wildcard=True
-    )
-    replacement_block = BlockDefine(
-        dialog,
-        world.world_wrapper.translation_manager,
-        *(options.get("replacement_block_options", []) or [world.world_wrapper.platform])
-    )
-    dialog.sizer.Add(original_block, 0)
-    dialog.sizer.Add(replacement_block, 0)
-    dialog.Fit()
+        original_platform, original_version, original_blockstate, original_namespace, original_base_name, original_properties = self._original_block.options
+        replacement_block = self._get_replacement_block()
 
-    if dialog.ShowModal() == wx.ID_OK:
-        options = {
-            "original_block_options": original_block.options,
-            "replacement_block": world.translation_manager.get_version(
-                replacement_block.platform,
-                replacement_block.version
-            ).block.to_universal(
-                replacement_block.block,
-                force_blockstate=replacement_block.force_blockstate
-            )[0],
-            "replacement_block_options": replacement_block.options,
-        }
-    return options
+        replacement_block_id = world.palette.get_add_block(replacement_block)
+
+        original_block_matches = []
+        universal_block_count = 0
+
+        iter_count = len(list(world.get_chunk_slices(selection, dimension)))
+        count = 0
+
+        for chunk, slices, _ in world.get_chunk_slices(selection, dimension):
+            if universal_block_count < len(world.palette):
+                for universal_block_id in range(universal_block_count, len(world.palette)):
+                    version_block = world.translation_manager.get_version(
+                        original_platform,
+                        original_version
+                    ).block.from_universal(
+                        world.palette[universal_block_id],
+                        force_blockstate=original_blockstate
+                    )[0]
+                    if version_block.namespace == original_namespace and \
+                            version_block.base_name == original_base_name \
+                            and all(original_properties.get(prop) in ['*', val.to_snbt()] for prop, val in version_block.properties.items()):
+                        original_block_matches.append(universal_block_id)
+
+                universal_block_count = len(world.palette)
+            blocks = chunk.blocks[slices]
+            blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
+            chunk.blocks[slices] = blocks
+            chunk.changed = True
+
+            count += 1
+            yield 100 * count / iter_count
+
+    def DoGetBestClientSize(self):
+        sizer = self.GetSizer()
+        if sizer is None:
+            return -1, -1
+        else:
+            sx, sy = self.GetSizer().CalcMin()
+            return sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X), sy + wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y)
 
 
 export = {
-    "v": 1,  # a version 1 plugin
     "name": "Replace",  # the name of the plugin
-    "features": ["src_selection", "wxoptions"],
-    "inputs": ["src_selection", "options"],  # the inputs to give to the plugin
-    "operation": replace,  # the actual function to call when running the plugin
-    "wxoptions": show_ui
+    "operation": Replace,  # the actual function to call when running the plugin
 }

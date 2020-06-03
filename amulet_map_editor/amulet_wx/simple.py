@@ -5,7 +5,7 @@ from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
 
 class SimpleSizer:
     def __init__(self, sizer_dir=wx.VERTICAL):
-        self.sizer = wx.BoxSizer(sizer_dir)
+        self._sizer = self.sizer = wx.BoxSizer(sizer_dir)
 
     def add_object(self, obj, space=1, options=wx.ALL):
         self.sizer.Add(
