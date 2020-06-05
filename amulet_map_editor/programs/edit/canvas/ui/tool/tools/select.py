@@ -90,7 +90,9 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._remove_paste()
         self._button_panel.Show()
         self.Layout()
-        self.canvas.select_mode = 0
+        self.canvas.draw_structure = False
+        self.canvas.draw_selection = True
+        self.canvas.selection_editable = True
 
     def disable(self):
         self._remove_paste()

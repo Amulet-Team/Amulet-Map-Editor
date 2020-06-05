@@ -110,7 +110,7 @@ class EditCanvas(ControllableEditCanvas):
             msg="",
             throw_exceptions=False
     ) -> Any:
-        self.disable_threads()
+        self._disable_threads()
         err = None
         out = None
         try:
@@ -143,7 +143,7 @@ class EditCanvas(ControllableEditCanvas):
             wx.MessageDialog(self, f"Exception running operation: {e}\nSee the console for more details", style=wx.OK).ShowModal()
             err = e
 
-        self.enable_threads()
+        self._enable_threads()
         if err is not None and throw_exceptions:
             raise err
         return out
@@ -198,7 +198,7 @@ class EditCanvas(ControllableEditCanvas):
             self.camera_location = location
 
     def save(self):
-        self.disable_threads()
+        self._disable_threads()
 
         def save():
             for chunk_index, chunk_count in self.world.save_iter():
@@ -206,7 +206,7 @@ class EditCanvas(ControllableEditCanvas):
 
         show_loading_dialog(lambda: save(), f"Saving world.", "Please wait.", self)
         wx.PostEvent(self, SaveEvent())
-        self.enable_threads()
+        self._enable_threads()
 
     def close(self):
         wx.PostEvent(self, EditCloseEvent())

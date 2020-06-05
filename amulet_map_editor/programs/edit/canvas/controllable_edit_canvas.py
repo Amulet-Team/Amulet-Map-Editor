@@ -102,7 +102,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._selection_group.delete_active()
             else:  # run once on button press and frequently until released
                 if action == "box click":
-                    if self.select_mode == 0:
+                    if self.selection_editable:
                         self.box_select("add box modifier" in self._persistent_actions)
                 elif action == "toggle mouse mode":
                     self._toggle_mouse_lock()

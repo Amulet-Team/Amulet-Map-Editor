@@ -29,10 +29,6 @@ from amulet_map_editor.programs.edit.canvas.events import (
 if TYPE_CHECKING:
     from amulet.api.world import World
 
-MODE_NORMAL = 0  # normal selection
-MODE_DISABLED = 1  # non-interactive selection boxes
-MODE_STRUCTURE = 2  # MODE_DISABLED and draw structure if exists
-
 
 class BaseEditCanvas(BaseCanvas):
     """Adds base logic for drawing everything related to the edit program to the BaseCanvas.
@@ -85,18 +81,21 @@ class BaseEditCanvas(BaseCanvas):
         self._camera_rotate_speed = 2
         self._select_distance = 10
         self._select_distance2 = 10
-        self._select_mode = MODE_NORMAL
 
         self._selection_moved = True  # has the selection point moved and does the box need rebuilding
         self._selection_location: BlockCoordinates = (0, 0, 0)
 
+        self._draw_selection = True
+        self._selection_editable = True
         self._selection_group = RenderSelectionGroup(
             self.context_identifier,
             self._texture_bounds,
             self._gl_texture_atlas
         )
+
+        self._draw_structure = False
         self._structure: Optional[RenderStructure] = None
-        self._structure_locations: List[numpy.ndarray] = []
+        self._structure_locations: List[numpy.ndarray] = []  # TODO rewrite this
 
         self._draw_timer = wx.Timer(self)
         self._gc_timer = wx.Timer(self)
@@ -125,6 +124,10 @@ class BaseEditCanvas(BaseCanvas):
         return self._world()
 
     @property
+    def selection_location(self) -> BlockCoordinates:
+        return self._selection_location
+
+    @property
     def selection_group(self) -> SelectionGroup:
         """Create a SelectionGroup class from the selected boxes."""
         return self._selection_group.create_selection_group()
@@ -150,12 +153,12 @@ class BaseEditCanvas(BaseCanvas):
         self._rebuild_timer.Stop()
         self._render_world.disable()
 
-    def disable_threads(self):
+    def _disable_threads(self):
         """Stop the generation of new chunk geometry.
         Makes it safe to modify the world data."""
         self._render_world.chunk_generator.stop()
 
-    def enable_threads(self):
+    def _enable_threads(self):
         """Start the generation of new chunk geometry."""
         self._render_world.chunk_generator.start()
 
@@ -198,8 +201,37 @@ class BaseEditCanvas(BaseCanvas):
         )
 
     @property
+    def draw_structure(self) -> bool:
+        """Should the moveable structure be drawn"""
+        return self._draw_structure
+
+    @draw_structure.setter
+    def draw_structure(self, draw_structure: bool):
+        self._draw_structure = bool(draw_structure)
+
+    @property
     def structure_locations(self) -> List[numpy.ndarray]:
+        """The locations where the structure should be displayed. DO NOT USE THIS YET.
+        todo: rewrite this to allow rotation."""
         return self._structure_locations
+
+    @property
+    def draw_selection(self) -> bool:
+        """Should the selection box(es) be drawn"""
+        return self._draw_selection
+
+    @draw_selection.setter
+    def draw_selection(self, draw_selection: bool):
+        self._draw_selection = bool(draw_selection)
+
+    @property
+    def selection_editable(self) -> bool:
+        """Should the selection box(es) be editable"""
+        return self._selection_editable
+
+    @selection_editable.setter
+    def selection_editable(self, selection_editable: bool):
+        self._selection_editable = bool(selection_editable)
 
     @property
     def select_distance(self) -> int:
@@ -218,19 +250,6 @@ class BaseEditCanvas(BaseCanvas):
     def select_distance2(self, distance: int):
         self._select_distance2 = distance
         self._selection_moved = True
-
-    @property
-    def select_mode(self) -> int:
-        return self._select_mode
-
-    @select_mode.setter
-    def select_mode(self, select_mode: int):
-        self._select_mode = select_mode
-        self._selection_moved = True
-
-    @property
-    def selection_location(self) -> BlockCoordinates:
-        return self._selection_location
 
     @property
     def dimension(self) -> Dimension:
@@ -422,7 +441,7 @@ class BaseEditCanvas(BaseCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        if self._select_mode == MODE_STRUCTURE and self._structure is not None:
+        if self._draw_structure and self._structure is not None:
             transform = numpy.eye(4, dtype=numpy.float32)
             for location in self.structure_locations:
                 transform[3, 0:3] = location
@@ -430,7 +449,8 @@ class BaseEditCanvas(BaseCanvas):
         if self._selection_moved:
             self._selection_moved = False
             self._change_box_location()
-        self._selection_group.draw(self.transformation_matrix, tuple(self.camera_location), self._select_mode == MODE_NORMAL)
+        if self._draw_selection:
+            self._selection_group.draw(self.transformation_matrix, tuple(self.camera_location), self._selection_editable)
         self.SwapBuffers()
 
     def _gc(self, event):

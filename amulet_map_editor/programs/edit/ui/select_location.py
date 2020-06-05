@@ -30,6 +30,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
         self.canvas.structure_locations.clear()
         self.canvas.structure_locations.append(numpy.array([0, 0, 0]))
         self.canvas.structure = structure
+        self.canvas.draw_structure = True
 
         def _add_row(label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
             sizer = wx.BoxSizer(wx.HORIZONTAL)
