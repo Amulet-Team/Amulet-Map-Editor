@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from amulet.api.structure import structure_buffer, Structure
+from amulet.api.structure import structure_cache, Structure
 from amulet.api.data_types import Dimension
 from amulet.api.selection import SelectionGroup
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationSilentAbort
@@ -17,5 +17,5 @@ def copy(
     structure = Structure.from_world(
         world, selection, dimension
     )
-    structure_buffer.append(structure)
+    structure_cache.add_structure(structure)
     raise OperationSilentAbort
