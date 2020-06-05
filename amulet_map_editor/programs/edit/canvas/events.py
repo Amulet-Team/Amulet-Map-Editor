@@ -6,6 +6,7 @@ DimensionChangeEvent, EVT_DIMENSION_CHANGE = newevent.NewEvent()
 
 # the active tool changed
 ToolChangeEvent, EVT_TOOL_CHANGE = newevent.NewEvent()
+PasteEvent, EVT_PASTE = newevent.NewEvent()
 
 UndoEvent, EVT_UNDO = newevent.NewEvent()
 RedoEvent, EVT_REDO = newevent.NewEvent()

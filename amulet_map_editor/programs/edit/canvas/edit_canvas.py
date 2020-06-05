@@ -5,6 +5,7 @@ import time
 import traceback
 
 from amulet.api.data_types import OperationReturnType
+from amulet.api.structure import Structure, structure_cache
 
 from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs.edit.edit import EDIT_CONFIG_ID
@@ -15,7 +16,6 @@ from amulet_map_editor.programs.edit.plugins import OperationError, OperationSuc
 from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.cut import cut
 from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.copy import copy
 from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.delete import delete
-from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.paste import paste
 
 from amulet_map_editor.programs.edit.canvas.events import (
     UndoEvent,
@@ -23,6 +23,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     CreateUndoEvent,
     SaveEvent,
     EditCloseEvent,
+    PasteEvent,
 )
 from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
@@ -173,8 +174,14 @@ class EditCanvas(ControllableEditCanvas):
             )
         )
 
-    def paste(self):
-        pass
+    def paste(self, structure: Structure = None):
+        if not isinstance(structure, Structure):
+            if structure_cache:
+                structure = structure_cache.get_structure()
+            else:
+                wx.MessageBox("A structure needs to be copied before one can be pasted.")
+                return
+        wx.PostEvent(self, PasteEvent(structure=structure))
 
     def delete(self):
         self.run_operation(

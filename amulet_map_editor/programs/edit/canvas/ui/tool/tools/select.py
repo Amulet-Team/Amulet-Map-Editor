@@ -1,7 +1,12 @@
-from typing import TYPE_CHECKING, Type, Any
+from typing import TYPE_CHECKING, Type, Any, Optional
 import wx
+import numpy
 
-from .base_tool_ui import BaseToolUI
+from amulet.operations.paste import paste_iter
+
+from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
+from amulet_map_editor.programs.edit.ui.select_location import SelectLocationUI
+from amulet_map_editor.programs.edit.canvas.events import EVT_PASTE
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
@@ -12,7 +17,14 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         BaseToolUI.__init__(self, canvas)
 
-        self.Add(wx.Panel(canvas))
+        self._button_panel = wx.Panel(canvas)
+        button_sizer = wx.BoxSizer(wx.VERTICAL)
+        self._button_panel.SetSizer(button_sizer)
+        button = wx.Button(self._button_panel, label="hello")
+        button_sizer.Add(button)
+        self.Add(self._button_panel)
+
+        self._paste_panel: Optional[SelectLocationUI] = None
 
         # self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
         # self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
@@ -47,11 +59,41 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         # self._canvas().Bind(EVT_BOX_BLUE_CORNER_CHANGE, self._blue_corner_renderer_change)
         # self._canvas().Bind(EVT_BOX_COORDS_ENABLE, self._enable_scrolls)
 
+    def bind_events(self):
+        self.canvas.Bind(EVT_PASTE, self._paste)
+
+    def _remove_paste(self):
+        if self._paste_panel is not None:
+            self._paste_panel.Destroy()
+            self._paste_panel = None
+
+    def _paste(self, evt):
+        structure = evt.structure
+        self._button_panel.Hide()
+        self._remove_paste()
+        self._paste_panel = SelectLocationUI(self.canvas, self.canvas, structure, self._paste_confirm)
+        self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
+        self.Layout()
+
+    def _paste_confirm(self):
+        self.canvas.run_operation(
+            lambda: paste_iter(
+                self.canvas.world,
+                self.canvas.dimension,
+                self._paste_panel.structure,
+                [self._paste_panel.location],
+                self._paste_panel.copy_air
+            )
+        )
+
     def enable(self):
+        self._remove_paste()
+        self._button_panel.Show()
+        self.Layout()
         self.canvas.select_mode = 0
 
     def disable(self):
-        pass
+        self._remove_paste()
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
