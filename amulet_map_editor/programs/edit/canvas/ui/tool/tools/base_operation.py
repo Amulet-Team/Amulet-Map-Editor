@@ -24,6 +24,9 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
 
         # self._operation_change()
 
+    def bind_events(self):
+        pass
+
     @property
     def _operations(self) -> OperationStorageType:
         raise NotImplementedError

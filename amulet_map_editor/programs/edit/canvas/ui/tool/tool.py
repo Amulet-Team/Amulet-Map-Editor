@@ -43,6 +43,10 @@ class Tool(wx.BoxSizer, BaseUI):
         self.register_tool("Import", SelectImportOperationUI)
         self.register_tool("Export", SelectExportOperationUI)
 
+    def bind_events(self):
+        for tool in self._tools.values():
+            tool.bind_events()
+
     def register_tool(self, name: str, tool_cls: Type[BaseToolUIType]):
         assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(tool_cls, BaseToolUI)
         self._tool_select.register_tool(name)

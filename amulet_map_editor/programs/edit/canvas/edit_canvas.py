@@ -93,8 +93,14 @@ class EditCanvas(ControllableEditCanvas):
         file_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
         canvas_sizer.Add(file_sizer, 0, wx.EXPAND, 0)
 
-        tool_sizer = Tool(self)
-        canvas_sizer.Add(tool_sizer, 1, wx.EXPAND, 0)
+        self._tool_sizer = Tool(self)
+        canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
+
+        self.bind_events()
+
+    def bind_events(self):
+        self._file_panel.bind_events()
+        self._tool_sizer.bind_events()
 
     def run_operation(
             self,

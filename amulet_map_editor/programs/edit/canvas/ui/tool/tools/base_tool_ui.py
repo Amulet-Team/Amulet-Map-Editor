@@ -11,3 +11,6 @@ class BaseToolUI(BaseUI):
 
     def disable(self):
         raise NotImplementedError
+
+    def bind_events(self):
+        raise NotImplementedError

@@ -22,7 +22,6 @@ class FilePanel(wx.BoxSizer, BaseUI):
 
         self._location_button = wx.Button(canvas, label=', '.join([f'{s:.2f}' for s in self.canvas.camera_location]))
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
-        self.canvas.Bind(EVT_CAMERA_MOVE, self._on_camera_move)
 
         self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
@@ -40,17 +39,20 @@ class FilePanel(wx.BoxSizer, BaseUI):
             return button
 
         self._undo_button: Optional[wx.Button] = create_button('Undo', lambda evt: self.canvas.undo())
-        self.canvas.Bind(EVT_UNDO, self._on_update_buttons)
         self._redo_button: Optional[wx.Button] = create_button('Redo', lambda evt: self.canvas.redo())
-        self.canvas.Bind(EVT_REDO, self._on_update_buttons)
         self._save_button: Optional[wx.Button] = create_button('Save', lambda evt: self.canvas.save())
-        self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
-        self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
         create_button('Close', lambda evt: self.canvas.close())
         self._update_buttons()
 
         # self.Fit(self)
         self.Layout()
+
+    def bind_events(self):
+        self.canvas.Bind(EVT_CAMERA_MOVE, self._on_camera_move)
+        self.canvas.Bind(EVT_UNDO, self._on_update_buttons)
+        self.canvas.Bind(EVT_REDO, self._on_update_buttons)
+        self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
+        self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
 
     def _on_update_buttons(self, evt):
         self._update_buttons()
