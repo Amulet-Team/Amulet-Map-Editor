@@ -1,7 +1,7 @@
 import numpy
 from OpenGL.GL import *
 import itertools
-from typing import Tuple, Dict, Any, Optional, List
+from typing import Tuple, Dict, Any, Optional, List, Union
 
 from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh, Drawable
 from amulet.api.selection import SelectionGroup, SelectionBox
@@ -34,7 +34,7 @@ class RenderSelectionGroupStatic(Drawable):
             if box.is_static:
                 yield box
 
-    def __contains__(self, position: BlockCoordinatesAny):
+    def __contains__(self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]):
         return any(position in box for box in self._boxes)
 
     def __getitem__(self, index: int) -> "RenderSelection":
@@ -90,7 +90,7 @@ class RenderSelectionGroup(RenderSelectionGroupStatic):
             else:
                 self._active = None
 
-    def update_position(self, position: PointCoordinatesAny, box_index: Optional[int]):
+    def update_position(self, position: BlockCoordinatesAny, box_index: Optional[int]):
         self._last_position = position
         self._hover_box = box_index
         self._temp_box.point1 = self._temp_box.point2 = position
@@ -188,7 +188,7 @@ class RenderSelection(TriMesh):
         """
         return self._being_resized
 
-    def __contains__(self, position: BlockCoordinatesAny) -> bool:
+    def __contains__(self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]) -> bool:
         """
         Is the block position inside the selection box cuboid.
         :param position: (x, y, z)
