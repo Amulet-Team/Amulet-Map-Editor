@@ -23,6 +23,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
     CameraRotateEvent,
     DimensionChangeEvent,
+    SelectionPointChangeEvent,
 )
 
 if TYPE_CHECKING:
@@ -284,6 +285,7 @@ class BaseEditCanvas(BaseCanvas):
         else:
             position, box_index = self._box_location_closest()
 
+        wx.PostEvent(self, SelectionPointChangeEvent(location=position))
         self._selection_group.update_position(position, box_index)
 
     def ray_collision(self):
