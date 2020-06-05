@@ -9,7 +9,7 @@ import minecraft_model_reader
 from amulet.api.chunk import Chunk
 from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import PointCoordinatesNDArray, Dimension
+from amulet.api.data_types import PointCoordinatesNDArray, Dimension, BlockCoordinates
 from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
@@ -88,6 +88,8 @@ class BaseEditCanvas(BaseCanvas):
         self._select_mode = MODE_NORMAL
 
         self._selection_moved = True  # has the selection point moved and does the box need rebuilding
+        self._selection_location: BlockCoordinates = (0, 0, 0)
+
         self._selection_group = RenderSelectionGroup(
             self.context_identifier,
             self._texture_bounds,
@@ -227,6 +229,10 @@ class BaseEditCanvas(BaseCanvas):
         self._selection_moved = True
 
     @property
+    def selection_location(self) -> BlockCoordinates:
+        return self._selection_location
+
+    @property
     def dimension(self) -> Dimension:
         return self._render_world.dimension
 
@@ -284,8 +290,8 @@ class BaseEditCanvas(BaseCanvas):
             position, box_index = self._box_location_distance(self.select_distance)
         else:
             position, box_index = self._box_location_closest()
-
-        wx.PostEvent(self, SelectionPointChangeEvent(location=position))
+        self._selection_location = position.tolist()
+        wx.PostEvent(self, SelectionPointChangeEvent(location=position.tolist()))
         self._selection_group.update_position(position, box_index)
 
     def ray_collision(self):
