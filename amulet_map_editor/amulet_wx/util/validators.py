@@ -1,8 +1,19 @@
 import wx
 
 
+SpecialChrs = {
+    wx.WXK_BACK,
+    wx.WXK_DELETE,
+    wx.WXK_SHIFT,
+    wx.WXK_END,
+    wx.WXK_HOME,
+    wx.WXK_LEFT,
+    wx.WXK_RIGHT,
+}
+
+
 class BaseValidator(wx.Validator):
-    ''' Validates data as it is entered into the text controls. '''
+    """Validates data as it is entered into the text controls."""
 
     def __init__(self):
         super().__init__()
@@ -27,12 +38,12 @@ class BaseValidator(wx.Validator):
 class IntValidator(BaseValidator):
     def OnChar(self, event):
         keycode = int(event.GetKeyCode())
-        if keycode > 256 or 48 <= keycode <= 57 or keycode == 45:
+        if keycode in SpecialChrs or 48 <= keycode <= 57 or keycode == 45:
             event.Skip()
 
 
 class FloatValidator(BaseValidator):
     def OnChar(self, event):
         keycode = int(event.GetKeyCode())
-        if keycode > 256 or 45 <= keycode <= 57:
+        if keycode in SpecialChrs or 45 <= keycode <= 57:
             event.Skip()
