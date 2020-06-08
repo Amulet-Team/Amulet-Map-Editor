@@ -7,6 +7,7 @@ import wx
 import struct
 import hashlib
 import inspect
+import string
 
 from .fixed_pipeline import FixedFunctionUI
 from .operation_ui import OperationUI, OperationUIType
@@ -19,6 +20,8 @@ if TYPE_CHECKING:
 
 STOCK_PLUGINS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "stock_plugins"))
 CUSTOM_PLUGINS_DIR = os.path.abspath("plugins")
+
+ValidChrs = set("-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 
 class OperationLoadException(Exception):
@@ -53,14 +56,14 @@ class OperationLoader:
             os.path.join(
                 "config",
                 "edit_plugins",
-                f"""{self._name}_{
+                f"""{''.join(c for c in self._name if c in ValidChrs)}_{
                     struct.unpack(
                         "H",
                         hashlib.sha1(
                             self._path.encode('utf-8')
                         ).digest()[:2]
                     )[0]
-                }"""  # generate a file name that identifiable to the operation but "unique" to the path
+                }.config"""  # generate a file name that identifiable to the operation but "unique" to the path
             )
         )
 
