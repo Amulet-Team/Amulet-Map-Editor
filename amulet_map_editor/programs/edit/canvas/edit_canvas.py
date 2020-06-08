@@ -24,6 +24,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     SaveEvent,
     EditCloseEvent,
     PasteEvent,
+    ToolChangeEvent,
 )
 from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
@@ -181,6 +182,7 @@ class EditCanvas(ControllableEditCanvas):
             else:
                 wx.MessageBox("A structure needs to be copied before one can be pasted.")
                 return
+        wx.PostEvent(self, ToolChangeEvent(tool="Select"))
         wx.PostEvent(self, PasteEvent(structure=structure))
 
     def delete(self):
