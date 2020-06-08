@@ -1,75 +1,85 @@
 from typing import TYPE_CHECKING
 import wx
 
-from amulet_map_editor.amulet_wx.ui.select_block import VersionSelect
-from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
 from amulet.api.selection import SelectionGroup
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import Dimension
+from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.structure_interface.mcstructure import MCStructureFormatWrapper
+
+from amulet_map_editor.amulet_wx.ui.select_block import VersionSelect
+from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import SimpleOperationPanel
+from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
+
 
 if TYPE_CHECKING:
     from amulet.api.world import World
+    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
-def export_mcstructure(
-    world: "World",
-    dimension: Dimension,
-    selection: SelectionGroup,
-    options: dict
-):
-    assert len(selection.selection_boxes) == 1, "The mcstructure format only supports a single selection box."
-    path, version = options.get('path', None), options.get('version', None)
-    if isinstance(path, str) and path.endswith('.mcstructure') and version:
-        wrapper = MCStructureFormatWrapper(path, 'w')
-        wrapper.selection = selection
-        wrapper.version = version
-        wrapper.translation_manager = world.translation_manager
-        wrapper.open()
-        for cx, cz in wrapper.selection.chunk_locations():
-            try:
-                chunk = world.get_chunk(cx, cz, dimension)
-                wrapper.commit_chunk(chunk, world.palette)
-            except ChunkLoadError:
-                continue
+class ExportMCStructure(SimpleOperationPanel):
+    def __init__(
+            self,
+            parent: wx.Window,
+            canvas: "EditCanvas",
+            world: "World",
+            options_path: str
+    ):
+        SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
 
-        wrapper.close()
-    else:
-        raise Exception('Please specify a save location and platform in the options before running.')
+        options = self._load_options({})
 
+        self._file_picker = wx.FilePickerCtrl(
+            self,
+            path=options.get('path', ''),
+            wildcard="mcstructure file (*.mcstructure)|*.mcstructure",
+            style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT
+        )
+        self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
+        self._version_define = VersionSelect(
+            self,
+            world.translation_manager,
+            options.get("platform", None) or world.world_wrapper.platform,
+            allowed_platforms=("bedrock", ),
+            allow_numerical=False
+        )
+        self._sizer.Add(self._version_define, 0, wx.CENTRE, 5)
+        self._add_run_button("Export")
+        self.Layout()
 
-def show_ui(parent, world: "World", options: dict) -> dict:
-    dialog = SimpleDialog(parent, 'Export Bedrock .mcstructure')
-    file_picker = wx.FilePickerCtrl(
-        dialog,
-        path=options.get('path', ''),
-        wildcard="mcstructure file (*.mcstructure)|*.mcstructure",
-        style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT
-    )
-    dialog.sizer.Add(file_picker, 0, wx.ALL, 5)
-    version_define = VersionSelect(
-        dialog,
-        world.translation_manager,
-        options.get("platform", None) or world.world_wrapper.platform,
-        allowed_platforms=("bedrock", ),
-        allow_numerical=False
-    )
-    dialog.sizer.Add(version_define, 0)
-    dialog.Fit()
+    def unload(self):
+        self._save_options({
+            "path": self._file_picker.GetPath(),
+            "version": self._version_define.version
+        })
 
-    if dialog.ShowModal() == wx.ID_OK:
-        options = {
-            "path": file_picker.GetPath(),
-            "version": version_define.version
-        }
-    return options
+    def _operation(self, world: "World", dimension: Dimension, selection: SelectionGroup) -> OperationReturnType:
+        if len(selection.selection_boxes) == 0:
+            raise OperationError("No selection was given to export.")
+        elif len(selection.selection_boxes) != 1:
+            raise OperationError("The mcstructure format only supports a single selection box.")
+
+        path = self._file_picker.GetPath()
+        version = self._version_define.version
+
+        if isinstance(path, str) and path.endswith('.mcstructure') and version:
+            wrapper = MCStructureFormatWrapper(path, 'w')
+            wrapper.selection = selection
+            wrapper.version = version
+            wrapper.translation_manager = world.translation_manager
+            wrapper.open()
+            for cx, cz in wrapper.selection.chunk_locations():
+                try:
+                    chunk = world.get_chunk(cx, cz, dimension)
+                    wrapper.commit_chunk(chunk, world.palette)
+                except ChunkLoadError:
+                    continue
+
+            wrapper.close()
+        else:
+            raise OperationError('Please specify a save location and version in the options before running.')
 
 
 export = {
-    "v": 1,  # a version 1 plugin
     "name": "Export Bedrock .mcstructure",  # the name of the plugin
-    "features": ["src_selection", "wxoptions"],
-    "inputs": ["src_selection", "options"],  # the inputs to give to the plugin
-    "operation": export_mcstructure,  # the actual function to call when running the plugin
-    "wxoptions": show_ui
+    "operation": ExportMCStructure,  # the UI class to display
 }
