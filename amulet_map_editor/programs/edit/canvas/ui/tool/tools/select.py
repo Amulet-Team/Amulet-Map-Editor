@@ -1,11 +1,10 @@
 from typing import TYPE_CHECKING, Type, Any, Optional
 import wx
-import numpy
 
 from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
-from amulet_map_editor.programs.edit.ui.select_location import SelectLocationUI
+from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectLocationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_PASTE
 
 if TYPE_CHECKING:

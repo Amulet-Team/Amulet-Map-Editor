@@ -34,7 +34,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
 
         def _add_row(label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
             sizer = wx.BoxSizer(wx.HORIZONTAL)
-            self.add_object(sizer, 0, 0)
+            self.add_object(sizer, 0, wx.ALIGN_CENTER_HORIZONTAL)
             name_text = wx.StaticText(self, label=label)
             sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
             obj = wx_object(self, **kwargs)
