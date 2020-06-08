@@ -332,6 +332,7 @@ class BaseEditCanvas(BaseCanvas):
         cx: Optional[int] = None
         cz: Optional[int] = None
         chunk: Optional[Chunk] = None
+        in_air = False
 
         box_index, nearest_selection_box = self._selection_group.closest_intersection(self.camera_location, self._look_vector())
 
@@ -352,7 +353,11 @@ class BaseEditCanvas(BaseCanvas):
                     chunk = None
 
             if chunk is not None and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]].namespaced_name != 'universal_minecraft:air':
-                return location, None
+                # the block is not air
+                if in_air:  # if we have previously found an air block
+                    return location, None
+            elif not in_air:
+                in_air = True
         return location, None
 
     def _box_location_distance(self, distance: int) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
