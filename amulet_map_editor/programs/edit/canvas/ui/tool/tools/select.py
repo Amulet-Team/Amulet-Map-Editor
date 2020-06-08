@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class SelectOptions(wx.BoxSizer, BaseToolUI):
     def __init__(self, canvas: 'EditCanvas'):
-        wx.BoxSizer.__init__(self, wx.VERTICAL)
+        wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         BaseToolUI.__init__(self, canvas)
 
         self._button_panel = wx.Panel(canvas)
@@ -31,7 +31,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         paste_button = wx.Button(self._button_panel, label="Paste")
         button_sizer.Add(paste_button, 0, wx.ALL, 5)
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste())
-        self.Add(self._button_panel)
+        self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
         self._paste_panel: Optional[SelectLocationUI] = None
 
