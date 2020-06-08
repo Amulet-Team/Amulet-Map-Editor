@@ -1,9 +1,40 @@
-from amulet.operations.paste import paste
+from typing import TYPE_CHECKING
+import wx
+
+from amulet.api.structure import Structure
+from amulet.api.selection import SelectionGroup
+from amulet.api.data_types import Dimension, OperationReturnType
+
+from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import SimpleOperationPanel
+
+if TYPE_CHECKING:
+    from amulet.api.world import World
+    from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
+
+
+class Clone(SimpleOperationPanel):
+    def __init__(
+            self,
+            parent: wx.Window,
+            canvas: "EditCanvas",
+            world: "World",
+            options_path: str
+    ):
+        SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
+        self._add_run_button()
+        self.Layout()
+
+    def _operation(self, world: "World", dimension: Dimension, selection: SelectionGroup) -> OperationReturnType:
+        structure = Structure.from_world(
+            world, selection, dimension
+        )
+        self.canvas.paste(structure)
+
+    def unload(self):
+        pass
+
 
 export = {
-    "v": 1,  # a version 1 plugin
     "name": "Clone",  # the name of the plugin
-    "features": ["src_selection", "dst_location_absolute"],
-    "inputs": ["structure", "options"],  # the inputs to give to the plugin
-    "operation": paste  # the actual function to call when running the plugin
+    "operation": Clone  # the actual function to call when running the plugin
 }

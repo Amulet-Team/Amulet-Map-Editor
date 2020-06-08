@@ -40,5 +40,5 @@ class SimpleOperationPanel(wx.Panel, OperationUI):
             )
         )
 
-    def _operation(self, world: "World", dimension: Dimension, target_box: SelectionGroup) -> OperationReturnType:
+    def _operation(self, world: "World", dimension: Dimension, selection: SelectionGroup) -> OperationReturnType:
         raise NotImplementedError
