@@ -1,14 +1,20 @@
 import wx
+import wx.lib.inspection
+from wx.lib.agw import flatnotebook
 import os
-from typing import Dict
+from typing import Dict, Union
 import webbrowser
 
 from amulet.api.errors import LoaderNoneMatched
-from amulet_map_editor.amulet_wx.world_select import WorldSelectDialog
+from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
 from amulet_map_editor import lang, version, log, IMG_DIR
 from amulet_map_editor.programs import WorldManagerUI
-from amulet_map_editor.amulet_wx import simple
 from amulet_map_editor.programs import BaseWorldUI
+
+NOTEBOOK_MENU_STYLE = flatnotebook.FNB_NO_X_BUTTON | flatnotebook.FNB_HIDE_ON_SINGLE_TAB | flatnotebook.FNB_NAV_BUTTONS_WHEN_NEEDED
+NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
+
+CLOSEABLE_PAGE_TYPE = Union[WorldManagerUI]
 
 
 class AmuletMainWindow(wx.Frame):
@@ -35,11 +41,14 @@ class AmuletMainWindow(wx.Frame):
         icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.path.dirname(__file__), 'img', 'icon64.png'), wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
 
-        self._open_worlds: Dict[str, BaseWorldUI] = {}
+        self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}
 
-        self.world_tab_holder = wx.Notebook(
-            self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0
+        self.world_tab_holder = flatnotebook.FlatNotebook(
+            self,
+            agwStyle=NOTEBOOK_MENU_STYLE
         )
+
+        self.world_tab_holder.Bind(flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING, self._on_page_close)
 
         self._main_menu = AmuletMainMenu(self.world_tab_holder, self._open_world)
 
@@ -50,7 +59,7 @@ class AmuletMainWindow(wx.Frame):
             lang.get('main_menu')
         )
 
-        self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CLOSE, self._on_close_app)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
         self.Show()
@@ -104,28 +113,32 @@ class AmuletMainWindow(wx.Frame):
             if self._last_page is not None:
                 self._last_page.disable()
             self._last_page: BaseWorldUI = current
+            if self._last_page is self._main_menu:
+                self.world_tab_holder.SetAGWWindowStyleFlag(NOTEBOOK_MENU_STYLE)
+            else:
+                self.world_tab_holder.SetAGWWindowStyleFlag(NOTEBOOK_STYLE)
         if self._last_page is not None:
             self._last_page.enable()
 
     def _add_world_tab(self, obj, obj_name):
-        # TODO: find a way for the tab to be optionally closeable
         self.world_tab_holder.AddPage(obj, obj_name, True)
         self._disable_enable()
 
     def _show_open_world(self):
         select_world = WorldSelectDialog(self, self._open_world)
         select_world.ShowModal()
+        select_world.Destroy()
 
     def _open_world(self, path: str):
         """Open a world panel add add it to the notebook"""
         if path in self._open_worlds:
             self.world_tab_holder.SetSelection(
-                self.world_tab_holder.FindPage(self._open_worlds[path])
+                self.world_tab_holder.GetPageIndex(self._open_worlds[path])
             )
             self._disable_enable()
         else:
             try:
-                world = WorldManagerUI(self.world_tab_holder, path)
+                world = WorldManagerUI(self.world_tab_holder, path, lambda: self.close_world(path))
             except LoaderNoneMatched as e:
                 log.error(e)
                 wx.MessageBox(str(e))
@@ -137,22 +150,30 @@ class AmuletMainWindow(wx.Frame):
         """Close a given world and remove it from the notebook"""
         if path in self._open_worlds:
             world = self._open_worlds[path]
-            world.disable()
-            world.close()
             self.world_tab_holder.DeletePage(
-                self.world_tab_holder.FindPage(world)
+                self.world_tab_holder.GetPageIndex(world)
             )
-            del self._open_worlds[path]
-            self._last_page: BaseWorldUI = self.world_tab_holder.GetCurrentPage()
-            if self._last_page is not None:
-                self._last_page.enable()
 
-    def _on_close(self, evt):
+    def _on_page_close(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
+        page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetCurrentPage()
+        if page is not self._main_menu:
+            if page.is_closeable():
+                path = page.path
+                page.disable()
+                page.close()
+                self._last_page = None
+                del self._open_worlds[path]
+            else:
+                evt.Veto()
+
+    def _on_close_app(self, evt):
         close = True
-        for path, world in list(self._open_worlds.items()):
-            if world.is_closeable():
+        for path, page in list(self._open_worlds.items()):
+            page: CLOSEABLE_PAGE_TYPE
+            if page.is_closeable():
                 self.close_world(path)
             else:
+                log.info(f"{page.world_name} cannot be closed.")
                 close = False
         if close:
             evt.Skip()
@@ -162,14 +183,17 @@ class AmuletMainWindow(wx.Frame):
             )
 
 
-class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
-    def __init__(self, parent, open_world):
+class AmuletMainMenu(wx.Panel, BaseWorldUI):
+    def __init__(self, parent: wx.Window, open_world):
         super(AmuletMainMenu, self).__init__(
             parent
         )
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+        sizer.AddStretchSpacer(1)
         self._open_world_callback = open_world
-        sizer = wx.BoxSizer()
-        self.add_object(sizer, 0, wx.ALL | wx.CENTER)
+        name_sizer = wx.BoxSizer()
+        sizer.Add(name_sizer, 0, wx.CENTER)
         img = wx.Image(
             os.path.join(IMG_DIR, 'icon128.png'),
             wx.BITMAP_TYPE_ANY
@@ -189,33 +213,37 @@ class AmuletMainMenu(simple.SimplePanel, BaseWorldUI):
             (0, 0),
             (64, 64)
         )
-        sizer.Add(icon, flag=wx.CENTER)
+        icon2.Bind(wx.EVT_LEFT_DOWN, lambda evt: wx.lib.inspection.InspectionTool().Show())
+        name_sizer.Add(icon, flag=wx.CENTER)
 
         amulet_converter = wx.StaticText(self, label='Amulet')
         amulet_converter.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        sizer.Add(
+        name_sizer.Add(
             amulet_converter, flag=wx.CENTER
         )
-        sizer.Add(icon2, flag=wx.CENTER)
+        name_sizer.Add(icon2, flag=wx.CENTER)
         button_font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
         self._open_world_button = wx.Button(self, label='Open World', size=(400, 70))
         self._open_world_button.SetFont(button_font)
         self._open_world_button.Bind(wx.EVT_BUTTON, self._show_world_select)
-        self.add_object(self._open_world_button, 0, wx.ALL|wx.CENTER)
+        sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._help_button = wx.Button(self, label='Help', size=(400, 70))
         self._help_button.SetFont(button_font)
         self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
-        self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
+        sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._help_button = wx.Button(self, label='Amulet Discord', size=(400, 70))
         self._help_button.SetFont(button_font)
         self._help_button.Bind(wx.EVT_BUTTON, self._discord)
-        self.add_object(self._help_button, 0, wx.ALL | wx.CENTER)
+        sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)
+
+        sizer.AddStretchSpacer(2)
 
     def _show_world_select(self, evt):
         select_world = WorldSelectDialog(self, self._open_world_callback)
         select_world.ShowModal()
+        select_world.Destroy()
 
     def _documentation(self, evt):
         webbrowser.open('https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/readme.md')

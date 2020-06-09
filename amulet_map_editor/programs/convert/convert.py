@@ -1,14 +1,14 @@
 import wx
 from concurrent.futures import ThreadPoolExecutor
 import webbrowser
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 from amulet import world_interface
 from amulet.api.world import World
 
 from amulet_map_editor import lang, log
-from amulet_map_editor.amulet_wx.simple import SimplePanel
-from amulet_map_editor.amulet_wx.world_select import WorldSelectDialog, WorldUI
+from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
+from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 
 if TYPE_CHECKING:
@@ -20,12 +20,13 @@ work_count = 0
 
 
 class ConvertExtension(SimplePanel, BaseWorldProgram):
-    def __init__(self, container, world: World):
+    def __init__(self, container, world: World, close_self_callback: Callable[[], None]):
         SimplePanel.__init__(
             self,
             container
         )
         self.world = world
+        self._close_self_callback = close_self_callback
 
         self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
         self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
@@ -94,6 +95,7 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
     def _show_world_select(self, evt):
         select_world = WorldSelectDialog(self, self._output_world_callback)
         select_world.ShowModal()
+        select_world.Destroy()
 
     def _output_world_callback(self, path):
         if path == self.world.world_path:
@@ -160,4 +162,4 @@ class ConvertExtension(SimplePanel, BaseWorldProgram):
         return work_count == 0
 
     def _close_world(self, evt):
-        self.GetGrandParent().GetParent().close_world(self.world.world_path)
+        self._close_self_callback()

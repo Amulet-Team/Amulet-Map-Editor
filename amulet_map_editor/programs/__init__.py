@@ -9,8 +9,8 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet import world_interface
 
 from amulet_map_editor import log
-from amulet_map_editor.amulet_wx.simple import SimplePanel
-from amulet_map_editor.amulet_wx.world_select import WorldUI
+from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
+from amulet_map_editor.amulet_wx.ui.select_world import WorldUI
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -62,10 +62,10 @@ class BaseWorldUI:
 
 
 class WorldManagerUI(wx.Notebook, BaseWorldUI):
-    def __init__(self, parent, path):
+    def __init__(self, parent: wx.Window, path: str, close_self_callback: Callable[[], None]):
         super().__init__(parent, style=wx.NB_LEFT)
-        self._finished = False
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
+        self._path = path
+        self._close_self_callback = close_self_callback
         try:
             self.world = world_interface.load_world(path)
         except LoaderNoneMatched as e:
@@ -75,10 +75,14 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
         self._extensions: List[BaseWorldProgram] = []
         self._last_extension: int = -1
         self._load_extensions()
-        self._finished = True
+        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
+
+    @property
+    def path(self) -> str:
+        return self._path
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault('&File', {}).setdefault('exit', {}).setdefault('Close World', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        menu.setdefault('&File', {}).setdefault('exit', {}).setdefault('Close World', lambda evt: self._close_self_callback)
         return self._extensions[self.GetSelection()].menu(menu)
 
     def _load_extensions(self):
@@ -87,7 +91,7 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
         select = True
         for extension_name, extension in _extensions:
             try:
-                ext = extension(self, self.world)
+                ext = extension(self, self.world, self._close_self_callback)
                 self._extensions.append(ext)
                 self.AddPage(ext, extension_name, select)
                 select = False
@@ -109,10 +113,9 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
     def _page_change(self, evt):
         """Method to fire when the page is changed"""
         if self.GetSelection() != self._last_extension:
-            if self._finished:
-                self._extensions[self._last_extension].disable()
-                self._extensions[self.GetSelection()].enable()
-                self.GetGrandParent().create_menu()
+            self._extensions[self._last_extension].disable()
+            self._extensions[self.GetSelection()].enable()
+            self.GetGrandParent().create_menu()
             self._last_extension = self.GetSelection()
 
     def disable(self):
@@ -133,11 +136,16 @@ class BaseWorldProgram:
         """Run when the panel is hidden/disabled"""
         pass
 
-    def is_closeable(self):
+    def is_closeable(self) -> bool:
+        """
+        Check if it is safe to close the UI.
+        If this is going to return False it should notify the user.
+        :return: True if the program can be closed, False otherwise
+        """
         return True
 
     def close(self):
-        """Run when the world is closed"""
+        """Fully close the UI. Called when destroying the UI."""
         pass
 
     def menu(self, menu: MenuData) -> MenuData:
@@ -145,12 +153,13 @@ class BaseWorldProgram:
 
 
 class AboutExtension(SimplePanel, BaseWorldProgram):
-    def __init__(self, container, world: 'World'):
+    def __init__(self, container, world: 'World', close_self_callback: Callable[[], None]):
         SimplePanel.__init__(
             self,
             container
         )
         self.world = world
+        self._close_self_callback = close_self_callback
 
         self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
         self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
@@ -175,7 +184,7 @@ class AboutExtension(SimplePanel, BaseWorldProgram):
         )
 
     def _close_world(self, evt):
-        self.GetGrandParent().GetParent().close_world(self.world.world_path)
+        self._close_self_callback()
 
 
 _fixed_extensions.append(("About", AboutExtension))

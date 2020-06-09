@@ -5,6 +5,7 @@ import uuid
 import numpy
 import math
 from typing import Optional
+from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -21,7 +22,6 @@ class BaseCanvas(glcanvas.GLCanvas):
         self._transformation_matrix: Optional[numpy.ndarray] = None
 
     def _setup_opengl(self):
-        glClearColor(0.5, 0.66, 1.0, 1.0)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glDepthFunc(GL_LEQUAL)
@@ -37,6 +37,14 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     def _close(self):
         glDeleteTextures([self._gl_texture_atlas])
+
+    @property
+    def camera_location(self) -> CameraLocationType:
+        raise NotImplementedError
+
+    @property
+    def camera_rotation(self) -> CameraRotationType:
+        raise NotImplementedError
 
     @property
     def fov(self) -> float:
@@ -107,9 +115,9 @@ class BaseCanvas(glcanvas.GLCanvas):
         # camera translation
         if self._transformation_matrix is None:
             transformation_matrix = numpy.eye(4, dtype=numpy.float32)
-            transformation_matrix[3, :3] = numpy.array(self._camera[:3]) * -1
+            transformation_matrix[3, :3] = numpy.array(self.camera_location) * -1
 
-            transformation_matrix = numpy.matmul(transformation_matrix, self.rotation_matrix(*self._camera[3:5]))
+            transformation_matrix = numpy.matmul(transformation_matrix, self.rotation_matrix(*self.camera_rotation))
             self._transformation_matrix = numpy.matmul(transformation_matrix, self.projection_matrix())
 
         return self._transformation_matrix

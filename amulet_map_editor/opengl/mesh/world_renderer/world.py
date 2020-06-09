@@ -8,16 +8,17 @@ import weakref
 import minecraft_model_reader
 import PyMCTranslate
 from amulet.api.block import BlockManager
+from amulet.api.data_types import Dimension
 
 from amulet_map_editor import log
 from .chunk import RenderChunk
 from .region import ChunkManager
+from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 from amulet_map_editor.opengl.resource_pack import ResourcePackManager
 from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
 
 if TYPE_CHECKING:
     from amulet.api.world import World
-
 
 def sin(theta: Union[int, float]) -> float:
     return math.sin(math.radians(theta))
@@ -137,8 +138,9 @@ class RenderWorld(ResourcePackManager, Drawable):
     ):
         super().__init__(context_identifier, resource_pack, texture, texture_bounds, translator)
         self._world = world
-        self._camera = [0, 150, 0, 90, 0]
-        self._dimension = "overworld"
+        self._camera_location: CameraLocationType = (0, 150, 0)
+        self._camera_rotation: CameraRotationType = (90, 0)
+        self._dimension: Dimension = "overworld"
         self._render_distance = 10
         self._garbage_distance = 20
         self._chunk_manager = ChunkManager(self.context_identifier, self.texture)
@@ -178,19 +180,27 @@ class RenderWorld(ResourcePackManager, Drawable):
         self.disable()
 
     @property
-    def camera(self):
-        return self._camera
+    def camera_location(self) -> CameraLocationType:
+        return self._camera_location
 
-    @camera.setter
-    def camera(self, value: List[Union[int, float]]):
-        self._camera = value
+    @camera_location.setter
+    def camera_location(self, value: CameraLocationType):
+        self._camera_location = value
 
     @property
-    def dimension(self) -> str:
+    def camera_rotation(self) -> CameraRotationType:
+        return self._camera_rotation
+
+    @camera_rotation.setter
+    def camera_rotation(self, value: CameraRotationType):
+        self._camera_rotation = value
+
+    @property
+    def dimension(self) -> Dimension:
         return self._dimension
 
     @dimension.setter
-    def dimension(self, dimension: int):
+    def dimension(self, dimension: Dimension):
         self._chunk_generator.stop()
         self._dimension = dimension
         self.run_garbage_collector(True)
@@ -218,7 +228,7 @@ class RenderWorld(ResourcePackManager, Drawable):
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
-        cx, cz = int(self._camera[0]) >> 4, int(self._camera[2]) >> 4
+        cx, cz = int(self.camera_location[0]) >> 4, int(self.camera_location[2]) >> 4
 
         sign = 1
         length = 1
@@ -233,7 +243,7 @@ class RenderWorld(ResourcePackManager, Drawable):
             length += 1
 
     def draw(self, transformation_matrix: numpy.ndarray):
-        self._chunk_manager.draw(transformation_matrix, self._camera[:3])
+        self._chunk_manager.draw(transformation_matrix, self.camera_location)
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
@@ -242,10 +252,10 @@ class RenderWorld(ResourcePackManager, Drawable):
         else:
             safe_area = (
                 self._dimension,
-                self._camera[0]//16 - self.garbage_distance,
-                self._camera[2]//16 - self.garbage_distance,
-                self._camera[0]//16 + self.garbage_distance,
-                self._camera[2]//16 + self.garbage_distance
+                self.camera_location[0]//16 - self.garbage_distance,
+                self.camera_location[2]//16 - self.garbage_distance,
+                self.camera_location[0]//16 + self.garbage_distance,
+                self.camera_location[2]//16 + self.garbage_distance
             )
             self._chunk_manager.unload(safe_area[1:])
             self._world.unload(safe_area)
