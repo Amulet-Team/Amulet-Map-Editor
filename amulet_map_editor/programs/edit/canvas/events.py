@@ -18,8 +18,7 @@ EditCloseEvent, EVT_EDIT_CLOSE = newevent.NewEvent()
 SelectionPointChangeEvent, EVT_SELECTION_POINT_CHANGE = newevent.NewEvent()
 
 # events fired when the active selection box changes.  TODO: reimplement these
-BoxChangeEvent, EVT_BOX_CHANGE = newevent.NewEvent()
-BoxGreenCornerChangeEvent, EVT_BOX_GREEN_CORNER_CHANGE = newevent.NewEvent()
-BoxBlueCornerChangeEvent, EVT_BOX_BLUE_CORNER_CHANGE = newevent.NewEvent()
-
-BoxCoordsEnableEvent, EVT_BOX_COORDS_ENABLE = newevent.NewEvent()
+BoxChangeEvent, EVT_BOX_CHANGE = newevent.NewEvent()  # one or more of the box coordinates have changed
+BoxPoint1ChangeEvent, EVT_BOX_POINT_1_CHANGE = newevent.NewEvent()  # the first box corner has changed
+BoxPoint2ChangeEvent, EVT_BOX_POINT_2_CHANGE = newevent.NewEvent()  # the second box corner has changed
+BoxEditToggleEvent, EVT_BOX_EDIT_TOGGLE = newevent.NewEvent()  # the box has switched between edit and static mode

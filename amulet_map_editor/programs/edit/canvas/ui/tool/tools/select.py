@@ -3,9 +3,15 @@ import wx
 
 from amulet.operations.paste import paste_iter
 
+from amulet_map_editor.amulet_wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectLocationUI
-from amulet_map_editor.programs.edit.canvas.events import EVT_PASTE
+from amulet_map_editor.programs.edit.canvas.events import (
+    EVT_PASTE,
+    EVT_BOX_POINT_1_CHANGE,
+    EVT_BOX_POINT_2_CHANGE,
+    EVT_BOX_EDIT_TOGGLE,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
@@ -20,53 +26,59 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
         delete_button = wx.Button(self._button_panel, label="Delete")
-        button_sizer.Add(delete_button, 0, wx.ALL, 5)
+        button_sizer.Add(delete_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
         delete_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.delete())
         copy_button = wx.Button(self._button_panel, label="Copy")
-        button_sizer.Add(copy_button, 0, wx.ALL, 5)
+        button_sizer.Add(copy_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
         copy_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.copy())
         cut_button = wx.Button(self._button_panel, label="Cut")
-        button_sizer.Add(cut_button, 0, wx.ALL, 5)
+        button_sizer.Add(cut_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
         cut_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.cut())
         paste_button = wx.Button(self._button_panel, label="Paste")
-        button_sizer.Add(paste_button, 0, wx.ALL, 5)
+        button_sizer.Add(paste_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste())
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
         self._paste_panel: Optional[SelectLocationUI] = None
 
-        # self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
-        # self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
-        # self._z1: wx.SpinCtrl = self._add_row('z1', wx.SpinCtrl, min=-30000000, max=30000000)
-        # self._x1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-        # self._y1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-        # self._z1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-        #
-        # self._x2: wx.SpinCtrl = self._add_row('x2', wx.SpinCtrl, min=-30000000, max=30000000)
-        # self._y2: wx.SpinCtrl = self._add_row('y2', wx.SpinCtrl, min=-30000000, max=30000000)
-        # self._z2: wx.SpinCtrl = self._add_row('z2', wx.SpinCtrl, min=-30000000, max=30000000)
-        # self._x2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-        # self._y2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-        # self._z2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-        #
-        # self._x1.Disable()
-        # self._y1.Disable()
-        # self._z1.Disable()
-        # self._x2.Disable()
-        # self._y2.Disable()
-        # self._z2.Disable()
-        #
-        # self._x1.SetBackgroundColour((160, 215, 145))
-        # self._y1.SetBackgroundColour((160, 215, 145))
-        # self._z1.SetBackgroundColour((160, 215, 145))
-        #
-        # self._x2.SetBackgroundColour((150, 150, 215))
-        # self._y2.SetBackgroundColour((150, 150, 215))
-        # self._z2.SetBackgroundColour((150, 150, 215))
-        #
-        # self._canvas().Bind(EVT_BOX_GREEN_CORNER_CHANGE, self._green_corner_renderer_change)
-        # self._canvas().Bind(EVT_BOX_BLUE_CORNER_CHANGE, self._blue_corner_renderer_change)
-        # self._canvas().Bind(EVT_BOX_COORDS_ENABLE, self._enable_scrolls)
+        self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._z1: wx.SpinCtrl = self._add_row('z1', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
+        self._y1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
+        self._z1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
+        self._x1.SetValidator(IntValidator())
+        self._y1.SetValidator(IntValidator())
+        self._z1.SetValidator(IntValidator())
+
+        self._x2: wx.SpinCtrl = self._add_row('x2', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._y2: wx.SpinCtrl = self._add_row('y2', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._z2: wx.SpinCtrl = self._add_row('z2', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
+        self._y2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
+        self._z2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
+        self._x2.SetValidator(IntValidator())
+        self._y2.SetValidator(IntValidator())
+        self._z2.SetValidator(IntValidator())
+
+        self._x1.Disable()
+        self._y1.Disable()
+        self._z1.Disable()
+        self._x2.Disable()
+        self._y2.Disable()
+        self._z2.Disable()
+
+        self._x1.SetBackgroundColour((160, 215, 145))
+        self._y1.SetBackgroundColour((160, 215, 145))
+        self._z1.SetBackgroundColour((160, 215, 145))
+
+        self._x2.SetBackgroundColour((150, 150, 215))
+        self._y2.SetBackgroundColour((150, 150, 215))
+        self._z2.SetBackgroundColour((150, 150, 215))
+
+        self._canvas().Bind(EVT_BOX_POINT_1_CHANGE, self._green_corner_renderer_change)
+        self._canvas().Bind(EVT_BOX_POINT_2_CHANGE, self._blue_corner_renderer_change)
+        self._canvas().Bind(EVT_BOX_EDIT_TOGGLE, self._enable_scrolls)
 
     def bind_events(self):
         self.canvas.Bind(EVT_PASTE, self._paste)
@@ -108,33 +120,36 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.Add(sizer, 0, 0)
-        name_text = wx.StaticText(self, label=label)
+        self._button_panel.GetSizer().Add(sizer, 0, 0)
+        name_text = wx.StaticText(self._button_panel, label=label)
         sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
-        obj = wx_object(self, **kwargs)
+        obj = wx_object(self._button_panel, **kwargs)
         sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
         return obj
 
-    # def _green_corner_input_change(self, _):
-    #     self._canvas().active_selection.point1 = [self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()]
-    #
-    # def _blue_corner_input_change(self, _):
-    #     self._canvas().active_selection.point2 = [self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()]
-    #
-    # def _green_corner_renderer_change(self, evt):
-    #     self._x1.SetValue(evt.x)
-    #     self._y1.SetValue(evt.y)
-    #     self._z1.SetValue(evt.z)
-    #
-    # def _blue_corner_renderer_change(self, evt):
-    #     self._x2.SetValue(evt.x)
-    #     self._y2.SetValue(evt.y)
-    #     self._z2.SetValue(evt.z)
-    #
-    # def _enable_scrolls(self, evt):
-    #     self._x1.Enable(evt.enabled)
-    #     self._y1.Enable(evt.enabled)
-    #     self._z1.Enable(evt.enabled)
-    #     self._x2.Enable(evt.enabled)
-    #     self._y2.Enable(evt.enabled)
-    #     self._z2.Enable(evt.enabled)
+    def _green_corner_input_change(self, _):
+        self._canvas().active_selection.point1 = [self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()]
+
+    def _blue_corner_input_change(self, _):
+        self._canvas().active_selection.point2 = [self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()]
+
+    def _green_corner_renderer_change(self, evt):
+        x, y, z = evt.location
+        self._x1.SetValue(x)
+        self._y1.SetValue(y)
+        self._z1.SetValue(z)
+
+    def _blue_corner_renderer_change(self, evt):
+        x, y, z = evt.location
+        self._x2.SetValue(x)
+        self._y2.SetValue(y)
+        self._z2.SetValue(z)
+
+    def _enable_scrolls(self, evt):
+        enabled = not evt.edit
+        self._x1.Enable(enabled)
+        self._y1.Enable(enabled)
+        self._z1.Enable(enabled)
+        self._x2.Enable(enabled)
+        self._y2.Enable(enabled)
+        self._z2.Enable(enabled)
