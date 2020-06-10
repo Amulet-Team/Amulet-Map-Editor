@@ -5,6 +5,7 @@ import numpy
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
 from amulet_map_editor.amulet_wx.util.key_config import serialise_key_event, KeybindGroup, ActionLookupType
+from .events import EditEscapeEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -113,6 +114,7 @@ class ControllableEditCanvas(BaseEditCanvas):
 
         elif key[1] == wx.WXK_ESCAPE:
             self._escape()
+            wx.PostEvent(self, EditEscapeEvent())
         elif not press:
             remove_actions = [self._key_binds[k] for k in self._key_binds if k[1] == key[1]]
             for a in remove_actions:
