@@ -103,7 +103,7 @@ class RenderRegion(TriMesh):
         self._merged_chunk_locations: Dict[Tuple[int, int], Tuple[int, int, int, int]] = {}
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
 
-        self.region_transform = numpy.eye(4, dtype=numpy.float32)
+        self.region_transform = numpy.eye(4, dtype=numpy.float64)
         self.region_transform[3, [0, 2]] = numpy.array([rx, rz]) * region_size * 16
 
     @property

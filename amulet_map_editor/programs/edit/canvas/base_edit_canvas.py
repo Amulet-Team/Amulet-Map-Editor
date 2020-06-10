@@ -447,7 +447,7 @@ class BaseEditCanvas(BaseCanvas):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
         if self._draw_structure and self._structure is not None:
-            transform = numpy.eye(4, dtype=numpy.float32)
+            transform = numpy.eye(4, dtype=numpy.float64)
             for location in self.structure_locations:
                 transform[3, 0:3] = location
                 self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)

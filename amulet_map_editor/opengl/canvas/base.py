@@ -76,7 +76,7 @@ class BaseCanvas(glcanvas.GLCanvas):
                 [s, 0, c, 0],
                 [0, 0, 0, 1]
             ],
-            dtype=numpy.float32
+            dtype=numpy.float64
         )
 
         # rotations
@@ -90,7 +90,7 @@ class BaseCanvas(glcanvas.GLCanvas):
                 [0, -s, c, 0],
                 [0, 0, 0, 1]
             ],
-            dtype=numpy.float32
+            dtype=numpy.float64
         )
 
         return numpy.matmul(y_rot, x_rot)
@@ -107,14 +107,14 @@ class BaseCanvas(glcanvas.GLCanvas):
                 [0, 0, (z_far + z_near) / (z_near - z_far), -1],
                 [0, 0, (2 * z_far * z_near) / (z_near - z_far), 0]
             ],
-            dtype=numpy.float32
+            dtype=numpy.float64
         )
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
         if self._transformation_matrix is None:
-            transformation_matrix = numpy.eye(4, dtype=numpy.float32)
+            transformation_matrix = numpy.eye(4, dtype=numpy.float64)
             transformation_matrix[3, :3] = numpy.array(self.camera_location) * -1
 
             transformation_matrix = numpy.matmul(transformation_matrix, self.rotation_matrix(*self.camera_rotation))

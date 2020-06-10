@@ -161,6 +161,7 @@ class RenderSelection(TriMesh):
         self._points: numpy.ndarray = numpy.zeros((2, 3), dtype=numpy.int)  # The points set using point1 and point2
         self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
         self.verts = numpy.zeros((6*2*3*3, self._vert_len), dtype=numpy.float32)
+        self.transformation_matrix = numpy.eye(4, dtype=numpy.float64)
         self._rebuild = True
         self._volume = 1
 
@@ -345,10 +346,21 @@ class RenderSelection(TriMesh):
 
     def _create_geometry(self):
         self._setup()
-        self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(self.min-0.005, self.max+0.005)
+        self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(
+            (-0.005, -0.005, -0.005),
+            self.max - self.min + 0.005
+        )
         self.verts[:36, 3:5] /= 16
-        self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(self.point1-0.01, self.point1+1.01)
-        self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(self.point2-0.01, self.point2+1.01)
+        self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(
+            self.point1 - self.min - 0.01,
+            self.point1 - self.min + 1.01
+        )
+        self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(
+            self.point2 - self.min - 0.01,
+            self.point2 - self.min + 1.01
+        )
+
+        self.transformation_matrix[3, :3] = self.min
 
         self.change_verts()
         self._volume = numpy.product(self.max - self.min)
@@ -367,6 +379,8 @@ class RenderSelection(TriMesh):
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
+
+        transformation_matrix = numpy.matmul(self.transformation_matrix, transformation_matrix)
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)
