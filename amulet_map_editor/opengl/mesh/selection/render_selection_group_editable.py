@@ -83,9 +83,10 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             else:
                 self._active_box = None
                 self._active_box_index = self._last_active_box_index = None
-        elif self._active_box is not None and self._active_box.is_dynamic and self._last_active_box_index is not None:
+        else:
             # if the box hasn't been committed yet
-            self._active_box_index = self._last_active_box_index
+            self._active_box = None
+            self._active_box_index = self._last_active_box_index = None
 
     def update_cursor_position(self, position: BlockCoordinatesAny, box_index: Optional[int]):
         self._cursor_position[:] = position
