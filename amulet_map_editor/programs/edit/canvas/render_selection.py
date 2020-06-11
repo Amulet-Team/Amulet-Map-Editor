@@ -26,8 +26,10 @@ class EditProgramRenderSelectionGroup(RenderSelectionGroupEditable):
     def _post_box_change_event(self):
         wx.PostEvent(self.canvas, BoxChangeEvent(corners=self.active_selection_corners))
 
-    def _post_box_end_edit_event(self):
+    def _post_box_enable_inputs_event(self):
+        super()._post_box_enable_inputs_event()
         wx.PostEvent(self.canvas, BoxEditToggleEvent(edit=False))
 
-    def _post_box_start_edit_event(self):
+    def _post_box_disable_inputs_event(self):
+        super()._post_box_disable_inputs_event()
         wx.PostEvent(self.canvas, BoxEditToggleEvent(edit=True))
