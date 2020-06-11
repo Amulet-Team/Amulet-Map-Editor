@@ -92,6 +92,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         structure = evt.structure
         self._button_panel.Hide()
         self._remove_paste()
+        self.canvas.selection_editable = False
         self._paste_panel = SelectLocationUI(self.canvas, self.canvas, structure, self._paste_confirm)
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
         self.Layout()
