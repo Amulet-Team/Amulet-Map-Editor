@@ -14,11 +14,12 @@ from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, cos, tan, atan
-from amulet_map_editor.opengl.mesh.selection import RenderSelection, RenderSelectionGroupEditable
+from amulet_map_editor.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
+from .render_selection import EditProgramRenderSelectionGroup
 from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
     CameraRotateEvent,
@@ -86,7 +87,8 @@ class BaseEditCanvas(BaseCanvas):
         self._selection_location: BlockCoordinates = (0, 0, 0)
 
         self._draw_selection = True
-        self._selection_group = RenderSelectionGroupEditable(
+        self._selection_group = EditProgramRenderSelectionGroup(
+            self,
             self.context_identifier,
             self._texture_bounds,
             self._gl_texture_atlas
@@ -132,10 +134,16 @@ class BaseEditCanvas(BaseCanvas):
         return self._selection_group.create_selection_group()
 
     @property
-    def active_selection(self) -> Optional[RenderSelection]:
-        """Get the selection box that is currently active.
-        May be None if no selection box exists."""
-        return self._selection_group.active_box
+    def active_selection_corners(self) -> Tuple[BlockCoordinates, BlockCoordinates]:
+        """Get the bounds of the selection box that is currently active.
+        Will be all 0 if no selection box exists.
+        The second value will be one less than the actual top edge.
+        This is the same as box selection in game works and solves some other issues."""
+        return self._selection_group.active_selection_corners
+
+    @active_selection_corners.setter
+    def active_selection_corners(self, box_corners: Tuple[BlockCoordinates, BlockCoordinates]):
+        self._selection_group.active_selection_corners = box_corners
 
     def enable(self):
         """Enable the canvas and start it working."""
@@ -302,7 +310,7 @@ class BaseEditCanvas(BaseCanvas):
         self._camera_rotate_speed = val
 
     def _change_box_location(self):
-        if self._selection_group.active_box and self._selection_group.active_box.being_resized:
+        if self._selection_group.reediting:
             position, box_index = self._box_location_distance(self.select_distance2)
         elif self._mouse_lock:
             position, box_index = self._box_location_distance(self.select_distance)
@@ -315,8 +323,8 @@ class BaseEditCanvas(BaseCanvas):
     def ray_collision(self):
         vector_start = self.camera_location
         direction_vector = self._look_vector()
-        min_point = self.active_selection.min
-        max_point = self.active_selection.max
+        min_point, max_point = numpy.sort(self.active_selection_corners, 0)
+        max_point += 1
 
         point_array = max_point.copy()
         numpy.putmask(point_array, direction_vector > 0, min_point)

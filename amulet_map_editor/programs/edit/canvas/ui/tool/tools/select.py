@@ -8,8 +8,7 @@ from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import Ba
 from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectLocationUI
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_PASTE,
-    EVT_BOX_POINT_1_CHANGE,
-    EVT_BOX_POINT_2_CHANGE,
+    EVT_BOX_CHANGE,
     EVT_BOX_EDIT_TOGGLE,
 )
 
@@ -44,9 +43,9 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
         self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
         self._z1: wx.SpinCtrl = self._add_row('z1', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._x1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-        self._y1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
-        self._z1.Bind(wx.EVT_SPINCTRL, self._green_corner_input_change)
+        self._x1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
+        self._y1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
+        self._z1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._x1.SetValidator(IntValidator())
         self._y1.SetValidator(IntValidator())
         self._z1.SetValidator(IntValidator())
@@ -54,9 +53,9 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._x2: wx.SpinCtrl = self._add_row('x2', wx.SpinCtrl, min=-30000000, max=30000000)
         self._y2: wx.SpinCtrl = self._add_row('y2', wx.SpinCtrl, min=-30000000, max=30000000)
         self._z2: wx.SpinCtrl = self._add_row('z2', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._x2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-        self._y2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
-        self._z2.Bind(wx.EVT_SPINCTRL, self._blue_corner_input_change)
+        self._x2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
+        self._y2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
+        self._z2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._x2.SetValidator(IntValidator())
         self._y2.SetValidator(IntValidator())
         self._z2.SetValidator(IntValidator())
@@ -76,12 +75,10 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._y2.SetBackgroundColour((150, 150, 215))
         self._z2.SetBackgroundColour((150, 150, 215))
 
-        self._canvas().Bind(EVT_BOX_POINT_1_CHANGE, self._green_corner_renderer_change)
-        self._canvas().Bind(EVT_BOX_POINT_2_CHANGE, self._blue_corner_renderer_change)
-        self._canvas().Bind(EVT_BOX_EDIT_TOGGLE, self._enable_scrolls)
-
     def bind_events(self):
         self.canvas.Bind(EVT_PASTE, self._paste)
+        self._canvas().Bind(EVT_BOX_CHANGE, self._box_renderer_change)
+        self._canvas().Bind(EVT_BOX_EDIT_TOGGLE, self._enable_scrolls)
 
     def _remove_paste(self):
         if self._paste_panel is not None:
@@ -128,23 +125,20 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
         return obj
 
-    def _green_corner_input_change(self, _):
-        self._canvas().active_selection.point1 = [self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()]
+    def _box_input_change(self, _):
+        self.canvas.active_selection_corners = (
+            (self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()),
+            (self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue())
+        )
 
-    def _blue_corner_input_change(self, _):
-        self._canvas().active_selection.point2 = [self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()]
-
-    def _green_corner_renderer_change(self, evt):
-        x, y, z = evt.location
-        self._x1.SetValue(x)
-        self._y1.SetValue(y)
-        self._z1.SetValue(z)
-
-    def _blue_corner_renderer_change(self, evt):
-        x, y, z = evt.location
-        self._x2.SetValue(x)
-        self._y2.SetValue(y)
-        self._z2.SetValue(z)
+    def _box_renderer_change(self, evt):
+        (x1, y1, z1), (x2, y2, z2) = evt.corners
+        self._x1.SetValue(x1)
+        self._y1.SetValue(y1)
+        self._z1.SetValue(z1)
+        self._x2.SetValue(x2)
+        self._y2.SetValue(y2)
+        self._z2.SetValue(z2)
 
     def _enable_scrolls(self, evt):
         enabled = not evt.edit

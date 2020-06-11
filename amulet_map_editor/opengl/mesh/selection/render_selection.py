@@ -16,7 +16,7 @@ class RenderSelection(TriMesh):
                  ):
         super().__init__(context_identifier, texture)
         self._points: numpy.ndarray = numpy.zeros((2, 3), dtype=numpy.int)  # The points set using point1 and point2
-        self._bounds_: Optional[numpy.ndarray] = None  # The min and max locations
+        self._bounds: Optional[numpy.ndarray] = None  # The min and max locations
         self.transformation_matrix = numpy.eye(4, dtype=numpy.float64)
         self._rebuild = True
         self._volume = 1
@@ -57,7 +57,7 @@ class RenderSelection(TriMesh):
         """
         # Logic based on https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 
-        (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort((self._bounds - numpy.array(origin)) / numpy.array(vector), axis=0)
+        (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort((self.bounds - numpy.array(origin)) / numpy.array(vector), axis=0)
 
         if tmin > tymax or tymin > tmax:
             return None
@@ -88,7 +88,7 @@ class RenderSelection(TriMesh):
         return self._draw_mode
 
     def _mark_recreate(self):
-        self._bounds_ = None
+        self._bounds = None
         self._rebuild = True
 
     @property
@@ -112,20 +112,20 @@ class RenderSelection(TriMesh):
             self._mark_recreate()
 
     @property
-    def _bounds(self) -> numpy.ndarray:
+    def bounds(self) -> numpy.ndarray:
         """The array storing min and max locations"""
-        if self._bounds_ is None:
-            self._bounds_ = numpy.sort(self._points, 0)
-            self._bounds[1] += 1
-        return self._bounds_
+        if self._bounds is None:
+            self._bounds = numpy.sort(self._points, 0)
+            self.bounds[1] += 1
+        return self._bounds
 
     @property
     def min(self) -> numpy.ndarray:
-        return self._bounds[0]
+        return self.bounds[0]
 
     @property
     def max(self) -> numpy.ndarray:
-        return self._bounds[1]
+        return self.bounds[1]
 
     @staticmethod
     def _create_box(box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
