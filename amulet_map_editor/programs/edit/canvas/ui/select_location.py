@@ -1,6 +1,6 @@
 import wx
 import numpy
-from typing import Optional, Callable, Type, Any, TYPE_CHECKING
+from typing import Callable, Type, Any, TYPE_CHECKING
 
 from amulet.api.structure import Structure
 from amulet.api.data_types import BlockCoordinates

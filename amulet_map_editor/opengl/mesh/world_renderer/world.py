@@ -1,5 +1,5 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, List, Set
+from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, Set
 import math
 from concurrent.futures import ThreadPoolExecutor, Future
 import time

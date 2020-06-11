@@ -69,7 +69,7 @@ class RenderSelectionEditable(RenderSelection):
             self._being_resized = True
 
     def _mark_recreate(self):
-        self._bounds_ = None
+        self._bounds = None
         self._rebuild = True
 
     def set_active_point(self, position: BlockCoordinatesAny):
@@ -92,7 +92,6 @@ class RenderSelectionEditable(RenderSelection):
         Draw the selection box
         :param transformation_matrix: 4x4 transformation matrix for the camera
         :param camera_position: The position of the camera. Used to flip draw direction if camera inside box.
-        :param active: If the selection box is the active selection (draw corner boxes)
         :return:
         """
         self._setup()
