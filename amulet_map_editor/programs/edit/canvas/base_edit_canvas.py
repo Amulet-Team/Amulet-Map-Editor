@@ -14,7 +14,7 @@ from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, cos, tan, atan
-from amulet_map_editor.opengl.mesh.selection import RenderSelection, RenderSelectionGroup
+from amulet_map_editor.opengl.mesh.selection import RenderSelection, RenderSelectionGroupEditable
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
@@ -86,8 +86,7 @@ class BaseEditCanvas(BaseCanvas):
         self._selection_location: BlockCoordinates = (0, 0, 0)
 
         self._draw_selection = True
-        self._selection_editable = True
-        self._selection_group = RenderSelectionGroup(
+        self._selection_group = RenderSelectionGroupEditable(
             self.context_identifier,
             self._texture_bounds,
             self._gl_texture_atlas
@@ -136,7 +135,7 @@ class BaseEditCanvas(BaseCanvas):
     def active_selection(self) -> Optional[RenderSelection]:
         """Get the selection box that is currently active.
         May be None if no selection box exists."""
-        return self._selection_group.active_selection
+        return self._selection_group.active_box
 
     def enable(self):
         """Enable the canvas and start it working."""
@@ -227,11 +226,11 @@ class BaseEditCanvas(BaseCanvas):
     @property
     def selection_editable(self) -> bool:
         """Should the selection box(es) be editable"""
-        return self._selection_editable
+        return self._selection_group.editable
 
     @selection_editable.setter
     def selection_editable(self, selection_editable: bool):
-        self._selection_editable = bool(selection_editable)
+        self._selection_group.editable = bool(selection_editable)
 
     @property
     def select_distance(self) -> int:
@@ -303,7 +302,7 @@ class BaseEditCanvas(BaseCanvas):
         self._camera_rotate_speed = val
 
     def _change_box_location(self):
-        if self._selection_group.active_selection and self._selection_group.active_selection.being_resized:
+        if self._selection_group.active_box and self._selection_group.active_box.being_resized:
             position, box_index = self._box_location_distance(self.select_distance2)
         elif self._mouse_lock:
             position, box_index = self._box_location_distance(self.select_distance)
@@ -311,7 +310,7 @@ class BaseEditCanvas(BaseCanvas):
             position, box_index = self._box_location_closest()
         self._selection_location = position.tolist()
         wx.PostEvent(self, SelectionPointChangeEvent(location=position.tolist()))
-        self._selection_group.update_position(position, box_index)
+        self._selection_group.update_cursor_position(position, box_index)
 
     def ray_collision(self):
         vector_start = self.camera_location
@@ -455,7 +454,7 @@ class BaseEditCanvas(BaseCanvas):
             self._selection_moved = False
             self._change_box_location()
         if self._draw_selection:
-            self._selection_group.draw(self.transformation_matrix, tuple(self.camera_location), self._selection_editable)
+            self._selection_group.draw(self.transformation_matrix, tuple(self.camera_location))
         self.SwapBuffers()
 
     def _gc(self, event):

@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Set
 import wx
 import numpy
+import time
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
@@ -20,6 +21,7 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._mouse_moved = False  # has the mouse position changed since the last frame
         self._persistent_actions: Set[str] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
         self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
+        self._box_select_time = 0
 
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
@@ -98,13 +100,17 @@ class ControllableEditCanvas(BaseEditCanvas):
                     if self.select_distance2 > 1:
                         self.select_distance2 -= 1
                 elif action == "deselect boxes":
-                    self._selection_group.deselect()
+                    self._selection_group.deselect_all()
                 elif action == "remove box":
-                    self._selection_group.delete_active()
-            else:  # run once on button press and frequently until released
-                if action == "box click":
+                    self._selection_group.deselect_active()
+                elif action == "box click":
                     if self.selection_editable:
                         self.box_select("add box modifier" in self._persistent_actions)
+                        self._box_select_time = time.time()
+            else:  # run once on button press and frequently until released
+                if action == "box click":
+                    if self.selection_editable and time.time() - self._box_select_time > 0.3:
+                        self._selection_group.box_select_disable()
                 elif action == "toggle mouse mode":
                     self._toggle_mouse_lock()
                 elif action == "speed+":
@@ -122,19 +128,9 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._persistent_actions.remove(a)
 
     def box_select(self, add_modifier: bool = False):
-        position = self._selection_group.box_click(add_modifier)
+        position = self._selection_group.box_select_toggle(add_modifier)
         if position is not None:
             self.select_distance2 = int(numpy.linalg.norm(position - self.camera_location))
-
-        # if self._selection_box.select_state <= 1:
-        #     self._selection_box.select_state += 1
-        # elif self._selection_box.select_state == 2:
-        #     self._selection_box.point1, self._selection_box.point2 = self._selection_box2.point1, self._selection_box2.point2
-        #     self._selection_box.select_state = 1
-        #     x, y, z = self._selection_box.point1
-        #     wx.PostEvent(self, BoxGreenCornerChangeEvent(x=x, y=y, z=z))
-        #     wx.PostEvent(self, BoxBlueCornerChangeEvent(x=x, y=y, z=z))
-        # wx.PostEvent(self, BoxCoordsEnableEvent(enabled=self._selection_box.select_state == 2))
 
     def _process_persistent_inputs(self, evt):
         """Handle actions run by keys that are being held down."""
