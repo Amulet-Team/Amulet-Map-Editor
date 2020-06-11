@@ -5,8 +5,8 @@ import time
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.util.key_config import serialise_key_event, KeybindGroup, ActionLookupType
-from .events import EditEscapeEvent
+from amulet_map_editor.amulet_wx.util.key_config import serialise_key_event, KeybindGroup, ActionLookupType, Escape
+from .events import EditEscapeEvent, EVT_EDIT_ESCAPE
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -47,6 +47,8 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(wx.EVT_KEY_DOWN, self._press)
         self.Bind(wx.EVT_KEY_UP, self._release)
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
+
+        self.Bind(EVT_EDIT_ESCAPE, self._selection_group.escape_event)
 
         self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
 
@@ -118,7 +120,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                 elif action == "speed-":
                     self._camera_move_speed /= 1.1
 
-        elif key[1] == wx.WXK_ESCAPE:
+        elif key[1] == Escape:
             self._escape()
             wx.PostEvent(self, EditEscapeEvent())
         elif not press:

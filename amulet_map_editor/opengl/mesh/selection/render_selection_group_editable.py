@@ -86,6 +86,10 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         """Is the selection being modified after having been confirmed at least once."""
         return self._active_box is not None and self._active_box.being_resized
 
+    def escape_event(self, evt):
+        self.escape()
+        evt.Skip()
+
     def escape(self):
         """If the selection box is being modified revert it"""
         if self._active_box_index is not None:
