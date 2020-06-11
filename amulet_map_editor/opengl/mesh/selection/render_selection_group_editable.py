@@ -36,6 +36,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._last_active_box_index = self._active_box_index
         self._active_box.point1, self._active_box.point2 = self._cursor_position, self._cursor_position
         self._active_box_index = None
+        self._post_box_start_edit_event()
 
     def _create_active_box(self):
         self._active_box = self._new_editable_render_selection()  # create a new render selection
@@ -61,8 +62,10 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._editable = editable
         if editable and self._active_box_index is not None:
             self._create_active_box()
+            self._post_box_start_edit_event()
         else:
             self._active_box: Optional[RenderSelectionEditable] = None
+            self._post_box_end_edit_event()
 
     def deselect_all(self):
         while self._boxes:
@@ -70,6 +73,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             box.unload()
         self._active_box: Optional[RenderSelectionEditable] = None
         self._active_box_index = self._last_active_box_index = None
+        self._post_box_end_edit_event()
 
     def deselect_active(self):
         if self._active_box_index is not None:
@@ -83,16 +87,26 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             else:
                 self._active_box = None
                 self._active_box_index = self._last_active_box_index = None
+        elif self._last_active_box_index is not None:
+            self._active_box_index = self._last_active_box_index
+            self._create_active_box()
         else:
             # if the box hasn't been committed yet
             self._active_box = None
             self._active_box_index = self._last_active_box_index = None
+        self._post_box_end_edit_event()
 
     def update_cursor_position(self, position: BlockCoordinatesAny, box_index: Optional[int]):
         self._cursor_position[:] = position
         self._hover_box_index = box_index
         if self._active_box:
             self._active_box.set_active_point(position)
+
+    def _post_box_start_edit_event(self):
+        pass
+
+    def _post_box_end_edit_event(self):
+        pass
 
     def box_select_disable(self):
         """Lock the currently selected box in its current state."""
@@ -108,26 +122,28 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         else:
             box = self._boxes[self._active_box_index]
         box.point1, box.point2 = self._active_box.point1, self._active_box.point2
+        self._post_box_end_edit_event()
 
     def box_select_toggle(self, add_modifier: bool = False) -> Optional[BlockCoordinatesNDArray]:
         """Method called to activate or deactivate the active selection"""
         if self._active_box is None:  # if there is no active selection
             self._create_active_box_from_cursor()
-        else:  # if there is an active selection
-            if self._active_box.is_static:  # if it is is_static
-                if self._hover_box_index == self._active_box_index:  # if the cursor was hovering over the current selection
-                    self._active_box.unlock(self._cursor_position)  # unlock it
-                    self._last_active_box_index = self._active_box_index
-                    return self._cursor_position
-                elif self._hover_box_index is not None:  # if hovering over a different selected box
-                    self._active_box_index = self._hover_box_index  # activate that selection box
-                    self._create_active_box()
-                else:  # if no hovered selection box
-                    if not add_modifier:
-                        self.deselect_all()
-                    self._create_active_box_from_cursor()
-            else:  # the box was being edited.
-                self._box_select_disable()
+        elif self._active_box.is_static:  # if there is an active selection that is static
+            if self._hover_box_index == self._active_box_index:  # if the cursor was hovering over the current selection
+                self._active_box.unlock(self._cursor_position)  # unlock it
+                self._last_active_box_index = self._active_box_index
+                self._post_box_start_edit_event()
+                return self._cursor_position
+            elif self._hover_box_index is not None:  # if hovering over a different selected box
+                self._active_box_index = self._hover_box_index  # activate that selection box
+                self._create_active_box()
+                self._post_box_end_edit_event()
+            else:  # if no hovered selection box
+                if not add_modifier:
+                    self.deselect_all()
+                self._create_active_box_from_cursor()
+        else:  # if there is an active selection that is being edited
+            self._box_select_disable()
 
     def draw(self, transformation_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
         for index, box in enumerate(self._boxes):
