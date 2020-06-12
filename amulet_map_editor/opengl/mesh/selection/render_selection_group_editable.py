@@ -19,7 +19,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._editable = True
         self._active_box: Optional[RenderSelectionEditable] = None
         self._active_box_index: Optional[int] = None
-        self._last_active_box_index: Optional[int] = None
+        self._last_active_box_index: Optional[int] = None  # the last active box for use when deselecting or escaping a non-committed box
         self._hover_box_index: Optional[int] = None
         self._boxes: List[RenderSelectionHighlightable] = []
         self._last_highlighted_box_index: Optional[int] = None
@@ -52,8 +52,14 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     def _new_editable_render_selection(self):
         return RenderSelectionEditable(self._context_identifier, self._texture_bounds, self._texture)
 
+    def _unload_active_box(self):
+        if self._active_box is not None:
+            self._active_box.unload()
+            self._active_box = None
+
     def _create_active_box_from_cursor(self):
         # create from the cursor position
+        self._unload_active_box()
         self._active_box = self._new_editable_render_selection()  # create a new render selection
         self._last_active_box_index = self._active_box_index
         self._active_box.point1, self._active_box.point2 = self._cursor_position, self._cursor_position
@@ -61,8 +67,9 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._post_box_disable_inputs_event()
 
     def _create_active_box_from_existing(self):
+        self._unload_active_box()
         self._active_box = self._new_editable_render_selection()  # create a new render selection
-        self._last_active_box_index = self._active_box_index
+        self._last_active_box_index = None
         active_box = self._boxes[self._active_box_index]
         self._active_box.point1, self._active_box.point2 = active_box.point1, active_box.point2
         self._active_box.lock()
@@ -103,10 +110,11 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             self._create_active_box_from_existing()
         elif self._last_active_box_index is not None:
             self._active_box_index = self._last_active_box_index
+            self._last_active_box_index = None
             self._create_active_box_from_existing()
         else:
             # if the box hasn't been committed yet
-            self._active_box = None
+            self._unload_active_box()
             self._active_box_index = self._last_active_box_index = None
             self._post_box_disable_inputs_event()
 
@@ -124,23 +132,22 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             box = self._boxes.pop(self._active_box_index)
             box.unload()
             if self._boxes:
-                if self._last_active_box_index is not None and self._last_active_box_index > self._active_box_index:
-                    self._last_active_box_index -= 1
                 if self._active_box_index >= 1:
                     self._active_box_index -= 1
                 if self._last_highlighted_box_index is not None and self._last_highlighted_box_index >= 1:
                     self._last_highlighted_box_index -= 1
                 self._create_active_box_from_existing()
             else:
-                self._active_box = None
+                self._unload_active_box()
                 self._active_box_index = self._last_active_box_index = None
                 self._post_box_disable_inputs_event()
         elif self._last_active_box_index is not None:
             self._active_box_index = self._last_active_box_index
+            self._last_active_box_index = None
             self._create_active_box_from_existing()
         else:
             # if the box hasn't been committed yet
-            self._active_box = None
+            self._unload_active_box()
             self._active_box_index = self._last_active_box_index = None
             self._post_box_disable_inputs_event()
 
