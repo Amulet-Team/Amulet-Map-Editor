@@ -27,7 +27,7 @@ class RenderSelectionEditable(RenderSelection):
         self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
         self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), missing_no)
         self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), missing_no)
-        self.verts[:, 9:12] = 1
+        self.verts[:, 9:12] = self.box_tint
 
     @property
     def is_static(self) -> bool:

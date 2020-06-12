@@ -11,7 +11,18 @@ from amulet.api.block import BlockManager
 
 from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.opengl.resource_pack import ResourcePackManager
-from amulet_map_editor.opengl.mesh.selection import RenderSelectionGroup
+from amulet_map_editor.opengl.mesh.selection import RenderSelectionGroup, RenderSelection
+
+
+class GreenRenderSelection(RenderSelection):
+    @property
+    def box_tint(self) -> Tuple[float, float, float]:
+        return 0.7, 1.0, 0.7
+
+
+class GreenRenderSelectionGroup(RenderSelectionGroup):
+    def _new_render_selection(self):
+        return GreenRenderSelection(self._context_identifier, self._texture_bounds, self._texture)
 
 
 class SubRenderStructure(RenderChunkBuilder):
@@ -69,7 +80,7 @@ class RenderStructure(ResourcePackManager):
         super().__init__(context_identifier, resource_pack, texture, texture_bounds, translator)
         self._structure = structure
         self._sub_structures = []
-        self._selection = RenderSelectionGroup(context_identifier, texture_bounds, texture, structure.selection)
+        self._selection = GreenRenderSelectionGroup(context_identifier, texture_bounds, texture, structure.selection)
         self._create_geometry()  # TODO: move this to a different thread
 
     @property

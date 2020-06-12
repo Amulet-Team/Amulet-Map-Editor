@@ -25,11 +25,15 @@ class RenderSelection(TriMesh):
         self.draw_count = 36
         self._draw_mode = GL_TRIANGLES
 
+    @property
+    def box_tint(self) -> Tuple[int, int, int]:
+        return 1, 1, 1
+
     def _init_verts(self, texture_bounds: Dict[Any, Tuple[float, float, float, float]]):
         missing_no = texture_bounds.get(('minecraft', 'missing_no'), (0, 0, 0, 0))
         self.verts = numpy.zeros((6 * 2 * 3, self._vert_len), dtype=numpy.float32)
         self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
-        self.verts[:, 9:12] = 1
+        self.verts[:, 9:12] = self.box_tint
 
     def __contains__(self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]) -> bool:
         """
