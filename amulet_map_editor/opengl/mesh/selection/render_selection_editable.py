@@ -98,7 +98,6 @@ class RenderSelectionEditable(RenderSelection):
         if self._rebuild:
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
-        self.draw_start = 0
 
         transformation_matrix = numpy.matmul(self.transformation_matrix, transformation_matrix)
 
@@ -107,15 +106,22 @@ class RenderSelectionEditable(RenderSelection):
         else:
             glCullFace(GL_BACK)
 
-        draw_count = self.draw_count = 36 + (self._volume > 1) * 2 * 36
+        self.draw_start = 0
+        self.draw_count = 36
         super()._draw(transformation_matrix)
+
         glCullFace(GL_BACK)
+        if self._volume > 1:
+            self.draw_start = 36
+            self.draw_count = 108
+            super()._draw(transformation_matrix)
+            self.draw_start = 0
+            self.draw_count = 36
 
         # draw the lines around the boxes
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
-        self.draw_count = 36
-        for start in range(0, draw_count, 36):
+        for start in range(0, 36 + (self._volume > 1) * 2 * 36, 36):
             self.draw_start = start
             super()._draw(transformation_matrix)
         glEnable(GL_DEPTH_TEST)
