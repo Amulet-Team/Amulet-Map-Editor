@@ -145,7 +145,6 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             self._post_box_disable_inputs_event()
 
     def update_cursor_position(self, position: BlockCoordinatesAny, box_index: Optional[int]):
-        print(self._last_active_box_index, self._active_box_index)
         self._cursor_position[:] = position
         self._hover_box_index = box_index
         self._cursor.point1 = self._cursor.point2 = position
