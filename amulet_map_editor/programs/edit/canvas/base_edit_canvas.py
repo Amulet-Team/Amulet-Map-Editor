@@ -14,7 +14,6 @@ from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, cos, tan, atan
-from amulet_map_editor.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.opengl.mesh.structure import RenderStructure
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
@@ -461,8 +460,11 @@ class BaseEditCanvas(BaseCanvas):
         if self._selection_moved:
             self._selection_moved = False
             self._change_box_location()
-        if self._draw_selection:
-            self._selection_group.draw(self.transformation_matrix, tuple(self.camera_location))
+        self._selection_group.draw(
+            self.transformation_matrix,
+            tuple(self.camera_location),
+            self.draw_selection
+        )
         self.SwapBuffers()
 
     def _gc(self, event):
