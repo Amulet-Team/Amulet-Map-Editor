@@ -175,15 +175,14 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         if self._active_box is None:  # if there is no active selection
             self._create_active_box_from_cursor()
         elif self._active_box.is_static:  # if there is an active selection that is static
+            if self._hover_box_index is not None and self._hover_box_index != self._active_box_index:  # if hovering over a different selected box
+                self._active_box_index = self._hover_box_index  # activate that selection box
+                self._create_active_box_from_existing()
             if self._hover_box_index == self._active_box_index:  # if the cursor was hovering over the current selection
                 self._active_box.unlock(self._cursor_position)  # unlock it
                 self._last_active_box_index = self._active_box_index
                 self._post_box_disable_inputs_event()
                 return self._cursor_position
-            elif self._hover_box_index is not None:  # if hovering over a different selected box
-                self._active_box_index = self._hover_box_index  # activate that selection box
-                self._create_active_box_from_existing()
-                self._post_box_enable_inputs_event()
             else:  # if no hovered selection box
                 if not add_modifier:
                     self.deselect_all()
