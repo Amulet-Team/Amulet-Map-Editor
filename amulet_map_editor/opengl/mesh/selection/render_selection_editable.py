@@ -3,10 +3,10 @@ from OpenGL.GL import *
 from typing import Tuple, Dict, Any
 
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
-from .render_selection import RenderSelection
+from .render_selection_highlightable import RenderSelectionHighlightable
 
 
-class RenderSelectionEditable(RenderSelection):
+class RenderSelectionEditable(RenderSelectionHighlightable):
     """A drawable selection box with additional editing controls"""
     def __init__(self,
                  context_identifier: str,
@@ -28,6 +28,13 @@ class RenderSelectionEditable(RenderSelection):
         self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), missing_no)
         self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), missing_no)
         self.verts[:, 9:12] = self.box_tint
+
+    @property
+    def highlight_colour(self) -> Tuple[float, float, float]:
+        if self.is_dynamic:
+            return 1.0, 0.7, 0.3
+        else:
+            return 1.2, 1.2, 1.2
 
     @property
     def is_static(self) -> bool:
@@ -73,7 +80,15 @@ class RenderSelectionEditable(RenderSelection):
         self._rebuild = True
 
     def set_active_point(self, position: BlockCoordinatesAny):
-        self._points[self._free_edges] = numpy.array([position, position])[self._free_edges]
+        if self.is_dynamic:
+            self._points[self._free_edges] = numpy.array([position, position])[self._free_edges]
+            self._highlight_edges[:] = self._free_edges
+        elif position in self:
+            self._highlight_edges[:] = position == self._points
+            self._highlight_edges[1, self._highlight_edges[0]] = False
+        else:
+            self._highlight_edges[:] = False
+
         self._mark_recreate()
 
     def _create_geometry_(self):

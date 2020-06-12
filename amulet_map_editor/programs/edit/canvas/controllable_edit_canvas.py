@@ -111,7 +111,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                         self._box_select_time = time.time()
             else:  # run once on button press and frequently until released
                 if action == "box click":
-                    if self.selection_editable and time.time() - self._box_select_time > 0.3:
+                    if self.selection_editable and time.time() - self._box_select_time > 0.1:
                         self._selection_group.box_select_disable()
                 elif action == "toggle mouse mode":
                     self._toggle_mouse_lock()

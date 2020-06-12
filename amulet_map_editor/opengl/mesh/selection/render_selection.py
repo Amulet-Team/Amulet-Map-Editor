@@ -26,7 +26,7 @@ class RenderSelection(TriMesh):
         self._draw_mode = GL_TRIANGLES
 
     @property
-    def box_tint(self) -> Tuple[int, int, int]:
+    def box_tint(self) -> Tuple[float, float, float]:
         return 1, 1, 1
 
     def _init_verts(self, texture_bounds: Dict[Any, Tuple[float, float, float, float]]):

@@ -1,9 +1,10 @@
 import numpy
-from typing import Tuple, Dict, Any, Optional
+from typing import Tuple, Dict, Any, Optional, List
 
 from amulet.api.data_types import BlockCoordinatesAny, BlockCoordinatesNDArray, PointCoordinatesAny, BlockCoordinates
 from .render_selection_group import RenderSelectionGroup
 from .render_selection import RenderSelection
+from .render_selection_highlightable import RenderSelectionHighlightable
 from .render_selection_editable import RenderSelectionEditable
 
 
@@ -20,6 +21,8 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._active_box_index: Optional[int] = None
         self._last_active_box_index: Optional[int] = None
         self._hover_box_index: Optional[int] = None
+        self._boxes: List[RenderSelectionHighlightable] = []
+        self._last_highlighted_box_index: Optional[int] = None
 
         self._cursor = RenderSelection(context_identifier, texture_bounds, texture)
         self._cursor_position = numpy.array([0, 0, 0], dtype=numpy.int)
@@ -42,6 +45,9 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         if self._active_box_index is not None:
             box = self._boxes[self._active_box_index]
             box.point1, box.point2 = box_corners
+
+    def _new_render_selection(self):
+        return RenderSelectionHighlightable(self._context_identifier, self._texture_bounds, self._texture)
 
     def _new_editable_render_selection(self):
         return RenderSelectionEditable(self._context_identifier, self._texture_bounds, self._texture)
@@ -109,7 +115,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             box = self._boxes.pop()
             box.unload()
         self._active_box: Optional[RenderSelectionEditable] = None
-        self._active_box_index = self._last_active_box_index = None
+        self._active_box_index = self._last_active_box_index = self._last_highlighted_box_index = None
         self._post_box_disable_inputs_event()
 
     def deselect_active(self):
@@ -118,8 +124,12 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             box = self._boxes.pop(self._active_box_index)
             box.unload()
             if self._boxes:
+                if self._last_active_box_index is not None and self._last_active_box_index > self._active_box_index:
+                    self._last_active_box_index -= 1
                 if self._active_box_index >= 1:
                     self._active_box_index -= 1
+                if self._last_highlighted_box_index is not None and self._last_highlighted_box_index >= 1:
+                    self._last_highlighted_box_index -= 1
                 self._create_active_box_from_existing()
             else:
                 self._active_box = None
@@ -135,9 +145,17 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             self._post_box_disable_inputs_event()
 
     def update_cursor_position(self, position: BlockCoordinatesAny, box_index: Optional[int]):
+        print(self._last_active_box_index, self._active_box_index)
         self._cursor_position[:] = position
         self._hover_box_index = box_index
         self._cursor.point1 = self._cursor.point2 = position
+        if self._last_highlighted_box_index is not None and self._last_highlighted_box_index != box_index:
+            self._boxes[self._last_highlighted_box_index].set_highlight_edges(False)
+            self._last_highlighted_box_index = None
+        if box_index is not None and self._active_box_index != box_index:
+            self._boxes[box_index].set_active_point(position)
+            self._last_highlighted_box_index = box_index
+
         if self._active_box:
             self._active_box.set_active_point(position)
             self._post_box_change_event()
@@ -206,7 +224,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         if draw_cursor and not self.editing:
             self._cursor.draw(transformation_matrix)
 
-    def closest_intersection(self, origin: PointCoordinatesAny, vector: PointCoordinatesAny) -> Tuple[Optional[int], Optional["RenderSelection"]]:
+    def closest_intersection(self, origin: PointCoordinatesAny, vector: PointCoordinatesAny) -> Tuple[Optional[int], Optional["RenderSelectionHighlightable"]]:
         """
         Returns the index for the closest box in the look vector
         :param origin:
