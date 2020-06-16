@@ -109,6 +109,16 @@ class ControllableEditCanvas(BaseEditCanvas):
                     if self.selection_editable:
                         self.box_select("add box modifier" in self._persistent_actions)
                         self._box_select_time = time.time()
+                elif action == "inspect block":
+                    x, y, z = self.cursor_location
+                    try:
+                        print(
+                            self.world.get_block(x, y, z, self.dimension),
+                            self.world.get_chunk(x>>4, z>>4, self.dimension).block_entities.get((x, y, z), None)
+                        )
+                    except Exception as e:
+                        print(e)
+
             else:  # run once on button press and frequently until released
                 if action == "box click":
                     if self.selection_editable and time.time() - self._box_select_time > 0.1:

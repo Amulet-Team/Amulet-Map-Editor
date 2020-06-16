@@ -12,6 +12,7 @@ from amulet_map_editor.amulet_wx.util.key_config import (
     MouseWheelScrollDown,
     Control,
     Numpad_Add,
+    Alt,
 )
 
 
@@ -31,6 +32,7 @@ KeybindKeys: List[KeyActionType] = [
     "deselect boxes",
     "add box modifier",
     "remove box",
+    "inspect block",
 ]
 
 
@@ -51,6 +53,7 @@ PresetKeybinds: KeybindContainer = {
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control, ), "D"),
+        "inspect block": ((), Alt),
     },
     "right_laptop": {
         "up": ((), Space),
@@ -68,6 +71,7 @@ PresetKeybinds: KeybindContainer = {
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control, ), "D"),
+        "inspect block": ((), Alt),
     },
     "left": {
         "up": ((), Space),
@@ -85,6 +89,7 @@ PresetKeybinds: KeybindContainer = {
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control, ), "D"),
+        "inspect block": ((), Alt),
     },
     "left_laptop": {
         "up": ((), Space),
@@ -102,6 +107,7 @@ PresetKeybinds: KeybindContainer = {
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control, ), "D"),
+        "inspect block": ((), Alt),
     }
 }
 

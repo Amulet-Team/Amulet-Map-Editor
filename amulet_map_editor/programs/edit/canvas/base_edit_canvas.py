@@ -308,6 +308,11 @@ class BaseEditCanvas(BaseCanvas):
     def camera_rotate_speed(self, val: float):
         self._camera_rotate_speed = val
 
+    @property
+    def cursor_location(self) -> BlockCoordinates:
+        """The location of the cursor box in the world."""
+        return self._selection_group.cursor_position
+
     def _change_box_location(self):
         if self._selection_group.reediting:
             position, box_index = self._box_location_distance(self.select_distance2)
