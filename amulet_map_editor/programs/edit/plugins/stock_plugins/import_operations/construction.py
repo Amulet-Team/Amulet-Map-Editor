@@ -37,7 +37,7 @@ class ImportConstruction(SimpleOperationPanel):
             style=wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
-        self._add_run_button("Import")
+        self._add_run_button("Load")
         self.Layout()
 
     def unload(self):
