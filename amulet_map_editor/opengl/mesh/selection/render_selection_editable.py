@@ -124,8 +124,8 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         self.draw_start = 0
         self.draw_count = 36
         super()._draw(transformation_matrix)
-
         glCullFace(GL_BACK)
+
         if self._volume > 1:
             self.draw_start = 36
             self.draw_count = 108

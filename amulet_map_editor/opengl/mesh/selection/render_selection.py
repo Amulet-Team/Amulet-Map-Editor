@@ -191,7 +191,6 @@ class RenderSelection(TriMesh):
         if self._rebuild:
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
-        self.draw_start = 0
 
         transformation_matrix = numpy.matmul(self.transformation_matrix, transformation_matrix)
 
@@ -200,5 +199,13 @@ class RenderSelection(TriMesh):
         else:
             glCullFace(GL_BACK)
 
+        self.draw_start = 0
+        self.draw_count = 36
         super()._draw(transformation_matrix)
         glCullFace(GL_BACK)
+
+        # draw the lines around the boxes
+        glDisable(GL_DEPTH_TEST)
+        self._draw_mode = GL_LINE_STRIP
+        super()._draw(transformation_matrix)
+        glEnable(GL_DEPTH_TEST)
