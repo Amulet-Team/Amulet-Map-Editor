@@ -112,10 +112,13 @@ class ControllableEditCanvas(BaseEditCanvas):
                 elif action == "inspect block":
                     x, y, z = self.cursor_location
                     try:
-                        print(
-                            self.world.get_block(x, y, z, self.dimension),
-                            self.world.get_chunk(x>>4, z>>4, self.dimension).block_entities.get((x, y, z), None)
+                        block = self.world.get_block(x, y, z, self.dimension)
+                        block_entity = self.world.get_chunk(x >> 4, z >> 4, self.dimension).block_entities.get((x, y, z), None)
+                        translator = self.world.translation_manager.get_version(
+                            self.world.world_wrapper.platform, self.world.world_wrapper.version
                         )
+                        version_block, version_block_entity, _ = translator.block.from_universal(block, extra_input=block_entity)
+                        print(f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}")
                     except Exception as e:
                         print(e)
 
