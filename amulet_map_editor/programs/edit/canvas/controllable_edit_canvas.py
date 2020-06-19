@@ -117,7 +117,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                         translator = self.world.translation_manager.get_version(
                             self.world.world_wrapper.platform, self.world.world_wrapper.version
                         )
-                        version_block, version_block_entity, _ = translator.block.from_universal(block, extra_input=block_entity)
+                        version_block, version_block_entity, _ = translator.block.from_universal(block, extra_input=block_entity, block_location=(x, y, z))
                         print(f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}")
                     except Exception as e:
                         print(e)
