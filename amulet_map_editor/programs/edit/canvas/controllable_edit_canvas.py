@@ -191,8 +191,8 @@ class ControllableEditCanvas(BaseEditCanvas):
         if not -90 <= rx <= 90:
             rx = max(min(rx, 90), -90)
         ry += self._camera_rotate_speed * yaw
-        self.camera_location = self._render_world.camera_location = (x, y, z)
-        self.camera_rotation = self._render_world.camera_rotation = (rx, ry)
+        self.camera_location = (x, y, z)
+        self.camera_rotation = (rx, ry)
 
     def _toggle_mouse_lock(self):
         """Toggle mouse selection mode."""

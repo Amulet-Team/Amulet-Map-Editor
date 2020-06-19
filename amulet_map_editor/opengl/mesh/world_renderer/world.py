@@ -109,7 +109,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                     self._region_size,
                     chunk_coords,
                     self.render_world.dimension,
-                    self._render_world().texture
+                    self.render_world.texture
                 )
 
                 try:

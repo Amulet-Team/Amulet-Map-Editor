@@ -273,7 +273,7 @@ class BaseEditCanvas(BaseCanvas):
     @camera_location.setter
     def camera_location(self, location: CameraLocationType):
         assert len(location) == 3 and all(isinstance(v, (int, float)) for v in location), "format for camera_location is invalid"
-        self._camera_location = location
+        self._camera_location = self._render_world.camera_location = location
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraMoveEvent(location=self.camera_location))
@@ -285,7 +285,7 @@ class BaseEditCanvas(BaseCanvas):
     @camera_rotation.setter
     def camera_rotation(self, rotation: CameraRotationType):
         assert len(rotation) == 2 and all(isinstance(v, (int, float)) for v in rotation), "format for camera_rotation is invalid"
-        self._camera_rotation = rotation
+        self._camera_rotation = self._render_world.camera_rotation = rotation
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraRotateEvent(rotation=self.camera_rotation))
