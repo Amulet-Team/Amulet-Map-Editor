@@ -295,8 +295,8 @@ class WorldSelectDialog(wx.Dialog):
         super().__init__(
             parent,
             title="World Select",
-            pos=wx.Point(0, 0),
-            size=wx.Size(*[int(s*0.99) for s in parent.GetSize()]),
+            pos=wx.Point(50, 50),
+            size=wx.Size(*[int(s*0.95) for s in parent.GetSize()]),
             style=wx.CAPTION
             | wx.CLOSE_BOX
             | wx.MAXIMIZE_BOX
