@@ -10,6 +10,10 @@ from amulet_map_editor.amulet_wx.ui import simple
 
 import amulet_nbt as nbt
 
+from amulet_map_editor import resources
+
+nbt_resources = resources.img.nbt
+
 
 class NBTRadioButton(simple.SimplePanel):
     def __init__(self, parent, nbt_tag_class, icon):
@@ -47,62 +51,72 @@ class NBTEditor(simple.SimplePanel):
             self.__class__.image_map = {
                 nbt.TAG_Byte: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_byte.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_byte.png"),
+                        nbt_resources["nbt_tag_byte.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_Short: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_short.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_short.png"),
+                        nbt_resources["nbt_tag_short.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_Int: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_int.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_int.png"),
+                        nbt_resources["nbt_tag_int.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_Long: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_long.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_long.png"),
+                        nbt_resources["nbt_tag_long.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_Float: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_float.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_float.png"),
+                        nbt_resources["nbt_tag_float.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_Double: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_double.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_double.png"),
+                        nbt_resources["nbt_tag_double.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_String: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_string.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_string.png"),
+                        nbt_resources["nbt_tag_string.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_Compound: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_compound.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_compound.png"),
+                        nbt_resources["nbt_tag_compound.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.NBTFile: self.image_list.ImageCount - 1,
                 nbt.TAG_List: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_list.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_list.png"),
+                        nbt_resources["nbt_tag_list.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
                 nbt.TAG_Byte_Array: self.image_list.Add(
                     wx.Image(
-                        op.join("..", "img", "nbt", "nbt_tag_array.png"),
+                        # op.join("..", "img", "nbt", "nbt_tag_array.png"),
+                        nbt_resources["nbt_tag_array.png"],
                         wx.BITMAP_TYPE_PNG,
                     ).ConvertToBitmap()
                 ),
