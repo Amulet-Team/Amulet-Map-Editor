@@ -16,7 +16,7 @@ matrix:
     - os: linux
     - os: osx
 
-if: branch IN (master, fix-travis)
+# if: branch IN (master, fix-travis)
 
 before_install:
   - git config --global user.email ${USER_EMAIL}
