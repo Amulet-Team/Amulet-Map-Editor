@@ -29,17 +29,22 @@ before_install:
 
 install:
   - pip3 install --upgrade pip
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user --upgrade setuptools wheel ; else pip3 install --upgrade setuptools wheel ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] ; then source ./.travis/osx_setup_python.sh 3.7.1 10.6 ; fi
+#  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user --upgrade setuptools wheel ; else pip3 install --upgrade setuptools wheel ; fi
+#  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user -r requirements.txt ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user --upgrade setuptools wheel ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user -r requirements.txt ; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then pip3 install -r requirements_linux.txt ; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install pypiwin32 ; fi
-  - pip3 install pyinstaller>=3.5
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then pip3 install -r requirements_linux.txt ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] || [ "$TRAVIS_OS_NAME" = "linux" ] ; pip3 install pyinstaller>=3.5 ; fi
   - wget https://raw.githubusercontent.com/gentlegiantJGC/PyMCTranslate/master/minify_json.py
-  - pyinstaller -y Amulet.spec
+  - if [ "$TRAVIS_OS_NAME" = "windows" ] || [ "$TRAVIS_OS_NAME" = "linux" ] ; then pyinstaller -y Amulet.spec ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] ; then bash ./.travis/osx_build_app.sh AmuletApp $TRAVIS_TAG
 
 script:
   - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then 7z a "${ZIPFILE_NAME}.zip" -r ./dist/* ; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then cd dist/ ; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then cd dist/ || cd dist_app/ ; fi
   - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then zip -r "${ZIPFILE_NAME}.zip" "Amulet" -x "*/\.DS_Store" ; fi
   - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then cp "${ZIPFILE_NAME}.zip" ../ ; fi
   - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then cd .. ; fi
