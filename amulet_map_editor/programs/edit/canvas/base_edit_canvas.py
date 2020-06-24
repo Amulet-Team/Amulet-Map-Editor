@@ -64,7 +64,7 @@ class BaseEditCanvas(BaseCanvas):
             minecraft_model_reader.java_vanilla_fix
         )
 
-        self._resource_pack_translator = world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
+        self._resource_pack_translator = world.world_wrapper.translation_manager.get_version('java', (999, 0, 0))
 
         self._render_world = RenderWorld(
             self.context_identifier,
