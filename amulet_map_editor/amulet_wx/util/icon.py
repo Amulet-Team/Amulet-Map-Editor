@@ -1,7 +1,8 @@
 import wx
-import os
-from amulet_map_editor import IMG_DIR
+from amulet_map_editor import resources
 
-ADD_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "add.png"))
-SUBTRACT_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "subtract.png"))
-EDIT_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "edit.png"))
+resources_icon = resources.img.icon
+
+ADD_ICON = wx.Bitmap(resources_icon["add.png"])
+SUBTRACT_ICON = wx.Bitmap(resources_icon["subtract.png"])
+EDIT_ICON = wx.Bitmap(resources_icon["edit.png"])

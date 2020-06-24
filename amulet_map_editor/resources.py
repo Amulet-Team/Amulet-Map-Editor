@@ -3,15 +3,10 @@ from __future__ import annotations
 from typing import Dict, Union
 
 import os.path as op
-import sys
 
-_BASE = (
-    op.dirname(sys.executable)
-    if getattr(sys, "frozen", False)
-    else op.dirname(__file__)
-)
+_BASE = op.dirname(__file__)
 
-_RESOURCE_DIRS = {}
+_RESOURCE_DIRS: Dict[str, _ResourceDict] = {}
 
 
 class _ResourceDict:
@@ -53,6 +48,9 @@ class _ResourceDict:
             raise AttributeError(
                 f'Could not find file or directory named "{item}" in "{self.directory_name}"'
             )
+
+    def get_directory_or_file(self, name) -> Union[str, _ResourceDict]:
+        return self.__getitem__(name)
 
 
 def __getattr__(name) -> Union[str, _ResourceDict]:

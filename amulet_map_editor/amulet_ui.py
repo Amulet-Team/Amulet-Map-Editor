@@ -1,20 +1,23 @@
 import wx
 import wx.lib.inspection
 from wx.lib.agw import flatnotebook
-import os
 from typing import Dict, Union
 import webbrowser
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
-from amulet_map_editor import lang, version, log, IMG_DIR
+from amulet_map_editor import lang, version, log
 from amulet_map_editor.programs import WorldManagerUI
 from amulet_map_editor.programs import BaseWorldUI
+
+from amulet_map_editor import resources
 
 NOTEBOOK_MENU_STYLE = flatnotebook.FNB_NO_X_BUTTON | flatnotebook.FNB_HIDE_ON_SINGLE_TAB | flatnotebook.FNB_NAV_BUTTONS_WHEN_NEEDED
 NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
 
 CLOSEABLE_PAGE_TYPE = Union[WorldManagerUI]
+
+resources_img = resources.img
 
 
 class AmuletMainWindow(wx.Frame):
@@ -38,7 +41,7 @@ class AmuletMainWindow(wx.Frame):
         )
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)  # TODO: work out proper localisation
         icon = wx.Icon()
-        icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.path.dirname(__file__), 'img', 'icon64.png'), wx.BITMAP_TYPE_ANY))
+        icon.CopyFromBitmap(wx.Bitmap(resources_img['icon64.png'], wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
 
         self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}
@@ -195,7 +198,7 @@ class AmuletMainMenu(wx.Panel, BaseWorldUI):
         name_sizer = wx.BoxSizer()
         sizer.Add(name_sizer, 0, wx.CENTER)
         img = wx.Image(
-            os.path.join(IMG_DIR, 'icon128.png'),
+            resources_img['icon128.png'],
             wx.BITMAP_TYPE_ANY
         )
 
