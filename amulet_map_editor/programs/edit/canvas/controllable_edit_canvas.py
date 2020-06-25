@@ -113,12 +113,19 @@ class ControllableEditCanvas(BaseEditCanvas):
                     x, y, z = self.cursor_location
                     try:
                         block = self.world.get_block(x, y, z, self.dimension)
-                        block_entity = self.world.get_chunk(x >> 4, z >> 4, self.dimension).block_entities.get((x, y, z), None)
+                        chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
+                        block_entity = chunk.block_entities.get((x, y, z), None)
                         translator = self.world.translation_manager.get_version(
                             self.world.world_wrapper.platform, self.world.world_wrapper.version
                         )
                         version_block, version_block_entity, _ = translator.block.from_universal(block, extra_input=block_entity, block_location=(x, y, z))
                         print(f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}")
+                        if len(chunk.biomes.shape) == 2:
+                            biome = chunk.biomes[x % 16, z % 16]
+                            print(self.world.translation_manager.universal_biome_registry.to_str(biome))
+                        elif len(chunk.biomes.shape) == 3:
+                            biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
+                            print(self.world.translation_manager.universal_biome_registry.to_str(biome))
                     except Exception as e:
                         print(e)
 
