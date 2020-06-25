@@ -7,7 +7,6 @@ import wx
 import struct
 import hashlib
 import inspect
-import string
 
 from .fixed_pipeline import FixedFunctionUI
 from .operation_ui import OperationUI, OperationUIType
@@ -18,7 +17,9 @@ if TYPE_CHECKING:
     from amulet.api.world import World
 
 
-STOCK_PLUGINS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "stock_plugins"))
+STOCK_PLUGINS_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "stock_plugins")
+)
 CUSTOM_PLUGINS_DIR = os.path.abspath("plugins")
 
 ValidChrs = set("-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
@@ -26,29 +27,32 @@ ValidChrs = set("-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234
 
 class OperationLoadException(Exception):
     """Exception for internal use"""
+
     pass
 
 
 class OperationLoader:
     """A class to handle loading and reloading operations from their python modules/packages"""
-    def __init__(
-            self,
-            export_dict: dict,
-            path: str
-    ):
+
+    def __init__(self, export_dict: dict, path: str, owning_dict: dict):
         self._path = path
         self._name = ""
-        self._ui: Optional[Callable[[wx.Window, "EditCanvas", "World"], OperationUI]] = None
-        self._load(export_dict)
+        self._ui: Optional[
+            Callable[[wx.Window, "EditCanvas", "World"], OperationUI]
+        ] = None
+        self._owning_dict = owning_dict
+        self.load(export_dict)
 
-    def _load(self, export_dict: dict):
+    def load(self, export_dict: dict):
         if not isinstance(export_dict, dict):
             raise OperationLoadException("Export must be a dictionary.")
 
         if "name" in export_dict:
             self._name = export_dict["name"]
             if not isinstance(self.name, str):
-                raise OperationLoadException('"name" in export must exist and be a string.')
+                raise OperationLoadException(
+                    '"name" in export must exist and be a string.'
+                )
         else:
             raise OperationLoadException('"name" is not defined in export.')
 
@@ -63,30 +67,46 @@ class OperationLoader:
                             self._path.encode('utf-8')
                         ).digest()[:2]
                     )[0]
-                }.config"""  # generate a file name that identifiable to the operation but "unique" to the path
+                }.config""",  # generate a file name that identifiable to the operation but "unique" to the path
             )
         )
 
         if "operation" in export_dict:
-            if inspect.isclass(export_dict["operation"]) and issubclass(export_dict["operation"], (wx.Window, wx.Sizer)):
+            if inspect.isclass(export_dict["operation"]) and issubclass(
+                export_dict["operation"], (wx.Window, wx.Sizer)
+            ):
                 operation_ui: Type[OperationUI] = export_dict.get("operation", None)
                 if not issubclass(operation_ui, OperationUI):
-                    raise OperationLoadException('"operation" must be a subclass of edit.plugins.OperationUI.')
-                self._ui = lambda parent, canvas, world: operation_ui(parent, canvas, world, options_path)
+                    raise OperationLoadException(
+                        '"operation" must be a subclass of edit.plugins.OperationUI.'
+                    )
+                self._ui = lambda parent, canvas, world: operation_ui(
+                    parent, canvas, world, options_path
+                )
 
             elif callable(export_dict["operation"]):
                 operation = export_dict.get("operation", None)
                 if not callable(operation):
-                    raise OperationLoadException('"operation" in export must be callable.')
+                    raise OperationLoadException(
+                        '"operation" in export must be callable.'
+                    )
                 if operation.__code__.co_argcount != 4:
-                    raise OperationLoadException('"operation" function in export must have 4 inputs.')
+                    raise OperationLoadException(
+                        '"operation" function in export must have 4 inputs.'
+                    )
                 options = export_dict.get("options", {})
                 if not isinstance(options, dict):
-                    raise OperationLoadException('"operation" in export must be a dictionary if defined.')
-                self._ui = lambda parent, canvas, world: FixedFunctionUI(parent, canvas, world, options_path, operation, options)
+                    raise OperationLoadException(
+                        '"operation" in export must be a dictionary if defined.'
+                    )
+                self._ui = lambda parent, canvas, world: FixedFunctionUI(
+                    parent, canvas, world, options_path, operation, options
+                )
 
             else:
-                raise OperationLoadException('"operation" in export must be a callable, or a subclass of wx.Window or wx.Sizer.')
+                raise OperationLoadException(
+                    '"operation" in export must be a callable, or a subclass of wx.Window or wx.Sizer.'
+                )
         else:
             raise OperationLoadException('"operation" is not present in export.')
 
@@ -94,7 +114,17 @@ class OperationLoader:
     def name(self) -> str:
         return self._name
 
-    def __call__(self, parent: wx.Window, canvas: "EditCanvas", world: "World") -> OperationUIType:
+    def __call__(
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World"
+    ) -> OperationUIType:
+        if os.path.isfile(self._path):
+            get_export_dict(
+                _load_module_file(self._path), self._owning_dict, self._path
+            )
+        elif os.path.isdir(self._path):
+            get_export_dict(
+                _load_module_directory(self._path), self._owning_dict, self._path
+            )
         return self._ui(parent, canvas, world)
 
 
@@ -121,11 +151,23 @@ def _load_module_directory(module_path):
 
 def parse_export(plugin: dict, operations_dict: Dict[str, OperationLoader], path: str):
     try:
-        operations_dict[path] = OperationLoader(plugin, path)
+        if path in operations_dict:
+            operations_dict[path].load(plugin)
+        else:
+            operations_dict[path] = OperationLoader(plugin, path, operations_dict)
     except OperationLoadException as e:
         log.error(f"Error loading plugin {path}. {e}")
     except Exception as e:
         log.error(f"Exception loading plugin {path}. {e}")
+
+
+def get_export_dict(mod, operations_: OperationStorageType, path: str):
+    if hasattr(mod, "export"):
+        plugin = getattr(mod, "export")
+        parse_export(plugin, operations_, path)
+    elif hasattr(mod, "exports"):
+        for plugin in getattr(mod, "exports"):
+            parse_export(plugin, operations_, path)
 
 
 def _load_operations(operations_: OperationStorageType, path: str):
@@ -136,25 +178,11 @@ def _load_operations(operations_: OperationStorageType, path: str):
                 continue
 
             mod = _load_module_file(fpath)
-            if hasattr(mod, "export"):
-                plugin = getattr(mod, "export")
-                parse_export(plugin, operations_, fpath)
-            elif hasattr(mod, "exports"):
-                for plugin in getattr(mod, "exports"):
-                    parse_export(plugin, operations_, fpath)
+            get_export_dict(mod, operations_, fpath)
 
         for dpath in glob.iglob(os.path.join(path, "**", "__init__.py")):
             mod = _load_module_directory(dpath)
-            if hasattr(mod, "export"):
-                plugin = getattr(mod, "export")
-                parse_export(
-                    plugin, operations_, os.path.basename(os.path.dirname(dpath))
-                )
-            elif hasattr(mod, "exports"):
-                for plugin in getattr(mod, "exports"):
-                    parse_export(
-                        plugin, operations_, os.path.basename(os.path.dirname(dpath))
-                    )
+            get_export_dict(mod, operations_, os.path.basename(os.path.dirname(dpath)))
 
 
 def _load_operations_group(dir_paths: List[str]):
@@ -171,16 +199,12 @@ operations: OperationStorageType = {}
 export_operations: OperationStorageType = {}
 import_operations: OperationStorageType = {}
 _meta: Dict[str, OperationStorageType] = {
-    'internal_operations': internal_operations,
-    'operations': operations,
-    'export_operations': export_operations,
-    'import_operations': import_operations
+    "internal_operations": internal_operations,
+    "operations": operations,
+    "export_operations": export_operations,
+    "import_operations": import_operations,
 }
-_public = {
-    'operations',
-    'export_operations',
-    'import_operations'
-}
+_public = {"operations", "export_operations", "import_operations"}
 
 
 def merge_operations():
@@ -196,8 +220,8 @@ def _reload_operation_name(dir_name):
         os.makedirs(os.path.join("plugins", dir_name), exist_ok=True)
     _meta[dir_name].clear()
     name_operations = _load_operations_group(
-        [os.path.join(STOCK_PLUGINS_DIR, dir_name)] +
-        [os.path.join(CUSTOM_PLUGINS_DIR, dir_name)] * (dir_name in _public)
+        [os.path.join(STOCK_PLUGINS_DIR, dir_name)]
+        + [os.path.join(CUSTOM_PLUGINS_DIR, dir_name)] * (dir_name in _public)
     )
     _meta[dir_name].update(name_operations)
 
