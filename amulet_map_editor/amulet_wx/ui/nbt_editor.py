@@ -13,7 +13,6 @@ from amulet_map_editor import resources
 
 nbt_resources = resources.img.nbt
 
-
 class NBTRadioButton(simple.SimplePanel):
     def __init__(self, parent, nbt_tag_class, icon):
         super(NBTRadioButton, self).__init__(parent, wx.HORIZONTAL)

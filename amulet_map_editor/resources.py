@@ -6,8 +6,6 @@ import os.path as op
 
 _BASE = op.dirname(__file__)
 
-_RESOURCE_DIRS: Dict[str, _ResourceDict] = {}
-
 
 class _ResourceDict:
     __slots__ = ("directory_name", "_file_cache", "_dir_cache")
@@ -53,18 +51,12 @@ class _ResourceDict:
         return self.__getitem__(name)
 
 
-def __getattr__(name) -> Union[str, _ResourceDict]:
-    path = op.join(_BASE, name)
-    if op.isfile(path):
-        return op.join(_BASE, name)
-    if name in _RESOURCE_DIRS:
-        return _RESOURCE_DIRS[name]
-    if not op.exists(path) or not op.isdir(path):
-        raise FileNotFoundError(
-            f'Could not file a file or directory with name "{name}"'
-        )
-    return _RESOURCE_DIRS.setdefault(name, _ResourceDict(path))
+_BASE_RESOURCEDICT = _ResourceDict(_BASE)
+
+
+def __getattr__(name):
+    return _BASE_RESOURCEDICT[name]
 
 
 def get_directory_or_file(name) -> Union[str, _ResourceDict]:
-    return __getattr__(name)
+    return _BASE_RESOURCEDICT.get_directory_or_file(name)
