@@ -121,7 +121,7 @@ class OperationLoader:
     def name(self) -> str:
         return self._name
 
-    def reload(self):
+    def reload(self) -> "OperationLoader":
         global persistent_storage
         if self.on_store:
             persistent_storage[self._path] = self.on_store()
