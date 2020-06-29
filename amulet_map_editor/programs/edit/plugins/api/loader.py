@@ -43,6 +43,9 @@ class OperationLoader:
         self._owning_dict = owning_dict
         self.load(export_dict)
 
+        self.on_load = None
+        self.on_store = None
+
     def load(self, export_dict: dict):
         if not isinstance(export_dict, dict):
             raise OperationLoadException("Export must be a dictionary.")
@@ -103,6 +106,10 @@ class OperationLoader:
                     parent, canvas, world, options_path, operation, options
                 )
 
+                if "on_store" in export_dict and "on_load" in export_dict:
+                    self.on_load = export_dict["on_load"]
+                    self.on_store = export_dict["on_store"]
+
             else:
                 raise OperationLoadException(
                     '"operation" in export must be a callable, or a subclass of wx.Window or wx.Sizer.'
@@ -114,9 +121,11 @@ class OperationLoader:
     def name(self) -> str:
         return self._name
 
-    def __call__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "World"
-    ) -> OperationUIType:
+    def reload(self):
+        global persistent_storage
+        if self.on_store:
+            persistent_storage[self._path] = self.on_store()
+
         if os.path.isfile(self._path):
             get_export_dict(
                 _load_module_file(self._path), self._owning_dict, self._path
@@ -125,6 +134,14 @@ class OperationLoader:
             get_export_dict(
                 _load_module_directory(self._path), self._owning_dict, self._path
             )
+        if self.on_load:
+            self.on_load(persistent_storage.get(self._path, None))
+
+        return self
+
+    def __call__(
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World"
+    ) -> OperationUIType:
         return self._ui(parent, canvas, world)
 
 
@@ -205,6 +222,8 @@ _meta: Dict[str, OperationStorageType] = {
     "import_operations": import_operations,
 }
 _public = {"operations", "export_operations", "import_operations"}
+
+persistent_storage = {}
 
 
 def merge_operations():

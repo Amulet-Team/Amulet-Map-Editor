@@ -5,6 +5,8 @@ from amulet_map_editor.amulet_wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.programs.edit.plugins import OperationUIType, OperationStorageType
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 
+from amulet_map_editor.amulet_wx.util.icon import REFRESH_ICON, scale_bitmap
+
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas import EditCanvas
 
@@ -15,10 +17,22 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         BaseToolUI.__init__(self, canvas)
         self._active_operation: Optional[OperationUIType] = None
 
+        horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         self._operation_choice = SimpleChoiceAny(self.canvas)
+        self._reload_operation = wx.BitmapButton(self.canvas, bitmap=scale_bitmap(REFRESH_ICON, 16, 16))
+        self._reload_operation.SetToolTip("Reload operation")
+
+        horizontal_sizer.Add(self._operation_choice)
+        horizontal_sizer.Add(self._reload_operation)
+
+        self.Add(horizontal_sizer)
+
         self._operation_choice.SetItems({key: value.name for key, value in self._operations.items()})
         self._operation_choice.Bind(wx.EVT_CHOICE, self._on_operation_change)
-        self.Add(self._operation_choice)
+
+        self._reload_operation.Bind(wx.EVT_BUTTON, self._reload_operation_loader)
+
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
         self.Add(self._operation_sizer)
 
@@ -56,6 +70,12 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self._active_operation = operation(self.canvas, self.canvas, self.canvas.world)
             self._operation_sizer.Add(self._active_operation, 1, wx.EXPAND)
             self.Layout()
+
+    def _reload_operation_loader(self, evt):
+        operation_path = self._operation_choice.GetAny()
+        if operation_path:
+            self._operations[operation_path] = self._operations[operation_path].reload()
+            self._operation_change()
 
     def enable(self):
         self._operation_change()
