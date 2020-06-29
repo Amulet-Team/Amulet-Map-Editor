@@ -1,6 +1,6 @@
 numpy==1.17.4
 pyopengl==3.1.5
-git+git://github.com/Amulet-Team/Amulet-Core.git
-git+git://github.com/Amulet-Team/Amulet-NBT.git
-git+git://github.com/gentlegiantJGC/PyMCTranslate.git
-git+git://github.com/gentlegiantJGC/Minecraft-Model-Reader.git
+git+git://github.com/Amulet-Team/Amulet-Core.git@4986e49c143abded07e548b486d71c5085a77d41
+git+git://github.com/Amulet-Team/Amulet-NBT.git@138a71cb1245b07b9a9afd8dfca6ac73bd659a78
+git+git://github.com/gentlegiantJGC/PyMCTranslate.git@1d4601f85f994af230f979e419bd871ae68ba5c5
+git+git://github.com/gentlegiantJGC/Minecraft-Model-Reader.git@7b2a2fe8b04ff742c57fec41bfdd38bc97b1996e
