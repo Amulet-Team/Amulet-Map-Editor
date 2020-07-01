@@ -5,7 +5,7 @@ from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.amulet_wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
-from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectLocationUI
+from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectLocationUI, SelectTransformUI
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_PASTE,
     EVT_BOX_CHANGE,
@@ -38,7 +38,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste())
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
-        self._paste_panel: Optional[SelectLocationUI] = None
+        self._paste_panel: Optional[SelectTransformUI] = None
 
         self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
         self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
@@ -90,7 +90,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._button_panel.Hide()
         self._remove_paste()
         self.canvas.selection_editable = False
-        self._paste_panel = SelectLocationUI(self.canvas, self.canvas, structure, self._paste_confirm)
+        self._paste_panel = SelectTransformUI(self.canvas, self.canvas, structure, self._paste_confirm)
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
         self.Layout()
 

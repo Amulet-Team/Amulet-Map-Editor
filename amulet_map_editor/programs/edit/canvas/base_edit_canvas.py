@@ -14,7 +14,7 @@ from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, cos, tan, atan
-from amulet_map_editor.opengl.mesh.structure import RenderStructure
+from amulet_map_editor.opengl.mesh.structure import RenderStructure, StructureGroup
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
@@ -94,7 +94,14 @@ class BaseEditCanvas(BaseCanvas):
         )
 
         self._draw_structure = False
-        self._structure: Optional[RenderStructure] = None
+        self._structure: StructureGroup = StructureGroup(
+            self.context_identifier,
+            world.palette,
+            self._resource_pack,
+            self._gl_texture_atlas,
+            self._texture_bounds,
+            self._resource_pack_translator
+        )
         self._structure_locations: List[numpy.ndarray] = []  # TODO rewrite this
 
         self._draw_timer = wx.Timer(self)
@@ -192,19 +199,8 @@ class BaseEditCanvas(BaseCanvas):
         log.info('Finished setting up texture atlas in OpenGL')
 
     @property
-    def structure(self) -> Optional[RenderStructure]:
+    def structure(self) -> StructureGroup:
         return self._structure
-
-    @structure.setter
-    def structure(self, structure: Structure):
-        self._structure = RenderStructure(
-            self.context_identifier,
-            structure,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds,
-            self._resource_pack_translator
-        )
 
     @property
     def draw_structure(self) -> bool:
@@ -214,12 +210,6 @@ class BaseEditCanvas(BaseCanvas):
     @draw_structure.setter
     def draw_structure(self, draw_structure: bool):
         self._draw_structure = bool(draw_structure)
-
-    @property
-    def structure_locations(self) -> List[numpy.ndarray]:
-        """The locations where the structure should be displayed. DO NOT USE THIS YET.
-        todo: rewrite this to allow rotation."""
-        return self._structure_locations
 
     @property
     def draw_selection(self) -> bool:
@@ -457,11 +447,8 @@ class BaseEditCanvas(BaseCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        if self._draw_structure and self._structure is not None:
-            transform = numpy.eye(4, dtype=numpy.float64)
-            for location in self.structure_locations:
-                transform[3, 0:3] = location
-                self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
+        if self._draw_structure:
+            self._structure.draw(self.transformation_matrix)
         if self._selection_moved:
             self._selection_moved = False
             self._change_box_location()

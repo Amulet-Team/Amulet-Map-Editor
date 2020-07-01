@@ -12,6 +12,7 @@ from amulet.api.block import BlockManager
 from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.opengl.resource_pack import ResourcePackManager
 from amulet_map_editor.opengl.mesh.selection import RenderSelectionGroup, RenderSelection
+from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
 
 
 class GreenRenderSelection(RenderSelection):
@@ -25,7 +26,8 @@ class GreenRenderSelectionGroup(RenderSelectionGroup):
         return GreenRenderSelection(self._context_identifier, self._texture_bounds, self._texture)
 
 
-class SubRenderStructure(RenderChunkBuilder):
+class RenderStructureChunk(RenderChunkBuilder):
+    """A class to create geometry for a chunk in the structure and render it."""
     def __init__(
         self,
         render_structure: 'RenderStructure',
@@ -67,7 +69,8 @@ class SubRenderStructure(RenderChunkBuilder):
         return self._offset
 
 
-class RenderStructure(ResourcePackManager):
+class RenderStructure(ResourcePackManager, Drawable):
+    """A class to create geometry for a Structure and render it."""
     def __init__(
         self,
         context_identifier: Any,
@@ -91,15 +94,15 @@ class RenderStructure(ResourcePackManager):
         offset = -self._structure.selection.min
         sections = []
         for chunk, slices, _ in self._structure.get_chunk_slices():
-            section = SubRenderStructure(self, self._structure.palette, chunk, slices, offset, self.texture)
+            section = RenderStructureChunk(self, self._structure.palette, chunk, slices, offset, self.texture)
             section.create_geometry()
             sections.append(section)
         self._sub_structures = sections
 
-    def draw(self, transformation_matrix: numpy.ndarray, cam_cx, cam_cz):
+    def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
         for chunk in sorted(
             self._sub_structures, key=lambda x: abs(x.cx - cam_cx) + abs(x.cz - cam_cz),
             reverse=True
         ):
-            chunk.draw(transformation_matrix)
-        self._selection.draw(transformation_matrix)
+            chunk.draw(camera_matrix)
+        self._selection.draw(camera_matrix)
