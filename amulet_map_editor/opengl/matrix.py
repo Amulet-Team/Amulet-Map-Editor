@@ -3,11 +3,35 @@ import numpy
 from typing import Optional
 
 
+def scale_matrix(sx: float, sy: float, sz: float) -> numpy.ndarray:
+    return numpy.array(
+        [
+            [sx, 0, 0, 0],
+            [0, sy, 0, 0],
+            [0, 0, sz, 0],
+            [0, 0, 0, 1]
+        ],
+        dtype=numpy.float64
+    )
+
+
+def displacement_matrix(x: float, y: float, z: float) -> numpy.ndarray:
+    return numpy.array(
+        [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [x, y, z, 1]
+        ],
+        dtype=numpy.float64
+    )
+
+
 def rotation_matrix(
         pitch: float,  # pitch (y axis) in radians
         yaw: float,  # pitch (transformed z axis) in radians
         roll: Optional[float] = None  # pitch (transformed x axis) in radians
-):
+) -> numpy.ndarray:
     c = math.cos(yaw)
     s = math.sin(yaw)
 
@@ -59,7 +83,7 @@ def projection_matrix(
         aspect,  # aspect ratio x/y
         z_near,  # near clipping distance
         z_far  # far clipping distance
-):
+) -> numpy.ndarray:
     # camera projection
     f = 1 / math.tan(fovy / 2)
     return numpy.array(
