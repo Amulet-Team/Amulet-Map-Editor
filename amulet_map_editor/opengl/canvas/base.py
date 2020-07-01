@@ -6,6 +6,7 @@ import numpy
 import math
 from typing import Optional
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.opengl.matrix import rotation_matrix, projection_matrix
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -66,49 +67,16 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @staticmethod
     def rotation_matrix(pitch, yaw):
-        c = math.cos(math.radians(yaw))
-        s = math.sin(math.radians(yaw))
-
-        y_rot = numpy.array(
-            [
-                [c, 0, -s, 0],
-                [0, 1, 0, 0],
-                [s, 0, c, 0],
-                [0, 0, 0, 1]
-            ],
-            dtype=numpy.float64
+        return rotation_matrix(
+            math.radians(pitch),
+            math.radians(yaw)
         )
-
-        # rotations
-        c = math.cos(math.radians(pitch))
-        s = math.sin(math.radians(pitch))
-
-        x_rot = numpy.array(
-            [
-                [1, 0, 0, 0],
-                [0, c, s, 0],
-                [0, -s, c, 0],
-                [0, 0, 0, 1]
-            ],
-            dtype=numpy.float64
-        )
-
-        return numpy.matmul(y_rot, x_rot)
 
     def projection_matrix(self):
         # camera projection
         fovy, aspect, z_near, z_far = self._projection
         fovy = math.radians(fovy)
-        f = 1 / math.tan(fovy / 2)
-        return numpy.array(
-            [
-                [f / aspect, 0, 0, 0],
-                [0, f, 0, 0],
-                [0, 0, (z_far + z_near) / (z_near - z_far), -1],
-                [0, 0, (2 * z_far * z_near) / (z_near - z_far), 0]
-            ],
-            dtype=numpy.float64
-        )
+        return projection_matrix(fovy, aspect, z_near, z_far)
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:
