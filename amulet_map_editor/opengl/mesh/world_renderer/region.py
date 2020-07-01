@@ -54,11 +54,11 @@ class ChunkManager:
     def region_coords(self, cx, cz):
         return cx // self.region_size, cz // self.region_size
 
-    def draw(self, camera_transform, camera):
+    def draw(self, camera_matrix, camera):
         cam_rx, cam_rz = numpy.floor(numpy.array(camera)[[0, 2]]/(16*self.region_size))
         cam_cx, cam_cz = numpy.floor(numpy.array(camera)[[0, 2]]/16)
         for region in sorted(self._regions.values(), key=lambda x: abs(x.rx-cam_rx) + abs(x.rz-cam_rz), reverse=True):
-            region.draw(camera_transform, cam_cx, cam_cz)
+            region.draw(camera_matrix, cam_cx, cam_cz)
         self._merge_chunk_temp()
 
     def unload(self, safe_area: Tuple[int, int, int, int] = None):
@@ -182,8 +182,8 @@ class RenderRegion(TriMesh):
             chunk.unload()
         self._chunks.clear()
 
-    def draw(self, transformation_matrix: numpy.ndarray, cam_cx, cam_cz):
-        transformation_matrix = numpy.matmul(self.region_transform, transformation_matrix)
+    def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
+        transformation_matrix = numpy.matmul(self.region_transform, camera_matrix)
         super().draw(transformation_matrix)
         for chunk in sorted(self._manual_chunks.values(), key=lambda x: abs(x.cx-cam_cx) + abs(x.cz-cam_cz), reverse=True):
             chunk.draw(transformation_matrix)

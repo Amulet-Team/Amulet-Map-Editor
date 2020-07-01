@@ -45,6 +45,6 @@ class RenderSelectionGroup(Drawable):
             SelectionBox(box.min, box.max) for box in self._boxes
         ])
 
-    def draw(self, transformation_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
+    def draw(self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
         for box in self._boxes:
-            box.draw(transformation_matrix, camera_position)
+            box.draw(camera_matrix, camera_position)

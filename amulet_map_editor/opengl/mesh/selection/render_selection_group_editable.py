@@ -220,7 +220,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
 
     def draw(
             self,
-            transformation_matrix: numpy.ndarray,
+            camera_matrix: numpy.ndarray,
             camera_position: PointCoordinatesAny = None,
             draw_selection=True,
             draw_cursor=True
@@ -228,11 +228,11 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         if draw_selection:
             for index, box in enumerate(self._boxes):
                 if not self.editable or index != self._active_box_index:
-                    box.draw(transformation_matrix, camera_position)
+                    box.draw(camera_matrix, camera_position)
             if self._active_box is not None:
-                self._active_box.draw(transformation_matrix, camera_position)
+                self._active_box.draw(camera_matrix, camera_position)
         if draw_cursor and not self.editing:
-            self._cursor.draw(transformation_matrix)
+            self._cursor.draw(camera_matrix)
 
     def closest_intersection(self, origin: PointCoordinatesAny, vector: PointCoordinatesAny) -> Tuple[Optional[int], Optional["RenderSelectionHighlightable"]]:
         """

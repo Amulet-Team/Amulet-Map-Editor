@@ -242,8 +242,8 @@ class RenderWorld(ResourcePackManager, Drawable):
             sign *= -1
             length += 1
 
-    def draw(self, transformation_matrix: numpy.ndarray):
-        self._chunk_manager.draw(transformation_matrix, self.camera_location)
+    def draw(self, camera_matrix: numpy.ndarray):
+        self._chunk_manager.draw(camera_matrix, self.camera_location)
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:

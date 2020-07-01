@@ -180,10 +180,10 @@ class RenderSelection(TriMesh):
         self._volume = numpy.product(self.max - self.min)
         self._rebuild = False
 
-    def draw(self, transformation_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
+    def draw(self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
         """
         Draw the selection box
-        :param transformation_matrix: 4x4 transformation matrix for the camera
+        :param camera_matrix: 4x4 transformation matrix for the camera
         :param camera_position: The position of the camera. Used to flip draw direction if camera inside box.
         :return:
         """
@@ -192,7 +192,7 @@ class RenderSelection(TriMesh):
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
 
-        transformation_matrix = numpy.matmul(self.transformation_matrix, transformation_matrix)
+        transformation_matrix = numpy.matmul(self.transformation_matrix, camera_matrix)
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)
