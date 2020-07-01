@@ -61,8 +61,8 @@ def rotation_matrix(
     mat = numpy.matmul(y_rot, x_rot)
 
     if roll:
-        c = math.cos(pitch)
-        s = math.sin(pitch)
+        c = math.cos(roll)
+        s = math.sin(roll)
 
         z_rot = numpy.array(
             [
