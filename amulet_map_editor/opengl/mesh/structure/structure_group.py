@@ -5,15 +5,16 @@ import minecraft_model_reader
 import PyMCTranslate
 from amulet.api.block import BlockManager
 from amulet.api.structure import Structure
+from amulet.api.data_types import FloatTriplet, PointCoordinates
 
 from .structure import RenderStructure
 from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
-from amulet_map_editor.opengl.matrix import rotation_matrix, displacement_matrix, scale_matrix
+from amulet_map_editor.opengl.matrix import transform_matrix
 from amulet_map_editor.opengl.resource_pack import ResourcePackManager
 
-LocationType = Tuple[float, float, float]
-ScaleType = Tuple[float, float, float]
-RotationType = Tuple[float, float, float]
+LocationType = PointCoordinates
+ScaleType = FloatTriplet
+RotationType = FloatTriplet
 TransformType = Tuple[LocationType, ScaleType, RotationType]
 
 
@@ -51,17 +52,6 @@ class StructureGroup(ResourcePackManager, Drawable):
             return (0, 0, 0), (0, 0, 0), (0, 0, 0)
         return self._transforms[self._active_structure]
 
-    @staticmethod
-    def get_matrix(
-            location: LocationType,
-            scale: ScaleType,
-            rotation: RotationType
-    ):
-        scale_transform = scale_matrix(*scale)
-        rotation_transform = rotation_matrix(*rotation)
-        displacement_transform = displacement_matrix(*location)
-        return numpy.matmul(numpy.matmul(scale_transform, rotation_transform), displacement_transform)
-
     def append(
             self,
             structure: Structure,
@@ -83,7 +73,7 @@ class StructureGroup(ResourcePackManager, Drawable):
             )
         )
         self._transforms.append((location, scale, rotation))
-        self._transformation_matrices.append(self.get_matrix(location, scale, rotation))
+        self._transformation_matrices.append(transform_matrix(location, scale, rotation))
         if self._active_structure is None:
             self._active_structure = 0
         else:
@@ -103,7 +93,7 @@ class StructureGroup(ResourcePackManager, Drawable):
     ):
         if self._active_structure is not None:
             self._transforms[self._active_structure] = (location, scale, rotation)
-            self._transformation_matrices[self._active_structure] = self.get_matrix(location, scale, rotation)
+            self._transformation_matrices[self._active_structure] = transform_matrix(location, scale, rotation)
 
     def draw(self, camera_matrix: numpy.ndarray):
         for structure, transform in zip(self._structures, self._transformation_matrices):
