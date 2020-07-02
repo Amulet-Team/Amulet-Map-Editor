@@ -2,10 +2,15 @@ import wx
 from typing import TYPE_CHECKING, Optional
 
 from amulet_map_editor.amulet_wx.ui.simple import SimpleChoiceAny
-from amulet_map_editor.programs.edit.plugins import OperationUIType, OperationStorageType
+from amulet_map_editor.programs.edit.plugins import (
+    OperationUIType,
+    OperationStorageType,
+)
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 
 from amulet_map_editor.amulet_wx.util.icon import REFRESH_ICON, scale_bitmap
+
+from amulet_map_editor.util.log import log
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas import EditCanvas
@@ -20,15 +25,19 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self._operation_choice = SimpleChoiceAny(self.canvas)
-        self._reload_operation = wx.BitmapButton(self.canvas, bitmap=scale_bitmap(REFRESH_ICON, 16, 16))
-        self._reload_operation.SetToolTip("Reload operation")
+        self._reload_operation = wx.BitmapButton(
+            self.canvas, bitmap=scale_bitmap(REFRESH_ICON, 16, 16)
+        )
+        self._reload_operation.SetToolTip("Reload selected operation")
 
         horizontal_sizer.Add(self._operation_choice)
         horizontal_sizer.Add(self._reload_operation)
 
         self.Add(horizontal_sizer)
 
-        self._operation_choice.SetItems({key: value.name for key, value in self._operations.items()})
+        self._operation_choice.SetItems(
+            {key: value.name for key, value in self._operations.items()}
+        )
         self._operation_choice.Bind(wx.EVT_CHOICE, self._on_operation_change)
 
         self._reload_operation.Bind(wx.EVT_BUTTON, self._reload_operation_loader)
@@ -67,14 +76,21 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         if operation_path:
             operation = self._operations[operation_path]
             self.disable()
-            self._active_operation = operation(self.canvas, self.canvas, self.canvas.world)
+            self._active_operation = operation(
+                self.canvas, self.canvas, self.canvas.world
+            )
             self._operation_sizer.Add(self._active_operation, 1, wx.EXPAND)
             self.Layout()
 
     def _reload_operation_loader(self, evt):
         operation_path = self._operation_choice.GetAny()
         if operation_path:
-            self._operations[operation_path] = self._operations[operation_path].reload()
+            operation_loader, success = self._operations[operation_path].reload()
+            if success:
+                self._operations[operation_path] = operation_loader
+            else:
+                log.warning(f"Couldn't successfully reload {operation_path}")
+                self.reload_operations()
             self._operation_change()
 
     def enable(self):
@@ -85,3 +101,24 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
 
     def disable(self):
         self._unload_active_operation()
+
+    def reload_operations(self):
+        self._operation_choice.SetItems(
+            {key: value.name for key, value in self._operations.items()}
+        )
+
+        if not self.operation:
+            return
+
+        items = self._operation_choice.GetItems()
+        operation_loader = self._operations[self.operation]
+
+        if operation_loader.name in items and operation_loader.name != items[0]:
+            self._operation_choice.SetValue(operation_loader.name)
+        else:
+            log.warning(
+                f"Couldn't successfully reload currently selected operation: {self.operation}"
+            )
+            self._operation_choice.SetValue(self._operation_choice.GetItems()[0])
+
+        self._operation_change()

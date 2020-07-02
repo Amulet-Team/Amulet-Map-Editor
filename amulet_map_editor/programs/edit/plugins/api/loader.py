@@ -2,7 +2,7 @@ import os
 import glob
 import importlib.util
 from amulet import log
-from typing import Dict, List, TYPE_CHECKING, Callable, Optional, Type
+from typing import Dict, List, TYPE_CHECKING, Callable, Optional, Type, Tuple
 import wx
 import struct
 import hashlib
@@ -121,10 +121,13 @@ class OperationLoader:
     def name(self) -> str:
         return self._name
 
-    def reload(self) -> "OperationLoader":
+    def reload(self) -> Tuple["OperationLoader", bool]:
         global persistent_storage
         if self.on_store:
             persistent_storage[self._path] = self.on_store()
+
+        if not os.path.exists(self._path):
+            return None, False
 
         if os.path.isfile(self._path):
             get_export_dict(
@@ -137,7 +140,7 @@ class OperationLoader:
         if self.on_load:
             self.on_load(persistent_storage.get(self._path, None))
 
-        return self
+        return self, True
 
     def __call__(
         self, parent: wx.Window, canvas: "EditCanvas", world: "World"
