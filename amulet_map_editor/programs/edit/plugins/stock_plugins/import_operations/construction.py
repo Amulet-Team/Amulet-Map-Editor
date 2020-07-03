@@ -59,7 +59,7 @@ class ImportConstruction(SimpleOperationPanel):
             for chunk_index, (cx, cz) in enumerate(wrapper.all_chunk_coords()):
                 try:
                     chunks[(cx, cz)] = wrapper.load_chunk(cx, cz, global_palette)
-                    yield 100 * (chunk_index + 1) / chunk_count
+                    yield (chunk_index + 1) / chunk_count
                 except ChunkLoadError:
                     pass
 

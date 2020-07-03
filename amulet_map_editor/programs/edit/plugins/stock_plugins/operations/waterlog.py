@@ -85,7 +85,7 @@ class Waterlog(wx.Panel, OperationUI):
 
             chunk.changed = True
             count += 1
-            yield 100 * count / iter_count
+            yield count / iter_count
 
 
 export = {

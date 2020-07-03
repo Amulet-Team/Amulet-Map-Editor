@@ -39,6 +39,7 @@ def show_loading_dialog(
     dialog = wx.ProgressDialog(
         title,
         message,
+        maximum=10_000,
         parent=parent,
         style=wx.PD_APP_MODAL
         | wx.PD_ELAPSED_TIME
@@ -58,7 +59,7 @@ def show_loading_dialog(
                         if len(progress) >= 1:
                             progress = progress[0]
                     if isinstance(progress, (int, float)) and isinstance(message, str):
-                        dialog.Update(min(99.99, max(0, progress)), message)
+                        dialog.Update(min(9999, max(0, progress*10_000)), message)
             except StopIteration as e:
                 obj = e.value
     except Exception as e:
@@ -111,12 +112,19 @@ class EditCanvas(ControllableEditCanvas):
             msg="",
             throw_exceptions=False
     ) -> Any:
-        self._disable_threads()
+        def operation_wrapper():
+            yield 0, "Disabling Threads"
+            self._disable_threads()
+            yield 0, msg or "Running Operation"
+            op = operation()
+            if isinstance(op, GeneratorType):
+                yield from op
+            return op
         err = None
         out = None
         try:
             out = show_loading_dialog(
-                operation,
+                operation_wrapper,
                 title,
                 msg,
                 self,
