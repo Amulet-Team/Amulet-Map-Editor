@@ -21,9 +21,9 @@ Extract the contained folder to a location on your computer and run the executab
 
 In order to run Amulet from source, you will need to install the following packages and the dependancies for those packages:
 
-The following can be easily installed using `python -m pip install -r requirements.txt`
+The following can be easily installed using `python3 -m pip install -r requirements.txt`
 
-For linux run `python -m pip install -r requirements_linux.txt`
+For linux run `python3 -m pip install -r requirements_linux.txt`
 
 - numpy
 - wxpython
@@ -33,7 +33,7 @@ For linux run `python -m pip install -r requirements_linux.txt`
 - [PyMCTranslate](https://github.com/gentlegiantJGC/PyMCTranslate)  The library to handle block, block entity, entity and biome translation. between versions
 - [Minecraft-Model-Reader](https://github.com/gentlegiantJGC/Minecraft-Model-Reader)  The library to handle loading block models and textures from a resource pack for use in the renderer.
 
-run `python main.py`
+run `python3 main.py`
 
 ## Contributing
 
