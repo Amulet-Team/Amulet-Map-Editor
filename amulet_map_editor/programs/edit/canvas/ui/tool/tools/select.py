@@ -100,7 +100,9 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
                 self.canvas.world,
                 self.canvas.dimension,
                 self._paste_panel.structure,
-                [self._paste_panel.location],
+                self._paste_panel.location,
+                (1, 1, 1),
+                self._paste_panel.rotation,
                 self._paste_panel.copy_air
             )
         )

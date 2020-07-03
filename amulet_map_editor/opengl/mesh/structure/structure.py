@@ -13,6 +13,7 @@ from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.opengl.resource_pack import ResourcePackManager
 from amulet_map_editor.opengl.mesh.selection import RenderSelectionGroup, RenderSelection
 from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.opengl.matrix import displacement_matrix
 
 
 class GreenRenderSelection(RenderSelection):
@@ -84,6 +85,7 @@ class RenderStructure(ResourcePackManager, Drawable):
         self._structure = structure
         self._sub_structures = []
         self._selection = GreenRenderSelectionGroup(context_identifier, texture_bounds, texture, structure.selection)
+        self._selection_transform = displacement_matrix(*(self._structure.selection.min - self._structure.selection.max)//2)
         self._create_geometry()  # TODO: move this to a different thread
 
     @property
@@ -91,7 +93,7 @@ class RenderStructure(ResourcePackManager, Drawable):
         return self._structure.palette
 
     def _create_geometry(self):
-        offset = -self._structure.selection.min
+        offset = -(self._structure.selection.min + self._structure.selection.max)//2
         sections = []
         for chunk, slices, _ in self._structure.get_chunk_slices():
             section = RenderStructureChunk(self, self._structure.palette, chunk, slices, offset, self.texture)
@@ -105,4 +107,4 @@ class RenderStructure(ResourcePackManager, Drawable):
             reverse=True
         ):
             chunk.draw(camera_matrix)
-        self._selection.draw(camera_matrix)
+        self._selection.draw(numpy.matmul(self._selection_transform, camera_matrix))
