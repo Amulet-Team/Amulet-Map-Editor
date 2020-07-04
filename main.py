@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import wx
 from amulet_map_editor.amulet_ui import AmuletMainWindow
 from amulet_map_editor import log
