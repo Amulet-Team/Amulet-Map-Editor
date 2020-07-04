@@ -81,4 +81,9 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         python_requires=PYTHON_REQUIRES,
         install_requires=INSTALL_REQUIRES,
+        entry_points={
+            "gui_scripts": [
+                "amulet-map-editor = amulet_map_editor.load:run",
+            ]
+        }
     )
