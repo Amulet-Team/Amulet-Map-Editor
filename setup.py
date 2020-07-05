@@ -29,6 +29,10 @@ CLASSIFIERS = [
     "Topic :: Games/Entertainment",
     "Private :: Do Not Upload",
 ]
+PACKAGE_DATA={
+    "": ["*.png", "*.mcmeta", "*.lang", "version"],
+    "amulet_map_editor.opengl": ["*.frag", "*.vert"]
+}
 PYTHON_REQUIRES='~=3.7'
 INSTALL_REQUIRES = []
 
@@ -79,6 +83,8 @@ if __name__ == "__main__":
         packages=PACKAGES,
         zip_safe=False,
         classifiers=CLASSIFIERS,
+        include_package_data=True,
+        package_data=PACKAGE_DATA,
         python_requires=PYTHON_REQUIRES,
         install_requires=INSTALL_REQUIRES,
         entry_points={
