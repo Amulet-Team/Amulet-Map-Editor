@@ -85,7 +85,7 @@ class RenderStructure(ResourcePackManager, Drawable):
         self._structure = structure
         self._sub_structures = []
         self._selection = GreenRenderSelectionGroup(context_identifier, texture_bounds, texture, structure.selection)
-        self._selection_transform = displacement_matrix(*(self._structure.selection.min - self._structure.selection.max)//2)
+        self._selection_transform = displacement_matrix(*((self._structure.selection.min - self._structure.selection.max)/2).astype(int))
         self._create_geometry()  # TODO: move this to a different thread
 
     @property
@@ -93,7 +93,7 @@ class RenderStructure(ResourcePackManager, Drawable):
         return self._structure.palette
 
     def _create_geometry(self):
-        offset = -(self._structure.selection.min + self._structure.selection.max)//2
+        offset = -((self._structure.selection.min + self._structure.selection.max)/2).astype(int)
         sections = []
         for chunk, slices, _ in self._structure.get_chunk_slices():
             section = RenderStructureChunk(self, self._structure.palette, chunk, slices, offset, self.texture)
