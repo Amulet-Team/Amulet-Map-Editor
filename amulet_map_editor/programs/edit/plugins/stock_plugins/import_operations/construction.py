@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
-
 class ImportConstruction(SimpleOperationPanel):
     def __init__(
             self,
