@@ -105,6 +105,10 @@ class EditCanvas(ControllableEditCanvas):
         self._file_panel.bind_events()
         self._tool_sizer.bind_events()
 
+    @property
+    def tools(self):
+        return self._tool_sizer.tools
+
     def run_operation(
             self,
             operation: Callable[[], OperationReturnType],
