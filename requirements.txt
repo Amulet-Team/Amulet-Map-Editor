@@ -1,2 +1,2 @@
-wxPython==4.0.7.post2
+wxPython==4.1.0
 -r requirements_base.txt

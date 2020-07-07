@@ -121,10 +121,10 @@ class TriMesh(Drawable):
         """Unload all opengl data"""
         log.debug(f"unload {self}")
         if self._vbo is not None:
-            glDeleteBuffers(1, self._vbo)
+            glDeleteBuffers(1, int(self._vbo))
             self._vbo = None
         if self._vao is not None:
-            glDeleteVertexArrays(1, self._vao)
+            glDeleteVertexArrays(1, int(self._vao))
             self._vao = None
 
     def draw(self, transformation_matrix: numpy.ndarray):

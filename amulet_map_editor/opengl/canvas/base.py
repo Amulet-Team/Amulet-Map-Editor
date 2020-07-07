@@ -11,16 +11,13 @@ from amulet_map_editor.opengl.matrix import rotation_matrix, projection_matrix
 
 class BaseCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: wx.Window):
-        attribs = (
-            glcanvas.WX_GL_CORE_PROFILE,
-            glcanvas.WX_GL_RGBA,
-            glcanvas.WX_GL_DOUBLEBUFFER,
-            glcanvas.WX_GL_DEPTH_SIZE,
-            24,
-        )
-        super().__init__(parent, -1, size=parent.GetClientSize(), attribList=attribs)
+        display_attributes = wx.glcanvas.GLAttributes()
+        display_attributes.PlatformDefaults().MinRGBA(8, 8, 8, 8).DoubleBuffer().Depth(24).EndList()
+        super().__init__(parent, display_attributes, size=parent.GetClientSize())
         self._projection = [70.0, 4 / 3, 0.1, 10000.0]
-        self._context = glcanvas.GLContext(self)  # setup the OpenGL context
+        context_attributes = wx.glcanvas.GLContextAttrs()
+        context_attributes.CoreProfile().OGLVersion(3, 3).Robust().ResetIsolation().EndList()
+        self._context = glcanvas.GLContext(self, ctxAttrs=context_attributes)  # setup the OpenGL context
         self.SetCurrent(self._context)
         self.context_identifier = str(
             uuid.uuid4()
