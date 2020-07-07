@@ -22,15 +22,17 @@ class StructureGroup(ResourcePackManager, Drawable):
     """A group of RenderStructure classes with transforms"""
 
     def __init__(
-            self,
-            context_identifier: Any,
-            block_palette: BlockManager,
-            resource_pack: minecraft_model_reader.JavaRPHandler,
-            texture: Any,
-            texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-            translator: PyMCTranslate.Version
+        self,
+        context_identifier: Any,
+        block_palette: BlockManager,
+        resource_pack: minecraft_model_reader.JavaRPHandler,
+        texture: Any,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        translator: PyMCTranslate.Version,
     ):
-        super().__init__(context_identifier, resource_pack, texture, texture_bounds, translator)
+        super().__init__(
+            context_identifier, resource_pack, texture, texture_bounds, translator
+        )
         self._block_palette = block_palette
         self._structures: List[RenderStructure] = []
         self._transforms: List[TransformType] = []
@@ -53,11 +55,11 @@ class StructureGroup(ResourcePackManager, Drawable):
         return self._transforms[self._active_structure]
 
     def append(
-            self,
-            structure: Structure,
-            location: LocationType,
-            scale: ScaleType,
-            rotation: RotationType
+        self,
+        structure: Structure,
+        location: LocationType,
+        scale: ScaleType,
+        rotation: RotationType,
     ):
         """Append a structure to the list and activate it."""
         # TODO: update this to support multiple structures
@@ -69,11 +71,13 @@ class StructureGroup(ResourcePackManager, Drawable):
                 self._resource_pack,
                 self._texture,
                 self._texture_bounds,
-                self._resource_pack_translator
+                self._resource_pack_translator,
             )
         )
         self._transforms.append((location, scale, rotation))
-        self._transformation_matrices.append(transform_matrix(location, scale, rotation))
+        self._transformation_matrices.append(
+            transform_matrix(location, scale, rotation)
+        )
         if self._active_structure is None:
             self._active_structure = 0
         else:
@@ -86,15 +90,16 @@ class StructureGroup(ResourcePackManager, Drawable):
         self._active_structure = None
 
     def set_active_transform(
-            self,
-            location: LocationType,
-            scale: ScaleType,
-            rotation: RotationType
+        self, location: LocationType, scale: ScaleType, rotation: RotationType
     ):
         if self._active_structure is not None:
             self._transforms[self._active_structure] = (location, scale, rotation)
-            self._transformation_matrices[self._active_structure] = transform_matrix(location, scale, rotation)
+            self._transformation_matrices[self._active_structure] = transform_matrix(
+                location, scale, rotation
+            )
 
     def draw(self, camera_matrix: numpy.ndarray):
-        for structure, transform in zip(self._structures, self._transformation_matrices):
+        for structure, transform in zip(
+            self._structures, self._transformation_matrices
+        ):
             structure.draw(numpy.matmul(transform, camera_matrix), 0, 0)

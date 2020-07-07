@@ -10,20 +10,19 @@ from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension
 from amulet.structure_interface.construction import ConstructionFormatWrapper
 
-from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import SimpleOperationPanel
+from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
+    SimpleOperationPanel,
+)
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
+
 class ImportConstruction(SimpleOperationPanel):
     def __init__(
-            self,
-            parent: wx.Window,
-            canvas: "EditCanvas",
-            world: "World",
-            options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
     ):
         SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
 
@@ -31,23 +30,27 @@ class ImportConstruction(SimpleOperationPanel):
 
         self._file_picker = wx.FilePickerCtrl(
             self,
-            path=options.get('path', ''),
+            path=options.get("path", ""),
             wildcard="Construction file (*.construction)|*.construction",
-            style=wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN
+            style=wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN,
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
         self._add_run_button("Load")
         self.Layout()
 
     def unload(self):
-        self._save_options({
-            "path": self._file_picker.GetPath()
-        })
+        self._save_options({"path": self._file_picker.GetPath()})
 
-    def _operation(self, world: "World", dimension: Dimension, selection: SelectionGroup):
+    def _operation(
+        self, world: "World", dimension: Dimension, selection: SelectionGroup
+    ):
         path = self._file_picker.GetPath()
-        if isinstance(path, str) and path.endswith('.construction') and os.path.isfile(path):
-            wrapper = ConstructionFormatWrapper(path, 'r')
+        if (
+            isinstance(path, str)
+            and path.endswith(".construction")
+            and os.path.isfile(path)
+        ):
+            wrapper = ConstructionFormatWrapper(path, "r")
             wrapper.translation_manager = world.translation_manager
             wrapper.open()
             selection = wrapper.selection
@@ -63,15 +66,11 @@ class ImportConstruction(SimpleOperationPanel):
                     pass
 
             wrapper.close()
-            self.canvas.paste(
-                Structure(
-                    chunks,
-                    global_palette,
-                    selection
-                )
-            )
+            self.canvas.paste(Structure(chunks, global_palette, selection))
         else:
-            raise OperationError('Please specify a construction file in the options before running.')
+            raise OperationError(
+                "Please specify a construction file in the options before running."
+            )
 
 
 export = {

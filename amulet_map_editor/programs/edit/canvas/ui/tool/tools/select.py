@@ -5,7 +5,10 @@ from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.amulet_wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
-from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectLocationUI, SelectTransformUI
+from amulet_map_editor.programs.edit.canvas.ui.select_location import (
+    SelectLocationUI,
+    SelectTransformUI,
+)
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_PASTE,
     EVT_BOX_CHANGE,
@@ -17,7 +20,7 @@ if TYPE_CHECKING:
 
 
 class SelectOptions(wx.BoxSizer, BaseToolUI):
-    def __init__(self, canvas: 'EditCanvas'):
+    def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         BaseToolUI.__init__(self, canvas)
 
@@ -25,24 +28,38 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
         delete_button = wx.Button(self._button_panel, label="Delete")
-        button_sizer.Add(delete_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
+        button_sizer.Add(
+            delete_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5
+        )
         delete_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.delete())
         copy_button = wx.Button(self._button_panel, label="Copy")
-        button_sizer.Add(copy_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
+        button_sizer.Add(
+            copy_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5
+        )
         copy_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.copy())
         cut_button = wx.Button(self._button_panel, label="Cut")
-        button_sizer.Add(cut_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
+        button_sizer.Add(
+            cut_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5
+        )
         cut_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.cut())
         paste_button = wx.Button(self._button_panel, label="Paste")
-        button_sizer.Add(paste_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
+        button_sizer.Add(
+            paste_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5
+        )
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste())
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
         self._paste_panel: Optional[SelectTransformUI] = None
 
-        self._x1: wx.SpinCtrl = self._add_row('x1', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._y1: wx.SpinCtrl = self._add_row('y1', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._z1: wx.SpinCtrl = self._add_row('z1', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x1: wx.SpinCtrl = self._add_row(
+            "x1", wx.SpinCtrl, min=-30000000, max=30000000
+        )
+        self._y1: wx.SpinCtrl = self._add_row(
+            "y1", wx.SpinCtrl, min=-30000000, max=30000000
+        )
+        self._z1: wx.SpinCtrl = self._add_row(
+            "z1", wx.SpinCtrl, min=-30000000, max=30000000
+        )
         self._x1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._y1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._z1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
@@ -50,9 +67,15 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._y1.SetValidator(IntValidator())
         self._z1.SetValidator(IntValidator())
 
-        self._x2: wx.SpinCtrl = self._add_row('x2', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._y2: wx.SpinCtrl = self._add_row('y2', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._z2: wx.SpinCtrl = self._add_row('z2', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x2: wx.SpinCtrl = self._add_row(
+            "x2", wx.SpinCtrl, min=-30000000, max=30000000
+        )
+        self._y2: wx.SpinCtrl = self._add_row(
+            "y2", wx.SpinCtrl, min=-30000000, max=30000000
+        )
+        self._z2: wx.SpinCtrl = self._add_row(
+            "z2", wx.SpinCtrl, min=-30000000, max=30000000
+        )
         self._x2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._y2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._z2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
@@ -90,7 +113,9 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._button_panel.Hide()
         self._remove_paste()
         self.canvas.selection_editable = False
-        self._paste_panel = SelectTransformUI(self.canvas, self.canvas, structure, self._paste_confirm)
+        self._paste_panel = SelectTransformUI(
+            self.canvas, self.canvas, structure, self._paste_confirm
+        )
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
         self.Layout()
 
@@ -103,7 +128,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
                 self._paste_panel.location,
                 (1, 1, 1),
                 self._paste_panel.rotation,
-                self._paste_panel.copy_air
+                self._paste_panel.copy_air,
             )
         )
 
@@ -130,7 +155,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
     def _box_input_change(self, _):
         self.canvas.active_selection_corners = (
             (self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()),
-            (self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue())
+            (self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()),
         )
 
     def _box_renderer_change(self, evt):

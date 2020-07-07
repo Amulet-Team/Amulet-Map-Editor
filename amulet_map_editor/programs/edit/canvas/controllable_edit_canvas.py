@@ -5,7 +5,12 @@ import time
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.util.key_config import serialise_key_event, KeybindGroup, ActionLookupType, Escape
+from amulet_map_editor.amulet_wx.util.key_config import (
+    serialise_key_event,
+    KeybindGroup,
+    ActionLookupType,
+    Escape,
+)
 from .events import EditEscapeEvent, EVT_EDIT_ESCAPE
 
 if TYPE_CHECKING:
@@ -14,12 +19,15 @@ if TYPE_CHECKING:
 
 class ControllableEditCanvas(BaseEditCanvas):
     """Adds the user interaction logic to BaseEditCanvas"""
-    def __init__(self, world_panel: wx.Window, world: 'World'):
+
+    def __init__(self, world_panel: wx.Window, world: "World"):
         super().__init__(world_panel, world)
         self._last_mouse_x = 0
         self._last_mouse_y = 0
         self._mouse_moved = False  # has the mouse position changed since the last frame
-        self._persistent_actions: Set[str] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
+        self._persistent_actions: Set[
+            str
+        ] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
         self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
         self._box_select_time = 0
 
@@ -116,22 +124,42 @@ class ControllableEditCanvas(BaseEditCanvas):
                         chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
                         block_entity = chunk.block_entities.get((x, y, z), None)
                         translator = self.world.translation_manager.get_version(
-                            self.world.world_wrapper.platform, self.world.world_wrapper.version
+                            self.world.world_wrapper.platform,
+                            self.world.world_wrapper.version,
                         )
-                        version_block, version_block_entity, _ = translator.block.from_universal(block, extra_input=block_entity, block_location=(x, y, z))
-                        print(f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}")
+                        (
+                            version_block,
+                            version_block_entity,
+                            _,
+                        ) = translator.block.from_universal(
+                            block, extra_input=block_entity, block_location=(x, y, z)
+                        )
+                        print(
+                            f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}"
+                        )
                         if len(chunk.biomes.shape) == 2:
                             biome = chunk.biomes[x % 16, z % 16]
-                            print(self.world.translation_manager.universal_biome_registry.to_str(biome))
+                            print(
+                                self.world.translation_manager.universal_biome_registry.to_str(
+                                    biome
+                                )
+                            )
                         elif len(chunk.biomes.shape) == 3:
                             biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
-                            print(self.world.translation_manager.universal_biome_registry.to_str(biome))
+                            print(
+                                self.world.translation_manager.universal_biome_registry.to_str(
+                                    biome
+                                )
+                            )
                     except Exception as e:
                         print(e)
 
             else:  # run once on button press and frequently until released
                 if action == "box click":
-                    if self.selection_editable and time.time() - self._box_select_time > 0.1:
+                    if (
+                        self.selection_editable
+                        and time.time() - self._box_select_time > 0.1
+                    ):
                         self._selection_group.box_select_disable()
                 elif action == "toggle mouse mode":
                     self._toggle_mouse_lock()
@@ -144,7 +172,9 @@ class ControllableEditCanvas(BaseEditCanvas):
             self._escape()
             wx.PostEvent(self, EditEscapeEvent())
         elif not press:
-            remove_actions = [self._key_binds[k] for k in self._key_binds if k[1] == key[1]]
+            remove_actions = [
+                self._key_binds[k] for k in self._key_binds if k[1] == key[1]
+            ]
             for a in remove_actions:
                 if a in self._persistent_actions:
                     self._persistent_actions.remove(a)
@@ -152,22 +182,24 @@ class ControllableEditCanvas(BaseEditCanvas):
     def box_select(self, add_modifier: bool = False):
         position = self._selection_group.box_select_toggle(add_modifier)
         if position is not None:
-            self.select_distance2 = int(numpy.linalg.norm(position - self.camera_location))
+            self.select_distance2 = int(
+                numpy.linalg.norm(position - self.camera_location)
+            )
 
     def _process_persistent_inputs(self, evt):
         """Handle actions run by keys that are being held down."""
         forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
-        if 'up' in self._persistent_actions:
+        if "up" in self._persistent_actions:
             up += 1
-        if 'down' in self._persistent_actions:
+        if "down" in self._persistent_actions:
             up -= 1
-        if 'forwards' in self._persistent_actions:
+        if "forwards" in self._persistent_actions:
             forward += 1
-        if 'backwards' in self._persistent_actions:
+        if "backwards" in self._persistent_actions:
             forward -= 1
-        if 'left' in self._persistent_actions:
+        if "left" in self._persistent_actions:
             right -= 1
-        if 'right' in self._persistent_actions:
+        if "right" in self._persistent_actions:
             right += 1
 
         if self._mouse_lock:
@@ -208,7 +240,9 @@ class ControllableEditCanvas(BaseEditCanvas):
             self._release_mouse()
         else:
             self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-            self._mouse_delta_x = self._mouse_delta_y = self._last_mouse_x = self._last_mouse_y = 0
+            self._mouse_delta_x = (
+                self._mouse_delta_y
+            ) = self._last_mouse_x = self._last_mouse_y = 0
             self._mouse_lock = True
         self._selection_moved = True
 

@@ -9,13 +9,17 @@ from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 
 class RenderSelection(TriMesh):
     """A drawable selection box"""
-    def __init__(self,
-                 context_identifier: str,
-                 texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-                 texture: int
-                 ):
+
+    def __init__(
+        self,
+        context_identifier: str,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        texture: int,
+    ):
         super().__init__(context_identifier, texture)
-        self._points: numpy.ndarray = numpy.zeros((2, 3), dtype=numpy.int)  # The points set using point1 and point2
+        self._points: numpy.ndarray = numpy.zeros(
+            (2, 3), dtype=numpy.int
+        )  # The points set using point1 and point2
         self._bounds: Optional[numpy.ndarray] = None  # The min and max locations
         self.transformation_matrix = numpy.eye(4, dtype=numpy.float64)
         self._rebuild = True
@@ -30,12 +34,16 @@ class RenderSelection(TriMesh):
         return 1, 1, 1
 
     def _init_verts(self, texture_bounds: Dict[Any, Tuple[float, float, float, float]]):
-        missing_no = texture_bounds.get(('minecraft', 'missing_no'), (0, 0, 0, 0))
+        missing_no = texture_bounds.get(("minecraft", "missing_no"), (0, 0, 0, 0))
         self.verts = numpy.zeros((6 * 2 * 3, self._vert_len), dtype=numpy.float32)
-        self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
+        self.verts[:36, 5:9] = texture_bounds.get(
+            ("amulet", "ui/selection"), missing_no
+        )
         self.verts[:, 9:12] = self.box_tint
 
-    def __contains__(self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]) -> bool:
+    def __contains__(
+        self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]
+    ) -> bool:
         """
         Is the block position inside the selection box cuboid.
         :param position: (x, y, z)
@@ -50,9 +58,13 @@ class RenderSelection(TriMesh):
         :param position: (x, y, z)
         :return: True if the position is inside the box otherwise False
         """
-        return position in self and numpy.any(numpy.any(position == self._points, axis=0))
+        return position in self and numpy.any(
+            numpy.any(position == self._points, axis=0)
+        )
 
-    def intersects_vector(self, origin: PointCoordinatesAny, vector: PointCoordinatesAny) -> Optional[float]:
+    def intersects_vector(
+        self, origin: PointCoordinatesAny, vector: PointCoordinatesAny
+    ) -> Optional[float]:
         """
         Determine if a look vector from a given point collides with this selection box.
         :param origin: Location of the origin of the vector
@@ -61,7 +73,9 @@ class RenderSelection(TriMesh):
         """
         # Logic based on https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 
-        (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort((self.bounds - numpy.array(origin)) / numpy.array(vector), axis=0)
+        (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort(
+            (self.bounds - numpy.array(origin)) / numpy.array(vector), axis=0
+        )
 
         if tmin > tymax or tymin > tmax:
             return None
@@ -134,39 +148,83 @@ class RenderSelection(TriMesh):
     @staticmethod
     def _create_box(box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
         box = numpy.array([box_min, box_max])
-        _box_coordinates = numpy.array(
-            list(
-                itertools.product(
-                    *box.T.tolist()
-                )
-            )
+        _box_coordinates = numpy.array(list(itertools.product(*box.T.tolist())))
+        _cube_face_lut = numpy.array(
+            [  # This maps to the vertices used (defined in cube_vert_lut)
+                0,
+                4,
+                5,
+                1,  # down
+                0,
+                1,
+                3,
+                2,  # west
+                4,
+                0,
+                2,
+                6,  # north
+                5,
+                4,
+                6,
+                7,  # east
+                1,
+                5,
+                7,
+                3,  # south
+                3,
+                7,
+                6,
+                2,  # up
+            ]
         )
-        _cube_face_lut = numpy.array([  # This maps to the vertices used (defined in cube_vert_lut)
-            0, 4, 5, 1,  # down
-            0, 1, 3, 2,  # west
-            4, 0, 2, 6,  # north
-            5, 4, 6, 7,  # east
-            1, 5, 7, 3,  # south
-            3, 7, 6, 2,  # up
-        ])
         box = box.ravel()
-        _texture_index = numpy.array([
-            0, 2, 3, 5,  # down
-            2, 1, 5, 4,  # west
-            3, 1, 0, 4,  # north
-            5, 1, 2, 4,  # east
-            0, 1, 3, 4,  # south
-            0, 5, 3, 2,  # up
-        ], numpy.uint32)
-        _uv_slice = numpy.array([0, 1, 2, 1, 2, 3, 0, 3]*6, dtype=numpy.uint32).reshape((6, 8)) + numpy.arange(0, 24, 4).reshape((6, 1))
+        _texture_index = numpy.array(
+            [
+                0,
+                2,
+                3,
+                5,  # down
+                2,
+                1,
+                5,
+                4,  # west
+                3,
+                1,
+                0,
+                4,  # north
+                5,
+                1,
+                2,
+                4,  # east
+                0,
+                1,
+                3,
+                4,  # south
+                0,
+                5,
+                3,
+                2,  # up
+            ],
+            numpy.uint32,
+        )
+        _uv_slice = numpy.array(
+            [0, 1, 2, 1, 2, 3, 0, 3] * 6, dtype=numpy.uint32
+        ).reshape((6, 8)) + numpy.arange(0, 24, 4).reshape((6, 1))
 
-        _tri_face = numpy.array([0, 1, 2, 2, 3, 0] * 6, numpy.uint32).reshape((6, 6)) + numpy.arange(0, 24, 4).reshape((6, 1))
-        return _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)), box[_texture_index[_uv_slice]].reshape(-1, 2)[_tri_face, :].reshape((-1, 2))
+        _tri_face = numpy.array([0, 1, 2, 2, 3, 0] * 6, numpy.uint32).reshape(
+            (6, 6)
+        ) + numpy.arange(0, 24, 4).reshape((6, 1))
+        return (
+            _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)),
+            box[_texture_index[_uv_slice]]
+            .reshape(-1, 2)[_tri_face, :]
+            .reshape((-1, 2)),
+        )
 
     def _create_geometry_(self):
         self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(
             (-0.005, -0.005, -0.005) + (self.min % 16),
-            self.max - self.min + (self.min % 16) + 0.005
+            self.max - self.min + (self.min % 16) + 0.005,
         )
         self.verts[:36, 3:5] /= 16
 
@@ -180,7 +238,9 @@ class RenderSelection(TriMesh):
         self._volume = numpy.product(self.max - self.min)
         self._rebuild = False
 
-    def draw(self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
+    def draw(
+        self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None
+    ):
         """
         Draw the selection box
         :param camera_matrix: 4x4 transformation matrix for the camera

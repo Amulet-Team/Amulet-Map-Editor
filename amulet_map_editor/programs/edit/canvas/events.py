@@ -19,5 +19,11 @@ EditEscapeEvent, EVT_EDIT_ESCAPE = newevent.NewEvent()  # the escape key was pre
 SelectionPointChangeEvent, EVT_SELECTION_POINT_CHANGE = newevent.NewEvent()
 
 # events fired when the active selection box changes.  TODO: reimplement these
-BoxChangeEvent, EVT_BOX_CHANGE = newevent.NewEvent()  # one or more of the box coordinates have changed
-BoxEditToggleEvent, EVT_BOX_EDIT_TOGGLE = newevent.NewEvent()  # the box has switched between edit and static mode
+(
+    BoxChangeEvent,
+    EVT_BOX_CHANGE,
+) = newevent.NewEvent()  # one or more of the box coordinates have changed
+(
+    BoxEditToggleEvent,
+    EVT_BOX_EDIT_TOGGLE,
+) = newevent.NewEvent()  # the box has switched between edit and static mode

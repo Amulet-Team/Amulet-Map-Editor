@@ -7,7 +7,9 @@ from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.structure_interface.schematic import SchematicFormatWrapper
 
 from amulet_map_editor.amulet_wx.ui.select_block import PlatformSelect
-from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import SimpleOperationPanel
+from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
+    SimpleOperationPanel,
+)
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 
@@ -30,11 +32,7 @@ file format instead."""
 
 class ExportSchematic(SimpleOperationPanel):
     def __init__(
-            self,
-            parent: wx.Window,
-            canvas: "EditCanvas",
-            world: "World",
-            options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
     ):
         SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
 
@@ -42,44 +40,49 @@ class ExportSchematic(SimpleOperationPanel):
 
         self._file_picker = wx.FilePickerCtrl(
             self,
-            path=options.get('path', ''),
+            path=options.get("path", ""),
             wildcard="Schematic file (*.schematic)|*.schematic",
-            style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT
+            style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
         self._platform_define = PlatformSelect(
             self,
             world.translation_manager,
             options.get("platform", None) or world.world_wrapper.platform,
-            allow_universal=False
+            allow_universal=False,
         )
         self._sizer.Add(self._platform_define, 0, wx.CENTRE, 5)
         self._sizer.Add(
-            wx.StaticText(
-                self,
-                label=WarningMsg,
-                style=wx.ALIGN_CENTRE_HORIZONTAL
-            ), 0, wx.ALL | wx.CENTER, 5
+            wx.StaticText(self, label=WarningMsg, style=wx.ALIGN_CENTRE_HORIZONTAL),
+            0,
+            wx.ALL | wx.CENTER,
+            5,
         )
         self._add_run_button("Export")
         self.Layout()
 
     def unload(self):
-        self._save_options({
-            "path": self._file_picker.GetPath(),
-            "platform": self._platform_define.platform,
-        })
+        self._save_options(
+            {
+                "path": self._file_picker.GetPath(),
+                "platform": self._platform_define.platform,
+            }
+        )
 
-    def _operation(self, world: "World", dimension: Dimension, selection: SelectionGroup) -> OperationReturnType:
+    def _operation(
+        self, world: "World", dimension: Dimension, selection: SelectionGroup
+    ) -> OperationReturnType:
         if len(selection.selection_boxes) == 0:
             raise OperationError("No selection was given to export.")
         elif len(selection.selection_boxes) != 1:
-            raise OperationError("The schematic format only supports a single selection box.")
+            raise OperationError(
+                "The schematic format only supports a single selection box."
+            )
 
         path = self._file_picker.GetPath()
         platform = self._platform_define.platform
-        if isinstance(path, str) and path.endswith('.schematic') and platform:
-            wrapper = SchematicFormatWrapper(path, 'w')
+        if isinstance(path, str) and path.endswith(".schematic") and platform:
+            wrapper = SchematicFormatWrapper(path, "w")
             wrapper.platform = platform
             wrapper.selection = selection
             wrapper.translation_manager = world.translation_manager
@@ -93,7 +96,9 @@ class ExportSchematic(SimpleOperationPanel):
 
             wrapper.close()
         else:
-            raise OperationError('Please specify a save location and platform in the options before running.')
+            raise OperationError(
+                "Please specify a save location and platform in the options before running."
+            )
 
 
 export = {

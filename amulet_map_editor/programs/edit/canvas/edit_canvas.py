@@ -9,13 +9,27 @@ from amulet.api.structure import Structure, structure_cache
 
 from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs.edit.edit import EDIT_CONFIG_ID
-from amulet_map_editor.programs.edit.key_config import DefaultKeys, DefaultKeybindGroupId, PresetKeybinds
+from amulet_map_editor.programs.edit.key_config import (
+    DefaultKeys,
+    DefaultKeybindGroupId,
+    PresetKeybinds,
+)
 from amulet_map_editor.programs.edit.canvas.ui.goto import show_goto
 from amulet_map_editor.programs.edit.canvas.ui.tool import Tool
-from amulet_map_editor.programs.edit.plugins import OperationError, OperationSuccessful, OperationSilentAbort
-from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.cut import cut
-from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.copy import copy
-from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.delete import delete
+from amulet_map_editor.programs.edit.plugins import (
+    OperationError,
+    OperationSuccessful,
+    OperationSilentAbort,
+)
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.cut import (
+    cut,
+)
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.copy import (
+    copy,
+)
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.delete import (
+    delete,
+)
 
 from amulet_map_editor.programs.edit.canvas.events import (
     UndoEvent,
@@ -26,7 +40,9 @@ from amulet_map_editor.programs.edit.canvas.events import (
     PasteEvent,
     ToolChangeEvent,
 )
-from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import ControllableEditCanvas
+from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import (
+    ControllableEditCanvas,
+)
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
 
 if TYPE_CHECKING:
@@ -59,7 +75,7 @@ def show_loading_dialog(
                         if len(progress) >= 1:
                             progress = progress[0]
                     if isinstance(progress, (int, float)) and isinstance(message, str):
-                        dialog.Update(min(9999, max(0, progress*10_000)), message)
+                        dialog.Update(min(9999, max(0, progress * 10_000)), message)
             except StopIteration as e:
                 obj = e.value
     except Exception as e:
@@ -72,6 +88,7 @@ def show_loading_dialog(
 
 class EditCanvas(ControllableEditCanvas):
     """Adds embedded UI elements to the canvas."""
+
     def __init__(self, parent: wx.Window, world: "World"):
         super().__init__(parent, world)
         config = CONFIG.get(EDIT_CONFIG_ID, {})
@@ -83,9 +100,7 @@ class EditCanvas(ControllableEditCanvas):
             keybinds = PresetKeybinds[group]
         else:
             keybinds = DefaultKeys
-        self.set_key_binds(
-            keybinds
-        )
+        self.set_key_binds(keybinds)
 
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
@@ -110,11 +125,11 @@ class EditCanvas(ControllableEditCanvas):
         return self._tool_sizer.tools
 
     def run_operation(
-            self,
-            operation: Callable[[], OperationReturnType],
-            title="",
-            msg="",
-            throw_exceptions=False
+        self,
+        operation: Callable[[], OperationReturnType],
+        title="",
+        msg="",
+        throw_exceptions=False,
     ) -> Any:
         def operation_wrapper():
             yield 0, "Disabling Threads"
@@ -124,15 +139,11 @@ class EditCanvas(ControllableEditCanvas):
             if isinstance(op, GeneratorType):
                 yield from op
             return op
+
         err = None
         out = None
         try:
-            out = show_loading_dialog(
-                operation_wrapper,
-                title,
-                msg,
-                self,
-            )
+            out = show_loading_dialog(operation_wrapper, title, msg, self,)
             self.world.create_undo_point()
             wx.PostEvent(self, CreateUndoEvent())
         except OperationError as e:
@@ -153,7 +164,11 @@ class EditCanvas(ControllableEditCanvas):
         except Exception as e:
             self.world.restore_last_undo_point()
             log.error(traceback.format_exc())
-            wx.MessageDialog(self, f"Exception running operation: {e}\nSee the console for more details", style=wx.OK).ShowModal()
+            wx.MessageDialog(
+                self,
+                f"Exception running operation: {e}\nSee the console for more details",
+                style=wx.OK,
+            ).ShowModal()
             err = e
 
         self._enable_threads()
@@ -171,20 +186,12 @@ class EditCanvas(ControllableEditCanvas):
 
     def cut(self):
         self.run_operation(
-            lambda: cut(
-                self.world,
-                self.dimension,
-                self.selection_group
-            )
+            lambda: cut(self.world, self.dimension, self.selection_group)
         )
 
     def copy(self):
         self.run_operation(
-            lambda: copy(
-                self.world,
-                self.dimension,
-                self.selection_group
-            )
+            lambda: copy(self.world, self.dimension, self.selection_group)
         )
 
     def paste(self, structure: Structure = None):
@@ -192,18 +199,16 @@ class EditCanvas(ControllableEditCanvas):
             if structure_cache:
                 structure = structure_cache.get_structure()
             else:
-                wx.MessageBox("A structure needs to be copied before one can be pasted.")
+                wx.MessageBox(
+                    "A structure needs to be copied before one can be pasted."
+                )
                 return
         wx.PostEvent(self, ToolChangeEvent(tool="Select"))
         wx.PostEvent(self, PasteEvent(structure=structure))
 
     def delete(self):
         self.run_operation(
-            lambda: delete(
-                self.world,
-                self.dimension,
-                self.selection_group
-            )
+            lambda: delete(self.world, self.dimension, self.selection_group)
         )
 
     def goto(self):

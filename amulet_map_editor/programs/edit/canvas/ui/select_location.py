@@ -16,12 +16,13 @@ class SelectLocationUI(SimplePanel, BaseUI):
     """A UI element that can be dropped into the EditCanvas and let the user pick a location for a structure.
     This UI does not allow for rotation.
     Will send EVT_SELECT_CONFIRM when the user confirms the selection."""
+
     def __init__(
-            self,
-            parent: wx.Window,
-            canvas: "EditCanvas",
-            structure: Structure,
-            confirm_callback: Callable[[], None]
+        self,
+        parent: wx.Window,
+        canvas: "EditCanvas",
+        structure: Structure,
+        confirm_callback: Callable[[], None],
     ):
         SimplePanel.__init__(self, parent)
         BaseUI.__init__(self, canvas)
@@ -34,7 +35,9 @@ class SelectLocationUI(SimplePanel, BaseUI):
         self._setup_ui()
 
         self._confirm = wx.Button(self, label="Confirm")
-        self.sizer.Add(self._confirm, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, border=5)
+        self.sizer.Add(
+            self._confirm, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, border=5
+        )
 
         self._confirm.Bind(wx.EVT_BUTTON, lambda evt: confirm_callback())
 
@@ -48,12 +51,18 @@ class SelectLocationUI(SimplePanel, BaseUI):
         return obj
 
     def _setup_ui(self):
-        self._x: wx.SpinCtrl = self._add_row('x', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._y: wx.SpinCtrl = self._add_row('y', wx.SpinCtrl, min=-30000000, max=30000000)
-        self._z: wx.SpinCtrl = self._add_row('z', wx.SpinCtrl, min=-30000000, max=30000000)
+        self._x: wx.SpinCtrl = self._add_row(
+            "x", wx.SpinCtrl, min=-30000000, max=30000000
+        )
+        self._y: wx.SpinCtrl = self._add_row(
+            "y", wx.SpinCtrl, min=-30000000, max=30000000
+        )
+        self._z: wx.SpinCtrl = self._add_row(
+            "z", wx.SpinCtrl, min=-30000000, max=30000000
+        )
         for ui in (self._x, self._y, self._z):
             ui.SetValidator(IntValidator())
-        self._copy_air: wx.CheckBox = self._add_row('Copy Air', wx.CheckBox)
+        self._copy_air: wx.CheckBox = self._add_row("Copy Air", wx.CheckBox)
         self._x.Bind(wx.EVT_SPINCTRL, self._on_transform_change)
         self._y.Bind(wx.EVT_SPINCTRL, self._on_transform_change)
         self._z.Bind(wx.EVT_SPINCTRL, self._on_transform_change)
@@ -88,9 +97,30 @@ class SelectTransformUI(SelectLocationUI):
         # self._sy.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_transform_change)
         # self._sz.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_transform_change)
 
-        self._rx: wx.SpinCtrl = self._add_row('rx', wx.SpinCtrlDouble, min=-30000000, max=30000000, inc=90, style=wx.SP_ARROW_KEYS | wx.SP_WRAP)
-        self._ry: wx.SpinCtrl = self._add_row('ry', wx.SpinCtrlDouble, min=-30000000, max=30000000, inc=90, style=wx.SP_ARROW_KEYS | wx.SP_WRAP)
-        self._rz: wx.SpinCtrl = self._add_row('rz', wx.SpinCtrlDouble, min=-30000000, max=30000000, inc=90, style=wx.SP_ARROW_KEYS | wx.SP_WRAP)
+        self._rx: wx.SpinCtrl = self._add_row(
+            "rx",
+            wx.SpinCtrlDouble,
+            min=-30000000,
+            max=30000000,
+            inc=90,
+            style=wx.SP_ARROW_KEYS | wx.SP_WRAP,
+        )
+        self._ry: wx.SpinCtrl = self._add_row(
+            "ry",
+            wx.SpinCtrlDouble,
+            min=-30000000,
+            max=30000000,
+            inc=90,
+            style=wx.SP_ARROW_KEYS | wx.SP_WRAP,
+        )
+        self._rz: wx.SpinCtrl = self._add_row(
+            "rz",
+            wx.SpinCtrlDouble,
+            min=-30000000,
+            max=30000000,
+            inc=90,
+            style=wx.SP_ARROW_KEYS | wx.SP_WRAP,
+        )
         self._rx.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_transform_change)
         self._ry.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_transform_change)
         self._rz.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_transform_change)
@@ -106,5 +136,9 @@ class SelectTransformUI(SelectLocationUI):
 
     def _on_transform_change(self, evt):
         for ctrl in (self._rx, self._ry, self._rz):
-            ctrl.SetValue(round((ctrl.GetValue() % 360) / 90)*90)  # TODO: change this if smaller increments are allowed
-        self.canvas.structure.set_active_transform(self.location, self.scale, tuple(math.radians(r) for r in self.rotation))
+            ctrl.SetValue(
+                round((ctrl.GetValue() % 360) / 90) * 90
+            )  # TODO: change this if smaller increments are allowed
+        self.canvas.structure.set_active_transform(
+            self.location, self.scale, tuple(math.radians(r) for r in self.rotation)
+        )

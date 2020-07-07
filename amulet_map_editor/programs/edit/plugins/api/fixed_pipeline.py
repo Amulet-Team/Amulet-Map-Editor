@@ -10,18 +10,20 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
     from amulet.api.world import World
 
-FixedOperationType = Callable[["World", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType]
+FixedOperationType = Callable[
+    ["World", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType
+]
 
 
 class FixedFunctionUI(wx.Panel, OperationUI):
     def __init__(
-            self,
-            parent: wx.Window,
-            canvas: "EditCanvas",
-            world: "World",
-            options_path: str,
-            operation: FixedOperationType,
-            options: Dict[str, Any]
+        self,
+        parent: wx.Window,
+        canvas: "EditCanvas",
+        world: "World",
+        options_path: str,
+        operation: FixedOperationType,
+        options: Dict[str, Any],
     ):
         wx.Panel.__init__(self, parent)
         OperationUI.__init__(self, parent, canvas, world, options_path)
@@ -55,7 +57,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
             "str_choice": self._create_str_choice,
             "file_open": self._create_file_open_picker,
             "file_save": self._create_file_save_picker,
-            "directory": self._create_directory_picker
+            "directory": self._create_directory_picker,
         }
         for option_name, option in options.items():
             if not (isinstance(option, (list, tuple)) and option):
@@ -90,18 +92,10 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         if len(options) in {0, 1, 3} and all(isinstance(o, int) for o in options):
             sizer = self._create_horizontal_options_sizer(option_name)
             if len(options) == 0:
-                option = wx.SpinCtrl(
-                    self,
-                    min=-30_000_000,
-                    max=30_000_000,
-                    initial=0,
-                )
+                option = wx.SpinCtrl(self, min=-30_000_000, max=30_000_000, initial=0,)
             elif len(options) == 1:
                 option = wx.SpinCtrl(
-                    self,
-                    min=-30_000_000,
-                    max=30_000_000,
-                    initial=options[0],
+                    self, min=-30_000_000, max=30_000_000, initial=options[0],
                 )
             elif len(options) == 3:
                 option = wx.SpinCtrl(
@@ -117,21 +111,17 @@ class FixedFunctionUI(wx.Panel, OperationUI):
             self._options[option_name] = option
 
     def _create_float(self, option_name: str, options: Sequence):
-        if len(options) in {0, 1, 3} and all(isinstance(o, (int, float)) for o in options):
+        if len(options) in {0, 1, 3} and all(
+            isinstance(o, (int, float)) for o in options
+        ):
             sizer = self._create_horizontal_options_sizer(option_name)
             if len(options) == 0:
                 option = wx.SpinCtrlDouble(
-                    self,
-                    min=-30_000_000,
-                    max=30_000_000,
-                    initial=0,
+                    self, min=-30_000_000, max=30_000_000, initial=0,
                 )
             elif len(options) == 1:
                 option = wx.SpinCtrlDouble(
-                    self,
-                    min=-30_000_000,
-                    max=30_000_000,
-                    initial=options[0],
+                    self, min=-30_000_000, max=30_000_000, initial=options[0],
                 )
             elif len(options) == 3:
                 option = wx.SpinCtrlDouble(
@@ -166,28 +156,19 @@ class FixedFunctionUI(wx.Panel, OperationUI):
 
     def _create_file_save_picker(self, option_name: str, options: Sequence):
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.FilePickerCtrl(
-            self,
-            style=wx.FLP_SAVE | wx.FLP_USE_TEXTCTRL
-        )
+        option = wx.FilePickerCtrl(self, style=wx.FLP_SAVE | wx.FLP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
 
     def _create_file_open_picker(self, option_name: str, options: Sequence):
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.FilePickerCtrl(
-            self,
-            style=wx.FLP_OPEN | wx.FLP_USE_TEXTCTRL
-        )
+        option = wx.FilePickerCtrl(self, style=wx.FLP_OPEN | wx.FLP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
 
     def _create_directory_picker(self, option_name: str, options: Sequence):
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.DirPickerCtrl(
-            self,
-            style=wx.DIRP_USE_TEXTCTRL
-        )
+        option = wx.DirPickerCtrl(self, style=wx.DIRP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
 
@@ -195,14 +176,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         options = {}
         for key, window in self._options.items():
             if isinstance(
-                    window,
-                    (
-                        wx.CheckBox,
-                        wx.SpinCtrl,
-                        wx.SpinCtrlDouble,
-                        wx.TextCtrl,
-
-                    )
+                window, (wx.CheckBox, wx.SpinCtrl, wx.SpinCtrlDouble, wx.TextCtrl,)
             ):
                 options[key] = window.GetValue()
             elif isinstance(window, wx.Choice):
@@ -217,6 +191,6 @@ class FixedFunctionUI(wx.Panel, OperationUI):
                 self.world,
                 self.canvas.dimension,
                 self.canvas.selection_group,
-                self._get_values()
+                self._get_values(),
             )
         )

@@ -11,12 +11,20 @@ from amulet_map_editor.opengl.matrix import rotation_matrix, projection_matrix
 
 class BaseCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: wx.Window):
-        attribs = (glcanvas.WX_GL_CORE_PROFILE, glcanvas.WX_GL_RGBA, glcanvas.WX_GL_DOUBLEBUFFER, glcanvas.WX_GL_DEPTH_SIZE, 24)
+        attribs = (
+            glcanvas.WX_GL_CORE_PROFILE,
+            glcanvas.WX_GL_RGBA,
+            glcanvas.WX_GL_DOUBLEBUFFER,
+            glcanvas.WX_GL_DEPTH_SIZE,
+            24,
+        )
         super().__init__(parent, -1, size=parent.GetClientSize(), attribList=attribs)
         self._projection = [70.0, 4 / 3, 0.1, 10000.0]
         self._context = glcanvas.GLContext(self)  # setup the OpenGL context
         self.SetCurrent(self._context)
-        self.context_identifier = str(uuid.uuid4())  # create a UUID for the context. Used to get shaders
+        self.context_identifier = str(
+            uuid.uuid4()
+        )  # create a UUID for the context. Used to get shaders
         self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
         self._setup_opengl()  # set some OpenGL states
 
@@ -67,10 +75,7 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @staticmethod
     def rotation_matrix(pitch, yaw):
-        return rotation_matrix(
-            math.radians(pitch),
-            math.radians(yaw)
-        )
+        return rotation_matrix(math.radians(pitch), math.radians(yaw))
 
     def projection_matrix(self):
         # camera projection
@@ -85,7 +90,11 @@ class BaseCanvas(glcanvas.GLCanvas):
             transformation_matrix = numpy.eye(4, dtype=numpy.float64)
             transformation_matrix[3, :3] = numpy.array(self.camera_location) * -1
 
-            transformation_matrix = numpy.matmul(transformation_matrix, self.rotation_matrix(*self.camera_rotation))
-            self._transformation_matrix = numpy.matmul(transformation_matrix, self.projection_matrix())
+            transformation_matrix = numpy.matmul(
+                transformation_matrix, self.rotation_matrix(*self.camera_rotation)
+            )
+            self._transformation_matrix = numpy.matmul(
+                transformation_matrix, self.projection_matrix()
+            )
 
         return self._transformation_matrix

@@ -8,25 +8,31 @@ from .render_selection_highlightable import RenderSelectionHighlightable
 
 class RenderSelectionEditable(RenderSelectionHighlightable):
     """A drawable selection box with additional editing controls"""
-    def __init__(self,
-                 context_identifier: str,
-                 texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-                 texture: int
-                 ):
-        super().__init__(
-            context_identifier,
-            texture_bounds,
-            texture
-        )
+
+    def __init__(
+        self,
+        context_identifier: str,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        texture: int,
+    ):
+        super().__init__(context_identifier, texture_bounds, texture)
         self._being_resized = False
-        self._free_edges = numpy.array([[False, False, False], [True, True, True]], dtype=numpy.bool)  # which edges can be moved by a call to set_active_point
+        self._free_edges = numpy.array(
+            [[False, False, False], [True, True, True]], dtype=numpy.bool
+        )  # which edges can be moved by a call to set_active_point
 
     def _init_verts(self, texture_bounds: Dict[Any, Tuple[float, float, float, float]]):
-        missing_no = texture_bounds.get(('minecraft', 'missing_no'), (0, 0, 0, 0))
+        missing_no = texture_bounds.get(("minecraft", "missing_no"), (0, 0, 0, 0))
         self.verts = numpy.zeros((6 * 2 * 3 * 3, self._vert_len), dtype=numpy.float32)
-        self.verts[:36, 5:9] = texture_bounds.get(('amulet', 'ui/selection'), missing_no)
-        self.verts[36:72, 5:9] = texture_bounds.get(('amulet', 'ui/selection_green'), missing_no)
-        self.verts[72:, 5:9] = texture_bounds.get(('amulet', 'ui/selection_blue'), missing_no)
+        self.verts[:36, 5:9] = texture_bounds.get(
+            ("amulet", "ui/selection"), missing_no
+        )
+        self.verts[36:72, 5:9] = texture_bounds.get(
+            ("amulet", "ui/selection_green"), missing_no
+        )
+        self.verts[72:, 5:9] = texture_bounds.get(
+            ("amulet", "ui/selection_blue"), missing_no
+        )
         self.verts[:, 9:12] = self.box_tint
 
     @property
@@ -81,7 +87,9 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
     def set_active_point(self, position: BlockCoordinatesAny):
         if self.is_dynamic:
-            self._points[self._free_edges] = numpy.array([position, position])[self._free_edges]
+            self._points[self._free_edges] = numpy.array([position, position])[
+                self._free_edges
+            ]
             self._highlight_edges[:] = self._free_edges
         elif position in self:
             self._highlight_edges[:] = position == self._points
@@ -95,14 +103,16 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         super()._create_geometry_()
         self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(
             self.point1 - self.min - 0.01 + (self.min % 16),
-            self.point1 - self.min + 1.01 + (self.min % 16)
+            self.point1 - self.min + 1.01 + (self.min % 16),
         )
         self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(
             self.point2 - self.min - 0.01 + (self.min % 16),
-            self.point2 - self.min + 1.01 + (self.min % 16)
+            self.point2 - self.min + 1.01 + (self.min % 16),
         )
 
-    def draw(self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
+    def draw(
+        self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None
+    ):
         """
         Draw the selection box
         :param camera_matrix: 4x4 transformation matrix for the camera
