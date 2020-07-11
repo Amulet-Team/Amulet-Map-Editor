@@ -114,7 +114,7 @@ class RenderStructure(ResourcePackManager, Drawable):
         return self._structure.palette
 
     def _create_geometry(self):
-        offset = -(
+        offset = -numpy.floor(
             (self._structure.selection.min + self._structure.selection.max) / 2
         ).astype(int)
         sections = []
