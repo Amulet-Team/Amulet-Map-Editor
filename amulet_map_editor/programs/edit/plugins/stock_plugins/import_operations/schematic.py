@@ -59,7 +59,8 @@ class ImportSchematic(SimpleOperationPanel):
             chunks = {}
             for (cx, cz) in wrapper.all_chunk_coords():
                 try:
-                    chunks[(cx, cz)] = wrapper.load_chunk(cx, cz, global_palette)
+                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz)
+                    chunk.block_palette = global_palette
                 except ChunkLoadError:
                     pass
 

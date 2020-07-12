@@ -28,24 +28,16 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
         delete_button = wx.Button(self._button_panel, label="Delete")
-        button_sizer.Add(
-            delete_button, 0, wx.ALL | wx.EXPAND, 5
-        )
+        button_sizer.Add(delete_button, 0, wx.ALL | wx.EXPAND, 5)
         delete_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.delete())
         copy_button = wx.Button(self._button_panel, label="Copy")
-        button_sizer.Add(
-            copy_button, 0, wx.ALL | wx.EXPAND, 5
-        )
+        button_sizer.Add(copy_button, 0, wx.ALL | wx.EXPAND, 5)
         copy_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.copy())
         cut_button = wx.Button(self._button_panel, label="Cut")
-        button_sizer.Add(
-            cut_button, 0, wx.ALL | wx.EXPAND, 5
-        )
+        button_sizer.Add(cut_button, 0, wx.ALL | wx.EXPAND, 5)
         cut_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.cut())
         paste_button = wx.Button(self._button_panel, label="Paste")
-        button_sizer.Add(
-            paste_button, 0, wx.ALL | wx.EXPAND, 5
-        )
+        button_sizer.Add(paste_button, 0, wx.ALL | wx.EXPAND, 5)
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste())
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
