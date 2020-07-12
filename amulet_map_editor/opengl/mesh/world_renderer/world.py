@@ -150,8 +150,8 @@ class RenderWorld(ResourcePackManager, Drawable):
         self._camera_location: CameraLocationType = (0, 150, 0)
         self._camera_rotation: CameraRotationType = (90, 0)
         self._dimension: Dimension = "overworld"
-        self._render_distance = 10
-        self._garbage_distance = 20
+        self._render_distance = 5
+        self._garbage_distance = 10
         self._chunk_manager = ChunkManager(self.context_identifier, self.texture)
         self._chunk_generator = ChunkGenerator(self)
 
@@ -224,16 +224,7 @@ class RenderWorld(ResourcePackManager, Drawable):
     def render_distance(self, val: int):
         assert isinstance(val, int), "Render distance must be an int"
         self._render_distance = val
-
-    @property
-    def garbage_distance(self) -> int:
-        """The distance outside which chunks should be unloaded"""
-        return self._garbage_distance
-
-    @garbage_distance.setter
-    def garbage_distance(self, val: int):
-        assert isinstance(val, int), "garbage distance must be an int"
-        self._garbage_distance = val
+        self._garbage_distance = val + 5
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
@@ -241,7 +232,7 @@ class RenderWorld(ResourcePackManager, Drawable):
 
         sign = 1
         length = 1
-        for _ in range(self.render_distance * 2 + 1):
+        for _ in range(self._render_distance * 2 + 1):
             for _ in range(length):
                 yield cx, cz
                 cx += sign
@@ -261,10 +252,10 @@ class RenderWorld(ResourcePackManager, Drawable):
         else:
             safe_area = (
                 self._dimension,
-                self.camera_location[0] // 16 - self.garbage_distance,
-                self.camera_location[2] // 16 - self.garbage_distance,
-                self.camera_location[0] // 16 + self.garbage_distance,
-                self.camera_location[2] // 16 + self.garbage_distance,
+                self.camera_location[0] // 16 - self._garbage_distance,
+                self.camera_location[2] // 16 - self._garbage_distance,
+                self.camera_location[0] // 16 + self._garbage_distance,
+                self.camera_location[2] // 16 + self._garbage_distance,
             )
             self._chunk_manager.unload(safe_area[1:])
             self._world.unload(safe_area)

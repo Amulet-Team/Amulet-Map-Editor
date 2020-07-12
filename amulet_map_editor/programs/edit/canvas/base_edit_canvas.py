@@ -7,7 +7,6 @@ import weakref
 
 import minecraft_model_reader
 from amulet.api.chunk import Chunk
-from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import PointCoordinatesNDArray, Dimension, BlockCoordinates
 from amulet.api.selection import SelectionGroup
@@ -19,7 +18,7 @@ from amulet_map_editor.opengl.mesh.world_renderer.world import (
     tan,
     atan,
 )
-from amulet_map_editor.opengl.mesh.structure import RenderStructure, StructureGroup
+from amulet_map_editor.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
@@ -92,8 +91,8 @@ class BaseEditCanvas(BaseCanvas):
 
         self._camera_location: CameraLocationType = (0.0, 100.0, 0.0)
         self._camera_rotation: CameraRotationType = (45.0, 45.0)
-        self._camera_move_speed = 2
-        self._camera_rotate_speed = 2
+        self._camera_move_speed = 2.0
+        self._camera_rotate_speed = 2.0
         self._select_distance = 10
         self._select_distance2 = 10
 
@@ -143,6 +142,14 @@ class BaseEditCanvas(BaseCanvas):
     @property
     def world(self) -> "World":
         return self._world()
+
+    @property
+    def render_distance(self) -> int:
+        return self._render_world.render_distance
+
+    @render_distance.setter
+    def render_distance(self, render_distance: int):
+        self._render_world.render_distance = render_distance
 
     @property
     def selection_location(self) -> BlockCoordinates:
