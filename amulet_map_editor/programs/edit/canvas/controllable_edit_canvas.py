@@ -11,7 +11,7 @@ from amulet_map_editor.amulet_wx.util.key_config import (
     ActionLookupType,
     Escape,
 )
-from .events import EditEscapeEvent, EVT_EDIT_ESCAPE
+from .events import EditEscapeEvent, EVT_EDIT_ESCAPE, BoxClickEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -117,6 +117,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     if self.selection_editable:
                         self.box_select("add box modifier" in self._persistent_actions)
                         self._box_select_time = time.time()
+                    wx.PostEvent(self, BoxClickEvent())
                 elif action == "inspect block":
                     x, y, z = self.cursor_location
                     try:

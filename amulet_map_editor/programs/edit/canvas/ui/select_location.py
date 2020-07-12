@@ -7,6 +7,7 @@ from amulet.api.data_types import BlockCoordinates
 from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 from amulet_map_editor.amulet_wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.canvas.ui.base_ui import BaseUI
+from amulet_map_editor.programs.edit.canvas.events import EVT_SELECTION_POINT_CHANGE, EVT_BOX_CLICK
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
@@ -40,6 +41,9 @@ class SelectLocationUI(SimplePanel, BaseUI):
         )
 
         self._confirm.Bind(wx.EVT_BUTTON, lambda evt: confirm_callback())
+        self._clicked = False
+        self.canvas.Bind(EVT_SELECTION_POINT_CHANGE, self._cursor_move)
+        self.canvas.Bind(EVT_BOX_CLICK, self._box_click)
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -82,6 +86,19 @@ class SelectLocationUI(SimplePanel, BaseUI):
     def _on_transform_change(self, evt):
         location, scale, rotation = self.canvas.structure.active_transform
         self.canvas.structure.set_active_transform(self.location, scale, rotation)
+
+    def _cursor_move(self, evt):
+        if not self._clicked:
+            x, y, z = evt.location
+            self._x.SetValue(x)
+            self._y.SetValue(y)
+            self._z.SetValue(z)
+            self._on_transform_change(None)
+        evt.Skip()
+
+    def _box_click(self, evt):
+        self._clicked = True
+        evt.Skip()
 
 
 class SelectTransformUI(SelectLocationUI):
