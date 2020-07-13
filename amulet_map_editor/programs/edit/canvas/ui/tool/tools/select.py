@@ -133,6 +133,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self.canvas.selection_editable = True
 
     def disable(self):
+        super().disable()
         self._remove_paste()
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:

@@ -114,11 +114,15 @@ class EditCanvas(ControllableEditCanvas):
         self._tool_sizer = Tool(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
 
-        self.bind_events()
+        self._bind_events()
 
-    def bind_events(self):
+    def _bind_events(self):
         self._file_panel.bind_events()
         self._tool_sizer.bind_events()
+
+    def reset_bound_events(self):
+        super().reset_bound_events()
+        self._bind_events()
 
     @property
     def tools(self):

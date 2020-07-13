@@ -38,8 +38,6 @@ class Tool(wx.BoxSizer, BaseUI):
         tool_select_sizer.AddStretchSpacer(1)
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
-        self.canvas.Bind(EVT_TOOL_CHANGE, lambda evt: self._enable_tool(evt.tool))
-
         self.register_tool("Select", SelectOptions)
         self._enable_tool("Select")
         self.register_tool("Operation", SelectOperationUI)
@@ -53,6 +51,7 @@ class Tool(wx.BoxSizer, BaseUI):
     def bind_events(self):
         for tool in self._tools.values():
             tool.bind_events()
+        self.canvas.Bind(EVT_TOOL_CHANGE, lambda evt: self._enable_tool(evt.tool))
 
     def register_tool(self, name: str, tool_cls: Type[BaseToolUIType]):
         assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(
