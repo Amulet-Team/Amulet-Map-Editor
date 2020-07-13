@@ -13,10 +13,9 @@ from amulet_map_editor.programs import BaseWorldUI
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
-    from amulet_map_editor import update_check
-    CHECK_FOR_UPDATE = True
+    from amulet_map_editor.util import update_check
 except ImportError:
-    CHECK_FOR_UPDATE = False
+    update_check = None
     log.warning("Could not import update checker")
     pass
 
@@ -80,7 +79,7 @@ class AmuletMainWindow(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self._on_close_app)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
-        if CHECK_FOR_UPDATE:
+        if update_check is not None:
             self.Bind(update_check.EVT_UPDATE_CHECK, lambda evt: update_check.show_update_window(self, version, evt))
             update_check.check_for_update(version, self)
 
