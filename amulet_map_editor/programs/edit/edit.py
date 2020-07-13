@@ -7,9 +7,11 @@ EDIT_CONFIG_ID = "amulet_edit"
 from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.util.key_config import KeyConfigDialog
+from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
 from amulet_map_editor.programs.edit.canvas.events import EVT_EDIT_CLOSE
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
+from amulet_map_editor.programs.edit.plugins.api import loader
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -19,7 +21,9 @@ class EditExtension(wx.Panel, BaseWorldProgram):
     def __init__(self, parent, world: "World", close_self_callback: Callable[[], None]):
         wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetBackgroundColour(tuple(int(v*255) for v in EditCanvas.background_colour))
+        self.SetBackgroundColour(
+            tuple(int(v * 255) for v in EditCanvas.background_colour)
+        )
         self.SetSizer(self._sizer)
         self._world = world
         self._canvas: Optional[EditCanvas] = None
@@ -33,6 +37,12 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self.Update()
 
             self._canvas = EditCanvas(self, self._world)
+
+            edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
+            self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
+            self._canvas.render_distance = edit_config.get("options", {}).get("render_distance", 5)
+            self._canvas.camera_rotate_speed = edit_config.get("options", {}).get("camera_sensitivity", 2.0)
+
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
             self.Bind(wx.EVT_SIZE, self._on_resize)
             self._canvas.Bind(EVT_EDIT_CLOSE, self._on_close)
@@ -51,8 +61,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             self._canvas.disable()
 
     def _on_close(self, evt: EVT_EDIT_CLOSE):
-        if self.is_closeable():
-            self._close_self_callback()
+        self._close_self_callback()
 
     def close(self):
         """Fully close the UI. Called when destroying the UI."""
@@ -68,7 +77,9 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         if self._canvas is not None:
             if self._canvas.is_closeable():
                 return self._check_close_world()
-            log.info(f"The canvas in edit for world {self._world.world_wrapper.world_name} was not closeable for some reason.")
+            log.info(
+                f"The canvas in edit for world {self._world.world_wrapper.world_name} was not closeable for some reason."
+            )
             return False
         return not bool(self._world.chunk_history_manager.unsaved_changes)
 
@@ -97,9 +108,11 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             elif response == wx.ID_NO:
                 return True
             elif response == wx.ID_CANCEL:
-                log.info(f"""Aborting closing world {
+                log.info(
+                    f"""Aborting closing world {
                     self._world.world_wrapper.world_name
-                } because the user pressed cancel.""")
+                } because the user pressed cancel."""
+                )
                 return False
         return True
 
@@ -132,6 +145,12 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
             "Controls...", lambda evt: self._edit_controls()
         )
+        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
+            "Options...", lambda evt: self._edit_options()
+        )
+        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
+            "Reload all operations", lambda evt: self._reload_all_operations()
+        )
         menu.setdefault("&Help", {}).setdefault("help", {}).setdefault(
             "Controls", lambda evt: self._help_controls()
         )
@@ -141,13 +160,70 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         edit_config = CONFIG.get(EDIT_CONFIG_ID, {})
         keybind_id = edit_config.get("keybind_group", DefaultKeybindGroupId)
         user_keybinds = edit_config.get("user_keybinds", {})
-        key_config = KeyConfigDialog(self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds)
+        key_config = KeyConfigDialog(
+            self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds
+        )
         if key_config.ShowModal() == wx.ID_OK:
             user_keybinds, keybind_id, keybinds = key_config.options
             edit_config["user_keybinds"] = user_keybinds
             edit_config["keybind_group"] = keybind_id
             CONFIG.put(EDIT_CONFIG_ID, edit_config)
             self._canvas.set_key_binds(keybinds)
+
+    def _edit_options(self):
+        if self._canvas is not None:
+            fov = self._canvas.fov
+            render_distance = self._canvas.render_distance
+            camera_sensitivity = self._canvas.camera_rotate_speed
+            dialog = SimpleDialog(self, "Options")
+
+            sizer = wx.FlexGridSizer(3, 2, 0, 0)
+            dialog.sizer.Add(sizer, flag=wx.ALL, border=5)
+            fov_ui = wx.SpinCtrlDouble(dialog, min=0, max=180, initial=fov)
+
+            def set_fov(evt):
+                self._canvas.fov = fov_ui.GetValue()
+            fov_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_fov)
+            sizer.Add(wx.StaticText(dialog, label="Field of View"), flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
+            sizer.Add(fov_ui, flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
+
+            render_distance_ui = wx.SpinCtrl(dialog, min=0, max=50, initial=render_distance)
+
+            def set_render_distance(evt):
+                self._canvas.render_distance = render_distance_ui.GetValue()
+            render_distance_ui.Bind(wx.EVT_SPINCTRL, set_render_distance)
+            sizer.Add(wx.StaticText(dialog, label="Render Distance"), flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
+            sizer.Add(render_distance_ui, flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
+
+            camera_sensitivity_ui = wx.SpinCtrlDouble(dialog, min=0, max=10, initial=camera_sensitivity)
+
+            def set_camera_sensitivity(evt):
+                self._canvas.camera_rotate_speed = camera_sensitivity_ui.GetValue()
+            camera_sensitivity_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_camera_sensitivity)
+            sizer.Add(wx.StaticText(dialog, label="Camera Sensitivity"), flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
+            sizer.Add(camera_sensitivity_ui, flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
+
+            dialog.Fit()
+
+            response = dialog.ShowModal()
+            if response == wx.ID_OK:
+                edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
+                edit_config.setdefault("options", {})
+                edit_config["options"]["fov"] = fov_ui.GetValue()
+                edit_config["options"]["render_distance"] = render_distance_ui.GetValue()
+                edit_config["options"]["camera_sensitivity"] = camera_sensitivity_ui.GetValue()
+                CONFIG.put(EDIT_CONFIG_ID, edit_config)
+            elif response == wx.ID_CANCEL:
+                self._canvas.fov = fov
+                self._canvas.render_distance = render_distance
+                self._canvas.camera_rotate_speed = camera_sensitivity
+
+    def _reload_all_operations(self):
+        loader.persistent_storage.clear()
+        loader.reload_operations()
+
+        if self._canvas:
+            self._canvas.tools["Operation"].reload_operations()
 
     @staticmethod
     def _help_controls():

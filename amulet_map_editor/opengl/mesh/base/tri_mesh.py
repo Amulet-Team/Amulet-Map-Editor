@@ -14,6 +14,7 @@ class Drawable:
 class TriMesh(Drawable):
     """The base class for a triangular face mesh.
     Implements the base logic to set up and unload OpenGL."""
+
     _vertex_attrs = (
         3,  # vertex attribute pointers
         2,  # texture coords attribute pointers
@@ -26,11 +27,15 @@ class TriMesh(Drawable):
         """Create a new TriMesh.
         The object can be created from another thread so OpenGL
         variables cannot be set from here"""
-        self.context_identifier = context_identifier  # a string identifier unique to the context
+        self.context_identifier = (
+            context_identifier  # a string identifier unique to the context
+        )
         self._vao = None  # vertex array object
         self._vbo = None  # vertex buffer object
         self._shader = None  # the shader program
-        self._transform_location = None  # the reference within the shader program of the transformation matrix
+        self._transform_location = (
+            None  # the reference within the shader program of the transformation matrix
+        )
         self._texture_location = None  # the location of the texture in the shader
         self._texture = texture
         self.verts = new_empty_verts()  # the vertices to draw
@@ -47,14 +52,16 @@ class TriMesh(Drawable):
 
     @property
     def shader_name(self) -> str:
-        return 'render_chunk'
+        return "render_chunk"
 
     def _setup(self):
         """Setup OpenGL attributes if required"""
         if self._vao is None:  # if the opengl state has not been set
             self._shader = get_shader(self.context_identifier, self.shader_name)
             glUseProgram(self._shader)
-            self._transform_location = glGetUniformLocation(self._shader, "transformation_matrix")
+            self._transform_location = glGetUniformLocation(
+                self._shader, "transformation_matrix"
+            )
             self._texture_location = glGetUniformLocation(self._shader, "image")
             self._vao = glGenVertexArrays(1)  # create the array
             glBindVertexArray(self._vao)
@@ -70,18 +77,27 @@ class TriMesh(Drawable):
         """Set up OpenGL vertex attributes"""
         attr_start = 0
         for index, attr_count in enumerate(self._vertex_attrs):
-            glVertexAttribPointer(index, attr_count, GL_FLOAT, GL_FALSE, self._vert_len * 4, ctypes.c_void_p(attr_start * 4))
+            glVertexAttribPointer(
+                index,
+                attr_count,
+                GL_FLOAT,
+                GL_FALSE,
+                self._vert_len * 4,
+                ctypes.c_void_p(attr_start * 4),
+            )
             glEnableVertexAttribArray(index)
             attr_start += attr_count
 
     def change_verts(self, verts=None):
         """Modify the vertices in OpenGL."""
-        log.debug(f'change_verts {self}')
+        log.debug(f"change_verts {self}")
         try:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
         except GLError:  # There seems to be errors randomly when binding the VBO
-            log.debug(f'Failed binding the OpenGL state for {self}. Trying to reload it.')
+            log.debug(
+                f"Failed binding the OpenGL state for {self}. Trying to reload it."
+            )
             self.unload()
             self._setup()
             if verts is None:
@@ -97,16 +113,18 @@ class TriMesh(Drawable):
         if verts is not None:
             glBufferData(GL_ARRAY_BUFFER, verts.size * 4, verts, self.vertex_usage)
         else:
-            glBufferData(GL_ARRAY_BUFFER, self.verts.size * 4, self.verts, self.vertex_usage)
+            glBufferData(
+                GL_ARRAY_BUFFER, self.verts.size * 4, self.verts, self.vertex_usage
+            )
 
     def unload(self):
         """Unload all opengl data"""
-        log.debug(f'unload {self}')
+        log.debug(f"unload {self}")
         if self._vbo is not None:
-            glDeleteBuffers(1, self._vbo)
+            glDeleteBuffers(1, int(self._vbo))
             self._vbo = None
         if self._vao is not None:
-            glDeleteVertexArrays(1, self._vao)
+            glDeleteVertexArrays(1, int(self._vao))
             self._vao = None
 
     def draw(self, transformation_matrix: numpy.ndarray):
@@ -115,12 +133,19 @@ class TriMesh(Drawable):
 
     def _draw(self, transformation_matrix: numpy.ndarray):
         glUseProgram(self._shader)
-        glUniformMatrix4fv(self._transform_location, 1, GL_FALSE, transformation_matrix.astype(numpy.float32))
+        glUniformMatrix4fv(
+            self._transform_location,
+            1,
+            GL_FALSE,
+            transformation_matrix.astype(numpy.float32),
+        )
         glUniform1i(self._texture_location, 0)
         try:
             glBindVertexArray(self._vao)
         except GLError:  # There seems to be errors randomly when binding the VBO
-            log.debug(f'Failed binding the OpenGL state for {self}. Trying to reload it.')
+            log.debug(
+                f"Failed binding the OpenGL state for {self}. Trying to reload it."
+            )
             self.unload()
             self._setup()
             glBindVertexArray(self._vao)

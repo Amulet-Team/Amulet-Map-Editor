@@ -28,37 +28,61 @@ class ChunkManager:
         self._chunk_temp_set.add(chunk_coords)
 
     def render_chunk_needs_rebuild(self, chunk_coords: Tuple[int, int]) -> bool:
-        return chunk_coords not in self._chunk_temp_set and self.render_chunk_in_main_database(chunk_coords) and self.get_render_chunk(chunk_coords).needs_rebuild()
+        return (
+            chunk_coords not in self._chunk_temp_set
+            and self.render_chunk_in_main_database(chunk_coords)
+            and self.get_render_chunk(chunk_coords).needs_rebuild()
+        )
 
     def get_render_chunk(self, chunk_coords: Tuple[int, int]) -> RenderChunk:
         """Get a RenderChunk from the database.
         Might throw a key error if it has not been added to the real database yet."""
-        return self._regions[self.region_coords(*chunk_coords)].get_render_chunk(chunk_coords)
+        return self._regions[self.region_coords(*chunk_coords)].get_render_chunk(
+            chunk_coords
+        )
 
     def _merge_chunk_temp(self):
         for _ in range(self._chunk_temp.qsize()):
             render_chunk = self._chunk_temp.get()
             region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
             if region_coords not in self._regions:
-                self._regions[region_coords] = RenderRegion(region_coords[0], region_coords[1], self.region_size, self.context_identifier, self._texture)
+                self._regions[region_coords] = RenderRegion(
+                    region_coords[0],
+                    region_coords[1],
+                    self.region_size,
+                    self.context_identifier,
+                    self._texture,
+                )
             self._regions[region_coords].add_render_chunk(render_chunk)
         self._chunk_temp_set.clear()
 
     def __contains__(self, chunk_coords: Tuple[int, int]):
-        return chunk_coords in self._chunk_temp_set or self.render_chunk_in_main_database(chunk_coords)
+        return (
+            chunk_coords in self._chunk_temp_set
+            or self.render_chunk_in_main_database(chunk_coords)
+        )
 
     def render_chunk_in_main_database(self, chunk_coords: Tuple[int, int]) -> bool:
         region_coords = self.region_coords(*chunk_coords)
-        return region_coords in self._regions and chunk_coords in self._regions[region_coords]
+        return (
+            region_coords in self._regions
+            and chunk_coords in self._regions[region_coords]
+        )
 
     def region_coords(self, cx, cz):
         return cx // self.region_size, cz // self.region_size
 
-    def draw(self, camera_transform, camera):
-        cam_rx, cam_rz = numpy.floor(numpy.array(camera)[[0, 2]]/(16*self.region_size))
-        cam_cx, cam_cz = numpy.floor(numpy.array(camera)[[0, 2]]/16)
-        for region in sorted(self._regions.values(), key=lambda x: abs(x.rx-cam_rx) + abs(x.rz-cam_rz), reverse=True):
-            region.draw(camera_transform, cam_cx, cam_cz)
+    def draw(self, camera_matrix, camera):
+        cam_rx, cam_rz = numpy.floor(
+            numpy.array(camera)[[0, 2]] / (16 * self.region_size)
+        )
+        cam_cx, cam_cz = numpy.floor(numpy.array(camera)[[0, 2]] / 16)
+        for region in sorted(
+            self._regions.values(),
+            key=lambda x: abs(x.rx - cam_rx) + abs(x.rz - cam_rz),
+            reverse=True,
+        ):
+            region.draw(camera_matrix, cam_cx, cam_cz)
         self._merge_chunk_temp()
 
     def unload(self, safe_area: Tuple[int, int, int, int] = None):
@@ -74,7 +98,9 @@ class ChunkManager:
             max_rx, max_rz = self.region_coords(*safe_area[2:])
             delete_regions = []
             for region in self._regions.values():
-                if not (min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz):
+                if not (
+                    min_rx <= region.rx <= max_rx and min_rz <= region.rz <= max_rz
+                ):
                     region.unload()
                     delete_regions.append((region.rx, region.rz))
 
@@ -94,13 +120,17 @@ class ChunkManager:
 
 
 class RenderRegion(TriMesh):
-    def __init__(self, rx: int, rz: int, region_size: int, context_identifier: str, texture: int):
+    def __init__(
+        self, rx: int, rz: int, region_size: int, context_identifier: str, texture: int
+    ):
         """A group of RenderChunks to minimise the number of draw calls"""
         super().__init__(context_identifier, texture)
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
-        self._merged_chunk_locations: Dict[Tuple[int, int], Tuple[int, int, int, int]] = {}
+        self._merged_chunk_locations: Dict[
+            Tuple[int, int], Tuple[int, int, int, int]
+        ] = {}
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
 
         self.region_transform = numpy.eye(4, dtype=numpy.float64)
@@ -111,7 +141,7 @@ class RenderRegion(TriMesh):
         return GL_DYNAMIC_DRAW
 
     def __repr__(self):
-        return f'RenderRegion({self.rx}, {self.rz})'
+        return f"RenderRegion({self.rx}, {self.rz})"
 
     def __contains__(self, item):
         return item in self._chunks
@@ -131,11 +161,26 @@ class RenderRegion(TriMesh):
     def _disable_merged_chunk(self, chunk_coords: Tuple[int, int]):
         """Zero out the region of memory in the merged chunks related to a given chunk"""
         if chunk_coords in self._merged_chunk_locations:
-            offset, size, translucent_offset, translucent_size = self._merged_chunk_locations.pop(chunk_coords)
+            (
+                offset,
+                size,
+                translucent_offset,
+                translucent_size,
+            ) = self._merged_chunk_locations.pop(chunk_coords)
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            glBufferSubData(GL_ARRAY_BUFFER, offset*4, size*4, numpy.zeros(size, dtype=numpy.float32))
-            glBufferSubData(GL_ARRAY_BUFFER, translucent_offset*4, translucent_size*4, numpy.zeros(translucent_size, dtype=numpy.float32))
+            glBufferSubData(
+                GL_ARRAY_BUFFER,
+                offset * 4,
+                size * 4,
+                numpy.zeros(size, dtype=numpy.float32),
+            )
+            glBufferSubData(
+                GL_ARRAY_BUFFER,
+                translucent_offset * 4,
+                translucent_size * 4,
+                numpy.zeros(translucent_size, dtype=numpy.float32),
+            )
             glBindVertexArray(0)
             glBindBuffer(GL_ARRAY_BUFFER, 0)
 
@@ -149,11 +194,13 @@ class RenderRegion(TriMesh):
             offset = 0
             translucent_offset = 0
             for chunk_location, chunk in self._chunks.items():
-                region_verts.append(chunk.verts[:chunk.verts_translucent])
-                region_verts_translucent.append(chunk.verts[chunk.verts_translucent:])
+                region_verts.append(chunk.verts[: chunk.verts_translucent])
+                region_verts_translucent.append(chunk.verts[chunk.verts_translucent :])
                 merged_locations[chunk_location] = [
-                    offset, chunk.verts_translucent,
-                    translucent_offset, chunk.verts.size - chunk.verts_translucent
+                    offset,
+                    chunk.verts_translucent,
+                    translucent_offset,
+                    chunk.verts.size - chunk.verts_translucent,
                 ]
                 offset += chunk.verts_translucent
                 translucent_offset += chunk.verts.size - chunk.verts_translucent
@@ -167,7 +214,7 @@ class RenderRegion(TriMesh):
                 verts = numpy.concatenate(region_verts)
             else:
                 verts = new_empty_verts()
-            self.draw_count = int(verts.size//self._vert_len)
+            self.draw_count = int(verts.size // self._vert_len)
             self._merged_chunk_locations = merged_locations
 
             self.change_verts(verts)
@@ -182,8 +229,12 @@ class RenderRegion(TriMesh):
             chunk.unload()
         self._chunks.clear()
 
-    def draw(self, transformation_matrix: numpy.ndarray, cam_cx, cam_cz):
-        transformation_matrix = numpy.matmul(self.region_transform, transformation_matrix)
+    def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
+        transformation_matrix = numpy.matmul(self.region_transform, camera_matrix)
         super().draw(transformation_matrix)
-        for chunk in sorted(self._manual_chunks.values(), key=lambda x: abs(x.cx-cam_cx) + abs(x.cz-cam_cz), reverse=True):
+        for chunk in sorted(
+            self._manual_chunks.values(),
+            key=lambda x: abs(x.cx - cam_cx) + abs(x.cz - cam_cz),
+            reverse=True,
+        ):
             chunk.draw(transformation_matrix)

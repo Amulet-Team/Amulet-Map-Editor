@@ -13,11 +13,7 @@ if TYPE_CHECKING:
 
 class SimpleOperationPanel(wx.Panel, OperationUI):
     def __init__(
-            self,
-            parent: wx.Window,
-            canvas: "EditCanvas",
-            world: "World",
-            options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
     ):
         wx.Panel.__init__(self, parent)
         OperationUI.__init__(self, parent, canvas, world, options_path)
@@ -34,11 +30,11 @@ class SimpleOperationPanel(wx.Panel, OperationUI):
     def _run_operation(self, _):
         self.canvas.run_operation(
             lambda: self._operation(
-                self.world,
-                self.canvas.dimension,
-                self.canvas.selection_group
+                self.world, self.canvas.dimension, self.canvas.selection_group
             )
         )
 
-    def _operation(self, world: "World", dimension: Dimension, selection: SelectionGroup) -> OperationReturnType:
+    def _operation(
+        self, world: "World", dimension: Dimension, selection: SelectionGroup
+    ) -> OperationReturnType:
         raise NotImplementedError

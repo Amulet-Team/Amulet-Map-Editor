@@ -9,12 +9,14 @@ from .render_selection import RenderSelection
 
 class RenderSelectionGroup(Drawable):
     """A group of selection boxes to be drawn"""
-    def __init__(self,
-                 context_identifier: str,
-                 texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-                 texture: int,
-                 selection: SelectionGroup = None
-                 ):
+
+    def __init__(
+        self,
+        context_identifier: str,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        texture: int,
+        selection: SelectionGroup = None,
+    ):
         self._context_identifier = context_identifier
         self._texture_bounds = texture_bounds
         self._texture = texture
@@ -29,7 +31,9 @@ class RenderSelectionGroup(Drawable):
                 self._boxes.append(render_box)
 
     def _new_render_selection(self):
-        return RenderSelection(self._context_identifier, self._texture_bounds, self._texture)
+        return RenderSelection(
+            self._context_identifier, self._texture_bounds, self._texture
+        )
 
     def __iter__(self):
         yield from self._boxes
@@ -41,10 +45,10 @@ class RenderSelectionGroup(Drawable):
         return self._boxes[index]
 
     def create_selection_group(self) -> SelectionGroup:
-        return SelectionGroup([
-            SelectionBox(box.min, box.max) for box in self._boxes
-        ])
+        return SelectionGroup([SelectionBox(box.min, box.max) for box in self._boxes])
 
-    def draw(self, transformation_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None):
+    def draw(
+        self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None
+    ):
         for box in self._boxes:
-            box.draw(transformation_matrix, camera_position)
+            box.draw(camera_matrix, camera_position)

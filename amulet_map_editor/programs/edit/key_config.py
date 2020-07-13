@@ -52,7 +52,7 @@ PresetKeybinds: KeybindContainer = {
         "selection distance -": ((), "F"),
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((Control, ), "D"),
+        "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
     },
     "right_laptop": {
@@ -70,12 +70,12 @@ PresetKeybinds: KeybindContainer = {
         "selection distance -": ((), "F"),
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((Control, ), "D"),
+        "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
     },
     "left": {
         "up": ((), Space),
-        "down": ((), ';'),
+        "down": ((), ";"),
         "forwards": ((), "I"),
         "backwards": ((), "K"),
         "left": ((), "J"),
@@ -88,12 +88,12 @@ PresetKeybinds: KeybindContainer = {
         "selection distance -": ((), "H"),
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((Control, ), "D"),
+        "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
     },
     "left_laptop": {
         "up": ((), Space),
-        "down": ((), ';'),
+        "down": ((), ";"),
         "forwards": ((), "I"),
         "backwards": ((), "K"),
         "left": ((), "J"),
@@ -106,9 +106,9 @@ PresetKeybinds: KeybindContainer = {
         "selection distance -": ((), "H"),
         "deselect boxes": ((Control, Shift), "D"),
         "add box modifier": ((), Numpad_Add),
-        "remove box": ((Control, ), "D"),
+        "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
-    }
+    },
 }
 
 DefaultKeybindGroupId: KeybindGroupIdType = "right"

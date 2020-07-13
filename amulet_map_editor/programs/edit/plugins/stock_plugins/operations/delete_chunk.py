@@ -7,5 +7,5 @@ def delete_chunk_wrapper(world, dimension, selection, _):
 
 export = {
     "name": "Delete Chunks",  # the name of the plugin
-    "operation": delete_chunk_wrapper  # the actual function to call when running the plugin
+    "operation": delete_chunk_wrapper,  # the actual function to call when running the plugin
 }

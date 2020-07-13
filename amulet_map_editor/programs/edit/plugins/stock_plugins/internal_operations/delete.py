@@ -10,17 +10,13 @@ if TYPE_CHECKING:
 
 
 def delete(
-    world: "World",
-    dimension: Dimension,
-    selection: SelectionGroup
+    world: "World", dimension: Dimension, selection: SelectionGroup
 ) -> OperationReturnType:
     yield from fill(
         world,
         dimension,
         selection,
-        world.translation_manager.get_version(
-            'java', (1, 15, 2)
-        ).block.to_universal(
+        world.translation_manager.get_version("java", (1, 15, 2)).block.to_universal(
             Block("minecraft", "air")
-        )[0]
+        )[0],
     )

@@ -20,6 +20,7 @@ from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
 if TYPE_CHECKING:
     from amulet.api.world import World
 
+
 def sin(theta: Union[int, float]) -> float:
     return math.sin(math.radians(theta))
 
@@ -45,7 +46,7 @@ def atan(x: Union[int, float]) -> float:
 
 
 class ChunkGenerator(ThreadPoolExecutor):
-    def __init__(self, render_world: 'RenderWorld'):
+    def __init__(self, render_world: "RenderWorld"):
         super().__init__(max_workers=1)
         self._render_world = weakref.ref(render_world)
         self._region_size = render_world.chunk_manager.region_size
@@ -73,16 +74,20 @@ class ChunkGenerator(ThreadPoolExecutor):
             # first check if there is a chunk that exists and needs rebuilding
             chunk_coords = next(
                 (
-                    c for c in self.render_world.chunk_coords() if
-                    self.render_world.chunk_manager.render_chunk_needs_rebuild(c)
+                    c
+                    for c in self.render_world.chunk_coords()
+                    if self.render_world.chunk_manager.render_chunk_needs_rebuild(c)
                 ),
-                None
+                None,
             )
             if chunk_coords is not None:
                 # if there was a chunk found that needs rebuilding then add the surrounding chunks for rebuilding
                 # (this deals with if the chunk was deleted or the blocks up to the chunk boundary were deleted)
                 for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    chunk_coords_ = (chunk_coords[0] + offset[0], chunk_coords[1] + offset[1])
+                    chunk_coords_ = (
+                        chunk_coords[0] + offset[0],
+                        chunk_coords[1] + offset[1],
+                    )
                     if chunk_coords_ in self.render_world.chunk_manager:
                         self._chunk_rebuilds.add(chunk_coords_)
             elif self._chunk_rebuilds:
@@ -93,10 +98,11 @@ class ChunkGenerator(ThreadPoolExecutor):
                 # if no chunks need rebuilding then find a new chunk to load.
                 chunk_coords = next(
                     (
-                        c for c in self.render_world.chunk_coords() if
-                        c not in self.render_world.chunk_manager
+                        c
+                        for c in self.render_world.chunk_coords()
+                        if c not in self.render_world.chunk_manager
                     ),
-                    None
+                    None,
                 )
             if chunk_coords is not None:
                 # if chunk coords is in here then remove it so it doesn't get generated twice.
@@ -109,45 +115,48 @@ class ChunkGenerator(ThreadPoolExecutor):
                     self._region_size,
                     chunk_coords,
                     self.render_world.dimension,
-                    self.render_world.texture
+                    self.render_world.texture,
                 )
 
                 try:
                     chunk.create_geometry()
                 except:
-                    log.error(f'Failed generating chunk geometry for chunk {chunk_coords}', exc_info=True)
+                    log.error(
+                        f"Failed generating chunk geometry for chunk {chunk_coords}",
+                        exc_info=True,
+                    )
 
-                self.render_world.chunk_manager.add_render_chunk(
-                    chunk
-                )
+                self.render_world.chunk_manager.add_render_chunk(chunk)
             delta_time = time.time() - start_time
-            if delta_time < 1/60:
+            if delta_time < 1 / 60:
                 # go to sleep so this thread doesn't lock up the main thread.
-                time.sleep(1/60-delta_time)
+                time.sleep(1 / 60 - delta_time)
 
 
 class RenderWorld(ResourcePackManager, Drawable):
     def __init__(
         self,
         context_identifier: Any,
-        world: 'World',
+        world: "World",
         resource_pack: minecraft_model_reader.JavaRPHandler,
         texture: Any,
         texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        translator: PyMCTranslate.Version
+        translator: PyMCTranslate.Version,
     ):
-        super().__init__(context_identifier, resource_pack, texture, texture_bounds, translator)
+        super().__init__(
+            context_identifier, resource_pack, texture, texture_bounds, translator
+        )
         self._world = world
         self._camera_location: CameraLocationType = (0, 150, 0)
         self._camera_rotation: CameraRotationType = (90, 0)
         self._dimension: Dimension = "overworld"
-        self._render_distance = 10
-        self._garbage_distance = 20
+        self._render_distance = 5
+        self._garbage_distance = 10
         self._chunk_manager = ChunkManager(self.context_identifier, self.texture)
         self._chunk_generator = ChunkGenerator(self)
 
     @property
-    def world(self) -> 'World':
+    def world(self) -> "World":
         return self._world
 
     @property
@@ -213,18 +222,9 @@ class RenderWorld(ResourcePackManager, Drawable):
 
     @render_distance.setter
     def render_distance(self, val: int):
-        assert isinstance(val, int), 'Render distance must be an int'
+        assert isinstance(val, int), "Render distance must be an int"
         self._render_distance = val
-
-    @property
-    def garbage_distance(self) -> int:
-        """The distance outside which chunks should be unloaded"""
-        return self._garbage_distance
-
-    @garbage_distance.setter
-    def garbage_distance(self, val: int):
-        assert isinstance(val, int), 'garbage distance must be an int'
-        self._garbage_distance = val
+        self._garbage_distance = val + 5
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
@@ -232,7 +232,7 @@ class RenderWorld(ResourcePackManager, Drawable):
 
         sign = 1
         length = 1
-        for _ in range(self.render_distance*2+1):
+        for _ in range(self._render_distance * 2 + 1):
             for _ in range(length):
                 yield cx, cz
                 cx += sign
@@ -242,8 +242,8 @@ class RenderWorld(ResourcePackManager, Drawable):
             sign *= -1
             length += 1
 
-    def draw(self, transformation_matrix: numpy.ndarray):
-        self._chunk_manager.draw(transformation_matrix, self.camera_location)
+    def draw(self, camera_matrix: numpy.ndarray):
+        self._chunk_manager.draw(camera_matrix, self.camera_location)
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
@@ -252,10 +252,10 @@ class RenderWorld(ResourcePackManager, Drawable):
         else:
             safe_area = (
                 self._dimension,
-                self.camera_location[0]//16 - self.garbage_distance,
-                self.camera_location[2]//16 - self.garbage_distance,
-                self.camera_location[0]//16 + self.garbage_distance,
-                self.camera_location[2]//16 + self.garbage_distance
+                self.camera_location[0] // 16 - self._garbage_distance,
+                self.camera_location[2] // 16 - self._garbage_distance,
+                self.camera_location[0] // 16 + self._garbage_distance,
+                self.camera_location[2] // 16 + self._garbage_distance,
             )
             self._chunk_manager.unload(safe_area[1:])
             self._world.unload(safe_area)

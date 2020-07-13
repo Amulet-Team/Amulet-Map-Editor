@@ -7,14 +7,18 @@ import weakref
 
 import minecraft_model_reader
 from amulet.api.chunk import Chunk
-from amulet.api.structure import Structure
 from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import PointCoordinatesNDArray, Dimension, BlockCoordinates
 from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
-from amulet_map_editor.opengl.mesh.world_renderer.world import RenderWorld, cos, tan, atan
-from amulet_map_editor.opengl.mesh.structure import RenderStructure
+from amulet_map_editor.opengl.mesh.world_renderer.world import (
+    RenderWorld,
+    cos,
+    tan,
+    atan,
+)
+from amulet_map_editor.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.opengl import textureatlas
 from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor import log
@@ -36,7 +40,7 @@ class BaseEditCanvas(BaseCanvas):
 
     background_colour = (0.5, 0.66, 1.0)
 
-    def __init__(self, parent: wx.Window, world: 'World'):
+    def __init__(self, parent: wx.Window, world: "World"):
         super().__init__(parent)
         glClearColor(*self.background_colour, 1.0)
         self.Hide()
@@ -49,22 +53,32 @@ class BaseEditCanvas(BaseCanvas):
         self._mouse_lock = False
 
         # load the resource packs
-        os.makedirs('resource_packs', exist_ok=True)
-        if not os.path.isfile('resource_packs/readme.txt'):
-            with open('resource_packs/readme.txt', 'w') as f:
-                f.write('Put the Java resource pack you want loaded in here.')
+        os.makedirs("resource_packs", exist_ok=True)
+        if not os.path.isfile("resource_packs/readme.txt"):
+            with open("resource_packs/readme.txt", "w") as f:
+                f.write("Put the Java resource pack you want loaded in here.")
 
-        self._texture_bounds: Optional[Dict[Any, Tuple[float, float, float, float]]] = None
+        self._texture_bounds: Optional[
+            Dict[Any, Tuple[float, float, float, float]]
+        ] = None
         self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
 
         self._load_resource_pack(
-            minecraft_model_reader.JavaRP(os.path.join(os.path.dirname(__file__), '..', 'amulet_resource_pack')),
+            minecraft_model_reader.JavaRP(
+                os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack")
+            ),
             minecraft_model_reader.java_vanilla_latest,
-            *[minecraft_model_reader.JavaRP(rp) for rp in os.listdir('resource_packs') if os.path.isdir(rp)],
+            *[
+                minecraft_model_reader.JavaRP(rp)
+                for rp in os.listdir("resource_packs")
+                if os.path.isdir(rp)
+            ],
             minecraft_model_reader.java_vanilla_fix
         )
 
-        self._resource_pack_translator = world.world_wrapper.translation_manager.get_version('java', (1, 15, 2))
+        self._resource_pack_translator = world.world_wrapper.translation_manager.get_version(
+            "java", (999, 0, 0)
+        )
 
         self._render_world = RenderWorld(
             self.context_identifier,
@@ -72,29 +86,35 @@ class BaseEditCanvas(BaseCanvas):
             self._resource_pack,
             self._gl_texture_atlas,
             self._texture_bounds,
-            self._resource_pack_translator
+            self._resource_pack_translator,
         )
 
         self._camera_location: CameraLocationType = (0.0, 100.0, 0.0)
         self._camera_rotation: CameraRotationType = (45.0, 45.0)
-        self._camera_move_speed = 2
-        self._camera_rotate_speed = 2
+        self._camera_move_speed = 2.0
+        self._camera_rotate_speed = 2.0
         self._select_distance = 10
         self._select_distance2 = 10
 
-        self._selection_moved = True  # has the selection point moved and does the box need rebuilding
+        self._selection_moved = (
+            True  # has the selection point moved and does the box need rebuilding
+        )
         self._selection_location: BlockCoordinates = (0, 0, 0)
 
         self._draw_selection = True
         self._selection_group = EditProgramRenderSelectionGroup(
-            self,
-            self.context_identifier,
-            self._texture_bounds,
-            self._gl_texture_atlas
+            self, self.context_identifier, self._texture_bounds, self._gl_texture_atlas
         )
 
         self._draw_structure = False
-        self._structure: Optional[RenderStructure] = None
+        self._structure: StructureGroup = StructureGroup(
+            self.context_identifier,
+            world.palette,
+            self._resource_pack,
+            self._gl_texture_atlas,
+            self._texture_bounds,
+            self._resource_pack_translator,
+        )
         self._structure_locations: List[numpy.ndarray] = []  # TODO rewrite this
 
         self._draw_timer = wx.Timer(self)
@@ -124,6 +144,14 @@ class BaseEditCanvas(BaseCanvas):
         return self._world()
 
     @property
+    def render_distance(self) -> int:
+        return self._render_world.render_distance
+
+    @render_distance.setter
+    def render_distance(self, render_distance: int):
+        self._render_world.render_distance = render_distance
+
+    @property
     def selection_location(self) -> BlockCoordinates:
         return self._selection_location
 
@@ -141,7 +169,9 @@ class BaseEditCanvas(BaseCanvas):
         return self._selection_group.active_selection_corners
 
     @active_selection_corners.setter
-    def active_selection_corners(self, box_corners: Tuple[BlockCoordinates, BlockCoordinates]):
+    def active_selection_corners(
+        self, box_corners: Tuple[BlockCoordinates, BlockCoordinates]
+    ):
         self._selection_group.active_selection_corners = box_corners
 
     def enable(self):
@@ -187,24 +217,23 @@ class BaseEditCanvas(BaseCanvas):
             self._resource_pack.textures
         )
         glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_atlas)
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGBA,
+            width,
+            height,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            texture_atlas,
+        )
         glBindTexture(GL_TEXTURE_2D, 0)
-        log.info('Finished setting up texture atlas in OpenGL')
+        log.info("Finished setting up texture atlas in OpenGL")
 
     @property
-    def structure(self) -> Optional[RenderStructure]:
+    def structure(self) -> StructureGroup:
         return self._structure
-
-    @structure.setter
-    def structure(self, structure: Structure):
-        self._structure = RenderStructure(
-            self.context_identifier,
-            structure,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds,
-            self._resource_pack_translator
-        )
 
     @property
     def draw_structure(self) -> bool:
@@ -214,12 +243,6 @@ class BaseEditCanvas(BaseCanvas):
     @draw_structure.setter
     def draw_structure(self, draw_structure: bool):
         self._draw_structure = bool(draw_structure)
-
-    @property
-    def structure_locations(self) -> List[numpy.ndarray]:
-        """The locations where the structure should be displayed. DO NOT USE THIS YET.
-        todo: rewrite this to allow rotation."""
-        return self._structure_locations
 
     @property
     def draw_selection(self) -> bool:
@@ -272,7 +295,9 @@ class BaseEditCanvas(BaseCanvas):
 
     @camera_location.setter
     def camera_location(self, location: CameraLocationType):
-        assert len(location) == 3 and all(isinstance(v, (int, float)) for v in location), "format for camera_location is invalid"
+        assert len(location) == 3 and all(
+            isinstance(v, (int, float)) for v in location
+        ), "format for camera_location is invalid"
         self._camera_location = self._render_world.camera_location = location
         self._transformation_matrix = None
         self._selection_moved = True
@@ -284,7 +309,9 @@ class BaseEditCanvas(BaseCanvas):
 
     @camera_rotation.setter
     def camera_rotation(self, rotation: CameraRotationType):
-        assert len(rotation) == 2 and all(isinstance(v, (int, float)) for v in rotation), "format for camera_rotation is invalid"
+        assert len(rotation) == 2 and all(
+            isinstance(v, (int, float)) for v in rotation
+        ), "format for camera_rotation is invalid"
         self._camera_rotation = self._render_world.camera_rotation = rotation
         self._transformation_matrix = None
         self._selection_moved = True
@@ -345,7 +372,9 @@ class BaseEditCanvas(BaseCanvas):
         chunk: Optional[Chunk] = None
         in_air = False
 
-        box_index, nearest_selection_box = self._selection_group.closest_intersection(self.camera_location, self._look_vector())
+        box_index, nearest_selection_box = self._selection_group.closest_intersection(
+            self.camera_location, self._look_vector()
+        )
 
         location = numpy.array([0, 0, 0], dtype=numpy.int32)
         for location in self._collision_locations():
@@ -363,7 +392,13 @@ class BaseEditCanvas(BaseCanvas):
                 except ChunkLoadError:
                     chunk = None
 
-            if chunk is not None and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]].namespaced_name != 'universal_minecraft:air':
+            if (
+                chunk is not None
+                and self._render_world.world.palette[
+                    chunk.blocks[x % 16, y, z % 16]
+                ].namespaced_name
+                != "universal_minecraft:air"
+            ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block
                     return location, None
@@ -371,15 +406,26 @@ class BaseEditCanvas(BaseCanvas):
                 in_air = True
         return location, None
 
-    def _box_location_distance(self, distance: int) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+    def _box_location_distance(
+        self, distance: int
+    ) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
         """
         The first block location along the camera's look vector that is further away than `distance`.
         :param distance: The distance between the block and the camera.
         :return: (x, y, z) numpy array, selection box index
         """
         look_vector = self._look_vector()
-        position = numpy.array(self.camera_location, dtype=numpy.int) + numpy.floor(look_vector*distance).astype(numpy.int)
-        box = next((index for index, box in enumerate(self._selection_group) if box.in_boundary(position)), None)
+        position = numpy.array(self.camera_location, dtype=numpy.int) + numpy.floor(
+            look_vector * distance
+        ).astype(numpy.int)
+        box = next(
+            (
+                index
+                for index, box in enumerate(self._selection_group)
+                if box.in_boundary(position)
+            ),
+            None,
+        )
         return position, box
 
     def _look_vector(self) -> numpy.ndarray:
@@ -390,14 +436,24 @@ class BaseEditCanvas(BaseCanvas):
         look_vector = numpy.array([0, 0, -1, 0])
         if not self._mouse_lock:
             screen_x, screen_y = numpy.array(self.GetSize(), numpy.int) / 2
-            screen_dx = atan(self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x)
-            screen_dy = atan(cos(screen_dx) * tan(self.fov / 2) * self._mouse_delta_y / screen_y)
-            look_vector = numpy.matmul(self.rotation_matrix(screen_dy, screen_dx), look_vector)
-        look_vector = numpy.matmul(self.rotation_matrix(*self.camera_rotation), look_vector)[:3]
+            screen_dx = atan(
+                self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x
+            )
+            screen_dy = atan(
+                cos(screen_dx) * tan(self.fov / 2) * self._mouse_delta_y / screen_y
+            )
+            look_vector = numpy.matmul(
+                self.rotation_matrix(screen_dy, screen_dx), look_vector
+            )
+        look_vector = numpy.matmul(
+            self.rotation_matrix(*self.camera_rotation), look_vector
+        )[:3]
         look_vector[abs(look_vector) < 0.000001] = 0.000001
         return look_vector
 
-    def _collision_locations(self, max_distance=100) -> Generator[numpy.ndarray, None, None]:
+    def _collision_locations(
+        self, max_distance=100
+    ) -> Generator[numpy.ndarray, None, None]:
         """
         The block locations that the camera's look vector passes through.
         :param max_distance: The maximum distance along the look vector to traverse.
@@ -409,11 +465,7 @@ class BaseEditCanvas(BaseCanvas):
         dx, dy, dz = look_vector
 
         vectors = numpy.array(
-            [
-                look_vector / abs(dx),
-                look_vector / abs(dy),
-                look_vector / abs(dz)
-            ]
+            [look_vector / abs(dx), look_vector / abs(dy), look_vector / abs(dz)]
         )
         offsets = -numpy.eye(3)
 
@@ -448,7 +500,9 @@ class BaseEditCanvas(BaseCanvas):
             self.aspect_ratio = width / height
         else:
             self.aspect_ratio = 1
-        self.DoSetSize(0, 0, width, height, 0)  # I don't know if this is how you are supposed to do this
+        self.DoSetSize(
+            0, 0, width, height, 0
+        )  # I don't know if this is how you are supposed to do this
 
     def _on_draw(self, event):
         self.draw()
@@ -457,18 +511,13 @@ class BaseEditCanvas(BaseCanvas):
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self._render_world.draw(self.transformation_matrix)
-        if self._draw_structure and self._structure is not None:
-            transform = numpy.eye(4, dtype=numpy.float64)
-            for location in self.structure_locations:
-                transform[3, 0:3] = location
-                self._structure.draw(numpy.matmul(transform, self.transformation_matrix), 0, 0)
+        if self._draw_structure:
+            self._structure.draw(self.transformation_matrix)
         if self._selection_moved:
             self._selection_moved = False
             self._change_box_location()
         self._selection_group.draw(
-            self.transformation_matrix,
-            tuple(self.camera_location),
-            self.draw_selection
+            self.transformation_matrix, tuple(self.camera_location), self.draw_selection
         )
         self.SwapBuffers()
 
