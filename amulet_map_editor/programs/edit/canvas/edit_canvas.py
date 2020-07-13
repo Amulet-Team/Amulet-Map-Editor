@@ -62,6 +62,7 @@ def show_loading_dialog(
         | wx.PD_REMAINING_TIME
         | wx.PD_AUTO_HIDE,
     )
+    dialog.Fit()
     t = time.time()
     try:
         obj = run()
