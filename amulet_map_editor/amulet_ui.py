@@ -183,7 +183,7 @@ class AmuletMainWindow(wx.Frame):
             self.world_tab_holder.DeletePage(self.world_tab_holder.GetPageIndex(world))
 
     def _on_page_close(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
-        page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetCurrentPage()
+        page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetPage(evt.GetSelection())
         if page is not self._main_menu:
             if page.is_closeable():
                 path = page.path
@@ -195,18 +195,12 @@ class AmuletMainWindow(wx.Frame):
                 evt.Veto()
 
     def _on_close_app(self, evt):
-        close = True
         for path, page in list(self._open_worlds.items()):
-            page: CLOSEABLE_PAGE_TYPE
-            if page.is_closeable():
-                self.close_world(path)
-            else:
-                log.info(f"{page.world_name} cannot be closed.")
-                close = False
-        if close:
-            evt.Skip()
-        else:
+            self.close_world(path)
+        if self.world_tab_holder.GetPageCount() > 1:
             wx.MessageBox("A world is still being used. Please close it first")
+        else:
+            evt.Skip()
 
 
 class AmuletMainMenu(wx.Panel, BaseWorldUI):

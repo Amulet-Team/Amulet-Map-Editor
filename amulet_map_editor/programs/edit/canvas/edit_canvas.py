@@ -39,6 +39,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     EditCloseEvent,
     PasteEvent,
     ToolChangeEvent,
+    EVT_EDIT_CLOSE,
 )
 from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import (
     ControllableEditCanvas,
@@ -90,8 +91,9 @@ def show_loading_dialog(
 class EditCanvas(ControllableEditCanvas):
     """Adds embedded UI elements to the canvas."""
 
-    def __init__(self, parent: wx.Window, world: "World"):
+    def __init__(self, parent: wx.Window, world: "World", close_callback: Callable):
         super().__init__(parent, world)
+        self._close_callback = close_callback
         config = CONFIG.get(EDIT_CONFIG_ID, {})
         user_keybinds = config.get("user_keybinds", {})
         group = config.get("keybind_group", DefaultKeybindGroupId)
@@ -120,6 +122,10 @@ class EditCanvas(ControllableEditCanvas):
     def _bind_events(self):
         self._file_panel.bind_events()
         self._tool_sizer.bind_events()
+        self.Bind(EVT_EDIT_CLOSE, self._on_close)
+
+    def _on_close(self, evt):
+        self._close_callback()
 
     def reset_bound_events(self):
         super().reset_bound_events()

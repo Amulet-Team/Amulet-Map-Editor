@@ -8,7 +8,6 @@ from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.util.key_config import KeyConfigDialog
 from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
-from amulet_map_editor.programs.edit.canvas.events import EVT_EDIT_CLOSE
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 from amulet_map_editor.programs.edit.plugins.api import loader
@@ -36,7 +35,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         if self._canvas is None:
             self.Update()
 
-            self._canvas = EditCanvas(self, self._world)
+            self._canvas = EditCanvas(self, self._world, self._close_self_callback)
 
             edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
             self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
@@ -45,7 +44,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
             self.Bind(wx.EVT_SIZE, self._on_resize)
-            self._canvas.Bind(EVT_EDIT_CLOSE, self._on_close)
             self._temp.Destroy()
             self._canvas.Show()
             self._canvas.draw()
@@ -59,9 +57,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
     def disable(self):
         if self._canvas is not None:
             self._canvas.disable()
-
-    def _on_close(self, evt: EVT_EDIT_CLOSE):
-        self._close_self_callback()
 
     def close(self):
         """Fully close the UI. Called when destroying the UI."""
