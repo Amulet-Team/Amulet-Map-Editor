@@ -17,7 +17,6 @@ try:
 except ImportError:
     update_check = None
     log.warning("Could not import update checker")
-    pass
 
 NOTEBOOK_MENU_STYLE = (
     flatnotebook.FNB_NO_X_BUTTON
@@ -27,6 +26,8 @@ NOTEBOOK_MENU_STYLE = (
 NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
 
 CLOSEABLE_PAGE_TYPE = Union[WorldManagerUI]
+
+wx.Image.SetDefaultLoadFlags(0)
 
 
 class AmuletMainWindow(wx.Frame):
