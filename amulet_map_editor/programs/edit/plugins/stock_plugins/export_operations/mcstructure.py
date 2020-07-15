@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 import wx
+import os
 
 from amulet.api.selection import SelectionGroup
 from amulet.api.errors import ChunkLoadError
@@ -71,12 +72,15 @@ class ExportMCStructure(SimpleOperationPanel):
             wrapper.version = version
             wrapper.translation_manager = world.translation_manager
             wrapper.open()
-            for cx, cz in wrapper.selection.chunk_locations():
+            chunk_count = len(list(selection.chunk_locations()))
+            yield 0, f"Exporting {os.path.basename(path)}"
+            for chunk_index, (cx, cz) in enumerate(selection.chunk_locations()):
                 try:
                     chunk = world.get_chunk(cx, cz, dimension)
                     wrapper.commit_chunk(chunk, world.palette)
                 except ChunkLoadError:
                     continue
+                yield (chunk_index + 1) / chunk_count
 
             wrapper.close()
         else:

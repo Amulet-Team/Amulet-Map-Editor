@@ -138,14 +138,14 @@ class EditCanvas(ControllableEditCanvas):
     def run_operation(
         self,
         operation: Callable[[], OperationReturnType],
-        title="",
-        msg="",
+        title="Amulet",
+        msg="Running Operation",
         throw_exceptions=False,
     ) -> Any:
         def operation_wrapper():
             yield 0, "Disabling Threads"
             self._disable_threads()
-            yield 0, msg or "Running Operation"
+            yield 0, msg
             op = operation()
             if isinstance(op, GeneratorType):
                 yield from op
