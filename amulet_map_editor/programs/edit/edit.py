@@ -27,24 +27,38 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._world = world
         self._canvas: Optional[EditCanvas] = None
         self._close_self_callback = close_self_callback
-        self._temp = wx.StaticText(self, label="Please wait while the renderer loads")
-        self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        self._sizer.Add(self._temp)
+
+        self._sizer.AddStretchSpacer(1)
+        self._temp_msg = wx.StaticText(self, label="Please wait while the renderer loads")
+        self._temp_msg.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        self._sizer.Add(self._temp_msg, 0, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        self._temp_loading_bar = wx.Gauge(self, range=10000)
+        self._sizer.Add(self._temp_loading_bar, 0, flag=wx.EXPAND)
+        self._sizer.AddStretchSpacer(1)
 
     def enable(self):
         if self._canvas is None:
             self.Update()
 
-            self._canvas = EditCanvas(self, self._world, self._close_self_callback)
+            self._canvas = EditCanvas(self, self._world, self._close_self_callback, auto_setup=False)
+            for arg in self._canvas.setup():
+                print(arg)
+                if isinstance(arg, (int, float)):
+                    self._temp_loading_bar.SetValue(min(arg, 1) * 10000)
+                elif isinstance(arg, tuple) and isinstance(arg[0], (int, float)) and isinstance(arg[1], str):
+                    self._temp_loading_bar.SetValue(min(arg[0], 1) * 10000)
+                    self._temp_msg.SetLabel(arg[1])
+                self.Layout()
+                self.Update()
 
             edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
             self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
             self._canvas.render_distance = edit_config.get("options", {}).get("render_distance", 5)
             self._canvas.camera_rotate_speed = edit_config.get("options", {}).get("camera_sensitivity", 2.0)
 
+            self._sizer.Clear(True)
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
             self.Bind(wx.EVT_SIZE, self._on_resize)
-            self._temp.Destroy()
             self._canvas.Show()
             self._canvas.draw()
 

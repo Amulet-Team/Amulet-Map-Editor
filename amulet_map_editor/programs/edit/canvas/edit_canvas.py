@@ -1,10 +1,10 @@
 import wx
-from typing import TYPE_CHECKING, Callable, Any
+from typing import TYPE_CHECKING, Callable, Any, Generator
 from types import GeneratorType
 import time
 import traceback
 
-from amulet.api.data_types import OperationReturnType
+from amulet.api.data_types import OperationReturnType, OperationYieldType
 from amulet.api.structure import Structure, structure_cache
 
 from amulet_map_editor import CONFIG, log
@@ -91,8 +91,8 @@ def show_loading_dialog(
 class EditCanvas(ControllableEditCanvas):
     """Adds embedded UI elements to the canvas."""
 
-    def __init__(self, parent: wx.Window, world: "World", close_callback: Callable):
-        super().__init__(parent, world)
+    def __init__(self, parent: wx.Window, world: "World", close_callback: Callable, **kwargs):
+        super().__init__(parent, world, **kwargs)
         self._close_callback = close_callback
         config = CONFIG.get(EDIT_CONFIG_ID, {})
         user_keybinds = config.get("user_keybinds", {})
@@ -105,6 +105,8 @@ class EditCanvas(ControllableEditCanvas):
             keybinds = DefaultKeys
         self.set_key_binds(keybinds)
 
+    def setup(self) -> Generator[OperationYieldType, None, None]:
+        yield from super().setup()
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
@@ -116,7 +118,6 @@ class EditCanvas(ControllableEditCanvas):
 
         self._tool_sizer = Tool(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
-
         self._bind_events()
 
     def _bind_events(self):
