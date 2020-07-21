@@ -42,7 +42,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             self._canvas = EditCanvas(self, self._world, self._close_self_callback, auto_setup=False)
             for arg in self._canvas.setup():
-                print(arg)
                 if isinstance(arg, (int, float)):
                     self._temp_loading_bar.SetValue(min(arg, 1) * 10000)
                 elif isinstance(arg, tuple) and isinstance(arg[0], (int, float)) and isinstance(arg[1], str):
