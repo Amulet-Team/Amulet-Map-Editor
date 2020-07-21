@@ -4,9 +4,10 @@ from wx.lib import newevent
 import PyMCTranslate
 from typing import Tuple, Optional, Type, Any
 
-PlatformChangeEvent, EVT_PLATFORM_CHANGE = newevent.NewEvent()
-VersionChangeEvent, EVT_VERSION_CHANGE = newevent.NewEvent()
-FormatChangeEvent, EVT_FORMAT_CHANGE = newevent.NewEvent()
+PlatformChangeEvent, EVT_PLATFORM_CHANGE = newevent.NewEvent()  # the platform entry changed
+VersionNumberChangeEvent, EVT_VERSION_NUMBER_CHANGE = newevent.NewEvent()  # the version number entry changed
+FormatChangeEvent, EVT_FORMAT_CHANGE = newevent.NewEvent()  # the format entry changed (is fired even if the entry isn't visible)
+VersionChangeEvent, EVT_VERSION_CHANGE = newevent.NewEvent()  # one of the above changed. Fired after EVT_FORMAT_CHANGE
 
 
 class PlatformSelect(wx.Panel):
@@ -35,13 +36,16 @@ class PlatformSelect(wx.Panel):
         self.platform = platform
         self._platform_choice.Bind(wx.EVT_CHOICE, lambda evt: wx.PostEvent(self, PlatformChangeEvent(platform=self.platform)))
 
-    def _add_ui_element(self, label: str, obj: Type[wx.Control], **kwargs) -> Any:
+    def _add_ui_element(self, label: str, obj: Type[wx.Control], shown=True, **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
         text = wx.StaticText(self, label=label, style=wx.ALIGN_CENTER_VERTICAL)
         sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
         wx_obj = obj(self, **kwargs)
         sizer.Add(wx_obj, 2)
+        if not shown:
+            text.Hide()
+            wx_obj.Hide()
         return wx_obj
 
     @property
@@ -73,8 +77,9 @@ class VersionSelect(PlatformSelect):
             parent: wx.Window,
             translation_manager: PyMCTranslate.TranslationManager,
             platform: str = None,
-            version: Tuple[int, int, int] = None,
+            version_number: Tuple[int, int, int] = None,
             force_blockstate: bool = None,
+            show_force_blockstate: bool = True,
             allow_numerical: bool = True,
             allow_blockstate: bool = True,
             **kwargs
@@ -89,30 +94,49 @@ class VersionSelect(PlatformSelect):
             "Version:", SimpleChoiceAny, reverse=True
         )
         self._populate_version()
-        self.version = version
-        self._version_choice.Bind(wx.EVT_CHOICE, lambda evt: wx.PostEvent(self, VersionChangeEvent(version=self.version)))
+        self.version_number = version_number
+        self._version_choice.Bind(wx.EVT_CHOICE, lambda evt: wx.PostEvent(self, VersionNumberChangeEvent(version_number=self.version_number)))
 
-        self.Bind(EVT_VERSION_CHANGE, self._on_version_change)
+        self.Bind(EVT_VERSION_NUMBER_CHANGE, self._on_version_number_change)
         self._blockstate_choice: Optional[SimpleChoice] = self._add_ui_element(
-            "Format:", SimpleChoice
+            "Format:", SimpleChoice, shown=show_force_blockstate
         )
         self._blockstate_choice.SetItems(["native", "blockstate"])
         self._blockstate_choice.SetSelection(0)
         self._populate_blockstate()
         self.force_blockstate = force_blockstate
-        self._blockstate_choice.Bind(wx.EVT_CHOICE, lambda evt: wx.PostEvent(self, FormatChangeEvent(force_blockstate=self.force_blockstate)))
+        self._blockstate_choice.Bind(
+            wx.EVT_CHOICE,
+            lambda evt: self._post_version_change()
+        )
+
+    def _post_version_change(self):
+        wx.PostEvent(
+            self,
+            FormatChangeEvent(
+                force_blockstate=self.force_blockstate
+            )
+        ),
+        wx.PostEvent(
+            self,
+            VersionChangeEvent(
+                platform=self.platform,
+                version_number=self.version_number,
+                force_blockstate=self.force_blockstate
+            )
+        )
 
     @property
-    def version(self) -> Tuple[int, int, int]:
+    def version_number(self) -> Tuple[int, int, int]:
         return self._version_choice.GetCurrentObject()
 
-    @version.setter
-    def version(self, version: Tuple[int, int, int]):
-        if version and version in self._version_choice.values:
-            self._version_choice.SetSelection(self._version_choice.values.index(version))
+    @version_number.setter
+    def version_number(self, version_number: Tuple[int, int, int]):
+        if version_number and version_number in self._version_choice.values:
+            self._version_choice.SetSelection(self._version_choice.values.index(version_number))
         else:
             self._version_choice.SetSelection(0)
-        wx.PostEvent(self, VersionChangeEvent(version=self.version))
+        wx.PostEvent(self, VersionNumberChangeEvent(version_number=self.version_number))
 
     @property
     def force_blockstate(self) -> bool:
@@ -122,7 +146,7 @@ class VersionSelect(PlatformSelect):
     def force_blockstate(self, force_blockstate: bool):
         if force_blockstate is not None:
             self._blockstate_choice.SetSelection(int(force_blockstate))
-        wx.PostEvent(self, FormatChangeEvent(force_blockstate=self.force_blockstate))
+        self._post_version_change()
 
     def _populate_version(self):
         versions = self._translation_manager.version_numbers(self.platform)
@@ -134,7 +158,7 @@ class VersionSelect(PlatformSelect):
 
     def _populate_blockstate(self):
         if self._translation_manager.get_version(
-                self.platform, self.version
+                self.platform, self.version_number
         ).has_abstract_format:
             self._blockstate_choice.Enable()
         else:
@@ -142,24 +166,26 @@ class VersionSelect(PlatformSelect):
 
     def _on_platform_change(self, evt):
         self._populate_version()
-        self.version = None
+        self.version_number = None
         evt.Skip()
 
-    def _on_version_change(self, evt):
+    def _on_version_number_change(self, evt):
         self._populate_blockstate()
         self.force_blockstate = None
         evt.Skip()
 
 
 if __name__ == '__main__':
-    import PyMCTranslate
-    translation_manager = PyMCTranslate.new_translation_manager()
-    app = wx.App()
-    for cls in (PlatformSelect, VersionSelect):
-        dialog = wx.Dialog(None)
-        sizer = wx.BoxSizer()
-        dialog.SetSizer(sizer)
-        sizer.Add(cls(dialog, translation_manager))
-        dialog.Show()
-        dialog.Fit()
-    app.MainLoop()
+    def main():
+        import PyMCTranslate
+        translation_manager = PyMCTranslate.new_translation_manager()
+        app = wx.App()
+        for cls in (PlatformSelect, VersionSelect, lambda *args: VersionSelect(*args, show_force_blockstate=False)):
+            dialog = wx.Dialog(None)
+            sizer = wx.BoxSizer()
+            dialog.SetSizer(sizer)
+            sizer.Add(cls(dialog, translation_manager))
+            dialog.Show()
+            dialog.Fit()
+        app.MainLoop()
+    main()
