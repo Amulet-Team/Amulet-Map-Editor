@@ -18,11 +18,11 @@ class BlockSelect(wx.Panel):
             parent,
             translation_manager: PyMCTranslate.TranslationManager,
             platform: str,
-            version: Tuple[int, int, int],
+            version_number: Tuple[int, int, int],
             force_blockstate: bool = None,
             namespace: str = None,
             block_name: str = None,
-            pick_block: bool = True
+            show_pick_block: bool = True
     ):
         super().__init__(parent, style=wx.BORDER_SIMPLE)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
@@ -40,11 +40,14 @@ class BlockSelect(wx.Panel):
         sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
         self._namespace_combo = wx.ComboBox(self)
         sizer.Add(self._namespace_combo, 2)
-        self.version = platform, version, force_blockstate or False
+        self._set_version((
+            platform,
+            version_number,
+            force_blockstate or False
+        ))
         self._populate_namespace()
-        self.namespace = namespace
+        self._set_namespace(namespace)
 
-        self._namespace_combo.Bind(wx.EVT_COMBOBOX, lambda evt: wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace)))
         self._namespace_combo.Bind(wx.EVT_TEXT, lambda evt: wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace)))
 
         self.Bind(EVT_NAMESPACE_CHANGE, self._on_namespace_change)
@@ -61,7 +64,7 @@ class BlockSelect(wx.Panel):
         self._block_search = wx.SearchCtrl(self)
         search_sizer.Add(self._block_search, 1, wx.ALIGN_CENTER_VERTICAL)
         self._block_search.Bind(wx.EVT_TEXT, self._on_search_change)
-        if pick_block:
+        if show_pick_block:
             pick_block_button = wx.BitmapButton(self, bitmap=wx.Bitmap(os.path.join(IMG_DIR, "icon", "pick.png")))
             search_sizer.Add(pick_block_button, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             pick_block_button.Bind(wx.EVT_BUTTON, lambda evt: wx.PostEvent(self, PickBlockEvent(widget=self)))
@@ -70,7 +73,7 @@ class BlockSelect(wx.Panel):
 
         self._block_names: List[str] = []
         self._populate_block_name()
-        self.block_name = block_name
+        self._set_block_name(block_name)
         self._block_list_box.Bind(wx.EVT_LISTBOX, lambda evt: self._post_block_change())
 
     def _post_block_change(self):
@@ -94,12 +97,16 @@ class BlockSelect(wx.Panel):
 
     @version.setter
     def version(self, version: Tuple[str, Tuple[int, int, int], bool]):
+        self._set_version(version)
+        self._populate_namespace()
+        self.namespace = None
+
+    def _set_version(self, version: Tuple[str, Tuple[int, int, int], bool]):
         assert version[0] in self._translation_manager.platforms() and \
                version[1] in self._translation_manager.version_numbers(version[0]) and \
                isinstance(version[2], bool), \
                f"{version} is not a valid version"
         self._platform, self._version_number, self._force_blockstate = version
-        self._populate_namespace()
 
     @property
     def namespace(self) -> str:
@@ -107,14 +114,16 @@ class BlockSelect(wx.Panel):
 
     @namespace.setter
     def namespace(self, namespace: str):
+        self._set_namespace(namespace)
+        wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace))
+
+    def _set_namespace(self, namespace: str):
         namespace = namespace or "minecraft"
         if isinstance(namespace, str):
             if namespace in self._namespace_combo.GetItems():
                 self._namespace_combo.SetSelection(self._namespace_combo.GetItems().index(namespace))
             else:
-                self._namespace_combo.SetValue(namespace)
-
-        wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace))
+                self._namespace_combo.ChangeValue(namespace)
 
     @property
     def block_name(self) -> str:
@@ -122,15 +131,18 @@ class BlockSelect(wx.Panel):
 
     @block_name.setter
     def block_name(self, block_name: str):
+        self._set_block_name(block_name)
+        self._post_block_change()
+
+    def _set_block_name(self, block_name: str):
         block_name = block_name or ""
         self._block_search.ChangeValue(block_name)
         self._update_block_name(block_name)
-        self._post_block_change()
 
     def _populate_namespace(self):
         version = self._translation_manager.get_version(self._platform, self._version_number)
         namespaces = version.block.namespaces(self._force_blockstate)
-        self._namespace_combo.SetItems(namespaces)
+        self._namespace_combo.SetItems(namespaces)  # TODO: This produces EVT_TEXT making the rest fire twice
 
     def _populate_block_name(self):
         version = self._translation_manager.get_version(self._platform, self._version_number)
@@ -162,10 +174,9 @@ class BlockSelect(wx.Panel):
 
 if __name__ == '__main__':
     def main():
-        import PyMCTranslate
         translation_manager = PyMCTranslate.new_translation_manager()
         app = wx.App()
-        for cls in (BlockSelect, ):
+        for cls in (BlockSelect,):
             dialog = wx.Dialog(None)
             sizer = wx.BoxSizer()
             dialog.SetSizer(sizer)
