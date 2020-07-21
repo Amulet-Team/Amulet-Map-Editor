@@ -33,7 +33,7 @@ class PlatformSelect(wx.Panel):
             "Platform:", SimpleChoice
         )
         self._populate_platform()
-        self.platform = platform
+        self._set_platform(platform)
         self._platform_choice.Bind(wx.EVT_CHOICE, lambda evt: wx.PostEvent(self, PlatformChangeEvent(platform=self.platform)))
 
     def _add_ui_element(self, label: str, obj: Type[wx.Control], shown=True, **kwargs) -> Any:
@@ -54,11 +54,14 @@ class PlatformSelect(wx.Panel):
 
     @platform.setter
     def platform(self, platform: str):
+        self._set_platform(platform)
+        wx.PostEvent(self, PlatformChangeEvent(platform=self.platform))
+
+    def _set_platform(self, platform: str):
         if platform and platform in self._platform_choice.GetItems():
             self._platform_choice.SetSelection(self._platform_choice.GetItems().index(platform))
         else:
             self._platform_choice.SetSelection(0)
-        wx.PostEvent(self, PlatformChangeEvent(platform=self.platform))
 
     def _populate_platform(self):
         platforms = self._translation_manager.platforms()
@@ -94,7 +97,7 @@ class VersionSelect(PlatformSelect):
             "Version:", SimpleChoiceAny, reverse=True
         )
         self._populate_version()
-        self.version_number = version_number
+        self._set_version_number(version_number)
         self._version_choice.Bind(wx.EVT_CHOICE, lambda evt: wx.PostEvent(self, VersionNumberChangeEvent(version_number=self.version_number)))
 
         self.Bind(EVT_VERSION_NUMBER_CHANGE, self._on_version_number_change)
@@ -104,7 +107,7 @@ class VersionSelect(PlatformSelect):
         self._blockstate_choice.SetItems(["native", "blockstate"])
         self._blockstate_choice.SetSelection(0)
         self._populate_blockstate()
-        self.force_blockstate = force_blockstate
+        self._set_force_blockstate(force_blockstate)
         self._blockstate_choice.Bind(
             wx.EVT_CHOICE,
             lambda evt: self._post_version_change()
@@ -132,11 +135,14 @@ class VersionSelect(PlatformSelect):
 
     @version_number.setter
     def version_number(self, version_number: Tuple[int, int, int]):
+        self._set_version_number(version_number)
+        wx.PostEvent(self, VersionNumberChangeEvent(version_number=self.version_number))
+
+    def _set_version_number(self, version_number: Tuple[int, int, int]):
         if version_number and version_number in self._version_choice.values:
             self._version_choice.SetSelection(self._version_choice.values.index(version_number))
         else:
             self._version_choice.SetSelection(0)
-        wx.PostEvent(self, VersionNumberChangeEvent(version_number=self.version_number))
 
     @property
     def force_blockstate(self) -> bool:
@@ -144,9 +150,12 @@ class VersionSelect(PlatformSelect):
 
     @force_blockstate.setter
     def force_blockstate(self, force_blockstate: bool):
+        self._set_force_blockstate(force_blockstate)
+        self._post_version_change()
+
+    def _set_force_blockstate(self, force_blockstate: bool):
         if force_blockstate is not None:
             self._blockstate_choice.SetSelection(int(force_blockstate))
-        self._post_version_change()
 
     def _populate_version(self):
         versions = self._translation_manager.version_numbers(self.platform)
@@ -177,7 +186,6 @@ class VersionSelect(PlatformSelect):
 
 if __name__ == '__main__':
     def main():
-        import PyMCTranslate
         translation_manager = PyMCTranslate.new_translation_manager()
         app = wx.App()
         for cls in (PlatformSelect, VersionSelect, lambda *args: VersionSelect(*args, show_force_blockstate=False)):
