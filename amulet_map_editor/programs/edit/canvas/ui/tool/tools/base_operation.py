@@ -56,7 +56,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
 
     @property
     def operation(self) -> str:
-        return self._operation_choice.GetAny()
+        return self._operation_choice.GetCurrentObject()
 
     def _on_operation_change(self, evt):
         self._operation_change()
@@ -72,7 +72,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self._active_operation = None
 
     def _operation_change(self):
-        operation_path = self._operation_choice.GetAny()
+        operation_path = self._operation_choice.GetCurrentObject()
         if operation_path:
             operation = self._operations[operation_path]
             self.disable()
@@ -83,7 +83,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self.Layout()
 
     def _reload_operation_loader(self, evt):
-        operation_path = self._operation_choice.GetAny()
+        operation_path = self._operation_choice.GetCurrentObject()
         if operation_path:
             operation_loader, success = self._operations[operation_path].reload()
             if success:

@@ -79,7 +79,7 @@ class FilePanel(wx.BoxSizer, BaseUI):
 
     def _on_dimension_change(self, evt):
         """Run when the dimension selection is changed by the user."""
-        dimension = self._dim_options.GetAny()
+        dimension = self._dim_options.GetCurrentObject()
         if dimension is not None:
             self.canvas.dimension = dimension
         evt.Skip()

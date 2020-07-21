@@ -5,6 +5,8 @@ import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
 
+from amulet_map_editor import log
+
 
 class SimpleSizer:
     def __init__(self, sizer_dir=wx.VERTICAL):
@@ -114,8 +116,16 @@ class SimpleChoiceAny(wx.Choice):
 
     def GetAny(self) -> Optional[Any]:
         """Return the value currently selected in the form before it was converted to a string"""
+        log.warning("SimpleChoiceAny.GetAny is being depreciated and will be removed in the future. Please use SimpleChoiceAny.GetCurrentObject instead", exc_info=True)
+        return self.GetCurrentObject()
+
+    def GetCurrentObject(self) -> Optional[Any]:
+        """Return the value currently selected in the form before it was converted to a string"""
         if self._values:
             return self._values[self.GetSelection()]
+
+    def GetCurrentString(self) -> str:
+        return self.GetString(self.GetSelection())
 
 
 class SimpleDialog(wx.Dialog):
