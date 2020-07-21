@@ -127,7 +127,10 @@ class BlockSelect(wx.Panel):
 
     @property
     def block_name(self) -> str:
-        return self._block_list_box.GetString(self._block_list_box.GetSelection())
+        block_name: str = self._block_list_box.GetString(self._block_list_box.GetSelection())
+        if self._block_list_box.GetSelection() == 0 and block_name.startswith("\""):
+            block_name = block_name[1:-1]
+        return block_name
 
     @block_name.setter
     def block_name(self, block_name: str):
