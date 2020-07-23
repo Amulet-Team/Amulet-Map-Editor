@@ -81,7 +81,10 @@ class AmuletMainWindow(wx.Frame):
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
         if update_check is not None:
-            self.Bind(update_check.EVT_UPDATE_CHECK, lambda evt: update_check.show_update_window(self, version, evt))
+            self.Bind(
+                update_check.EVT_UPDATE_CHECK,
+                lambda evt: update_check.show_update_window(self, version, evt),
+            )
             update_check.check_for_update(version, self)
 
         self.Show()
