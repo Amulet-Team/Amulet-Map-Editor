@@ -48,7 +48,8 @@ class BlockSelect(wx.Panel):
         self._populate_namespace()
         self._set_namespace(namespace)
 
-        self._namespace_combo.Bind(wx.EVT_TEXT, lambda evt: wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace)))
+        self._namespace_combo.Bind(wx.EVT_TEXT, lambda evt: self._post_namespace_change())
+        self._do_text_event = True  # some widgets create events. This is used to suppress them
 
         self.Bind(EVT_NAMESPACE_CHANGE, self._on_namespace_change)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -75,6 +76,11 @@ class BlockSelect(wx.Panel):
         self._populate_block_name()
         self._set_block_name(block_name)
         self._block_list_box.Bind(wx.EVT_LISTBOX, lambda evt: self._post_block_change())
+
+    def _post_namespace_change(self):
+        if self._do_text_event:
+            wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace))
+        self._do_text_event = True
 
     def _post_block_change(self):
         wx.PostEvent(
@@ -145,7 +151,8 @@ class BlockSelect(wx.Panel):
     def _populate_namespace(self):
         version = self._translation_manager.get_version(self._platform, self._version_number)
         namespaces = version.block.namespaces(self._force_blockstate)
-        self._namespace_combo.SetItems(namespaces)  # TODO: This produces EVT_TEXT making the rest fire twice
+        self._do_text_event = False
+        self._namespace_combo.Set(namespaces)
 
     def _populate_block_name(self):
         version = self._translation_manager.get_version(self._platform, self._version_number)
