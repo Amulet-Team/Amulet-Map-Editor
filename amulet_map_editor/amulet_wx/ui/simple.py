@@ -116,7 +116,10 @@ class SimpleChoiceAny(wx.Choice):
 
     def GetAny(self) -> Optional[Any]:
         """Return the value currently selected in the form before it was converted to a string"""
-        log.warning("SimpleChoiceAny.GetAny is being depreciated and will be removed in the future. Please use SimpleChoiceAny.GetCurrentObject instead", exc_info=True)
+        log.warning(
+            "SimpleChoiceAny.GetAny is being depreciated and will be removed in the future. Please use SimpleChoiceAny.GetCurrentObject instead",
+            exc_info=True,
+        )
         return self.GetCurrentObject()
 
     def GetCurrentObject(self) -> Optional[Any]:

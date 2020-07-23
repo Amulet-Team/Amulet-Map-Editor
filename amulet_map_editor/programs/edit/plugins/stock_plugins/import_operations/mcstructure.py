@@ -66,7 +66,7 @@ class ImportMCStructure(SimpleOperationPanel):
                     chunk.block_palette = global_palette
                 except ChunkLoadError:
                     pass
-                yield (chunk_index + 1)/chunk_count
+                yield (chunk_index + 1) / chunk_count
 
             wrapper.close()
             self.canvas.paste(Structure(chunks, global_palette, selection))

@@ -6,10 +6,18 @@ import numpy
 import weakref
 
 import minecraft_model_reader
-from minecraft_model_reader.java.download_resources import get_java_vanilla_latest_iter, get_java_vanilla_fix
+from minecraft_model_reader.java.download_resources import (
+    get_java_vanilla_latest_iter,
+    get_java_vanilla_fix,
+)
 from amulet.api.chunk import Chunk
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import PointCoordinatesNDArray, Dimension, BlockCoordinates, OperationYieldType
+from amulet.api.data_types import (
+    PointCoordinatesNDArray,
+    Dimension,
+    BlockCoordinates,
+    OperationYieldType,
+)
 from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
@@ -113,12 +121,9 @@ class BaseEditCanvas(BaseCanvas):
             if os.path.isdir(rp)
         ]
 
-        self._resource_pack = minecraft_model_reader.JavaRPHandler((
-            amulet_pack,
-            latest_pack,
-            *user_packs,
-            fix_pack
-        ))
+        self._resource_pack = minecraft_model_reader.JavaRPHandler(
+            (amulet_pack, latest_pack, *user_packs, fix_pack)
+        )
 
         yield 0.7, "Creating texture atlas"
         self._create_atlas()
