@@ -190,7 +190,7 @@ class _BlockPicker(wx.Panel):
             self.mv_dwn_btn.Bind(wx.EVT_BUTTON, parent.move_down)
             self.delete_btn.Bind(wx.EVT_BUTTON, parent.delete)
 
-            sizer_1.Add(sizer_2, 0, wx.ALL, 5)
+            sizer_1.Add(sizer_2)
             self.block_define = BlockDefine(self, translation_manager, wx.HORIZONTAL)
             sizer_1.Add(self.block_define, 0, wx.ALL, 5)
 
@@ -221,7 +221,9 @@ class _BlockPicker(wx.Panel):
     def panel_change(self, action, evt):
         if action == "collapse":
             self.expanded.Hide()
-            self.collapsed.block_label.SetLabelText(self.expanded.block_label.GetLabelText())
+            self.collapsed.block_label.SetLabelText(
+                self.expanded.block_label.GetLabelText()
+            )
             self.collapsed.Show()
         elif action == "expand":
             self.collapsed.Hide()
@@ -274,7 +276,7 @@ class ComplexBlockPicker(wx.lib.scrolledpanel.ScrolledPanel):
         self.block_picker_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.block_picker_sizer.Add(
-            _BlockPicker(self, translation_manager), 0, wx.TOP | wx.BOTTOM, 5
+            _BlockPicker(self, translation_manager), 0, wx.ALL | wx.EXPAND, 5
         )
 
         self.sizer.Add(self.block_picker_sizer)
@@ -288,15 +290,8 @@ class ComplexBlockPicker(wx.lib.scrolledpanel.ScrolledPanel):
         self.add_button.Bind(wx.EVT_BUTTON, self.add_block_picker)
 
     def add_block_picker(self, evt):
-        # index = self.block_picker_sizer.ItemCount
-        # for i, child in enumerate(self.block_picker_sizer.GetChildren()):
-        #    if not child.IsShown:
-        #        index = i - 1
-        #        break
-
         block_picker = _BlockPicker(self, self.translation_manager)
-        # self.block_picker_sizer.Insert(index, block_picker)
-        self.block_picker_sizer.Add(block_picker, 0, wx.TOP | wx.BOTTOM, 5)
+        self.block_picker_sizer.Add(block_picker, 0, wx.ALL | wx.EXPAND, 5)
         self.block_picker_sizer.Layout()
         self.sizer.Layout()
         self.Layout()
