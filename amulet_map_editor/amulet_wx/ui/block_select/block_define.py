@@ -33,7 +33,7 @@ class BlockDefine(wx.Panel):
         properties: PropertyType = None,
         nbt: amulet_nbt.TAG_Compound = None,
         show_nbt: bool = True,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(parent)
 
@@ -52,7 +52,7 @@ class BlockDefine(wx.Panel):
             platform,
             version_number,
             force_blockstate,
-            **kwargs
+            **kwargs,
         )
         left_sizer.Add(self._version_picker, 0, wx.EXPAND)
 
@@ -64,7 +64,7 @@ class BlockDefine(wx.Panel):
             self._version_picker.force_blockstate,
             namespace,
             block_name,
-            **kwargs
+            **kwargs,
         )
         left_sizer.Add(self._block_picker, 1, wx.EXPAND | wx.TOP, 5)
         self._version_picker.Bind(EVT_VERSION_CHANGE, self._on_version_change)
@@ -112,27 +112,27 @@ class _BlockPicker(wx.Panel):
             sizer = wx.BoxSizer(wx.HORIZONTAL)
 
             self.expand_btn = wx.Button(
-                self, wx.ID_ANY, u"Expand", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Expand", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer.Add(self.expand_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.mv_up_btn = wx.Button(
-                self, wx.ID_ANY, u"Move Up", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Move Up", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer.Add(self.mv_up_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.mv_dwn_btn = wx.Button(
-                self, wx.ID_ANY, u"Move Down", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Move Down", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer.Add(self.mv_dwn_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.delete_btn = wx.Button(
-                self, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Delete", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer.Add(self.delete_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.block_label = wx.StaticText(
-                self, wx.ID_ANY, u"N/A", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "N/A", wx.DefaultPosition, wx.DefaultSize, 0
             )
             self.block_label.Wrap(-1)
 
@@ -157,27 +157,27 @@ class _BlockPicker(wx.Panel):
             sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
 
             self.expand_btn = wx.Button(
-                self, wx.ID_ANY, u"Collapse", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Collapse", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer_2.Add(self.expand_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.mv_up_btn = wx.Button(
-                self, wx.ID_ANY, u"Move Up", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Move Up", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer_2.Add(self.mv_up_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.mv_dwn_btn = wx.Button(
-                self, wx.ID_ANY, u"Move Down", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Move Down", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer_2.Add(self.mv_dwn_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.delete_btn = wx.Button(
-                self, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "Delete", wx.DefaultPosition, wx.DefaultSize, 0
             )
             sizer_2.Add(self.delete_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
             self.block_label = wx.StaticText(
-                self, wx.ID_ANY, u"N/A", wx.DefaultPosition, wx.DefaultSize, 0
+                self, wx.ID_ANY, "N/A", wx.DefaultPosition, wx.DefaultSize, 0
             )
             self.block_label.Wrap(-1)
 
@@ -197,6 +197,12 @@ class _BlockPicker(wx.Panel):
             self.SetSizerAndFit(sizer_1)
             self.Layout()
 
+            self.block_define._block_picker.Bind(EVT_BLOCK_CHANGE, self.on_block_change)
+
+        def on_block_change(self, evt):
+            self.block_label.SetLabelText(f"{evt.namespace}:{evt.block_name}")
+            evt.Skip()
+
     def __init__(self, parent, translation_manager):
         super().__init__(parent, style=wx.SIMPLE_BORDER)
 
@@ -215,6 +221,7 @@ class _BlockPicker(wx.Panel):
     def panel_change(self, action, evt):
         if action == "collapse":
             self.expanded.Hide()
+            self.collapsed.block_label.SetLabelText(self.expanded.block_label.GetLabelText())
             self.collapsed.Show()
         elif action == "expand":
             self.collapsed.Hide()
