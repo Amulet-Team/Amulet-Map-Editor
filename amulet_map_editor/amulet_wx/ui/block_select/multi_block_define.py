@@ -4,7 +4,8 @@ import wx.lib.scrolledpanel
 import PyMCTranslate
 
 from amulet_map_editor.amulet_wx.ui.block_select.block import EVT_BLOCK_CHANGE
-from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
+if __name__ != '__main__':
+    from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
 
 
 class _BlockPicker(wx.Panel):
@@ -106,6 +107,15 @@ class _BlockPicker(wx.Panel):
             self.block_label.SetLabelText(f"{evt.namespace}:{evt.block_name}")
             evt.Skip()
 
+        def gen_block_string(self):
+            base = f"{self.block_define._block_picker.namespace}:{self.block_define._block_picker.block_name}"
+            properties = ','.join(
+                (
+                    f"{key}={value}" for key, value in self.block_define._property_picker.properties.items()
+                )
+            )
+            return f"{base}[{properties}]" if properties else base
+
     def __init__(self, parent, translation_manager):
         super().__init__(parent, style=wx.SIMPLE_BORDER)
 
@@ -125,7 +135,7 @@ class _BlockPicker(wx.Panel):
         if action == "collapse":
             self.expanded.Hide()
             self.collapsed.block_label.SetLabelText(
-                self.expanded.block_label.GetLabelText()
+                self.expanded.gen_block_string()
             )
             self.collapsed.Show()
         elif action == "expand":
@@ -204,6 +214,7 @@ class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
 if __name__ == "__main__":
     app = wx.App()
     import wx.lib.inspection
+    from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
 
     wx.lib.inspection.InspectionTool().Show()
 
