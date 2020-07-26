@@ -9,7 +9,7 @@ if __name__ != '__main__':
 
 
 class _BlockPicker(wx.Panel):
-    class CollpasedBlockDefine(wx.Panel):
+    class CollapsedBlockDefine(wx.Panel):
         def __init__(self, parent: "_BlockPicker"):
             super().__init__(parent)
 
@@ -120,7 +120,7 @@ class _BlockPicker(wx.Panel):
         super().__init__(parent, style=wx.SIMPLE_BORDER)
 
         self.expanded = _BlockPicker.ExpandedBlockDefine(self, translation_manager)
-        self.collapsed = _BlockPicker.CollpasedBlockDefine(self)
+        self.collapsed = _BlockPicker.CollapsedBlockDefine(self)
 
         self.expanded.Hide()
 
