@@ -7,6 +7,7 @@ import PyMCTranslate
 if __name__ == "__main__":
     app = wx.App()
 
+from amulet_map_editor.amulet_wx.util.icon import UP_ARROW, DOWN_ARROW, scale_bitmap
 from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
 from amulet_map_editor.amulet_wx.ui.block_select.properties import EVT_PROPERTIES_CHANGE
 
@@ -112,11 +113,11 @@ class _CollapsibleBlockDefine(wx.Panel):
         self.expand_button = wx.Button(self, label="Expand")
         header_sizer.Add(self.expand_button, 0, 5)
 
-        self.up_button = wx.Button(self, label="Move Up")
+        self.up_button = wx.BitmapButton(self, bitmap=scale_bitmap(UP_ARROW, 16, 16))
         header_sizer.Add(self.up_button, 0, wx.LEFT, 5)
         self.up_button.Bind(wx.EVT_BUTTON, lambda evt: parent.move_up(self))
 
-        self.down_button = wx.Button(self, label="Move Down")
+        self.down_button = wx.BitmapButton(self, bitmap=scale_bitmap(DOWN_ARROW, 16, 16))
         header_sizer.Add(self.down_button, 0, wx.LEFT, 5)
         self.down_button.Bind(wx.EVT_BUTTON, lambda evt: parent.move_down(self))
 
