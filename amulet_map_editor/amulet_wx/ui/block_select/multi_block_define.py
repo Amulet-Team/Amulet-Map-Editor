@@ -3,6 +3,9 @@ import wx.lib.scrolledpanel
 
 import PyMCTranslate
 
+if __name__ == "__main__":
+    app = wx.App()
+
 from amulet_map_editor.amulet_wx.ui.block_select.block import EVT_BLOCK_CHANGE
 
 if __name__ != "__main__":
@@ -204,9 +207,7 @@ class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
 
 
 if __name__ == "__main__":
-    app = wx.App()
     import wx.lib.inspection
-    from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
 
     wx.lib.inspection.InspectionTool().Show()
 

@@ -8,6 +8,9 @@ from amulet.api.block import PropertyType, Block
 from amulet.api.block_entity import BlockEntity
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 
+if __name__ == "__main__":
+    app = wx.App()
+
 from amulet_map_editor.amulet_wx.ui.version_select import (
     VersionSelect,
     EVT_VERSION_CHANGE,
@@ -17,11 +20,10 @@ from amulet_map_editor.amulet_wx.ui.block_select.block import (
     EVT_BLOCK_CHANGE,
 )
 
-if __name__ != "__main__":
-    from amulet_map_editor.amulet_wx.ui.block_select.properties import (
-        PropertySelect,
-        WildcardSNBTType,
-    )
+from amulet_map_editor.amulet_wx.ui.block_select.properties import (
+    PropertySelect,
+    WildcardSNBTType,
+)
 
 
 class BlockDefine(wx.Panel):
@@ -191,11 +193,6 @@ class BlockDefine(wx.Panel):
 
 
 if __name__ == "__main__":
-    app = wx.App()
-    from amulet_map_editor.amulet_wx.ui.block_select.properties import (
-        PropertySelect,
-        WildcardSNBTType,
-    )
 
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
