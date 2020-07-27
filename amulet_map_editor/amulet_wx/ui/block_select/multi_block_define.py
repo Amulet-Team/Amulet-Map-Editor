@@ -108,10 +108,10 @@ class _BlockPicker(wx.Panel):
             evt.Skip()
 
         def gen_block_string(self):
-            base = f"{self.block_define._block_picker.namespace}:{self.block_define._block_picker.block_name}"
+            base = f"{self.block_define.namespace}:{self.block_define.block_name}"
             properties = ','.join(
                 (
-                    f"{key}={value}" for key, value in self.block_define._property_picker.properties.items()
+                    f"{key}={value}" for key, value in self.block_define.str_properties.items()
                 )
             )
             return f"{base}[{properties}]" if properties else base

@@ -1,10 +1,12 @@
 import wx
 import wx.lib.scrolledpanel
-from typing import Tuple
+from typing import Tuple, Optional, Dict
 
 import PyMCTranslate
 import amulet_nbt
-from amulet.api.block import PropertyType
+from amulet.api.block import PropertyType, Block
+from amulet.api.block_entity import BlockEntity
+from amulet.api.data_types import VersionNumberTuple, PlatformType
 
 from amulet_map_editor.amulet_wx.ui.version_select import (
     VersionSelect,
@@ -16,7 +18,7 @@ from amulet_map_editor.amulet_wx.ui.block_select.block import (
 )
 
 if __name__ != "__main__":
-    from amulet_map_editor.amulet_wx.ui.block_select.properties import PropertySelect
+    from amulet_map_editor.amulet_wx.ui.block_select.properties import PropertySelect, WildcardSNBTType
 
 
 class BlockDefine(wx.Panel):
@@ -33,10 +35,12 @@ class BlockDefine(wx.Panel):
         properties: PropertyType = None,
         nbt: amulet_nbt.TAG_Compound = None,
         show_nbt: bool = True,
+        wildcard_properties = False,
         **kwargs,
     ):
         super().__init__(parent)
 
+        self._translation_manager = translation_manager
         sizer = wx.BoxSizer(orientation)
         left_sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(left_sizer, 1, wx.EXPAND)
@@ -78,6 +82,7 @@ class BlockDefine(wx.Panel):
             self._block_picker.namespace,
             self._block_picker.block_name,
             properties,
+            wildcard_properties
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._block_picker.Bind(EVT_BLOCK_CHANGE, self._on_block_change)
@@ -103,10 +108,97 @@ class BlockDefine(wx.Panel):
         )
         evt.Skip()
 
+    @property
+    def platform(self) -> PlatformType:
+        return self._version_picker.platform
+
+    @platform.setter
+    def platform(self, platform: PlatformType):
+        self._version_picker.platform = platform
+
+    @property
+    def version_number(self) -> VersionNumberTuple:
+        return self._version_picker.version_number
+
+    @version_number.setter
+    def version_number(self, version_number: VersionNumberTuple):
+        self._version_picker.version_number = version_number
+
+    @property
+    def force_blockstate(self) -> bool:
+        return self._version_picker.force_blockstate
+
+    @force_blockstate.setter
+    def force_blockstate(self, force_blockstate: bool):
+        self._version_picker.force_blockstate = force_blockstate
+
+    @property
+    def version(self) -> Tuple[PlatformType, VersionNumberTuple, bool]:
+        return self._version_picker.version
+
+    @version.setter
+    def version(self, version: Tuple[PlatformType, VersionNumberTuple, bool]):
+        self._version_picker.version = version
+
+    @property
+    def namespace(self) -> str:
+        return self._block_picker.namespace
+
+    @namespace.setter
+    def namespace(self, namespace: str):
+        self._block_picker.namespace = namespace
+
+    @property
+    def block_name(self) -> str:
+        return self._block_picker.block_name
+
+    @block_name.setter
+    def block_name(self, block_name: str):
+        self._block_picker.block_name = block_name
+
+    @property
+    def str_properties(self) -> Dict[str, "WildcardSNBTType"]:
+        return self._property_picker.str_properties
+
+    @str_properties.setter
+    def str_properties(self, str_properties: Dict[str, "WildcardSNBTType"]):
+        self._property_picker.str_properties = str_properties
+
+    @property
+    def properties(self) -> PropertyType:
+        return self._property_picker.properties
+
+    @properties.setter
+    def properties(self, properties: PropertyType):
+        self._property_picker.properties = properties
+
+    @property
+    def block(self) -> Block:
+        return Block(
+            self.namespace,
+            self.block_name,
+            self.properties
+        )
+
+    @property
+    def block_entity(self) -> Optional[BlockEntity]:
+        return None
+
+    @property
+    def universal_block(self) -> Tuple[Block, Optional[BlockEntity]]:
+        return self._translation_manager.get_version(
+            self.platform,
+            self.version_number
+        ).block.to_universal(
+            self.block,
+            self.block_entity,
+            self.force_blockstate
+        )[:2]
+
 
 if __name__ == "__main__":
     app = wx.App()
-    from amulet_map_editor.amulet_wx.ui.block_select.properties import PropertySelect
+    from amulet_map_editor.amulet_wx.ui.block_select.properties import PropertySelect, WildcardSNBTType
 
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
