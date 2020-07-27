@@ -4,6 +4,8 @@ from wx.lib import newevent
 import PyMCTranslate
 from typing import Tuple, Optional, Type, Any
 
+from amulet.api.data_types import VersionNumberTuple, PlatformType
+
 (
     PlatformChangeEvent,
     EVT_PLATFORM_CHANGE,
@@ -29,10 +31,10 @@ class PlatformSelect(wx.Panel):
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
-        platform: str = None,
+        platform: PlatformType = None,
         allow_universal: bool = True,
         allow_vanilla: bool = True,
-        allowed_platforms: Tuple[str, ...] = None,
+        allowed_platforms: Tuple[PlatformType, ...] = None,
         **kwargs
     ):
         super().__init__(parent, style=wx.BORDER_SIMPLE)
@@ -68,15 +70,15 @@ class PlatformSelect(wx.Panel):
         return wx_obj
 
     @property
-    def platform(self) -> str:
+    def platform(self) -> PlatformType:
         return self._platform_choice.GetCurrentString()
 
     @platform.setter
-    def platform(self, platform: str):
+    def platform(self, platform: PlatformType):
         self._set_platform(platform)
         wx.PostEvent(self, PlatformChangeEvent(platform=self.platform))
 
-    def _set_platform(self, platform: str):
+    def _set_platform(self, platform: PlatformType):
         if platform and platform in self._platform_choice.GetItems():
             self._platform_choice.SetSelection(
                 self._platform_choice.GetItems().index(platform)
@@ -100,8 +102,8 @@ class VersionSelect(PlatformSelect):
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
-        platform: str = None,
-        version_number: Tuple[int, int, int] = None,
+        platform: PlatformType = None,
+        version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
         show_force_blockstate: bool = True,
         allow_numerical: bool = True,
@@ -150,15 +152,15 @@ class VersionSelect(PlatformSelect):
         )
 
     @property
-    def version_number(self) -> Tuple[int, int, int]:
+    def version_number(self) -> VersionNumberTuple:
         return self._version_choice.GetCurrentObject()
 
     @version_number.setter
-    def version_number(self, version_number: Tuple[int, int, int]):
+    def version_number(self, version_number: VersionNumberTuple):
         self._set_version_number(version_number)
         wx.PostEvent(self, VersionNumberChangeEvent(version_number=self.version_number))
 
-    def _set_version_number(self, version_number: Tuple[int, int, int]):
+    def _set_version_number(self, version_number: VersionNumberTuple):
         if version_number and version_number in self._version_choice.values:
             self._version_choice.SetSelection(
                 self._version_choice.values.index(version_number)
@@ -178,6 +180,17 @@ class VersionSelect(PlatformSelect):
     def _set_force_blockstate(self, force_blockstate: bool):
         if force_blockstate is not None:
             self._blockstate_choice.SetSelection(int(force_blockstate))
+
+    @property
+    def version(self) -> Tuple[PlatformType, VersionNumberTuple, bool]:
+        return self.platform, self.version_number, self.force_blockstate
+
+    @version.setter
+    def version(self, version: Tuple[PlatformType, VersionNumberTuple, bool]):
+        platform, version_number, force_blockstate = version
+        self._set_platform(platform)
+        self._set_version_number(version_number)
+        self.force_blockstate = force_blockstate
 
     def _populate_version(self):
         versions = self._translation_manager.version_numbers(self.platform)
