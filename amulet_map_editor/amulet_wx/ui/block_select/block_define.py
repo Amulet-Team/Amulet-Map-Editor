@@ -48,11 +48,12 @@ class BlockDefine(wx.Panel):
         self._translation_manager = translation_manager
         sizer = wx.BoxSizer(orientation)
         left_sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(left_sizer, 1, wx.EXPAND)
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         if orientation == wx.HORIZONTAL:
+            sizer.Add(left_sizer, 1, wx.EXPAND)
             sizer.Add(right_sizer, 1, wx.EXPAND | wx.LEFT, 5)
         else:
+            sizer.Add(left_sizer, 2, wx.EXPAND)
             sizer.Add(right_sizer, 1, wx.EXPAND | wx.TOP, 5)
 
         self._version_picker = VersionSelect(

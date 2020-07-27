@@ -200,7 +200,6 @@ class BlockSelect(wx.Panel):
         selection = self._block_list_box.GetSelection()
         if selection != wx.NOT_FOUND:
             current_string = self._block_list_box.GetString(selection)
-            print(current_string)
             if current_string in block_names:
                 index = block_names.index(current_string)
 

@@ -3,7 +3,7 @@ import wx
 import numpy
 
 from amulet.api.block import Block
-from amulet_map_editor.amulet_wx.ui.select_block import BlockDefine
+from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine
 from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.amulet_wx.ui.simple import SimpleScrollablePanel
 
@@ -24,24 +24,22 @@ class Replace(SimpleScrollablePanel, OperationUI):
         self._original_block = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
+            wx.VERTICAL,
             *(
                 options.get("original_block_options", [])
                 or [world.world_wrapper.platform]
             ),
-            wildcard=True,
-            style=wx.BORDER_SIMPLE,
-            properties_style=wx.BORDER_SIMPLE
+            wildcard_properties=True
         )
         self._sizer.Add(self._original_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self._replacement_block = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
+            wx.VERTICAL,
             *(
                 options.get("replacement_block_options", [])
                 or [world.world_wrapper.platform]
-            ),
-            style=wx.BORDER_SIMPLE,
-            properties_style=wx.BORDER_SIMPLE
+            )
         )
         self._sizer.Add(
             self._replacement_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
@@ -54,21 +52,28 @@ class Replace(SimpleScrollablePanel, OperationUI):
         self.Layout()
 
     def _get_replacement_block(self) -> Block:
-        return self.world.translation_manager.get_version(
-            self._replacement_block.platform, self._replacement_block.version
-        ).block.to_universal(
-            self._replacement_block.block,
-            force_blockstate=self._replacement_block.force_blockstate,
-        )[
-            0
-        ]
+        return self._replacement_block.universal_block[0]
 
     def unload(self):
         self._save_options(
             {
-                "original_block_options": self._original_block.options,
+                "original_block_options": (
+                    self._original_block.platform,
+                    self._original_block.version_number,
+                    self._original_block.force_blockstate,
+                    self._original_block.namespace,
+                    self._original_block.block_name,
+                    self._original_block.properties,
+                ),
                 "replacement_block": self._get_replacement_block(),
-                "replacement_block_options": self._replacement_block.options,
+                "replacement_block_options": (
+                    self._replacement_block.platform,
+                    self._replacement_block.version_number,
+                    self._replacement_block.force_blockstate,
+                    self._replacement_block.namespace,
+                    self._replacement_block.block_name,
+                    self._replacement_block.properties,
+                ),
             }
         )
 
@@ -87,7 +92,14 @@ class Replace(SimpleScrollablePanel, OperationUI):
             original_namespace,
             original_base_name,
             original_properties,
-        ) = self._original_block.options
+        ) = (
+            self._original_block.platform,
+            self._original_block.version_number,
+            self._original_block.force_blockstate,
+            self._original_block.namespace,
+            self._original_block.block_name,
+            self._original_block.properties,
+        )
         replacement_block = self._get_replacement_block()
 
         replacement_block_id = world.palette.get_add_block(replacement_block)

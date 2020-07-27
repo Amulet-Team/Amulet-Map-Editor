@@ -318,9 +318,7 @@ class ManualPropertySelect(wx.Panel):
         self.Freeze()
         self._property_sizer.Detach(sizer)
         sizer.Clear(True)
-        print(self._properties)
         del self._properties[key]
-        print(self._properties)
         self.Layout()
         self.Thaw()
         self._post_property_change()
