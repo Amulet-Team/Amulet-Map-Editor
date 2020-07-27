@@ -60,8 +60,8 @@ class PlatformSelect(wx.Panel):
     ) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
-        text = wx.StaticText(self, label=label, style=wx.ALIGN_CENTER_VERTICAL)
-        sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
+        text = wx.StaticText(self, label=label, style=wx.ALIGN_CENTER)
+        sizer.Add(text, 1)
         wx_obj = obj(self, **kwargs)
         sizer.Add(wx_obj, 2)
         if not shown:

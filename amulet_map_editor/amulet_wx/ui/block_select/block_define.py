@@ -18,7 +18,10 @@ from amulet_map_editor.amulet_wx.ui.block_select.block import (
 )
 
 if __name__ != "__main__":
-    from amulet_map_editor.amulet_wx.ui.block_select.properties import PropertySelect, WildcardSNBTType
+    from amulet_map_editor.amulet_wx.ui.block_select.properties import (
+        PropertySelect,
+        WildcardSNBTType,
+    )
 
 
 class BlockDefine(wx.Panel):
@@ -35,7 +38,7 @@ class BlockDefine(wx.Panel):
         properties: PropertyType = None,
         nbt: amulet_nbt.TAG_Compound = None,
         show_nbt: bool = True,
-        wildcard_properties = False,
+        wildcard_properties=False,
         **kwargs,
     ):
         super().__init__(parent)
@@ -82,7 +85,7 @@ class BlockDefine(wx.Panel):
             self._block_picker.namespace,
             self._block_picker.block_name,
             properties,
-            wildcard_properties
+            wildcard_properties,
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._block_picker.Bind(EVT_BLOCK_CHANGE, self._on_block_change)
@@ -174,11 +177,7 @@ class BlockDefine(wx.Panel):
 
     @property
     def block(self) -> Block:
-        return Block(
-            self.namespace,
-            self.block_name,
-            self.properties
-        )
+        return Block(self.namespace, self.block_name, self.properties)
 
     @property
     def block_entity(self) -> Optional[BlockEntity]:
@@ -187,25 +186,28 @@ class BlockDefine(wx.Panel):
     @property
     def universal_block(self) -> Tuple[Block, Optional[BlockEntity]]:
         return self._translation_manager.get_version(
-            self.platform,
-            self.version_number
-        ).block.to_universal(
-            self.block,
-            self.block_entity,
-            self.force_blockstate
-        )[:2]
+            self.platform, self.version_number
+        ).block.to_universal(self.block, self.block_entity, self.force_blockstate)[:2]
 
 
 if __name__ == "__main__":
     app = wx.App()
-    from amulet_map_editor.amulet_wx.ui.block_select.properties import PropertySelect, WildcardSNBTType
+    from amulet_map_editor.amulet_wx.ui.block_select.properties import (
+        PropertySelect,
+        WildcardSNBTType,
+    )
 
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
         dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        sizer.Add(BlockDefine(dialog, translation_manager, wx.HORIZONTAL), 1, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(
+            BlockDefine(dialog, translation_manager, wx.HORIZONTAL),
+            1,
+            wx.ALL | wx.EXPAND,
+            5,
+        )
         dialog.Show()
         dialog.Fit()
         app.MainLoop()
