@@ -1,12 +1,14 @@
 import wx
 from wx.lib import newevent
-from typing import Tuple, Dict, Optional, List
+from typing import Tuple, Dict, Optional, List, Union
 import weakref
 
 import PyMCTranslate
 import amulet_nbt
 from amulet_nbt import SNBTType
-from amulet.api.block import PropertyDataTypes
+from amulet.api.block import PropertyDataTypes, PropertyType
+
+WildcardSNBTType = Union[SNBTType, str]
 
 from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON
 
@@ -18,15 +20,16 @@ from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON
 
 class PropertySelect(wx.Panel):
     def __init__(
-        self,
-        parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        platform: str,
-        version_number: Tuple[int, int, int],
-        force_blockstate: bool,
-        namespace: str,
-        block_name: str,
-        properties: Dict[str, SNBTType] = None,
+            self,
+            parent: wx.Window,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str,
+            version_number: Tuple[int, int, int],
+            force_blockstate: bool,
+            namespace: str,
+            block_name: str,
+            properties: Dict[str, SNBTType] = None,
+            wildcard_mode=False  # TODO
     ):
         super().__init__(parent, style=wx.BORDER_SIMPLE)
         self._parent = weakref.ref(parent)
@@ -47,6 +50,8 @@ class PropertySelect(wx.Panel):
         self._manual = ManualPropertySelect(self, translation_manager)
         sizer.Add(self._manual, 1, wx.EXPAND)
 
+        self._wildcard_mode = wildcard_mode
+
         self._set_version_block(
             (platform, version_number, force_blockstate, namespace, block_name)
         )
@@ -55,6 +60,10 @@ class PropertySelect(wx.Panel):
     @property
     def parent(self) -> wx.Window:
         return self._parent()
+
+    @property
+    def wildcard_mode(self) -> bool:
+        return self._wildcard_mode
 
     @property
     def version_block(self) -> Tuple[str, Tuple[int, int, int], bool, str, str]:
@@ -68,19 +77,19 @@ class PropertySelect(wx.Panel):
 
     @version_block.setter
     def version_block(
-        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
+            self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
     ):
         self._set_version_block(version_block)
-        self.properties = None
+        self.str_properties = None
 
     def _set_version_block(
-        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
+            self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
     ):
         version = version_block[:3]
         assert (
-            version[0] in self._translation_manager.platforms()
-            and version[1] in self._translation_manager.version_numbers(version[0])
-            and isinstance(version[2], bool)
+                version[0] in self._translation_manager.platforms()
+                and version[1] in self._translation_manager.version_numbers(version[0])
+                and isinstance(version[2], bool)
         ), f"{version} is not a valid version"
         self._platform, self._version_number, self._force_blockstate = version
         block = version_block[3:5]
@@ -91,16 +100,26 @@ class PropertySelect(wx.Panel):
         self._set_ui()
 
     @property
-    def properties(self) -> Dict[str, SNBTType]:
+    def str_properties(self) -> Dict[str, WildcardSNBTType]:
         if self._manual_enabled:
             return self._manual.properties
         else:
             return self._simple.properties
 
-    @properties.setter
-    def properties(self, properties: Dict[str, SNBTType]):
+    @str_properties.setter
+    def str_properties(self, properties: Dict[str, WildcardSNBTType]):
         self._set_properties(properties)
-        wx.PostEvent(self, PropertiesChangeEvent(properties=self.properties))
+        wx.PostEvent(self, PropertiesChangeEvent(properties=self.str_properties))
+
+    @property
+    def properties(self) -> PropertyType:
+        if self.wildcard_mode:
+            raise Exception("Accessing the properties attribute is invalid in wildcard mode")
+        return {key: amulet_nbt.from_snbt(val) for key, val in self.str_properties.items()}
+
+    @properties.setter
+    def properties(self, properties: PropertyType):
+        self.str_properties = {key: val.to_snbt() for key, val in (properties or {}).items()}
 
     def _set_properties(self, properties: Dict[str, SNBTType]):
         properties = properties or {}
@@ -134,7 +153,7 @@ class PropertySelect(wx.Panel):
 
 class SimplePropertySelect(wx.Panel):
     def __init__(
-        self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
+            self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
     ):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -167,7 +186,6 @@ class SimplePropertySelect(wx.Panel):
 
     @properties.setter
     def properties(self, properties: Dict[str, SNBTType]):
-        print("set properties")
         self.Freeze()
         self._properties.clear()
         self._property_sizer.Clear(True)
@@ -199,7 +217,7 @@ class SimplePropertySelect(wx.Panel):
 
 class ManualPropertySelect(wx.Panel):
     def __init__(
-        self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
+            self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
     ):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -257,13 +275,17 @@ class ManualPropertySelect(wx.Panel):
 
     def _change_value(self, snbt: SNBTType, snbt_text: wx.StaticText):
         try:
-            snbt = amulet_nbt.from_snbt(snbt).to_snbt()
+            nbt = amulet_nbt.from_snbt(snbt)
         except:
             snbt_text.SetLabel("Invalid SNBT")
             snbt_text.SetBackgroundColour((255, 200, 200))
         else:
-            snbt_text.SetLabel(snbt)
-            snbt_text.SetBackgroundColour(wx.NullColour)
+            if isinstance(nbt, PropertyDataTypes):
+                snbt_text.SetLabel(nbt.to_snbt())
+                snbt_text.SetBackgroundColour(wx.NullColour)
+            else:
+                snbt_text.SetLabel(f"{nbt.__class__.__name__} not valid")
+                snbt_text.SetBackgroundColour((255, 200, 200))
         self.Layout()
 
     def _on_remove_property(self, sizer: wx.Sizer):
@@ -293,7 +315,6 @@ class ManualPropertySelect(wx.Panel):
 
 
 if __name__ == "__main__":
-
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
         app = wx.App()
@@ -317,5 +338,6 @@ if __name__ == "__main__":
         dialog.Show()
         dialog.Fit()
         app.MainLoop()
+
 
     main()
