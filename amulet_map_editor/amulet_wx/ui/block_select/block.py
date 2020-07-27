@@ -159,7 +159,6 @@ class BlockSelect(wx.Panel):
     @block_name.setter
     def block_name(self, block_name: str):
         self._set_block_name(block_name)
-        self._post_block_change()
 
     def _set_block_name(self, block_name: str):
         block_name = block_name or ""
@@ -212,10 +211,13 @@ class BlockSelect(wx.Panel):
         elif search_str in block_names:
             # if the searched text perfectly matches select that
             self._block_list_box.SetSelection(block_names.index(search_str))
+            self._post_block_change()
         elif len(self._block_list_box.GetItems()) >= 2:
             self._block_list_box.SetSelection(1)
+            self._post_block_change()
         else:
             self._block_list_box.SetSelection(0)
+            self._post_block_change()
 
 
 if __name__ == "__main__":
