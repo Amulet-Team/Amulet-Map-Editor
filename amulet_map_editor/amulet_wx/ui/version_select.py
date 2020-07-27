@@ -9,21 +9,21 @@ from amulet.api.data_types import VersionNumberTuple, PlatformType
 (
     PlatformChangeEvent,
     EVT_PLATFORM_CHANGE,
-) = newevent.NewEvent()  # the platform entry changed
+) = newevent.NewCommandEvent()  # the platform entry changed
 (
     VersionNumberChangeEvent,
     EVT_VERSION_NUMBER_CHANGE,
-) = newevent.NewEvent()  # the version number entry changed
+) = newevent.NewCommandEvent()  # the version number entry changed
 (
     FormatChangeEvent,
     EVT_FORMAT_CHANGE,
 ) = (
-    newevent.NewEvent()
+    newevent.NewCommandEvent()
 )  # the format entry changed (is fired even if the entry isn't visible)
 (
     VersionChangeEvent,
     EVT_VERSION_CHANGE,
-) = newevent.NewEvent()  # one of the above changed. Fired after EVT_FORMAT_CHANGE
+) = newevent.NewCommandEvent()  # one of the above changed. Fired after EVT_FORMAT_CHANGE
 
 
 class PlatformSelect(wx.Panel):
@@ -52,7 +52,7 @@ class PlatformSelect(wx.Panel):
         self._set_platform(platform)
         self._platform_choice.Bind(
             wx.EVT_CHOICE,
-            lambda evt: wx.PostEvent(self, PlatformChangeEvent(platform=self.platform)),
+            lambda evt: wx.PostEvent(self, PlatformChangeEvent(self.GetId(), platform=self.platform)),
         )
 
     def _add_ui_element(
@@ -76,7 +76,7 @@ class PlatformSelect(wx.Panel):
     @platform.setter
     def platform(self, platform: PlatformType):
         self._set_platform(platform)
-        wx.PostEvent(self, PlatformChangeEvent(platform=self.platform))
+        wx.PostEvent(self, PlatformChangeEvent(self.GetId(), platform=self.platform))
 
     def _set_platform(self, platform: PlatformType):
         if platform and platform in self._platform_choice.GetItems():
@@ -124,7 +124,7 @@ class VersionSelect(PlatformSelect):
         self._version_choice.Bind(
             wx.EVT_CHOICE,
             lambda evt: wx.PostEvent(
-                self, VersionNumberChangeEvent(version_number=self.version_number)
+                self, VersionNumberChangeEvent(self.GetId(), version_number=self.version_number)
             ),
         )
 
@@ -141,10 +141,11 @@ class VersionSelect(PlatformSelect):
         )
 
     def _post_version_change(self):
-        wx.PostEvent(self, FormatChangeEvent(force_blockstate=self.force_blockstate)),
+        wx.PostEvent(self, FormatChangeEvent(self.GetId(), force_blockstate=self.force_blockstate)),
         wx.PostEvent(
             self,
             VersionChangeEvent(
+                self.GetId(),
                 platform=self.platform,
                 version_number=self.version_number,
                 force_blockstate=self.force_blockstate,
@@ -158,7 +159,7 @@ class VersionSelect(PlatformSelect):
     @version_number.setter
     def version_number(self, version_number: VersionNumberTuple):
         self._set_version_number(version_number)
-        wx.PostEvent(self, VersionNumberChangeEvent(version_number=self.version_number))
+        wx.PostEvent(self, VersionNumberChangeEvent(self.GetId(), version_number=self.version_number))
 
     def _set_version_number(self, version_number: VersionNumberTuple):
         if version_number and version_number in self._version_choice.values:

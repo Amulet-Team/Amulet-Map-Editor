@@ -9,21 +9,21 @@ from amulet_map_editor import IMG_DIR
 (
     NamespaceChangeEvent,
     EVT_NAMESPACE_CHANGE,
-) = newevent.NewEvent()  # the namespace entry changed
+) = newevent.NewCommandEvent()  # the namespace entry changed
 (
     BlockNameChangeEvent,
     EVT_BLOCK_NAME_CHANGE,
-) = newevent.NewEvent()  # the block name entry changed
+) = newevent.NewCommandEvent()  # the block name entry changed
 (
     BlockChangeEvent,
     EVT_BLOCK_CHANGE,
 ) = (
-    newevent.NewEvent()
+    newevent.NewCommandEvent()
 )  # the block or namespace changed. Generated after EVT_BLOCK_NAME_CHANGE
 (
     PickBlockEvent,
     EVT_PICK_BLOCK,
-) = newevent.NewEvent()  # The pick block button was pressed
+) = newevent.NewCommandEvent()  # The pick block button was pressed
 
 
 class BlockSelect(wx.Panel):
@@ -89,7 +89,7 @@ class BlockSelect(wx.Panel):
             )
             pick_block_button.Bind(
                 wx.EVT_BUTTON,
-                lambda evt: wx.PostEvent(self, PickBlockEvent(widget=self)),
+                lambda evt: wx.PostEvent(self, PickBlockEvent(self.GetId(), widget=self)),
             )
         self._block_list_box = wx.ListBox(self, style=wx.LB_SINGLE)
         sizer.Add(self._block_list_box, 1, wx.EXPAND)
@@ -101,13 +101,13 @@ class BlockSelect(wx.Panel):
 
     def _post_namespace_change(self):
         if self._do_text_event:
-            wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace))
+            wx.PostEvent(self, NamespaceChangeEvent(self.GetId(), namespace=self.namespace))
         self._do_text_event = True
 
     def _post_block_change(self):
-        wx.PostEvent(self, BlockNameChangeEvent(block_name=self.block_name)),
+        wx.PostEvent(self, BlockNameChangeEvent(self.GetId(), block_name=self.block_name)),
         wx.PostEvent(
-            self, BlockChangeEvent(namespace=self.namespace, block_name=self.block_name)
+            self, BlockChangeEvent(self.GetId(), namespace=self.namespace, block_name=self.block_name)
         )
 
     @property
@@ -135,7 +135,7 @@ class BlockSelect(wx.Panel):
     @namespace.setter
     def namespace(self, namespace: str):
         self._set_namespace(namespace)
-        wx.PostEvent(self, NamespaceChangeEvent(namespace=self.namespace))
+        wx.PostEvent(self, NamespaceChangeEvent(self.GetId(), namespace=self.namespace))
 
     def _set_namespace(self, namespace: str):
         namespace = namespace or "minecraft"
