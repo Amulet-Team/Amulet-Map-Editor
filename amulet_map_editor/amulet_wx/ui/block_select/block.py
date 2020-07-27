@@ -195,11 +195,27 @@ class BlockSelect(wx.Panel):
     def _update_block_name(self, search_str: str):
         block_names = [bn for bn in self._block_names if search_str in bn]
         if search_str not in block_names:
-            search_str = f'"{search_str}"'
-            block_names.insert(0, search_str)
+            block_names.insert(0, f'"{search_str}"')
+
+        index = 0
+        selection = self._block_list_box.GetSelection()
+        if selection != wx.NOT_FOUND:
+            current_string = self._block_list_box.GetString(selection)
+            print(current_string)
+            if current_string in block_names:
+                index = block_names.index(current_string)
+
         self._block_list_box.SetItems(block_names)
-        if search_str in block_names:
+        if index:
+            # if the previously selected string is in the list select that
+            self._block_list_box.SetSelection(index)
+        elif search_str in block_names:
+            # if the searched text perfectly matches select that
             self._block_list_box.SetSelection(block_names.index(search_str))
+        elif len(self._block_list_box.GetItems()) >= 2:
+            self._block_list_box.SetSelection(1)
+        else:
+            self._block_list_box.SetSelection(0)
 
 
 if __name__ == "__main__":
