@@ -15,7 +15,7 @@ from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON
 (
     PropertiesChangeEvent,
     EVT_PROPERTIES_CHANGE,
-) = newevent.NewEvent()  # the properties changed
+) = newevent.NewCommandEvent()  # the properties changed
 
 
 class PropertySelect(wx.Panel):
@@ -109,7 +109,9 @@ class PropertySelect(wx.Panel):
     @str_properties.setter
     def str_properties(self, properties: Dict[str, WildcardSNBTType]):
         self._set_properties(properties)
-        wx.PostEvent(self, PropertiesChangeEvent(properties=self.str_properties))
+        wx.PostEvent(
+            self, PropertiesChangeEvent(self.GetId(), properties=self.str_properties)
+        )
 
     @property
     def properties(self) -> PropertyType:
@@ -206,6 +208,13 @@ class SimplePropertySelect(wx.Panel):
             self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
             choice = wx.Choice(self, choices=choices)
             self._property_sizer.Add(choice, 0, wx.EXPAND)
+            choice.Bind(
+                wx.EVT_CHOICE,
+                lambda evt: wx.PostEvent(
+                    self,
+                    PropertiesChangeEvent(self.GetId(), properties=self.properties),
+                ),
+            )
             val = spec_defaults[name]
             if name in properties:
                 try:
@@ -250,17 +259,22 @@ class ManualPropertySelect(wx.Panel):
 
         add_button.Bind(wx.EVT_BUTTON, lambda evt: self._add_property())
 
-        self._properties: List[Tuple[wx.TextCtrl, wx.TextCtrl]] = []
+        self._property_index = 0
+        self._properties: Dict[int, Tuple[wx.TextCtrl, wx.TextCtrl]] = {}
 
     def _post_property_change(self):
-        wx.PostEvent(self, PropertiesChangeEvent(properties=self.properties))
+        wx.PostEvent(
+            self, PropertiesChangeEvent(self.GetId(), properties=self.properties)
+        )
 
     def _add_property(self, name: str = "", value: SNBTType = ""):
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._property_index += 1
         subtract_button = wx.BitmapButton(self, bitmap=SUBTRACT_ICON, size=(30, 30))
         sizer.Add(subtract_button, 0, wx.ALIGN_CENTER_VERTICAL)
-        subtract_button.Bind(wx.EVT_BUTTON, lambda evt: self._on_remove_property(sizer))
+        index = self._property_index
+        subtract_button.Bind(wx.EVT_BUTTON, lambda evt: self._on_remove_property(sizer, index))
         name_entry = wx.TextCtrl(self, value=name, style=wx.TE_CENTER)
         sizer.Add(name_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         name_entry.Bind(wx.EVT_TEXT, lambda evt: self._post_property_change())
@@ -272,6 +286,10 @@ class ManualPropertySelect(wx.Panel):
         value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, snbt_text))
 
         self._property_sizer.Add(sizer, 1, wx.TOP | wx.EXPAND, 5)
+        self._properties[self._property_index] = (
+            name_entry,
+            value_entry
+        )
         self.Fit()
         self.Layout()
         self.Thaw()
@@ -279,6 +297,7 @@ class ManualPropertySelect(wx.Panel):
     def _on_value_change(self, evt, snbt_text: wx.StaticText):
         self._change_value(evt.GetString(), snbt_text)
         self._post_property_change()
+        evt.Skip()
 
     def _change_value(self, snbt: SNBTType, snbt_text: wx.StaticText):
         try:
@@ -295,17 +314,21 @@ class ManualPropertySelect(wx.Panel):
                 snbt_text.SetBackgroundColour((255, 200, 200))
         self.Layout()
 
-    def _on_remove_property(self, sizer: wx.Sizer):
+    def _on_remove_property(self, sizer: wx.Sizer, key: int):
         self.Freeze()
         self._property_sizer.Detach(sizer)
         sizer.Clear(True)
+        print(self._properties)
+        del self._properties[key]
+        print(self._properties)
         self.Layout()
         self.Thaw()
+        self._post_property_change()
 
     @property
     def properties(self) -> Dict[str, SNBTType]:
         properties = {}
-        for name, value in self._properties:
+        for name, value in self._properties.values():
             try:
                 nbt = amulet_nbt.from_snbt(value.GetValue())
             except:
@@ -317,6 +340,8 @@ class ManualPropertySelect(wx.Panel):
     @properties.setter
     def properties(self, properties: Dict[str, SNBTType]):
         self._property_sizer.Clear(True)
+        self._properties.clear()
+        self._property_index = 0
         for name, value in properties.items():
             self._add_property(name, value)
 
