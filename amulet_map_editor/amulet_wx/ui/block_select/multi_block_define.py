@@ -4,7 +4,8 @@ import wx.lib.scrolledpanel
 import PyMCTranslate
 
 from amulet_map_editor.amulet_wx.ui.block_select.block import EVT_BLOCK_CHANGE
-if __name__ != '__main__':
+
+if __name__ != "__main__":
     from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
 
 
@@ -15,32 +16,30 @@ class _BlockPicker(wx.Panel):
 
             sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-            self.expand_btn = wx.Button(
-                self, wx.ID_ANY, "Expand", wx.DefaultPosition, wx.DefaultSize, 0
+            self.expand_btn = wx.Button(self, label="Expand")
+            sizer.Add(
+                self.expand_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
             )
-            sizer.Add(self.expand_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-            self.mv_up_btn = wx.Button(
-                self, wx.ID_ANY, "Move Up", wx.DefaultPosition, wx.DefaultSize, 0
+            self.mv_up_btn = wx.Button(self, label="Move Up")
+            sizer.Add(
+                self.mv_up_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
             )
-            sizer.Add(self.mv_up_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-            self.mv_dwn_btn = wx.Button(
-                self, wx.ID_ANY, "Move Down", wx.DefaultPosition, wx.DefaultSize, 0
+            self.mv_dwn_btn = wx.Button(self, label="Move Down")
+            sizer.Add(
+                self.mv_dwn_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
             )
-            sizer.Add(self.mv_dwn_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-            self.delete_btn = wx.Button(
-                self, wx.ID_ANY, "Delete", wx.DefaultPosition, wx.DefaultSize, 0
+            self.delete_btn = wx.Button(self, label="Delete")
+            sizer.Add(
+                self.delete_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
             )
-            sizer.Add(self.delete_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-            self.block_label = wx.StaticText(
-                self, wx.ID_ANY, "N/A", wx.DefaultPosition, wx.DefaultSize, 0
-            )
+            self.block_label = wx.StaticText(self, label="N/A")
             self.block_label.Wrap(-1)
 
-            sizer.Add(self.block_label, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+            sizer.Add(self.block_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
             self.SetSizer(sizer)
             self.Layout()
@@ -60,32 +59,22 @@ class _BlockPicker(wx.Panel):
 
             sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
 
-            self.expand_btn = wx.Button(
-                self, wx.ID_ANY, "Collapse", wx.DefaultPosition, wx.DefaultSize, 0
-            )
-            sizer_2.Add(self.expand_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+            self.expand_btn = wx.Button(self, label="Collapse")
+            sizer_2.Add(self.expand_btn, 0, wx.TOP | wx.LEFT, 5)
 
-            self.mv_up_btn = wx.Button(
-                self, wx.ID_ANY, "Move Up", wx.DefaultPosition, wx.DefaultSize, 0
-            )
-            sizer_2.Add(self.mv_up_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+            self.mv_up_btn = wx.Button(self, label="Move Up")
+            sizer_2.Add(self.mv_up_btn, 0, wx.TOP | wx.LEFT, 5)
 
-            self.mv_dwn_btn = wx.Button(
-                self, wx.ID_ANY, "Move Down", wx.DefaultPosition, wx.DefaultSize, 0
-            )
-            sizer_2.Add(self.mv_dwn_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+            self.mv_dwn_btn = wx.Button(self, label="Move Down")
+            sizer_2.Add(self.mv_dwn_btn, 0, wx.TOP | wx.LEFT, 5)
 
-            self.delete_btn = wx.Button(
-                self, wx.ID_ANY, "Delete", wx.DefaultPosition, wx.DefaultSize, 0
-            )
-            sizer_2.Add(self.delete_btn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+            self.delete_btn = wx.Button(self, label="Delete")
+            sizer_2.Add(self.delete_btn, 0, wx.TOP | wx.LEFT, 5)
 
-            self.block_label = wx.StaticText(
-                self, wx.ID_ANY, "N/A", wx.DefaultPosition, wx.DefaultSize, 0
-            )
+            self.block_label = wx.StaticText(self, label="N/A")
             self.block_label.Wrap(-1)
 
-            sizer_2.Add(self.block_label, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+            sizer_2.Add(self.block_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.LEFT, 5)
 
             self.expand_btn.Bind(
                 wx.EVT_BUTTON, lambda evt: parent.panel_change("collapse", evt)
@@ -109,9 +98,10 @@ class _BlockPicker(wx.Panel):
 
         def gen_block_string(self):
             base = f"{self.block_define.namespace}:{self.block_define.block_name}"
-            properties = ','.join(
+            properties = ",".join(
                 (
-                    f"{key}={value}" for key, value in self.block_define.str_properties.items()
+                    f"{key}={value}"
+                    for key, value in self.block_define.str_properties.items()
                 )
             )
             return f"{base}[{properties}]" if properties else base
@@ -134,9 +124,7 @@ class _BlockPicker(wx.Panel):
     def panel_change(self, action, evt):
         if action == "collapse":
             self.expanded.Hide()
-            self.collapsed.block_label.SetLabelText(
-                self.expanded.gen_block_string()
-            )
+            self.collapsed.block_label.SetLabelText(self.expanded.gen_block_string())
             self.collapsed.Show()
         elif action == "expand":
             self.collapsed.Hide()
@@ -154,7 +142,7 @@ class _BlockPicker(wx.Panel):
         index = [child.Window for child in sizer.GetChildren()].index(self)
 
         sizer.Detach(self)
-        sizer.Insert(index - 1 if index > 0 else 0, self, 0, wx.ALL, 5)
+        sizer.Insert(index - 1 if index > 0 else 0, self, 0, wx.TOP | wx.LEFT, 5)
         parent.Layout()
 
     def move_down(self, evt):
@@ -164,7 +152,9 @@ class _BlockPicker(wx.Panel):
         index = [child.Window for child in sizer.GetChildren()].index(self)
 
         sizer.Detach(self)
-        sizer.Insert(index + 1 if index < length else length, self, 0, wx.ALL, 5)
+        sizer.Insert(
+            index + 1 if index < length else length, self, 0, wx.TOP | wx.LEFT, 5
+        )
         parent.Layout()
 
     def delete(self, evt):
@@ -179,7 +169,7 @@ class _BlockPicker(wx.Panel):
 
 class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
     def __init__(self, parent, translation_manager):
-        super(MultiBlockDefine, self).__init__(parent, style=wx.SIMPLE_BORDER)
+        super().__init__(parent, style=wx.SIMPLE_BORDER)
         self.SetupScrolling()
 
         self.translation_manager = translation_manager
@@ -189,13 +179,13 @@ class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
         self.block_picker_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.block_picker_sizer.Add(
-            _BlockPicker(self, translation_manager), 0, wx.ALL | wx.EXPAND, 5
+            _BlockPicker(self, translation_manager), 0, wx.TOP | wx.LEFT | wx.EXPAND, 5
         )
 
         self.sizer.Add(self.block_picker_sizer)
 
         self.add_button = wx.Button(self, label="+")
-        self.sizer.Add(self.add_button, 0, wx.ALL, 5)
+        self.sizer.Add(self.add_button, 0, wx.TOP | wx.LEFT, 5)
 
         self.SetSizerAndFit(self.sizer)
         self.Layout()
@@ -203,12 +193,14 @@ class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
         self.add_button.Bind(wx.EVT_BUTTON, self.add_block_picker)
 
     def add_block_picker(self, evt):
+        self.Freeze()
         block_picker = _BlockPicker(self, self.translation_manager)
-        self.block_picker_sizer.Add(block_picker, 0, wx.ALL | wx.EXPAND, 5)
+        self.block_picker_sizer.Add(block_picker, 0, wx.TOP | wx.LEFT | wx.EXPAND, 5)
         self.block_picker_sizer.Layout()
         self.sizer.Layout()
         self.Layout()
         self.Refresh()
+        self.Thaw()
 
 
 if __name__ == "__main__":
@@ -223,7 +215,9 @@ if __name__ == "__main__":
         dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        sizer.Add(MultiBlockDefine(dialog, translation_manager), 1, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(
+            MultiBlockDefine(dialog, translation_manager), 1, wx.ALL | wx.EXPAND, 5
+        )
         dialog.Show()
         dialog.Fit()
         app.MainLoop()
