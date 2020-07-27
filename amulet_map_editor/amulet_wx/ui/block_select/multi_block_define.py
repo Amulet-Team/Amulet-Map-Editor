@@ -1,224 +1,188 @@
 import wx
 import wx.lib.scrolledpanel
+from typing import List
 
 import PyMCTranslate
 
 if __name__ == "__main__":
     app = wx.App()
 
-from amulet_map_editor.amulet_wx.ui.block_select.block import EVT_BLOCK_CHANGE
-
-if __name__ != "__main__":
-    from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
-
-
-class _BlockPicker(wx.Panel):
-    class CollapsedBlockDefine(wx.Panel):
-        def __init__(self, parent: "_BlockPicker"):
-            super().__init__(parent)
-
-            sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-            self.expand_btn = wx.Button(self, label="Expand")
-            sizer.Add(
-                self.expand_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
-            )
-
-            self.mv_up_btn = wx.Button(self, label="Move Up")
-            sizer.Add(
-                self.mv_up_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
-            )
-
-            self.mv_dwn_btn = wx.Button(self, label="Move Down")
-            sizer.Add(
-                self.mv_dwn_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
-            )
-
-            self.delete_btn = wx.Button(self, label="Delete")
-            sizer.Add(
-                self.delete_btn, 0, wx.TOP | wx.LEFT | wx.BOTTOM, 5
-            )
-
-            self.block_label = wx.StaticText(self, label="N/A")
-            self.block_label.Wrap(-1)
-
-            sizer.Add(self.block_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
-
-            self.SetSizer(sizer)
-            self.Layout()
-
-            self.expand_btn.Bind(
-                wx.EVT_BUTTON, lambda evt: parent.panel_change("expand", evt)
-            )
-            self.mv_up_btn.Bind(wx.EVT_BUTTON, parent.move_up)
-            self.mv_dwn_btn.Bind(wx.EVT_BUTTON, parent.move_down)
-            self.delete_btn.Bind(wx.EVT_BUTTON, parent.delete)
-
-    class ExpandedBlockDefine(wx.Panel):
-        def __init__(self, parent, translation_manager):
-            super().__init__(parent)
-
-            sizer_1 = wx.BoxSizer(wx.VERTICAL)
-
-            sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-
-            self.expand_btn = wx.Button(self, label="Collapse")
-            sizer_2.Add(self.expand_btn, 0, wx.TOP | wx.LEFT, 5)
-
-            self.mv_up_btn = wx.Button(self, label="Move Up")
-            sizer_2.Add(self.mv_up_btn, 0, wx.TOP | wx.LEFT, 5)
-
-            self.mv_dwn_btn = wx.Button(self, label="Move Down")
-            sizer_2.Add(self.mv_dwn_btn, 0, wx.TOP | wx.LEFT, 5)
-
-            self.delete_btn = wx.Button(self, label="Delete")
-            sizer_2.Add(self.delete_btn, 0, wx.TOP | wx.LEFT, 5)
-
-            self.block_label = wx.StaticText(self, label="N/A")
-            self.block_label.Wrap(-1)
-
-            sizer_2.Add(self.block_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.LEFT, 5)
-
-            self.expand_btn.Bind(
-                wx.EVT_BUTTON, lambda evt: parent.panel_change("collapse", evt)
-            )
-            self.mv_up_btn.Bind(wx.EVT_BUTTON, parent.move_up)
-            self.mv_dwn_btn.Bind(wx.EVT_BUTTON, parent.move_down)
-            self.delete_btn.Bind(wx.EVT_BUTTON, parent.delete)
-
-            sizer_1.Add(sizer_2)
-            self.block_define = BlockDefine(self, translation_manager, wx.HORIZONTAL)
-            sizer_1.Add(self.block_define, 0, wx.ALL, 5)
-
-            self.SetSizerAndFit(sizer_1)
-            self.Layout()
-
-            self.block_define._block_picker.Bind(EVT_BLOCK_CHANGE, self.on_block_change)
-
-        def on_block_change(self, evt):
-            self.block_label.SetLabelText(f"{evt.namespace}:{evt.block_name}")
-            evt.Skip()
-
-        def gen_block_string(self):
-            base = f"{self.block_define.namespace}:{self.block_define.block_name}"
-            properties = ",".join(
-                (
-                    f"{key}={value}"
-                    for key, value in self.block_define.str_properties.items()
-                )
-            )
-            return f"{base}[{properties}]" if properties else base
-
-    def __init__(self, parent, translation_manager):
-        super().__init__(parent, style=wx.SIMPLE_BORDER)
-
-        self.expanded = _BlockPicker.ExpandedBlockDefine(self, translation_manager)
-        self.collapsed = _BlockPicker.CollapsedBlockDefine(self)
-
-        self.expanded.Hide()
-
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.expanded)
-        self.sizer.Add(self.collapsed)
-
-        self.SetSizerAndFit(self.sizer)
-        self.Layout()
-
-    def panel_change(self, action, evt):
-        if action == "collapse":
-            self.expanded.Hide()
-            self.collapsed.block_label.SetLabelText(self.expanded.gen_block_string())
-            self.collapsed.Show()
-        elif action == "expand":
-            self.collapsed.Hide()
-            self.expanded.Show()
-        self.SetSizerAndFit(self.sizer)
-        self.Layout()
-        parent = self.GetParent()
-        while parent is not None:
-            parent.Layout()
-            parent = parent.GetParent()
-
-    def move_up(self, evt):
-        parent = self.GetParent()
-        sizer = parent.GetSizer()
-        index = [child.Window for child in sizer.GetChildren()].index(self)
-
-        sizer.Detach(self)
-        sizer.Insert(index - 1 if index > 0 else 0, self, 0, wx.TOP | wx.LEFT, 5)
-        parent.Layout()
-
-    def move_down(self, evt):
-        parent = self.GetParent()
-        sizer = parent.GetSizer()
-        length = sizer.ItemCount
-        index = [child.Window for child in sizer.GetChildren()].index(self)
-
-        sizer.Detach(self)
-        sizer.Insert(
-            index + 1 if index < length else length, self, 0, wx.TOP | wx.LEFT, 5
-        )
-        parent.Layout()
-
-    def delete(self, evt):
-        parent = self.GetParent()
-        sizer = parent.GetSizer()
-        self.Hide()
-        self.Destroy()
-        sizer.Layout()
-        parent.Layout()
-        parent.Refresh()
+from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
+from amulet_map_editor.amulet_wx.ui.block_select.properties import EVT_PROPERTIES_CHANGE
 
 
 class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
-    def __init__(self, parent, translation_manager):
-        super().__init__(parent, style=wx.SIMPLE_BORDER)
+    def __init__(self, parent, translation_manager, style=0):
+        super().__init__(parent, style=style)
         self.SetupScrolling()
 
-        self.translation_manager = translation_manager
+        self._translation_manager = translation_manager
 
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self._sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.block_picker_sizer = wx.BoxSizer(wx.VERTICAL)
+        self._add_button = wx.Button(self, label="+")
+        self._sizer.Add(self._add_button, 0, wx.TOP | wx.LEFT, 10)
+        self._sizer.AddSpacer(5)
 
-        self.block_picker_sizer.Add(
-            _BlockPicker(self, translation_manager), 0, wx.TOP | wx.LEFT | wx.EXPAND, 5
+        self._block_picker_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self._block_picker_sizer.Add(
+            _CollapsibleBlockDefine(self, translation_manager),
+            0,
+            wx.TOP | wx.LEFT | wx.EXPAND,
+            5,
         )
+        self._sizer.Add(self._block_picker_sizer)
 
-        self.sizer.Add(self.block_picker_sizer)
-
-        self.add_button = wx.Button(self, label="+")
-        self.sizer.Add(self.add_button, 0, wx.TOP | wx.LEFT, 5)
-
-        self.SetSizerAndFit(self.sizer)
+        self.SetSizerAndFit(self._sizer)
         self.Layout()
 
-        self.add_button.Bind(wx.EVT_BUTTON, self.add_block_picker)
+        self._add_button.Bind(wx.EVT_BUTTON, self._add)
+        self._fix_enabled_buttons()
 
-    def add_block_picker(self, evt):
+    def _add(self, evt):
         self.Freeze()
-        block_picker = _BlockPicker(self, self.translation_manager)
-        self.block_picker_sizer.Add(block_picker, 0, wx.TOP | wx.LEFT | wx.EXPAND, 5)
-        self.block_picker_sizer.Layout()
-        self.sizer.Layout()
+        self.collapse()
+        block_picker = _CollapsibleBlockDefine(self, self._translation_manager)
+        self._block_picker_sizer.Add(block_picker, 0, wx.TOP | wx.LEFT | wx.EXPAND, 5)
+        self._block_picker_sizer.Layout()
+        self._sizer.Layout()
         self.Layout()
+        self._fix_enabled_buttons()
         self.Refresh()
         self.Thaw()
 
+    def move_up(self, obj):
+        sizer = self._block_picker_sizer
+        index = [child.Window for child in sizer.GetChildren()].index(obj)
+
+        sizer.Detach(obj)
+        sizer.Insert(index - 1 if index > 0 else 0, obj, 0, wx.TOP | wx.LEFT, 5)
+        self._fix_enabled_buttons()
+        self.Layout()
+
+    def move_down(self, obj):
+        sizer = self._block_picker_sizer
+        length = sizer.ItemCount
+        index = [child.Window for child in sizer.GetChildren()].index(obj)
+
+        sizer.Detach(obj)
+        sizer.Insert(
+            index + 1 if index < length - 1 else length - 1, obj, 0, wx.TOP | wx.LEFT, 5
+        )
+        self._fix_enabled_buttons()
+        self.Layout()
+
+    def delete(self, obj):
+        obj.Hide()
+        obj.Destroy()
+        self._fix_enabled_buttons()
+        self.Layout()
+
+    def collapse(self):
+        for child in self._block_picker_sizer.GetChildren():
+            child.Window.collapsed = True
+
+    def _fix_enabled_buttons(self):
+        windows: List[_CollapsibleBlockDefine] = [child.Window for child in self._block_picker_sizer.GetChildren()]
+        for window in windows:
+            window.up_button.Enable()
+            window.down_button.Enable()
+            window.delete_button.Enable()
+
+        if len(windows) >= 1:
+            windows[0].up_button.Disable()
+            windows[-1].down_button.Disable()
+        if len(windows) == 1:
+            windows[0].delete_button.Disable()
+
+
+class _CollapsibleBlockDefine(wx.Panel):
+    def __init__(self, parent: MultiBlockDefine, translation_manager, collapsed=False):
+        super().__init__(parent, style=wx.BORDER_SIMPLE)
+
+        self._collapsed = collapsed
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+
+        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(header_sizer, 0, wx.ALL, 5)
+
+        self.expand_button = wx.Button(self, label="Expand")
+        header_sizer.Add(self.expand_button, 0, 5)
+
+        self.up_button = wx.Button(self, label="Move Up")
+        header_sizer.Add(self.up_button, 0, wx.LEFT, 5)
+        self.up_button.Bind(wx.EVT_BUTTON, lambda evt: parent.move_up(self))
+
+        self.down_button = wx.Button(self, label="Move Down")
+        header_sizer.Add(self.down_button, 0, wx.LEFT, 5)
+        self.down_button.Bind(wx.EVT_BUTTON, lambda evt: parent.move_down(self))
+
+        self.delete_button = wx.Button(self, label="Delete")
+        header_sizer.Add(self.delete_button, 0, wx.LEFT, 5)
+        self.delete_button.Bind(wx.EVT_BUTTON, lambda evt: parent.delete(self))
+
+        self.block_define = BlockDefine(self, translation_manager, wx.HORIZONTAL)
+        sizer.Add(self.block_define, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5)
+        self.collapsed = collapsed
+
+        self.block_label = wx.StaticText(
+            self,
+            label=self._gen_block_string(),
+            style=wx.ST_ELLIPSIZE_END | wx.ST_NO_AUTORESIZE,
+            size=(500, -1),
+        )
+        header_sizer.Add(self.block_label, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+
+        self.expand_button.Bind(wx.EVT_BUTTON, lambda evt: self._toggle_block_expand(parent))
+        self.block_define.Bind(EVT_PROPERTIES_CHANGE, self._on_properties_change)
+
+    @property
+    def collapsed(self) -> bool:
+        return self._collapsed
+
+    @collapsed.setter
+    def collapsed(self, collapsed: bool):
+        self._collapsed = collapsed
+        if self._collapsed:
+            self.expand_button.SetLabel("Expand")
+            self.block_define.Hide()
+        else:
+            self.expand_button.SetLabel("Collapse")
+            self.block_define.Show()
+        self.TopLevelParent.Layout()
+
+    def _toggle_block_expand(self, parent: MultiBlockDefine):
+        if self.collapsed:
+            parent.collapse()
+        self.collapsed = not self.collapsed
+
+    def _on_properties_change(self, evt):
+        self.block_label.SetLabel(self._gen_block_string())
+        self.TopLevelParent.Layout()
+        evt.Skip()
+
+    def _gen_block_string(self):
+        base = f"{self.block_define.namespace}:{self.block_define.block_name}"
+        properties = ",".join(
+            (
+                f"{key}={value}"
+                for key, value in self.block_define.str_properties.items()
+            )
+        )
+        return f"{base}[{properties}]" if properties else base
+
 
 if __name__ == "__main__":
-    import wx.lib.inspection
-
-    wx.lib.inspection.InspectionTool().Show()
 
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
         dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        sizer.Add(
-            MultiBlockDefine(dialog, translation_manager), 1, wx.ALL | wx.EXPAND, 5
-        )
+        sizer.Add(MultiBlockDefine(dialog, translation_manager), 1, wx.EXPAND)
         dialog.Show()
         dialog.Fit()
         app.MainLoop()
