@@ -1,6 +1,5 @@
 import wx
-import os
-from amulet_map_editor import IMG_DIR
+from amulet_map_editor import resources
 
 ADD_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "plus_green.png"))
 SUBTRACT_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "minus_red.png"))

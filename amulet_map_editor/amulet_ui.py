@@ -1,13 +1,12 @@
 import wx
 import wx.lib.inspection
 from wx.lib.agw import flatnotebook
-import os
 from typing import Dict, Union
 import webbrowser
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
-from amulet_map_editor import lang, version, log, IMG_DIR
+from amulet_map_editor import lang, version, log
 from amulet_map_editor.programs import WorldManagerUI
 from amulet_map_editor.programs import BaseWorldUI
 
