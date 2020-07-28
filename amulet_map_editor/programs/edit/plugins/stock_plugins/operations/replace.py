@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 import wx
 import numpy
 
@@ -18,7 +18,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
     ):
         SimpleScrollablePanel.__init__(self, parent)
         OperationUI.__init__(self, parent, canvas, world, options_path)
-
+        self.Freeze()
         options = self._load_options({})
 
         self._original_block = BlockDefine(
@@ -31,7 +31,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
             ),
             wildcard_properties=True
         )
-        self._sizer.Add(self._original_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self._replacement_block = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
@@ -42,7 +42,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
             )
         )
         self._sizer.Add(
-            self._replacement_block, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
+            self._replacement_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
         )
 
         self._run_button = wx.Button(self, label="Run Operation")
@@ -50,6 +50,11 @@ class Replace(SimpleScrollablePanel, OperationUI):
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
         self.Layout()
+        self.Thaw()
+
+    @property
+    def wx_add_options(self) -> Tuple[int, ...]:
+        return 1,
 
     def _get_replacement_block(self) -> Block:
         return self._replacement_block.universal_block[0]
@@ -63,7 +68,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
                     self._original_block.force_blockstate,
                     self._original_block.namespace,
                     self._original_block.block_name,
-                    self._original_block.properties,
+                    self._original_block.str_properties,
                 ),
                 "replacement_block": self._get_replacement_block(),
                 "replacement_block_options": (
@@ -72,7 +77,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
                     self._replacement_block.force_blockstate,
                     self._replacement_block.namespace,
                     self._replacement_block.block_name,
-                    self._replacement_block.properties,
+                    self._replacement_block.str_properties,
                 ),
             }
         )
@@ -98,7 +103,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
             self._original_block.force_blockstate,
             self._original_block.namespace,
             self._original_block.block_name,
-            self._original_block.properties,
+            self._original_block.str_properties,
         )
         replacement_block = self._get_replacement_block()
 

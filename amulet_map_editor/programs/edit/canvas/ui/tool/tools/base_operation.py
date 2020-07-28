@@ -43,7 +43,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         self._reload_operation.Bind(wx.EVT_BUTTON, self._reload_operation_loader)
 
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.Add(self._operation_sizer)
+        self.Add(self._operation_sizer, 1, wx.EXPAND)
 
         # self._operation_change()
 
@@ -79,7 +79,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self._active_operation = operation(
                 self.canvas, self.canvas, self.canvas.world
             )
-            self._operation_sizer.Add(self._active_operation, 1, wx.EXPAND)
+            self._operation_sizer.Add(self._active_operation, *self._active_operation.wx_add_options)
             self.Layout()
 
     def _reload_operation_loader(self, evt):

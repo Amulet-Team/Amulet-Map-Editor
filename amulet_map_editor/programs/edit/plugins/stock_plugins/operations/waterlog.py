@@ -1,9 +1,10 @@
 import numpy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 import wx
 
-from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine
+from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
 from amulet_map_editor.programs.edit.plugins import OperationUI
+from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -27,14 +28,32 @@ class Waterlog(wx.Panel, OperationUI):
             world.world_wrapper.translation_manager,
             wx.VERTICAL,
             *(options.get("fill_block_options", []) or [world.world_wrapper.platform]),
+            show_pick_block=True
         )
-        self._sizer.Add(self._block_define, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._block_click_registered = False
+        self._block_define.Bind(EVT_PICK_BLOCK, self._on_pick_block_button)
+        self._sizer.Add(self._block_define, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
         self.Layout()
+
+    @property
+    def wx_add_options(self) -> Tuple[int, ...]:
+        return 1,
+
+    def _on_pick_block_button(self, evt):
+        """Set up listening for the block click"""
+        if not self._block_click_registered:
+            self.canvas.Bind(EVT_BOX_CLICK, self._on_pick_block)
+        evt.Skip()
+
+    def _on_pick_block(self, evt):
+        self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
+        x, y, z = self.canvas.cursor_location
+        self._block_define.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
 
     def _get_fill_block(self):
         return self._block_define.universal_block[0]

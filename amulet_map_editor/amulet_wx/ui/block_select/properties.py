@@ -20,16 +20,16 @@ from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, scale
 
 class PropertySelect(wx.Panel):
     def __init__(
-        self,
-        parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        platform: str,
-        version_number: Tuple[int, int, int],
-        force_blockstate: bool,
-        namespace: str,
-        block_name: str,
-        properties: Dict[str, SNBTType] = None,
-        wildcard_mode=False,  # TODO
+            self,
+            parent: wx.Window,
+            translation_manager: PyMCTranslate.TranslationManager,
+            platform: str,
+            version_number: Tuple[int, int, int],
+            force_blockstate: bool,
+            namespace: str,
+            block_name: str,
+            properties: Dict[str, SNBTType] = None,
+            wildcard_mode=False,
     ):
         super().__init__(parent, style=wx.BORDER_SIMPLE)
         self._parent = weakref.ref(parent)
@@ -45,7 +45,7 @@ class PropertySelect(wx.Panel):
         self._block_name: Optional[str] = None
 
         self._manual_enabled = False
-        self._simple = SimplePropertySelect(self, translation_manager)
+        self._simple = SimplePropertySelect(self, translation_manager, wildcard_mode)
         sizer.Add(self._simple, 1, wx.EXPAND)
         self._manual = ManualPropertySelect(self, translation_manager)
         sizer.Add(self._manual, 1, wx.EXPAND)
@@ -55,7 +55,7 @@ class PropertySelect(wx.Panel):
         self._set_version_block(
             (platform, version_number, force_blockstate, namespace, block_name)
         )
-        self._set_properties(properties)
+        self.set_properties(properties)
 
     @property
     def parent(self) -> wx.Window:
@@ -77,19 +77,19 @@ class PropertySelect(wx.Panel):
 
     @version_block.setter
     def version_block(
-        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
+            self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
     ):
         self._set_version_block(version_block)
         self.str_properties = None
 
     def _set_version_block(
-        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
+            self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
     ):
         version = version_block[:3]
         assert (
-            version[0] in self._translation_manager.platforms()
-            and version[1] in self._translation_manager.version_numbers(version[0])
-            and isinstance(version[2], bool)
+                version[0] in self._translation_manager.platforms()
+                and version[1] in self._translation_manager.version_numbers(version[0])
+                and isinstance(version[2], bool)
         ), f"{version} is not a valid version"
         self._platform, self._version_number, self._force_blockstate = version
         block = version_block[3:5]
@@ -108,7 +108,7 @@ class PropertySelect(wx.Panel):
 
     @str_properties.setter
     def str_properties(self, properties: Dict[str, WildcardSNBTType]):
-        self._set_properties(properties)
+        self.set_properties(properties)
         wx.PostEvent(
             self, PropertiesChangeEvent(self.GetId(), properties=self.str_properties)
         )
@@ -129,14 +129,14 @@ class PropertySelect(wx.Panel):
             key: val.to_snbt() for key, val in (properties or {}).items()
         }
 
-    def _set_properties(self, properties: Dict[str, SNBTType]):
+    def set_properties(self, properties: Dict[str, SNBTType]):
         properties = properties or {}
         self.Freeze()
         if self._manual_enabled:
             self._manual.properties = properties
         else:
             self._simple.properties = properties
-        self.Layout()
+        self.TopLevelParent.Layout()
         self.Thaw()
 
     def _set_ui(self):
@@ -164,7 +164,10 @@ class PropertySelect(wx.Panel):
 
 class SimplePropertySelect(wx.Panel):
     def __init__(
-        self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
+            self,
+            parent: wx.Window,
+            translation_manager: PyMCTranslate.TranslationManager,
+            wildcard_mode,
     ):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -184,6 +187,7 @@ class SimplePropertySelect(wx.Panel):
 
         self._properties: Dict[str, wx.Choice] = {}
         self._specification: dict = {}
+        self._wildcard_mode = wildcard_mode
 
     def set_specification(self, specification: dict):
         self._specification = specification
@@ -208,6 +212,8 @@ class SimplePropertySelect(wx.Panel):
         for name, choices in spec_properties.items():
             label = wx.StaticText(self, label=name)
             self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
+            if self._wildcard_mode:
+                choices = ["*"] + choices
             choice = wx.Choice(self, choices=choices)
             self._property_sizer.Add(choice, 0, wx.EXPAND)
             choice.Bind(
@@ -218,7 +224,7 @@ class SimplePropertySelect(wx.Panel):
                 ),
             )
             val = spec_defaults[name]
-            if name in properties:
+            if name in properties and val != "*":
                 try:
                     snbt = amulet_nbt.from_snbt(properties[name]).to_snbt()
                 except:
@@ -226,7 +232,8 @@ class SimplePropertySelect(wx.Panel):
                 else:
                     if snbt in choices:
                         val = snbt
-            choice.SetSelection(choices.index(val))
+            if val in choices:
+                choice.SetSelection(choices.index(val))
             self._properties[name] = choice
         self.Thaw()
         self.Fit()
@@ -235,7 +242,7 @@ class SimplePropertySelect(wx.Panel):
 
 class ManualPropertySelect(wx.Panel):
     def __init__(
-        self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
+            self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
     ):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -293,7 +300,7 @@ class ManualPropertySelect(wx.Panel):
             value_entry
         )
         self.Fit()
-        self.Layout()
+        self.TopLevelParent.Layout()
         self.Thaw()
 
     def _on_value_change(self, evt, snbt_text: wx.StaticText):
@@ -321,7 +328,7 @@ class ManualPropertySelect(wx.Panel):
         self._property_sizer.Detach(sizer)
         sizer.Clear(True)
         del self._properties[key]
-        self.Layout()
+        self.TopLevelParent.Layout()
         self.Thaw()
         self._post_property_change()
 
@@ -347,7 +354,6 @@ class ManualPropertySelect(wx.Panel):
 
 
 if __name__ == "__main__":
-
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
         app = wx.App()
@@ -371,5 +377,6 @@ if __name__ == "__main__":
         dialog.Show()
         dialog.Fit()
         app.MainLoop()
+
 
     main()

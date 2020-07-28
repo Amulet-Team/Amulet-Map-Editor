@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 import wx
 
 from amulet.operations.fill import fill
@@ -32,13 +32,17 @@ class Fill(wx.Panel, OperationUI):
         )
         self._block_click_registered = False
         self._block_define.Bind(EVT_PICK_BLOCK, self._on_pick_block_button)
-        self._sizer.Add(self._block_define, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._sizer.Add(self._block_define, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
         self.Layout()
+
+    @property
+    def wx_add_options(self) -> Tuple[int, ...]:
+        return 1,
 
     def _on_pick_block_button(self, evt):
         """Set up listening for the block click"""
