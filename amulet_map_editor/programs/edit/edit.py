@@ -8,7 +8,6 @@ from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs import BaseWorldProgram, MenuData
 from amulet_map_editor.amulet_wx.util.key_config import KeyConfigDialog
 from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
-from amulet_map_editor.programs.edit.canvas.events import EVT_EDIT_CLOSE
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 from amulet_map_editor.programs.edit.plugins.api import loader
@@ -28,25 +27,49 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         self._world = world
         self._canvas: Optional[EditCanvas] = None
         self._close_self_callback = close_self_callback
-        self._temp = wx.StaticText(self, label="Please wait while the renderer loads")
-        self._temp.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        self._sizer.Add(self._temp)
+
+        self._sizer.AddStretchSpacer(1)
+        self._temp_msg = wx.StaticText(
+            self, label="Please wait while the renderer loads"
+        )
+        self._temp_msg.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        self._sizer.Add(self._temp_msg, 0, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        self._temp_loading_bar = wx.Gauge(self, range=10000)
+        self._sizer.Add(self._temp_loading_bar, 0, flag=wx.EXPAND)
+        self._sizer.AddStretchSpacer(1)
 
     def enable(self):
         if self._canvas is None:
             self.Update()
 
-            self._canvas = EditCanvas(self, self._world)
+            self._canvas = EditCanvas(
+                self, self._world, self._close_self_callback, auto_setup=False
+            )
+            for arg in self._canvas.setup():
+                if isinstance(arg, (int, float)):
+                    self._temp_loading_bar.SetValue(min(arg, 1) * 10000)
+                elif (
+                    isinstance(arg, tuple)
+                    and isinstance(arg[0], (int, float))
+                    and isinstance(arg[1], str)
+                ):
+                    self._temp_loading_bar.SetValue(min(arg[0], 1) * 10000)
+                    self._temp_msg.SetLabel(arg[1])
+                self.Layout()
+                self.Update()
 
             edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
             self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
-            self._canvas.render_distance = edit_config.get("options", {}).get("render_distance", 5)
-            self._canvas.camera_rotate_speed = edit_config.get("options", {}).get("camera_sensitivity", 2.0)
+            self._canvas.render_distance = edit_config.get("options", {}).get(
+                "render_distance", 5
+            )
+            self._canvas.camera_rotate_speed = edit_config.get("options", {}).get(
+                "camera_sensitivity", 2.0
+            )
 
+            self._sizer.Clear(True)
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
             self.Bind(wx.EVT_SIZE, self._on_resize)
-            self._canvas.Bind(EVT_EDIT_CLOSE, self._on_close)
-            self._temp.Destroy()
             self._canvas.Show()
             self._canvas.draw()
 
@@ -59,9 +82,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
     def disable(self):
         if self._canvas is not None:
             self._canvas.disable()
-
-    def _on_close(self, evt: EVT_EDIT_CLOSE):
-        self._close_self_callback()
 
     def close(self):
         """Fully close the UI. Called when destroying the UI."""
@@ -183,25 +203,56 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             def set_fov(evt):
                 self._canvas.fov = fov_ui.GetValue()
-            fov_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_fov)
-            sizer.Add(wx.StaticText(dialog, label="Field of View"), flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
-            sizer.Add(fov_ui, flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
 
-            render_distance_ui = wx.SpinCtrl(dialog, min=0, max=50, initial=render_distance)
+            fov_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_fov)
+            sizer.Add(
+                wx.StaticText(dialog, label="Field of View"),
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                fov_ui,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+
+            render_distance_ui = wx.SpinCtrl(
+                dialog, min=0, max=50, initial=render_distance
+            )
 
             def set_render_distance(evt):
                 self._canvas.render_distance = render_distance_ui.GetValue()
-            render_distance_ui.Bind(wx.EVT_SPINCTRL, set_render_distance)
-            sizer.Add(wx.StaticText(dialog, label="Render Distance"), flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
-            sizer.Add(render_distance_ui, flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
 
-            camera_sensitivity_ui = wx.SpinCtrlDouble(dialog, min=0, max=10, initial=camera_sensitivity)
+            render_distance_ui.Bind(wx.EVT_SPINCTRL, set_render_distance)
+            sizer.Add(
+                wx.StaticText(dialog, label="Render Distance"),
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                render_distance_ui,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+
+            camera_sensitivity_ui = wx.SpinCtrlDouble(
+                dialog, min=0, max=10, initial=camera_sensitivity
+            )
 
             def set_camera_sensitivity(evt):
                 self._canvas.camera_rotate_speed = camera_sensitivity_ui.GetValue()
+
             camera_sensitivity_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_camera_sensitivity)
-            sizer.Add(wx.StaticText(dialog, label="Camera Sensitivity"), flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
-            sizer.Add(camera_sensitivity_ui, flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND, border=5)
+            sizer.Add(
+                wx.StaticText(dialog, label="Camera Sensitivity"),
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                camera_sensitivity_ui,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
 
             dialog.Fit()
 
@@ -210,8 +261,12 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                 edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
                 edit_config.setdefault("options", {})
                 edit_config["options"]["fov"] = fov_ui.GetValue()
-                edit_config["options"]["render_distance"] = render_distance_ui.GetValue()
-                edit_config["options"]["camera_sensitivity"] = camera_sensitivity_ui.GetValue()
+                edit_config["options"][
+                    "render_distance"
+                ] = render_distance_ui.GetValue()
+                edit_config["options"][
+                    "camera_sensitivity"
+                ] = camera_sensitivity_ui.GetValue()
                 CONFIG.put(EDIT_CONFIG_ID, edit_config)
             elif response == wx.ID_CANCEL:
                 self._canvas.fov = fov

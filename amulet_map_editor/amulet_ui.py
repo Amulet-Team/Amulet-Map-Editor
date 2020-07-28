@@ -1,7 +1,6 @@
 import wx
 import wx.lib.inspection
 from wx.lib.agw import flatnotebook
-import os
 from typing import Dict, Union
 import webbrowser
 
@@ -13,27 +12,21 @@ from amulet_map_editor.programs import BaseWorldUI
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
-    from amulet_map_editor import update_check
-    CHECK_FOR_UPDATE = True
+    from amulet_map_editor.util import update_check
 except ImportError:
-    CHECK_FOR_UPDATE = False
+    update_check = None
     log.warning("Could not import update checker")
-    pass
 
 NOTEBOOK_MENU_STYLE = (
     flatnotebook.FNB_NO_X_BUTTON
     | flatnotebook.FNB_HIDE_ON_SINGLE_TAB
     | flatnotebook.FNB_NAV_BUTTONS_WHEN_NEEDED
 )
-
-from amulet_map_editor import resources
-
-NOTEBOOK_MENU_STYLE = flatnotebook.FNB_NO_X_BUTTON | flatnotebook.FNB_HIDE_ON_SINGLE_TAB | flatnotebook.FNB_NAV_BUTTONS_WHEN_NEEDED
 NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
 
 CLOSEABLE_PAGE_TYPE = Union[WorldManagerUI]
 
-resources_img = resources.img
+wx.Image.SetDefaultLoadFlags(0)
 
 
 class AmuletMainWindow(wx.Frame):
@@ -59,7 +52,12 @@ class AmuletMainWindow(wx.Frame):
             wx.LANGUAGE_ENGLISH
         )  # TODO: work out proper localisation
         icon = wx.Icon()
-        icon.CopyFromBitmap(wx.Bitmap(resources_img['icon64.png'], wx.BITMAP_TYPE_ANY))
+        icon.CopyFromBitmap(
+            wx.Bitmap(
+                os.path.join(IMG_DIR, "logo", "icon128.png"),
+                wx.BITMAP_TYPE_ANY,
+            )
+        )
         self.SetIcon(icon)
 
         self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}
@@ -81,8 +79,11 @@ class AmuletMainWindow(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self._on_close_app)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
-        if CHECK_FOR_UPDATE:
-            self.Bind(update_check.EVT_UPDATE_CHECK, lambda evt: update_check.show_update_window(self, version, evt))
+        if update_check is not None:
+            self.Bind(
+                update_check.EVT_UPDATE_CHECK,
+                lambda evt: update_check.show_update_window(self, version, evt),
+            )
             update_check.check_for_update(version, self)
 
         self.Show()
@@ -184,7 +185,7 @@ class AmuletMainWindow(wx.Frame):
             self.world_tab_holder.DeletePage(self.world_tab_holder.GetPageIndex(world))
 
     def _on_page_close(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
-        page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetCurrentPage()
+        page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetPage(evt.GetSelection())
         if page is not self._main_menu:
             if page.is_closeable():
                 path = page.path
@@ -196,18 +197,12 @@ class AmuletMainWindow(wx.Frame):
                 evt.Veto()
 
     def _on_close_app(self, evt):
-        close = True
         for path, page in list(self._open_worlds.items()):
-            page: CLOSEABLE_PAGE_TYPE
-            if page.is_closeable():
-                self.close_world(path)
-            else:
-                log.info(f"{page.world_name} cannot be closed.")
-                close = False
-        if close:
-            evt.Skip()
-        else:
+            self.close_world(path)
+        if self.world_tab_holder.GetPageCount() > 1:
             wx.MessageBox("A world is still being used. Please close it first")
+        else:
+            evt.Skip()
 
 
 class AmuletMainMenu(wx.Panel, BaseWorldUI):
@@ -219,10 +214,7 @@ class AmuletMainMenu(wx.Panel, BaseWorldUI):
         self._open_world_callback = open_world
         name_sizer = wx.BoxSizer()
         sizer.Add(name_sizer, 0, wx.CENTER)
-        img = wx.Image(
-            resources_img['icon128.png'],
-            wx.BITMAP_TYPE_ANY
-        )
+        img = wx.Image(os.path.join(IMG_DIR, "logo", "icon128.png"), wx.BITMAP_TYPE_ANY)
 
         icon = wx.StaticBitmap(
             self,

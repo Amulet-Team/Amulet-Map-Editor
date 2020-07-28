@@ -58,12 +58,15 @@ class ImportMCStructure(SimpleOperationPanel):
 
             global_palette = BlockManager()
             chunks = {}
-            for (cx, cz) in wrapper.all_chunk_coords():
+            chunk_count = len(list(wrapper.all_chunk_coords()))
+            yield 0, f"Importing {os.path.basename(path)}"
+            for chunk_index, (cx, cz) in enumerate(wrapper.all_chunk_coords()):
                 try:
                     chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz)
                     chunk.block_palette = global_palette
                 except ChunkLoadError:
                     pass
+                yield (chunk_index + 1) / chunk_count
 
             wrapper.close()
             self.canvas.paste(Structure(chunks, global_palette, selection))

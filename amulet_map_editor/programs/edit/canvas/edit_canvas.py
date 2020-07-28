@@ -1,10 +1,10 @@
 import wx
-from typing import TYPE_CHECKING, Callable, Any
+from typing import TYPE_CHECKING, Callable, Any, Generator
 from types import GeneratorType
 import time
 import traceback
 
-from amulet.api.data_types import OperationReturnType
+from amulet.api.data_types import OperationReturnType, OperationYieldType
 from amulet.api.structure import Structure, structure_cache
 
 from amulet_map_editor import CONFIG, log
@@ -39,6 +39,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     EditCloseEvent,
     PasteEvent,
     ToolChangeEvent,
+    EVT_EDIT_CLOSE,
 )
 from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import (
     ControllableEditCanvas,
@@ -62,6 +63,7 @@ def show_loading_dialog(
         | wx.PD_REMAINING_TIME
         | wx.PD_AUTO_HIDE,
     )
+    dialog.Fit()
     t = time.time()
     try:
         obj = run()
@@ -89,8 +91,11 @@ def show_loading_dialog(
 class EditCanvas(ControllableEditCanvas):
     """Adds embedded UI elements to the canvas."""
 
-    def __init__(self, parent: wx.Window, world: "World"):
-        super().__init__(parent, world)
+    def __init__(
+        self, parent: wx.Window, world: "World", close_callback: Callable, **kwargs
+    ):
+        super().__init__(parent, world, **kwargs)
+        self._close_callback = close_callback
         config = CONFIG.get(EDIT_CONFIG_ID, {})
         user_keybinds = config.get("user_keybinds", {})
         group = config.get("keybind_group", DefaultKeybindGroupId)
@@ -102,6 +107,8 @@ class EditCanvas(ControllableEditCanvas):
             keybinds = DefaultKeys
         self.set_key_binds(keybinds)
 
+    def setup(self) -> Generator[OperationYieldType, None, None]:
+        yield from super().setup()
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
@@ -113,12 +120,19 @@ class EditCanvas(ControllableEditCanvas):
 
         self._tool_sizer = Tool(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
+        self._bind_events()
 
-        self.bind_events()
-
-    def bind_events(self):
+    def _bind_events(self):
         self._file_panel.bind_events()
         self._tool_sizer.bind_events()
+        self.Bind(EVT_EDIT_CLOSE, self._on_close)
+
+    def _on_close(self, evt):
+        self._close_callback()
+
+    def reset_bound_events(self):
+        super().reset_bound_events()
+        self._bind_events()
 
     @property
     def tools(self):
@@ -127,14 +141,14 @@ class EditCanvas(ControllableEditCanvas):
     def run_operation(
         self,
         operation: Callable[[], OperationReturnType],
-        title="",
-        msg="",
+        title="Amulet",
+        msg="Running Operation",
         throw_exceptions=False,
     ) -> Any:
         def operation_wrapper():
             yield 0, "Disabling Threads"
             self._disable_threads()
-            yield 0, msg or "Running Operation"
+            yield 0, msg
             op = operation()
             if isinstance(op, GeneratorType):
                 yield from op

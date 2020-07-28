@@ -6,9 +6,18 @@ import numpy
 import weakref
 
 import minecraft_model_reader
+from minecraft_model_reader.java.download_resources import (
+    get_java_vanilla_latest_iter,
+    get_java_vanilla_fix,
+)
 from amulet.api.chunk import Chunk
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import PointCoordinatesNDArray, Dimension, BlockCoordinates
+from amulet.api.data_types import (
+    PointCoordinatesNDArray,
+    Dimension,
+    BlockCoordinates,
+    OperationYieldType,
+)
 from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
@@ -40,12 +49,12 @@ class BaseEditCanvas(BaseCanvas):
 
     background_colour = (0.5, 0.66, 1.0)
 
-    def __init__(self, parent: wx.Window, world: "World"):
+    def __init__(self, parent: wx.Window, world: "World", auto_setup=True):
         super().__init__(parent)
         glClearColor(*self.background_colour, 1.0)
         self.Hide()
 
-        self._bound_events: Set[wx.PyEventBinder] = set()
+        self._bound_events: List[Tuple[wx.PyEventBinder, Any, Any]] = []
 
         self._world = weakref.ref(world)
         self._mouse_delta_x = 0
@@ -63,71 +72,100 @@ class BaseEditCanvas(BaseCanvas):
         ] = None
         self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
 
-        self._load_resource_pack(
-            minecraft_model_reader.JavaRP(
-                os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack")
-            ),
-            minecraft_model_reader.java_vanilla_latest,
-            *[
-                minecraft_model_reader.JavaRP(rp)
-                for rp in os.listdir("resource_packs")
-                if os.path.isdir(rp)
-            ],
-            minecraft_model_reader.java_vanilla_fix
-        )
+        self._resource_pack_translator = None
 
-        self._resource_pack_translator = world.world_wrapper.translation_manager.get_version(
-            "java", (999, 0, 0)
-        )
-
-        self._render_world = RenderWorld(
-            self.context_identifier,
-            world,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds,
-            self._resource_pack_translator,
-        )
+        self._render_world = None
 
         self._camera_location: CameraLocationType = (0.0, 100.0, 0.0)
         self._camera_rotation: CameraRotationType = (45.0, 45.0)
         self._camera_move_speed = 2.0
         self._camera_rotate_speed = 2.0
+        self._selection_location: BlockCoordinates = (0, 0, 0)
         self._select_distance = 10
         self._select_distance2 = 10
 
-        self._selection_moved = (
-            True  # has the selection point moved and does the box need rebuilding
-        )
-        self._selection_location: BlockCoordinates = (0, 0, 0)
+        # has the selection point moved and does the box need rebuilding
+        self._selection_moved = True
 
         self._draw_selection = True
-        self._selection_group = EditProgramRenderSelectionGroup(
-            self, self.context_identifier, self._texture_bounds, self._gl_texture_atlas
-        )
+        self._selection_group: Optional[EditProgramRenderSelectionGroup] = None
 
         self._draw_structure = False
-        self._structure: StructureGroup = StructureGroup(
+        self._structure: Optional[StructureGroup] = None
+
+        self._draw_timer = wx.Timer(self)
+        self._gc_timer = wx.Timer(self)
+        self._rebuild_timer = wx.Timer(self)
+
+        if auto_setup:
+            for _ in self.setup():
+                pass
+
+    def setup(self) -> Generator[OperationYieldType, None, None]:
+        """Set up objects that take a while to set up."""
+        yield 0.1, "Downloading vanilla resource pack"
+        gen = get_java_vanilla_latest_iter()
+        try:
+            while True:
+                yield next(gen) * 0.4 + 0.1
+        except StopIteration as e:
+            latest_pack = e.value
+        yield 0.5, "Loading resource packs"
+        fix_pack = get_java_vanilla_fix()
+        amulet_pack = minecraft_model_reader.JavaRP(
+            os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack")
+        )
+        user_packs = [
+            minecraft_model_reader.JavaRP(rp)
+            for rp in os.listdir("resource_packs")
+            if os.path.isdir(rp)
+        ]
+
+        self._resource_pack = minecraft_model_reader.JavaRPHandler(
+            (amulet_pack, latest_pack, *user_packs, fix_pack)
+        )
+
+        yield 0.7, "Creating texture atlas"
+        self._create_atlas()
+
+        yield 0.9, "Setting up renderer"
+
+        self._resource_pack_translator = self.world.translation_manager.get_version(
+            "java", (999, 0, 0)
+        )
+
+        self._render_world = RenderWorld(
             self.context_identifier,
-            world.palette,
+            self.world,
             self._resource_pack,
             self._gl_texture_atlas,
             self._texture_bounds,
             self._resource_pack_translator,
         )
-        self._structure_locations: List[numpy.ndarray] = []  # TODO rewrite this
 
-        self._draw_timer = wx.Timer(self)
-        self._gc_timer = wx.Timer(self)
-        self._rebuild_timer = wx.Timer(self)
+        self._selection_group = EditProgramRenderSelectionGroup(
+            self, self.context_identifier, self._texture_bounds, self._gl_texture_atlas
+        )
+
+        self._structure: StructureGroup = StructureGroup(
+            self.context_identifier,
+            self.world.palette,
+            self._resource_pack,
+            self._gl_texture_atlas,
+            self._texture_bounds,
+            self._resource_pack_translator,
+        )
+
         self._bind_base_events()
+        yield 1.0
 
     def reset_bound_events(self):
         """Unbind all events and re-bind the default events.
         We are allowing users to bind custom events so we should have a way to reset what is bound."""
-        for event in self._bound_events:
-            self.Unbind(event)
-            self._bind_base_events()
+        for event, handler, source in self._bound_events:
+            if not self.Unbind(event, source, handler=handler):
+                log.error(f"Failed to unbind {event}, {handler}")
+        self._bind_base_events()
 
     def _bind_base_events(self):
         self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
@@ -136,8 +174,15 @@ class BaseEditCanvas(BaseCanvas):
 
     def Bind(self, event, handler, source=None, id=wx.ID_ANY, id2=wx.ID_ANY):
         """Bind an event to the canvas."""
-        self._bound_events.add(event)
+        self._bound_events.append((event, handler, source))
         super().Bind(event, handler, source, id, id2)
+
+    def Unbind(self, event, source=None, id=wx.ID_ANY, id2=wx.ID_ANY, handler=None) -> bool:
+        """Unbind an event from the canvas."""
+        key = (event, handler, source)
+        if key in self._bound_events:
+            self._bound_events.remove(key)
+        return super().Unbind(event, source=source, id=id, id2=id2, handler=handler)
 
     @property
     def world(self) -> "World":

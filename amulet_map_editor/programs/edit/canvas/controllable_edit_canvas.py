@@ -1,7 +1,9 @@
-from typing import TYPE_CHECKING, Set
+from typing import TYPE_CHECKING, Set, Generator
 import wx
 import numpy
 import time
+
+from amulet.api.data_types import OperationYieldType
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
@@ -20,8 +22,8 @@ if TYPE_CHECKING:
 class ControllableEditCanvas(BaseEditCanvas):
     """Adds the user interaction logic to BaseEditCanvas"""
 
-    def __init__(self, world_panel: wx.Window, world: "World"):
-        super().__init__(world_panel, world)
+    def __init__(self, world_panel: wx.Window, world: "World", **kwargs):
+        super().__init__(world_panel, world, **kwargs)
         self._last_mouse_x = 0
         self._last_mouse_y = 0
         self._mouse_moved = False  # has the mouse position changed since the last frame
@@ -33,7 +35,6 @@ class ControllableEditCanvas(BaseEditCanvas):
 
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
-        self._bind_controllable_events()
 
     def reset_bound_events(self):
         """Unbind all events and re-bind the default events.
@@ -59,6 +60,10 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(EVT_EDIT_ESCAPE, self._selection_group.escape_event)
 
         self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
+
+    def setup(self) -> Generator[OperationYieldType, None, None]:
+        yield from super().setup()
+        self._bind_controllable_events()
 
     def enable(self):
         super().enable()
