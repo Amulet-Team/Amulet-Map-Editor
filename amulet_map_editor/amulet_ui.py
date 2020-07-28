@@ -55,7 +55,7 @@ class AmuletMainWindow(wx.Frame):
         icon = wx.Icon()
         icon.CopyFromBitmap(
             wx.Bitmap(
-                os.path.join(os.path.dirname(__file__), "img", "icon64.png"),
+                os.path.join(IMG_DIR, "logo", "icon128.png"),
                 wx.BITMAP_TYPE_ANY,
             )
         )
@@ -215,7 +215,7 @@ class AmuletMainMenu(wx.Panel, BaseWorldUI):
         self._open_world_callback = open_world
         name_sizer = wx.BoxSizer()
         sizer.Add(name_sizer, 0, wx.CENTER)
-        img = wx.Image(os.path.join(IMG_DIR, "icon128.png"), wx.BITMAP_TYPE_ANY)
+        img = wx.Image(os.path.join(IMG_DIR, "logo", "icon128.png"), wx.BITMAP_TYPE_ANY)
 
         icon = wx.StaticBitmap(
             self,
