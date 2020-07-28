@@ -1,10 +1,13 @@
 import wx
 from wx.lib import newevent
 from typing import Tuple, List, Optional
-import os
 
 import PyMCTranslate
-from amulet_map_editor import IMG_DIR
+
+if __name__ == '__main__':
+    app = wx.App()
+
+from amulet_map_editor.amulet_wx.util.icon import COLOUR_PICKER, scale_bitmap
 
 (
     NamespaceChangeEvent,
@@ -82,7 +85,7 @@ class BlockSelect(wx.Panel):
         self._block_search.Bind(wx.EVT_TEXT, self._on_search_change)
         if show_pick_block:
             pick_block_button = wx.BitmapButton(
-                self, bitmap=wx.Bitmap(os.path.join(IMG_DIR, "icon", "pick.png"))
+                self, bitmap=scale_bitmap(COLOUR_PICKER, 22, 22)
             )
             search_sizer.Add(
                 pick_block_button, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5
@@ -223,14 +226,14 @@ if __name__ == "__main__":
 
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
-        app = wx.App()
-        for cls in (BlockSelect,):
-            dialog = wx.Dialog(None)
-            sizer = wx.BoxSizer()
-            dialog.SetSizer(sizer)
-            sizer.Add(cls(dialog, translation_manager, "java", (1, 16, 0)))
-            dialog.Show()
-            dialog.Fit()
+        dialog = wx.Dialog(None)
+        sizer = wx.BoxSizer()
+        dialog.SetSizer(sizer)
+        sizer.Add(
+            BlockSelect(dialog, translation_manager, "java", (1, 16, 0), False)
+        )
+        dialog.Show()
+        dialog.Fit()
         app.MainLoop()
 
     main()

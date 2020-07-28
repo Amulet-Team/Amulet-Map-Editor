@@ -10,7 +10,7 @@ from amulet.api.block import PropertyDataTypes, PropertyType
 
 WildcardSNBTType = Union[SNBTType, str]
 
-from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON
+from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, scale_bitmap
 
 (
     PropertiesChangeEvent,
@@ -241,7 +241,7 @@ class ManualPropertySelect(wx.Panel):
         self._translation_manager = translation_manager
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        add_button = wx.BitmapButton(self, bitmap=ADD_ICON, size=(30, 30))
+        add_button = wx.BitmapButton(self, bitmap=scale_bitmap(ADD_ICON, 30, 30), size=(30, 30))
         header_sizer.Add(add_button)
         sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
@@ -271,7 +271,7 @@ class ManualPropertySelect(wx.Panel):
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._property_index += 1
-        subtract_button = wx.BitmapButton(self, bitmap=SUBTRACT_ICON, size=(30, 30))
+        subtract_button = wx.BitmapButton(self, bitmap=scale_bitmap(SUBTRACT_ICON, 30, 30), size=(30, 30))
         sizer.Add(subtract_button, 0, wx.ALIGN_CENTER_VERTICAL)
         index = self._property_index
         subtract_button.Bind(wx.EVT_BUTTON, lambda evt: self._on_remove_property(sizer, index))
