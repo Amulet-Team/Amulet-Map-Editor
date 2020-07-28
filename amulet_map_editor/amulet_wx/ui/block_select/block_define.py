@@ -41,6 +41,7 @@ class BlockDefine(wx.Panel):
         nbt: amulet_nbt.TAG_Compound = None,
         show_nbt: bool = True,
         wildcard_properties=False,
+        show_pick_block: bool = False,
         **kwargs,
     ):
         super().__init__(parent)
@@ -74,7 +75,7 @@ class BlockDefine(wx.Panel):
             self._version_picker.force_blockstate,
             namespace,
             block_name,
-            **kwargs,
+            show_pick_block,
         )
         left_sizer.Add(self._block_picker, 1, wx.EXPAND | wx.TOP, 5)
         self._version_picker.Bind(EVT_VERSION_CHANGE, self._on_version_change)
@@ -105,14 +106,17 @@ class BlockDefine(wx.Panel):
         evt.Skip()
 
     def _on_block_change(self, evt):
+        self._update_properties()
+        evt.Skip()
+
+    def _update_properties(self):
         self._property_picker.version_block = (
             self._version_picker.platform,
             self._version_picker.version_number,
             self._version_picker.force_blockstate,
-            evt.namespace,
-            evt.block_name,
+            self._block_picker.namespace,
+            self._block_picker.block_name,
         )
-        evt.Skip()
 
     @property
     def platform(self) -> PlatformType:
@@ -182,15 +186,37 @@ class BlockDefine(wx.Panel):
     def block(self) -> Block:
         return Block(self.namespace, self.block_name, self.properties)
 
+    @block.setter
+    def block(self, block: Block):
+        self._block_picker.set_namespace(block.namespace)
+        self._block_picker.set_block_name(block.base_name)
+        self._update_properties()
+        self.properties = block.properties
+
     @property
     def block_entity(self) -> Optional[BlockEntity]:
-        return None
+        return None  # TODO
+
+    @block_entity.setter
+    def block_entity(self, block_entity: Optional[BlockEntity]):
+        if block_entity is not None:
+            pass  # TODO
 
     @property
     def universal_block(self) -> Tuple[Block, Optional[BlockEntity]]:
         return self._translation_manager.get_version(
             self.platform, self.version_number
         ).block.to_universal(self.block, self.block_entity, self.force_blockstate)[:2]
+
+    @universal_block.setter
+    def universal_block(self, universal_block: Tuple[Block, Optional[BlockEntity]]):
+        block, block_entity = universal_block
+        v_block, v_block_entity = self._translation_manager.get_version(
+            self.platform, self.version_number
+        ).block.from_universal(block, block_entity, self.force_blockstate)[:2]
+        if isinstance(v_block, Block):
+            self.block = v_block
+            self.block_entity = v_block_entity
 
 
 if __name__ == "__main__":

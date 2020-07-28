@@ -131,11 +131,13 @@ class PropertySelect(wx.Panel):
 
     def _set_properties(self, properties: Dict[str, SNBTType]):
         properties = properties or {}
+        self.Freeze()
         if self._manual_enabled:
             self._manual.properties = properties
         else:
             self._simple.properties = properties
         self.Layout()
+        self.Thaw()
 
     def _set_ui(self):
         self.Freeze()

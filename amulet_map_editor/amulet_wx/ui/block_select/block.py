@@ -39,7 +39,7 @@ class BlockSelect(wx.Panel):
         force_blockstate: bool,
         namespace: str = None,
         block_name: str = None,
-        show_pick_block: bool = True,
+        show_pick_block: bool = False,
     ):
         super().__init__(parent, style=wx.BORDER_SIMPLE)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
@@ -59,7 +59,7 @@ class BlockSelect(wx.Panel):
         sizer.Add(self._namespace_combo, 2)
         self._set_version((platform, version_number, force_blockstate or False))
         self._populate_namespace()
-        self._set_namespace(namespace)
+        self.set_namespace(namespace)
 
         self._namespace_combo.Bind(
             wx.EVT_TEXT, lambda evt: self._post_namespace_change()
@@ -99,7 +99,7 @@ class BlockSelect(wx.Panel):
 
         self._block_names: List[str] = []
         self._populate_block_name()
-        self._set_block_name(block_name)
+        self.set_block_name(block_name)
         self._block_list_box.Bind(wx.EVT_LISTBOX, lambda evt: self._post_block_change())
 
     def _post_namespace_change(self):
@@ -137,10 +137,10 @@ class BlockSelect(wx.Panel):
 
     @namespace.setter
     def namespace(self, namespace: str):
-        self._set_namespace(namespace)
+        self.set_namespace(namespace)
         wx.PostEvent(self, NamespaceChangeEvent(self.GetId(), namespace=self.namespace))
 
-    def _set_namespace(self, namespace: str):
+    def set_namespace(self, namespace: str):
         namespace = namespace or "minecraft"
         if isinstance(namespace, str):
             if namespace in self._namespace_combo.GetItems():
@@ -161,12 +161,13 @@ class BlockSelect(wx.Panel):
 
     @block_name.setter
     def block_name(self, block_name: str):
-        self._set_block_name(block_name)
+        if self.set_block_name(block_name):
+            self._post_block_change()
 
-    def _set_block_name(self, block_name: str):
+    def set_block_name(self, block_name: str) -> bool:
         block_name = block_name or ""
         self._block_search.ChangeValue(block_name)
-        self._update_block_name(block_name)
+        return self._update_block_name(block_name)
 
     def _populate_namespace(self):
         version = self._translation_manager.get_version(
@@ -192,9 +193,10 @@ class BlockSelect(wx.Panel):
 
     def _on_search_change(self, evt):
         search_str = evt.GetString()
-        self._update_block_name(search_str)
+        if self._update_block_name(search_str):
+            self._post_block_change()
 
-    def _update_block_name(self, search_str: str):
+    def _update_block_name(self, search_str: str) -> bool:
         block_names = [bn for bn in self._block_names if search_str in bn]
         if search_str not in block_names:
             block_names.insert(0, f'"{search_str}"')
@@ -210,16 +212,17 @@ class BlockSelect(wx.Panel):
         if index:
             # if the previously selected string is in the list select that
             self._block_list_box.SetSelection(index)
+            return False
         elif search_str in block_names:
             # if the searched text perfectly matches select that
             self._block_list_box.SetSelection(block_names.index(search_str))
-            self._post_block_change()
+            return True
         elif len(self._block_list_box.GetItems()) >= 2:
             self._block_list_box.SetSelection(1)
-            self._post_block_change()
+            return True
         else:
             self._block_list_box.SetSelection(0)
-            self._post_block_change()
+            return True
 
 
 if __name__ == "__main__":
