@@ -10,12 +10,13 @@ if TYPE_CHECKING:
 
 
 class EditProgramRenderSelectionGroup(RenderSelectionGroupEditable):
-    def __init__(self,
-                 canvas: "EditCanvas",
-                 context_identifier: str,
-                 texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-                 texture: int
-                 ):
+    def __init__(
+        self,
+        canvas: "EditCanvas",
+        context_identifier: str,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        texture: int,
+    ):
         super().__init__(context_identifier, texture_bounds, texture)
         self._canvas = weakref.ref(canvas)
 

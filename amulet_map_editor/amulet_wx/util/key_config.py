@@ -1,8 +1,12 @@
 import wx
-from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog, SimpleScrollablePanel, SimpleChoice
+from amulet_map_editor.amulet_wx.ui.simple import (
+    SimpleDialog,
+    SimpleScrollablePanel,
+    SimpleChoice,
+)
 from typing import Dict, Tuple, Optional, Union, Sequence
 
-from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, EDIT_ICON
+from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, EDIT_ICON, scale_bitmap
 
 ModifierKeyType = str
 KeyType = Union[int, str]
@@ -218,11 +222,13 @@ _mouse_events = {
     wx.EVT_MIDDLE_DOWN.evtType[0]: MouseMiddle,
     wx.EVT_MIDDLE_UP.evtType[0]: MouseMiddle,
     wx.EVT_RIGHT_DOWN.evtType[0]: MouseRight,
-    wx.EVT_RIGHT_UP.evtType[0]: MouseRight
+    wx.EVT_RIGHT_UP.evtType[0]: MouseRight,
 }
 
 
-def serialise_key_event(evt: Union[wx.KeyEvent, wx.MouseEvent]) -> Optional[SerialisedKeyType]:
+def serialise_key_event(
+    evt: Union[wx.KeyEvent, wx.MouseEvent]
+) -> Optional[SerialisedKeyType]:
     if isinstance(evt, wx.KeyEvent):
         modifier = []
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
@@ -264,7 +270,7 @@ class KeyCatcher(wx.Dialog):
     def __init__(self, parent: wx.Window, action: str):
         super().__init__(parent, title=f"Press the key you want assigned to {action}")
 
-        self._key = ((), 'NONE')
+        self._key = ((), "NONE")
 
         self.Bind(wx.EVT_LEFT_DOWN, self._on_key)
         self.Bind(wx.EVT_MIDDLE_DOWN, self._on_key)
@@ -285,20 +291,18 @@ class KeyCatcher(wx.Dialog):
 
 class KeyConfigDialog(SimpleDialog):
     def __init__(
-            self,
-            parent: wx.Window,
-            selected_group: KeybindGroupIdType,
-            entries: Sequence[KeyActionType],
-            fixed_keybinds: KeybindContainer,
-            user_keybinds: KeybindContainer
+        self,
+        parent: wx.Window,
+        selected_group: KeybindGroupIdType,
+        entries: Sequence[KeyActionType],
+        fixed_keybinds: KeybindContainer,
+        user_keybinds: KeybindContainer,
     ):
-        super().__init__(parent, 'Key Select')
-        self._key_config = KeyConfig(self, selected_group, entries, fixed_keybinds, user_keybinds)
-        self.sizer.Add(
-            self._key_config,
-            1,
-            wx.EXPAND
+        super().__init__(parent, "Key Select")
+        self._key_config = KeyConfig(
+            self, selected_group, entries, fixed_keybinds, user_keybinds
         )
+        self.sizer.Add(self._key_config, 1, wx.EXPAND)
         self.Layout()
         self.Fit()
 
@@ -309,12 +313,12 @@ class KeyConfigDialog(SimpleDialog):
 
 class KeyConfig(wx.BoxSizer):
     def __init__(
-            self,
-            parent: wx.Window,
-            selected_group: KeybindGroupIdType,
-            entries: Sequence[KeyActionType],
-            fixed_keybinds: KeybindContainer,
-            user_keybinds: KeybindContainer
+        self,
+        parent: wx.Window,
+        selected_group: KeybindGroupIdType,
+        entries: Sequence[KeyActionType],
+        fixed_keybinds: KeybindContainer,
+        user_keybinds: KeybindContainer,
     ):
         super().__init__(wx.VERTICAL)
         self._entries = entries
@@ -326,20 +330,20 @@ class KeyConfig(wx.BoxSizer):
         self._choice = SimpleChoice(
             parent,
             list(self._fixed_keybinds.keys()) + list(self._user_keybinds.keys()),
-            selected_group
+            selected_group,
         )
         self._choice.Bind(wx.EVT_CHOICE, self._on_group_change)
         top_sizer.Add(self._choice, 1, wx.ALL | wx.EXPAND, 5)
 
-        add = wx.BitmapButton(parent, bitmap=ADD_ICON)
+        add = wx.BitmapButton(parent, bitmap=scale_bitmap(ADD_ICON, 32, 32))
         add.Bind(wx.EVT_BUTTON, lambda evt: self._create_new_group())
         top_sizer.Add(add, 0, wx.ALL, 5)
 
-        self._delete = wx.BitmapButton(parent, bitmap=SUBTRACT_ICON)
+        self._delete = wx.BitmapButton(parent, bitmap=scale_bitmap(SUBTRACT_ICON, 32, 32))
         self._delete.Bind(wx.EVT_BUTTON, lambda evt: self._delete_group())
         top_sizer.Add(self._delete, 0, wx.ALL, 5)
 
-        self._rename = wx.BitmapButton(parent, bitmap=EDIT_ICON)
+        self._rename = wx.BitmapButton(parent, bitmap=scale_bitmap(EDIT_ICON, 32, 32))
         self._rename.Bind(wx.EVT_BUTTON, lambda evt: self._rename_group())
         top_sizer.Add(self._rename, 0, wx.ALL, 5)
 
@@ -351,8 +355,7 @@ class KeyConfig(wx.BoxSizer):
         self._key_buttons: Dict[str, wx.Button] = {}
         for action in entries:
             grid_sizer.Add(
-                wx.StaticText(self._options, label=action.title()),
-                0, wx.ALIGN_CENTER
+                wx.StaticText(self._options, label=action.title()), 0, wx.ALIGN_CENTER
             )
             self._key_buttons[action] = button = wx.Button(self._options)
             button.Bind(wx.EVT_BUTTON, lambda evt, a=action: self._modify_button(a))
@@ -372,9 +375,7 @@ class KeyConfig(wx.BoxSizer):
 
         for action in self._entries:
             self._key_buttons[action].SetLabel(
-                stringify_key(
-                    group.get(action, ((), 'NONE'))
-                )
+                stringify_key(group.get(action, ((), "NONE")))
             )
 
     def _rebuild_choice(self, group_name=None):
@@ -385,7 +386,7 @@ class KeyConfig(wx.BoxSizer):
         if group_name is not None:
             self._choice.SetSelection(self._choice.FindString(group_name))
         else:
-            self._choice.SetSelection(max(index-1, 0))
+            self._choice.SetSelection(max(index - 1, 0))
         self._rebuild_buttons()
 
     def _delete_group(self):
@@ -397,13 +398,13 @@ class KeyConfig(wx.BoxSizer):
     def _request_group_name(self) -> Optional[str]:
         group_name = ""
         while group_name == "":
-            msg = wx.TextEntryDialog(
-                self._options,
-                "Enter a new group name."
-            )
+            msg = wx.TextEntryDialog(self._options, "Enter a new group name.")
             if msg.ShowModal() == wx.ID_OK:
                 group_name = msg.GetValue()
-                if group_name in self._fixed_keybinds or group_name in self._user_keybinds:
+                if (
+                    group_name in self._fixed_keybinds
+                    or group_name in self._user_keybinds
+                ):
                     group_name = ""
             else:
                 return

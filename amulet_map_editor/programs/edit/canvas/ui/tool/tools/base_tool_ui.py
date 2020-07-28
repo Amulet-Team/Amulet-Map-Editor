@@ -7,10 +7,10 @@ BaseToolUIType = Union[wx.Window, wx.Sizer, "BaseToolUI"]
 
 class BaseToolUI(BaseUI):
     def enable(self):
-        raise NotImplementedError
+        pass
 
     def disable(self):
-        raise NotImplementedError
+        self.canvas.reset_bound_events()
 
     def bind_events(self):
-        raise NotImplementedError
+        pass

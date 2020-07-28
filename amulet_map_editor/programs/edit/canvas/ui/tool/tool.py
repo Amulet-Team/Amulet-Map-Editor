@@ -2,10 +2,13 @@ import wx
 from typing import TYPE_CHECKING, Type, Dict, Optional
 
 from amulet_map_editor.programs.edit.canvas.ui import BaseUI
-from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI, BaseToolUIType
+from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import (
+    BaseToolUI,
+    BaseToolUIType,
+)
 from amulet_map_editor.programs.edit.canvas.events import (
     ToolChangeEvent,
-    EVT_TOOL_CHANGE
+    EVT_TOOL_CHANGE,
 )
 
 from .tools.select import SelectOptions
@@ -35,20 +38,25 @@ class Tool(wx.BoxSizer, BaseUI):
         tool_select_sizer.AddStretchSpacer(1)
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
-        self.canvas.Bind(EVT_TOOL_CHANGE, lambda evt: self._enable_tool(evt.tool))
-
         self.register_tool("Select", SelectOptions)
         self._enable_tool("Select")
         self.register_tool("Operation", SelectOperationUI)
         self.register_tool("Import", SelectImportOperationUI)
         self.register_tool("Export", SelectExportOperationUI)
 
+    @property
+    def tools(self):
+        return self._tools.copy()
+
     def bind_events(self):
         for tool in self._tools.values():
             tool.bind_events()
+        self.canvas.Bind(EVT_TOOL_CHANGE, lambda evt: self._enable_tool(evt.tool))
 
     def register_tool(self, name: str, tool_cls: Type[BaseToolUIType]):
-        assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(tool_cls, BaseToolUI)
+        assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(
+            tool_cls, BaseToolUI
+        )
         self._tool_select.register_tool(name)
         tool = tool_cls(self.canvas)
         if isinstance(tool, wx.Window):
@@ -88,4 +96,7 @@ class ToolSelect(wx.Panel, BaseUI):
         self._sizer.Add(button)
         self._sizer.Fit(self)
         self.Layout()
-        button.Bind(wx.EVT_BUTTON, lambda evt: wx.PostEvent(self.canvas, ToolChangeEvent(tool=name)))
+        button.Bind(
+            wx.EVT_BUTTON,
+            lambda evt: wx.PostEvent(self.canvas, ToolChangeEvent(tool=name)),
+        )

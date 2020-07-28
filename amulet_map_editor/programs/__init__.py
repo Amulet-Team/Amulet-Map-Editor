@@ -16,35 +16,44 @@ if TYPE_CHECKING:
     from amulet.api.world import World
 
 MenuData = Dict[
-    str, Dict[
-        str, Dict[
-            str, Union[
+    str,
+    Dict[
+        str,
+        Dict[
+            str,
+            Union[
                 Callable,
                 Tuple[Callable],
                 Tuple[Callable, str],
                 Tuple[Callable, str, Any],
-            ]
-        ]
-    ]
+            ],
+        ],
+    ],
 ]
 
 # this is where most of the magic will happen
 
-_extensions: List[Tuple[str, Type['BaseWorldProgram']]] = []
-_fixed_extensions: List[Tuple[str, Type['BaseWorldProgram']]] = []
+_extensions: List[Tuple[str, Type["BaseWorldProgram"]]] = []
+_fixed_extensions: List[Tuple[str, Type["BaseWorldProgram"]]] = []
 
 
 def load_extensions():
     if not _extensions:
         _extensions.extend(_fixed_extensions)
-        for _, name, _ in pkgutil.iter_modules([os.path.join(os.path.dirname(__file__))]):
+        for _, name, _ in pkgutil.iter_modules(
+            [os.path.join(os.path.dirname(__file__))]
+        ):
             # load module and confirm that all required attributes are defined
-            module = importlib.import_module(f'amulet_map_editor.programs.{name}')
+            module = importlib.import_module(f"amulet_map_editor.programs.{name}")
 
-            if hasattr(module, 'export'):
-                export = getattr(module, 'export')
-                if 'ui' in export and issubclass(export['ui'], BaseWorldProgram) and issubclass(export['ui'], wx.Window):
-                    _extensions.append((export.get('name', 'missingno'), export['ui']))
+            if hasattr(module, "export"):
+                export = getattr(module, "export")
+                if (
+                    "ui" in export
+                    and issubclass(export["ui"], BaseWorldProgram)
+                    and issubclass(export["ui"], wx.Window)
+                ):
+                    _extensions.append((export.get("name", "missingno"), export["ui"]))
 
 
 class BaseWorldUI:
@@ -62,7 +71,9 @@ class BaseWorldUI:
 
 
 class WorldManagerUI(wx.Notebook, BaseWorldUI):
-    def __init__(self, parent: wx.Window, path: str, close_self_callback: Callable[[], None]):
+    def __init__(
+        self, parent: wx.Window, path: str, close_self_callback: Callable[[], None]
+    ):
         super().__init__(parent, style=wx.NB_LEFT)
         self._path = path
         self._close_self_callback = close_self_callback
@@ -82,7 +93,9 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
         return self._path
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault('&File', {}).setdefault('exit', {}).setdefault('Close World', lambda evt: self._close_self_callback)
+        menu.setdefault("&File", {}).setdefault("exit", {}).setdefault(
+            "Close World", lambda evt: self._close_self_callback
+        )
         return self._extensions[self.GetSelection()].menu(menu)
 
     def _load_extensions(self):
@@ -96,7 +109,9 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
                 self.AddPage(ext, extension_name, select)
                 select = False
             except Exception as e:
-                log.exception(f'Failed to load extension {extension_name}\n{e}\n{traceback.format_exc()}')
+                log.exception(
+                    f"Failed to load extension {extension_name}\n{e}\n{traceback.format_exc()}"
+                )
                 continue
 
     def is_closeable(self) -> bool:
@@ -127,7 +142,6 @@ class WorldManagerUI(wx.Notebook, BaseWorldUI):
 
 
 class BaseWorldProgram:
-
     def enable(self):
         """Run when the panel is shown/enabled"""
         pass
@@ -153,34 +167,30 @@ class BaseWorldProgram:
 
 
 class AboutExtension(SimplePanel, BaseWorldProgram):
-    def __init__(self, container, world: 'World', close_self_callback: Callable[[], None]):
-        SimplePanel.__init__(
-            self,
-            container
-        )
+    def __init__(
+        self, container, world: "World", close_self_callback: Callable[[], None]
+    ):
+        SimplePanel.__init__(self, container)
         self.world = world
         self._close_self_callback = close_self_callback
 
-        self._close_world_button = wx.Button(self, wx.ID_ANY, label='Close World')
+        self._close_world_button = wx.Button(self, wx.ID_ANY, label="Close World")
         self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
         self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
 
         self.add_object(
-            wx.StaticText(
-                self,
-                label='Currently Opened World: '
-            ), 0, wx.ALL | wx.CENTER
+            wx.StaticText(self, label="Currently Opened World: "), 0, wx.ALL | wx.CENTER
         )
-        self.add_object(
-            WorldUI(self, self.world.world_wrapper), 0, wx.ALL | wx.CENTER
-        )
+        self.add_object(WorldUI(self, self.world.world_wrapper), 0, wx.ALL | wx.CENTER)
         self.add_object(
             wx.StaticText(
                 self,
-                label='Choose from the options on the left what you would like to do.\n'
-                      'You can switch between these at any time.\n'
-                      '<================='
-            ), 0, wx.ALL | wx.CENTER
+                label="Choose from the options on the left what you would like to do.\n"
+                "You can switch between these at any time.\n"
+                "<=================",
+            ),
+            0,
+            wx.ALL | wx.CENTER,
         )
 
     def _close_world(self, evt):

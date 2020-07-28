@@ -7,13 +7,17 @@ from .render_selection import RenderSelection
 
 class RenderSelectionHighlightable(RenderSelection):
     """A drawable selection box with edges that can be highlighted"""
-    def __init__(self,
-                 context_identifier: str,
-                 texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-                 texture: int
-                 ):
+
+    def __init__(
+        self,
+        context_identifier: str,
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
+        texture: int,
+    ):
         super().__init__(context_identifier, texture_bounds, texture)
-        self._highlight_edges = numpy.array([[False, False, False], [False, False, False]], dtype=numpy.bool)  # which edges are highlighted
+        self._highlight_edges = numpy.array(
+            [[False, False, False], [False, False, False]], dtype=numpy.bool
+        )  # which edges are highlighted
 
     @property
     def highlight_colour(self) -> Tuple[float, float, float]:
@@ -61,8 +65,5 @@ class RenderSelectionHighlightable(RenderSelection):
         # 5 up 4
 
         self.verts[:36][
-            numpy.repeat(
-                self._highlight_edges.ravel()[indexes], 6
-            ),
-            9:12
+            numpy.repeat(self._highlight_edges.ravel()[indexes], 6), 9:12
         ] = self.highlight_colour

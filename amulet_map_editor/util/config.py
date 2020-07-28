@@ -3,7 +3,7 @@ import pickle
 import gzip
 from typing import Any
 
-_path = os.path.abspath(os.path.join('.', 'config'))
+_path = os.path.abspath(os.path.join(".", "config"))
 
 
 def get(identifier: str, default: Any = None) -> Any:
@@ -13,7 +13,7 @@ def get(identifier: str, default: Any = None) -> Any:
     :param default: The value to return if one could not be loaded
     :return: config data
     """
-    path = os.path.join(_path, identifier+'.config')
+    path = os.path.join(_path, identifier + ".config")
     if os.path.isfile(path):
         try:
             with gzip.open(path, "rb") as fp:
@@ -33,6 +33,6 @@ def put(identifier: str, data: Any):
     """
     if not os.path.isdir(_path):
         os.makedirs(_path)
-    path = os.path.join(_path, identifier+'.config')
+    path = os.path.join(_path, identifier + ".config")
     with gzip.open(path, "wb") as fp:
         pickle.dump(data, fp)

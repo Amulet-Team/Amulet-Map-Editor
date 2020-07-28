@@ -12,12 +12,14 @@ class ResourcePackManager:
         resource_pack: minecraft_model_reader.BaseRPHandler,
         texture: int,
         texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        translator: PyMCTranslate.Version
+        translator: PyMCTranslate.Version,
     ):
         self.context_identifier = context_identifier
         self._texture = texture
         self._resource_pack = resource_pack
-        self._texture_bounds: Dict[Any, Tuple[float, float, float, float]] = texture_bounds
+        self._texture_bounds: Dict[
+            Any, Tuple[float, float, float, float]
+        ] = texture_bounds
         self._resource_pack_translator = translator
 
         self._block_models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
@@ -25,7 +27,7 @@ class ResourcePackManager:
     def set_resource_pack(
         self,
         resource_pack: minecraft_model_reader.BaseRPHandler,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]]
+        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
     ):
         self._resource_pack = resource_pack
         self._texture_bounds = texture_bounds
@@ -37,7 +39,7 @@ class ResourcePackManager:
 
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:
-            texture = ('minecraft', 'missing_no')
+            texture = ("minecraft", "missing_no")
         return self._texture_bounds[texture]
 
     @property
@@ -52,23 +54,22 @@ class ResourcePackManager:
     def translator(self, translator: PyMCTranslate.Version):
         self._resource_pack_translator = translator
 
-    def get_block_model(self, pallete_index: int) -> minecraft_model_reader.MinecraftMesh:
+    def get_block_model(
+        self, pallete_index: int
+    ) -> minecraft_model_reader.MinecraftMesh:
         if pallete_index not in self._block_models:
             block = self._palette[pallete_index]
             extra_blocks = tuple()
             if block.extra_blocks:
                 extra_blocks = tuple(
-                    self._resource_pack_translator.block.from_universal(
-                        block_
-                    )[0] for block_ in block.extra_blocks
+                    self._resource_pack_translator.block.from_universal(block_)[0]
+                    for block_ in block.extra_blocks
                 )
             block = self._resource_pack_translator.block.from_universal(
                 block.base_block
             )[0]
             for block_ in extra_blocks:
                 block += block_
-            self._block_models[pallete_index] = self._resource_pack.get_model(
-                block
-            )
+            self._block_models[pallete_index] = self._resource_pack.get_model(block)
 
         return self._block_models[pallete_index]

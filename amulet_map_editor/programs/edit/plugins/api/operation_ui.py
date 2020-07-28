@@ -1,5 +1,5 @@
 import pickle
-from typing import Any, TYPE_CHECKING, Union
+from typing import Any, TYPE_CHECKING, Union, Tuple
 import os
 import wx
 import weakref
@@ -13,7 +13,10 @@ OperationUIType = Union[wx.Window, wx.Sizer, "OperationUI"]
 
 class OperationUI:
     """The base class that all operations must inherit from."""
-    def __init__(self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str):
+
+    def __init__(
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+    ):
         self._parent = weakref.ref(parent)
         self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
@@ -30,6 +33,16 @@ class OperationUI:
     @property
     def world(self) -> "World":
         return self._world()
+
+    @property
+    def wx_add_options(self) -> Tuple[int, ...]:
+        """The options used to put the UI element into a vertical BoxSizer covering the whole canvas.
+        Override if these options do not work for your UI."""
+        if isinstance(self, wx.Window):
+            return ()
+        elif isinstance(self, wx.Sizer):
+            return 1, wx.EXPAND
+        return ()
 
     def unload(self):
         """Unbind any events that have been set up and make safe to destroy the UI.

@@ -5,18 +5,15 @@ import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
 
+from amulet_map_editor import log
+
 
 class SimpleSizer:
     def __init__(self, sizer_dir=wx.VERTICAL):
         self._sizer = self.sizer = wx.BoxSizer(sizer_dir)
 
     def add_object(self, obj, space=1, options=wx.ALL):
-        self.sizer.Add(
-            obj,
-            space,
-            options,
-            5
-        )
+        self.sizer.Add(obj, space, options, 5)
 
 
 class SimplePanel(wx.Panel, SimpleSizer):
@@ -35,12 +32,9 @@ class SimplePanel(wx.Panel, SimpleSizer):
 
 class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
     """A scrolled panel that automatically sets itself up."""
+
     def __init__(self, parent: wx.Window, sizer_dir=wx.VERTICAL, **kwargs):
-        ScrolledPanel.__init__(
-            self,
-            parent,
-            **kwargs
-        )
+        ScrolledPanel.__init__(self, parent, **kwargs)
         SimpleSizer.__init__(self, sizer_dir)
         self.SetSizer(self.sizer)
         self.SetupScrolling()
@@ -49,11 +43,14 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
 
 class SimpleChoice(wx.Choice):
     """A wrapper for wx.Choice that sets up the UI for you."""
-    def __init__(self, parent: wx.Window, choices: Sequence[str] = (), default: Optional[str] = None):
-        super().__init__(
-            parent,
-            choices=choices
-        )
+
+    def __init__(
+        self,
+        parent: wx.Window,
+        choices: Sequence[str] = (),
+        default: Optional[str] = None,
+    ):
+        super().__init__(parent, choices=choices)
         if choices:
             if default is not None and default in choices:
                 self.SetSelection(choices.index(default))
@@ -69,10 +66,9 @@ StringableType = Any
 
 class SimpleChoiceAny(wx.Choice):
     """An extension for wx.Choice that enables showing and returning objects that are not strings."""
+
     def __init__(self, parent: wx.Window, sort=True, reverse=False):
-        super().__init__(
-            parent
-        )
+        super().__init__(parent)
         self._values: List[Any] = []
         self._keys: List[str] = []
         self._sorted = sort
@@ -82,7 +78,11 @@ class SimpleChoiceAny(wx.Choice):
     def values(self) -> List[Any]:
         return self._values
 
-    def SetItems(self, items: Union[Iterable[StringableType], Dict[StringableType, Any]], default: StringableType = None):
+    def SetItems(
+        self,
+        items: Union[Iterable[StringableType], Dict[StringableType, Any]],
+        default: StringableType = None,
+    ):
         """Set items. Does not have to be strings.
         If items is a dictionary the string of the values are show to the user and the key is returned from GetAny
         If it is just an iterable the string of the values are shown and the raw equivalent input is returned."""
@@ -116,18 +116,27 @@ class SimpleChoiceAny(wx.Choice):
 
     def GetAny(self) -> Optional[Any]:
         """Return the value currently selected in the form before it was converted to a string"""
+        log.warning(
+            "SimpleChoiceAny.GetAny is being depreciated and will be removed in the future. Please use SimpleChoiceAny.GetCurrentObject instead",
+            exc_info=True,
+        )
+        return self.GetCurrentObject()
+
+    def GetCurrentObject(self) -> Optional[Any]:
+        """Return the value currently selected in the form before it was converted to a string"""
         if self._values:
             return self._values[self.GetSelection()]
+
+    def GetCurrentString(self) -> str:
+        return self.GetString(self.GetSelection())
 
 
 class SimpleDialog(wx.Dialog):
     """A dialog with ok and cancel buttons set up."""
+
     def __init__(self, parent: wx.Window, title, sizer_dir=wx.VERTICAL):
         wx.Dialog.__init__(
-            self,
-            parent,
-            title=title,
-            style=wx.CAPTION | wx.RESIZE_BORDER
+            self, parent, title=title, style=wx.CAPTION | wx.RESIZE_BORDER
         )
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
