@@ -10,6 +10,9 @@ from amulet_map_editor import lang, version, log
 from amulet_map_editor.programs import WorldManagerUI
 from amulet_map_editor.programs import BaseWorldUI
 
+import amulet_map_editor.resources as resources
+
+
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
     from amulet_map_editor.util import update_check
@@ -52,12 +55,7 @@ class AmuletMainWindow(wx.Frame):
             wx.LANGUAGE_ENGLISH
         )  # TODO: work out proper localisation
         icon = wx.Icon()
-        icon.CopyFromBitmap(
-            wx.Bitmap(
-                os.path.join(IMG_DIR, "logo", "icon128.png"),
-                wx.BITMAP_TYPE_ANY,
-            )
-        )
+        icon.CopyFromBitmap(resources.img.logo.icon128.bitmap())
         self.SetIcon(icon)
 
         self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}
@@ -214,22 +212,10 @@ class AmuletMainMenu(wx.Panel, BaseWorldUI):
         self._open_world_callback = open_world
         name_sizer = wx.BoxSizer()
         sizer.Add(name_sizer, 0, wx.CENTER)
-        img = wx.Image(os.path.join(IMG_DIR, "logo", "icon128.png"), wx.BITMAP_TYPE_ANY)
+        img = resources.img.logo.icon128.bitmap(64, 64)
 
-        icon = wx.StaticBitmap(
-            self,
-            wx.ID_ANY,
-            img.Scale(64, 64, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(),
-            (0, 0),
-            (64, 64),
-        )
-        icon2 = wx.StaticBitmap(
-            self,
-            wx.ID_ANY,
-            img.Scale(64, 64, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(),
-            (0, 0),
-            (64, 64),
-        )
+        icon = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (64, 64))
+        icon2 = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (64, 64))
         icon2.Bind(
             wx.EVT_LEFT_DOWN, lambda evt: wx.lib.inspection.InspectionTool().Show()
         )

@@ -1,21 +1,24 @@
 import wx
-from amulet_map_editor import resources
 
-ADD_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "plus_green.png"))
-SUBTRACT_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "minus_red.png"))
-EDIT_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "edit.png"))
-REFRESH_ICON = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "refresh.png"))
+import amulet_map_editor.resources as resources
 
-UP_ARROW = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "chevron-up.png"))
-DOWN_ARROW = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "chevron-down.png"))
+tablericons = resources.img.icon.tablericons
 
-UP_CARET = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "caret-up.png"))
-DOWN_CARET = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "caret-down.png"))
+ADD_ICON = tablericons.plus_green.bitmap()
+SUBTRACT_ICON = tablericons.minus_red.bitmap()
+EDIT_ICON = tablericons.edit.bitmap()
+REFRESH_ICON = tablericons.refresh.bitmap()
 
-COLOUR_PICKER = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "color-picker.png"))
-TRASH = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "trash.png"))
-MAXIMIZE = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "arrows-maximize.png"))
-MINIMIZE = wx.Bitmap(os.path.join(IMG_DIR, "icon", "tablericons", "arrows-minimize.png"))
+UP_ARROW = tablericons.chevron_up.bitmap()
+DOWN_ARROW = tablericons.chevron_down.bitmap()
+
+UP_CARET = tablericons.caret_up.bitmap()
+DOWN_CARET = tablericons.caret_down.bitmap()
+
+COLOUR_PICKER = tablericons.color_picker.bitmap()
+TRASH = tablericons.trash.bitmap()
+MAXIMIZE = tablericons.arrows_maximize.bitmap()
+MINIMIZE = tablericons.arrows_minimize.bitmap()
 
 
 def scale_bitmap(bitmap, width, height):

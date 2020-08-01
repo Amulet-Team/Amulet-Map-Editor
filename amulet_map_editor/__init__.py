@@ -9,5 +9,3 @@ if os.path.isfile(_version_path):
         version = _f.read()
 else:
     version = "?"
-
-IMG_DIR = os.path.join(os.path.dirname(__file__), "img")
