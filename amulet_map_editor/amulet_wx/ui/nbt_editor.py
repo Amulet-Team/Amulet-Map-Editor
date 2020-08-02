@@ -13,6 +13,7 @@ from amulet_map_editor import resources
 
 nbt_resources = resources.img.nbt
 
+
 class NBTRadioButton(simple.SimplePanel):
     def __init__(self, parent, nbt_tag_class, icon):
         super(NBTRadioButton, self).__init__(parent, wx.HORIZONTAL)
@@ -35,82 +36,31 @@ class NBTRadioButton(simple.SimplePanel):
 
 
 class NBTEditor(simple.SimplePanel):
-
-    image_list = None
-    image_map = None
-
     def __init__(self, parent, nbt_data, root_tag_name="", callback=None):
         super(NBTEditor, self).__init__(parent)
 
         self.nbt_data = nbt_data
 
-        if self.__class__.image_map is None and self.__class__.image_list is None:
-            self.__class__.image_list = wx.ImageList(16, 16)
-            self.__class__.image_map = {
-                nbt.TAG_Byte: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_byte.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Short: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_short.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Int: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_int.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Long: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_long.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Float: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_float.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Double: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_double.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_String: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_string.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Compound: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_compound.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.NBTFile: self.image_list.ImageCount - 1,
-                nbt.TAG_List: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_list.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Byte_Array: self.image_list.Add(
-                    wx.Image(
-                        nbt_resources["nbt_tag_array.png"],
-                        wx.BITMAP_TYPE_PNG,
-                    ).ConvertToBitmap()
-                ),
-                nbt.TAG_Int_Array: self.image_list.ImageCount - 1,
-                nbt.TAG_Long_Array: self.image_list.ImageCount - 1,
-            }
+        self.image_list = wx.ImageList(16, 16)
+        self.image_map = {
+            nbt.TAG_Byte: self.image_list.Add(nbt_resources.nbt_tag_byte.bitmap()),
+            nbt.TAG_Short: self.image_list.Add(nbt_resources.nbt_tag_short.bitmap()),
+            nbt.TAG_Int: self.image_list.Add(nbt_resources.nbt_tag_int.bitmap()),
+            nbt.TAG_Long: self.image_list.Add(nbt_resources.nbt_tag_long.bitmap()),
+            nbt.TAG_Float: self.image_list.Add(nbt_resources.nbt_tag_float.bitmap()),
+            nbt.TAG_Double: self.image_list.Add(nbt_resources.nbt_tag_double.bitmap()),
+            nbt.TAG_String: self.image_list.Add(nbt_resources.nbt_tag_string.bitmap()),
+            nbt.TAG_Compound: self.image_list.Add(
+                nbt_resources.nbt_tag_compound.bitmap()
+            ),
+            nbt.NBTFile: self.image_list.ImageCount - 1,
+            nbt.TAG_List: self.image_list.Add(nbt_resources.nbt_tag_list.bitmap()),
+            nbt.TAG_Byte_Array: self.image_list.Add(
+                nbt_resources.nbt_tag_array.bitmap()
+            ),
+            nbt.TAG_Int_Array: self.image_list.ImageCount - 1,
+            nbt.TAG_Long_Array: self.image_list.ImageCount - 1,
+        }
         self.other = self.image_map[nbt.TAG_String]
 
         self.tree = self.build_tree(root_tag_name)
@@ -340,8 +290,8 @@ class EditTagDialog(wx.Frame):
         else:
             self.name_field.SetValue(tag_name)
 
-        name_panel.add_object(name_label, space=0)
-        name_panel.add_object(self.name_field, space=0)
+        name_panel.add_object(name_label, space=0, options=wx.ALL | wx.CENTER)
+        name_panel.add_object(self.name_field, space=1, options=wx.ALL | wx.EXPAND)
 
         value_label = wx.StaticText(value_panel, label="Value: ")
         self.value_field = wx.TextCtrl(value_panel)
@@ -351,8 +301,8 @@ class EditTagDialog(wx.Frame):
         else:
             self.value_field.SetValue(str(tag.value))
 
-        value_panel.add_object(value_label, space=0)
-        value_panel.add_object(self.value_field, space=0)
+        value_panel.add_object(value_label, space=0, options=wx.ALL | wx.CENTER)
+        value_panel.add_object(self.value_field, space=1, options=wx.ALL | wx.EXPAND)
 
         tag_type_sizer = wx.GridSizer(self.GRID_ROWS, self.GRID_COLUMNS, 0, 0)
 
@@ -362,9 +312,7 @@ class EditTagDialog(wx.Frame):
             rd_btn = NBTRadioButton(
                 tag_type_panel,
                 tag_type,
-                NBTEditor.image_list.GetBitmap(
-                    NBTEditor.image_map[getattr(nbt, tag_type)]
-                ),
+                parent.image_list.GetBitmap(parent.image_map[getattr(nbt, tag_type)]),
             )
             self.radio_buttons.append(rd_btn)
             rd_btn.Bind(wx.EVT_RADIOBUTTON, partial(self.handle_radio_button, tag_type))
@@ -381,8 +329,8 @@ class EditTagDialog(wx.Frame):
         button_panel.add_object(self.save_button, space=0)
         button_panel.add_object(self.cancel_button, space=0)
 
-        main_panel.add_object(name_panel, space=0)
-        main_panel.add_object(value_panel, space=0)
+        main_panel.add_object(name_panel, space=0, options=wx.ALL | wx.EXPAND)
+        main_panel.add_object(value_panel, space=0, options=wx.ALL | wx.EXPAND)
         main_panel.add_object(tag_type_panel, space=0)
         main_panel.add_object(button_panel, space=0)
 
@@ -390,6 +338,9 @@ class EditTagDialog(wx.Frame):
         self.cancel_button.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
         self.value_field.Bind(wx.EVT_TEXT, self.value_changed)
+
+        self.SetSize((235, 260))
+        self.Layout()
 
     def value_changed(self, evt):
         tag_value = evt.GetString()
@@ -437,22 +388,8 @@ if __name__ == "__main__":
     import wx.lib.inspection
 
     app = wx.App()
-    # wx.lib.inspection.InspectionTool().Show()
+    wx.lib.inspection.InspectionTool().Show()
     frame = wx.Frame(None)
-    NBTEditor(
-        frame,
-        nbt.TAG_Compound(
-            {
-                "test1": nbt.TAG_Int(100),
-                "test2": nbt.TAG_String("test string"),
-                "test3": nbt.TAG_List(
-                    [nbt.TAG_Byte(1), nbt.TAG_Byte(2), nbt.TAG_Byte(3), nbt.TAG_Byte(4)]
-                ),
-                "test4": nbt.TAG_Int_Array(),
-            }
-        ),
-        "tag_compound_test",
-        callback=print_nbt,
-    )
+    NBTEditor(frame, nbt.load("level.dat"), callback=print_nbt)
     frame.Show()
     app.MainLoop()

@@ -2,61 +2,144 @@ from __future__ import annotations
 
 from typing import Dict, Union
 
-import os.path as op
+from os.path import (
+    join as opjoin,
+    splitext as opsplit,
+    dirname as opdir,
+    isdir,
+    normpath,
+)
+from os import listdir
+import json
 
-_BASE = op.dirname(__file__)
+import wx
 
 
-class _ResourceDict:
-    __slots__ = ("directory_name", "_file_cache", "_dir_cache")
+_BASE = normpath(opjoin(opdir(__file__), "resources"))
 
-    def __init__(self, dir_name: str):
-        self.directory_name = dir_name
-        self._file_cache: Dict[str, str] = {}
-        self._dir_cache: Dict[str, _ResourceDict] = {}
+
+class _ResourceItem:
+    __slots__ = ("_path",)
+
+    def __init__(self, path):
+        self._path = path
 
     def __repr__(self):
-        return f'_ResourceDict("{self.directory_name}")'
+        return f'{self.__class__.__name__}("{self._path}")'
 
-    def __getattr__(self, item: str) -> _ResourceDict:
-        if item in self._dir_cache:
-            return self._dir_cache[item]
+    @property
+    def path(self):
+        return self._path
 
-        path = op.join(self.directory_name, item)
-        if op.isdir(path):
-            return self._dir_cache.setdefault(item, _ResourceDict(path))
+    def to(self, resource_item):
+        return resource_item(self._path)
 
-        raise NotADirectoryError(
-            f'Could not find directory named "{item}" in "{self.directory_name}"'
-        )
+    @classmethod
+    def default_object(cls):
+        return None
 
-    def __getitem__(self, item: str) -> Union[str, _ResourceDict]:
-        if item in self._file_cache:
-            return self._file_cache[item]
 
-        if item in self._dir_cache:
-            return self._dir_cache[item]
+class BitmapResourceItem(_ResourceItem):
+    def bitmap(self, width=-1, height=-1, quality=wx.IMAGE_QUALITY_HIGH) -> wx.Bitmap:
+        bm = wx.Bitmap(self._path)
 
-        path = op.join(self.directory_name, item)
-        if op.isfile(path):
-            return self._file_cache.setdefault(item, path)
-        elif op.isdir(path):
-            return self._dir_cache.setdefault(item, _ResourceDict(path))
-        else:
-            raise AttributeError(
-                f'Could not find file or directory named "{item}" in "{self.directory_name}"'
+        if width > 0 or height > 0:
+            im: wx.Image = bm.ConvertToImage()
+            im = im.Scale(
+                width if width > 0 else bm.Width,
+                height if height > 0 else bm.Height,
+                quality,
             )
+            bm = im.ConvertToBitmap()
+        return bm
 
-    def get_directory_or_file(self, name) -> Union[str, _ResourceDict]:
-        return self.__getitem__(name)
-
-
-_BASE_RESOURCEDICT = _ResourceDict(_BASE)
-
-
-def __getattr__(name):
-    return _BASE_RESOURCEDICT[name]
+    @classmethod
+    def default_object(cls):
+        bm = wx.Bitmap()
+        bm.Create(32, 32)
+        return bm
 
 
-def get_directory_or_file(name) -> Union[str, _ResourceDict]:
-    return _BASE_RESOURCEDICT.get_directory_or_file(name)
+class TextResourceItem(_ResourceItem):
+    def text(self):
+        with open(self._path) as fp:
+            return fp.read()
+
+    @classmethod
+    def default_object(cls):
+        return ""
+
+
+class JSONResourceItem(_ResourceItem):
+    def json(self):
+        with open(self._path) as fp:
+            return json.load(fp)
+
+    @classmethod
+    def default_object(cls):
+        return dict()
+
+
+class _MissingResourceItem(_ResourceItem):
+    __slots__ = ("_path", "_factory")
+
+    def __init__(self, path, factory):
+        super(_MissingResourceItem, self).__init__(path)
+        self._factory = factory
+
+    def __getattr__(self, item):
+        return _MissingResourceItem(opjoin(self._path, item), self._factory)
+
+    def __call__(self, *args, **kwargs):
+        return self._factory.default_object()
+
+
+class _ResourceDirectory(_ResourceItem):
+    __slots__ = ("_path", "_factory", "_entries")
+
+    def __init__(self, directory_name, factory_class, parent):
+        super(_ResourceDirectory, self).__init__(opjoin(parent, directory_name))
+        self._factory = factory_class
+
+        self._entries: Dict[str, Union[_ResourceDirectory, _ResourceItem, str]] = {}
+        self.scan()
+
+    def scan(self):
+        self._entries.clear()
+        for entry in listdir(self._path):
+            path = opjoin(self._path, entry)
+            if isdir(path):
+                self._entries[entry] = _ResourceDirectory(
+                    entry, self._factory, self._path
+                )
+            else:
+                filename, ext = opsplit(entry)
+                self._entries[filename] = ext
+
+    def __repr__(self):
+        return f"_ResourceDirectory({self._path})"
+
+    def __getattr__(self, item) -> Union[_ResourceItem, _MissingResourceItem]:
+        if item in self._entries:
+            if isinstance(self._entries[item], str):
+                ext = self._entries[item]
+                del self._entries[item]
+                self._entries[item] = self._factory(opjoin(self._path, f"{item}{ext}"))
+            return self._entries[item]
+        else:
+            return _MissingResourceItem(opjoin(self._path, item), self._factory)
+
+
+img = _ResourceDirectory("img", BitmapResourceItem, _BASE)
+
+if __name__ == "__main__":  # Demo code
+    logo_dir = img.logo
+    icon64_item = logo_dir.icon64
+    non_existent_item = logo_dir.icon42
+    non_existent_path = img.test1.test2.test3.file_doesnt_exist
+
+    app = wx.App()
+    print(icon64_item.bitmap())
+    print(non_existent_item.bitmap())
+    print(non_existent_path.bitmap())
+    print(icon64_item.path)
