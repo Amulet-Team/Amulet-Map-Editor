@@ -10,7 +10,7 @@ from amulet.api.block import PropertyDataTypes, PropertyType
 
 WildcardSNBTType = Union[SNBTType, str]
 
-from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, scale_bitmap
+from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON
 
 (
     PropertiesChangeEvent,
@@ -20,16 +20,16 @@ from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, scale
 
 class PropertySelect(wx.Panel):
     def __init__(
-            self,
-            parent: wx.Window,
-            translation_manager: PyMCTranslate.TranslationManager,
-            platform: str,
-            version_number: Tuple[int, int, int],
-            force_blockstate: bool,
-            namespace: str,
-            block_name: str,
-            properties: Dict[str, SNBTType] = None,
-            wildcard_mode=False,
+        self,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        platform: str,
+        version_number: Tuple[int, int, int],
+        force_blockstate: bool,
+        namespace: str,
+        block_name: str,
+        properties: Dict[str, SNBTType] = None,
+        wildcard_mode=False,
     ):
         super().__init__(parent, style=wx.BORDER_SIMPLE)
         self._parent = weakref.ref(parent)
@@ -77,19 +77,19 @@ class PropertySelect(wx.Panel):
 
     @version_block.setter
     def version_block(
-            self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
+        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
     ):
         self._set_version_block(version_block)
         self.str_properties = None
 
     def _set_version_block(
-            self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
+        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
     ):
         version = version_block[:3]
         assert (
-                version[0] in self._translation_manager.platforms()
-                and version[1] in self._translation_manager.version_numbers(version[0])
-                and isinstance(version[2], bool)
+            version[0] in self._translation_manager.platforms()
+            and version[1] in self._translation_manager.version_numbers(version[0])
+            and isinstance(version[2], bool)
         ), f"{version} is not a valid version"
         self._platform, self._version_number, self._force_blockstate = version
         block = version_block[3:5]
@@ -164,10 +164,10 @@ class PropertySelect(wx.Panel):
 
 class SimplePropertySelect(wx.Panel):
     def __init__(
-            self,
-            parent: wx.Window,
-            translation_manager: PyMCTranslate.TranslationManager,
-            wildcard_mode,
+        self,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        wildcard_mode,
     ):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -242,7 +242,7 @@ class SimplePropertySelect(wx.Panel):
 
 class ManualPropertySelect(wx.Panel):
     def __init__(
-            self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
+        self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
     ):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -250,7 +250,9 @@ class ManualPropertySelect(wx.Panel):
         self._translation_manager = translation_manager
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        add_button = wx.BitmapButton(self, bitmap=scale_bitmap(ADD_ICON, 30, 30), size=(30, 30))
+        add_button = wx.BitmapButton(
+            self, bitmap=ADD_ICON.bitmap(30, 30), size=(30, 30)
+        )
         header_sizer.Add(add_button)
         sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
@@ -280,10 +282,14 @@ class ManualPropertySelect(wx.Panel):
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._property_index += 1
-        subtract_button = wx.BitmapButton(self, bitmap=scale_bitmap(SUBTRACT_ICON, 30, 30), size=(30, 30))
+        subtract_button = wx.BitmapButton(
+            self, bitmap=SUBTRACT_ICON.bitmap(30, 30), size=(30, 30)
+        )
         sizer.Add(subtract_button, 0, wx.ALIGN_CENTER_VERTICAL)
         index = self._property_index
-        subtract_button.Bind(wx.EVT_BUTTON, lambda evt: self._on_remove_property(sizer, index))
+        subtract_button.Bind(
+            wx.EVT_BUTTON, lambda evt: self._on_remove_property(sizer, index)
+        )
         name_entry = wx.TextCtrl(self, value=name, style=wx.TE_CENTER)
         sizer.Add(name_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         name_entry.Bind(wx.EVT_TEXT, lambda evt: self._post_property_change())
@@ -295,10 +301,7 @@ class ManualPropertySelect(wx.Panel):
         value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, snbt_text))
 
         self._property_sizer.Add(sizer, 1, wx.TOP | wx.EXPAND, 5)
-        self._properties[self._property_index] = (
-            name_entry,
-            value_entry
-        )
+        self._properties[self._property_index] = (name_entry, value_entry)
         self.Fit()
         self.TopLevelParent.Layout()
         self.Thaw()
@@ -354,6 +357,7 @@ class ManualPropertySelect(wx.Panel):
 
 
 if __name__ == "__main__":
+
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
         app = wx.App()
@@ -377,6 +381,5 @@ if __name__ == "__main__":
         dialog.Show()
         dialog.Fit()
         app.MainLoop()
-
 
     main()

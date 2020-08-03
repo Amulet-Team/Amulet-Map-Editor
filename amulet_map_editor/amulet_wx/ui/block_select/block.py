@@ -4,10 +4,7 @@ from typing import Tuple, List, Optional
 
 import PyMCTranslate
 
-if __name__ == '__main__':
-    app = wx.App()
-
-from amulet_map_editor.amulet_wx.util.icon import COLOUR_PICKER, scale_bitmap
+from amulet_map_editor.amulet_wx.util.icon import COLOUR_PICKER
 
 (
     NamespaceChangeEvent,
@@ -85,14 +82,16 @@ class BlockSelect(wx.Panel):
         self._block_search.Bind(wx.EVT_TEXT, self._on_search_change)
         if show_pick_block:
             pick_block_button = wx.BitmapButton(
-                self, bitmap=scale_bitmap(COLOUR_PICKER, 22, 22)
+                self, bitmap=COLOUR_PICKER.bitmap(22, 22)
             )
             search_sizer.Add(
                 pick_block_button, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5
             )
             pick_block_button.Bind(
                 wx.EVT_BUTTON,
-                lambda evt: wx.PostEvent(self, PickBlockEvent(self.GetId(), widget=self)),
+                lambda evt: wx.PostEvent(
+                    self, PickBlockEvent(self.GetId(), widget=self)
+                ),
             )
         self._block_list_box = wx.ListBox(self, style=wx.LB_SINGLE)
         sizer.Add(self._block_list_box, 1, wx.EXPAND)
@@ -104,13 +103,20 @@ class BlockSelect(wx.Panel):
 
     def _post_namespace_change(self):
         if self._do_text_event:
-            wx.PostEvent(self, NamespaceChangeEvent(self.GetId(), namespace=self.namespace))
+            wx.PostEvent(
+                self, NamespaceChangeEvent(self.GetId(), namespace=self.namespace)
+            )
         self._do_text_event = True
 
     def _post_block_change(self):
-        wx.PostEvent(self, BlockNameChangeEvent(self.GetId(), block_name=self.block_name)),
         wx.PostEvent(
-            self, BlockChangeEvent(self.GetId(), namespace=self.namespace, block_name=self.block_name)
+            self, BlockNameChangeEvent(self.GetId(), block_name=self.block_name)
+        ),
+        wx.PostEvent(
+            self,
+            BlockChangeEvent(
+                self.GetId(), namespace=self.namespace, block_name=self.block_name
+            ),
         )
 
     @property
@@ -228,13 +234,12 @@ class BlockSelect(wx.Panel):
 if __name__ == "__main__":
 
     def main():
+        app = wx.App()
         translation_manager = PyMCTranslate.new_translation_manager()
         dialog = wx.Dialog(None)
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        sizer.Add(
-            BlockSelect(dialog, translation_manager, "java", (1, 16, 0), False)
-        )
+        sizer.Add(BlockSelect(dialog, translation_manager, "java", (1, 16, 0), False))
         dialog.Show()
         dialog.Fit()
         app.MainLoop()

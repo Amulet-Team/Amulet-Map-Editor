@@ -8,9 +8,6 @@ from amulet.api.block import PropertyType, Block
 from amulet.api.block_entity import BlockEntity
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 
-if __name__ == "__main__":
-    app = wx.App()
-
 from amulet_map_editor.amulet_wx.ui.version_select import (
     VersionSelect,
     EVT_VERSION_CHANGE,
@@ -228,6 +225,7 @@ class BlockDefine(wx.Panel):
 if __name__ == "__main__":
 
     def main():
+        app = wx.App()
         translation_manager = PyMCTranslate.new_translation_manager()
         dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         sizer = wx.BoxSizer()
