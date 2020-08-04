@@ -25,7 +25,7 @@
 from PIL import Image
 import numpy
 import math
-from typing import Dict, Tuple, List, Any, Optional
+from typing import Dict, Tuple, List, Any, Optional, Generator
 from amulet_map_editor import log
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
@@ -257,10 +257,27 @@ class TextureAtlasMap(object):
 def create_atlas(
     texture_dict: Dict[Any, str]
 ) -> Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]:
+    atlas_iter = create_atlas_iter(texture_dict)
+    try:
+        while True:
+            yield next(atlas_iter)
+    except StopIteration as e:
+        return e.value
+
+
+def create_atlas_iter(
+        texture_dict: Dict[Any, str]
+) -> Generator[
+    float,
+    None,
+    Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]
+]:
     log.info("Creating texture atlas")
     # Parse texture names
     textures = []
-    for texture in texture_dict.values():
+    for texture_index, texture in enumerate(texture_dict.values()):
+        if not texture_index % 100:
+            yield texture_index / (len(texture_dict) * 2)
         # Look for a texture name
         name, frames = texture, [texture]
 
@@ -292,7 +309,9 @@ def create_atlas(
             log.info(f"Trying to pack textures into image of size {size}x{size}")
             atlas = TextureAtlas(size, size)
 
-            for texture in textures:
+            for texture_index, texture in enumerate(textures):
+                if not texture_index % 30:
+                    yield 0.5 + texture_index / (len(textures) / 2)
                 atlas.pack(texture)
             atlas_created = True
         except AtlasTooSmall:

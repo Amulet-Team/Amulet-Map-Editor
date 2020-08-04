@@ -42,7 +42,6 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             self._canvas = EditCanvas(self, self._world, self._close_self_callback, auto_setup=False)
             for arg in self._canvas.setup():
-                print(arg)
                 if isinstance(arg, (int, float)):
                     self._temp_loading_bar.SetValue(min(arg, 1) * 10000)
                 elif isinstance(arg, tuple) and isinstance(arg[0], (int, float)) and isinstance(arg[1], str):
@@ -50,6 +49,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                     self._temp_msg.SetLabel(arg[1])
                 self.Layout()
                 self.Update()
+                wx.Yield()
 
             edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
             self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
