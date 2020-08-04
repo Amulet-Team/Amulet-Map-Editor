@@ -3,9 +3,10 @@ import wx
 import numpy
 
 from amulet.api.block import Block
-from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine
-from amulet_map_editor.programs.edit.plugins import OperationUI
+from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
 from amulet_map_editor.amulet_wx.ui.simple import SimpleScrollablePanel
+from amulet_map_editor.programs.edit.plugins import OperationUI
+from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -21,6 +22,8 @@ class Replace(SimpleScrollablePanel, OperationUI):
         self.Freeze()
         options = self._load_options({})
 
+        self._block_click_registered = 0
+
         self._original_block = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
@@ -29,9 +32,11 @@ class Replace(SimpleScrollablePanel, OperationUI):
                 options.get("original_block_options", [])
                 or [world.world_wrapper.platform]
             ),
-            wildcard_properties=True
+            wildcard_properties=True,
+            show_pick_block=True
         )
         self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._original_block.Bind(EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 1))
         self._replacement_block = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
@@ -39,11 +44,13 @@ class Replace(SimpleScrollablePanel, OperationUI):
             *(
                 options.get("replacement_block_options", [])
                 or [world.world_wrapper.platform]
-            )
+            ),
+            show_pick_block=True
         )
         self._sizer.Add(
             self._replacement_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
         )
+        self._replacement_block.Bind(EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 2))
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
@@ -55,6 +62,22 @@ class Replace(SimpleScrollablePanel, OperationUI):
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
         return 1,
+
+    def _on_pick_block_button(self, evt, code):
+        """Set up listening for the block click"""
+        if not self._block_click_registered:
+            self.canvas.Bind(EVT_BOX_CLICK, self._on_pick_block)
+            self._block_click_registered = code
+        evt.Skip()
+
+    def _on_pick_block(self, evt):
+        self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
+        x, y, z = self.canvas.cursor_location
+        if self._block_click_registered == 1:
+            self._original_block.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
+        elif self._block_click_registered == 2:
+            self._replacement_block.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
+        self._block_click_registered = 0
 
     def _get_replacement_block(self) -> Block:
         return self._replacement_block.universal_block[0]

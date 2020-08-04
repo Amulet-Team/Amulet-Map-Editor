@@ -49,10 +49,12 @@ class Fill(wx.Panel, OperationUI):
         """Set up listening for the block click"""
         if not self._block_click_registered:
             self.canvas.Bind(EVT_BOX_CLICK, self._on_pick_block)
+            self._block_click_registered = True
         evt.Skip()
 
     def _on_pick_block(self, evt):
         self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
+        self._block_click_registered = False
         x, y, z = self.canvas.cursor_location
         self._block_define.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
 
