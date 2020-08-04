@@ -121,14 +121,22 @@ class BaseEditCanvas(BaseCanvas):
             if os.path.isdir(rp)
         ]
 
-        self._resource_pack = minecraft_model_reader.JavaRPHandler(
-            (amulet_pack, latest_pack, *user_packs, fix_pack)
+        self._resource_pack = minecraft_model_reader.JavaRPHandler((
+                amulet_pack,
+                latest_pack,
+                *user_packs,
+                fix_pack
+            ),
+            load=False
         )
+        for i in self._resource_pack.reload():
+            yield i / 4 + 0.5
 
-        yield 0.7, "Creating texture atlas"
-        self._create_atlas()
+        yield 0.75, "Creating texture atlas"
+        for i in self._create_atlas():
+            yield i / 4 + 0.75
 
-        yield 0.9, "Setting up renderer"
+        yield 1.0, "Setting up renderer"
 
         self._resource_pack_translator = self.world.translation_manager.get_version(
             "java", (999, 0, 0)
@@ -157,7 +165,6 @@ class BaseEditCanvas(BaseCanvas):
         )
 
         self._bind_base_events()
-        yield 1.0
 
     def reset_bound_events(self):
         """Unbind all events and re-bind the default events.
@@ -254,13 +261,19 @@ class BaseEditCanvas(BaseCanvas):
 
     def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
         self._resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
-        self._create_atlas()
+        for _ in self._create_atlas():
+            pass
 
-    def _create_atlas(self):
+    def _create_atlas(self) -> Generator[float, None, None]:
         """Create and bind the atlas texture."""
-        texture_atlas, self._texture_bounds, width, height = textureatlas.create_atlas(
+        atlas_iter = textureatlas.create_atlas(
             self._resource_pack.textures
         )
+        try:
+            while True:
+                yield next(atlas_iter)
+        except StopIteration as e:
+            texture_atlas, self._texture_bounds, width, height = e.value
         glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
         glTexImage2D(
             GL_TEXTURE_2D,

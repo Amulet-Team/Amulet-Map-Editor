@@ -57,6 +57,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                     self._temp_msg.SetLabel(arg[1])
                 self.Layout()
                 self.Update()
+                wx.Yield()
 
             edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
             self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)

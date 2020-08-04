@@ -38,8 +38,3 @@ run `python main.py`
 ## Contributing
 
 For information about contributing to this project, please read the [contribution](contributing.md) file.
-
-
-## License
-This software is available under the MIT license.
-Please see each dependancy for subsequent licences.
