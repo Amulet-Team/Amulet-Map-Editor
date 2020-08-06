@@ -8,7 +8,7 @@ from amulet_map_editor.programs.edit.plugins import (
 )
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 
-from amulet_map_editor.amulet_wx.util.icon import REFRESH_ICON, scale_bitmap
+from amulet_map_editor.amulet_wx.util.icon import REFRESH_ICON
 
 from amulet_map_editor.util.log import log
 
@@ -26,7 +26,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
 
         self._operation_choice = SimpleChoiceAny(self.canvas)
         self._reload_operation = wx.BitmapButton(
-            self.canvas, bitmap=scale_bitmap(REFRESH_ICON, 16, 16)
+            self.canvas, bitmap=REFRESH_ICON.bitmap(16, 16)
         )
         self._reload_operation.SetToolTip("Reload selected operation")
 
@@ -43,7 +43,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         self._reload_operation.Bind(wx.EVT_BUTTON, self._reload_operation_loader)
 
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.Add(self._operation_sizer)
+        self.Add(self._operation_sizer, 1, wx.EXPAND)
 
         # self._operation_change()
 
@@ -56,7 +56,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
 
     @property
     def operation(self) -> str:
-        return self._operation_choice.GetAny()
+        return self._operation_choice.GetCurrentObject()
 
     def _on_operation_change(self, evt):
         self._operation_change()
@@ -72,18 +72,20 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self._active_operation = None
 
     def _operation_change(self):
-        operation_path = self._operation_choice.GetAny()
+        operation_path = self._operation_choice.GetCurrentObject()
         if operation_path:
             operation = self._operations[operation_path]
             self.disable()
             self._active_operation = operation(
                 self.canvas, self.canvas, self.canvas.world
             )
-            self._operation_sizer.Add(self._active_operation, 1, wx.EXPAND)
+            self._operation_sizer.Add(
+                self._active_operation, *self._active_operation.wx_add_options
+            )
             self.Layout()
 
     def _reload_operation_loader(self, evt):
-        operation_path = self._operation_choice.GetAny()
+        operation_path = self._operation_choice.GetCurrentObject()
         if operation_path:
             operation_loader, success = self._operations[operation_path].reload()
             if success:

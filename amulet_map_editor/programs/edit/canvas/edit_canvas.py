@@ -92,7 +92,9 @@ def show_loading_dialog(
 class EditCanvas(ControllableEditCanvas):
     """Adds embedded UI elements to the canvas."""
 
-    def __init__(self, parent: wx.Window, world: "World", close_callback: Callable, **kwargs):
+    def __init__(
+        self, parent: wx.Window, world: "World", close_callback: Callable, **kwargs
+    ):
         super().__init__(parent, world, **kwargs)
         self._close_callback = close_callback
         config = CONFIG.get(EDIT_CONFIG_ID, {})

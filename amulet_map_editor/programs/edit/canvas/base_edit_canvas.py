@@ -6,10 +6,18 @@ import numpy
 import weakref
 
 import minecraft_model_reader
-from minecraft_model_reader.java.download_resources import get_java_vanilla_latest_iter, get_java_vanilla_fix
+from minecraft_model_reader.java.download_resources import (
+    get_java_vanilla_latest_iter,
+    get_java_vanilla_fix,
+)
 from amulet.api.chunk import Chunk
 from amulet.api.errors import ChunkLoadError
-from amulet.api.data_types import PointCoordinatesNDArray, Dimension, BlockCoordinates, OperationYieldType
+from amulet.api.data_types import (
+    PointCoordinatesNDArray,
+    Dimension,
+    BlockCoordinates,
+    OperationYieldType,
+)
 from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
@@ -164,7 +172,6 @@ class BaseEditCanvas(BaseCanvas):
         for event, handler, source in self._bound_events:
             if not self.Unbind(event, source, handler=handler):
                 log.error(f"Failed to unbind {event}, {handler}")
-        self._bound_events.clear()
         self._bind_base_events()
 
     def _bind_base_events(self):
@@ -176,6 +183,13 @@ class BaseEditCanvas(BaseCanvas):
         """Bind an event to the canvas."""
         self._bound_events.append((event, handler, source))
         super().Bind(event, handler, source, id, id2)
+
+    def Unbind(self, event, source=None, id=wx.ID_ANY, id2=wx.ID_ANY, handler=None) -> bool:
+        """Unbind an event from the canvas."""
+        key = (event, handler, source)
+        if key in self._bound_events:
+            self._bound_events.remove(key)
+        return super().Unbind(event, source=source, id=id, id2=id2, handler=handler)
 
     @property
     def world(self) -> "World":

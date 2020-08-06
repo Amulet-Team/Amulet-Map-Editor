@@ -335,15 +335,15 @@ class KeyConfig(wx.BoxSizer):
         self._choice.Bind(wx.EVT_CHOICE, self._on_group_change)
         top_sizer.Add(self._choice, 1, wx.ALL | wx.EXPAND, 5)
 
-        add = wx.BitmapButton(parent, bitmap=ADD_ICON)
+        add = wx.BitmapButton(parent, bitmap=ADD_ICON.bitmap(32, 32))
         add.Bind(wx.EVT_BUTTON, lambda evt: self._create_new_group())
         top_sizer.Add(add, 0, wx.ALL, 5)
 
-        self._delete = wx.BitmapButton(parent, bitmap=SUBTRACT_ICON)
+        self._delete = wx.BitmapButton(parent, bitmap=SUBTRACT_ICON.bitmap(32, 32))
         self._delete.Bind(wx.EVT_BUTTON, lambda evt: self._delete_group())
         top_sizer.Add(self._delete, 0, wx.ALL, 5)
 
-        self._rename = wx.BitmapButton(parent, bitmap=EDIT_ICON)
+        self._rename = wx.BitmapButton(parent, bitmap=EDIT_ICON.bitmap(32, 32))
         self._rename.Bind(wx.EVT_BUTTON, lambda evt: self._rename_group())
         top_sizer.Add(self._rename, 0, wx.ALL, 5)
 
