@@ -1,7 +1,6 @@
 from .api.data_types import PathType, OperationStorageType
-from .api.operation_ui import OperationUI, OperationUIType
-from .api.fixed_pipeline import FixedFunctionUI
 from .api.errors import OperationError, OperationSuccessful, OperationSilentAbort
+from .api.fixed_pipeline import FixedFunctionUI
 from .api.loader import (
     all_operations,
     internal_operations,
@@ -10,3 +9,4 @@ from .api.loader import (
     import_operations,
     reload_operations,
 )
+from .api.operation_ui import OperationUI, OperationUIType

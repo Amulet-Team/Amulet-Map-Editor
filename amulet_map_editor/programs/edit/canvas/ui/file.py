@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Optional
+
 import wx
 
-from .base_ui import BaseUI
 from amulet_map_editor.amulet_wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_CAMERA_MOVE,
@@ -10,6 +10,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     EVT_CREATE_UNDO,
     EVT_SAVE,
 )
+from .base_ui import BaseUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas

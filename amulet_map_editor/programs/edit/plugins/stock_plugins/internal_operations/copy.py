@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
 
-from amulet.api.structure import structure_cache, Structure
 from amulet.api.data_types import Dimension
 from amulet.api.selection import SelectionGroup
+from amulet.api.structure import structure_cache, Structure
+
 from amulet_map_editor.programs.edit.plugins.api.errors import (
     OperationSilentAbort,
     OperationError,

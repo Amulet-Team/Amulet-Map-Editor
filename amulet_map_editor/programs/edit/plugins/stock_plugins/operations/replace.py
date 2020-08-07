@@ -1,12 +1,13 @@
 from typing import TYPE_CHECKING, Tuple
-import wx
-import numpy
 
+import numpy
+import wx
 from amulet.api.block import Block
+
 from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
 from amulet_map_editor.amulet_wx.ui.simple import SimpleScrollablePanel
-from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
+from amulet_map_editor.programs.edit.plugins import OperationUI
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -36,7 +37,9 @@ class Replace(SimpleScrollablePanel, OperationUI):
             show_pick_block=True
         )
         self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
-        self._original_block.Bind(EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 1))
+        self._original_block.Bind(
+            EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 1)
+        )
         self._replacement_block = BlockDefine(
             self,
             world.world_wrapper.translation_manager,
@@ -50,7 +53,9 @@ class Replace(SimpleScrollablePanel, OperationUI):
         self._sizer.Add(
             self._replacement_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
         )
-        self._replacement_block.Bind(EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 2))
+        self._replacement_block.Bind(
+            EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 2)
+        )
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
@@ -61,7 +66,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
 
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
-        return 1,
+        return (1,)
 
     def _on_pick_block_button(self, evt, code):
         """Set up listening for the block click"""
@@ -74,9 +79,15 @@ class Replace(SimpleScrollablePanel, OperationUI):
         self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
         x, y, z = self.canvas.cursor_location
         if self._block_click_registered == 1:
-            self._original_block.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
+            self._original_block.universal_block = (
+                self.world.get_block(x, y, z, self.canvas.dimension),
+                None,
+            )
         elif self._block_click_registered == 2:
-            self._replacement_block.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
+            self._replacement_block.universal_block = (
+                self.world.get_block(x, y, z, self.canvas.dimension),
+                None,
+            )
         self._block_click_registered = 0
 
     def _get_replacement_block(self) -> Block:

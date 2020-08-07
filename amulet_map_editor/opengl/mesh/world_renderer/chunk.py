@@ -1,12 +1,12 @@
-import numpy
-from typing import TYPE_CHECKING, Tuple, List, Union
-import weakref
 import itertools
+import weakref
+from typing import TYPE_CHECKING, Tuple, List, Union
 
 import minecraft_model_reader
-from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
+import numpy
 from amulet.api.chunk.blocks import Blocks
 from amulet.api.data_types import Dimension
+from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 
 from amulet_map_editor.opengl.mesh import new_empty_verts
 from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder

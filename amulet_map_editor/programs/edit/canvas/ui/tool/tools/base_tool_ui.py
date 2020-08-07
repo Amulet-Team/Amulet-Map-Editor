@@ -1,5 +1,7 @@
-import wx
 from typing import Union
+
+import wx
+
 from ...base_ui import BaseUI
 
 BaseToolUIType = Union[wx.Window, wx.Sizer, "BaseToolUI"]

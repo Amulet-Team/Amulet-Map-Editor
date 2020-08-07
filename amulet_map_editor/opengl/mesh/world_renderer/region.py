@@ -1,9 +1,11 @@
-from OpenGL.GL import *
-from typing import Dict, Tuple
-import numpy
 import queue
-from .chunk import RenderChunk, new_empty_verts
+from typing import Dict, Tuple
+
+import numpy
+from OpenGL.GL import *
+
 from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
+from .chunk import RenderChunk, new_empty_verts
 
 
 class ChunkManager:

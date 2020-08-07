@@ -1,9 +1,10 @@
 """A collection of classes for wx objects to abstract away
 the repeated code and make working with wx a bit more simple."""
 
+from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
+
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
-from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
 
 from amulet_map_editor import log
 

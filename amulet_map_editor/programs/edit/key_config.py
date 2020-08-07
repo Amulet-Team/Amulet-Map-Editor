@@ -1,4 +1,5 @@
 from typing import List
+
 from amulet_map_editor.amulet_wx.util.key_config import (
     KeybindContainer,
     KeybindGroup,
@@ -14,7 +15,6 @@ from amulet_map_editor.amulet_wx.util.key_config import (
     Numpad_Add,
     Alt,
 )
-
 
 KeybindKeys: List[KeyActionType] = [
     "up",
@@ -34,7 +34,6 @@ KeybindKeys: List[KeyActionType] = [
     "remove box",
     "inspect block",
 ]
-
 
 PresetKeybinds: KeybindContainer = {
     "right": {

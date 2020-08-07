@@ -1,23 +1,21 @@
-from typing import TYPE_CHECKING
-import wx
 import os
+from typing import TYPE_CHECKING
 
-from amulet.api.selection import SelectionGroup
-from amulet.api.errors import ChunkLoadError
+import wx
 from amulet.api.data_types import Dimension, OperationReturnType
+from amulet.api.errors import ChunkLoadError
+from amulet.api.selection import SelectionGroup
 from amulet.structure_interface.schematic import SchematicFormatWrapper
 
 from amulet_map_editor.amulet_wx.ui.version_select import PlatformSelect
+from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
     SimpleOperationPanel,
 )
-from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
-
 
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
-
 
 WarningMsg = """The Schematic format is a
 legacy format that can only

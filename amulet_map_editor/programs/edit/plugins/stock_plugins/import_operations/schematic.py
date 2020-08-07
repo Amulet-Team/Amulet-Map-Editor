@@ -1,19 +1,18 @@
-import wx
 import os
 from typing import TYPE_CHECKING
 
-
+import wx
 from amulet.api.block import BlockManager
-from amulet.api.structure import Structure
-from amulet.api.selection import SelectionGroup
-from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension
+from amulet.api.errors import ChunkLoadError
+from amulet.api.selection import SelectionGroup
+from amulet.api.structure import Structure
 from amulet.structure_interface.schematic import SchematicFormatWrapper
 
+from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
     SimpleOperationPanel,
 )
-from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 if TYPE_CHECKING:
     from amulet.api.world import World

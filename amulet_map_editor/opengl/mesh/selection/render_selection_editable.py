@@ -1,8 +1,9 @@
-import numpy
-from OpenGL.GL import *
 from typing import Tuple, Dict, Any
 
+import numpy
+from OpenGL.GL import *
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
+
 from .render_selection_highlightable import RenderSelectionHighlightable
 
 

@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from functools import partial
 from collections.abc import MutableMapping, MutableSequence
-
-import wx
-
-from amulet_map_editor.amulet_wx.ui import simple
+from functools import partial
 
 import amulet_nbt as nbt
+import wx
 
 from amulet_map_editor import resources
+from amulet_map_editor.amulet_wx.ui import simple
 
 nbt_resources = resources.img.nbt
 
@@ -260,7 +258,6 @@ class NBTEditor(simple.SimplePanel):
 
 
 class EditTagDialog(wx.Frame):
-
     GRID_ROWS = 3
     GRID_COLUMNS = 4
 

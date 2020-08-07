@@ -1,18 +1,18 @@
-from typing import TYPE_CHECKING, Set, Generator
-import wx
-import numpy
 import time
+from typing import TYPE_CHECKING, Set, Generator
 
+import numpy
+import wx
 from amulet.api.data_types import OperationYieldType
 
-from .base_edit_canvas import BaseEditCanvas
-from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
 from amulet_map_editor.amulet_wx.util.key_config import (
     serialise_key_event,
     KeybindGroup,
     ActionLookupType,
     Escape,
 )
+from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
+from .base_edit_canvas import BaseEditCanvas
 from .events import EditEscapeEvent, EVT_EDIT_ESCAPE, BoxClickEvent
 
 if TYPE_CHECKING:

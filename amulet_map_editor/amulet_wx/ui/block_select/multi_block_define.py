@@ -1,9 +1,11 @@
-import wx
-import wx.lib.scrolledpanel
 from typing import List
 
 import PyMCTranslate
+import wx
+import wx.lib.scrolledpanel
 
+from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
+from amulet_map_editor.amulet_wx.ui.block_select.properties import EVT_PROPERTIES_CHANGE
 from amulet_map_editor.amulet_wx.util.icon import (
     UP_CARET,
     DOWN_CARET,
@@ -12,8 +14,6 @@ from amulet_map_editor.amulet_wx.util.icon import (
     MAXIMIZE,
     MINIMIZE,
 )
-from amulet_map_editor.amulet_wx.ui.block_select.block_define import BlockDefine
-from amulet_map_editor.amulet_wx.ui.block_select.properties import EVT_PROPERTIES_CHANGE
 
 
 class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):

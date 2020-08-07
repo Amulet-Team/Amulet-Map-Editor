@@ -22,10 +22,12 @@
 #
 """Texture Atlas and Map File Generation Utility Classes"""
 
-from PIL import Image
-import numpy
 import math
 from typing import Dict, Tuple, List, Any, Optional, Generator
+
+import numpy
+from PIL import Image
+
 from amulet_map_editor import log
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
@@ -266,11 +268,11 @@ def create_atlas(
 
 
 def create_atlas_iter(
-        texture_dict: Dict[Any, str]
+    texture_dict: Dict[Any, str]
 ) -> Generator[
     float,
     None,
-    Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]
+    Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int],
 ]:
     log.info("Creating texture atlas")
     # Parse texture names

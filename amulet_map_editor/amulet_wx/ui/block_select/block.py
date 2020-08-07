@@ -1,8 +1,8 @@
-import wx
-from wx.lib import newevent
 from typing import Tuple, List, Optional
 
 import PyMCTranslate
+import wx
+from wx.lib import newevent
 
 from amulet_map_editor.amulet_wx.util.icon import COLOUR_PICKER
 

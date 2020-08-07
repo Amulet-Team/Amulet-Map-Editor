@@ -1,11 +1,6 @@
 import math
+
 import numpy
-from amulet.utils.matrix import (
-    scale_matrix,
-    rotation_matrix,
-    transform_matrix,
-    displacement_matrix,
-)
 
 
 def projection_matrix(

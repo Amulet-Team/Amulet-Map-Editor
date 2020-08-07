@@ -1,5 +1,7 @@
 from typing import Optional, Tuple
+
 import wx
+
 from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
 
 

@@ -1,10 +1,11 @@
-from amulet_map_editor.amulet_wx.ui.simple import SimpleChoice, SimpleChoiceAny
-import wx
-from wx.lib import newevent
-import PyMCTranslate
 from typing import Tuple, Optional, Type, Any
 
+import PyMCTranslate
+import wx
 from amulet.api.data_types import VersionNumberTuple, PlatformType
+from wx.lib import newevent
+
+from amulet_map_editor.amulet_wx.ui.simple import SimpleChoice, SimpleChoiceAny
 
 (
     PlatformChangeEvent,
@@ -23,7 +24,9 @@ from amulet.api.data_types import VersionNumberTuple, PlatformType
 (
     VersionChangeEvent,
     EVT_VERSION_CHANGE,
-) = newevent.NewCommandEvent()  # one of the above changed. Fired after EVT_FORMAT_CHANGE
+) = (
+    newevent.NewCommandEvent()
+)  # one of the above changed. Fired after EVT_FORMAT_CHANGE
 
 
 class PlatformSelect(wx.Panel):
@@ -52,7 +55,9 @@ class PlatformSelect(wx.Panel):
         self._set_platform(platform)
         self._platform_choice.Bind(
             wx.EVT_CHOICE,
-            lambda evt: wx.PostEvent(self, PlatformChangeEvent(self.GetId(), platform=self.platform)),
+            lambda evt: wx.PostEvent(
+                self, PlatformChangeEvent(self.GetId(), platform=self.platform)
+            ),
         )
 
     def _add_ui_element(
@@ -124,7 +129,10 @@ class VersionSelect(PlatformSelect):
         self._version_choice.Bind(
             wx.EVT_CHOICE,
             lambda evt: wx.PostEvent(
-                self, VersionNumberChangeEvent(self.GetId(), version_number=self.version_number)
+                self,
+                VersionNumberChangeEvent(
+                    self.GetId(), version_number=self.version_number
+                ),
             ),
         )
 
@@ -141,7 +149,10 @@ class VersionSelect(PlatformSelect):
         )
 
     def _post_version_change(self):
-        wx.PostEvent(self, FormatChangeEvent(self.GetId(), force_blockstate=self.force_blockstate)),
+        wx.PostEvent(
+            self,
+            FormatChangeEvent(self.GetId(), force_blockstate=self.force_blockstate),
+        ),
         wx.PostEvent(
             self,
             VersionChangeEvent(
@@ -159,7 +170,10 @@ class VersionSelect(PlatformSelect):
     @version_number.setter
     def version_number(self, version_number: VersionNumberTuple):
         self._set_version_number(version_number)
-        wx.PostEvent(self, VersionNumberChangeEvent(self.GetId(), version_number=self.version_number))
+        wx.PostEvent(
+            self,
+            VersionNumberChangeEvent(self.GetId(), version_number=self.version_number),
+        )
 
     def _set_version_number(self, version_number: VersionNumberTuple):
         if version_number and version_number in self._version_choice.values:

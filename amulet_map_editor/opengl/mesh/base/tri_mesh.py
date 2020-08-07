@@ -1,9 +1,10 @@
+import numpy
 from OpenGL.GL import *
 from OpenGL.error import GLError
-import numpy
+
+from amulet_map_editor import log
 from amulet_map_editor.opengl.mesh import new_empty_verts
 from amulet_map_editor.opengl.shaders import get_shader
-from amulet_map_editor import log
 
 
 class Drawable:

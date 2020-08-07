@@ -1,21 +1,21 @@
-import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, Set
 import math
-from concurrent.futures import ThreadPoolExecutor, Future
 import time
 import weakref
+from concurrent.futures import ThreadPoolExecutor, Future
+from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, Set
 
-import minecraft_model_reader
 import PyMCTranslate
+import minecraft_model_reader
+import numpy
 from amulet.api.block import BlockManager
 from amulet.api.data_types import Dimension
 
 from amulet_map_editor import log
+from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.opengl.resource_pack import ResourcePackManager
 from .chunk import RenderChunk
 from .region import ChunkManager
-from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
-from amulet_map_editor.opengl.resource_pack import ResourcePackManager
-from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
 
 if TYPE_CHECKING:
     from amulet.api.world import World

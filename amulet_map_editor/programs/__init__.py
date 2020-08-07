@@ -1,16 +1,16 @@
-import wx
-import os
-from typing import List, Dict, Callable, Union, Tuple, Any, Type, TYPE_CHECKING
 import importlib
+import os
 import pkgutil
 import traceback
+from typing import List, Dict, Callable, Union, Tuple, Any, Type, TYPE_CHECKING
 
-from amulet.api.errors import LoaderNoneMatched
+import wx
 from amulet import world_interface
+from amulet.api.errors import LoaderNoneMatched
 
 from amulet_map_editor import log
-from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 from amulet_map_editor.amulet_wx.ui.select_world import WorldUI
+from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 
 if TYPE_CHECKING:
     from amulet.api.world import World

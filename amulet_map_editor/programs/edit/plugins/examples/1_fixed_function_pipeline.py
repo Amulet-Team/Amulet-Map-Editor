@@ -3,9 +3,9 @@
 # You define a function and it will appear in the UI for you to run
 
 
+from amulet.api.data_types import Dimension
 from amulet.api.selection import SelectionGroup
 from amulet.api.world import World
-from amulet.api.data_types import Dimension
 
 
 # for those that are new to python 3 the thing after the colon is the object type that the variable should be

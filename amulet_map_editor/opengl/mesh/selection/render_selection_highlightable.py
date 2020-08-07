@@ -1,7 +1,8 @@
 from typing import Dict, Any, Tuple
-import numpy
 
+import numpy
 from amulet.api.data_types import BlockCoordinatesAny
+
 from .render_selection import RenderSelection
 
 

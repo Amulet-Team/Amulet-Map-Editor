@@ -1,20 +1,20 @@
-import wx
 from typing import TYPE_CHECKING, Type, Dict, Optional
 
+import wx
+
+from amulet_map_editor.programs.edit.canvas.events import (
+    ToolChangeEvent,
+    EVT_TOOL_CHANGE,
+)
 from amulet_map_editor.programs.edit.canvas.ui import BaseUI
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import (
     BaseToolUI,
     BaseToolUIType,
 )
-from amulet_map_editor.programs.edit.canvas.events import (
-    ToolChangeEvent,
-    EVT_TOOL_CHANGE,
-)
-
-from .tools.select import SelectOptions
-from .tools.operation import SelectOperationUI
-from .tools.import_tool import SelectImportOperationUI
 from .tools.export_tool import SelectExportOperationUI
+from .tools.import_tool import SelectImportOperationUI
+from .tools.operation import SelectOperationUI
+from .tools.select import SelectOptions
 
 if TYPE_CHECKING:
     from ...edit_canvas import EditCanvas

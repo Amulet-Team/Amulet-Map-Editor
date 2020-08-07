@@ -1,7 +1,8 @@
+import os
+
+from . import lang
 from .util import config as CONFIG
 from .util.log import log
-from . import lang
-import os
 
 _version_path = os.path.join(os.path.dirname(__file__), "version")
 if os.path.isfile(_version_path):

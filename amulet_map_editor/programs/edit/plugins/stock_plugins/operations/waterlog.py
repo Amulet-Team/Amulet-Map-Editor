@@ -1,17 +1,17 @@
-import numpy
 from typing import TYPE_CHECKING, Tuple
+
+import numpy
 import wx
 
-from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
-from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
-from amulet_map_editor.programs.edit.plugins import OperationUI
-from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 from amulet_map_editor import resources
+from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
+from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
+from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
+from amulet_map_editor.programs.edit.plugins import OperationUI
 
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
-
 
 MODES = {
     "Overlay": "Overlay the block on the existing. If the first block is air it replaces the first block otherwise it sets the second block.",
@@ -19,13 +19,13 @@ MODES = {
     "Normal Fill": "Replace all selected blocks with the chosen block.",
     "Game Fill": "Fill like in game. Moves water blocks to the second block and replaces the first block. Useful for setting blocks in existing water.",
     "Set First": "Set the first block leaving the second block as it was. If you want to change the first block without modifying the second block.",
-    "Set Second": "Set the second block leaving the first block as it was. This can cause issues if the first block is air. You might prefer \"Overlay\"",
+    "Set Second": 'Set the second block leaving the first block as it was. This can cause issues if the first block is air. You might prefer "Overlay"',
 }
 
 
 class Waterlog(wx.Panel, OperationUI):
     def __init__(
-            self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
     ):
         wx.Panel.__init__(self, parent)
         OperationUI.__init__(self, parent, canvas, world, options_path)
@@ -39,46 +39,42 @@ class Waterlog(wx.Panel, OperationUI):
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(top_sizer, 0, wx.EXPAND | wx.ALL, 5)
 
-        help_button = wx.BitmapButton(self, bitmap=resources.img.icon.tablericons.help.bitmap(22, 22))
+        help_button = wx.BitmapButton(
+            self, bitmap=resources.img.icon.tablericons.help.bitmap(22, 22)
+        )
         top_sizer.Add(help_button)
 
         def on_button(evt):
             dialog = SimpleDialog(self, "Extra block help.")
             text = wx.TextCtrl(
-                    dialog,
-                    value="Blocks in the newer versions of Minecraft support having two blocks in the same location.\n"
-                          "This is how the game is able to have water and blocks like fences at the same location.\n"
-                          "In the example of waterlogged fences the fence is the first block and the water is the second. Unless it is water the second block is usually just visual.\n"
-                          "In Java currently the second block is strictly water but in Bedrock there is no limit on what the second block can be.\n"
-                          "It is not possible to set non-water second blocks in the game but this operation enables the use of that feature.\n"
-                          "There are a number of different modes which can be selected at the top. A description of how it works will appear.",
-                    style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP
-                )
-            dialog.sizer.Add(
-                text,
-                1,
-                wx.EXPAND
+                dialog,
+                value="Blocks in the newer versions of Minecraft support having two blocks in the same location.\n"
+                "This is how the game is able to have water and blocks like fences at the same location.\n"
+                "In the example of waterlogged fences the fence is the first block and the water is the second. Unless it is water the second block is usually just visual.\n"
+                "In Java currently the second block is strictly water but in Bedrock there is no limit on what the second block can be.\n"
+                "It is not possible to set non-water second blocks in the game but this operation enables the use of that feature.\n"
+                "There are a number of different modes which can be selected at the top. A description of how it works will appear.",
+                style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP,
             )
+            dialog.sizer.Add(text, 1, wx.EXPAND)
             dialog.ShowModal()
             evt.Skip()
 
         help_button.Bind(wx.EVT_BUTTON, on_button)
 
-        self._mode = wx.Choice(
-            self,
-            choices=list(MODES.keys())
-        )
+        self._mode = wx.Choice(self, choices=list(MODES.keys()))
         self._mode.SetSelection(0)
         top_sizer.Add(self._mode, 1, wx.EXPAND | wx.LEFT, 5)
         self._mode.Bind(wx.EVT_CHOICE, self._on_mode_change)
 
         self._mode_description = wx.TextCtrl(
-            self,
-            style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP
         )
         self._sizer.Add(self._mode_description, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
 
-        self._mode_description.SetLabel(MODES[self._mode.GetString(self._mode.GetSelection())])
+        self._mode_description.SetLabel(
+            MODES[self._mode.GetString(self._mode.GetSelection())]
+        )
         self._mode_description.Fit()
 
         self._block_define = BlockDefine(
@@ -101,10 +97,12 @@ class Waterlog(wx.Panel, OperationUI):
 
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
-        return 1,
+        return (1,)
 
     def _on_mode_change(self, evt):
-        self._mode_description.SetLabel(MODES[self._mode.GetString(self._mode.GetSelection())])
+        self._mode_description.SetLabel(
+            MODES[self._mode.GetString(self._mode.GetSelection())]
+        )
         self._mode_description.Fit()
         self.Layout()
         evt.Skip()
@@ -120,7 +118,10 @@ class Waterlog(wx.Panel, OperationUI):
         self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
         self._block_click_registered = False
         x, y, z = self.canvas.cursor_location
-        self._block_define.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
+        self._block_define.universal_block = (
+            self.world.get_block(x, y, z, self.canvas.dimension),
+            None,
+        )
 
     def _get_fill_block(self):
         return self._block_define.universal_block[0]
@@ -159,9 +160,10 @@ class Waterlog(wx.Panel, OperationUI):
                 lut = numpy.array(
                     [
                         world.palette.get_add_block(
-                            waterlog_block if world.palette[block_id].namespaced_name == "universal_minecraft:air"
-                            else
-                            world.palette[block_id].base_block
+                            waterlog_block
+                            if world.palette[block_id].namespaced_name
+                            == "universal_minecraft:air"
+                            else world.palette[block_id].base_block
                             + waterlog_block  # get the Block object for that id and add the user specified block
                         )  # register the new block / get the numerical id if it was already registered
                         for block_id in palette
@@ -171,10 +173,13 @@ class Waterlog(wx.Panel, OperationUI):
                 lut = numpy.array(
                     [
                         world.palette.get_add_block(
-                            waterlog_block if world.palette[block_id].namespaced_name == "universal_minecraft:air"
-                            else
-                            waterlog_block +  # get the Block object for that id and add the user specified block
-                            world.palette[block_id].base_block
+                            waterlog_block
+                            if world.palette[block_id].namespaced_name
+                            == "universal_minecraft:air"
+                            else waterlog_block
+                            + world.palette[  # get the Block object for that id and add the user specified block
+                                block_id
+                            ].base_block
                         )  # register the new block / get the numerical id if it was already registered
                         for block_id in palette
                     ]  # add the new id to the palette
@@ -185,15 +190,17 @@ class Waterlog(wx.Panel, OperationUI):
                         world.palette.get_add_block(
                             waterlog_block
                         )  # register the new block / get the numerical id if it was already registered
-                    ] * len(palette)  # add the new id to the palette
+                    ]
+                    * len(palette)  # add the new id to the palette
                 )
             elif mode == "Game Fill":
                 lut = numpy.array(
                     [
                         world.palette.get_add_block(
                             waterlog_block + world.palette[block_id].base_block
-                            if world.palette[block_id].namespaced_name == "universal_minecraft:water" else
-                            waterlog_block
+                            if world.palette[block_id].namespaced_name
+                            == "universal_minecraft:water"
+                            else waterlog_block
                         )  # register the new block / get the numerical id if it was already registered
                         for block_id in palette
                     ]  # add the new id to the palette
@@ -203,8 +210,8 @@ class Waterlog(wx.Panel, OperationUI):
                     [
                         world.palette.get_add_block(
                             waterlog_block + world.palette[block_id].extra_blocks[0]
-                            if world.palette[block_id].extra_blocks else
-                            waterlog_block
+                            if world.palette[block_id].extra_blocks
+                            else waterlog_block
                         )  # register the new block / get the numerical id if it was already registered
                         for block_id in palette
                     ]  # add the new id to the palette

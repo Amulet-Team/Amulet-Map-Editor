@@ -1,8 +1,9 @@
-import pickle
-from typing import Any, TYPE_CHECKING, Union, Tuple
 import os
-import wx
+import pickle
 import weakref
+from typing import Any, TYPE_CHECKING, Union, Tuple
+
+import wx
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
