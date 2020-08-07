@@ -1,4 +1,2 @@
-from .util import config as CONFIG
-from .util.log import log
-from . import lang
+from amulet_map_editor.api import lang, config as CONFIG, log
 from .api import version, AmuletUI

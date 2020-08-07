@@ -5,8 +5,8 @@ import uuid
 import numpy
 import math
 from typing import Optional
-from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
-from amulet_map_editor.opengl.matrix import rotation_matrix, projection_matrix
+from amulet_map_editor.api.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.api.opengl.matrix import rotation_matrix, projection_matrix
 
 
 class BaseCanvas(glcanvas.GLCanvas):

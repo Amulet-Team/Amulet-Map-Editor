@@ -2,8 +2,8 @@ from OpenGL.GL import *
 from typing import Dict, Tuple
 import numpy
 import queue
-from .chunk import RenderChunk, new_empty_verts
-from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
+from .chunk import RenderChunk
+from amulet_map_editor.api.opengl.mesh.base.tri_mesh import TriMesh
 
 
 class ChunkManager:
@@ -213,7 +213,7 @@ class RenderRegion(TriMesh):
             if region_verts:
                 verts = numpy.concatenate(region_verts)
             else:
-                verts = new_empty_verts()
+                verts = self.new_empty_verts()
             self.draw_count = int(verts.size // self._vert_len)
             self._merged_chunk_locations = merged_locations
 

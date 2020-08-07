@@ -3,10 +3,11 @@ import wx
 import glob
 from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
-from amulet_map_editor import lang, CONFIG
+from amulet_map_editor.api import lang
 from amulet import world_interface
 from amulet_map_editor.amulet_wx.ui import simple
-from amulet_map_editor import log
+from amulet_map_editor.api.logging import log
+from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
@@ -254,7 +255,7 @@ class RecentWorldUI(simple.SimplePanel):
         self.rebuild()
 
     def rebuild(self, new_world: str = None):
-        meta: dict = CONFIG.get("amulet_meta", {})
+        meta: dict = config.get("amulet_meta", {})
         recent_worlds: list = meta.setdefault("recent_worlds", [])
         if new_world is not None:
             while new_world in recent_worlds:
@@ -269,7 +270,7 @@ class RecentWorldUI(simple.SimplePanel):
         )
         self.add_object(self._world_list, 1, wx.EXPAND)
         self.Layout()
-        CONFIG.put("amulet_meta", meta)
+        config.put("amulet_meta", meta)
 
 
 class WorldSelectAndRecentUI(simple.SimplePanel):

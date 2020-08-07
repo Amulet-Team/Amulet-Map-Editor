@@ -8,9 +8,9 @@ from amulet.api.structure import Structure
 from amulet.api.data_types import FloatTriplet, PointCoordinates
 
 from .structure import RenderStructure
-from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
-from amulet_map_editor.opengl.matrix import transform_matrix
-from amulet_map_editor.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.api.opengl.matrix import transform_matrix
+from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager
 
 LocationType = PointCoordinates
 ScaleType = FloatTriplet

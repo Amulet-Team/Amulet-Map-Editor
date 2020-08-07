@@ -10,7 +10,7 @@ from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import Ba
 
 from amulet_map_editor.amulet_wx.util.icon import REFRESH_ICON
 
-from amulet_map_editor.util.log import log
+from amulet_map_editor.api.logging import log
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas import EditCanvas

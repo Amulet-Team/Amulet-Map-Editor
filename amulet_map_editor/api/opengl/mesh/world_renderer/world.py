@@ -10,12 +10,12 @@ import PyMCTranslate
 from amulet.api.block import BlockManager
 from amulet.api.data_types import Dimension
 
-from amulet_map_editor import log
+from amulet_map_editor.api.logging import log
 from .chunk import RenderChunk
 from .region import ChunkManager
-from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
-from amulet_map_editor.opengl.resource_pack import ResourcePackManager
-from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.api.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
 
 if TYPE_CHECKING:
     from amulet.api.world import World

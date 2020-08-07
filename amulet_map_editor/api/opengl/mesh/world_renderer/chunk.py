@@ -8,8 +8,7 @@ from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from amulet.api.chunk.blocks import Blocks
 from amulet.api.data_types import Dimension
 
-from amulet_map_editor.opengl.mesh import new_empty_verts
-from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
+from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 
 if TYPE_CHECKING:
     from .world import RenderWorld
@@ -38,7 +37,7 @@ class RenderChunk(RenderChunkBuilder):
         self.verts_translucent = (
             0  # the offset into the above from which the faces can be translucent
         )
-        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
+        # self.chunk_lod1: numpy.ndarray = self.new_empty_verts()
 
     def __repr__(self):
         return f"RenderChunk({self._coords[0]}, {self._coords[1]})"
@@ -243,5 +242,5 @@ class RenderChunk(RenderChunkBuilder):
         unique_blocks: numpy.ndarray,
     ):
         # TODO
-        self.verts: numpy.ndarray = new_empty_verts()
-        # self.chunk_lod1: numpy.ndarray = new_empty_verts()
+        self.verts: numpy.ndarray = self.new_empty_verts()
+        # self.chunk_lod1: numpy.ndarray = self.new_empty_verts()

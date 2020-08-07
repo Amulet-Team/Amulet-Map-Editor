@@ -20,17 +20,17 @@ from amulet.api.data_types import (
 )
 from amulet.api.selection import SelectionGroup
 
-from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
-from amulet_map_editor.opengl.mesh.world_renderer.world import (
+from amulet_map_editor.api.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.api.opengl.mesh.world_renderer.world import (
     RenderWorld,
     cos,
     tan,
     atan,
 )
-from amulet_map_editor.opengl.mesh.structure import StructureGroup
-from amulet_map_editor.opengl import textureatlas
-from amulet_map_editor.opengl.canvas.base import BaseCanvas
-from amulet_map_editor import log
+from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
+from amulet_map_editor.api.opengl import textureatlas
+from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
+from amulet_map_editor.api.logging import log
 from .render_selection import EditProgramRenderSelectionGroup
 from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,

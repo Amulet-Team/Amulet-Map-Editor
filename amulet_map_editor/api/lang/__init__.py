@@ -1,5 +1,5 @@
 import os
-from amulet_map_editor import CONFIG
+from amulet_map_editor.api import config
 
 # there might be a proper way to do this but this should be enough for now
 
@@ -27,7 +27,7 @@ def load_language(lang: str):
         _load_langauge(lang)
 
 
-load_language(CONFIG.get("amulet_meta", {}).get("lang", default_lang))
+load_language(config.get("amulet_meta", {}).get("lang", default_lang))
 
 
 def get(key):

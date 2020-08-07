@@ -4,8 +4,8 @@ from typing import Dict, Union
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
-from amulet_map_editor.api import version
-from amulet_map_editor import lang, log
+from amulet_map_editor.api import version, lang
+from amulet_map_editor.api.logging import log
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
 

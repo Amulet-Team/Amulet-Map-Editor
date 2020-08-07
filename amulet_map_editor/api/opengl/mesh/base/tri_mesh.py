@@ -1,9 +1,8 @@
 from OpenGL.GL import *
 from OpenGL.error import GLError
 import numpy
-from amulet_map_editor.opengl.mesh import new_empty_verts
-from amulet_map_editor.opengl.shaders import get_shader
-from amulet_map_editor import log
+from amulet_map_editor.api.opengl.shaders import get_shader
+from amulet_map_editor.api.logging import log
 
 
 class Drawable:
@@ -38,9 +37,13 @@ class TriMesh(Drawable):
         )
         self._texture_location = None  # the location of the texture in the shader
         self._texture = texture
-        self.verts = new_empty_verts()  # the vertices to draw
+        self.verts = self.new_empty_verts()  # the vertices to draw
         self.draw_start = 0
         self.draw_count = 0  # the number of vertices to draw
+
+    @staticmethod
+    def new_empty_verts() -> numpy.ndarray:
+        return numpy.zeros(0, dtype=numpy.float32)
 
     @property
     def vertex_usage(self):

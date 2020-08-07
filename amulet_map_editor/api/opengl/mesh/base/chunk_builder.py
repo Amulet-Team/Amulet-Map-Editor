@@ -3,7 +3,7 @@ from typing import Tuple, Dict, List
 
 import minecraft_model_reader
 
-from amulet_map_editor.opengl.mesh import new_empty_verts, TriMesh
+from amulet_map_editor.api.opengl.mesh import TriMesh
 
 _brightness_step = 0.15
 _brightness_multiplier = {
@@ -30,8 +30,9 @@ class RenderChunkBuilder(TriMesh):
     def offset(self) -> numpy.ndarray:
         raise NotImplementedError
 
+    @staticmethod
     def _get_block_data(
-        self, blocks: numpy.ndarray
+        blocks: numpy.ndarray
     ) -> Tuple[numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
         :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks"""
@@ -52,7 +53,7 @@ class RenderChunkBuilder(TriMesh):
             self.verts = numpy.concatenate(chunk_verts, 0)
             self.verts_translucent = self.verts.size
         else:
-            self.verts = new_empty_verts()
+            self.verts = self.new_empty_verts()
 
         if chunk_verts_translucent:
             chunk_verts_translucent.insert(0, self.verts)
