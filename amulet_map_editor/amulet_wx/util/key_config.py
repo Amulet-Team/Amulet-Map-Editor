@@ -215,7 +215,6 @@ key_string_map = {
     wx.WXK_NUMPAD_DIVIDE: Numpad_Divide,
 }
 
-
 _mouse_events = {
     wx.EVT_LEFT_DOWN.evtType[0]: MouseLeft,
     wx.EVT_LEFT_UP.evtType[0]: MouseLeft,

@@ -14,7 +14,6 @@ from amulet_map_editor.programs import BaseWorldProgram, MenuData
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
 
-
 thread_pool_executor = ThreadPoolExecutor(max_workers=1)
 work_count = 0
 

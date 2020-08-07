@@ -1,6 +1,5 @@
 import wx
 
-
 SpecialChrs = {
     wx.WXK_BACK,
     wx.WXK_DELETE,

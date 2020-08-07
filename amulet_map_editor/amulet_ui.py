@@ -12,7 +12,6 @@ from amulet_map_editor.programs import BaseWorldUI
 
 import amulet_map_editor.resources as resources
 
-
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
     from amulet_map_editor.util import update_check

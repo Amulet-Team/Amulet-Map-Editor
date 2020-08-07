@@ -7,7 +7,6 @@ from amulet.api.selection import SelectionGroup
 from amulet.api.world import World
 from amulet.api.data_types import Dimension
 
-
 operation_options = {  # options is a dictionary where the key is the description shown to the user and the value describes how to build the UI
     "Text Label": ["label"],  # This will just be a label
     # bool examples  https://wxpython.org/Phoenix/docs/html/wx.CheckBox.html

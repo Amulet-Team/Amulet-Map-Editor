@@ -11,6 +11,7 @@ from amulet_map_editor import log
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
 
+
 # Windows 	%APPDATA%\.minecraft
 # macOS 	~/Library/Application Support/minecraft
 # Linux 	~/.minecraft

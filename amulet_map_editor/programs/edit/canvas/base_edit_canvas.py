@@ -121,13 +121,8 @@ class BaseEditCanvas(BaseCanvas):
             if os.path.isdir(rp)
         ]
 
-        self._resource_pack = minecraft_model_reader.JavaRPHandler((
-                amulet_pack,
-                latest_pack,
-                *user_packs,
-                fix_pack
-            ),
-            load=False
+        self._resource_pack = minecraft_model_reader.JavaRPHandler(
+            (amulet_pack, latest_pack, *user_packs, fix_pack), load=False
         )
         for i in self._resource_pack.reload():
             yield i / 4 + 0.5
@@ -184,7 +179,9 @@ class BaseEditCanvas(BaseCanvas):
         self._bound_events.append((event, handler, source))
         super().Bind(event, handler, source, id, id2)
 
-    def Unbind(self, event, source=None, id=wx.ID_ANY, id2=wx.ID_ANY, handler=None) -> bool:
+    def Unbind(
+        self, event, source=None, id=wx.ID_ANY, id2=wx.ID_ANY, handler=None
+    ) -> bool:
         """Unbind an event from the canvas."""
         key = (event, handler, source)
         if key in self._bound_events:
@@ -266,9 +263,7 @@ class BaseEditCanvas(BaseCanvas):
 
     def _create_atlas(self) -> Generator[float, None, None]:
         """Create and bind the atlas texture."""
-        atlas_iter = textureatlas.create_atlas(
-            self._resource_pack.textures
-        )
+        atlas_iter = textureatlas.create_atlas(self._resource_pack.textures)
         try:
             while True:
                 yield next(atlas_iter)

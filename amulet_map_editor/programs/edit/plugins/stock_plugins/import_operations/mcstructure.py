@@ -2,7 +2,6 @@ import wx
 import os
 from typing import TYPE_CHECKING
 
-
 from amulet.api.block import BlockManager
 from amulet.api.structure import Structure
 from amulet.api.selection import SelectionGroup

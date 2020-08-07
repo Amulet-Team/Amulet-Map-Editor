@@ -13,7 +13,6 @@ from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
 )
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
-
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas

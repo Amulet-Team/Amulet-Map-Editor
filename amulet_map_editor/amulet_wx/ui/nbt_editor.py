@@ -260,7 +260,6 @@ class NBTEditor(simple.SimplePanel):
 
 
 class EditTagDialog(wx.Frame):
-
     GRID_ROWS = 3
     GRID_COLUMNS = 4
 

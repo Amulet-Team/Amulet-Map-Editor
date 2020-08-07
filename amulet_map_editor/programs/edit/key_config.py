@@ -15,7 +15,6 @@ from amulet_map_editor.amulet_wx.util.key_config import (
     Alt,
 )
 
-
 KeybindKeys: List[KeyActionType] = [
     "up",
     "down",
@@ -34,7 +33,6 @@ KeybindKeys: List[KeyActionType] = [
     "remove box",
     "inspect block",
 ]
-
 
 PresetKeybinds: KeybindContainer = {
     "right": {

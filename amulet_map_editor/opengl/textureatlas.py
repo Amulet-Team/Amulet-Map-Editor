@@ -266,11 +266,11 @@ def create_atlas(
 
 
 def create_atlas_iter(
-        texture_dict: Dict[Any, str]
+    texture_dict: Dict[Any, str]
 ) -> Generator[
     float,
     None,
-    Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]
+    Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int],
 ]:
     log.info("Creating texture atlas")
     # Parse texture names

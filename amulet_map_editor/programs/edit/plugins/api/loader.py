@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas import EditCanvas
     from amulet.api.world import World
 
-
 STOCK_PLUGINS_DIR = os.path.abspath(
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "stock_plugins")
 )
@@ -64,12 +63,12 @@ class OperationLoader:
                 "config",
                 "edit_plugins",
                 f"""{''.join(c for c in self._name if c in ValidChrs)}_{
-                    struct.unpack(
-                        "H",
-                        hashlib.sha1(
-                            self._path.encode('utf-8')
-                        ).digest()[:2]
-                    )[0]
+                struct.unpack(
+                    "H",
+                    hashlib.sha1(
+                        self._path.encode('utf-8')
+                    ).digest()[:2]
+                )[0]
                 }.config""",  # generate a file name that identifiable to the operation but "unique" to the path
             )
         )

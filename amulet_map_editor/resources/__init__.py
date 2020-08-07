@@ -14,7 +14,6 @@ import json
 
 import wx
 
-
 _BASE = normpath(opjoin(opdir(__file__), ""))
 
 
