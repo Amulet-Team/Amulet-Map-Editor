@@ -183,7 +183,7 @@ class ScrollableWorldsUI(simple.SimpleScrollablePanel):
             if os.path.isdir(directory):
                 world_list = CollapseableWorldListUI(
                     self,
-                    glob.glob(os.path.join(directory, "*")),
+                    glob.glob(glob.escape(os.path.join(directory, "*"))),
                     group_name,
                     self.open_world_callback,
                 )
