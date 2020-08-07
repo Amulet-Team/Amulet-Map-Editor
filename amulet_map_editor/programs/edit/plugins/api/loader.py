@@ -193,14 +193,14 @@ def get_export_dict(mod, operations_: OperationStorageType, path: str):
 def _load_operations(operations_: OperationStorageType, path: str):
     """load all operations from a specified directory"""
     if os.path.isdir(path):
-        for fpath in glob.iglob(glob.escape(os.path.join(path, "*.py"))):
+        for fpath in glob.iglob(os.path.join(glob.escape(path), "*.py")):
             if fpath.endswith("__init__.py"):
                 continue
 
             mod = _load_module_file(fpath)
             get_export_dict(mod, operations_, fpath)
 
-        for dpath in glob.iglob(glob.escape(os.path.join(path, "**", "__init__.py"))):
+        for dpath in glob.iglob(os.path.join(glob.escape(path), "**", "__init__.py")):
             mod = _load_module_directory(dpath)
             get_export_dict(mod, operations_, os.path.basename(os.path.dirname(dpath)))
 
