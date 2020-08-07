@@ -1,20 +1,19 @@
 import wx
-import wx.lib.inspection
 from wx.lib.agw import flatnotebook
 from typing import Dict, Union
-import webbrowser
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
-from amulet_map_editor import lang, version, log
-from amulet_map_editor.programs import WorldManagerUI
-from amulet_map_editor.programs import BaseWorldUI
+from amulet_map_editor.api import version
+from amulet_map_editor import lang, log
+from amulet_map_editor.api.framework.pages import WorldPageUI
+from .pages import AmuletMainMenu, BasePageUI
 
 import amulet_map_editor.resources as resources
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
-    from amulet_map_editor.util import update_check
+    from amulet_map_editor.api.framework import update_check
 except ImportError:
     update_check = None
     log.warning("Could not import update checker")
@@ -26,12 +25,12 @@ NOTEBOOK_MENU_STYLE = (
 )
 NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
 
-CLOSEABLE_PAGE_TYPE = Union[WorldManagerUI]
+CLOSEABLE_PAGE_TYPE = Union[WorldPageUI]
 
 wx.Image.SetDefaultLoadFlags(0)
 
 
-class AmuletMainWindow(wx.Frame):
+class AmuletUI(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(
             self,
@@ -69,7 +68,7 @@ class AmuletMainWindow(wx.Frame):
 
         self._main_menu = AmuletMainMenu(self.world_tab_holder, self._open_world)
 
-        self._last_page: BaseWorldUI = self._main_menu
+        self._last_page: BasePageUI = self._main_menu
 
         self._add_world_tab(self._main_menu, lang.get("main_menu"))
 
@@ -125,21 +124,21 @@ class AmuletMainWindow(wx.Frame):
                         wx_id = wx.ID_ANY
 
                     menu_item: wx.MenuItem = menu.Append(
-                        wx.ID_ANY, menu_item_name, menu_item_description
+                        wx_id, menu_item_name, menu_item_description
                     )
                     self.Bind(wx.EVT_MENU, callback, menu_item)
             menu_bar.Append(menu, menu_name)
         self.SetMenuBar(menu_bar)
 
-    def _page_change(self, evt):
+    def _page_change(self, _):
         self._disable_enable()
 
     def _disable_enable(self):
-        current: BaseWorldUI = self.world_tab_holder.GetCurrentPage()
+        current: BasePageUI = self.world_tab_holder.GetCurrentPage()
         if self._last_page != current:
             if self._last_page is not None:
                 self._last_page.disable()
-            self._last_page: BaseWorldUI = current
+            self._last_page: BasePageUI = current
             if self._last_page is self._main_menu:
                 self.world_tab_holder.SetAGWWindowStyleFlag(NOTEBOOK_MENU_STYLE)
             else:
@@ -165,7 +164,7 @@ class AmuletMainWindow(wx.Frame):
             self._disable_enable()
         else:
             try:
-                world = WorldManagerUI(
+                world = WorldPageUI(
                     self.world_tab_holder, path, lambda: self.close_world(path)
                 )
             except LoaderNoneMatched as e:
@@ -200,60 +199,3 @@ class AmuletMainWindow(wx.Frame):
             wx.MessageBox("A world is still being used. Please close it first")
         else:
             evt.Skip()
-
-
-class AmuletMainMenu(wx.Panel, BaseWorldUI):
-    def __init__(self, parent: wx.Window, open_world):
-        super(AmuletMainMenu, self).__init__(parent)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(sizer)
-        sizer.AddStretchSpacer(1)
-        self._open_world_callback = open_world
-        name_sizer = wx.BoxSizer()
-        sizer.Add(name_sizer, 0, wx.CENTER)
-        img = resources.img.logo.icon128.bitmap(64, 64)
-
-        icon = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (64, 64))
-        icon2 = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (64, 64))
-        icon2.Bind(
-            wx.EVT_LEFT_DOWN, lambda evt: wx.lib.inspection.InspectionTool().Show()
-        )
-        name_sizer.Add(icon, flag=wx.CENTER)
-
-        amulet_converter = wx.StaticText(self, label="Amulet")
-        amulet_converter.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        name_sizer.Add(amulet_converter, flag=wx.CENTER)
-        name_sizer.Add(icon2, flag=wx.CENTER)
-        button_font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
-        self._open_world_button = wx.Button(self, label="Open World", size=(400, 70))
-        self._open_world_button.SetFont(button_font)
-        self._open_world_button.Bind(wx.EVT_BUTTON, self._show_world_select)
-        sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
-
-        self._help_button = wx.Button(self, label="Help", size=(400, 70))
-        self._help_button.SetFont(button_font)
-        self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
-        sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)
-
-        self._help_button = wx.Button(self, label="Amulet Discord", size=(400, 70))
-        self._help_button.SetFont(button_font)
-        self._help_button.Bind(wx.EVT_BUTTON, self._discord)
-        sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)
-
-        sizer.AddStretchSpacer(2)
-
-    def _show_world_select(self, evt):
-        select_world = WorldSelectDialog(self, self._open_world_callback)
-        select_world.ShowModal()
-        select_world.Destroy()
-
-    def _documentation(self, evt):
-        webbrowser.open(
-            "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/readme.md"
-        )
-
-    def _discord(self, evt):
-        webbrowser.open("https://discord.gg/BTm6jnf")
-
-    def enable(self):
-        self.GetGrandParent().create_menu()

@@ -138,7 +138,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                             version_block_entity,
                             _,
                         ) = translator.block.from_universal(
-                            block, extra_input=block_entity, block_location=(x, y, z)
+                            block, block_entity, block_location=(x, y, z)
                         )
                         print(
                             f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}"

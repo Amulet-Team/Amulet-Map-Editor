@@ -1,7 +1,7 @@
 import wx
 from OpenGL.GL import *
 import os
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator, Set
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
 import weakref
 

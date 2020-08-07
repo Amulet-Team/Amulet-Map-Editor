@@ -4,6 +4,7 @@ import urllib.request
 import threading
 import json
 import re
+import webbrowser
 
 import wx
 
@@ -113,9 +114,7 @@ class UpdateDialog(wx.Dialog):
         )
         ok_button.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
-    def goto_download_page(self, new_version, evt):
-        import webbrowser
-
+    def goto_download_page(self, new_version, _):
         webbrowser.open(
             f"https://github.com/Amulet-Team/Amulet-Map-Editor/releases/tag/v{new_version}"
         )

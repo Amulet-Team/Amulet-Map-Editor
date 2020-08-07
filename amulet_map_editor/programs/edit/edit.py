@@ -5,7 +5,8 @@ import webbrowser
 EDIT_CONFIG_ID = "amulet_edit"
 
 from amulet_map_editor import CONFIG, log
-from amulet_map_editor.programs import BaseWorldProgram, MenuData
+from amulet_map_editor.api.framework.programs import BaseProgram
+from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.amulet_wx.util.key_config import KeyConfigDialog
 from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
 from .canvas.edit_canvas import EditCanvas
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
     from amulet.api.world import World
 
 
-class EditExtension(wx.Panel, BaseWorldProgram):
+class EditExtension(wx.Panel, BaseProgram):
     def __init__(self, parent, world: "World", close_self_callback: Callable[[], None]):
         wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)

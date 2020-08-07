@@ -9,7 +9,8 @@ from amulet.api.world import World
 from amulet_map_editor import lang, log
 from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog, WorldUI
-from amulet_map_editor.programs import BaseWorldProgram, MenuData
+from amulet_map_editor.api.datatypes import MenuData
+from amulet_map_editor.api.framework.programs import BaseProgram
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
@@ -18,7 +19,7 @@ thread_pool_executor = ThreadPoolExecutor(max_workers=1)
 work_count = 0
 
 
-class ConvertExtension(SimplePanel, BaseWorldProgram):
+class ConvertExtension(SimplePanel, BaseProgram):
     def __init__(
         self, container, world: World, close_self_callback: Callable[[], None]
     ):
