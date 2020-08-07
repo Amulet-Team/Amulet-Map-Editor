@@ -1,12 +1,12 @@
-import weakref
+import wx
+from wx.lib import newevent
 from typing import Tuple, Dict, Optional, List, Union
+import weakref
 
 import PyMCTranslate
 import amulet_nbt
-import wx
-from amulet.api.block import PropertyDataTypes, PropertyType
 from amulet_nbt import SNBTType
-from wx.lib import newevent
+from amulet.api.block import PropertyDataTypes, PropertyType
 
 WildcardSNBTType = Union[SNBTType, str]
 

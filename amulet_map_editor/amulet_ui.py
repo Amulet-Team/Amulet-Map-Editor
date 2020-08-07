@@ -1,16 +1,17 @@
-import webbrowser
-from typing import Dict, Union
-
 import wx
 import wx.lib.inspection
-from amulet.api.errors import LoaderNoneMatched
 from wx.lib.agw import flatnotebook
+from typing import Dict, Union
+import webbrowser
+
+from amulet.api.errors import LoaderNoneMatched
+from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
+from amulet_map_editor import lang, version, log
+from amulet_map_editor.programs import WorldManagerUI
+from amulet_map_editor.programs import BaseWorldUI
 
 import amulet_map_editor.resources as resources
-from amulet_map_editor import lang, version, log
-from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
-from amulet_map_editor.programs import BaseWorldUI
-from amulet_map_editor.programs import WorldManagerUI
+
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:

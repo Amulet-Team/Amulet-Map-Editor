@@ -1,17 +1,16 @@
+import numpy
 from typing import Tuple, Dict, Any, Optional, List
 
-import numpy
 from amulet.api.data_types import (
     BlockCoordinatesAny,
     BlockCoordinatesNDArray,
     PointCoordinatesAny,
     BlockCoordinates,
 )
-
-from .render_selection import RenderSelection
-from .render_selection_editable import RenderSelectionEditable
 from .render_selection_group import RenderSelectionGroup
+from .render_selection import RenderSelection
 from .render_selection_highlightable import RenderSelectionHighlightable
+from .render_selection_editable import RenderSelectionEditable
 
 
 class RenderSelectionGroupEditable(RenderSelectionGroup):

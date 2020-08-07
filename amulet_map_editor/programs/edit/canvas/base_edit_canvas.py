@@ -1,43 +1,43 @@
-import os
-import weakref
-from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
-
-import minecraft_model_reader
-import numpy
 import wx
 from OpenGL.GL import *
+import os
+from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator, Set
+import numpy
+import weakref
+
+import minecraft_model_reader
+from minecraft_model_reader.java.download_resources import (
+    get_java_vanilla_latest_iter,
+    get_java_vanilla_fix,
+)
 from amulet.api.chunk import Chunk
+from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import (
     PointCoordinatesNDArray,
     Dimension,
     BlockCoordinates,
     OperationYieldType,
 )
-from amulet.api.errors import ChunkLoadError
 from amulet.api.selection import SelectionGroup
-from minecraft_model_reader.java.download_resources import (
-    get_java_vanilla_latest_iter,
-    get_java_vanilla_fix,
-)
 
-from amulet_map_editor import log
-from amulet_map_editor.opengl import textureatlas
-from amulet_map_editor.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
-from amulet_map_editor.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.opengl.mesh.world_renderer.world import (
     RenderWorld,
     cos,
     tan,
     atan,
 )
+from amulet_map_editor.opengl.mesh.structure import StructureGroup
+from amulet_map_editor.opengl import textureatlas
+from amulet_map_editor.opengl.canvas.base import BaseCanvas
+from amulet_map_editor import log
+from .render_selection import EditProgramRenderSelectionGroup
 from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
     CameraRotateEvent,
     DimensionChangeEvent,
     SelectionPointChangeEvent,
 )
-from .render_selection import EditProgramRenderSelectionGroup
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -121,8 +121,13 @@ class BaseEditCanvas(BaseCanvas):
             if os.path.isdir(rp)
         ]
 
-        self._resource_pack = minecraft_model_reader.JavaRPHandler(
-            (amulet_pack, latest_pack, *user_packs, fix_pack), load=False
+        self._resource_pack = minecraft_model_reader.JavaRPHandler((
+                amulet_pack,
+                latest_pack,
+                *user_packs,
+                fix_pack
+            ),
+            load=False
         )
         for i in self._resource_pack.reload():
             yield i / 4 + 0.5
@@ -179,9 +184,7 @@ class BaseEditCanvas(BaseCanvas):
         self._bound_events.append((event, handler, source))
         super().Bind(event, handler, source, id, id2)
 
-    def Unbind(
-        self, event, source=None, id=wx.ID_ANY, id2=wx.ID_ANY, handler=None
-    ) -> bool:
+    def Unbind(self, event, source=None, id=wx.ID_ANY, id2=wx.ID_ANY, handler=None) -> bool:
         """Unbind an event from the canvas."""
         key = (event, handler, source)
         if key in self._bound_events:
@@ -263,7 +266,9 @@ class BaseEditCanvas(BaseCanvas):
 
     def _create_atlas(self) -> Generator[float, None, None]:
         """Create and bind the atlas texture."""
-        atlas_iter = textureatlas.create_atlas(self._resource_pack.textures)
+        atlas_iter = textureatlas.create_atlas(
+            self._resource_pack.textures
+        )
         try:
             while True:
                 yield next(atlas_iter)

@@ -1,6 +1,6 @@
 import logging
-import os
 import sys
+import os
 
 log = logging.getLogger("amulet_map_editor")
 log_level = logging.DEBUG if "amulet-debug" in sys.argv else logging.INFO

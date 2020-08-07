@@ -1,16 +1,19 @@
 from typing import TYPE_CHECKING, Type, Any, Optional
-
 import wx
+
 from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.amulet_wx.util.validators import IntValidator
+from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
+from amulet_map_editor.programs.edit.canvas.ui.select_location import (
+    SelectLocationUI,
+    SelectTransformUI,
+)
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_PASTE,
     EVT_BOX_CHANGE,
     EVT_BOX_EDIT_TOGGLE,
 )
-from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectTransformUI
-from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas

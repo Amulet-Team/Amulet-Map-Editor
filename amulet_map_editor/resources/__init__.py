@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
-from os import listdir
+from typing import Dict, Union
+
 from os.path import (
     join as opjoin,
     splitext as opsplit,
@@ -9,9 +9,11 @@ from os.path import (
     isdir,
     normpath,
 )
-from typing import Dict, Union
+from os import listdir
+import json
 
 import wx
+
 
 _BASE = normpath(opjoin(opdir(__file__), ""))
 

@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING, Tuple
-
 import wx
-from amulet.operations.fill import fill
 
+from amulet.operations.fill import fill
 from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
-from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 from amulet_map_editor.programs.edit.plugins import OperationUI
+from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
+
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -43,7 +43,7 @@ class Fill(wx.Panel, OperationUI):
 
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
-        return (1,)
+        return 1,
 
     def _on_pick_block_button(self, evt):
         """Set up listening for the block click"""
@@ -56,10 +56,7 @@ class Fill(wx.Panel, OperationUI):
         self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
         self._block_click_registered = False
         x, y, z = self.canvas.cursor_location
-        self._block_define.universal_block = (
-            self.world.get_block(x, y, z, self.canvas.dimension),
-            None,
-        )
+        self._block_define.universal_block = self.world.get_block(x, y, z, self.canvas.dimension), None
 
     def _get_fill_block(self):
         return self._block_define.universal_block[0]

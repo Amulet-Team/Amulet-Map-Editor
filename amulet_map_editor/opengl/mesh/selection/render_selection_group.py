@@ -1,10 +1,9 @@
+import numpy
 from typing import Tuple, Dict, Any, List, Union
 
-import numpy
-from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
-from amulet.api.selection import SelectionGroup, SelectionBox
-
 from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
+from amulet.api.selection import SelectionGroup, SelectionBox
+from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 from .render_selection import RenderSelection
 
 

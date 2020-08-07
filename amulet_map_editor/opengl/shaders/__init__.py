@@ -1,8 +1,7 @@
+from OpenGL.GL import *
+import OpenGL.GL.shaders
 import os
 from typing import Dict, Tuple, Any
-
-import OpenGL.GL.shaders
-from OpenGL.GL import *
 
 shader_dir = os.path.join(os.path.dirname(__file__))
 _shaders: Dict[Tuple[str, str], Any] = {}

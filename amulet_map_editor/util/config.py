@@ -1,6 +1,6 @@
-import gzip
 import os
 import pickle
+import gzip
 from typing import Any
 
 _path = os.path.abspath(os.path.join(".", "config"))

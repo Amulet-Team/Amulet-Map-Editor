@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
 
+from amulet.operations.fill import fill
+from amulet.api.selection import SelectionGroup
 from amulet.api.block import Block
 from amulet.api.data_types import Dimension, OperationReturnType
-from amulet.api.selection import SelectionGroup
-from amulet.operations.fill import fill
 
 if TYPE_CHECKING:
     from amulet.api.world import World

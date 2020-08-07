@@ -1,16 +1,16 @@
 from typing import List, Optional, Tuple, Dict, Any
-
-import PyMCTranslate
-import minecraft_model_reader
 import numpy
-from amulet.api.block import BlockManager
-from amulet.api.data_types import FloatTriplet, PointCoordinates
-from amulet.api.structure import Structure
 
-from amulet_map_editor.opengl.matrix import transform_matrix
-from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
-from amulet_map_editor.opengl.resource_pack import ResourcePackManager
+import minecraft_model_reader
+import PyMCTranslate
+from amulet.api.block import BlockManager
+from amulet.api.structure import Structure
+from amulet.api.data_types import FloatTriplet, PointCoordinates
+
 from .structure import RenderStructure
+from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.opengl.matrix import transform_matrix
+from amulet_map_editor.opengl.resource_pack import ResourcePackManager
 
 LocationType = PointCoordinates
 ScaleType = FloatTriplet

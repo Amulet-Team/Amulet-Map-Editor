@@ -3,9 +3,9 @@
 # Notes about the operation
 
 
-from amulet.api.data_types import Dimension
 from amulet.api.selection import SelectionGroup
 from amulet.api.world import World
+from amulet.api.data_types import Dimension
 
 
 # Notes about the operation

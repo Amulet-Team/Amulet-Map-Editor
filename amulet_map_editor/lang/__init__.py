@@ -1,5 +1,4 @@
 import os
-
 from amulet_map_editor import CONFIG
 
 # there might be a proper way to do this but this should be enough for now

@@ -1,11 +1,10 @@
+import numpy
+from OpenGL.GL import *
 import itertools
 from typing import Tuple, Dict, Any, Optional, Union
 
-import numpy
-from OpenGL.GL import *
-from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
-
 from amulet_map_editor.opengl.mesh.base.tri_mesh import TriMesh
+from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 
 
 class RenderSelection(TriMesh):

@@ -1,7 +1,7 @@
+import numpy
 from typing import Tuple, Dict, List
 
 import minecraft_model_reader
-import numpy
 
 from amulet_map_editor.opengl.mesh import new_empty_verts, TriMesh
 

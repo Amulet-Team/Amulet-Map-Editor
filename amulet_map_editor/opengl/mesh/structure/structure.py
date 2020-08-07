@@ -1,21 +1,22 @@
-import weakref
 from typing import Tuple, Any, Dict
-
-import PyMCTranslate
-import minecraft_model_reader
+import weakref
 import numpy
-from amulet.api.block import BlockManager
-from amulet.api.chunk import Chunk
-from amulet.api.structure import Structure
 
-from amulet_map_editor.opengl.matrix import displacement_matrix
+import minecraft_model_reader
+import PyMCTranslate
+
+from amulet.api.structure import Structure
+from amulet.api.chunk import Chunk
+from amulet.api.block import BlockManager
+
 from amulet_map_editor.opengl.mesh.base.chunk_builder import RenderChunkBuilder
-from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.opengl.resource_pack import ResourcePackManager
 from amulet_map_editor.opengl.mesh.selection import (
     RenderSelectionGroup,
     RenderSelection,
 )
-from amulet_map_editor.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.opengl.matrix import displacement_matrix
 
 
 class GreenRenderSelection(RenderSelection):

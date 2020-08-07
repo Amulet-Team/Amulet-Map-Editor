@@ -1,5 +1,5 @@
-import weakref
 from typing import TYPE_CHECKING
+import weakref
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas

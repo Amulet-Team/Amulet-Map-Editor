@@ -1,12 +1,10 @@
-import math
-import uuid
-from typing import Optional
-
-import numpy
 import wx
-from OpenGL.GL import *
 from wx import glcanvas
-
+from OpenGL.GL import *
+import uuid
+import numpy
+import math
+from typing import Optional
 from amulet_map_editor.opengl.data_types import CameraLocationType, CameraRotationType
 from amulet_map_editor.opengl.matrix import rotation_matrix, projection_matrix
 

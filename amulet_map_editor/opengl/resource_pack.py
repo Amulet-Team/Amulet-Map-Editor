@@ -1,7 +1,7 @@
 from typing import Any, Dict, Tuple
 
-import PyMCTranslate
 import minecraft_model_reader
+import PyMCTranslate
 from amulet.api.block import BlockManager
 
 

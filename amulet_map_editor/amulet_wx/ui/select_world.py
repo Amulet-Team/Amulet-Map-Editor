@@ -1,18 +1,15 @@
-import glob
 import os
+import wx
+import glob
 from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
-
-import wx
-from amulet import world_interface
-
 from amulet_map_editor import lang, CONFIG
-from amulet_map_editor import log
+from amulet import world_interface
 from amulet_map_editor.amulet_wx.ui import simple
+from amulet_map_editor import log
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
-
 
 # Windows 	%APPDATA%\.minecraft
 # macOS 	~/Library/Application Support/minecraft

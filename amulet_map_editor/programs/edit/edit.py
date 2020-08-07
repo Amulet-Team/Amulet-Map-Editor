@@ -1,7 +1,6 @@
-import webbrowser
-from typing import TYPE_CHECKING, Optional, Callable
-
 import wx
+from typing import TYPE_CHECKING, Optional, Callable
+import webbrowser
 
 EDIT_CONFIG_ID = "amulet_edit"
 
@@ -115,11 +114,11 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             msg = wx.MessageDialog(
                 self,
                 f"""There {
-                'is' if unsaved_changes == 1 else 'are'
+                    'is' if unsaved_changes == 1 else 'are'
                 } {unsaved_changes} unsaved change{
-                's' if unsaved_changes >= 2 else ''
+                    's' if unsaved_changes >= 2 else ''
                 } in {
-                self._world.world_wrapper.world_name
+                    self._world.world_wrapper.world_name
                 }. Would you like to save?""",
                 style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT,
             )
@@ -133,7 +132,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                 log.info(
                     f"""Aborting closing world {
                     self._world.world_wrapper.world_name
-                    } because the user pressed cancel."""
+                } because the user pressed cancel."""
                 )
                 return False
         return True

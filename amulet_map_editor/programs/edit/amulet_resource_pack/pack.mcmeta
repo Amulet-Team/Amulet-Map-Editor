@@ -1,6 +1,6 @@
 {
-	"pack": {
-		"description": "Textures for the Amulet renderer",
-		"pack_format": 4
-	}
+    "pack": {
+        "description": "Textures for the Amulet renderer",
+        "pack_format": 4
+    }
 }

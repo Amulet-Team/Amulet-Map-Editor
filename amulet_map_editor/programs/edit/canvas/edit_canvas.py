@@ -1,16 +1,36 @@
+import wx
+from typing import TYPE_CHECKING, Callable, Any, Generator
+from types import GeneratorType
 import time
 import traceback
-from types import GeneratorType
-from typing import TYPE_CHECKING, Callable, Any, Generator
 
-import wx
 from amulet.api.data_types import OperationReturnType, OperationYieldType
 from amulet.api.structure import Structure, structure_cache
 
 from amulet_map_editor import CONFIG, log
-from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import (
-    ControllableEditCanvas,
+from amulet_map_editor.programs.edit.edit import EDIT_CONFIG_ID
+from amulet_map_editor.programs.edit.key_config import (
+    DefaultKeys,
+    DefaultKeybindGroupId,
+    PresetKeybinds,
 )
+from amulet_map_editor.programs.edit.canvas.ui.goto import show_goto
+from amulet_map_editor.programs.edit.canvas.ui.tool import Tool
+from amulet_map_editor.programs.edit.plugins import (
+    OperationError,
+    OperationSuccessful,
+    OperationSilentAbort,
+)
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.cut import (
+    cut,
+)
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.copy import (
+    copy,
+)
+from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.delete import (
+    delete,
+)
+
 from amulet_map_editor.programs.edit.canvas.events import (
     UndoEvent,
     RedoEvent,
@@ -21,29 +41,10 @@ from amulet_map_editor.programs.edit.canvas.events import (
     ToolChangeEvent,
     EVT_EDIT_CLOSE,
 )
+from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import (
+    ControllableEditCanvas,
+)
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
-from amulet_map_editor.programs.edit.canvas.ui.goto import show_goto
-from amulet_map_editor.programs.edit.canvas.ui.tool import Tool
-from amulet_map_editor.programs.edit.edit import EDIT_CONFIG_ID
-from amulet_map_editor.programs.edit.key_config import (
-    DefaultKeys,
-    DefaultKeybindGroupId,
-    PresetKeybinds,
-)
-from amulet_map_editor.programs.edit.plugins import (
-    OperationError,
-    OperationSuccessful,
-    OperationSilentAbort,
-)
-from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.copy import (
-    copy,
-)
-from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.cut import (
-    cut,
-)
-from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.delete import (
-    delete,
-)
 
 if TYPE_CHECKING:
     from amulet.api.world import World

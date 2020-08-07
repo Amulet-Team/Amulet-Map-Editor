@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import urllib.request
+import threading
 import json
 import re
-import threading
-import urllib.request
 
 import wx
 

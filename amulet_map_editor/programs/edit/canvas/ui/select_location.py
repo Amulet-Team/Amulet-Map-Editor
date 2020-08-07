@@ -1,17 +1,16 @@
-import math
-from typing import Callable, Type, Any, TYPE_CHECKING
-
 import wx
-from amulet.api.data_types import BlockCoordinates
-from amulet.api.structure import Structure
+from typing import Callable, Type, Any, TYPE_CHECKING
+import math
 
+from amulet.api.structure import Structure
+from amulet.api.data_types import BlockCoordinates
 from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
 from amulet_map_editor.amulet_wx.util.validators import IntValidator
+from amulet_map_editor.programs.edit.canvas.ui.base_ui import BaseUI
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_SELECTION_POINT_CHANGE,
     EVT_BOX_CLICK,
 )
-from amulet_map_editor.programs.edit.canvas.ui.base_ui import BaseUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas

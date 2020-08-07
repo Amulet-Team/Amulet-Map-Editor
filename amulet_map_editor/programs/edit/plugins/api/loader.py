@@ -1,21 +1,21 @@
-import glob
-import hashlib
-import importlib.util
-import inspect
 import os
-import struct
-from typing import Dict, List, TYPE_CHECKING, Callable, Optional, Type, Tuple
-
-import wx
+import glob
+import importlib.util
 from amulet import log
+from typing import Dict, List, TYPE_CHECKING, Callable, Optional, Type, Tuple
+import wx
+import struct
+import hashlib
+import inspect
 
-from .data_types import OperationStorageType
 from .fixed_pipeline import FixedFunctionUI
 from .operation_ui import OperationUI, OperationUIType
+from .data_types import OperationStorageType
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas import EditCanvas
     from amulet.api.world import World
+
 
 STOCK_PLUGINS_DIR = os.path.abspath(
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "stock_plugins")
@@ -64,12 +64,12 @@ class OperationLoader:
                 "config",
                 "edit_plugins",
                 f"""{''.join(c for c in self._name if c in ValidChrs)}_{
-                struct.unpack(
-                    "H",
-                    hashlib.sha1(
-                        self._path.encode('utf-8')
-                    ).digest()[:2]
-                )[0]
+                    struct.unpack(
+                        "H",
+                        hashlib.sha1(
+                            self._path.encode('utf-8')
+                        ).digest()[:2]
+                    )[0]
                 }.config""",  # generate a file name that identifiable to the operation but "unique" to the path
             )
         )

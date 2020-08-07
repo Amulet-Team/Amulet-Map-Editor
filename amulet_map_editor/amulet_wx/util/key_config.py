@@ -1,12 +1,11 @@
-from typing import Dict, Tuple, Optional, Union, Sequence
-
 import wx
-
 from amulet_map_editor.amulet_wx.ui.simple import (
     SimpleDialog,
     SimpleScrollablePanel,
     SimpleChoice,
 )
+from typing import Dict, Tuple, Optional, Union, Sequence
+
 from amulet_map_editor.amulet_wx.util.icon import ADD_ICON, SUBTRACT_ICON, EDIT_ICON
 
 ModifierKeyType = str
@@ -215,6 +214,7 @@ key_string_map = {
     wx.WXK_NUMPAD_DECIMAL: Numpad_Decimal,
     wx.WXK_NUMPAD_DIVIDE: Numpad_Divide,
 }
+
 
 _mouse_events = {
     wx.EVT_LEFT_DOWN.evtType[0]: MouseLeft,

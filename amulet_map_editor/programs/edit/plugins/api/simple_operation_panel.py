@@ -1,8 +1,8 @@
+import wx
 from typing import TYPE_CHECKING
 
-import wx
-from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.api.selection import SelectionGroup
+from amulet.api.data_types import Dimension, OperationReturnType
 
 from .operation_ui import OperationUI
 
