@@ -2,9 +2,9 @@ import webbrowser
 import wx
 import wx.lib.inspection
 
-from amulet_map_editor import resources
+from amulet_map_editor.api import image
 from .base_page import BasePageUI
-from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
+from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
 
 
 class AmuletMainMenu(wx.Panel, BasePageUI):
@@ -16,10 +16,10 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self._open_world_callback = open_world
         name_sizer = wx.BoxSizer()
         sizer.Add(name_sizer, 0, wx.CENTER)
-        img = resources.img.logo.icon128.bitmap(64, 64)
+        icon_img = image.logo.icon128.bitmap(64, 64)
 
-        icon = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (64, 64))
-        icon2 = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (64, 64))
+        icon = wx.StaticBitmap(self, wx.ID_ANY, icon_img, (0, 0), (64, 64))
+        icon2 = wx.StaticBitmap(self, wx.ID_ANY, icon_img, (0, 0), (64, 64))
         icon2.Bind(
             wx.EVT_LEFT_DOWN, lambda evt: wx.lib.inspection.InspectionTool().Show()
         )

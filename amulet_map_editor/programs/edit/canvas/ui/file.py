@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Optional
 import wx
 
 from .base_ui import BaseUI
-from amulet_map_editor.amulet_wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_CAMERA_MOVE,
     EVT_UNDO,

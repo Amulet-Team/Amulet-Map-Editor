@@ -7,8 +7,8 @@ EDIT_CONFIG_ID = "amulet_edit"
 from amulet_map_editor.api.logging import log
 from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
-from amulet_map_editor.amulet_wx.util.key_config import KeyConfigDialog
-from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
+from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
+from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 from amulet_map_editor.programs.edit.plugins.api import loader

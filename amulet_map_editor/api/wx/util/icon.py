@@ -1,6 +1,6 @@
-import amulet_map_editor.resources as resources
+from amulet_map_editor.api import image
 
-tablericons = resources.img.icon.tablericons
+tablericons = image.icon.tablericons
 
 ADD_ICON = tablericons.plus_green
 SUBTRACT_ICON = tablericons.minus_red

@@ -1,4 +1,4 @@
-from amulet_map_editor.amulet_wx.ui.simple import SimpleChoice, SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import SimpleChoice, SimpleChoiceAny
 import wx
 from wx.lib import newevent
 import PyMCTranslate

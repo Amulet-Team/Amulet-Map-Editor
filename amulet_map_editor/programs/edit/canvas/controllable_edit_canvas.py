@@ -7,7 +7,7 @@ from amulet.api.data_types import OperationYieldType
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.api.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.util.key_config import (
+from amulet_map_editor.api.wx.util.key_config import (
     serialise_key_event,
     KeybindGroup,
     ActionLookupType,

@@ -8,16 +8,16 @@ from amulet.api.block import PropertyType, Block
 from amulet.api.block_entity import BlockEntity
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 
-from amulet_map_editor.amulet_wx.ui.version_select import (
+from amulet_map_editor.api.wx.ui.version_select import (
     VersionSelect,
     EVT_VERSION_CHANGE,
 )
-from amulet_map_editor.amulet_wx.ui.block_select.block import (
+from amulet_map_editor.api.wx.ui.block_select import (
     BlockSelect,
     EVT_BLOCK_CHANGE,
 )
 
-from amulet_map_editor.amulet_wx.ui.block_select.properties import (
+from amulet_map_editor.api.wx.ui.block_select.properties import (
     PropertySelect,
     WildcardSNBTType,
     EVT_PROPERTIES_CHANGE,

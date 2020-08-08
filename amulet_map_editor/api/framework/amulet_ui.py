@@ -3,13 +3,13 @@ from wx.lib.agw import flatnotebook
 from typing import Dict, Union
 
 from amulet.api.errors import LoaderNoneMatched
-from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog
+from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
 from amulet_map_editor.api import version, lang
 from amulet_map_editor.api.logging import log
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
 
-import amulet_map_editor.resources as resources
+from amulet_map_editor.api import image
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
@@ -53,7 +53,7 @@ class AmuletUI(wx.Frame):
             wx.LANGUAGE_ENGLISH
         )  # TODO: work out proper localisation
         icon = wx.Icon()
-        icon.CopyFromBitmap(resources.img.logo.icon128.bitmap())
+        icon.CopyFromBitmap(image.logo.icon128.bitmap())
         self.SetIcon(icon)
 
         self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}

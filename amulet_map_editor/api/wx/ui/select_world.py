@@ -5,7 +5,7 @@ from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
 from amulet_map_editor.api import lang
 from amulet import world_interface
-from amulet_map_editor.amulet_wx.ui import simple
+from amulet_map_editor.api.wx.ui import simple
 from amulet_map_editor.api.logging import log
 from amulet_map_editor.api import config
 

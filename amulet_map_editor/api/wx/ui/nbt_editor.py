@@ -5,13 +5,13 @@ from collections.abc import MutableMapping, MutableSequence
 
 import wx
 
-from amulet_map_editor.amulet_wx.ui import simple
+from amulet_map_editor.api.wx.ui import simple
 
 import amulet_nbt as nbt
 
-from amulet_map_editor import resources
+from amulet_map_editor.api import image
 
-nbt_resources = resources.img.nbt
+nbt_resources = image.nbt
 
 
 class NBTRadioButton(simple.SimplePanel):

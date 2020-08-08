@@ -8,8 +8,8 @@ from amulet.api.world import World
 
 from amulet_map_editor.api import lang
 from amulet_map_editor.api.logging import log
-from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
-from amulet_map_editor.amulet_wx.ui.select_world import WorldSelectDialog, WorldUI
+from amulet_map_editor.api.wx.ui.simple import SimplePanel
+from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.programs import BaseProgram
 

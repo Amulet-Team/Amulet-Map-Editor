@@ -1,8 +1,8 @@
 import wx
 from typing import Callable, TYPE_CHECKING
 
-from amulet_map_editor.amulet_wx.ui.simple import SimplePanel
-from amulet_map_editor.amulet_wx.ui.select_world import WorldUI
+from amulet_map_editor.api.wx.ui.simple import SimplePanel
+from amulet_map_editor.api.wx.ui.select_world import WorldUI
 from amulet_map_editor.api.framework.programs import BaseProgram
 
 if TYPE_CHECKING:
