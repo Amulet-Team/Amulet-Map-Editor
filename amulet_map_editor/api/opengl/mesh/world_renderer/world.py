@@ -13,7 +13,10 @@ from amulet.api.data_types import Dimension
 from amulet_map_editor.api.logging import log
 from .chunk import RenderChunk
 from .region import ChunkManager
-from amulet_map_editor.api.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.api.opengl.data_types import (
+    CameraLocationType,
+    CameraRotationType,
+)
 from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
 

@@ -5,7 +5,10 @@ import uuid
 import numpy
 import math
 from typing import Optional
-from amulet_map_editor.api.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.api.opengl.data_types import (
+    CameraLocationType,
+    CameraRotationType,
+)
 from amulet_map_editor.api.opengl.matrix import rotation_matrix, projection_matrix
 
 

@@ -15,20 +15,14 @@ from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram
 
 _extensions: List[Tuple[str, Type[BaseProgram]]] = []
-_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [
-    ("About", AboutProgram)
-]
+_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [("About", AboutProgram)]
 
 
 def load_extensions():
     if not _extensions:
         _extensions.extend(_fixed_extensions)
         for _, name, _ in pkgutil.iter_modules(
-            [
-                os.path.join(
-                    os.path.dirname(programs.__file__)
-                )
-            ]
+            [os.path.join(os.path.dirname(programs.__file__))]
         ):
             # load module and confirm that all required attributes are defined
             module = importlib.import_module(f"amulet_map_editor.programs.{name}")

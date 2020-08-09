@@ -20,7 +20,10 @@ from amulet.api.data_types import (
 )
 from amulet.api.selection import SelectionGroup
 
-from amulet_map_editor.api.opengl.data_types import CameraLocationType, CameraRotationType
+from amulet_map_editor.api.opengl.data_types import (
+    CameraLocationType,
+    CameraRotationType,
+)
 from amulet_map_editor.api.opengl.mesh.world_renderer.world import (
     RenderWorld,
     cos,

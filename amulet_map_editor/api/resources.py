@@ -43,7 +43,9 @@ class ResourceDirectory(ResourceItem):
     __slots__ = ("_path", "_factory", "_entries")
     ALLOWED_EXTS = ()
 
-    def __init__(self, directory_name: str, factory_class: Type[ResourceItem], parent: str):
+    def __init__(
+        self, directory_name: str, factory_class: Type[ResourceItem], parent: str
+    ):
         super(ResourceDirectory, self).__init__(os.path.join(parent, directory_name))
         self._factory = factory_class
 
@@ -55,9 +57,7 @@ class ResourceDirectory(ResourceItem):
         for entry in os.listdir(self._path):
             path = os.path.join(self._path, entry)
             if os.path.isdir(path):
-                self._entries[entry] = self.__class__(
-                    entry, self._factory, self._path
-                )
+                self._entries[entry] = self.__class__(entry, self._factory, self._path)
             else:
                 filename, ext = os.path.splitext(entry)
                 ext = ext.lower()
@@ -67,11 +67,15 @@ class ResourceDirectory(ResourceItem):
     def __repr__(self):
         return f"ResourceDirectory({self._path})"
 
-    def __getattr__(self, item) -> Union["ResourceDirectory", ResourceItem, MissingResourceItem]:
+    def __getattr__(
+        self, item
+    ) -> Union["ResourceDirectory", ResourceItem, MissingResourceItem]:
         if item in self._entries:
             if isinstance(self._entries[item], str):
                 ext = self._entries[item]
-                self._entries[item] = self._factory(os.path.join(self._path, f"{item}{ext}"))
+                self._entries[item] = self._factory(
+                    os.path.join(self._path, f"{item}{ext}")
+                )
             return self._entries[item]
         else:
             return MissingResourceItem(os.path.join(self._path, item), self._factory)

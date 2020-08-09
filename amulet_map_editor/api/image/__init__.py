@@ -2,7 +2,11 @@ import wx
 import os
 from typing import Type, Union
 
-from amulet_map_editor.api.resources import ResourceItem, ResourceDirectory, MissingResourceItem
+from amulet_map_editor.api.resources import (
+    ResourceItem,
+    ResourceDirectory,
+    MissingResourceItem,
+)
 
 
 class BitmapResourceItem(ResourceItem):
@@ -29,17 +33,25 @@ class BitmapResourceItem(ResourceItem):
 class ImageResourceDirectory(ResourceDirectory):
     ALLOWED_EXTS = (".png",)
 
-    def __init__(self, directory_name: str, factory_class: Type[ResourceItem], parent: str):
+    def __init__(
+        self, directory_name: str, factory_class: Type[ResourceItem], parent: str
+    ):
         super().__init__(directory_name, factory_class, parent)
 
-    def __getattr__(self, item) -> Union["ImageResourceDirectory", BitmapResourceItem, MissingResourceItem]:
+    def __getattr__(
+        self, item
+    ) -> Union["ImageResourceDirectory", BitmapResourceItem, MissingResourceItem]:
         return super().__getattr__(item)
 
 
-_self = ImageResourceDirectory("image", BitmapResourceItem, os.path.dirname(os.path.dirname(__file__)))
+_self = ImageResourceDirectory(
+    "image", BitmapResourceItem, os.path.dirname(os.path.dirname(__file__))
+)
 
 
-def __getattr__(name: str) -> Union["ImageResourceDirectory", BitmapResourceItem, MissingResourceItem]:
+def __getattr__(
+    name: str,
+) -> Union["ImageResourceDirectory", BitmapResourceItem, MissingResourceItem]:
     return _self.__getattr__(name)
 
 
