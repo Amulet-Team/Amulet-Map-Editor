@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Tuple
 import wx
 
 from amulet.operations.fill import fill
-from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
+from amulet_map_editor.api.wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
 from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 

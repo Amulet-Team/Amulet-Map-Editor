@@ -1,5 +1,5 @@
 from typing import List
-from amulet_map_editor.amulet_wx.util.key_config import (
+from amulet_map_editor.api.wx.util.key_config import (
     KeybindContainer,
     KeybindGroup,
     KeybindGroupIdType,

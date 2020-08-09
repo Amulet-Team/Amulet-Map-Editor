@@ -1,7 +1,7 @@
 import wx
 from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
 
-from amulet_map_editor.amulet_wx.util.validators import IntValidator
+from amulet_map_editor.api.wx.util.validators import IntValidator
 
 from amulet.api.data_types import OperationReturnType
 from .operation_ui import OperationUI

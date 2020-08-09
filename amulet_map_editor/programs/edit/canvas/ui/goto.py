@@ -1,6 +1,6 @@
 from typing import Optional, Tuple
 import wx
-from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
+from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 
 
 def show_goto(

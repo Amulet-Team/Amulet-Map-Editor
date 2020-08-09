@@ -3,12 +3,9 @@ import wx
 
 from amulet.operations.paste import paste_iter
 
-from amulet_map_editor.amulet_wx.util.validators import IntValidator
+from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
-from amulet_map_editor.programs.edit.canvas.ui.select_location import (
-    SelectLocationUI,
-    SelectTransformUI,
-)
+from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectTransformUI
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_PASTE,
     EVT_BOX_CHANGE,

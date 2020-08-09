@@ -1,5 +1,5 @@
 import wx
-from typing import TYPE_CHECKING, Callable, Any, Generator
+from typing import TYPE_CHECKING, Callable, Any, Generator, Optional
 from types import GeneratorType
 import time
 import traceback
@@ -7,7 +7,8 @@ import traceback
 from amulet.api.data_types import OperationReturnType, OperationYieldType
 from amulet.api.structure import Structure, structure_cache
 
-from amulet_map_editor import CONFIG, log
+from amulet_map_editor.api import config
+from amulet_map_editor.api.logging import log
 from amulet_map_editor.programs.edit.edit import EDIT_CONFIG_ID
 from amulet_map_editor.programs.edit.key_config import (
     DefaultKeys,
@@ -97,9 +98,11 @@ class EditCanvas(ControllableEditCanvas):
     ):
         super().__init__(parent, world, **kwargs)
         self._close_callback = close_callback
-        config = CONFIG.get(EDIT_CONFIG_ID, {})
-        user_keybinds = config.get("user_keybinds", {})
-        group = config.get("keybind_group", DefaultKeybindGroupId)
+        self._file_panel: Optional[FilePanel] = None
+        self._tool_sizer: Optional[Tool] = None
+        config_ = config.get(EDIT_CONFIG_ID, {})
+        user_keybinds = config_.get("user_keybinds", {})
+        group = config_.get("keybind_group", DefaultKeybindGroupId)
         if group in user_keybinds:
             keybinds = user_keybinds[group]
         elif group in PresetKeybinds:
@@ -128,7 +131,7 @@ class EditCanvas(ControllableEditCanvas):
         self._tool_sizer.bind_events()
         self.Bind(EVT_EDIT_CLOSE, self._on_close)
 
-    def _on_close(self, evt):
+    def _on_close(self, _):
         self._close_callback()
 
     def reset_bound_events(self):

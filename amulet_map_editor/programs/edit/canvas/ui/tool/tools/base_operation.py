@@ -1,16 +1,16 @@
 import wx
 from typing import TYPE_CHECKING, Optional
 
-from amulet_map_editor.amulet_wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.programs.edit.plugins import (
     OperationUIType,
     OperationStorageType,
 )
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 
-from amulet_map_editor.amulet_wx.util.icon import REFRESH_ICON
+from amulet_map_editor.api.image import REFRESH_ICON
 
-from amulet_map_editor.util.log import log
+from amulet_map_editor.api.logging import log
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas import EditCanvas

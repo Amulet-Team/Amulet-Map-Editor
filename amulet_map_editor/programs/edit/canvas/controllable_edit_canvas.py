@@ -6,8 +6,8 @@ import time
 from amulet.api.data_types import OperationYieldType
 
 from .base_edit_canvas import BaseEditCanvas
-from amulet_map_editor.opengl.mesh.world_renderer.world import sin, cos
-from amulet_map_editor.amulet_wx.util.key_config import (
+from amulet_map_editor.api.opengl.mesh.world_renderer.world import sin, cos
+from amulet_map_editor.api.wx.util.key_config import (
     serialise_key_event,
     KeybindGroup,
     ActionLookupType,
@@ -138,7 +138,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                             version_block_entity,
                             _,
                         ) = translator.block.from_universal(
-                            block, extra_input=block_entity, block_location=(x, y, z)
+                            block, block_entity, block_location=(x, y, z)
                         )
                         print(
                             f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}"

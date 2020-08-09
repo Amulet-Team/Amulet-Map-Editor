@@ -2,11 +2,11 @@ import numpy
 from typing import TYPE_CHECKING, Tuple
 import wx
 
-from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
-from amulet_map_editor.amulet_wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
+from amulet_map_editor.api.wx.ui.simple import SimpleDialog
+from amulet_map_editor.api.wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
 from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
-from amulet_map_editor import resources
+from amulet_map_editor.api import image
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -39,7 +39,7 @@ class Waterlog(wx.Panel, OperationUI):
         self._sizer.Add(top_sizer, 0, wx.EXPAND | wx.ALL, 5)
 
         help_button = wx.BitmapButton(
-            self, bitmap=resources.img.icon.tablericons.help.bitmap(22, 22)
+            self, bitmap=image.icon.tablericons.help.bitmap(22, 22)
         )
         top_sizer.Add(help_button)
 

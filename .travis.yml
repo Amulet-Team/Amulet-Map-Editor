@@ -21,7 +21,7 @@ if: branch IN (master, fix-travis)
 before_install:
   - git config --global user.email ${USER_EMAIL}
   - git config --global user.name ${USER_NAME}
-  - export TRAVIS_TAG="v$(cat ./amulet_map_editor/version)"
+  - export TRAVIS_TAG="v$(cat ./amulet_map_editor/api/version/version)"
   - if [ $(git tag -l "${TRAVIS_TAG}") ] ; then travis_terminate 1 ; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then choco install python --version 3.7.5; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then python -m pip install --upgrade pip ; fi

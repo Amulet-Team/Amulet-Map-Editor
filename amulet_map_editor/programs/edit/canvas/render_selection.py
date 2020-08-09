@@ -2,7 +2,7 @@ from typing import Dict, Tuple, Any, TYPE_CHECKING
 import wx
 import weakref
 
-from amulet_map_editor.opengl.mesh.selection import RenderSelectionGroupEditable
+from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionGroupEditable
 from .events import BoxChangeEvent, BoxEditToggleEvent
 
 if TYPE_CHECKING:

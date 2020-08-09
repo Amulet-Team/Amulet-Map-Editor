@@ -4,19 +4,21 @@ import webbrowser
 
 EDIT_CONFIG_ID = "amulet_edit"
 
-from amulet_map_editor import CONFIG, log
-from amulet_map_editor.programs import BaseWorldProgram, MenuData
-from amulet_map_editor.amulet_wx.util.key_config import KeyConfigDialog
-from amulet_map_editor.amulet_wx.ui.simple import SimpleDialog
+from amulet_map_editor.api.logging import log
+from amulet_map_editor.api.framework.programs import BaseProgram
+from amulet_map_editor.api.datatypes import MenuData
+from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
+from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from .canvas.edit_canvas import EditCanvas
 from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
 from amulet_map_editor.programs.edit.plugins.api import loader
+from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
     from amulet.api.world import World
 
 
-class EditExtension(wx.Panel, BaseWorldProgram):
+class EditExtension(wx.Panel, BaseProgram):
     def __init__(self, parent, world: "World", close_self_callback: Callable[[], None]):
         wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
@@ -59,7 +61,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                 self.Update()
                 wx.Yield()
 
-            edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
+            edit_config: dict = config.get(EDIT_CONFIG_ID, {})
             self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
             self._canvas.render_distance = edit_config.get("options", {}).get(
                 "render_distance", 5
@@ -178,7 +180,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
         return menu
 
     def _edit_controls(self):
-        edit_config = CONFIG.get(EDIT_CONFIG_ID, {})
+        edit_config = config.get(EDIT_CONFIG_ID, {})
         keybind_id = edit_config.get("keybind_group", DefaultKeybindGroupId)
         user_keybinds = edit_config.get("user_keybinds", {})
         key_config = KeyConfigDialog(
@@ -188,7 +190,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
             user_keybinds, keybind_id, keybinds = key_config.options
             edit_config["user_keybinds"] = user_keybinds
             edit_config["keybind_group"] = keybind_id
-            CONFIG.put(EDIT_CONFIG_ID, edit_config)
+            config.put(EDIT_CONFIG_ID, edit_config)
             self._canvas.set_key_binds(keybinds)
 
     def _edit_options(self):
@@ -259,7 +261,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
 
             response = dialog.ShowModal()
             if response == wx.ID_OK:
-                edit_config: dict = CONFIG.get(EDIT_CONFIG_ID, {})
+                edit_config: dict = config.get(EDIT_CONFIG_ID, {})
                 edit_config.setdefault("options", {})
                 edit_config["options"]["fov"] = fov_ui.GetValue()
                 edit_config["options"][
@@ -268,7 +270,7 @@ class EditExtension(wx.Panel, BaseWorldProgram):
                 edit_config["options"][
                     "camera_sensitivity"
                 ] = camera_sensitivity_ui.GetValue()
-                CONFIG.put(EDIT_CONFIG_ID, edit_config)
+                config.put(EDIT_CONFIG_ID, edit_config)
             elif response == wx.ID_CANCEL:
                 self._canvas.fov = fov
                 self._canvas.render_distance = render_distance
