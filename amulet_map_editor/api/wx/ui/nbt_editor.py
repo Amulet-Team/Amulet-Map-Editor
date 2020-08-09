@@ -13,6 +13,8 @@ from amulet_map_editor.api import image
 
 nbt_resources = image.nbt
 
+NBT_FILE = b"\x0A\x00\x0B\x68\x65\x6C\x6C\x6F\x20\x77\x6F\x72\x6C\x64\x08\x00\x04\x6E\x61\x6D\x65\x00\x09\x42\x61\x6E\x61\x6E\x72\x61\x6D\x61\x00"
+
 
 class NBTRadioButton(simple.SimplePanel):
     def __init__(self, parent, nbt_tag_class, icon):
@@ -379,16 +381,14 @@ class EditTagDialog(wx.Frame):
         self.Close()
 
 
-def print_nbt(nbt_data):
-    print(nbt_data)
-
-
 if __name__ == "__main__":
     import wx.lib.inspection
 
     app = wx.App()
     wx.lib.inspection.InspectionTool().Show()
     frame = wx.Frame(None)
-    NBTEditor(frame, nbt.load("level.dat"), callback=print_nbt)
+    NBTEditor(
+        frame, nbt.load(buffer=NBT_FILE), callback=lambda nbt_data: print(nbt_data)
+    )
     frame.Show()
     app.MainLoop()
