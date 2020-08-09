@@ -32,6 +32,8 @@ class ControllableEditCanvas(BaseEditCanvas):
         ] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
         self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
         self._box_select_time = 0
+        self._toggle_mouse_time = 0
+        self._previous_mouse_lock = self._mouse_lock
 
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
@@ -123,6 +125,11 @@ class ControllableEditCanvas(BaseEditCanvas):
                         self.box_select("add box modifier" in self._persistent_actions)
                         self._box_select_time = time.time()
                     wx.PostEvent(self, BoxClickEvent())
+                elif action == "toggle mouse mode":
+                    self.SetFocus()
+                    self._previous_mouse_lock = self._mouse_lock
+                    self._capture_mouse()
+                    self._toggle_mouse_time = time.time()
                 elif action == "inspect block":
                     x, y, z = self.cursor_location
                     try:
@@ -168,7 +175,12 @@ class ControllableEditCanvas(BaseEditCanvas):
                     ):
                         self._selection_group.box_select_disable()
                 elif action == "toggle mouse mode":
-                    self._toggle_mouse_lock()
+                    if time.time() - self._toggle_mouse_time > 0.1:
+                        self._release_mouse()
+                    elif self._previous_mouse_lock:
+                        self._release_mouse()
+                    else:
+                        self._capture_mouse()
                 elif action == "speed+":
                     self._camera_move_speed *= 1.1
                 elif action == "speed-":
@@ -239,23 +251,19 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.camera_location = (x, y, z)
         self.camera_rotation = (rx, ry)
 
-    def _toggle_mouse_lock(self):
-        """Toggle mouse selection mode."""
-        self.SetFocus()
-        if self._mouse_lock:
-            self._release_mouse()
-        else:
-            self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-            self._mouse_delta_x = (
-                self._mouse_delta_y
-            ) = self._last_mouse_x = self._last_mouse_y = 0
-            self._mouse_lock = True
+    def _capture_mouse(self):
+        self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
+        self._mouse_delta_x = (
+            self._mouse_delta_y
+        ) = self._last_mouse_x = self._last_mouse_y = 0
+        self._mouse_lock = True
         self._selection_moved = True
 
     def _release_mouse(self):
         """Release the mouse"""
         self.SetCursor(wx.NullCursor)
         self._mouse_lock = False
+        self._selection_moved = True
 
     def _on_mouse_motion(self, evt):
         """Event fired when the mouse is moved."""
