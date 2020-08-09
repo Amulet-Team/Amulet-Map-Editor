@@ -57,3 +57,22 @@ def __getattr__(
 
 def __dir__():
     return _self.__dir__()
+
+
+TABLERICONS: ImageResourceDirectory = _self.icon.tablericons
+
+ADD_ICON: BitmapResourceItem = TABLERICONS.plus_green
+SUBTRACT_ICON: BitmapResourceItem = TABLERICONS.minus_red
+EDIT_ICON: BitmapResourceItem = TABLERICONS.edit
+REFRESH_ICON: BitmapResourceItem = TABLERICONS.refresh
+
+UP_ARROW: BitmapResourceItem = TABLERICONS.chevron_up
+DOWN_ARROW: BitmapResourceItem = TABLERICONS.chevron_down
+
+UP_CARET: BitmapResourceItem = TABLERICONS.caret_up
+DOWN_CARET: BitmapResourceItem = TABLERICONS.caret_down
+
+COLOUR_PICKER: BitmapResourceItem = TABLERICONS.color_picker
+TRASH: BitmapResourceItem = TABLERICONS.trash
+MAXIMIZE: BitmapResourceItem = TABLERICONS.arrows_maximize
+MINIMIZE: BitmapResourceItem = TABLERICONS.arrows_minimize

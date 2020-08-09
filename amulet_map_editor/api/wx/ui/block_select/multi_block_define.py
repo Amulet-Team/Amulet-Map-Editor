@@ -4,7 +4,7 @@ from typing import List
 
 import PyMCTranslate
 
-from amulet_map_editor.api.wx.util.icon import (
+from amulet_map_editor.api.image import (
     UP_CARET,
     DOWN_CARET,
     TRASH,

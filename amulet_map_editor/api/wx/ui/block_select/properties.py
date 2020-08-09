@@ -10,7 +10,7 @@ from amulet.api.block import PropertyDataTypes, PropertyType
 
 WildcardSNBTType = Union[SNBTType, str]
 
-from amulet_map_editor.api.wx.util.icon import ADD_ICON, SUBTRACT_ICON
+from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 
 (
     PropertiesChangeEvent,

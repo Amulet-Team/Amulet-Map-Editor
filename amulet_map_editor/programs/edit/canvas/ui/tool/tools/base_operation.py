@@ -8,7 +8,7 @@ from amulet_map_editor.programs.edit.plugins import (
 )
 from amulet_map_editor.programs.edit.canvas.ui.tool.tools.base_tool_ui import BaseToolUI
 
-from amulet_map_editor.api.wx.util.icon import REFRESH_ICON
+from amulet_map_editor.api.image import REFRESH_ICON
 
 from amulet_map_editor.api.logging import log
 

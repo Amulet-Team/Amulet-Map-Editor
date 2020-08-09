@@ -4,7 +4,7 @@ from typing import Tuple, List, Optional
 
 import PyMCTranslate
 
-from amulet_map_editor.api.wx.util.icon import COLOUR_PICKER
+from amulet_map_editor.api.image import COLOUR_PICKER
 
 (
     NamespaceChangeEvent,
