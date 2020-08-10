@@ -3,7 +3,7 @@ the repeated code and make working with wx a bit more simple."""
 
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
-from typing import Iterable, Union, Any, List, Optional, Sequence, Dict
+from typing import Iterable, Union, Any, List, Optional, Sequence, Dict, Tuple
 
 from amulet_map_editor.api.logging import log
 
@@ -89,12 +89,12 @@ class SimpleChoiceAny(wx.Choice):
         if not items:
             return
         if isinstance(items, dict):
-            items = [[str(value), key] for key, value in items.items()]
+            items: List[Tuple[str, Any]] = [(str(value), key) for key, value in items.items()]
             if self._sorted:
                 items = sorted(items, key=lambda x: x[0])
                 if self._reverse:
                     items.reverse()
-            self._keys = [key for key, _ in items]
+            self._keys = [key.strip() for key, _ in items]
             self._values = [value for _, value in items]
         else:
             if self._sorted:
@@ -103,7 +103,7 @@ class SimpleChoiceAny(wx.Choice):
                     self._values.reverse()
             else:
                 self._values = list(items)
-            self._keys = [str(v) for v in self._values]
+            self._keys = [str(v).strip() for v in self._values]
         super().SetItems(self._keys)
         if default is not None and default in self._values:
             self.SetSelection(self._values.index(default))
