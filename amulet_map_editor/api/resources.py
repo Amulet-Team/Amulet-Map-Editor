@@ -87,7 +87,6 @@ class ResourceDirectory(ResourceItem):
 # legacy support
 from . import image as img
 
-
 # class TextResourceItem(_ResourceItem):
 #     def text(self):
 #         with open(self._path) as fp:

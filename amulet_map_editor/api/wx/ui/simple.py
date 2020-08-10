@@ -89,7 +89,9 @@ class SimpleChoiceAny(wx.Choice):
         if not items:
             return
         if isinstance(items, dict):
-            items: List[Tuple[str, Any]] = [(str(value), key) for key, value in items.items()]
+            items: List[Tuple[str, Any]] = [
+                (str(value), key) for key, value in items.items()
+            ]
             if self._sorted:
                 items = sorted(items, key=lambda x: x[0])
                 if self._reverse:
