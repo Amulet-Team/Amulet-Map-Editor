@@ -152,18 +152,16 @@ class ControllableEditCanvas(BaseEditCanvas):
                         )
                         if len(chunk.biomes.shape) == 2:
                             biome = chunk.biomes[x % 16, z % 16]
-                            print(
-                                self.world.translation_manager.universal_biome_registry.to_str(
-                                    biome
-                                )
-                            )
+                            try:
+                                print(self.world.biome_palette[biome])
+                            except Exception as e:
+                                print(e)
                         elif len(chunk.biomes.shape) == 3:
                             biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
-                            print(
-                                self.world.translation_manager.universal_biome_registry.to_str(
-                                    biome
-                                )
-                            )
+                            try:
+                                print(self.world.biome_palette[biome])
+                            except Exception as e:
+                                print(e)
                     except Exception as e:
                         print(e)
 
