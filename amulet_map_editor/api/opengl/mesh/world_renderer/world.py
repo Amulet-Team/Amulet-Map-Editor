@@ -7,7 +7,7 @@ import weakref
 
 import minecraft_model_reader
 import PyMCTranslate
-from amulet.api.block import BlockManager
+from amulet.api.registry import BlockManager
 from amulet.api.data_types import Dimension
 
 from amulet_map_editor.api.logging import log

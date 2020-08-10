@@ -7,7 +7,7 @@ import PyMCTranslate
 
 from amulet.api.structure import Structure
 from amulet.api.chunk import Chunk
-from amulet.api.block import BlockManager
+from amulet.api.registry import BlockManager
 
 from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager

@@ -3,7 +3,7 @@ import numpy
 
 import minecraft_model_reader
 import PyMCTranslate
-from amulet.api.block import BlockManager
+from amulet.api.registry import BlockManager
 from amulet.api.structure import Structure
 from amulet.api.data_types import FloatTriplet, PointCoordinates
 
