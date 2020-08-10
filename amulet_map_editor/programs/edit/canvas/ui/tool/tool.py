@@ -51,7 +51,7 @@ class Tool(wx.BoxSizer, BaseUI):
     def bind_events(self):
         for tool in self._tools.values():
             tool.bind_events()
-        self.canvas.Bind(EVT_TOOL_CHANGE, lambda evt: self._enable_tool(evt.tool))
+        self.canvas.Bind(EVT_TOOL_CHANGE, self._enable_tool_event)
 
     def register_tool(self, name: str, tool_cls: Type[BaseToolUIType]):
         assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(
@@ -65,6 +65,10 @@ class Tool(wx.BoxSizer, BaseUI):
             tool.ShowItems(show=False)
         self._tools[name] = tool
         self._tool_option_sizer.Add(tool, 1, wx.EXPAND, 0)
+
+    def _enable_tool_event(self, evt):
+        self._enable_tool(evt.tool)
+        evt.Skip()
 
     def _enable_tool(self, tool: str):
         if tool in self._tools:

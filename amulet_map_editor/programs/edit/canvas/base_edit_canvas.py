@@ -167,9 +167,15 @@ class BaseEditCanvas(BaseCanvas):
     def reset_bound_events(self):
         """Unbind all events and re-bind the default events.
         We are allowing users to bind custom events so we should have a way to reset what is bound."""
+        handled_events = set()
         for event, handler, source in self._bound_events:
-            if not self.Unbind(event, source, handler=handler):
-                log.error(f"Failed to unbind {event}, {handler}")
+            if source is None:
+                if event not in handled_events:
+                    handled_events.add(event)
+                    super().Unbind(event)
+            else:
+                if not self.Unbind(event, source, handler=handler):
+                    log.error(f"Failed to unbind {event}, {handler}, {source}")
         self._bind_base_events()
 
     def _bind_base_events(self):
