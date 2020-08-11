@@ -48,7 +48,7 @@ class ExportMCStructure(SimpleOperationPanel):
         self._save_options(
             {
                 "path": self._file_picker.GetPath(),
-                "version": self._version_define.version,
+                "version": self._version_define.version_number,
             }
         )
 
@@ -63,7 +63,7 @@ class ExportMCStructure(SimpleOperationPanel):
             )
 
         path = self._file_picker.GetPath()
-        version = self._version_define.version
+        version = self._version_define.version_number
 
         if isinstance(path, str) and path.endswith(".mcstructure") and version:
             wrapper = MCStructureFormatWrapper(path, "w")

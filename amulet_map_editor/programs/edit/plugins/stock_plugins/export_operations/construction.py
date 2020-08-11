@@ -48,7 +48,7 @@ class ExportConstruction(SimpleOperationPanel):
             {
                 "path": self._file_picker.GetPath(),
                 "platform": self._version_define.platform,
-                "version": self._version_define.version,
+                "version": self._version_define.version_number,
             }
         )
 
@@ -57,7 +57,7 @@ class ExportConstruction(SimpleOperationPanel):
     ) -> OperationReturnType:
         path = self._file_picker.GetPath()
         platform = self._version_define.platform
-        version = self._version_define.version
+        version = self._version_define.version_number
         if (
             isinstance(path, str)
             and path.endswith(".construction")
