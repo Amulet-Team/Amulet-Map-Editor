@@ -33,7 +33,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ] || [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install --user -r requirements.txt ; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then pip3 install -r requirements_linux.txt ; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then pip3 install pypiwin32 ; fi
-  - pip3 install pyinstaller>=3.5
+  - pip3 install pyinstaller==3.6
   - wget https://raw.githubusercontent.com/gentlegiantJGC/PyMCTranslate/master/minify_json.py
   - pyinstaller -y Amulet.spec
 
