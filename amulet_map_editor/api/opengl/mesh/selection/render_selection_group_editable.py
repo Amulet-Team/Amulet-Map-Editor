@@ -154,7 +154,9 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._post_box_disable_inputs_event()
 
     def deselect_active(self):
-        if self._active_box_index is not None:
+        if self.canvas.tools["Select"]._paste_panel is not None:
+            self.canvas.tools["Select"].enable()
+        elif self._active_box_index is not None:
             # If the box already exists in the list
             box = self._boxes.pop(self._active_box_index)
             box.unload()
