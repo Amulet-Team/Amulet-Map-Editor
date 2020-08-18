@@ -1,0 +1,4 @@
+-r requirements_base.txt
+Sphinx>=1.7.4
+sphinx-autodoc-typehints>=1.3.0
+sphinx_rtd_theme>=0.3.1
