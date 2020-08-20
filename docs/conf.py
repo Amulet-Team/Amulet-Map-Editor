@@ -22,7 +22,7 @@ copyright = "2020, The Amulet Map Editor Team"
 author = "The Amulet Map Editor Team"
 
 # The full version, including alpha/beta/rc tags
-release = "0.7.0.1"
+release = "v0.7.0.1"
 
 
 # -- General configuration ---------------------------------------------------
