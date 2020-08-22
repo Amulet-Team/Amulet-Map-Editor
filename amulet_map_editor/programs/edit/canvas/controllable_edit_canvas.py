@@ -4,6 +4,7 @@ import numpy
 import time
 
 from amulet.api.data_types import OperationYieldType
+from wx.adv import RichToolTip
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.api.opengl.mesh.world_renderer.world import sin, cos
@@ -147,21 +148,26 @@ class ControllableEditCanvas(BaseEditCanvas):
                         ) = translator.block.from_universal(
                             block, block_entity, block_location=(x, y, z)
                         )
-                        print(
-                            f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}"
+                        block_data_text = f"x: {x}, y: {y}, z: {z}"
+                        block_data_text = (
+                            f"{block_data_text}\n{version_block}\n({block})"
                         )
+                        if block_entity:
+                            block_data_text = f"{block_data_text}\n{version_block_entity}\n({block_entity})"
                         if len(chunk.biomes.shape) == 2:
                             biome = chunk.biomes[x % 16, z % 16]
                             try:
-                                print(self.world.biome_palette[biome])
+                                block_data_text = f"{block_data_text}\n{self.world.biome_palette[biome]}"
                             except Exception as e:
                                 print(e)
                         elif len(chunk.biomes.shape) == 3:
                             biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
                             try:
-                                print(self.world.biome_palette[biome])
+                                block_data_text = f"{block_data_text}\n{self.world.biome_palette[biome]}"
                             except Exception as e:
                                 print(e)
+                        tooltip = RichToolTip("Inspect Block", block_data_text)
+                        tooltip.ShowFor(self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1))
                     except Exception as e:
                         print(e)
 
@@ -266,6 +272,7 @@ class ControllableEditCanvas(BaseEditCanvas):
     def _on_mouse_motion(self, evt):
         """Event fired when the mouse is moved."""
         self.SetFocus()
+        self._mouse_x, self._mouse_y = evt.GetPosition()
         if self._mouse_lock:
             if self._last_mouse_x == 0:
                 self._last_mouse_x, self._last_mouse_y = (
@@ -275,9 +282,8 @@ class ControllableEditCanvas(BaseEditCanvas):
                 self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
                 self._mouse_delta_x = self._mouse_delta_y = 0
             else:
-                mouse_x, mouse_y = evt.GetPosition()
-                dx = mouse_x - self._last_mouse_x
-                dy = mouse_y - self._last_mouse_y
+                dx = self._mouse_x - self._last_mouse_x
+                dy = self._mouse_y - self._last_mouse_y
                 self._last_mouse_x, self._last_mouse_y = (
                     int(self.GetSize()[0] / 2),
                     int(self.GetSize()[1] / 2),
@@ -289,13 +295,12 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._mouse_delta_x += dx
                     self._mouse_delta_y += dy
         else:
-            mouse_x, mouse_y = evt.GetPosition()
             self._last_mouse_x, self._last_mouse_y = (
                 int(self.GetSize()[0] / 2),
                 int(self.GetSize()[1] / 2),
             )
-            self._mouse_delta_x = mouse_x - self._last_mouse_x
-            self._mouse_delta_y = mouse_y - self._last_mouse_y
+            self._mouse_delta_x = self._mouse_x - self._last_mouse_x
+            self._mouse_delta_y = self._mouse_y - self._last_mouse_y
             self._mouse_moved = True
 
     def _on_loss_focus(self, evt):
