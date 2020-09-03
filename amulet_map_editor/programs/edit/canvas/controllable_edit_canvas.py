@@ -25,6 +25,7 @@ class ControllableEditCanvas(BaseEditCanvas):
 
     def __init__(self, world_panel: wx.Window, world: "World", **kwargs):
         super().__init__(world_panel, world, **kwargs)
+        self._mouse_x = self._mouse_y = 0
         self._last_mouse_x = 0
         self._last_mouse_y = 0
         self._mouse_moved = False  # has the mouse position changed since the last frame
