@@ -155,13 +155,13 @@ class ControllableEditCanvas(BaseEditCanvas):
                         )
                         if block_entity:
                             block_data_text = f"{block_data_text}\n{version_block_entity}\n({block_entity})"
-                        if len(chunk.biomes.shape) == 2:
+                        if chunk.biomes.dimension == 2:
                             biome = chunk.biomes[x % 16, z % 16]
                             try:
                                 block_data_text = f"{block_data_text}\n{self.world.biome_palette[biome]}"
                             except Exception as e:
                                 print(e)
-                        elif len(chunk.biomes.shape) == 3:
+                        elif chunk.biomes.dimension == 3:
                             biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
                             try:
                                 block_data_text = f"{block_data_text}\n{self.world.biome_palette[biome]}"
