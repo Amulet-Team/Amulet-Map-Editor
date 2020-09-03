@@ -138,9 +138,11 @@ class ControllableEditCanvas(BaseEditCanvas):
                         block = self.world.get_block(x, y, z, self.dimension)
                         chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
                         block_entity = chunk.block_entities.get((x, y, z), None)
+                        platform = self.world.world_wrapper.platform
+                        version = self.world.world_wrapper.version
                         translator = self.world.translation_manager.get_version(
-                            self.world.world_wrapper.platform,
-                            self.world.world_wrapper.version,
+                            platform,
+                            version,
                         )
                         (
                             version_block,
@@ -149,22 +151,34 @@ class ControllableEditCanvas(BaseEditCanvas):
                         ) = translator.block.from_universal(
                             block, block_entity, block_location=(x, y, z)
                         )
-                        block_data_text = f"x: {x}, y: {y}, z: {z}"
-                        block_data_text = (
-                            f"{block_data_text}\n{version_block}\n({block})"
-                        )
+                        if isinstance(version, tuple):
+                            version_str = ".".join(str(v) for v in version[:4])
+                        else:
+                            version_str = str(version)
+                        block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
+                        if version_block_entity:
+                            version_block_entity_str = str(version_block_entity)
+                            if len(version_block_entity_str) > 150:
+                                version_block_entity_str = version_block_entity_str[:150] + "..."
+                            block_data_text = f"{block_data_text}\n{version_block_entity_str}"
+
+                        block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
                         if block_entity:
-                            block_data_text = f"{block_data_text}\n{version_block_entity}\n({block_entity})"
+                            block_entity_str = str(block_entity)
+                            if len(block_entity_str) > 150:
+                                block_entity_str = block_entity_str[:150] + "..."
+                            block_data_text = f"{block_data_text}\n{block_entity_str}"
+
                         if chunk.biomes.dimension == 2:
                             biome = chunk.biomes[x % 16, z % 16]
                             try:
-                                block_data_text = f"{block_data_text}\n{self.world.biome_palette[biome]}"
+                                block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
                             except Exception as e:
                                 print(e)
                         elif chunk.biomes.dimension == 3:
                             biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
                             try:
-                                block_data_text = f"{block_data_text}\n{self.world.biome_palette[biome]}"
+                                block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
                             except Exception as e:
                                 print(e)
                         tooltip = RichToolTip("Inspect Block", block_data_text)
