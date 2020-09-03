@@ -109,7 +109,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                 elif action in self._persistent_actions:
                     self._persistent_actions.remove(action)
 
-            elif press:  # run once on button release
+            elif press:  # run once on button press and frequently until released
                 if action == "selection distance +":
                     self.select_distance += 1
                     self.select_distance2 += 1
@@ -172,7 +172,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     except Exception as e:
                         print(e)
 
-            else:  # run once on button press and frequently until released
+            else:  # run once on button release
                 if action == "box click":
                     if (
                         self.selection_editable
