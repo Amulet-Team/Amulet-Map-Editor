@@ -4,6 +4,7 @@ import numpy
 import time
 
 from amulet.api.data_types import OperationYieldType
+from wx.adv import RichToolTip
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor.api.opengl.mesh.world_renderer.world import sin, cos
@@ -24,6 +25,7 @@ class ControllableEditCanvas(BaseEditCanvas):
 
     def __init__(self, world_panel: wx.Window, world: "World", **kwargs):
         super().__init__(world_panel, world, **kwargs)
+        self._mouse_x = self._mouse_y = 0
         self._last_mouse_x = 0
         self._last_mouse_y = 0
         self._mouse_moved = False  # has the mouse position changed since the last frame
@@ -107,7 +109,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                 elif action in self._persistent_actions:
                     self._persistent_actions.remove(action)
 
-            elif press:  # run once on button release
+            elif press:  # run once on button press and frequently until released
                 if action == "selection distance +":
                     self.select_distance += 1
                     self.select_distance2 += 1
@@ -136,9 +138,11 @@ class ControllableEditCanvas(BaseEditCanvas):
                         block = self.world.get_block(x, y, z, self.dimension)
                         chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
                         block_entity = chunk.block_entities.get((x, y, z), None)
+                        platform = self.world.world_wrapper.platform
+                        version = self.world.world_wrapper.version
                         translator = self.world.translation_manager.get_version(
-                            self.world.world_wrapper.platform,
-                            self.world.world_wrapper.version,
+                            platform,
+                            version,
                         )
                         (
                             version_block,
@@ -147,25 +151,42 @@ class ControllableEditCanvas(BaseEditCanvas):
                         ) = translator.block.from_universal(
                             block, block_entity, block_location=(x, y, z)
                         )
-                        print(
-                            f"{version_block}\n{version_block_entity}\n\t{block}\n\t{block_entity}"
-                        )
-                        if len(chunk.biomes.shape) == 2:
+                        if isinstance(version, tuple):
+                            version_str = ".".join(str(v) for v in version[:4])
+                        else:
+                            version_str = str(version)
+                        block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
+                        if version_block_entity:
+                            version_block_entity_str = str(version_block_entity)
+                            if len(version_block_entity_str) > 150:
+                                version_block_entity_str = version_block_entity_str[:150] + "..."
+                            block_data_text = f"{block_data_text}\n{version_block_entity_str}"
+
+                        block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
+                        if block_entity:
+                            block_entity_str = str(block_entity)
+                            if len(block_entity_str) > 150:
+                                block_entity_str = block_entity_str[:150] + "..."
+                            block_data_text = f"{block_data_text}\n{block_entity_str}"
+
+                        if chunk.biomes.dimension == 2:
                             biome = chunk.biomes[x % 16, z % 16]
                             try:
-                                print(self.world.biome_palette[biome])
+                                block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
                             except Exception as e:
                                 print(e)
-                        elif len(chunk.biomes.shape) == 3:
+                        elif chunk.biomes.dimension == 3:
                             biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
                             try:
-                                print(self.world.biome_palette[biome])
+                                block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
                             except Exception as e:
                                 print(e)
+                        tooltip = RichToolTip("Inspect Block", block_data_text)
+                        tooltip.ShowFor(self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1))
                     except Exception as e:
                         print(e)
 
-            else:  # run once on button press and frequently until released
+            else:  # run once on button release
                 if action == "box click":
                     if (
                         self.selection_editable
@@ -266,6 +287,7 @@ class ControllableEditCanvas(BaseEditCanvas):
     def _on_mouse_motion(self, evt):
         """Event fired when the mouse is moved."""
         self.SetFocus()
+        self._mouse_x, self._mouse_y = evt.GetPosition()
         if self._mouse_lock:
             if self._last_mouse_x == 0:
                 self._last_mouse_x, self._last_mouse_y = (
@@ -275,9 +297,8 @@ class ControllableEditCanvas(BaseEditCanvas):
                 self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
                 self._mouse_delta_x = self._mouse_delta_y = 0
             else:
-                mouse_x, mouse_y = evt.GetPosition()
-                dx = mouse_x - self._last_mouse_x
-                dy = mouse_y - self._last_mouse_y
+                dx = self._mouse_x - self._last_mouse_x
+                dy = self._mouse_y - self._last_mouse_y
                 self._last_mouse_x, self._last_mouse_y = (
                     int(self.GetSize()[0] / 2),
                     int(self.GetSize()[1] / 2),
@@ -289,13 +310,12 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._mouse_delta_x += dx
                     self._mouse_delta_y += dy
         else:
-            mouse_x, mouse_y = evt.GetPosition()
             self._last_mouse_x, self._last_mouse_y = (
                 int(self.GetSize()[0] / 2),
                 int(self.GetSize()[1] / 2),
             )
-            self._mouse_delta_x = mouse_x - self._last_mouse_x
-            self._mouse_delta_y = mouse_y - self._last_mouse_y
+            self._mouse_delta_x = self._mouse_x - self._last_mouse_x
+            self._mouse_delta_y = self._mouse_y - self._last_mouse_y
             self._mouse_moved = True
 
     def _on_loss_focus(self, evt):
