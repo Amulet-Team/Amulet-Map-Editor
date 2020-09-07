@@ -460,9 +460,8 @@ class BaseEditCanvas(BaseCanvas):
 
             if (
                 chunk is not None
-                and self._render_world.world.palette[
-                    chunk.blocks[x % 16, y, z % 16]
-                ] != AIR
+                and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]]
+                != AIR
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block

@@ -3,6 +3,10 @@ from typing import TYPE_CHECKING
 import numpy
 import wx
 
+from amulet import block_coords_to_chunk_coords
+from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.biome_select import BiomeDefine
+from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
     SimpleOperationPanel,
 )
@@ -10,6 +14,8 @@ from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
 if TYPE_CHECKING:
     from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
+    from amulet import SelectionGroup
+    from amulet.api.data_types import Dimension, OperationReturnType
 
 
 MODES = {
@@ -20,10 +26,11 @@ MODES = {
 
 class SetBiome(SimpleOperationPanel):
     def __init__(
-            self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
     ):
         SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
         self.Freeze()
+        options = self._load_options({})
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(top_sizer, 0, wx.EXPAND | wx.ALL, 5)
@@ -42,11 +49,23 @@ class SetBiome(SimpleOperationPanel):
         )
         self._mode_description.Fit()
 
-        self._run_button = wx.Button(self, label="Run Operation")
-        self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
-        self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._biome_choice = BiomeDefine(
+            self,
+            world.world_wrapper.translation_manager,
+            wx.VERTICAL,
+            *(
+                options.get("original_block_options", [])
+                or [world.world_wrapper.platform]
+            ),
+            wildcard_properties=True,
+            show_pick_biome=True,
+        )
+        self._biome_click_registered = False
+        self._biome_choice.Bind(EVT_PICK, self._on_pick_biome_button)
+        self._sizer.Add(self._biome_choice, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
-        self.Layout()
+        self._add_run_button()
+
         self.Thaw()
 
     def _on_mode_change(self, evt):
@@ -60,10 +79,35 @@ class SetBiome(SimpleOperationPanel):
     def unload(self):
         pass
 
-    def _run_operation(self, _):
-        self.canvas.run_operation(lambda: self._set_biome())
+    def _on_pick_biome_button(self, evt):
+        """Set up listening for the biome click"""
+        if not self._biome_click_registered:
+            self.canvas.Bind(EVT_BOX_CLICK, self._on_pick_biome)
+            self._biome_click_registered = True
+        evt.Skip()
 
-    def _set_biome(self):
+    def _on_pick_biome(self, evt):
+        self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_biome)
+        self._biome_click_registered = False
+        x, y, z = self.canvas.cursor_location
+
+        # TODO: replace with "get_biome(x, y, z)" if it'll be created
+        cx, cz = block_coords_to_chunk_coords(x, z, chunk_size=self.world.chunk_size[0])
+        offset_x, offset_z = x - 16 * cx, z - 16 * cz
+        chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
+
+        if chunk.biomes.dimension == 3:
+            biome = chunk.biomes[offset_x//4, y//4, offset_z//4]
+        elif chunk.biomes.dimension == 2:
+            biome = chunk.biomes[offset_x, offset_z]
+        else:
+            return
+
+        self._biome_choice.universal_biome = chunk.biome_palette[biome]
+
+    def _operation(
+        self, world: "World", dimension: "Dimension", selection: "SelectionGroup"
+    ) -> "OperationReturnType":
         mode = self._mode.GetString(self._mode.GetSelection())
         world = self.world
         selection = self.canvas.selection_group
@@ -80,12 +124,13 @@ class SetBiome(SimpleOperationPanel):
             elif mode == "Whole Chunks":
                 pass
             else:
-                raise ValueError(f"mode {mode} doesn't exist for the Set Biome operation.")
+                raise ValueError(
+                    f"mode {mode} doesn't exist for the Set Biome operation."
+                )
 
             chunk.changed = True
             count += 1
             yield count / iter_count
-
 
 
 export = {

@@ -3,19 +3,11 @@ import wx.lib.scrolledpanel
 from typing import Tuple, Optional, Dict
 
 import PyMCTranslate
-import amulet_nbt
 from amulet.api.block import PropertyType, Block
 from amulet.api.block_entity import BlockEntity
-from amulet.api.data_types import VersionNumberTuple, PlatformType
 
-from amulet_map_editor.api.wx.ui.version_select import (
-    VersionSelect,
-    EVT_VERSION_CHANGE,
-)
-from amulet_map_editor.api.wx.ui.block_select import (
-    BlockSelect,
-    EVT_BLOCK_CHANGE,
-)
+from amulet_map_editor.api.wx.ui.base_define import BaseDefine
+from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 
 from amulet_map_editor.api.wx.ui.block_select.properties import (
     PropertySelect,
@@ -24,7 +16,7 @@ from amulet_map_editor.api.wx.ui.block_select.properties import (
 )
 
 
-class BlockDefine(wx.Panel):
+class BlockDefine(BaseDefine):
     def __init__(
         self,
         parent,
@@ -36,47 +28,30 @@ class BlockDefine(wx.Panel):
         namespace: str = None,
         block_name: str = None,
         properties: PropertyType = None,
-        nbt: amulet_nbt.TAG_Compound = None,
-        show_nbt: bool = True,
         wildcard_properties=False,
         show_pick_block: bool = False,
         **kwargs,
     ):
-        super().__init__(parent)
-
-        self._translation_manager = translation_manager
-        sizer = wx.BoxSizer(orientation)
-        left_sizer = wx.BoxSizer(wx.VERTICAL)
-        right_sizer = wx.BoxSizer(wx.VERTICAL)
-        if orientation == wx.HORIZONTAL:
-            sizer.Add(left_sizer, 1, wx.EXPAND)
-            sizer.Add(right_sizer, 1, wx.EXPAND | wx.LEFT, 5)
-        else:
-            sizer.Add(left_sizer, 2, wx.EXPAND)
-            sizer.Add(right_sizer, 1, wx.EXPAND | wx.TOP, 5)
-
-        self._version_picker = VersionSelect(
-            self,
+        super().__init__(
+            parent,
             translation_manager,
+            "Block",
+            BlockSelect,
+            orientation,
             platform,
             version_number,
-            force_blockstate,
+            namespace,
+            default_name=block_name,
+            show_pick=show_pick_block,
+            force_blockstate=force_blockstate,
             **kwargs,
         )
-        left_sizer.Add(self._version_picker, 0, wx.EXPAND)
 
-        self._block_picker = BlockSelect(
-            self,
-            translation_manager,
-            self._version_picker.platform,
-            self._version_picker.version_number,
-            self._version_picker.force_blockstate,
-            namespace,
-            block_name,
-            show_pick_block,
-        )
-        left_sizer.Add(self._block_picker, 1, wx.EXPAND | wx.TOP, 5)
-        self._version_picker.Bind(EVT_VERSION_CHANGE, self._on_version_change)
+        right_sizer = wx.BoxSizer(wx.VERTICAL)
+        if orientation == wx.HORIZONTAL:
+            self._sizer.Add(right_sizer, 1, wx.EXPAND | wx.LEFT, 5)
+        else:
+            self._sizer.Add(right_sizer, 1, wx.EXPAND | wx.TOP, 5)
 
         self._property_picker = PropertySelect(
             self,
@@ -84,27 +59,18 @@ class BlockDefine(wx.Panel):
             self._version_picker.platform,
             self._version_picker.version_number,
             self._version_picker.force_blockstate,
-            self._block_picker.namespace,
-            self._block_picker.block_name,
+            self._picker.namespace,
+            self._picker.name,
             properties,
             wildcard_properties,
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
-        self._block_picker.Bind(EVT_BLOCK_CHANGE, self._on_block_change)
         self._property_picker.Bind(EVT_PROPERTIES_CHANGE, self._on_property_change)
 
-        self.SetSizerAndFit(sizer)
+        self.SetSizerAndFit(self._sizer)
         self.Layout()
 
-    def _on_version_change(self, evt):
-        self._block_picker.version = (
-            evt.platform,
-            evt.version_number,
-            evt.force_blockstate,
-        )
-        evt.Skip()
-
-    def _on_block_change(self, evt):
+    def _on_picker_change(self, evt):
         self._update_properties()
         evt.Skip()
 
@@ -117,25 +83,9 @@ class BlockDefine(wx.Panel):
             self._version_picker.platform,
             self._version_picker.version_number,
             self._version_picker.force_blockstate,
-            self._block_picker.namespace,
-            self._block_picker.block_name,
+            self._picker.namespace,
+            self._picker.name,
         )
-
-    @property
-    def platform(self) -> PlatformType:
-        return self._version_picker.platform
-
-    @platform.setter
-    def platform(self, platform: PlatformType):
-        self._version_picker.platform = platform
-
-    @property
-    def version_number(self) -> VersionNumberTuple:
-        return self._version_picker.version_number
-
-    @version_number.setter
-    def version_number(self, version_number: VersionNumberTuple):
-        self._version_picker.version_number = version_number
 
     @property
     def force_blockstate(self) -> bool:
@@ -146,28 +96,12 @@ class BlockDefine(wx.Panel):
         self._version_picker.force_blockstate = force_blockstate
 
     @property
-    def version(self) -> Tuple[PlatformType, VersionNumberTuple, bool]:
-        return self._version_picker.version
-
-    @version.setter
-    def version(self, version: Tuple[PlatformType, VersionNumberTuple, bool]):
-        self._version_picker.version = version
-
-    @property
-    def namespace(self) -> str:
-        return self._block_picker.namespace
-
-    @namespace.setter
-    def namespace(self, namespace: str):
-        self._block_picker.namespace = namespace
-
-    @property
     def block_name(self) -> str:
-        return self._block_picker.block_name
+        return self._picker.name
 
     @block_name.setter
     def block_name(self, block_name: str):
-        self._block_picker.block_name = block_name
+        self._picker.name = block_name
 
     @property
     def str_properties(self) -> Dict[str, "WildcardSNBTType"]:
@@ -191,8 +125,8 @@ class BlockDefine(wx.Panel):
 
     @block.setter
     def block(self, block: Block):
-        self._block_picker.set_namespace(block.namespace)
-        self._block_picker.set_block_name(block.base_name)
+        self._picker.set_namespace(block.namespace)
+        self._picker.set_name(block.base_name)
         self._update_properties()
         self.properties = block.properties
 
