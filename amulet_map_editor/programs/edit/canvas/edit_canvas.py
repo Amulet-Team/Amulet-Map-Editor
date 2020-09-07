@@ -16,7 +16,7 @@ from amulet_map_editor.programs.edit.key_config import (
     PresetKeybinds,
 )
 from amulet_map_editor.programs.edit.canvas.ui.goto import show_goto
-from amulet_map_editor.programs.edit.canvas.ui.tool import Tool
+from amulet_map_editor.programs.edit.canvas.ui.tool import ToolManagerSizer
 from amulet_map_editor.programs.edit.plugins import (
     OperationError,
     OperationSuccessful,
@@ -99,7 +99,7 @@ class EditCanvas(ControllableEditCanvas):
         super().__init__(parent, world, **kwargs)
         self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None
-        self._tool_sizer: Optional[Tool] = None
+        self._tool_sizer: Optional[ToolManagerSizer] = None
         config_ = config.get(EDIT_CONFIG_ID, {})
         user_keybinds = config_.get("user_keybinds", {})
         group = config_.get("keybind_group", DefaultKeybindGroupId)
@@ -122,7 +122,7 @@ class EditCanvas(ControllableEditCanvas):
         file_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
         canvas_sizer.Add(file_sizer, 0, wx.EXPAND, 0)
 
-        self._tool_sizer = Tool(self)
+        self._tool_sizer = ToolManagerSizer(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
         self._bind_events()
 
