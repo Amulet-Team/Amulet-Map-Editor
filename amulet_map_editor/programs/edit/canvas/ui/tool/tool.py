@@ -70,6 +70,16 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
         self._enable_tool(evt.tool)
         evt.Skip()
 
+    def enable_default_tool(self) -> bool:
+        """
+        Enables the default tool (the select tool)
+        :return: True if the selection changed, False otherwise.
+        """
+        if not isinstance(self._active_tool, SelectOptions):
+            self._enable_tool("Select")
+            return True
+        return False
+
     def _enable_tool(self, tool: str):
         if tool in self._tools:
             if self._active_tool is not None:

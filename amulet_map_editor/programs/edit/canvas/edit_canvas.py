@@ -142,6 +142,9 @@ class EditCanvas(ControllableEditCanvas):
     def tools(self):
         return self._tool_sizer.tools
 
+    def _deselect(self) -> bool:
+        return self._tool_sizer.enable_default_tool()
+
     def run_operation(
         self,
         operation: Callable[[], OperationReturnType],
