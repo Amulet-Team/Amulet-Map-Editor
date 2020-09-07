@@ -11,6 +11,7 @@ from minecraft_model_reader.java.download_resources import (
     get_java_vanilla_fix,
 )
 from amulet.api.chunk import Chunk
+from amulet.api.block import Block
 from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import (
     PointCoordinatesNDArray,
@@ -44,6 +45,9 @@ from amulet_map_editor.programs.edit.canvas.events import (
 
 if TYPE_CHECKING:
     from amulet.api.world import World
+
+
+AIR = Block("universal_minecraft", "air")
 
 
 class BaseEditCanvas(BaseCanvas):
@@ -458,8 +462,7 @@ class BaseEditCanvas(BaseCanvas):
                 chunk is not None
                 and self._render_world.world.palette[
                     chunk.blocks[x % 16, y, z % 16]
-                ].namespaced_name
-                != "universal_minecraft:air"
+                ] != AIR
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block
