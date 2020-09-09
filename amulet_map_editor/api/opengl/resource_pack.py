@@ -39,7 +39,7 @@ class ResourcePackManager:
 
     def get_texture_bounds(self, texture):
         if texture not in self._texture_bounds:
-            texture = ("minecraft", "missing_no")
+            texture = self._resource_pack.get_texture("minecraft", "missing_no")
         return self._texture_bounds[texture]
 
     @property
