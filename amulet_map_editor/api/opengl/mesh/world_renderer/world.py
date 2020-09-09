@@ -141,7 +141,7 @@ class RenderWorld(ResourcePackManager, Drawable):
         self,
         context_identifier: Any,
         world: "World",
-        resource_pack: minecraft_model_reader.JavaRPHandler,
+        resource_pack: minecraft_model_reader.BaseResourcePackManager,
         texture: Any,
         texture_bounds: Dict[Any, Tuple[float, float, float, float]],
         translator: PyMCTranslate.Version,

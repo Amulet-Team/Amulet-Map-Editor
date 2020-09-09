@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
 import weakref
 
-import minecraft_model_reader
-from minecraft_model_reader.java.download_resources import (
+from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
     get_java_vanilla_fix,
 )
+from minecraft_model_reader.api.resource_pack.base import BaseResourcePackManager
+from minecraft_model_reader.api.resource_pack.java import JavaResourcePackManager, JavaResourcePack
 from amulet.api.chunk import Chunk
 from amulet.api.block import Block
 from amulet.api.errors import ChunkLoadError
@@ -77,7 +78,7 @@ class BaseEditCanvas(BaseCanvas):
         self._texture_bounds: Optional[
             Dict[Any, Tuple[float, float, float, float]]
         ] = None
-        self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
+        self._resource_pack: Optional[BaseResourcePackManager] = None
 
         self._resource_pack_translator = None
 
@@ -119,16 +120,16 @@ class BaseEditCanvas(BaseCanvas):
             latest_pack = e.value
         yield 0.5, "Loading resource packs"
         fix_pack = get_java_vanilla_fix()
-        amulet_pack = minecraft_model_reader.JavaRP(
+        amulet_pack = JavaResourcePack(
             os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack")
         )
         user_packs = [
-            minecraft_model_reader.JavaRP(rp)
+            JavaResourcePack(rp)
             for rp in os.listdir("resource_packs")
             if os.path.isdir(rp)
         ]
 
-        self._resource_pack = minecraft_model_reader.JavaRPHandler(
+        self._resource_pack = JavaResourcePackManager(
             (amulet_pack, latest_pack, *user_packs, fix_pack), load=False
         )
         for i in self._resource_pack.reload():
@@ -269,8 +270,8 @@ class BaseEditCanvas(BaseCanvas):
         """Check that the canvas and contained data is safe to be closed."""
         return self._render_world.is_closeable()
 
-    def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
-        self._resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
+    def _load_resource_pack(self, *resource_packs: JavaResourcePack):
+        self._resource_pack = JavaResourcePackManager(resource_packs)
         for _ in self._create_atlas():
             pass
 

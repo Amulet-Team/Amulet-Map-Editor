@@ -20,7 +20,7 @@ _brightness_multiplier = {
 class RenderChunkBuilder(TriMesh):
     """A class to define the logic to generate geometry from a block array"""
 
-    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
+    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.BlockMesh:
         raise NotImplementedError
 
     def _texture_bounds(self, texture):
@@ -85,7 +85,7 @@ class RenderChunkBuilder(TriMesh):
         offset = offset or (0, 0, 0)
         blocks = larger_blocks[1:-1, 1:-1, 1:-1]
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
-        models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
+        models: Dict[int, minecraft_model_reader.BlockMesh] = {}
         for block_temp_id in unique_blocks:
             model = models[block_temp_id] = self._get_model(block_temp_id)
             transparent_array[larger_blocks == block_temp_id] = model.is_transparent
@@ -134,7 +134,7 @@ class RenderChunkBuilder(TriMesh):
         for block_temp_id, model in models.items():
             # for each unique blockstate in the chunk
             # get the model and the locations of the blocks
-            model: minecraft_model_reader.MinecraftMesh
+            model: minecraft_model_reader.BlockMesh
             all_block_locations = numpy.argwhere(blocks == block_temp_id)
             if not all_block_locations.size:
                 continue

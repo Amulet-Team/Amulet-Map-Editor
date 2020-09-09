@@ -53,7 +53,7 @@ class RenderChunk(RenderChunkBuilder):
     def _render_world(self) -> "RenderWorld":
         return self._render_world_()
 
-    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
+    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.BlockMesh:
         return self._render_world.get_block_model(block_temp_id)
 
     def _texture_bounds(self, texture):

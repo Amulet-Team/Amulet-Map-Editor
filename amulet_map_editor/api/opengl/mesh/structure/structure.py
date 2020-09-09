@@ -71,7 +71,7 @@ class RenderStructureChunk(RenderChunkBuilder):
         )
         self._create_lod0(larger_blocks, unique_blocks)
 
-    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
+    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.BlockMesh:
         return self._render_structure().get_block_model(block_temp_id)
 
     def _texture_bounds(self, texture):
@@ -89,7 +89,7 @@ class RenderStructure(ResourcePackManager, Drawable):
         self,
         context_identifier: Any,
         structure: Structure,
-        resource_pack: minecraft_model_reader.JavaRPHandler,
+        resource_pack: minecraft_model_reader.BaseResourcePackManager,
         texture: Any,
         texture_bounds: Dict[Any, Tuple[float, float, float, float]],
         translator: PyMCTranslate.Version,

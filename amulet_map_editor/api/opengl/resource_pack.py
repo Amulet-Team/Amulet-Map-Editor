@@ -9,7 +9,7 @@ class ResourcePackManager:
     def __init__(
         self,
         context_identifier: Any,
-        resource_pack: minecraft_model_reader.BaseRPHandler,
+        resource_pack: minecraft_model_reader.BaseResourcePackManager,
         texture: int,
         texture_bounds: Dict[Any, Tuple[float, float, float, float]],
         translator: PyMCTranslate.Version,
@@ -22,11 +22,11 @@ class ResourcePackManager:
         ] = texture_bounds
         self._resource_pack_translator = translator
 
-        self._block_models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
+        self._block_models: Dict[int, minecraft_model_reader.BlockMesh] = {}
 
     def set_resource_pack(
         self,
-        resource_pack: minecraft_model_reader.BaseRPHandler,
+        resource_pack: minecraft_model_reader.BaseResourcePackManager,
         texture_bounds: Dict[Any, Tuple[float, float, float, float]],
     ):
         self._resource_pack = resource_pack
@@ -56,7 +56,7 @@ class ResourcePackManager:
 
     def get_block_model(
         self, pallete_index: int
-    ) -> minecraft_model_reader.MinecraftMesh:
+    ) -> minecraft_model_reader.BlockMesh:
         if pallete_index not in self._block_models:
             block = self._palette[pallete_index]
             extra_blocks = tuple()
@@ -70,6 +70,6 @@ class ResourcePackManager:
             )[0]
             for block_ in extra_blocks:
                 block += block_
-            self._block_models[pallete_index] = self._resource_pack.get_model(block)
+            self._block_models[pallete_index] = self._resource_pack.get_block_model(block)
 
         return self._block_models[pallete_index]
