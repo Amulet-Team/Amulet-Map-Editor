@@ -19,9 +19,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     """A group of selection boxes to be drawn with an added editable box."""
 
     def __init__(
-        self,
-        context_identifier: str,
-        resource_pack: OpenGLResourcePack,
+        self, context_identifier: str, resource_pack: OpenGLResourcePack,
     ):
         super().__init__(context_identifier, resource_pack)
         self._editable = True
@@ -64,9 +62,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         )
 
     def _new_editable_render_selection(self):
-        return RenderSelectionEditable(
-            self._context_identifier, self.resource_pack
-        )
+        return RenderSelectionEditable(self._context_identifier, self.resource_pack)
 
     def _unload_active_box(self):
         if self._active_box is not None:

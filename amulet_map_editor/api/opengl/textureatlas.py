@@ -324,8 +324,7 @@ def create_atlas_iter(
 
     texture_bounds = atlas.to_dict()
     texture_bounds = {
-        texture_path: texture_bounds[texture_path]
-        for texture_path in texture_tuple
+        texture_path: texture_bounds[texture_path] for texture_path in texture_tuple
     }
 
     log.info("Finished creating texture atlas")

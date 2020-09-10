@@ -9,8 +9,14 @@ from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
     get_java_vanilla_fix,
 )
-from minecraft_model_reader.api.resource_pack.java import JavaResourcePackManager, JavaResourcePack
-from minecraft_model_reader.api.resource_pack import load_resource_pack, load_resource_pack_manager
+from minecraft_model_reader.api.resource_pack.java import (
+    JavaResourcePackManager,
+    JavaResourcePack,
+)
+from minecraft_model_reader.api.resource_pack import (
+    load_resource_pack,
+    load_resource_pack_manager,
+)
 from amulet.api.chunk import Chunk
 from amulet.api.block import Block
 from amulet.api.errors import ChunkLoadError
@@ -136,9 +142,7 @@ class BaseEditCanvas(BaseCanvas):
 
         self._opengl_resource_pack = OpenGLResourcePack(
             resource_pack,
-            self.world.translation_manager.get_version(
-                "java", (999, 0, 0)
-            )
+            self.world.translation_manager.get_version("java", (999, 0, 0)),
         )
 
         yield 0.75, "Creating texture atlas"
@@ -148,9 +152,7 @@ class BaseEditCanvas(BaseCanvas):
         yield 1.0, "Setting up renderer"
 
         self._render_world = RenderWorld(
-            self.context_identifier,
-            self._opengl_resource_pack,
-            self.world,
+            self.context_identifier, self._opengl_resource_pack, self.world,
         )
 
         self._selection_group = EditProgramRenderSelectionGroup(
@@ -158,8 +160,7 @@ class BaseEditCanvas(BaseCanvas):
         )
 
         self._structure: StructureGroup = StructureGroup(
-            self.context_identifier,
-            self._opengl_resource_pack,
+            self.context_identifier, self._opengl_resource_pack,
         )
 
         self._bind_base_events()
@@ -456,9 +457,8 @@ class BaseEditCanvas(BaseCanvas):
 
             if (
                 chunk is not None
-                and self._render_world.world.palette[
-                    chunk.blocks[x % 16, y, z % 16]
-                ] != AIR
+                and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]]
+                != AIR
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block

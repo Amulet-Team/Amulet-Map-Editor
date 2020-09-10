@@ -17,13 +17,13 @@ if TYPE_CHECKING:
 
 class RenderChunk(RenderChunkBuilder):
     def __init__(
-            self,
-            context_identifier: str,
-            resource_pack: OpenGLResourcePack,
-            world: World,
-            region_size: int,
-            chunk_coords: Tuple[int, int],
-            dimension: Dimension,
+        self,
+        context_identifier: str,
+        resource_pack: OpenGLResourcePack,
+        world: World,
+        region_size: int,
+        chunk_coords: Tuple[int, int],
+        dimension: Dimension,
     ):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
@@ -57,7 +57,7 @@ class RenderChunk(RenderChunkBuilder):
     @property
     def offset(self) -> numpy.ndarray:
         return 16 * (
-                numpy.array([self._coords[0], 0, self._coords[1]]) % self._region_size
+            numpy.array([self._coords[0], 0, self._coords[1]]) % self._region_size
         )
 
     @property
@@ -99,7 +99,7 @@ class RenderChunk(RenderChunkBuilder):
         return chunk_state != self._chunk_state
 
     def _sub_chunks(
-            self, blocks: Blocks
+        self, blocks: Blocks
     ) -> List[Tuple[numpy.ndarray, numpy.ndarray, Tuple[int, int, int]]]:
         sub_chunks = []
         neighbour_chunks = {}
@@ -122,20 +122,20 @@ class RenderChunk(RenderChunkBuilder):
                     continue
                 if chunk_offset == (-1, 0):
                     larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[
-                                                   -1, :, :
-                                                   ]
+                        -1, :, :
+                    ]
                 elif chunk_offset == (1, 0):
                     larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[
-                                                    0, :, :
-                                                    ]
+                        0, :, :
+                    ]
                 elif chunk_offset == (0, -1):
                     larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(cy)[
-                                                   :, :, -1
-                                                   ]
+                        :, :, -1
+                    ]
                 elif chunk_offset == (0, 1):
                     larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(cy)[
-                                                    :, :, 0
-                                                    ]
+                        :, :, 0
+                    ]
             if cy - 1 in blocks:
                 larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy - 1)[:, -1, :]
             if cy + 1 in blocks:
@@ -163,7 +163,9 @@ class RenderChunk(RenderChunkBuilder):
             ).reshape((-1, self._vert_len))
             plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(-0.01)
             plane[:, 5:9] = self.resource_pack.texture_bounds(
-                self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
+                self.resource_pack.get_texture_path(
+                    "amulet", "amulet_ui/translucent_white"
+                )
             )
             if (self.cx + self.cz) % 2:
                 plane[:, 9:12] = [0.55, 0.5, 0.9]
@@ -189,7 +191,7 @@ class RenderChunk(RenderChunkBuilder):
         self.draw_count = 12
 
     def _create_chunk_plane(
-            self, height: Union[int, float]
+        self, height: Union[int, float]
     ) -> Tuple[numpy.ndarray, numpy.ndarray]:
         box = numpy.array([(0, height, 0), (16, height, 16)]) + self.offset
         _box_coordinates = numpy.array(list(itertools.product(*box.T.tolist())))
@@ -217,8 +219,8 @@ class RenderChunk(RenderChunkBuilder):
         return (
             _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)),
             box[_texture_index[_uv_slice]]
-                .reshape(-1, 2)[_tri_face, :]
-                .reshape((-1, 2)),
+            .reshape(-1, 2)[_tri_face, :]
+            .reshape((-1, 2)),
         )
 
     def _create_error_geometry(self):
@@ -237,10 +239,10 @@ class RenderChunk(RenderChunkBuilder):
         self.draw_count = 12
 
     def _create_lod1(
-            self,
-            blocks: numpy.ndarray,
-            larger_blocks: numpy.ndarray,
-            unique_blocks: numpy.ndarray,
+        self,
+        blocks: numpy.ndarray,
+        larger_blocks: numpy.ndarray,
+        unique_blocks: numpy.ndarray,
     ):
         # TODO
         self.verts: numpy.ndarray = self.new_empty_verts()

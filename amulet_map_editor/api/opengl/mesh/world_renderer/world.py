@@ -14,7 +14,10 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManager, OpenGLResourcePack
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePackManager,
+    OpenGLResourcePack,
+)
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
 
 if TYPE_CHECKING:

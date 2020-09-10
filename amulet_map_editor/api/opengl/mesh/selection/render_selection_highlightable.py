@@ -9,11 +9,7 @@ from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 class RenderSelectionHighlightable(RenderSelection):
     """A drawable selection box with edges that can be highlighted"""
 
-    def __init__(
-        self,
-        context_identifier: str,
-        resource_pack: OpenGLResourcePack
-    ):
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
         super().__init__(context_identifier, resource_pack)
         self._highlight_edges = numpy.array(
             [[False, False, False], [False, False, False]], dtype=numpy.bool

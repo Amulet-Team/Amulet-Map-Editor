@@ -13,10 +13,9 @@ from amulet_map_editor.api.opengl import textureatlas
 class OpenGLResourcePack:
     """This class will take a minecraft_model_reader resource pack and
     load all of the textures into a texture atlas."""
+
     def __init__(
-            self,
-            resource_pack: BaseResourcePackManager,
-            translator: PyMCTranslate.Version
+        self, resource_pack: BaseResourcePackManager, translator: PyMCTranslate.Version
     ):
         self._resource_pack = resource_pack
         self._translator = translator
@@ -33,7 +32,9 @@ class OpenGLResourcePack:
         """Get the opengl texture id of the atlas for a given context."""
         if context_id not in self._gl_textures:
             if self._image is None:
-                raise Exception("OpenGLResourcePack.setup() needs to be run before accessing a texture.")
+                raise Exception(
+                    "OpenGLResourcePack.setup() needs to be run before accessing a texture."
+                )
             self._setup_texture(context_id)
         return self._gl_textures[context_id]
 
@@ -62,11 +63,18 @@ class OpenGLResourcePack:
                 while True:
                     yield next(atlas_iter)
             except StopIteration as e:
-                self._image, self._texture_bounds, self._image_width, self._image_height = e.value
+                (
+                    self._image,
+                    self._texture_bounds,
+                    self._image_width,
+                    self._image_height,
+                ) = e.value
 
     def _setup_texture(self, context_id: str):
         """Set up the texture for a given context"""
-        gl_texture = self._gl_textures[context_id] = glGenTextures(1)  # Create the texture location
+        gl_texture = self._gl_textures[context_id] = glGenTextures(
+            1
+        )  # Create the texture location
         glBindTexture(GL_TEXTURE_2D, gl_texture)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -88,9 +96,7 @@ class OpenGLResourcePack:
         glBindTexture(GL_TEXTURE_2D, 0)
         log.info("Finished setting up texture atlas in OpenGL")
 
-    def get_block_model(
-        self, universal_block: Block
-    ) -> BlockMesh:
+    def get_block_model(self, universal_block: Block) -> BlockMesh:
         """Get the BlockMesh class for a given universal Block.
         The Block will be translated to the version format using the
         previously specified translator."""
@@ -102,6 +108,8 @@ class OpenGLResourcePack:
                 for block_ in universal_block.extra_blocks:
                     version_block += self._translator.block.from_universal(block_)[0]
 
-            self._block_models[universal_block] = self._resource_pack.get_block_model(version_block)
+            self._block_models[universal_block] = self._resource_pack.get_block_model(
+                version_block
+            )
 
         return self._block_models[universal_block]

@@ -2,7 +2,10 @@ import numpy
 from typing import List, Union
 
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
-from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack, OpenGLResourcePackManagerStatic
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePack,
+    OpenGLResourcePackManagerStatic,
+)
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 from .render_selection import RenderSelection
@@ -30,9 +33,7 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
                 self._boxes.append(render_box)
 
     def _new_render_selection(self):
-        return RenderSelection(
-            self.context_identifier, self.resource_pack
-        )
+        return RenderSelection(self.context_identifier, self.resource_pack)
 
     def __iter__(self):
         yield from self._boxes

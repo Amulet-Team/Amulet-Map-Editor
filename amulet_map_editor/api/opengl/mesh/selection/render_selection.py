@@ -4,20 +4,21 @@ import itertools
 from typing import Tuple, Optional, Union
 
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import TriMesh
-from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack, OpenGLResourcePackManagerStatic
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePack,
+    OpenGLResourcePackManagerStatic,
+)
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 
 
 class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     """A drawable selection box"""
 
-    def __init__(
-        self,
-        context_identifier: str,
-        resource_pack: OpenGLResourcePack
-    ):
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
         OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
-        TriMesh.__init__(self, context_identifier, resource_pack.get_atlas_id(context_identifier))
+        TriMesh.__init__(
+            self, context_identifier, resource_pack.get_atlas_id(context_identifier)
+        )
         self._points: numpy.ndarray = numpy.zeros(
             (2, 3), dtype=numpy.int
         )  # The points set using point1 and point2

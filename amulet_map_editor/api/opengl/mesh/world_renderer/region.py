@@ -9,10 +9,7 @@ from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
 class ChunkManager:
     def __init__(
-            self,
-            context_identifier: str,
-            resource_pack: OpenGLResourcePack,
-            region_size=16
+        self, context_identifier: str, resource_pack: OpenGLResourcePack, region_size=16
     ):
         self.context_identifier = context_identifier
         self._resource_pack = resource_pack
@@ -127,10 +124,17 @@ class ChunkManager:
 
 class RenderRegion(TriMesh):
     def __init__(
-        self, rx: int, rz: int, region_size: int, context_identifier: str, resource_pack: OpenGLResourcePack
+        self,
+        rx: int,
+        rz: int,
+        region_size: int,
+        context_identifier: str,
+        resource_pack: OpenGLResourcePack,
     ):
         """A group of RenderChunks to minimise the number of draw calls"""
-        super().__init__(context_identifier, resource_pack.get_atlas_id(context_identifier))
+        super().__init__(
+            context_identifier, resource_pack.get_atlas_id(context_identifier)
+        )
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}

@@ -141,8 +141,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                         platform = self.world.world_wrapper.platform
                         version = self.world.world_wrapper.version
                         translator = self.world.translation_manager.get_version(
-                            platform,
-                            version,
+                            platform, version,
                         )
                         (
                             version_block,
@@ -159,8 +158,12 @@ class ControllableEditCanvas(BaseEditCanvas):
                         if version_block_entity:
                             version_block_entity_str = str(version_block_entity)
                             if len(version_block_entity_str) > 150:
-                                version_block_entity_str = version_block_entity_str[:150] + "..."
-                            block_data_text = f"{block_data_text}\n{version_block_entity_str}"
+                                version_block_entity_str = (
+                                    version_block_entity_str[:150] + "..."
+                                )
+                            block_data_text = (
+                                f"{block_data_text}\n{version_block_entity_str}"
+                            )
 
                         block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
                         if block_entity:
@@ -182,7 +185,9 @@ class ControllableEditCanvas(BaseEditCanvas):
                             except Exception as e:
                                 print(e)
                         tooltip = RichToolTip("Inspect Block", block_data_text)
-                        tooltip.ShowFor(self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1))
+                        tooltip.ShowFor(
+                            self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1)
+                        )
                     except Exception as e:
                         print(e)
 

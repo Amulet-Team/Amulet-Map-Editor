@@ -7,7 +7,10 @@ from amulet.api.data_types import FloatTriplet, PointCoordinates
 from .structure import RenderStructure
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
 from amulet_map_editor.api.opengl.matrix import transform_matrix
-from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManager, OpenGLResourcePack
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePackManager,
+    OpenGLResourcePack,
+)
 
 LocationType = PointCoordinates
 ScaleType = FloatTriplet
@@ -19,9 +22,7 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
     """A group of RenderStructure classes with transforms"""
 
     def __init__(
-        self,
-        context_identifier: Any,
-        resource_pack: OpenGLResourcePack,
+        self, context_identifier: Any, resource_pack: OpenGLResourcePack,
     ):
         OpenGLResourcePackManager.__init__(self, resource_pack)
         ContextManager.__init__(self, context_identifier)
@@ -52,11 +53,7 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         # TODO: update this to support multiple structures
         self.clear()
         self._structures.append(
-            RenderStructure(
-                self.context_identifier,
-                self._resource_pack,
-                structure
-            )
+            RenderStructure(self.context_identifier, self._resource_pack, structure)
         )
         self._transforms.append((location, scale, rotation))
         self._transformation_matrices.append(

@@ -10,11 +10,7 @@ from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 class RenderSelectionEditable(RenderSelectionHighlightable):
     """A drawable selection box with additional editing controls"""
 
-    def __init__(
-        self,
-        context_identifier: str,
-        resource_pack: OpenGLResourcePack
-    ):
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
         super().__init__(context_identifier, resource_pack)
         self._being_resized = False
         self._free_edges = numpy.array(

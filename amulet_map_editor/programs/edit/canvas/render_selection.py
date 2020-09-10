@@ -15,7 +15,7 @@ class EditProgramRenderSelectionGroup(RenderSelectionGroupEditable):
         self,
         canvas: "EditCanvas",
         context_identifier: str,
-        resource_pack: OpenGLResourcePack
+        resource_pack: OpenGLResourcePack,
     ):
         super().__init__(context_identifier, resource_pack)
         self._canvas = weakref.ref(canvas)
