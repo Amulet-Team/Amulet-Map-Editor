@@ -28,13 +28,17 @@ class BaseCanvas(glcanvas.GLCanvas):
             self, ctxAttrs=context_attributes
         )  # setup the OpenGL context
         self.SetCurrent(self._context)
-        self.context_identifier = str(
+        self._context_identifier = str(
             uuid.uuid4()
         )  # create a UUID for the context. Used to get shaders
         self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
         self._setup_opengl()  # set some OpenGL states
 
         self._transformation_matrix: Optional[numpy.ndarray] = None
+
+    @property
+    def context_identifier(self) -> str:
+        return self._context_identifier
 
     def _setup_opengl(self):
         glEnable(GL_DEPTH_TEST)
