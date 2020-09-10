@@ -11,6 +11,7 @@ from minecraft_model_reader.api.resource_pack.java.download_resources import (
 )
 from minecraft_model_reader.api.resource_pack.base import BaseResourcePackManager
 from minecraft_model_reader.api.resource_pack.java import JavaResourcePackManager, JavaResourcePack
+from minecraft_model_reader.api.resource_pack import load_resource_pack, load_resource_pack_manager
 from amulet.api.chunk import Chunk
 from amulet.api.block import Block
 from amulet.api.errors import ChunkLoadError
@@ -35,6 +36,7 @@ from amulet_map_editor.api.opengl.mesh.world_renderer.world import (
 from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
+from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.logging import log
 from .render_selection import EditProgramRenderSelectionGroup
 from amulet_map_editor.programs.edit.canvas.events import (
@@ -78,9 +80,7 @@ class BaseEditCanvas(BaseCanvas):
         self._texture_bounds: Optional[
             Dict[Any, Tuple[float, float, float, float]]
         ] = None
-        self._resource_pack: Optional[BaseResourcePackManager] = None
-
-        self._resource_pack_translator = None
+        self._opengl_resource_pack: Optional[OpenGLResourcePack] = None
 
         self._render_world = None
 
@@ -120,7 +120,7 @@ class BaseEditCanvas(BaseCanvas):
             latest_pack = e.value
         yield 0.5, "Loading resource packs"
         fix_pack = get_java_vanilla_fix()
-        amulet_pack = JavaResourcePack(
+        amulet_pack = load_resource_pack(
             os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack")
         )
         user_packs = [
@@ -129,29 +129,29 @@ class BaseEditCanvas(BaseCanvas):
             if os.path.isdir(rp)
         ]
 
-        self._resource_pack = JavaResourcePackManager(
+        resource_pack = load_resource_pack_manager(
             (amulet_pack, latest_pack, *user_packs, fix_pack), load=False
         )
-        for i in self._resource_pack.reload():
+        for i in resource_pack.reload():
             yield i / 4 + 0.5
 
+        opengl_resource_pack = OpenGLResourcePack(
+            resource_pack,
+            self.world.translation_manager.get_version(
+                "java", (999, 0, 0)
+            )
+        )
+
         yield 0.75, "Creating texture atlas"
-        for i in self._create_atlas():
+        for i in opengl_resource_pack.setup():
             yield i / 4 + 0.75
 
         yield 1.0, "Setting up renderer"
 
-        self._resource_pack_translator = self.world.translation_manager.get_version(
-            "java", (999, 0, 0)
-        )
-
         self._render_world = RenderWorld(
-            self.context_identifier,
             self.world,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds,
-            self._resource_pack_translator,
+            self.context_identifier,
+            opengl_resource_pack
         )
 
         self._selection_group = EditProgramRenderSelectionGroup(

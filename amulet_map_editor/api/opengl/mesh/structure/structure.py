@@ -10,7 +10,7 @@ from amulet.api.chunk import Chunk
 from amulet.api.registry import BlockManager
 
 from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
-from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManager
 from amulet_map_editor.api.opengl.mesh.selection import (
     RenderSelectionGroup,
     RenderSelection,
@@ -82,7 +82,7 @@ class RenderStructureChunk(RenderChunkBuilder):
         return self._offset
 
 
-class RenderStructure(ResourcePackManager, Drawable):
+class RenderStructure(OpenGLResourcePackManager, Drawable):
     """A class to create geometry for a Structure and render it."""
 
     def __init__(

@@ -10,7 +10,7 @@ from amulet.api.data_types import FloatTriplet, PointCoordinates
 from .structure import RenderStructure
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
 from amulet_map_editor.api.opengl.matrix import transform_matrix
-from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManager
 
 LocationType = PointCoordinates
 ScaleType = FloatTriplet
@@ -18,7 +18,7 @@ RotationType = FloatTriplet
 TransformType = Tuple[LocationType, ScaleType, RotationType]
 
 
-class StructureGroup(ResourcePackManager, Drawable):
+class StructureGroup(OpenGLResourcePackManager, Drawable):
     """A group of RenderStructure classes with transforms"""
 
     def __init__(
