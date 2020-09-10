@@ -126,7 +126,7 @@ class BaseEditCanvas(BaseCanvas):
         yield 0.5, "Loading resource packs"
         fix_pack = get_java_vanilla_fix()
         amulet_pack = load_resource_pack(
-            os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack")
+            os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack", "java")
         )
         user_packs = [
             JavaResourcePack(rp)
