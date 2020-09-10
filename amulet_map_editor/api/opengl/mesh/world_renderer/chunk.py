@@ -163,7 +163,7 @@ class RenderChunk(RenderChunkBuilder):
             ).reshape((-1, self._vert_len))
             plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(-0.01)
             plane[:, 5:9] = self.resource_pack.texture_bounds(
-                self.resource_pack.get_texture_path("amulet", "ui/translucent_white")
+                self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
             )
             if (self.cx + self.cz) % 2:
                 plane[:, 9:12] = [0.55, 0.5, 0.9]
@@ -179,7 +179,7 @@ class RenderChunk(RenderChunkBuilder):
         ).reshape((-1, self._vert_len))
         plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
         plane[:, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "ui/translucent_white")
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
         )
         if (self.cx + self.cz) % 2:
             plane[:, 9:12] = [0.3, 0.3, 0.3]
@@ -227,7 +227,7 @@ class RenderChunk(RenderChunkBuilder):
         ).reshape((-1, self._vert_len))
         plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
         plane[:, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "ui/translucent_white")
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
         )
         if (self.cx + self.cz) % 2:
             plane[:, 9:12] = [1, 0.2, 0.2]

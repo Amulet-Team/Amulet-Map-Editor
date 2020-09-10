@@ -24,13 +24,13 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
     def _init_verts(self):
         self.verts = numpy.zeros((6 * 2 * 3 * 3, self._vert_len), dtype=numpy.float32)
         self.verts[:36, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "ui/selection")
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
         self.verts[36:72, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "ui/selection_green")
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_green")
         )
         self.verts[72:, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "ui/selection_blue")
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_blue")
         )
         self.verts[:, 9:12] = self.box_tint
 
