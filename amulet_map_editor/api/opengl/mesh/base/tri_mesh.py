@@ -10,7 +10,17 @@ class Drawable:
         raise NotImplementedError
 
 
-class TriMesh(Drawable):
+class ContextManager:
+    """Store the uuid of the context this data applies to."""
+    def __init__(self, context_identifier: str):
+        self._context_identifier = context_identifier
+
+    @property
+    def context_identifier(self) -> str:
+        return self._context_identifier
+
+
+class TriMesh(Drawable, ContextManager):
     """The base class for a triangular face mesh.
     Implements the base logic to set up and unload OpenGL."""
 
@@ -26,9 +36,7 @@ class TriMesh(Drawable):
         """Create a new TriMesh.
         The object can be created from another thread so OpenGL
         variables cannot be set from here"""
-        self.context_identifier = (
-            context_identifier  # a string identifier unique to the context
-        )
+        ContextManager.__init__(self, context_identifier)
         self._vao = None  # vertex array object
         self._vbo = None  # vertex buffer object
         self._shader = None  # the shader program
