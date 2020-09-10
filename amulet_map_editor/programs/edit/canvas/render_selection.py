@@ -1,9 +1,10 @@
-from typing import Dict, Tuple, Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import wx
 import weakref
 
 from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionGroupEditable
 from .events import BoxChangeEvent, BoxEditToggleEvent
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
 if TYPE_CHECKING:
     from .edit_canvas import EditCanvas
@@ -14,10 +15,9 @@ class EditProgramRenderSelectionGroup(RenderSelectionGroupEditable):
         self,
         canvas: "EditCanvas",
         context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        texture: int,
+        resource_pack: OpenGLResourcePack
     ):
-        super().__init__(context_identifier, texture_bounds, texture)
+        super().__init__(context_identifier, resource_pack)
         self._canvas = weakref.ref(canvas)
 
     @property

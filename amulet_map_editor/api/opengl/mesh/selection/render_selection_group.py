@@ -1,25 +1,24 @@
 import numpy
-from typing import Tuple, Dict, Any, List, Union
+from typing import List, Union
 
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack, OpenGLResourcePackManagerStatic
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 from .render_selection import RenderSelection
 
 
-class RenderSelectionGroup(Drawable):
+class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerStatic):
     """A group of selection boxes to be drawn"""
 
     def __init__(
         self,
         context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        texture: int,
+        resource_pack: OpenGLResourcePack,
         selection: SelectionGroup = None,
     ):
-        self._context_identifier = context_identifier
-        self._texture_bounds = texture_bounds
-        self._texture = texture
+        ContextManager.__init__(self, context_identifier)
+        OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
 
         self._boxes: List[RenderSelection] = []
 
@@ -32,7 +31,7 @@ class RenderSelectionGroup(Drawable):
 
     def _new_render_selection(self):
         return RenderSelection(
-            self._context_identifier, self._texture_bounds, self._texture
+            self.context_identifier, self.resource_pack
         )
 
     def __iter__(self):

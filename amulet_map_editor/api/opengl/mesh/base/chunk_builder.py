@@ -2,8 +2,10 @@ import numpy
 from typing import Tuple, Dict, List
 
 import minecraft_model_reader
+from amulet.api.chunk import Chunk
 
 from amulet_map_editor.api.opengl.mesh import TriMesh
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManagerStatic, OpenGLResourcePack
 
 _brightness_step = 0.15
 _brightness_multiplier = {
@@ -17,13 +19,16 @@ _brightness_multiplier = {
 }
 
 
-class RenderChunkBuilder(TriMesh):
+class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
     """A class to define the logic to generate geometry from a block array"""
 
-    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.BlockMesh:
-        raise NotImplementedError
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
+        texture = resource_pack.get_atlas_id(context_identifier)
+        TriMesh.__init__(self, context_identifier, texture)
+        OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
 
-    def _texture_bounds(self, texture):
+    @property
+    def chunk(self) -> Chunk:
         raise NotImplementedError
 
     @property
@@ -43,9 +48,9 @@ class RenderChunkBuilder(TriMesh):
         raise NotImplementedError
 
     def _set_verts(
-        self,
-        chunk_verts: List[numpy.ndarray],
-        chunk_verts_translucent: List[numpy.ndarray],
+            self,
+            chunk_verts: List[numpy.ndarray],
+            chunk_verts_translucent: List[numpy.ndarray],
     ):
         if chunk_verts:
             self.verts = numpy.concatenate(chunk_verts, 0)
@@ -60,7 +65,7 @@ class RenderChunkBuilder(TriMesh):
         self.draw_count = int(self.verts.size // self._vert_len)
 
     def _create_lod0_multi(
-        self, blocks: List[Tuple[numpy.ndarray, numpy.ndarray, Tuple[int, int, int]]]
+            self, blocks: List[Tuple[numpy.ndarray, numpy.ndarray, Tuple[int, int, int]]]
     ):
         chunk_verts = []
         chunk_verts_translucent = []
@@ -76,10 +81,10 @@ class RenderChunkBuilder(TriMesh):
         self._set_verts(*self._create_lod0_array(larger_blocks, unique_blocks))
 
     def _create_lod0_array(
-        self,
-        larger_blocks: numpy.ndarray,
-        unique_blocks: numpy.ndarray,
-        offset: Tuple[int, int, int] = None,
+            self,
+            larger_blocks: numpy.ndarray,
+            unique_blocks: numpy.ndarray,
+            offset: Tuple[int, int, int] = None,
     ) -> Tuple[List[numpy.ndarray], List[numpy.ndarray]]:
         """Create a numpy array for opaque geometry and a numpy array for """
         offset = offset or (0, 0, 0)
@@ -87,7 +92,7 @@ class RenderChunkBuilder(TriMesh):
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
         models: Dict[int, minecraft_model_reader.BlockMesh] = {}
         for block_temp_id in unique_blocks:
-            model = models[block_temp_id] = self._get_model(block_temp_id)
+            model = models[block_temp_id] = self.resource_pack.get_block_model(self.chunk.block_palette[block_temp_id])
             transparent_array[larger_blocks == block_temp_id] = model.is_transparent
 
         def get_transparent_array(offset_transparent_array, transparent_array_):
@@ -167,23 +172,23 @@ class RenderChunkBuilder(TriMesh):
                     (block_count, faces.size, self._vert_len), dtype=numpy.float32
                 )
                 vert_table[:, :, :3] = (
-                    verts[faces]
-                    + block_offsets[:, :].reshape((-1, 1, 3))
-                    + self.offset
-                    + offset
+                        verts[faces]
+                        + block_offsets[:, :].reshape((-1, 1, 3))
+                        + self.offset
+                        + offset
                 )
                 vert_table[:, :, 3:5] = tverts[faces]
 
                 vert_index = 0
                 for texture_index in model.texture_index[cull_dir]:
-                    tex_bounds = self._texture_bounds(model.textures[texture_index])
+                    tex_bounds = self.resource_pack.texture_bounds(model.textures[texture_index])
 
-                    vert_table[:, vert_index : vert_index + 3, 5:9] = tex_bounds
+                    vert_table[:, vert_index: vert_index + 3, 5:9] = tex_bounds
                     vert_index += 3
 
                 vert_table[:, :, 9:12] = (
-                    model.tint_verts[cull_dir].reshape((-1, 3))[faces]
-                    * _brightness_multiplier[cull_dir]
+                        model.tint_verts[cull_dir].reshape((-1, 3))[faces]
+                        * _brightness_multiplier[cull_dir]
                 )
 
                 if model.is_transparent == 1:

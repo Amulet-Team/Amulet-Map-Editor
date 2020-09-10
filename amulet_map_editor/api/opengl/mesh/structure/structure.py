@@ -1,21 +1,17 @@
-from typing import Tuple, Any, Dict
+from typing import Tuple, Any
 import weakref
 import numpy
 
-import minecraft_model_reader
-import PyMCTranslate
-
 from amulet.api.structure import Structure
 from amulet.api.chunk import Chunk
-from amulet.api.registry import BlockManager
 
 from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
-from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManager
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManager, OpenGLResourcePack
 from amulet_map_editor.api.opengl.mesh.selection import (
     RenderSelectionGroup,
     RenderSelection,
 )
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
 from amulet_map_editor.api.opengl.matrix import displacement_matrix
 
 
@@ -28,7 +24,7 @@ class GreenRenderSelection(RenderSelection):
 class GreenRenderSelectionGroup(RenderSelectionGroup):
     def _new_render_selection(self):
         return GreenRenderSelection(
-            self._context_identifier, self._texture_bounds, self._texture
+            self._context_identifier, self.resource_pack
         )
 
 
@@ -36,17 +32,14 @@ class RenderStructureChunk(RenderChunkBuilder):
     """A class to create geometry for a chunk in the structure and render it."""
 
     def __init__(
-        self,
-        render_structure: "RenderStructure",
-        structure_palette: BlockManager,
-        chunk: Chunk,
-        slices: Tuple[slice, slice, slice],
-        offset: numpy.ndarray,
-        texture: int,
+            self,
+            context_identifier: str,
+            resource_pack: OpenGLResourcePack,
+            chunk: Chunk,
+            slices: Tuple[slice, slice, slice],
+            offset: numpy.ndarray,
     ):
-        super().__init__(render_structure.context_identifier, texture)
-        self._render_structure = weakref.ref(render_structure)
-        self._structure_palette = structure_palette
+        super().__init__(context_identifier, resource_pack)
         self._chunk = weakref.ref(chunk)
         self._cx = chunk.cx
         self._cz = chunk.cz
@@ -56,6 +49,10 @@ class RenderStructureChunk(RenderChunkBuilder):
             0,
             chunk.cz * 16,
         )
+
+    @property
+    def chunk(self) -> Chunk:
+        return self._chunk()
 
     @property
     def cx(self):
@@ -71,47 +68,33 @@ class RenderStructureChunk(RenderChunkBuilder):
         )
         self._create_lod0(larger_blocks, unique_blocks)
 
-    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.BlockMesh:
-        return self._render_structure().get_block_model(block_temp_id)
-
-    def _texture_bounds(self, texture):
-        return self._render_structure().get_texture_bounds(texture)
-
     @property
     def offset(self) -> numpy.ndarray:
         return self._offset
 
 
-class RenderStructure(OpenGLResourcePackManager, Drawable):
+class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
     """A class to create geometry for a Structure and render it."""
 
     def __init__(
-        self,
-        context_identifier: Any,
-        structure: Structure,
-        resource_pack: minecraft_model_reader.BaseResourcePackManager,
-        texture: Any,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        translator: PyMCTranslate.Version,
+            self,
+            context_identifier: Any,
+            resource_pack: OpenGLResourcePack,
+            structure: Structure,
     ):
-        super().__init__(
-            context_identifier, resource_pack, texture, texture_bounds, translator
-        )
+        OpenGLResourcePackManager.__init__(self, resource_pack)
+        ContextManager.__init__(self, context_identifier)
         self._structure = structure
         self._sub_structures = []
         self._selection = GreenRenderSelectionGroup(
-            context_identifier, texture_bounds, texture, structure.selection
+            context_identifier, self.resource_pack, structure.selection
         )
         self._selection_transform = displacement_matrix(
             *(
-                (self._structure.selection.min - self._structure.selection.max) / 2
+                    (self._structure.selection.min - self._structure.selection.max) / 2
             ).astype(int)
         )
         self._create_geometry()  # TODO: move this to a different thread
-
-    @property
-    def _palette(self) -> BlockManager:
-        return self._structure.palette
 
     def _create_geometry(self):
         offset = -numpy.floor(
@@ -120,7 +103,7 @@ class RenderStructure(OpenGLResourcePackManager, Drawable):
         sections = []
         for chunk, slices, _ in self._structure.get_chunk_slices():
             section = RenderStructureChunk(
-                self, self._structure.palette, chunk, slices, offset, self.texture
+                self.context_identifier, self.resource_pack, chunk, slices, offset
             )
             section.create_geometry()
             sections.append(section)
@@ -128,9 +111,9 @@ class RenderStructure(OpenGLResourcePackManager, Drawable):
 
     def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
         for chunk in sorted(
-            self._sub_structures,
-            key=lambda x: abs(x.cx - cam_cx) + abs(x.cz - cam_cz),
-            reverse=True,
+                self._sub_structures,
+                key=lambda x: abs(x.cx - cam_cx) + abs(x.cz - cam_cz),
+                reverse=True,
         ):
             chunk.draw(camera_matrix)
         self._selection.draw(numpy.matmul(self._selection_transform, camera_matrix))

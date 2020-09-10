@@ -9,7 +9,6 @@ from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
     get_java_vanilla_fix,
 )
-from minecraft_model_reader.api.resource_pack.base import BaseResourcePackManager
 from minecraft_model_reader.api.resource_pack.java import JavaResourcePackManager, JavaResourcePack
 from minecraft_model_reader.api.resource_pack import load_resource_pack, load_resource_pack_manager
 from amulet.api.chunk import Chunk
@@ -135,7 +134,7 @@ class BaseEditCanvas(BaseCanvas):
         for i in resource_pack.reload():
             yield i / 4 + 0.5
 
-        opengl_resource_pack = OpenGLResourcePack(
+        self._opengl_resource_pack = OpenGLResourcePack(
             resource_pack,
             self.world.translation_manager.get_version(
                 "java", (999, 0, 0)
@@ -143,28 +142,24 @@ class BaseEditCanvas(BaseCanvas):
         )
 
         yield 0.75, "Creating texture atlas"
-        for i in opengl_resource_pack.setup():
+        for i in self._opengl_resource_pack.setup():
             yield i / 4 + 0.75
 
         yield 1.0, "Setting up renderer"
 
         self._render_world = RenderWorld(
-            self.world,
             self.context_identifier,
-            opengl_resource_pack
+            self._opengl_resource_pack,
+            self.world,
         )
 
         self._selection_group = EditProgramRenderSelectionGroup(
-            self, self.context_identifier, self._texture_bounds, self._gl_texture_atlas
+            self, self.context_identifier, self._opengl_resource_pack
         )
 
         self._structure: StructureGroup = StructureGroup(
             self.context_identifier,
-            self.world.palette,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds,
-            self._resource_pack_translator,
+            self._opengl_resource_pack,
         )
 
         self._bind_base_events()
