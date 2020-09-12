@@ -1,0 +1,18 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "Textures for the Amulet renderer",
+        "name": "Textures for the Amulet renderer",
+        "uuid": "a29e7a15-2ea8-4be4-895a-a85866d9b2d3",
+        "version": [0, 0, 1],
+        "min_engine_version": [ 1, 14, 0 ]
+    },
+    "modules": [
+        {
+            "description": "Textures for the Amulet renderer",
+            "type": "resources",
+            "uuid": "905f61c8-6f45-4e11-8adb-fe571202aa27",
+            "version": [0, 0, 1]
+        }
+    ]
+}
