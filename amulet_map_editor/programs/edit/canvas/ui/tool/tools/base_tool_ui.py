@@ -6,6 +6,10 @@ BaseToolUIType = Union[wx.Window, wx.Sizer, "BaseToolUI"]
 
 
 class BaseToolUI(BaseUI):
+    @property
+    def name(self) -> str:
+        raise NotImplementedError
+
     def enable(self):
         pass
 

@@ -87,6 +87,10 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._y2.SetBackgroundColour((150, 150, 215))
         self._z2.SetBackgroundColour((150, 150, 215))
 
+    @property
+    def name(self) -> str:
+        return "Select"
+
     def bind_events(self):
         self.canvas.Bind(EVT_PASTE, self._paste)
         self._canvas().Bind(EVT_BOX_CHANGE, self._box_renderer_change)
