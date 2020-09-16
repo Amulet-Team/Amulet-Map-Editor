@@ -119,9 +119,11 @@ class ControllableEditCanvas(BaseEditCanvas):
                     if self.select_distance2 > 1:
                         self.select_distance2 -= 1
                 elif action == "deselect boxes":
-                    self._selection_group.deselect_all()
+                    if not self._deselect():
+                        self._selection_group.deselect_all()
                 elif action == "remove box":
-                    self._selection_group.deselect_active()
+                    if not self._deselect():
+                        self._selection_group.deselect_active()
                 elif action == "box click":
                     if self.selection_editable:
                         self.box_select("add box modifier" in self._persistent_actions)
@@ -220,6 +222,13 @@ class ControllableEditCanvas(BaseEditCanvas):
             for a in remove_actions:
                 if a in self._persistent_actions:
                     self._persistent_actions.remove(a)
+
+    def _deselect(self) -> bool:
+        """
+        Additional deselect logic.
+        :return: True if it has done something and further actions should be suppressed.
+        """
+        return False
 
     def box_select(self, add_modifier: bool = False):
         position = self._selection_group.box_select_toggle(add_modifier)

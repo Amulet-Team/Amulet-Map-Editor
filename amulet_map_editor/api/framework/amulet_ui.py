@@ -10,6 +10,7 @@ from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
 
 from amulet_map_editor.api import image
+from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
@@ -30,6 +31,7 @@ CLOSEABLE_PAGE_TYPE = Union[WorldPageUI]
 wx.Image.SetDefaultLoadFlags(0)
 
 
+@preserve_ui_preferences
 class AmuletUI(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(

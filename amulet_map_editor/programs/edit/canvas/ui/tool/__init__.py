@@ -1,1 +1,1 @@
-from .tool import Tool
+from .tool import ToolManagerSizer
