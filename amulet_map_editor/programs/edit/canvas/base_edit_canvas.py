@@ -17,9 +17,7 @@ from minecraft_model_reader.api.resource_pack.bedrock.download_resources import 
     get_bedrock_vanilla_latest_iter,
     get_bedrock_vanilla_fix,
 )
-from minecraft_model_reader.api.resource_pack.bedrock import (
-    BedrockResourcePack,
-)
+from minecraft_model_reader.api.resource_pack.bedrock import BedrockResourcePack
 from minecraft_model_reader.api.resource_pack import (
     load_resource_pack,
     load_resource_pack_manager,
@@ -123,7 +121,11 @@ class BaseEditCanvas(BaseCanvas):
 
     def setup(self) -> Generator[OperationYieldType, None, None]:
         """Set up objects that take a while to set up."""
-        user_packs = [load_resource_pack(os.path.join("resource_packs", rp)) for rp in os.listdir("resource_packs") if os.path.isdir(os.path.join("resource_packs", rp))]
+        user_packs = [
+            load_resource_pack(os.path.join("resource_packs", rp))
+            for rp in os.listdir("resource_packs")
+            if os.path.isdir(os.path.join("resource_packs", rp))
+        ]
         if self.world.world_wrapper.platform == "bedrock":
             yield 0.1, "Downloading Bedrock vanilla resource pack"
             gen = get_bedrock_vanilla_latest_iter()
@@ -135,12 +137,18 @@ class BaseEditCanvas(BaseCanvas):
             yield 0.5, "Loading resource packs"
             fix_pack = get_bedrock_vanilla_fix()
             amulet_pack = load_resource_pack(
-                os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack", "bedrock")
+                os.path.join(
+                    os.path.dirname(__file__), "..", "amulet_resource_pack", "bedrock"
+                )
             )
 
-            user_packs = [pack for pack in user_packs if isinstance(pack, BedrockResourcePack)]
+            user_packs = [
+                pack for pack in user_packs if isinstance(pack, BedrockResourcePack)
+            ]
 
-            translator = self.world.translation_manager.get_version("bedrock", (999, 0, 0))
+            translator = self.world.translation_manager.get_version(
+                "bedrock", (999, 0, 0)
+            )
         else:
             yield 0.1, "Downloading Java vanilla resource pack"
             gen = get_java_vanilla_latest_iter()
@@ -152,10 +160,14 @@ class BaseEditCanvas(BaseCanvas):
             yield 0.5, "Loading resource packs"
             fix_pack = get_java_vanilla_fix()
             amulet_pack = load_resource_pack(
-                os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack", "java")
+                os.path.join(
+                    os.path.dirname(__file__), "..", "amulet_resource_pack", "java"
+                )
             )
 
-            user_packs = [pack for pack in user_packs if isinstance(pack, JavaResourcePack)]
+            user_packs = [
+                pack for pack in user_packs if isinstance(pack, JavaResourcePack)
+            ]
 
             translator = self.world.translation_manager.get_version("java", (999, 0, 0))
 
@@ -165,10 +177,7 @@ class BaseEditCanvas(BaseCanvas):
         for i in resource_pack.reload():
             yield i / 4 + 0.5
 
-        self._opengl_resource_pack = OpenGLResourcePack(
-            resource_pack,
-            translator
-        )
+        self._opengl_resource_pack = OpenGLResourcePack(resource_pack, translator)
 
         yield 0.75, "Creating texture atlas"
         for i in self._opengl_resource_pack.setup():
