@@ -21,7 +21,7 @@ def on_idle(self):
 
     qualified_name = ".".join((self.__module__, self.__class__.__name__))
 
-    def wrapper(_):
+    def wrapper(evt):
         update_cfg = False
         if self.__resized:
             self.__resized = False
@@ -36,20 +36,23 @@ def on_idle(self):
             }
             self.Refresh()
             self.Layout()
+        evt.Skip()
 
     return wrapper
 
 
 def on_size(self):
-    def wrapper(_):
+    def wrapper(evt):
         self.__resized = True
+        evt.Skip()
 
     return wrapper
 
 
 def on_move(self):
-    def wrapper(_):
+    def wrapper(evt):
         self.__moved = True
+        evt.Skip()
 
     return wrapper
 
