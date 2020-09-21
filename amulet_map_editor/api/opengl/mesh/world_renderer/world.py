@@ -1,13 +1,10 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Dict, Any, Set
+from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Any, Set
 import math
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
 import weakref
 
-import minecraft_model_reader
-import PyMCTranslate
-from amulet.api.registry import BlockManager
 from amulet.api.data_types import Dimension
 
 from amulet_map_editor.api.logging import log
@@ -17,8 +14,11 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePackManager,
+    OpenGLResourcePack,
+)
+from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -114,11 +114,12 @@ class ChunkGenerator(ThreadPoolExecutor):
 
                 # generate the chunk
                 chunk = RenderChunk(
-                    self.render_world,
+                    self.render_world.context_identifier,
+                    self.render_world.resource_pack,
+                    self.render_world.world,
                     self._region_size,
                     chunk_coords,
                     self.render_world.dimension,
-                    self.render_world.texture,
                 )
 
                 try:
@@ -136,26 +137,22 @@ class ChunkGenerator(ThreadPoolExecutor):
                 time.sleep(1 / 60 - delta_time)
 
 
-class RenderWorld(ResourcePackManager, Drawable):
+class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
     def __init__(
         self,
         context_identifier: Any,
+        opengl_resource_pack: OpenGLResourcePack,
         world: "World",
-        resource_pack: minecraft_model_reader.JavaRPHandler,
-        texture: Any,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        translator: PyMCTranslate.Version,
     ):
-        super().__init__(
-            context_identifier, resource_pack, texture, texture_bounds, translator
-        )
+        OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
+        ContextManager.__init__(self, context_identifier)
         self._world = world
         self._camera_location: CameraLocationType = (0, 150, 0)
         self._camera_rotation: CameraRotationType = (90, 0)
         self._dimension: Dimension = "overworld"
         self._render_distance = 5
         self._garbage_distance = 10
-        self._chunk_manager = ChunkManager(self.context_identifier, self.texture)
+        self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
         self._chunk_generator = ChunkGenerator(self)
 
     @property
@@ -169,14 +166,6 @@ class RenderWorld(ResourcePackManager, Drawable):
     @property
     def chunk_generator(self) -> ChunkGenerator:
         return self._chunk_generator
-
-    @property
-    def _palette(self) -> BlockManager:
-        return self._world.palette
-
-    @property
-    def translator(self) -> PyMCTranslate.Version:
-        return self._resource_pack_translator
 
     def is_closeable(self):
         return True
@@ -262,3 +251,7 @@ class RenderWorld(ResourcePackManager, Drawable):
             )
             self._chunk_manager.unload(safe_area[1:])
             self._world.unload(safe_area)
+
+    def _rebuild(self):
+        """Unload all the chunks so they can be rebuilt."""
+        self._chunk_manager.unload()

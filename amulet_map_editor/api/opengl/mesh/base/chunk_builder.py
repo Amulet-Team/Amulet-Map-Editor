@@ -2,8 +2,13 @@ import numpy
 from typing import Tuple, Dict, List
 
 import minecraft_model_reader
+from amulet.api.chunk import Chunk
 
 from amulet_map_editor.api.opengl.mesh import TriMesh
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePackManagerStatic,
+    OpenGLResourcePack,
+)
 
 _brightness_step = 0.15
 _brightness_multiplier = {
@@ -17,13 +22,16 @@ _brightness_multiplier = {
 }
 
 
-class RenderChunkBuilder(TriMesh):
+class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
     """A class to define the logic to generate geometry from a block array"""
 
-    def _get_model(self, block_temp_id: int) -> minecraft_model_reader.MinecraftMesh:
-        raise NotImplementedError
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
+        texture = resource_pack.get_atlas_id(context_identifier)
+        TriMesh.__init__(self, context_identifier, texture)
+        OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
 
-    def _texture_bounds(self, texture):
+    @property
+    def chunk(self) -> Chunk:
         raise NotImplementedError
 
     @property
@@ -85,9 +93,11 @@ class RenderChunkBuilder(TriMesh):
         offset = offset or (0, 0, 0)
         blocks = larger_blocks[1:-1, 1:-1, 1:-1]
         transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
-        models: Dict[int, minecraft_model_reader.MinecraftMesh] = {}
+        models: Dict[int, minecraft_model_reader.BlockMesh] = {}
         for block_temp_id in unique_blocks:
-            model = models[block_temp_id] = self._get_model(block_temp_id)
+            model = models[block_temp_id] = self.resource_pack.get_block_model(
+                self.chunk.block_palette[block_temp_id]
+            )
             transparent_array[larger_blocks == block_temp_id] = model.is_transparent
 
         def get_transparent_array(offset_transparent_array, transparent_array_):
@@ -134,7 +144,7 @@ class RenderChunkBuilder(TriMesh):
         for block_temp_id, model in models.items():
             # for each unique blockstate in the chunk
             # get the model and the locations of the blocks
-            model: minecraft_model_reader.MinecraftMesh
+            model: minecraft_model_reader.BlockMesh
             all_block_locations = numpy.argwhere(blocks == block_temp_id)
             if not all_block_locations.size:
                 continue
@@ -176,7 +186,9 @@ class RenderChunkBuilder(TriMesh):
 
                 vert_index = 0
                 for texture_index in model.texture_index[cull_dir]:
-                    tex_bounds = self._texture_bounds(model.textures[texture_index])
+                    tex_bounds = self.resource_pack.texture_bounds(
+                        model.textures[texture_index]
+                    )
 
                     vert_table[:, vert_index : vert_index + 3, 5:9] = tex_bounds
                     vert_index += 3

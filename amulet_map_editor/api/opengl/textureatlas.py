@@ -255,9 +255,9 @@ class TextureAtlasMap(object):
 
 
 def create_atlas(
-    texture_dict: Dict[Any, str]
+    texture_tuple: Tuple[str, ...]
 ) -> Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]:
-    atlas_iter = create_atlas_iter(texture_dict)
+    atlas_iter = create_atlas_iter(texture_tuple)
     try:
         while True:
             yield next(atlas_iter)
@@ -266,7 +266,7 @@ def create_atlas(
 
 
 def create_atlas_iter(
-    texture_dict: Dict[Any, str]
+    texture_tuple: Tuple[str, ...]
 ) -> Generator[
     float,
     None,
@@ -275,9 +275,9 @@ def create_atlas_iter(
     log.info("Creating texture atlas")
     # Parse texture names
     textures = []
-    for texture_index, texture in enumerate(texture_dict.values()):
+    for texture_index, texture in enumerate(texture_tuple):
         if not texture_index % 100:
-            yield texture_index / (len(texture_dict) * 2)
+            yield texture_index / (len(texture_tuple) * 2)
         # Look for a texture name
         name, frames = texture, [texture]
 
@@ -324,8 +324,7 @@ def create_atlas_iter(
 
     texture_bounds = atlas.to_dict()
     texture_bounds = {
-        tex_id: texture_bounds[texture_path]
-        for tex_id, texture_path in texture_dict.items()
+        texture_path: texture_bounds[texture_path] for texture_path in texture_tuple
     }
 
     log.info("Finished creating texture atlas")

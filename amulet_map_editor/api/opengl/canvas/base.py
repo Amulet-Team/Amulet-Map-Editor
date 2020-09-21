@@ -28,7 +28,7 @@ class BaseCanvas(glcanvas.GLCanvas):
             self, ctxAttrs=context_attributes
         )  # setup the OpenGL context
         self.SetCurrent(self._context)
-        self.context_identifier = str(
+        self._context_identifier = str(
             uuid.uuid4()
         )  # create a UUID for the context. Used to get shaders
         self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
@@ -36,19 +36,16 @@ class BaseCanvas(glcanvas.GLCanvas):
 
         self._transformation_matrix: Optional[numpy.ndarray] = None
 
+    @property
+    def context_identifier(self) -> str:
+        return self._context_identifier
+
     def _setup_opengl(self):
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glDepthFunc(GL_LEQUAL)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-        glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        glBindTexture(GL_TEXTURE_2D, 0)
 
     def _close(self):
         glDeleteTextures([self._gl_texture_atlas])

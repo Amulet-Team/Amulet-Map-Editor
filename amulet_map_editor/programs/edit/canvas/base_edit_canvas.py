@@ -5,10 +5,22 @@ from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
 import weakref
 
-import minecraft_model_reader
-from minecraft_model_reader.java.download_resources import (
+from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
     get_java_vanilla_fix,
+)
+from minecraft_model_reader.api.resource_pack.java import (
+    JavaResourcePackManager,
+    JavaResourcePack,
+)
+from minecraft_model_reader.api.resource_pack.bedrock.download_resources import (
+    get_bedrock_vanilla_latest_iter,
+    get_bedrock_vanilla_fix,
+)
+from minecraft_model_reader.api.resource_pack.bedrock import BedrockResourcePack
+from minecraft_model_reader.api.resource_pack import (
+    load_resource_pack,
+    load_resource_pack_manager,
 )
 from amulet.api.chunk import Chunk
 from amulet.api.block import Block
@@ -21,6 +33,7 @@ from amulet.api.data_types import (
 )
 from amulet.api.selection import SelectionGroup
 
+from amulet_map_editor import experimental_bedrock_resources
 from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
@@ -34,6 +47,7 @@ from amulet_map_editor.api.opengl.mesh.world_renderer.world import (
 from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
+from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.logging import log
 from .render_selection import EditProgramRenderSelectionGroup
 from amulet_map_editor.programs.edit.canvas.events import (
@@ -77,9 +91,7 @@ class BaseEditCanvas(BaseCanvas):
         self._texture_bounds: Optional[
             Dict[Any, Tuple[float, float, float, float]]
         ] = None
-        self._resource_pack: Optional[minecraft_model_reader.JavaRPHandler] = None
-
-        self._resource_pack_translator = None
+        self._opengl_resource_pack: Optional[OpenGLResourcePack] = None
 
         self._render_world = None
 
@@ -110,60 +122,80 @@ class BaseEditCanvas(BaseCanvas):
 
     def setup(self) -> Generator[OperationYieldType, None, None]:
         """Set up objects that take a while to set up."""
-        yield 0.1, "Downloading vanilla resource pack"
-        gen = get_java_vanilla_latest_iter()
-        try:
-            while True:
-                yield next(gen) * 0.4 + 0.1
-        except StopIteration as e:
-            latest_pack = e.value
-        yield 0.5, "Loading resource packs"
-        fix_pack = get_java_vanilla_fix()
-        amulet_pack = minecraft_model_reader.JavaRP(
-            os.path.join(os.path.dirname(__file__), "..", "amulet_resource_pack")
-        )
         user_packs = [
-            minecraft_model_reader.JavaRP(rp)
+            load_resource_pack(os.path.join("resource_packs", rp))
             for rp in os.listdir("resource_packs")
-            if os.path.isdir(rp)
+            if os.path.isdir(os.path.join("resource_packs", rp))
         ]
+        if self.world.world_wrapper.platform == "bedrock" and experimental_bedrock_resources:
+            yield 0.1, "Downloading Bedrock vanilla resource pack"
+            gen = get_bedrock_vanilla_latest_iter()
+            try:
+                while True:
+                    yield next(gen) * 0.4 + 0.1
+            except StopIteration as e:
+                latest_pack = e.value
+            yield 0.5, "Loading resource packs"
+            fix_pack = get_bedrock_vanilla_fix()
+            amulet_pack = load_resource_pack(
+                os.path.join(
+                    os.path.dirname(__file__), "..", "amulet_resource_pack", "bedrock"
+                )
+            )
 
-        self._resource_pack = minecraft_model_reader.JavaRPHandler(
+            user_packs = [
+                pack for pack in user_packs if isinstance(pack, BedrockResourcePack)
+            ]
+
+            translator = self.world.translation_manager.get_version(
+                "bedrock", (999, 0, 0)
+            )
+        else:
+            yield 0.1, "Downloading Java vanilla resource pack"
+            gen = get_java_vanilla_latest_iter()
+            try:
+                while True:
+                    yield next(gen) * 0.4 + 0.1
+            except StopIteration as e:
+                latest_pack = e.value
+            yield 0.5, "Loading resource packs"
+            fix_pack = get_java_vanilla_fix()
+            amulet_pack = load_resource_pack(
+                os.path.join(
+                    os.path.dirname(__file__), "..", "amulet_resource_pack", "java"
+                )
+            )
+
+            user_packs = [
+                pack for pack in user_packs if isinstance(pack, JavaResourcePack)
+            ]
+
+            translator = self.world.translation_manager.get_version("java", (999, 0, 0))
+
+        resource_pack = load_resource_pack_manager(
             (amulet_pack, latest_pack, *user_packs, fix_pack), load=False
         )
-        for i in self._resource_pack.reload():
+        for i in resource_pack.reload():
             yield i / 4 + 0.5
 
+        self._opengl_resource_pack = OpenGLResourcePack(resource_pack, translator)
+
         yield 0.75, "Creating texture atlas"
-        for i in self._create_atlas():
+        for i in self._opengl_resource_pack.setup():
             yield i / 4 + 0.75
 
         yield 1.0, "Setting up renderer"
 
-        self._resource_pack_translator = self.world.translation_manager.get_version(
-            "java", (999, 0, 0)
-        )
-
         self._render_world = RenderWorld(
-            self.context_identifier,
-            self.world,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds,
-            self._resource_pack_translator,
+            self.context_identifier, self._opengl_resource_pack, self.world,
         )
 
         self._selection_group = EditProgramRenderSelectionGroup(
-            self, self.context_identifier, self._texture_bounds, self._gl_texture_atlas
+            self, self.context_identifier, self._opengl_resource_pack
         )
 
         self._structure: StructureGroup = StructureGroup(
-            self.context_identifier,
-            self.world.palette,
-            self._resource_pack,
-            self._gl_texture_atlas,
-            self._texture_bounds,
-            self._resource_pack_translator,
+            self.context_identifier, self._opengl_resource_pack,
         )
 
         self._bind_base_events()
@@ -269,8 +301,8 @@ class BaseEditCanvas(BaseCanvas):
         """Check that the canvas and contained data is safe to be closed."""
         return self._render_world.is_closeable()
 
-    def _load_resource_pack(self, *resource_packs: minecraft_model_reader.JavaRP):
-        self._resource_pack = minecraft_model_reader.JavaRPHandler(resource_packs)
+    def _load_resource_pack(self, *resource_packs: JavaResourcePack):
+        self._resource_pack = JavaResourcePackManager(resource_packs)
         for _ in self._create_atlas():
             pass
 
@@ -460,9 +492,8 @@ class BaseEditCanvas(BaseCanvas):
 
             if (
                 chunk is not None
-                and self._render_world.world.palette[
-                    chunk.blocks[x % 16, y, z % 16]
-                ] != AIR
+                and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]]
+                != AIR
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block

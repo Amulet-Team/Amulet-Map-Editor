@@ -1,0 +1,20 @@
+{
+   "num_mip_levels" : 4,
+   "padding" : 8,
+   "resource_pack_name" : "amulet",
+   "texture_data" : {
+      "amulet_selection" : {
+         "textures" : "amulet_ui/selection"
+      },
+      "amulet_selection_blue" : {
+         "textures" : "amulet_ui/selection_blue"
+      },
+      "amulet_selection_green" : {
+         "textures" : "amulet_ui/selection_green"
+      },
+      "amulet_translucent_white" : {
+         "textures" : "amulet_ui/translucent_white"
+      }
+   },
+   "texture_name" : "atlas.terrain"
+}
