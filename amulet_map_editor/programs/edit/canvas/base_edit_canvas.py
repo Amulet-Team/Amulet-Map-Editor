@@ -33,6 +33,7 @@ from amulet.api.data_types import (
 )
 from amulet.api.selection import SelectionGroup
 
+from amulet_map_editor import experimental_bedrock_resources
 from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
@@ -126,7 +127,7 @@ class BaseEditCanvas(BaseCanvas):
             for rp in os.listdir("resource_packs")
             if os.path.isdir(os.path.join("resource_packs", rp))
         ]
-        if self.world.world_wrapper.platform == "bedrock":
+        if self.world.world_wrapper.platform == "bedrock" and experimental_bedrock_resources:
             yield 0.1, "Downloading Bedrock vanilla resource pack"
             gen = get_bedrock_vanilla_latest_iter()
             try:
