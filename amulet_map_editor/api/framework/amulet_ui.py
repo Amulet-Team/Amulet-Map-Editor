@@ -1,6 +1,7 @@
 import wx
 from wx.lib.agw import flatnotebook
 from typing import Dict, Union
+import traceback
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
@@ -170,8 +171,11 @@ class AmuletUI(wx.Frame):
                     self.world_tab_holder, path, lambda: self.close_world(path)
                 )
             except LoaderNoneMatched as e:
-                log.error(e)
-                wx.MessageBox(str(e))
+                log.error(f"Could not find a loader for this world.\n{e}")
+                wx.MessageBox(f"Could not find a loader for this world.\n{e}")
+            except Exception as e:
+                log.error(f"Error loading world.\n{e}\n{traceback.format_exc()}")
+                wx.MessageBox(f"Error loading world.\n{e}")
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)
