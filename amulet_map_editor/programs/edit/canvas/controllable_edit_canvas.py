@@ -7,6 +7,7 @@ from amulet.api.data_types import OperationYieldType
 from wx.adv import RichToolTip
 
 from .base_edit_canvas import BaseEditCanvas
+from amulet_map_editor import log
 from amulet_map_editor.api.opengl.mesh.world_renderer.world import sin, cos
 from amulet_map_editor.api.wx.util.key_config import (
     serialise_key_event,
@@ -135,63 +136,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._capture_mouse()
                     self._toggle_mouse_time = time.time()
                 elif action == "inspect block":
-                    x, y, z = self.cursor_location
-                    try:
-                        block = self.world.get_block(x, y, z, self.dimension)
-                        chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
-                        block_entity = chunk.block_entities.get((x, y, z), None)
-                        platform = self.world.world_wrapper.platform
-                        version = self.world.world_wrapper.version
-                        translator = self.world.translation_manager.get_version(
-                            platform, version,
-                        )
-                        (
-                            version_block,
-                            version_block_entity,
-                            _,
-                        ) = translator.block.from_universal(
-                            block, block_entity, block_location=(x, y, z)
-                        )
-                        if isinstance(version, tuple):
-                            version_str = ".".join(str(v) for v in version[:4])
-                        else:
-                            version_str = str(version)
-                        block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
-                        if version_block_entity:
-                            version_block_entity_str = str(version_block_entity)
-                            if len(version_block_entity_str) > 150:
-                                version_block_entity_str = (
-                                    version_block_entity_str[:150] + "..."
-                                )
-                            block_data_text = (
-                                f"{block_data_text}\n{version_block_entity_str}"
-                            )
-
-                        block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
-                        if block_entity:
-                            block_entity_str = str(block_entity)
-                            if len(block_entity_str) > 150:
-                                block_entity_str = block_entity_str[:150] + "..."
-                            block_data_text = f"{block_data_text}\n{block_entity_str}"
-
-                        if chunk.biomes.dimension == 2:
-                            biome = chunk.biomes[x % 16, z % 16]
-                            try:
-                                block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
-                            except Exception as e:
-                                print(e)
-                        elif chunk.biomes.dimension == 3:
-                            biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
-                            try:
-                                block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
-                            except Exception as e:
-                                print(e)
-                        tooltip = RichToolTip("Inspect Block", block_data_text)
-                        tooltip.ShowFor(
-                            self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1)
-                        )
-                    except Exception as e:
-                        print(e)
+                    self._inspect_block()
 
             else:  # run once on button release
                 if action == "box click":
@@ -222,6 +167,74 @@ class ControllableEditCanvas(BaseEditCanvas):
             for a in remove_actions:
                 if a in self._persistent_actions:
                     self._persistent_actions.remove(a)
+
+    def _inspect_block(self):
+        def get_block_info() -> str:
+            try:
+                block = self.world.get_block(x, y, z, self.dimension)
+                chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
+                block_entity = chunk.block_entities.get((x, y, z), None)
+                platform = self.world.world_wrapper.platform
+                version = self.world.world_wrapper.version
+                translator = self.world.translation_manager.get_version(
+                    platform, version,
+                )
+                (
+                    version_block,
+                    version_block_entity,
+                    _,
+                ) = translator.block.from_universal(
+                    block, block_entity, block_location=(x, y, z)
+                )
+                if isinstance(version, tuple):
+                    version_str = ".".join(str(v) for v in version[:4])
+                else:
+                    version_str = str(version)
+                block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
+                if version_block_entity:
+                    version_block_entity_str = str(version_block_entity)
+                    block_data_text = (
+                        f"{block_data_text}\n{version_block_entity_str}"
+                    )
+
+                block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
+                if block_entity:
+                    block_entity_str = str(block_entity)
+                    block_data_text = f"{block_data_text}\n{block_entity_str}"
+
+                if chunk.biomes.dimension == 2:
+                    biome = chunk.biomes[x % 16, z % 16]
+                    try:
+                        block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                    except Exception as e:
+                        log.error(e)
+                elif chunk.biomes.dimension == 3:
+                    biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
+                    try:
+                        block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                    except Exception as e:
+                        log.error(e)
+
+            except Exception as e:
+                log.error(e)
+                return str(e)
+            else:
+                return block_data_text
+
+        def truncate(s: str, max_line_length: int = None) -> str:
+            if isinstance(max_line_length, int):
+                max_line_length = max(-1, max_line_length)
+                s = "\n".join([
+                    line[:max_line_length - 3] + "..." if len(line) > max_line_length else line for line in s.split("\n")
+                ])
+            return s
+
+        x, y, z = self.cursor_location
+        msg = truncate(get_block_info(), 150)
+        tooltip = RichToolTip("Inspect Block", msg)
+        tooltip.ShowFor(
+            self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1)
+        )
 
     def _deselect(self) -> bool:
         """
