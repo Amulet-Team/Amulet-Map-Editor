@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Set, Generator
+from typing import TYPE_CHECKING, Set, Generator, Tuple, Optional
 import wx
 import numpy
 import time
@@ -37,6 +37,7 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._box_select_time = 0
         self._toggle_mouse_time = 0
         self._previous_mouse_lock = self._mouse_lock
+        self._previous_inspect_state: Tuple[Optional[Tuple[int, int, int]], float, str] = (None, 0, "")
 
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
@@ -170,6 +171,7 @@ class ControllableEditCanvas(BaseEditCanvas):
 
     def _inspect_block(self):
         def get_block_info() -> str:
+            x, y, z = self.cursor_location
             try:
                 block = self.world.get_block(x, y, z, self.dimension)
                 chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
@@ -229,8 +231,16 @@ class ControllableEditCanvas(BaseEditCanvas):
                 ])
             return s
 
-        x, y, z = self.cursor_location
-        msg = truncate(get_block_info(), 150)
+        if self.cursor_location != self._previous_inspect_state[0] or self._previous_inspect_state[1] < time.time() - 5:
+            # if the cursor is in a different position or the cache is greater than 5 seconds old recreate the text
+            full_msg = get_block_info()
+            self._previous_inspect_state = (
+                self.cursor_location,
+                time.time(),
+                full_msg
+            )
+
+        msg = truncate(self._previous_inspect_state[2], 150)
         tooltip = RichToolTip("Inspect Block", msg)
         tooltip.ShowFor(
             self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1)
