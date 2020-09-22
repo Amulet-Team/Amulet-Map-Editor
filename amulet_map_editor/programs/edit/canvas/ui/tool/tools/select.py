@@ -122,6 +122,8 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
                 (1, 1, 1),
                 self._paste_panel.rotation,
                 self._paste_panel.copy_air,
+                self._paste_panel.copy_water,
+                self._paste_panel.copy_lava,
             )
         )
 
