@@ -10,7 +10,6 @@ from amulet_map_editor.api.wx.ui.version_select import (
     VersionSelect,
     EVT_VERSION_CHANGE,
 )
-from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 
 
 class BaseDefine(wx.Panel):

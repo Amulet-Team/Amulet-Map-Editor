@@ -97,7 +97,7 @@ class SetBiome(SimpleOperationPanel):
         chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
 
         if chunk.biomes.dimension == 3:
-            biome = chunk.biomes[offset_x//4, y//4, offset_z//4]
+            biome = chunk.biomes[offset_x // 4, y // 4, offset_z // 4]
         elif chunk.biomes.dimension == 2:
             biome = chunk.biomes[offset_x, offset_z]
         else:
@@ -116,17 +116,42 @@ class SetBiome(SimpleOperationPanel):
         iter_count = len(list(world.get_chunk_slices(selection, dimension, True)))
         count = 0
         for chunk, slices, _ in world.get_chunk_slices(selection, dimension, True):
-            original_blocks = chunk.blocks[slices]
-            palette, blocks = numpy.unique(original_blocks, return_inverse=True)
-            blocks = blocks.reshape(original_blocks.shape)
+            new_biome = chunk.biome_palette.get_add_biome(
+                self._biome_choice.universal_biome
+            )
+
             if mode == "Selection Only":
-                pass
+                if chunk.biomes.dimension == 3:
+                    slices = (
+                        slice(slices[0].start // 4, slices[0].stop // 4),
+                        slice(slices[1].start // 4, slices[1].stop // 4),
+                        slice(slices[2].start // 4, slices[2].stop // 4),
+                    )
+                elif chunk.biomes.dimension == 2:
+                    slices = (slices[0], slices[2])
+                else:
+                    raise ValueError(
+                        f"The biome is not in the required dimension, instead it's in dimension {chunk.biomes.dimension}"
+                    )
             elif mode == "Whole Chunks":
-                pass
+                if chunk.biomes.dimension == 3:
+                    slices = (
+                        slice(None, None, None),
+                        slice(None, None, None),
+                        slice(None, None, None),
+                    )
+                elif chunk.biomes.dimension == 2:
+                    slices = (slice(None, None, None), slice(None, None, None))
+                else:
+                    raise ValueError(
+                        f"The biome is not in the required dimension, instead it's in dimension {chunk.biomes.dimension}"
+                    )
             else:
                 raise ValueError(
                     f"mode {mode} doesn't exist for the Set Biome operation."
                 )
+
+            chunk.biomes[slices] = new_biome
 
             chunk.changed = True
             count += 1

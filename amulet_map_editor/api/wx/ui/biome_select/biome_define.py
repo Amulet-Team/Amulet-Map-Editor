@@ -48,7 +48,7 @@ class BiomeDefine(BaseDefine):
 
     @property
     def biome(self) -> str:
-        return f"{self.namespace}:{self.biome}"
+        return f"{self.namespace}:{self.biome_name}"
 
     @biome.setter
     def biome(self, biome: str):
