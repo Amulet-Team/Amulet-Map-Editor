@@ -1,5 +1,5 @@
 import numpy
-from typing import Tuple, Dict, Any, Optional, List
+from typing import Tuple, Optional, List
 
 from amulet.api.data_types import (
     BlockCoordinatesAny,
@@ -12,17 +12,16 @@ from .render_selection import RenderSelection
 from .render_selection_highlightable import RenderSelectionHighlightable
 from .render_selection_editable import RenderSelectionEditable
 
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
+
 
 class RenderSelectionGroupEditable(RenderSelectionGroup):
     """A group of selection boxes to be drawn with an added editable box."""
 
     def __init__(
-        self,
-        context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        texture: int,
+        self, context_identifier: str, resource_pack: OpenGLResourcePack,
     ):
-        super().__init__(context_identifier, texture_bounds, texture)
+        super().__init__(context_identifier, resource_pack)
         self._editable = True
         self._active_box: Optional[RenderSelectionEditable] = None
         self._active_box_index: Optional[int] = None
@@ -33,7 +32,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._boxes: List[RenderSelectionHighlightable] = []
         self._last_highlighted_box_index: Optional[int] = None
 
-        self._cursor = RenderSelection(context_identifier, texture_bounds, texture)
+        self._cursor = RenderSelection(context_identifier, resource_pack)
         self._cursor_position = numpy.array([0, 0, 0], dtype=numpy.int)
 
     @property
@@ -59,13 +58,11 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
 
     def _new_render_selection(self):
         return RenderSelectionHighlightable(
-            self._context_identifier, self._texture_bounds, self._texture
+            self._context_identifier, self.resource_pack
         )
 
     def _new_editable_render_selection(self):
-        return RenderSelectionEditable(
-            self._context_identifier, self._texture_bounds, self._texture
-        )
+        return RenderSelectionEditable(self._context_identifier, self.resource_pack)
 
     def _unload_active_box(self):
         if self._active_box is not None:

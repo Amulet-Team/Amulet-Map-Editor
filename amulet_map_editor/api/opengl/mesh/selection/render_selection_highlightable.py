@@ -1,20 +1,16 @@
-from typing import Dict, Any, Tuple
+from typing import Tuple
 import numpy
 
 from amulet.api.data_types import BlockCoordinatesAny
 from .render_selection import RenderSelection
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
 
 class RenderSelectionHighlightable(RenderSelection):
     """A drawable selection box with edges that can be highlighted"""
 
-    def __init__(
-        self,
-        context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        texture: int,
-    ):
-        super().__init__(context_identifier, texture_bounds, texture)
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
+        super().__init__(context_identifier, resource_pack)
         self._highlight_edges = numpy.array(
             [[False, False, False], [False, False, False]], dtype=numpy.bool
         )  # which edges are highlighted

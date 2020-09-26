@@ -1,37 +1,32 @@
 import numpy
 from OpenGL.GL import *
-from typing import Tuple, Dict, Any
+from typing import Tuple
 
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 from .render_selection_highlightable import RenderSelectionHighlightable
+from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
 
 class RenderSelectionEditable(RenderSelectionHighlightable):
     """A drawable selection box with additional editing controls"""
 
-    def __init__(
-        self,
-        context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        texture: int,
-    ):
-        super().__init__(context_identifier, texture_bounds, texture)
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
+        super().__init__(context_identifier, resource_pack)
         self._being_resized = False
         self._free_edges = numpy.array(
             [[False, False, False], [True, True, True]], dtype=numpy.bool
         )  # which edges can be moved by a call to set_active_point
 
-    def _init_verts(self, texture_bounds: Dict[Any, Tuple[float, float, float, float]]):
-        missing_no = texture_bounds.get(("minecraft", "missing_no"), (0, 0, 0, 0))
+    def _init_verts(self):
         self.verts = numpy.zeros((6 * 2 * 3 * 3, self._vert_len), dtype=numpy.float32)
-        self.verts[:36, 5:9] = texture_bounds.get(
-            ("amulet", "ui/selection"), missing_no
+        self.verts[:36, 5:9] = self.resource_pack.texture_bounds(
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
-        self.verts[36:72, 5:9] = texture_bounds.get(
-            ("amulet", "ui/selection_green"), missing_no
+        self.verts[36:72, 5:9] = self.resource_pack.texture_bounds(
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_green")
         )
-        self.verts[72:, 5:9] = texture_bounds.get(
-            ("amulet", "ui/selection_blue"), missing_no
+        self.verts[72:, 5:9] = self.resource_pack.texture_bounds(
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_blue")
         )
         self.verts[:, 9:12] = self.box_tint
 

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from ...edit_canvas import EditCanvas
 
 
-class Tool(wx.BoxSizer, BaseUI):
+class ToolManagerSizer(wx.BoxSizer, BaseUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         BaseUI.__init__(self, canvas)
@@ -38,11 +38,11 @@ class Tool(wx.BoxSizer, BaseUI):
         tool_select_sizer.AddStretchSpacer(1)
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
-        self.register_tool("Select", SelectOptions)
+        self.register_tool(SelectOptions)
         self._enable_tool("Select")
-        self.register_tool("Operation", SelectOperationUI)
-        self.register_tool("Import", SelectImportOperationUI)
-        self.register_tool("Export", SelectExportOperationUI)
+        self.register_tool(SelectOperationUI)
+        self.register_tool(SelectImportOperationUI)
+        self.register_tool(SelectExportOperationUI)
 
     @property
     def tools(self):
@@ -53,22 +53,32 @@ class Tool(wx.BoxSizer, BaseUI):
             tool.bind_events()
         self.canvas.Bind(EVT_TOOL_CHANGE, self._enable_tool_event)
 
-    def register_tool(self, name: str, tool_cls: Type[BaseToolUIType]):
+    def register_tool(self, tool_cls: Type[BaseToolUIType]):
         assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(
             tool_cls, BaseToolUI
         )
-        self._tool_select.register_tool(name)
         tool = tool_cls(self.canvas)
+        self._tool_select.register_tool(tool.name)
         if isinstance(tool, wx.Window):
             tool.Hide()
         elif isinstance(tool, wx.Sizer):
             tool.ShowItems(show=False)
-        self._tools[name] = tool
+        self._tools[tool.name] = tool
         self._tool_option_sizer.Add(tool, 1, wx.EXPAND, 0)
 
     def _enable_tool_event(self, evt):
         self._enable_tool(evt.tool)
         evt.Skip()
+
+    def enable_default_tool(self) -> bool:
+        """
+        Enables the default tool (the select tool)
+        :return: True if the selection changed, False otherwise.
+        """
+        if not isinstance(self._active_tool, SelectOptions):
+            self._enable_tool("Select")
+            return True
+        return False
 
     def _enable_tool(self, tool: str):
         if tool in self._tools:

@@ -1,16 +1,16 @@
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Any
 import numpy
 
-import minecraft_model_reader
-import PyMCTranslate
-from amulet.api.registry import BlockManager
 from amulet.api.structure import Structure
 from amulet.api.data_types import FloatTriplet, PointCoordinates
 
 from .structure import RenderStructure
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable
+from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
 from amulet_map_editor.api.opengl.matrix import transform_matrix
-from amulet_map_editor.api.opengl.resource_pack import ResourcePackManager
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePackManager,
+    OpenGLResourcePack,
+)
 
 LocationType = PointCoordinates
 ScaleType = FloatTriplet
@@ -18,30 +18,18 @@ RotationType = FloatTriplet
 TransformType = Tuple[LocationType, ScaleType, RotationType]
 
 
-class StructureGroup(ResourcePackManager, Drawable):
+class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
     """A group of RenderStructure classes with transforms"""
 
     def __init__(
-        self,
-        context_identifier: Any,
-        block_palette: BlockManager,
-        resource_pack: minecraft_model_reader.JavaRPHandler,
-        texture: Any,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        translator: PyMCTranslate.Version,
+        self, context_identifier: Any, resource_pack: OpenGLResourcePack,
     ):
-        super().__init__(
-            context_identifier, resource_pack, texture, texture_bounds, translator
-        )
-        self._block_palette = block_palette
+        OpenGLResourcePackManager.__init__(self, resource_pack)
+        ContextManager.__init__(self, context_identifier)
         self._structures: List[RenderStructure] = []
         self._transforms: List[TransformType] = []
         self._transformation_matrices: List[numpy.ndarray] = []
         self._active_structure: Optional[int] = None
-
-    @property
-    def _palette(self) -> BlockManager:
-        return self._block_palette
 
     @property
     def active_structure(self) -> Optional[int]:
@@ -65,14 +53,7 @@ class StructureGroup(ResourcePackManager, Drawable):
         # TODO: update this to support multiple structures
         self.clear()
         self._structures.append(
-            RenderStructure(
-                self.context_identifier,
-                structure,
-                self._resource_pack,
-                self._texture,
-                self._texture_bounds,
-                self._resource_pack_translator,
-            )
+            RenderStructure(self.context_identifier, self._resource_pack, structure)
         )
         self._transforms.append((location, scale, rotation))
         self._transformation_matrices.append(

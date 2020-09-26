@@ -8,6 +8,7 @@ from amulet import world_interface
 from amulet_map_editor.api.wx.ui import simple
 from amulet_map_editor.api.logging import log
 from amulet_map_editor.api import config
+from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
@@ -286,6 +287,7 @@ class WorldSelectAndRecentUI(simple.SimplePanel):
         self._open_world_callback(path)
 
 
+@preserve_ui_preferences
 class WorldSelectDialog(wx.Dialog):
     def __init__(self, parent: wx.Window, open_world_callback: Callable[[str], None]):
         super().__init__(

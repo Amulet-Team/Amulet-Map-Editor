@@ -1,6 +1,7 @@
 import wx
 from wx.lib.agw import flatnotebook
 from typing import Dict, Union
+import traceback
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
@@ -10,6 +11,7 @@ from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
 
 from amulet_map_editor.api import image
+from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
@@ -30,6 +32,7 @@ CLOSEABLE_PAGE_TYPE = Union[WorldPageUI]
 wx.Image.SetDefaultLoadFlags(0)
 
 
+@preserve_ui_preferences
 class AmuletUI(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(
@@ -168,8 +171,11 @@ class AmuletUI(wx.Frame):
                     self.world_tab_holder, path, lambda: self.close_world(path)
                 )
             except LoaderNoneMatched as e:
-                log.error(e)
-                wx.MessageBox(str(e))
+                log.error(f"Could not find a loader for this world.\n{e}")
+                wx.MessageBox(f"Could not find a loader for this world.\n{e}")
+            except Exception as e:
+                log.error(f"Error loading world.\n{e}\n{traceback.format_exc()}")
+                wx.MessageBox(f"Error loading world.\n{e}")
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)

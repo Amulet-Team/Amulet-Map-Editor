@@ -1,22 +1,24 @@
 import numpy
 from OpenGL.GL import *
 import itertools
-from typing import Tuple, Dict, Any, Optional, Union
+from typing import Tuple, Optional, Union
 
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import TriMesh
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePack,
+    OpenGLResourcePackManagerStatic,
+)
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 
 
-class RenderSelection(TriMesh):
+class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     """A drawable selection box"""
 
-    def __init__(
-        self,
-        context_identifier: str,
-        texture_bounds: Dict[Any, Tuple[float, float, float, float]],
-        texture: int,
-    ):
-        super().__init__(context_identifier, texture)
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
+        OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
+        TriMesh.__init__(
+            self, context_identifier, resource_pack.get_atlas_id(context_identifier)
+        )
         self._points: numpy.ndarray = numpy.zeros(
             (2, 3), dtype=numpy.int
         )  # The points set using point1 and point2
@@ -25,7 +27,7 @@ class RenderSelection(TriMesh):
         self._rebuild = True
         self._volume = 1
 
-        self._init_verts(texture_bounds)
+        self._init_verts()
         self.draw_count = 36
         self._draw_mode = GL_TRIANGLES
 
@@ -33,11 +35,10 @@ class RenderSelection(TriMesh):
     def box_tint(self) -> Tuple[float, float, float]:
         return 1, 1, 1
 
-    def _init_verts(self, texture_bounds: Dict[Any, Tuple[float, float, float, float]]):
-        missing_no = texture_bounds.get(("minecraft", "missing_no"), (0, 0, 0, 0))
+    def _init_verts(self):
         self.verts = numpy.zeros((6 * 2 * 3, self._vert_len), dtype=numpy.float32)
-        self.verts[:36, 5:9] = texture_bounds.get(
-            ("amulet", "ui/selection"), missing_no
+        self.verts[:36, 5:9] = self.resource_pack.texture_bounds(
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
         self.verts[:, 9:12] = self.box_tint
 
