@@ -37,7 +37,9 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._box_select_time = 0
         self._toggle_mouse_time = 0
         self._previous_mouse_lock = self._mouse_lock
-        self._previous_inspect_state: Tuple[Optional[Tuple[int, int, int]], float, str] = (None, 0, "")
+        self._previous_inspect_state: Tuple[
+            Optional[Tuple[int, int, int]], float, str
+        ] = (None, 0, "")
 
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
@@ -195,9 +197,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                 block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
                 if version_block_entity:
                     version_block_entity_str = str(version_block_entity)
-                    block_data_text = (
-                        f"{block_data_text}\n{version_block_entity_str}"
-                    )
+                    block_data_text = f"{block_data_text}\n{version_block_entity_str}"
 
                 block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
                 if block_entity:
@@ -226,25 +226,27 @@ class ControllableEditCanvas(BaseEditCanvas):
         def truncate(s: str, max_line_length: int = None) -> str:
             if isinstance(max_line_length, int):
                 max_line_length = max(-1, max_line_length)
-                s = "\n".join([
-                    line[:max_line_length - 3] + "..." if len(line) > max_line_length else line for line in s.split("\n")
-                ])
+                s = "\n".join(
+                    [
+                        line[: max_line_length - 3] + "..."
+                        if len(line) > max_line_length
+                        else line
+                        for line in s.split("\n")
+                    ]
+                )
             return s
 
-        if self.cursor_location != self._previous_inspect_state[0] or self._previous_inspect_state[1] < time.time() - 5:
+        if (
+            self.cursor_location != self._previous_inspect_state[0]
+            or self._previous_inspect_state[1] < time.time() - 5
+        ):
             # if the cursor is in a different position or the cache is greater than 5 seconds old recreate the text
             full_msg = get_block_info()
-            self._previous_inspect_state = (
-                self.cursor_location,
-                time.time(),
-                full_msg
-            )
+            self._previous_inspect_state = (self.cursor_location, time.time(), full_msg)
 
         msg = truncate(self._previous_inspect_state[2], 150)
         tooltip = RichToolTip("Inspect Block", msg)
-        tooltip.ShowFor(
-            self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1)
-        )
+        tooltip.ShowFor(self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1))
 
     def _deselect(self) -> bool:
         """
