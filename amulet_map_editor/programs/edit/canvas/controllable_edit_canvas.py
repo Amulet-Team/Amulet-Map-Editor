@@ -36,6 +36,7 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
         self._box_select_time = 0
         self._toggle_mouse_time = 0
+        self._selection_undo_timeout = 0
         self._previous_mouse_lock = self._mouse_lock
         self._previous_inspect_state: Tuple[
             Optional[Tuple[int, int, int]], float, str
@@ -264,8 +265,10 @@ class ControllableEditCanvas(BaseEditCanvas):
             )
 
     def _on_box_change_confirm(self, evt):
-        self.world.history_manager.create_undo_point(True)
-        wx.PostEvent(self, CreateUndoEvent())
+        if self._selection_undo_timeout < time.time() - 1:
+            self.world.history_manager.create_undo_point(True)
+            wx.PostEvent(self, CreateUndoEvent())
+            self._selection_undo_timeout = time.time()
         evt.Skip()
 
     def _process_persistent_inputs(self, evt):
