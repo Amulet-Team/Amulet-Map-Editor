@@ -15,7 +15,7 @@ from amulet_map_editor.api.wx.util.key_config import (
     ActionLookupType,
     Escape,
 )
-from .events import EditEscapeEvent, EVT_EDIT_ESCAPE, BoxClickEvent, EVT_BOX_EDIT_TOGGLE
+from .events import EditEscapeEvent, EVT_EDIT_ESCAPE, BoxClickEvent, EVT_BOX_CHANGE_CONFIRM, CreateUndoEvent
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -66,7 +66,7 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
 
         self.Bind(EVT_EDIT_ESCAPE, self.selection.escape_event)
-        self.Bind(EVT_BOX_EDIT_TOGGLE, self._on_box_toggle)
+        self.Bind(EVT_BOX_CHANGE_CONFIRM, self._on_box_change_confirm)
 
         self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
 
@@ -263,9 +263,9 @@ class ControllableEditCanvas(BaseEditCanvas):
                 numpy.linalg.norm(position - self.camera_location)
             )
 
-    def _on_box_toggle(self, evt):
-        if not evt.edit:
-            self.world.history_manager.create_undo_point(True)
+    def _on_box_change_confirm(self, evt):
+        self.world.history_manager.create_undo_point(True)
+        wx.PostEvent(self, CreateUndoEvent())
         evt.Skip()
 
     def _process_persistent_inputs(self, evt):

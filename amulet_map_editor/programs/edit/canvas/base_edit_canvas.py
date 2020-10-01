@@ -54,8 +54,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
     CameraRotateEvent,
     DimensionChangeEvent,
-    SelectionPointChangeEvent,
-    EVT_BOX_EDIT_TOGGLE
+    SelectionPointChangeEvent
 )
 
 if TYPE_CHECKING:
