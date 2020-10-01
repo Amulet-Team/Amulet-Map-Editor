@@ -15,7 +15,7 @@ from amulet_map_editor.api.wx.util.key_config import (
     ActionLookupType,
     Escape,
 )
-from .events import EditEscapeEvent, EVT_EDIT_ESCAPE, BoxClickEvent
+from .events import EditEscapeEvent, EVT_EDIT_ESCAPE, BoxClickEvent, EVT_BOX_EDIT_TOGGLE
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -65,7 +65,8 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(wx.EVT_KEY_UP, self._release)
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
 
-        self.Bind(EVT_EDIT_ESCAPE, self._selection_group.escape_event)
+        self.Bind(EVT_EDIT_ESCAPE, self.selection.escape_event)
+        self.Bind(EVT_BOX_EDIT_TOGGLE, self._on_box_toggle)
 
         self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
 
@@ -124,10 +125,10 @@ class ControllableEditCanvas(BaseEditCanvas):
                         self.select_distance2 -= 1
                 elif action == "deselect boxes":
                     if not self._deselect():
-                        self._selection_group.deselect_all()
+                        self.selection.deselect_all()
                 elif action == "remove box":
                     if not self._deselect():
-                        self._selection_group.deselect_active()
+                        self.selection.deselect_active()
                 elif action == "box click":
                     if self.selection_editable:
                         self.box_select("add box modifier" in self._persistent_actions)
@@ -147,7 +148,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                         self.selection_editable
                         and time.time() - self._box_select_time > 0.1
                     ):
-                        self._selection_group.box_select_disable()
+                        self.selection.box_select_disable()
                 elif action == "toggle mouse mode":
                     if time.time() - self._toggle_mouse_time > 0.1:
                         self._release_mouse()
@@ -256,11 +257,16 @@ class ControllableEditCanvas(BaseEditCanvas):
         return False
 
     def box_select(self, add_modifier: bool = False):
-        position = self._selection_group.box_select_toggle(add_modifier)
+        position = self.selection.box_select_toggle(add_modifier)
         if position is not None:
             self.select_distance2 = int(
                 numpy.linalg.norm(position - self.camera_location)
             )
+
+    def _on_box_toggle(self, evt):
+        if not evt.edit:
+            self.world.history_manager.create_undo_point(True)
+        evt.Skip()
 
     def _process_persistent_inputs(self, evt):
         """Handle actions run by keys that are being held down."""

@@ -49,12 +49,13 @@ from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.logging import log
-from .render_selection import EditProgramRenderSelectionGroup
+from .render_selection import EditProgramRenderSelectionGroup, RenderSelectionHistoryManager
 from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
     CameraRotateEvent,
     DimensionChangeEvent,
     SelectionPointChangeEvent,
+    EVT_BOX_EDIT_TOGGLE
 )
 
 if TYPE_CHECKING:
@@ -107,7 +108,7 @@ class BaseEditCanvas(BaseCanvas):
         self._selection_moved = True
 
         self._draw_selection = True
-        self._selection_group: Optional[EditProgramRenderSelectionGroup] = None
+        self._selection_group: Optional[RenderSelectionHistoryManager] = None
 
         self._draw_structure = False
         self._structure: Optional[StructureGroup] = None
@@ -193,9 +194,12 @@ class BaseEditCanvas(BaseCanvas):
             self.context_identifier, self._opengl_resource_pack, self.world,
         )
 
-        self._selection_group = EditProgramRenderSelectionGroup(
-            self, self.context_identifier, self._opengl_resource_pack
+        self._selection_group = RenderSelectionHistoryManager(
+            EditProgramRenderSelectionGroup(
+                self, self.context_identifier, self._opengl_resource_pack
+            )
         )
+        self.world.history_manager.register(self._selection_group, False)
 
         self._structure: StructureGroup = StructureGroup(
             self.context_identifier, self._opengl_resource_pack,
@@ -253,9 +257,13 @@ class BaseEditCanvas(BaseCanvas):
         return self._selection_location
 
     @property
+    def selection(self) -> EditProgramRenderSelectionGroup:
+        return self._selection_group.value
+
+    @property
     def selection_group(self) -> SelectionGroup:
         """Create a SelectionGroup class from the selected boxes."""
-        return self._selection_group.create_selection_group()
+        return self.selection.create_selection_group()
 
     @property
     def active_selection_corners(self) -> Tuple[BlockCoordinates, BlockCoordinates]:
@@ -263,13 +271,13 @@ class BaseEditCanvas(BaseCanvas):
         Will be all 0 if no selection box exists.
         The second value will be one less than the actual top edge.
         This is the same as box selection in game works and solves some other issues."""
-        return self._selection_group.active_selection_corners
+        return self.selection.active_selection_corners
 
     @active_selection_corners.setter
     def active_selection_corners(
         self, box_corners: Tuple[BlockCoordinates, BlockCoordinates]
     ):
-        self._selection_group.active_selection_corners = box_corners
+        self.selection.active_selection_corners = box_corners
 
     def enable(self):
         """Enable the canvas and start it working."""
@@ -357,11 +365,11 @@ class BaseEditCanvas(BaseCanvas):
     @property
     def selection_editable(self) -> bool:
         """Should the selection box(es) be editable"""
-        return self._selection_group.editable
+        return self.selection.editable
 
     @selection_editable.setter
     def selection_editable(self, selection_editable: bool):
-        self._selection_group.editable = bool(selection_editable)
+        self.selection.editable = bool(selection_editable)
 
     @property
     def select_distance(self) -> int:
@@ -439,10 +447,10 @@ class BaseEditCanvas(BaseCanvas):
     @property
     def cursor_location(self) -> BlockCoordinates:
         """The location of the cursor box in the world."""
-        return self._selection_group.cursor_position
+        return self.selection.cursor_position
 
     def _change_box_location(self):
-        if self._selection_group.reediting:
+        if self.selection.reediting:
             position, box_index = self._box_location_distance(self.select_distance2)
         elif self._mouse_lock:
             position, box_index = self._box_location_distance(self.select_distance)
@@ -450,7 +458,7 @@ class BaseEditCanvas(BaseCanvas):
             position, box_index = self._box_location_closest()
         self._selection_location = position.tolist()
         wx.PostEvent(self, SelectionPointChangeEvent(location=position.tolist()))
-        self._selection_group.update_cursor_position(position, box_index)
+        self.selection.update_cursor_position(position, box_index)
 
     def ray_collision(self):
         vector_start = self.camera_location
@@ -473,7 +481,7 @@ class BaseEditCanvas(BaseCanvas):
         chunk: Optional[Chunk] = None
         in_air = False
 
-        box_index, nearest_selection_box = self._selection_group.closest_intersection(
+        box_index, nearest_selection_box = self.selection.closest_intersection(
             self.camera_location, self._look_vector()
         )
 
@@ -520,7 +528,7 @@ class BaseEditCanvas(BaseCanvas):
         box = next(
             (
                 index
-                for index, box in enumerate(self._selection_group)
+                for index, box in enumerate(self.selection)
                 if box.in_boundary(position)
             ),
             None,
@@ -615,7 +623,7 @@ class BaseEditCanvas(BaseCanvas):
         if self._selection_moved:
             self._selection_moved = False
             self._change_box_location()
-        self._selection_group.draw(
+        self.selection.draw(
             self.transformation_matrix, tuple(self.camera_location), self.draw_selection
         )
         self.SwapBuffers()
