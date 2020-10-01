@@ -162,6 +162,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._x2.SetValue(x2)
         self._y2.SetValue(y2)
         self._z2.SetValue(z2)
+        evt.Skip()
 
     def _enable_scrolls(self, evt):
         enabled = not evt.edit
@@ -171,3 +172,4 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._x2.Enable(enabled)
         self._y2.Enable(enabled)
         self._z2.Enable(enabled)
+        evt.Skip()
