@@ -10,6 +10,7 @@ from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
     SimpleOperationPanel,
 )
+from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
     from amulet.api.world import World
@@ -18,9 +19,18 @@ if TYPE_CHECKING:
     from amulet.api.data_types import Dimension, OperationReturnType
 
 
+BoxMode = "box"
+ColumnMode = "column"
+
+lang = {
+    ColumnMode: "Selected Column",
+    BoxMode: "Selected Box",
+}
+
+
 MODES = {
-    "Selection Only": "Set the biomes for only the blocks in the selection and not the chunks.",
-    "Whole Chunks": "Set the biomes for the full chunks for all the chunks in the selection.",
+    ColumnMode: "Set the biomes for the vertical column the selection intersects.",
+    BoxMode: "Set the biomes for only the blocks in the selection.",
 }
 
 Border = wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND
@@ -34,17 +44,18 @@ class SetBiome(SimpleOperationPanel):
         self.Freeze()
         options = self._load_options({})
 
-        self._mode = wx.Choice(self, choices=list(MODES.keys()))
-        self._mode.SetSelection(0)
+        self._mode = SimpleChoiceAny(self, sort=False)
+        self._mode.SetItems({mode: lang[mode] for mode in MODES.keys()})
         self._sizer.Add(self._mode, 0, Border, 5)
         self._mode.Bind(wx.EVT_CHOICE, self._on_mode_change)
+
         self._mode_description = wx.TextCtrl(
             self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP
         )
         self._sizer.Add(self._mode_description, 0, Border, 5)
 
         self._mode_description.SetLabel(
-            MODES[self._mode.GetString(self._mode.GetSelection())]
+            MODES[self._mode.GetCurrentObject()]
         )
         self._mode_description.Fit()
 
@@ -68,7 +79,7 @@ class SetBiome(SimpleOperationPanel):
 
     def _on_mode_change(self, evt):
         self._mode_description.SetLabel(
-            MODES[self._mode.GetString(self._mode.GetSelection())]
+            MODES[self._mode.GetCurrentObject()]
         )
         self._mode_description.Fit()
         self.Layout()
@@ -106,16 +117,15 @@ class SetBiome(SimpleOperationPanel):
     def _operation(
         self, world: "World", dimension: "Dimension", selection: "SelectionGroup"
     ) -> "OperationReturnType":
-        mode = self._mode.GetString(self._mode.GetSelection())
+        mode = self._mode.GetCurrentObject()
 
         iter_count = len(list(world.get_chunk_slices(selection, dimension, False)))
-        count = 0
-        for chunk, slices, _ in world.get_chunk_slices(selection, dimension, False):
+        for count, (chunk, slices, _) in enumerate(world.get_chunk_slices(selection, dimension, False)):
             new_biome = chunk.biome_palette.get_add_biome(
                 self._biome_choice.universal_biome
             )
 
-            if mode == "Selection Only":
+            if mode == BoxMode:
                 if chunk.biomes.dimension == 3:
                     slices = (
                         slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
@@ -126,27 +136,26 @@ class SetBiome(SimpleOperationPanel):
                     slices = (slices[0], slices[2])
                 else:
                     continue
-            elif mode == "Whole Chunks":
+            elif mode == ColumnMode:
                 if chunk.biomes.dimension == 3:
                     slices = (
+                        slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
                         slice(None, None, None),
-                        slice(None, None, None),
-                        slice(None, None, None),
+                        slice(slices[2].start // 4, math.ceil(slices[2].stop / 4)),
                     )
                 elif chunk.biomes.dimension == 2:
-                    slices = (slice(None, None, None), slice(None, None, None))
+                    slices = (slices[0], slices[2])
                 else:
                     continue
             else:
                 raise ValueError(
-                    f"mode {mode} doesn't exist for the Set Biome operation."
+                    f"mode {mode} is not a valid mode for the Set Biome operation."
                 )
 
             chunk.biomes[slices] = new_biome
 
             chunk.changed = True
-            count += 1
-            yield count / iter_count
+            yield (count + 1) / iter_count
 
 
 export = {
