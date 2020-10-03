@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
-import numpy
 import wx
+import math
 
 from amulet import block_coords_to_chunk_coords
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
@@ -23,6 +23,8 @@ MODES = {
     "Whole Chunks": "Set the biomes for the full chunks for all the chunks in the selection.",
 }
 
+Border = wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND
+
 
 class SetBiome(SimpleOperationPanel):
     def __init__(
@@ -32,17 +34,14 @@ class SetBiome(SimpleOperationPanel):
         self.Freeze()
         options = self._load_options({})
 
-        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._sizer.Add(top_sizer, 0, wx.EXPAND | wx.ALL, 5)
-
         self._mode = wx.Choice(self, choices=list(MODES.keys()))
         self._mode.SetSelection(0)
-        top_sizer.Add(self._mode, 1, wx.EXPAND | wx.LEFT, 5)
+        self._sizer.Add(self._mode, 0, Border, 5)
         self._mode.Bind(wx.EVT_CHOICE, self._on_mode_change)
         self._mode_description = wx.TextCtrl(
             self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP
         )
-        self._sizer.Add(self._mode_description, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+        self._sizer.Add(self._mode_description, 0, Border, 5)
 
         self._mode_description.SetLabel(
             MODES[self._mode.GetString(self._mode.GetSelection())]
@@ -57,12 +56,11 @@ class SetBiome(SimpleOperationPanel):
                 options.get("original_block_options", [])
                 or [world.world_wrapper.platform]
             ),
-            wildcard_properties=True,
             show_pick_biome=True,
         )
         self._biome_click_registered = False
         self._biome_choice.Bind(EVT_PICK, self._on_pick_biome_button)
-        self._sizer.Add(self._biome_choice, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._sizer.Add(self._biome_choice, 1, Border, 5)
 
         self._add_run_button()
 
@@ -109,13 +107,10 @@ class SetBiome(SimpleOperationPanel):
         self, world: "World", dimension: "Dimension", selection: "SelectionGroup"
     ) -> "OperationReturnType":
         mode = self._mode.GetString(self._mode.GetSelection())
-        world = self.world
-        selection = self.canvas.selection_group
-        dimension = self.canvas.dimension
 
-        iter_count = len(list(world.get_chunk_slices(selection, dimension, True)))
+        iter_count = len(list(world.get_chunk_slices(selection, dimension, False)))
         count = 0
-        for chunk, slices, _ in world.get_chunk_slices(selection, dimension, True):
+        for chunk, slices, _ in world.get_chunk_slices(selection, dimension, False):
             new_biome = chunk.biome_palette.get_add_biome(
                 self._biome_choice.universal_biome
             )
@@ -123,16 +118,14 @@ class SetBiome(SimpleOperationPanel):
             if mode == "Selection Only":
                 if chunk.biomes.dimension == 3:
                     slices = (
-                        slice(slices[0].start // 4, slices[0].stop // 4),
-                        slice(slices[1].start // 4, slices[1].stop // 4),
-                        slice(slices[2].start // 4, slices[2].stop // 4),
+                        slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
+                        slice(slices[1].start // 4, math.ceil(slices[1].stop / 4)),
+                        slice(slices[2].start // 4, math.ceil(slices[2].stop / 4)),
                     )
                 elif chunk.biomes.dimension == 2:
                     slices = (slices[0], slices[2])
                 else:
-                    raise ValueError(
-                        f"The biome is not in the required dimension, instead it's in dimension {chunk.biomes.dimension}"
-                    )
+                    continue
             elif mode == "Whole Chunks":
                 if chunk.biomes.dimension == 3:
                     slices = (
@@ -143,9 +136,7 @@ class SetBiome(SimpleOperationPanel):
                 elif chunk.biomes.dimension == 2:
                     slices = (slice(None, None, None), slice(None, None, None))
                 else:
-                    raise ValueError(
-                        f"The biome is not in the required dimension, instead it's in dimension {chunk.biomes.dimension}"
-                    )
+                    continue
             else:
                 raise ValueError(
                     f"mode {mode} doesn't exist for the Set Biome operation."
