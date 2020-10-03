@@ -211,7 +211,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     except Exception as e:
                         log.error(e)
                 elif chunk.biomes.dimension == 3:
-                    biome = chunk.biomes[(x % 16) // 4, y % 4, (z % 16) // 4]
+                    biome = chunk.biomes[(x % 16) // 4, y // 4, (z % 16) // 4]
                     try:
                         block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
                     except Exception as e:
