@@ -3,7 +3,12 @@ import wx
 import weakref
 
 from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionGroupEditable
-from .events import BoxChangeEvent, BoxDisableInputsEvent, BoxEnableInputsEvent, BoxChangeConfirmEvent
+from .events import (
+    BoxChangeEvent,
+    BoxDisableInputsEvent,
+    BoxEnableInputsEvent,
+    BoxChangeConfirmEvent,
+)
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 from amulet.api.history.history_manager import ObjectHistoryManager
 from amulet.api.history import Changeable
@@ -55,7 +60,4 @@ class RenderSelectionHistoryManager(ObjectHistoryManager):
         self.value.active_box_index = index
 
     def _pack_value(self, value: EditProgramRenderSelectionGroup) -> Optional[Any]:
-        return (
-            value.all_selection_corners,
-            value.active_box_index
-        )
+        return (value.all_selection_corners, value.active_box_index)

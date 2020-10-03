@@ -26,15 +26,15 @@ SelectionPointChangeEvent, EVT_SELECTION_POINT_CHANGE = newevent.NewEvent()
 
 (
     BoxDisableInputsEvent,
-    EVT_BOX_DISABLE_INPUTS
+    EVT_BOX_DISABLE_INPUTS,
 ) = newevent.NewEvent()  # the box starts being edited
 (
     BoxEnableInputsEvent,
-    EVT_BOX_ENABLE_INPUTS
+    EVT_BOX_ENABLE_INPUTS,
 ) = newevent.NewEvent()  # the box stops being edited
 (
     BoxChangeConfirmEvent,
-    EVT_BOX_CHANGE_CONFIRM
+    EVT_BOX_CHANGE_CONFIRM,
 ) = newevent.NewEvent()  # the coordinates of the box are confirmed
 
 # The button to select the box was clicked. (Usually left mouse) Note based on the state the box may be unchanged.

@@ -15,7 +15,13 @@ from amulet_map_editor.api.wx.util.key_config import (
     ActionLookupType,
     Escape,
 )
-from .events import EditEscapeEvent, EVT_EDIT_ESCAPE, BoxClickEvent, EVT_BOX_CHANGE_CONFIRM, CreateUndoEvent
+from .events import (
+    EditEscapeEvent,
+    EVT_EDIT_ESCAPE,
+    BoxClickEvent,
+    EVT_BOX_CHANGE_CONFIRM,
+    CreateUndoEvent,
+)
 
 if TYPE_CHECKING:
     from amulet.api.world import World

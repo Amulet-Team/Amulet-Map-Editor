@@ -49,12 +49,15 @@ from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.logging import log
-from .render_selection import EditProgramRenderSelectionGroup, RenderSelectionHistoryManager
+from .render_selection import (
+    EditProgramRenderSelectionGroup,
+    RenderSelectionHistoryManager,
+)
 from amulet_map_editor.programs.edit.canvas.events import (
     CameraMoveEvent,
     CameraRotateEvent,
     DimensionChangeEvent,
-    SelectionPointChangeEvent
+    SelectionPointChangeEvent,
 )
 
 if TYPE_CHECKING:

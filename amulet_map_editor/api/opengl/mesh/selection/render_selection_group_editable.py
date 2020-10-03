@@ -41,8 +41,12 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         # The box that is active (renders differently to the ones in self._boxes) may be None if no box is active.
         self._active_box: Optional[RenderSelectionEditable] = None
 
-        self._hover_box_index: Optional[int] = None  # the index of the box being hovered over
-        self._last_highlighted_box_index: Optional[int] = None  # the index of the box previously hovered over. Used to remove the highlight effect.
+        self._hover_box_index: Optional[
+            int
+        ] = None  # the index of the box being hovered over
+        self._last_highlighted_box_index: Optional[
+            int
+        ] = None  # the index of the box previously hovered over. Used to remove the highlight effect.
 
         self._editable = True  # Should the selection accept user interaction.
 
@@ -70,19 +74,23 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._confirm_change_event()
 
     @property
-    def all_selection_corners(self) -> Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]:
+    def all_selection_corners(
+        self,
+    ) -> Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]:
         """The corners of each selection box."""
-        return tuple(
-            (tuple(box.point1), tuple(box.point2)) for box in self._boxes
-        )
+        return tuple((tuple(box.point1), tuple(box.point2)) for box in self._boxes)
 
     @all_selection_corners.setter
-    def all_selection_corners(self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]):
+    def all_selection_corners(
+        self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]
+    ):
         """Set the selection corners."""
         if self.set_all_selection_corners(corners):
             self._confirm_change_event()
 
-    def set_all_selection_corners(self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]) -> bool:
+    def set_all_selection_corners(
+        self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]
+    ) -> bool:
         """
         Set the selection corners. Will not run _confirm_change_event. You may prefer the all_selection_corners setter.
         :param corners: The block coordinates of each corner.
