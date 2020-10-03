@@ -2,7 +2,9 @@ from typing import TYPE_CHECKING, Tuple
 import wx
 
 from amulet.operations.fill import fill
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
+
+from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 
@@ -31,7 +33,7 @@ class Fill(wx.Panel, OperationUI):
             show_pick_block=True
         )
         self._block_click_registered = False
-        self._block_define.Bind(EVT_PICK_BLOCK, self._on_pick_block_button)
+        self._block_define.Bind(EVT_PICK, self._on_pick_block_button)
         self._sizer.Add(self._block_define, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
         self._run_button = wx.Button(self, label="Run Operation")

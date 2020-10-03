@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Set, Generator, Tuple, Optional
+from typing import TYPE_CHECKING, Set, Generator
 import wx
 import numpy
 import time
@@ -44,9 +44,6 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._toggle_mouse_time = 0
         self._selection_undo_timeout = 0
         self._previous_mouse_lock = self._mouse_lock
-        self._previous_inspect_state: Tuple[
-            Optional[Tuple[int, int, int]], float, str
-        ] = (None, 0, "")
 
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
@@ -179,58 +176,60 @@ class ControllableEditCanvas(BaseEditCanvas):
                 if a in self._persistent_actions:
                     self._persistent_actions.remove(a)
 
-    def _inspect_block(self):
-        def get_block_info() -> str:
-            x, y, z = self.cursor_location
-            try:
-                block = self.world.get_block(x, y, z, self.dimension)
-                chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
-                block_entity = chunk.block_entities.get((x, y, z), None)
-                platform = self.world.world_wrapper.platform
-                version = self.world.world_wrapper.version
-                translator = self.world.translation_manager.get_version(
-                    platform, version,
-                )
-                (
-                    version_block,
-                    version_block_entity,
-                    _,
-                ) = translator.block.from_universal(
-                    block, block_entity, block_location=(x, y, z)
-                )
-                if isinstance(version, tuple):
-                    version_str = ".".join(str(v) for v in version[:4])
-                else:
-                    version_str = str(version)
-                block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
-                if version_block_entity:
-                    version_block_entity_str = str(version_block_entity)
-                    block_data_text = f"{block_data_text}\n{version_block_entity_str}"
-
-                block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
-                if block_entity:
-                    block_entity_str = str(block_entity)
-                    block_data_text = f"{block_data_text}\n{block_entity_str}"
-
-                if chunk.biomes.dimension == 2:
-                    biome = chunk.biomes[x % 16, z % 16]
-                    try:
-                        block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
-                    except Exception as e:
-                        log.error(e)
-                elif chunk.biomes.dimension == 3:
-                    biome = chunk.biomes[(z % 16) // 4, (x % 16) // 4, y % 4]
-                    try:
-                        block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
-                    except Exception as e:
-                        log.error(e)
-
-            except Exception as e:
-                log.error(e)
-                return str(e)
+    def _get_block_info_message(self) -> str:
+        x, y, z = self.cursor_location
+        try:
+            block = self.world.get_block(x, y, z, self.dimension)
+            chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
+            block_entity = chunk.block_entities.get((x, y, z), None)
+            platform = self.world.world_wrapper.platform
+            version = self.world.world_wrapper.version
+            translator = self.world.translation_manager.get_version(
+                platform, version,
+            )
+            (
+                version_block,
+                version_block_entity,
+                _,
+            ) = translator.block.from_universal(
+                block, block_entity, block_location=(x, y, z)
+            )
+            if isinstance(version, tuple):
+                version_str = ".".join(str(v) for v in version[:4])
             else:
-                return block_data_text
+                version_str = str(version)
+            block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
+            if version_block_entity:
+                version_block_entity_str = str(version_block_entity)
+                block_data_text = (
+                    f"{block_data_text}\n{version_block_entity_str}"
+                )
 
+            block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
+            if block_entity:
+                block_entity_str = str(block_entity)
+                block_data_text = f"{block_data_text}\n{block_entity_str}"
+
+            if chunk.biomes.dimension == 2:
+                biome = chunk.biomes[x % 16, z % 16]
+                try:
+                    block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                except Exception as e:
+                    log.error(e)
+            elif chunk.biomes.dimension == 3:
+                biome = chunk.biomes[(x % 16) // 4, y // 4, (z % 16) // 4]
+                try:
+                    block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                except Exception as e:
+                    log.error(e)
+
+        except Exception as e:
+            log.error(e)
+            return str(e)
+        else:
+            return block_data_text
+
+    def _inspect_block(self):
         def truncate(s: str, max_line_length: int = None) -> str:
             if isinstance(max_line_length, int):
                 max_line_length = max(-1, max_line_length)
@@ -244,17 +243,13 @@ class ControllableEditCanvas(BaseEditCanvas):
                 )
             return s
 
-        if (
-            self.cursor_location != self._previous_inspect_state[0]
-            or self._previous_inspect_state[1] < time.time() - 5
-        ):
-            # if the cursor is in a different position or the cache is greater than 5 seconds old recreate the text
-            full_msg = get_block_info()
-            self._previous_inspect_state = (self.cursor_location, time.time(), full_msg)
-
-        msg = truncate(self._previous_inspect_state[2], 150)
-        tooltip = RichToolTip("Inspect Block", msg)
-        tooltip.ShowFor(self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1))
+        if not self._mouse_moved:
+            full_msg = self._get_block_info_message()
+            msg = truncate(full_msg, 150)
+            tooltip = RichToolTip("Inspect Block", msg)
+            tooltip.ShowFor(
+                self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1)
+            )
 
     def _deselect(self) -> bool:
         """

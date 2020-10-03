@@ -3,7 +3,9 @@ import wx
 import numpy
 
 from amulet.api.block import Block
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine, EVT_PICK_BLOCK
+
+from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
@@ -37,7 +39,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
         )
         self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self._original_block.Bind(
-            EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 1)
+            EVT_PICK, lambda evt: self._on_pick_block_button(evt, 1)
         )
         self._replacement_block = BlockDefine(
             self,
@@ -53,7 +55,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
             self._replacement_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
         )
         self._replacement_block.Bind(
-            EVT_PICK_BLOCK, lambda evt: self._on_pick_block_button(evt, 2)
+            EVT_PICK, lambda evt: self._on_pick_block_button(evt, 2)
         )
 
         self._run_button = wx.Button(self, label="Run Operation")
