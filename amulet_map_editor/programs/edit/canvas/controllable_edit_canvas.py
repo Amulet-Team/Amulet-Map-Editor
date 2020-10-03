@@ -225,9 +225,14 @@ class ControllableEditCanvas(BaseEditCanvas):
         def truncate(s: str, max_line_length: int = None) -> str:
             if isinstance(max_line_length, int):
                 max_line_length = max(-1, max_line_length)
-                s = "\n".join([
-                    line[:max_line_length - 3] + "..." if len(line) > max_line_length else line for line in s.split("\n")
-                ])
+                s = "\n".join(
+                    [
+                        line[: max_line_length - 3] + "..."
+                        if len(line) > max_line_length
+                        else line
+                        for line in s.split("\n")
+                    ]
+                )
             return s
 
         if not self._mouse_moved:
