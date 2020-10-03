@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Set, Generator, Tuple, Optional
+from typing import TYPE_CHECKING, Set, Generator
 import wx
 import numpy
 import time
