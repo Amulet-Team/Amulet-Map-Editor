@@ -130,6 +130,7 @@ class SimpleChoiceAny(wx.Choice):
             return self._values[self.GetSelection()]
 
     def GetCurrentString(self) -> str:
+        """Get the string form of the value currently selected."""
         return self.GetString(self.GetSelection())
 
 
