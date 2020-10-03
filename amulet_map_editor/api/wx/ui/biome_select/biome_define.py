@@ -23,7 +23,6 @@ class BiomeDefine(BaseDefine):
         super().__init__(
             parent,
             translation_manager,
-            "Biome",
             BiomeSelect,
             orientation,
             platform,

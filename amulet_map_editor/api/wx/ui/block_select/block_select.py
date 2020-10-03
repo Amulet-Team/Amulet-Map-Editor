@@ -1,4 +1,5 @@
 import wx
+from typing import Tuple
 
 import PyMCTranslate
 
@@ -6,6 +7,30 @@ from amulet_map_editor.api.wx.ui.base_select import BaseSelect
 
 
 class BlockSelect(BaseSelect):
+    TypeName = "Block"
+
+    def __init__(
+        self,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        platform: str,
+        version_number: Tuple[int, int, int],
+        force_blockstate: bool,
+        namespace: str = None,
+        block_name: str = None,
+        show_pick_block: bool = False,
+    ):
+        super().__init__(
+            parent,
+            translation_manager,
+            platform,
+            version_number,
+            force_blockstate,
+            namespace,
+            block_name,
+            show_pick_block,
+        )
+
     def _populate_namespace(self):
         version = self._translation_manager.get_version(
             self._platform, self._version_number

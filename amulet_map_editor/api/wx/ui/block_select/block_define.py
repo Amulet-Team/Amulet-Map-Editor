@@ -35,7 +35,6 @@ class BlockDefine(BaseDefine):
         super().__init__(
             parent,
             translation_manager,
-            "Block",
             BlockSelect,
             orientation,
             platform,

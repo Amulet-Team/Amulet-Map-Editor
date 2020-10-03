@@ -2,6 +2,8 @@ from amulet_map_editor.api.wx.ui.base_select import BaseSelect
 
 
 class BiomeSelect(BaseSelect):
+    TypeName = "Biome"
+
     def _populate_namespace(self):
         version = self._translation_manager.get_version(
             self._platform, self._version_number

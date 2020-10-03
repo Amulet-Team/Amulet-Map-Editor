@@ -24,13 +24,14 @@ from amulet_map_editor.api.image import COLOUR_PICKER
 
 
 class BaseSelect(wx.Panel):
+    TypeName = "?"
+
     def __init__(
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
         version_number: Tuple[int, int, int],
-        type_name: str,
         force_blockstate: bool = None,
         namespace: str = None,
         default_name: str = None,
@@ -70,7 +71,7 @@ class BaseSelect(wx.Panel):
         sizer.Add(header_sizer, 0, wx.EXPAND | wx.BOTTOM, 5)
         header_sizer.Add(
             wx.StaticText(
-                self, label=f"{type_name.capitalize()} name:", style=wx.ALIGN_CENTER
+                self, label=f"{self.TypeName.capitalize()} name:", style=wx.ALIGN_CENTER
             ),
             1,
             wx.ALIGN_CENTER_VERTICAL,
