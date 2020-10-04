@@ -22,18 +22,33 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self, context_identifier: str, resource_pack: OpenGLResourcePack,
     ):
         super().__init__(context_identifier, resource_pack)
-        self._editable = True
-        self._active_box: Optional[RenderSelectionEditable] = None
+        # the block coordinate of the mouse pointer. This needs updating via `update_cursor_position` when the mouse moves
+        self._cursor_position = numpy.array([0, 0, 0], dtype=numpy.int)
+
+        # the drawable box to display where the mouse is selecting. Is not always drawn
+        self._cursor = RenderSelection(context_identifier, resource_pack)
+
+        # the list of all boxes in the selection
+        self._boxes: List[RenderSelectionHighlightable] = []
+
+        # the indexes into self._boxes that are currently active and was last active.
+        # These can be None only if self._boxes is empty and thus there are no boxes to be active.
         self._active_box_index: Optional[int] = None
         self._last_active_box_index: Optional[
             int
         ] = None  # the last active box for use when deselecting or escaping a non-committed box
-        self._hover_box_index: Optional[int] = None
-        self._boxes: List[RenderSelectionHighlightable] = []
-        self._last_highlighted_box_index: Optional[int] = None
 
-        self._cursor = RenderSelection(context_identifier, resource_pack)
-        self._cursor_position = numpy.array([0, 0, 0], dtype=numpy.int)
+        # The box that is active (renders differently to the ones in self._boxes) may be None if no box is active.
+        self._active_box: Optional[RenderSelectionEditable] = None
+
+        self._hover_box_index: Optional[
+            int
+        ] = None  # the index of the box being hovered over
+        self._last_highlighted_box_index: Optional[
+            int
+        ] = None  # the index of the box previously hovered over. Used to remove the highlight effect.
+
+        self._editable = True  # Should the selection accept user interaction.
 
     @property
     def active_selection_corners(self) -> Tuple[BlockCoordinates, BlockCoordinates]:
@@ -55,6 +70,67 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         if self._active_box_index is not None:
             box = self._boxes[self._active_box_index]
             box.point1, box.point2 = box_corners
+        self._enable_inputs_event()
+        self._confirm_change_event()
+
+    @property
+    def all_selection_corners(
+        self,
+    ) -> Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]:
+        """The corners of each selection box."""
+        return tuple((tuple(box.point1), tuple(box.point2)) for box in self._boxes)
+
+    @all_selection_corners.setter
+    def all_selection_corners(
+        self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]
+    ):
+        """Set the selection corners."""
+        if self.set_all_selection_corners(corners):
+            self._confirm_change_event()
+
+    def set_all_selection_corners(
+        self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]
+    ) -> bool:
+        """
+        Set the selection corners. Will not run _confirm_change_event. You may prefer the all_selection_corners setter.
+        :param corners: The block coordinates of each corner.
+        :return: Has the selection changed.
+        """
+        if corners != self.all_selection_corners:
+            if corners:
+                active = self._active_box_index
+                self._deselect_all()
+                for point1, point2 in corners:
+                    box = self._new_render_selection()
+                    box.point1 = point1
+                    box.point2 = point2
+                    self._boxes.append(box)
+                if isinstance(active, int) and active < len(corners):
+                    self._active_box_index = active
+                else:
+                    self._active_box_index = 0
+                self._create_active_box_from_existing()
+            else:
+                self._deselect_all()
+            return True
+        return False
+
+    @property
+    def active_box_index(self) -> Optional[int]:
+        """The index of the active selection box."""
+        return self._active_box_index
+
+    @active_box_index.setter
+    def active_box_index(self, index: Optional[int]):
+        """Set index of the active selection box."""
+        if isinstance(index, int):
+            index = min(index, len(self._boxes) - 1)
+            self._active_box_index = index
+            self._create_active_box_from_existing()
+        elif index is None:
+            self._unload_active_box()
+        else:
+            raise Exception("index format is incorrect")
 
     def _new_render_selection(self):
         return RenderSelectionHighlightable(
@@ -81,7 +157,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             self._cursor_position,
         )
         self._active_box_index = None
-        self._post_box_disable_inputs_event()
+        self._disable_inputs_event()
 
     def _create_active_box_from_existing(self):
         self._unload_active_box()
@@ -95,22 +171,27 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             active_box.point2,
         )
         self._active_box.lock()
-        self._post_box_enable_inputs_event()
+        self._enable_inputs_event()
 
     @property
     def editable(self) -> bool:
-        """Is the selection open for editing.
+        """Is the selection open for editing. Useful to stop the selection being edited.
         This is not for if the box is being modified."""
         return self._editable
 
     @editable.setter
     def editable(self, editable: bool):
-        self._editable = editable
+        """
+        Set if the selection is able to be edited.
+        :param editable: True for the selection to be editable for the user. False to ignore user interaction.
+        :return:
+        """
+        self._editable = bool(editable)
         if editable and self._active_box_index is not None:
             self._create_active_box_from_existing()
         else:
-            self._active_box: Optional[RenderSelectionEditable] = None
-            self._post_box_disable_inputs_event()
+            self._unload_active_box()
+            self._disable_inputs_event()
 
     @property
     def editing(self) -> bool:
@@ -138,9 +219,17 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             # if the box hasn't been committed yet
             self._unload_active_box()
             self._active_box_index = self._last_active_box_index = None
-            self._post_box_disable_inputs_event()
+            self._disable_inputs_event()
 
     def deselect_all(self):
+        """Destroy all selection boxes."""
+        changed = bool(self._boxes)
+        self._deselect_all()
+        if changed:
+            self._confirm_change_event()
+
+    def _deselect_all(self):
+        """Destroy all selection boxes. No events fired."""
         while self._boxes:
             box = self._boxes.pop()
             box.unload()
@@ -148,9 +237,10 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._active_box_index = (
             self._last_active_box_index
         ) = self._last_highlighted_box_index = None
-        self._post_box_disable_inputs_event()
+        self._disable_inputs_event()
 
     def deselect_active(self):
+        """Destroy the active selection box."""
         if self._active_box_index is not None:
             # If the box already exists in the list
             box = self._boxes.pop(self._active_box_index)
@@ -167,7 +257,8 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             else:
                 self._unload_active_box()
                 self._active_box_index = self._last_active_box_index = None
-                self._post_box_disable_inputs_event()
+                self._disable_inputs_event()
+            self._confirm_change_event()
         elif self._last_active_box_index is not None:
             self._active_box_index = self._last_active_box_index
             self._last_active_box_index = None
@@ -176,10 +267,11 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             # if the box hasn't been committed yet
             self._unload_active_box()
             self._active_box_index = self._last_active_box_index = None
-            self._post_box_disable_inputs_event()
+            self._disable_inputs_event()
 
     @property
     def cursor_position(self) -> BlockCoordinates:
+        """The block coordinate of the cursor."""
         return tuple(self._cursor_position)
 
     def update_cursor_position(
@@ -200,18 +292,22 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
 
         if self._active_box:
             self._active_box.set_active_point(position)
-            self._post_box_change_event()
+            self._box_change_event()
 
-    def _post_box_disable_inputs_event(self):
-        """Disable external inputs"""
-        self._post_box_change_event()
+    def _box_change_event(self):
+        """The coordinates of the box have changed."""
+        pass
 
-    def _post_box_enable_inputs_event(self):
-        """Enable external inputs"""
-        self._post_box_change_event()
+    def _disable_inputs_event(self):
+        """Disable external inputs. Generally called when box editing has started."""
+        self._box_change_event()
 
-    def _post_box_change_event(self):
-        """The coordinates of the box have changed"""
+    def _enable_inputs_event(self):
+        """Enable external inputs. Generally called when box editing has finished."""
+        self._box_change_event()
+
+    def _confirm_change_event(self):
+        """The changed coordinates have been confirmed as final."""
         pass
 
     def box_select_disable(self):
@@ -228,7 +324,8 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         else:
             box = self._boxes[self._active_box_index]
         box.point1, box.point2 = self._active_box.point1, self._active_box.point2
-        self._post_box_enable_inputs_event()
+        self._enable_inputs_event()
+        self._confirm_change_event()
 
     def box_select_toggle(
         self, add_modifier: bool = False
@@ -247,16 +344,17 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
                     self._hover_box_index
                 )  # activate that selection box
                 self._create_active_box_from_existing()
+                self._confirm_change_event()
             if (
                 self._hover_box_index == self._active_box_index
             ):  # if the cursor was hovering over the current selection
                 self._active_box.unlock(self._cursor_position)  # unlock it
                 self._last_active_box_index = self._active_box_index
-                self._post_box_disable_inputs_event()
+                self._disable_inputs_event()
                 return self._cursor_position
             else:  # if no hovered selection box
                 if not add_modifier:
-                    self.deselect_all()
+                    self._deselect_all()
                 self._create_active_box_from_cursor()
         else:  # if there is an active selection that is being edited
             self._box_select_disable()

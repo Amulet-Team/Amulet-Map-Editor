@@ -104,14 +104,14 @@ class EditExtension(wx.Panel, BaseProgram):
                 f"The canvas in edit for world {self._world.world_wrapper.world_name} was not closeable for some reason."
             )
             return False
-        return not bool(self._world.chunk_history_manager.unsaved_changes)
+        return not bool(self._world.history_manager.unsaved_changes)
 
     def _check_close_world(self) -> bool:
         """
         Check if it is safe to close the world and prompt the user if it is not.
         :return: True if the world can be closed, False otherwise
         """
-        unsaved_changes = self._world.chunk_history_manager.unsaved_changes
+        unsaved_changes = self._world.history_manager.unsaved_changes
         if unsaved_changes:
             msg = wx.MessageDialog(
                 self,

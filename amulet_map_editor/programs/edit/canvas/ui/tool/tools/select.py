@@ -9,7 +9,8 @@ from amulet_map_editor.programs.edit.canvas.ui.select_location import SelectTran
 from amulet_map_editor.programs.edit.canvas.events import (
     EVT_PASTE,
     EVT_BOX_CHANGE,
-    EVT_BOX_EDIT_TOGGLE,
+    EVT_BOX_DISABLE_INPUTS,
+    EVT_BOX_ENABLE_INPUTS,
 )
 
 if TYPE_CHECKING:
@@ -94,7 +95,8 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
     def bind_events(self):
         self.canvas.Bind(EVT_PASTE, self._paste)
         self._canvas().Bind(EVT_BOX_CHANGE, self._box_renderer_change)
-        self._canvas().Bind(EVT_BOX_EDIT_TOGGLE, self._enable_scrolls)
+        self._canvas().Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
+        self._canvas().Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
 
     def _remove_paste(self):
         if self._paste_panel is not None:
@@ -162,12 +164,15 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._x2.SetValue(x2)
         self._y2.SetValue(y2)
         self._z2.SetValue(z2)
+        evt.Skip()
 
     def _enable_scrolls(self, evt):
-        enabled = not evt.edit
-        self._x1.Enable(enabled)
-        self._y1.Enable(enabled)
-        self._z1.Enable(enabled)
-        self._x2.Enable(enabled)
-        self._y2.Enable(enabled)
-        self._z2.Enable(enabled)
+        self._set_scroll_state(True)
+        evt.Skip()
+
+    def _disable_scrolls(self, evt):
+        self._set_scroll_state(False)
+
+    def _set_scroll_state(self, state: bool):
+        for scroll in (self._x1, self._y1, self._z1, self._x2, self._y2, self._z2):
+            scroll.Enable(state)

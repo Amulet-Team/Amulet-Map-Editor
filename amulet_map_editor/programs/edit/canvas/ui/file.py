@@ -68,13 +68,13 @@ class FilePanel(wx.BoxSizer, BaseUI):
 
     def _update_buttons(self):
         self._undo_button.SetLabel(
-            f"Undo | {self.canvas.world.chunk_history_manager.undo_count}"
+            f"Undo | {self.canvas.world.history_manager.undo_count}"
         )
         self._redo_button.SetLabel(
-            f"Redo | {self.canvas.world.chunk_history_manager.redo_count}"
+            f"Redo | {self.canvas.world.history_manager.redo_count}"
         )
         self._save_button.SetLabel(
-            f"Save | {self.canvas.world.chunk_history_manager.unsaved_changes}"
+            f"Save | {self.canvas.world.history_manager.unsaved_changes}"
         )
 
     def _on_dimension_change(self, evt):

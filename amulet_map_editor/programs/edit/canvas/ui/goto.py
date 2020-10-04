@@ -6,7 +6,7 @@ from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 def show_goto(
     parent, x: float, y: float, z: float
 ) -> Optional[Tuple[float, float, float]]:
-    dialog = SimpleDialog(parent, "Replace", wx.HORIZONTAL)
+    dialog = SimpleDialog(parent, "Teleport", wx.HORIZONTAL)
     x_text = wx.StaticText(dialog, label="x:")
     x = wx.SpinCtrlDouble(dialog, min=-30000000, max=30000000, initial=x)
     y_text = wx.StaticText(dialog, label="y:")
