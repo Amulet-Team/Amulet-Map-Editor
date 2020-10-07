@@ -159,11 +159,11 @@ class Waterlog(wx.Panel, OperationUI):
             if mode == "Overlay":
                 lut = numpy.array(
                     [
-                        world.palette.get_add_block(
+                        world.block_palette.get_add_block(
                             waterlog_block
-                            if world.palette[block_id].namespaced_name
+                            if world.block_palette[block_id].namespaced_name
                             == "universal_minecraft:air"
-                            else world.palette[block_id].base_block
+                            else world.block_palette[block_id].base_block
                             + waterlog_block  # get the Block object for that id and add the user specified block
                         )  # register the new block / get the numerical id if it was already registered
                         for block_id in palette
@@ -172,12 +172,12 @@ class Waterlog(wx.Panel, OperationUI):
             elif mode == "Underlay":
                 lut = numpy.array(
                     [
-                        world.palette.get_add_block(
+                        world.block_palette.get_add_block(
                             waterlog_block
-                            if world.palette[block_id].namespaced_name
+                            if world.block_palette[block_id].namespaced_name
                             == "universal_minecraft:air"
                             else waterlog_block
-                            + world.palette[  # get the Block object for that id and add the user specified block
+                            + world.block_palette[  # get the Block object for that id and add the user specified block
                                 block_id
                             ].base_block
                         )  # register the new block / get the numerical id if it was already registered
@@ -187,7 +187,7 @@ class Waterlog(wx.Panel, OperationUI):
             elif mode == "Normal Fill":
                 lut = numpy.array(
                     [
-                        world.palette.get_add_block(
+                        world.block_palette.get_add_block(
                             waterlog_block
                         )  # register the new block / get the numerical id if it was already registered
                     ]
@@ -196,9 +196,9 @@ class Waterlog(wx.Panel, OperationUI):
             elif mode == "Game Fill":
                 lut = numpy.array(
                     [
-                        world.palette.get_add_block(
-                            waterlog_block + world.palette[block_id].base_block
-                            if world.palette[block_id].namespaced_name
+                        world.block_palette.get_add_block(
+                            waterlog_block + world.block_palette[block_id].base_block
+                            if world.block_palette[block_id].namespaced_name
                             == "universal_minecraft:water"
                             else waterlog_block
                         )  # register the new block / get the numerical id if it was already registered
@@ -208,9 +208,9 @@ class Waterlog(wx.Panel, OperationUI):
             elif mode == "Set First":
                 lut = numpy.array(
                     [
-                        world.palette.get_add_block(
-                            waterlog_block + world.palette[block_id].extra_blocks[0]
-                            if world.palette[block_id].extra_blocks
+                        world.block_palette.get_add_block(
+                            waterlog_block + world.block_palette[block_id].extra_blocks[0]
+                            if world.block_palette[block_id].extra_blocks
                             else waterlog_block
                         )  # register the new block / get the numerical id if it was already registered
                         for block_id in palette
@@ -219,8 +219,8 @@ class Waterlog(wx.Panel, OperationUI):
             elif mode == "Set Second":
                 lut = numpy.array(
                     [
-                        world.palette.get_add_block(
-                            world.palette[block_id].base_block + waterlog_block
+                        world.block_palette.get_add_block(
+                            world.block_palette[block_id].base_block + waterlog_block
                         )  # register the new block / get the numerical id if it was already registered
                         for block_id in palette
                     ]  # add the new id to the palette

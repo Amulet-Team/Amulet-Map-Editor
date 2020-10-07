@@ -76,7 +76,7 @@ class ExportMCStructure(SimpleOperationPanel):
             for chunk_index, (cx, cz) in enumerate(selection.chunk_locations()):
                 try:
                     chunk = world.get_chunk(cx, cz, dimension)
-                    wrapper.commit_chunk(chunk, world.palette)
+                    wrapper.commit_chunk(chunk, world.block_palette)
                 except ChunkLoadError:
                     continue
                 yield (chunk_index + 1) / chunk_count

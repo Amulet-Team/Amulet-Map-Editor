@@ -505,7 +505,7 @@ class BaseEditCanvas(BaseCanvas):
 
             if (
                 chunk is not None
-                and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]]
+                and self._render_world.world.block_palette[chunk.blocks[x % 16, y, z % 16]]
                 != AIR
             ):
                 # the block is not air
