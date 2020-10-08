@@ -101,7 +101,7 @@ class SetBiome(SimpleOperationPanel):
         x, y, z = self.canvas.cursor_location
 
         # TODO: replace with "get_biome(x, y, z)" if it'll be created
-        cx, cz = block_coords_to_chunk_coords(x, z, chunk_size=self.world.chunk_size[0])
+        cx, cz = block_coords_to_chunk_coords(x, z, sub_chunk_size=self.world.sub_chunk_size)
         offset_x, offset_z = x - 16 * cx, z - 16 * cz
         chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
 
