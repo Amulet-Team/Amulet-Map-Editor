@@ -146,7 +146,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         try:
             out_world = world_interface.load_format(self.out_world_path)
             log.info(
-                f"Converting world {self.world.world_path} to {out_world.world_path}"
+                f"Converting world {self.world.world_path} to {out_world.path}"
             )
             out_world: WorldFormatWrapper
             out_world.open()
@@ -154,7 +154,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             out_world.close()
             message = "World conversion completed"
             log.info(
-                f"Finished converting world {self.world.world_path} to {out_world.world_path}"
+                f"Finished converting world {self.world.world_path} to {out_world.path}"
             )
         except Exception as e:
             message = f"Error during conversion\n{e}"

@@ -139,7 +139,7 @@ class WorldList(simple.SimplePanel):
                 self.worlds.append(world_button)
             except Exception as e:
                 log.info(
-                    f"Failed to display world button for {world_format.world_path} {e}"
+                    f"Failed to display world button for {world_format.path} {e}"
                 )
 
         self.Layout()
