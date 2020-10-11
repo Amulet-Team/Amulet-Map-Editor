@@ -92,12 +92,13 @@ class ExportSchematic(SimpleOperationPanel):
                 selection
             )
             wrapper.translation_manager = world.translation_manager
+            wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))
             yield 0, f"Exporting {os.path.basename(path)}"
             for chunk_index, (cx, cz) in enumerate(selection.chunk_locations()):
                 try:
                     chunk = world.get_chunk(cx, cz, dimension)
-                    wrapper.commit_chunk(chunk, dimension)
+                    wrapper.commit_chunk(chunk, wrapper_dimension)
                 except ChunkLoadError:
                     continue
                 yield (chunk_index + 1) / chunk_count
