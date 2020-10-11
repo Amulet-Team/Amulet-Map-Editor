@@ -64,23 +64,29 @@ class ExportMCStructure(SimpleOperationPanel):
 
         path = self._file_picker.GetPath()
         version = self._version_define.version_number
-
-        if isinstance(path, str) and path.endswith(".mcstructure") and version:
-            wrapper = MCStructureFormatWrapper(path, "w")
-            wrapper.selection = selection
-            wrapper.version = version
+        if isinstance(path, str):
+            wrapper = MCStructureFormatWrapper(path)
+            if wrapper.exists:
+                response = wx.MessageDialog(self, f"A file is already present at {path}. Do you want to continue?", style=wx.YES | wx.NO).ShowModal()
+                if response == wx.ID_CANCEL:
+                    return
+            wrapper.create_and_open(
+                "bedrock",
+                version,
+                selection
+            )
             wrapper.translation_manager = world.translation_manager
-            wrapper.open()
+            wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))
             yield 0, f"Exporting {os.path.basename(path)}"
             for chunk_index, (cx, cz) in enumerate(selection.chunk_locations()):
                 try:
                     chunk = world.get_chunk(cx, cz, dimension)
-                    wrapper.commit_chunk(chunk, world.block_palette)
+                    wrapper.commit_chunk(chunk, wrapper_dimension)
                 except ChunkLoadError:
                     continue
                 yield (chunk_index + 1) / chunk_count
-
+            wrapper.save()
             wrapper.close()
         else:
             raise OperationError(

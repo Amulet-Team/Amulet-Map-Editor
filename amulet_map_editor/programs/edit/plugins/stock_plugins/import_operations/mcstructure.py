@@ -44,16 +44,16 @@ class ImportMCStructure(SimpleOperationPanel):
         self, world: "World", dimension: Dimension, selection: SelectionGroup
     ):
         path = self._file_picker.GetPath()
-
         if (
             isinstance(path, str)
             and path.endswith(".mcstructure")
             and os.path.isfile(path)
         ):
-            wrapper = MCStructureFormatWrapper(path, "r")
+            wrapper = MCStructureFormatWrapper(path)
             wrapper.translation_manager = world.translation_manager
             wrapper.open()
             selection = wrapper.selection
+            wrapper_dimension = wrapper.dimensions[0]
 
             global_palette = BlockManager()
             chunks = {}
@@ -61,7 +61,7 @@ class ImportMCStructure(SimpleOperationPanel):
             yield 0, f"Importing {os.path.basename(path)}"
             for chunk_index, (cx, cz) in enumerate(wrapper.all_chunk_coords()):
                 try:
-                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz)
+                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz, wrapper_dimension)
                     chunk.block_palette = global_palette
                 except ChunkLoadError:
                     pass
