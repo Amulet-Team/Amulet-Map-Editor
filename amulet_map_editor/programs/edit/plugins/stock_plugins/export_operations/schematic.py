@@ -41,7 +41,7 @@ class ExportSchematic(SimpleOperationPanel):
             self,
             path=options.get("path", ""),
             wildcard="Schematic file (*.schematic)|*.schematic",
-            style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
+            style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE,
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
         self._platform_define = PlatformSelect(
@@ -80,22 +80,28 @@ class ExportSchematic(SimpleOperationPanel):
 
         path = self._file_picker.GetPath()
         platform = self._platform_define.platform
-        if isinstance(path, str) and path.endswith(".schematic") and platform:
-            wrapper = SchematicFormatWrapper(path, "w")
-            wrapper.platform = platform
-            wrapper.selection = selection
+        if isinstance(path, str):
+            wrapper = SchematicFormatWrapper(path)
+            if wrapper.exists:
+                response = wx.MessageDialog(self, f"A file is already present at {path}. Do you want to continue?", style=wx.YES | wx.NO).ShowModal()
+                if response == wx.ID_CANCEL:
+                    return
+            wrapper.create_and_open(
+                platform,
+                (1, 12, 2),
+                selection
+            )
             wrapper.translation_manager = world.translation_manager
-            wrapper.open()
             chunk_count = len(list(selection.chunk_locations()))
             yield 0, f"Exporting {os.path.basename(path)}"
             for chunk_index, (cx, cz) in enumerate(selection.chunk_locations()):
                 try:
                     chunk = world.get_chunk(cx, cz, dimension)
-                    wrapper.commit_chunk(chunk, world.block_palette)
+                    wrapper.commit_chunk(chunk, dimension)
                 except ChunkLoadError:
                     continue
                 yield (chunk_index + 1) / chunk_count
-
+            wrapper.save()
             wrapper.close()
         else:
             raise OperationError(
