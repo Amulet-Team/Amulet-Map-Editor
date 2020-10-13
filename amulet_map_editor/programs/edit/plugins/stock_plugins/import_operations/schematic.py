@@ -52,7 +52,6 @@ class ImportSchematic(SimpleOperationPanel):
             wrapper = SchematicFormatWrapper(path)
             wrapper.translation_manager = world.translation_manager
             wrapper.open()
-            selection = wrapper.selection
             wrapper_dimension = wrapper.dimensions[0]
 
             global_palette = BlockManager()
@@ -68,7 +67,7 @@ class ImportSchematic(SimpleOperationPanel):
                 yield (chunk_index + 1) / chunk_count
 
             wrapper.close()
-            self.canvas.paste(Structure(chunks, global_palette, selection))
+            self.canvas.paste(Structure(chunks, global_palette, wrapper.selection))
         else:
             raise OperationError(
                 "Please specify a schematic file in the options before running."

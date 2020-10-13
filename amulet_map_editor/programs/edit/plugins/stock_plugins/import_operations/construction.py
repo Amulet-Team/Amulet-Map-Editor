@@ -49,10 +49,10 @@ class ImportConstruction(SimpleOperationPanel):
             and path.endswith(".construction")
             and os.path.isfile(path)
         ):
-            wrapper = ConstructionFormatWrapper(path, "r")
+            wrapper = ConstructionFormatWrapper(path)
             wrapper.translation_manager = world.translation_manager
             wrapper.open()
-            selection = wrapper.selection
+            wrapper_dimension = wrapper.dimensions[0]
 
             global_palette = BlockManager()
             chunks = {}
@@ -60,14 +60,14 @@ class ImportConstruction(SimpleOperationPanel):
             yield 0, f"Importing {os.path.basename(path)}"
             for chunk_index, (cx, cz) in enumerate(wrapper.all_chunk_coords()):
                 try:
-                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz)
+                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz, wrapper_dimension)
                     chunk.block_palette = global_palette
                 except ChunkLoadError:
                     pass
                 yield (chunk_index + 1) / chunk_count
 
             wrapper.close()
-            self.canvas.paste(Structure(chunks, global_palette, selection))
+            self.canvas.paste(Structure(chunks, global_palette, wrapper.selection))
         else:
             raise OperationError(
                 "Please specify a construction file in the options before running."

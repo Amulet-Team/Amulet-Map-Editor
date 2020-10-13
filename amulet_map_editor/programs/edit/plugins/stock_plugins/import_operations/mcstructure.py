@@ -52,7 +52,6 @@ class ImportMCStructure(SimpleOperationPanel):
             wrapper = MCStructureFormatWrapper(path)
             wrapper.translation_manager = world.translation_manager
             wrapper.open()
-            selection = wrapper.selection
             wrapper_dimension = wrapper.dimensions[0]
 
             global_palette = BlockManager()
@@ -68,7 +67,7 @@ class ImportMCStructure(SimpleOperationPanel):
                 yield (chunk_index + 1) / chunk_count
 
             wrapper.close()
-            self.canvas.paste(Structure(chunks, global_palette, selection))
+            self.canvas.paste(Structure(chunks, global_palette, wrapper.selection))
         else:
             raise OperationError(
                 "Please specify a mcstructure file in the options before running."
