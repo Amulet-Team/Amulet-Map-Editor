@@ -67,14 +67,14 @@ class ExportMCStructure(SimpleOperationPanel):
         if isinstance(path, str):
             wrapper = MCStructureFormatWrapper(path)
             if wrapper.exists:
-                response = wx.MessageDialog(self, f"A file is already present at {path}. Do you want to continue?", style=wx.YES | wx.NO).ShowModal()
+                response = wx.MessageDialog(
+                    self,
+                    f"A file is already present at {path}. Do you want to continue?",
+                    style=wx.YES | wx.NO,
+                ).ShowModal()
                 if response == wx.ID_CANCEL:
                     return
-            wrapper.create_and_open(
-                "bedrock",
-                version,
-                selection
-            )
+            wrapper.create_and_open("bedrock", version, selection)
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))

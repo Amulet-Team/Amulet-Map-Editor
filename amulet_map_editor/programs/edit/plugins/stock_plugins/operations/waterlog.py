@@ -209,7 +209,8 @@ class Waterlog(wx.Panel, OperationUI):
                 lut = numpy.array(
                     [
                         world.block_palette.get_add_block(
-                            waterlog_block + world.block_palette[block_id].extra_blocks[0]
+                            waterlog_block
+                            + world.block_palette[block_id].extra_blocks[0]
                             if world.block_palette[block_id].extra_blocks
                             else waterlog_block
                         )  # register the new block / get the numerical id if it was already registered

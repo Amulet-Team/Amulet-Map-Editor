@@ -138,9 +138,7 @@ class WorldList(simple.SimplePanel):
                 self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
                 self.worlds.append(world_button)
             except Exception as e:
-                log.info(
-                    f"Failed to display world button for {world_format.path} {e}"
-                )
+                log.info(f"Failed to display world button for {world_format.path} {e}")
 
         self.Layout()
 

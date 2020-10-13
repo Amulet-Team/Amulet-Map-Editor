@@ -60,7 +60,9 @@ class ImportConstruction(SimpleOperationPanel):
             yield 0, f"Importing {os.path.basename(path)}"
             for chunk_index, (cx, cz) in enumerate(wrapper.all_chunk_coords()):
                 try:
-                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz, wrapper_dimension)
+                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(
+                        cx, cz, wrapper_dimension
+                    )
                     chunk.block_palette = global_palette
                 except ChunkLoadError:
                     pass

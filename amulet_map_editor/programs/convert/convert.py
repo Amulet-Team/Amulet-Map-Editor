@@ -145,9 +145,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         global work_count
         try:
             out_world = world_interface.load_format(self.out_world_path)
-            log.info(
-                f"Converting world {self.world.world_path} to {out_world.path}"
-            )
+            log.info(f"Converting world {self.world.world_path} to {out_world.path}")
             out_world: WorldFormatWrapper
             out_world.open()
             self.world.save(out_world, self._update_loading_bar)

@@ -58,14 +58,14 @@ class ExportConstruction(SimpleOperationPanel):
         path = self._file_picker.GetPath()
         platform = self._version_define.platform
         version = self._version_define.version_number
-        if (
-            isinstance(path, str)
-            and platform
-            and version
-        ):
+        if isinstance(path, str) and platform and version:
             wrapper = ConstructionFormatWrapper(path)
             if wrapper.exists:
-                response = wx.MessageDialog(self, f"A file is already present at {path}. Do you want to continue?", style=wx.YES | wx.NO).ShowModal()
+                response = wx.MessageDialog(
+                    self,
+                    f"A file is already present at {path}. Do you want to continue?",
+                    style=wx.YES | wx.NO,
+                ).ShowModal()
                 if response == wx.ID_CANCEL:
                     return
             wrapper.create_and_open(platform, version, selection)
