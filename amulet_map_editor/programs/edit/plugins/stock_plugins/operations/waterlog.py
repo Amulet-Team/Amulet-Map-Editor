@@ -150,9 +150,9 @@ class Waterlog(wx.Panel, OperationUI):
         world = self.world
         selection = self.canvas.selection_group
         dimension = self.canvas.dimension
-        iter_count = len(list(world.get_chunk_slice_box(selection, dimension, True)))
+        iter_count = len(list(world.get_chunk_slice_box(dimension, selection, True)))
         count = 0
-        for chunk, slices, _ in world.get_chunk_slice_box(selection, dimension, True):
+        for chunk, slices, _ in world.get_chunk_slice_box(dimension, selection, True):
             original_blocks = chunk.blocks[slices]
             palette, blocks = numpy.unique(original_blocks, return_inverse=True)
             blocks = blocks.reshape(original_blocks.shape)
