@@ -102,7 +102,7 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
             (self._structure.selection.min + self._structure.selection.max) / 2
         ).astype(int)
         sections = []
-        for chunk, slices, _ in self._structure.get_chunk_slices():
+        for chunk, slices, _ in self._structure.get_chunk_slice_box():
             section = RenderStructureChunk(
                 self.context_identifier, self.resource_pack, chunk, slices, offset
             )
