@@ -2,8 +2,8 @@ import wx
 from typing import Callable, Type, Any, TYPE_CHECKING
 import math
 
-from amulet.api.structure import Structure
-from amulet.api.data_types import BlockCoordinates
+from amulet.api.world import ChunkWorld
+from amulet.api.data_types import BlockCoordinates, Dimension
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.canvas.ui.base_ui import BaseUI
@@ -26,15 +26,17 @@ class SelectLocationUI(SimplePanel, BaseUI):
         self,
         parent: wx.Window,
         canvas: "EditCanvas",
-        structure: Structure,
+        structure: ChunkWorld,
+        dimension: Dimension,
         confirm_callback: Callable[[], None],
     ):
         SimplePanel.__init__(self, parent)
         BaseUI.__init__(self, canvas)
 
         self._structure = structure
+        self._dimension = dimension
         self.canvas.structure.clear()
-        self.canvas.structure.append(structure, (0, 0, 0), (1, 1, 1), (0, 0, 0))
+        self.canvas.structure.append(structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0))
         self.canvas.draw_structure = True
 
         self._setup_ui()
@@ -107,8 +109,12 @@ class SelectLocationUI(SimplePanel, BaseUI):
         return self._copy_lava.GetValue()
 
     @property
-    def structure(self) -> Structure:
+    def structure(self) -> ChunkWorld:
         return self._structure
+
+    @property
+    def dimension(self) -> Dimension:
+        return self._dimension
 
     def _save_config(self, evt):
         select_config = config.get("edit_select_location", {})

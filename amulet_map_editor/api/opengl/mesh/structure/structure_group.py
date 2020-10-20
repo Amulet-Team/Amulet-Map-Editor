@@ -1,8 +1,8 @@
 from typing import List, Optional, Tuple, Any
 import numpy
 
-from amulet.api.structure import Structure
-from amulet.api.data_types import FloatTriplet, PointCoordinates
+from amulet.api.world import ChunkWorld
+from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
 
 from .structure import RenderStructure
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
@@ -44,7 +44,8 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def append(
         self,
-        structure: Structure,
+        structure: ChunkWorld,
+        dimension: Dimension,
         location: LocationType,
         scale: ScaleType,
         rotation: RotationType,
@@ -53,7 +54,7 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         # TODO: update this to support multiple structures
         self.clear()
         self._structures.append(
-            RenderStructure(self.context_identifier, self._resource_pack, structure)
+            RenderStructure(self.context_identifier, self._resource_pack, structure, dimension)
         )
         self._transforms.append((location, scale, rotation))
         self._transformation_matrices.append(

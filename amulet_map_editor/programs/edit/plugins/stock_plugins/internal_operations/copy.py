@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from amulet.api.structure import structure_cache, Structure
+from amulet.api.structure import structure_cache
 from amulet.api.data_types import Dimension
 from amulet.api.selection import SelectionGroup
 from amulet_map_editor.programs.edit.plugins.api.errors import (
@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 def copy(world: "World", dimension: Dimension, selection: SelectionGroup):
     if selection:
-        structure = Structure.from_world(world, selection, dimension)
-        structure_cache.add_structure(structure)
+        structure = world.extract_structure(selection, dimension)
+        structure_cache.add_structure(structure, structure.dimensions[0])
         raise OperationSilentAbort
     else:
         raise OperationError(

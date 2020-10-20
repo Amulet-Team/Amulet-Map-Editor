@@ -157,7 +157,7 @@ class EditExtension(wx.Panel, BaseProgram):
             "Copy\tCtrl+c", lambda evt: self._canvas.copy()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
-            "Paste\tCtrl+v", lambda evt: self._canvas.paste()
+            "Paste\tCtrl+v", lambda evt: self._canvas.paste_from_cache()
         )
         menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
             "Delete\tDelete", lambda evt: self._canvas.delete()

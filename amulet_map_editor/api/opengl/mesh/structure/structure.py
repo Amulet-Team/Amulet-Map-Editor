@@ -2,8 +2,9 @@ from typing import Tuple, Any
 import weakref
 import numpy
 
-from amulet.api.structure import Structure
+from amulet.api.world import ChunkWorld
 from amulet.api.chunk import Chunk
+from amulet.api.data_types import Dimension
 
 from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.api.opengl.resource_pack import (
@@ -81,28 +82,30 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
         self,
         context_identifier: Any,
         resource_pack: OpenGLResourcePack,
-        structure: Structure,
+        structure: ChunkWorld,
+        dimension: Dimension
     ):
         OpenGLResourcePackManager.__init__(self, resource_pack)
         ContextManager.__init__(self, context_identifier)
         self._structure = structure
+        self._dimension = dimension
         self._sub_structures = []
         self._selection = GreenRenderSelectionGroup(
-            context_identifier, self.resource_pack, structure.selection
+            context_identifier, self.resource_pack, structure.selection_bounds
         )
         self._selection_transform = displacement_matrix(
             *(
-                (self._structure.selection.min - self._structure.selection.max) / 2
+                (self._structure.selection_bounds.min - self._structure.selection_bounds.max) / 2
             ).astype(int)
         )
         self._create_geometry()  # TODO: move this to a different thread
 
     def _create_geometry(self):
         offset = -numpy.floor(
-            (self._structure.selection.min + self._structure.selection.max) / 2
+            (self._structure.selection_bounds.min + self._structure.selection_bounds.max) / 2
         ).astype(int)
         sections = []
-        for chunk, slices, _ in self._structure.get_chunk_slice_box():
+        for chunk, slices, _ in self._structure.get_chunk_slice_box(self._dimension, self._structure.selection_bounds):
             section = RenderStructureChunk(
                 self.context_identifier, self.resource_pack, chunk, slices, offset
             )

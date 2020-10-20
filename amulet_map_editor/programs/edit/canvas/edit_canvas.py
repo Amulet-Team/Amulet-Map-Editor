@@ -4,8 +4,9 @@ from types import GeneratorType
 import time
 import traceback
 
-from amulet.api.data_types import OperationReturnType, OperationYieldType
-from amulet.api.structure import Structure, structure_cache
+from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimension
+from amulet.api.structure import structure_cache
+from amulet.api.world import ChunkWorld
 
 from amulet_map_editor.api import config
 from amulet_map_editor.api.logging import log
@@ -215,17 +216,21 @@ class EditCanvas(ControllableEditCanvas):
             lambda: copy(self.world, self.dimension, self.selection_group)
         )
 
-    def paste(self, structure: Structure = None):
-        if not isinstance(structure, Structure):
-            if structure_cache:
-                structure = structure_cache.get_structure()
-            else:
-                wx.MessageBox(
-                    "A structure needs to be copied before one can be pasted."
-                )
-                return
+    def paste(self, structure: ChunkWorld, dimension: Dimension):
+        assert isinstance(structure, ChunkWorld), "Structure given is not a subclass of ChunkWorld."
+        assert dimension in structure.dimensions, "The requested dimension does not exist for this object."
         wx.PostEvent(self, ToolChangeEvent(tool="Select"))
-        wx.PostEvent(self, PasteEvent(structure=structure))
+        wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
+
+    def paste_from_cache(self):
+        if structure_cache:
+            structure, dimension = structure_cache.get_structure()
+            wx.PostEvent(self, ToolChangeEvent(tool="Select"))
+            wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
+        else:
+            wx.MessageBox(
+                "A structure needs to be copied before one can be pasted."
+            )
 
     def delete(self):
         self.run_operation(
