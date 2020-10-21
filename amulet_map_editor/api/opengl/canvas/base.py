@@ -9,7 +9,7 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.matrix import rotation_matrix, projection_matrix
+from amulet_map_editor.api.opengl.matrix import rotation_matrix, projection_matrix, displacement_matrix
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -90,14 +90,12 @@ class BaseCanvas(glcanvas.GLCanvas):
     def transformation_matrix(self) -> numpy.ndarray:
         # camera translation
         if self._transformation_matrix is None:
-            transformation_matrix = numpy.eye(4, dtype=numpy.float64)
-            transformation_matrix[3, :3] = numpy.array(self.camera_location) * -1
-
-            transformation_matrix = numpy.matmul(
-                transformation_matrix, self.rotation_matrix(*self.camera_rotation)
-            )
             self._transformation_matrix = numpy.matmul(
-                transformation_matrix, self.projection_matrix()
+                numpy.matmul(
+                    displacement_matrix(*numpy.array(self.camera_location) * -1),
+                    self.rotation_matrix(*self.camera_rotation)
+                ),
+                self.projection_matrix()
             )
 
         return self._transformation_matrix
