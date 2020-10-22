@@ -148,7 +148,7 @@ class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
         ContextManager.__init__(self, context_identifier)
         self._world = world
         self._camera_location: CameraLocationType = (0, 150, 0)
-        self._camera_rotation: CameraRotationType = (90, 0)
+        self._camera_rotation: CameraRotationType = (0, 90)  # yaw (-180 to 180), pitch (-90 to 90)
         self._dimension: Dimension = "overworld"
         self._render_distance = 5
         self._garbage_distance = 10
@@ -190,10 +190,16 @@ class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
 
     @property
     def camera_rotation(self) -> CameraRotationType:
+        """The rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         return self._camera_rotation
 
     @camera_rotation.setter
     def camera_rotation(self, value: CameraRotationType):
+        """Set the rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         self._camera_rotation = value
 
     @property

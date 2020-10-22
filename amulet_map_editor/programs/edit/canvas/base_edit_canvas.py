@@ -4,6 +4,7 @@ import os
 from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
 import weakref
+import math
 
 from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
@@ -48,6 +49,7 @@ from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
+from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy, rotation_matrix_yx
 from amulet_map_editor.api.logging import log
 from .render_selection import (
     EditProgramRenderSelectionGroup,
@@ -99,7 +101,7 @@ class BaseEditCanvas(BaseCanvas):
         self._render_world = None
 
         self._camera_location: CameraLocationType = (0.0, 100.0, 0.0)
-        self._camera_rotation: CameraRotationType = (45.0, 45.0)
+        self._camera_rotation: CameraRotationType = (45.0, 45.0)  # yaw (-180 to 180), pitch (-90 to 90)
         self._camera_move_speed = 2.0
         self._camera_rotate_speed = 2.0
         self._selection_location: BlockCoordinates = (0, 0, 0)
@@ -416,10 +418,16 @@ class BaseEditCanvas(BaseCanvas):
 
     @property
     def camera_rotation(self) -> CameraRotationType:
+        """The rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         return self._camera_rotation
 
     @camera_rotation.setter
     def camera_rotation(self, rotation: CameraRotationType):
+        """Set the rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         assert len(rotation) == 2 and all(
             isinstance(v, (int, float)) for v in rotation
         ), "format for camera_rotation is invalid"
@@ -544,7 +552,7 @@ class BaseEditCanvas(BaseCanvas):
         The x,y,z vector for the direction the camera is facing
         :return: (x, y, z) numpy float array ranging from -1 to 1
         """
-        look_vector = numpy.array([0, 0, -1, 0])
+        look_vector = numpy.array([0, 0, 1, 0])
         if not self._mouse_lock:
             screen_x, screen_y = numpy.array(self.GetSize(), numpy.int) / 2
             screen_dx = atan(
@@ -554,10 +562,11 @@ class BaseEditCanvas(BaseCanvas):
                 cos(screen_dx) * tan(self.fov / 2) * self._mouse_delta_y / screen_y
             )
             look_vector = numpy.matmul(
-                self.rotation_matrix(screen_dy, screen_dx), look_vector
+                rotation_matrix_xy(math.radians(screen_dy), -math.radians(screen_dx)), look_vector
             )
+        ry, rx = self.camera_rotation
         look_vector = numpy.matmul(
-            self.rotation_matrix(*self.camera_rotation), look_vector
+            rotation_matrix_xy(*numpy.radians([rx, -ry])), look_vector
         )[:3]
         look_vector[abs(look_vector) < 0.000001] = 0.000001
         return look_vector

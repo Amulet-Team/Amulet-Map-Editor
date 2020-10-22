@@ -301,17 +301,19 @@ class ControllableEditCanvas(BaseEditCanvas):
                 self._selection_moved = True
             return
         x, y, z = self.camera_location
-        rx, ry = self.camera_rotation
-        x += self._camera_move_speed * (cos(ry) * right + sin(ry) * forward)
+        ry, rx = self.camera_rotation
+        x += self._camera_move_speed * -(cos(ry) * right + sin(ry) * forward)
         y += self._camera_move_speed * up
-        z += self._camera_move_speed * (sin(ry) * right - cos(ry) * forward)
+        z += self._camera_move_speed * (cos(ry) * forward - sin(ry) * right)
 
         rx += self._camera_rotate_speed * pitch
         if not -90 <= rx <= 90:
             rx = max(min(rx, 90), -90)
         ry += self._camera_rotate_speed * yaw
+        if not -180 <= ry <= 180:
+            ry += -int(numpy.sign(ry)) * 360
         self.camera_location = (x, y, z)
-        self.camera_rotation = (rx, ry)
+        self.camera_rotation = (ry, rx)
 
     def _capture_mouse(self):
         self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))

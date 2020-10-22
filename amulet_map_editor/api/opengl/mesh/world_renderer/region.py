@@ -240,7 +240,7 @@ class RenderRegion(TriMesh):
         self._chunks.clear()
 
     def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
-        transformation_matrix = numpy.matmul(self.region_transform.T, camera_matrix)
+        transformation_matrix = numpy.matmul(camera_matrix, self.region_transform).T
         super().draw(transformation_matrix)
         for chunk in sorted(
             self._manual_chunks.values(),

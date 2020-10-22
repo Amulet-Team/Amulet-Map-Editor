@@ -9,7 +9,7 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy, projection_matrix, displacement_matrix
+from amulet_map_editor.api.opengl.matrix import rotation_matrix_yx, projection_matrix, displacement_matrix
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -56,6 +56,9 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @property
     def camera_rotation(self) -> CameraRotationType:
+        """The rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         raise NotImplementedError
 
     @property
@@ -77,8 +80,8 @@ class BaseCanvas(glcanvas.GLCanvas):
         self._transformation_matrix = None
 
     @staticmethod
-    def rotation_matrix(pitch, yaw):
-        return rotation_matrix_xy(-math.radians(pitch), -math.radians(yaw))
+    def rotation_matrix(yaw, pitch):
+        return rotation_matrix_yx(math.radians(yaw+180), math.radians(pitch))
 
     def projection_matrix(self):
         # camera projection
@@ -92,11 +95,11 @@ class BaseCanvas(glcanvas.GLCanvas):
         # camera translation
         if self._transformation_matrix is None:
             self._transformation_matrix = numpy.matmul(
+                self.projection_matrix(),
                 numpy.matmul(
-                    displacement_matrix(*-numpy.array(self.camera_location)).T,
-                    self.rotation_matrix(*self.camera_rotation)
-                ),
-                self.projection_matrix().T,
+                    self.rotation_matrix(*self.camera_rotation),
+                    displacement_matrix(*-numpy.array(self.camera_location)),
+                )
             )
 
         return self._transformation_matrix

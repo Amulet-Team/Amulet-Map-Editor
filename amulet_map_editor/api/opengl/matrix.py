@@ -3,6 +3,7 @@ import numpy
 from amulet.utils.matrix import (
     scale_matrix,
     rotation_matrix_xy,
+    rotation_matrix_yx,
     rotation_matrix_xyz,
     transform_matrix,
     displacement_matrix,

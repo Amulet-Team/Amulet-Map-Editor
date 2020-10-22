@@ -58,7 +58,7 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         )
         self._transforms.append((location, scale, rotation))
         self._transformation_matrices.append(
-            transform_matrix(scale, rotation, location).T
+            transform_matrix(scale, rotation, location)
         )
         if self._active_structure is None:
             self._active_structure = 0
@@ -78,10 +78,10 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
             self._transforms[self._active_structure] = (location, scale, rotation)
             self._transformation_matrices[self._active_structure] = transform_matrix(
                 scale, rotation, location
-            ).T
+            )
 
     def draw(self, camera_matrix: numpy.ndarray):
         for structure, transform in zip(
             self._structures, self._transformation_matrices
         ):
-            structure.draw(numpy.matmul(transform, camera_matrix), 0, 0)
+            structure.draw(numpy.matmul(camera_matrix, transform), 0, 0)
