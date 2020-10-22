@@ -120,4 +120,4 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
             reverse=True,
         ):
             chunk.draw(camera_matrix)
-        self._selection.draw(numpy.matmul(self._selection_transform, camera_matrix))
+        self._selection.draw(numpy.matmul(self._selection_transform.T, camera_matrix))

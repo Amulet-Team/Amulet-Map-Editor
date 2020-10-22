@@ -88,6 +88,7 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:
+        """The world to projection matrix."""
         # camera translation
         if self._transformation_matrix is None:
             self._transformation_matrix = numpy.matmul(
@@ -95,7 +96,7 @@ class BaseCanvas(glcanvas.GLCanvas):
                     displacement_matrix(*-numpy.array(self.camera_location)).T,
                     self.rotation_matrix(*self.camera_rotation)
                 ),
-                self.projection_matrix()
+                self.projection_matrix().T,
             )
 
         return self._transformation_matrix

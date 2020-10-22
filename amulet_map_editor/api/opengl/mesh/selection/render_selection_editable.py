@@ -119,7 +119,7 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
 
-        transformation_matrix = numpy.matmul(self.transformation_matrix, camera_matrix)
+        transformation_matrix = numpy.matmul(self.transformation_matrix.T, camera_matrix)
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)

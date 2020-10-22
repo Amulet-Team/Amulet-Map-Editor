@@ -5,6 +5,7 @@ import queue
 from .chunk import RenderChunk
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
+from amulet_map_editor.api.opengl.matrix import displacement_matrix
 
 
 class ChunkManager:
@@ -143,8 +144,7 @@ class RenderRegion(TriMesh):
         ] = {}
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
 
-        self.region_transform = numpy.eye(4, dtype=numpy.float64)
-        self.region_transform[3, [0, 2]] = numpy.array([rx, rz]) * region_size * 16
+        self.region_transform = displacement_matrix(rx * region_size * 16, 0, rz * region_size * 16)
 
     @property
     def vertex_usage(self):
@@ -240,7 +240,7 @@ class RenderRegion(TriMesh):
         self._chunks.clear()
 
     def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
-        transformation_matrix = numpy.matmul(self.region_transform, camera_matrix)
+        transformation_matrix = numpy.matmul(self.region_transform.T, camera_matrix)
         super().draw(transformation_matrix)
         for chunk in sorted(
             self._manual_chunks.values(),
