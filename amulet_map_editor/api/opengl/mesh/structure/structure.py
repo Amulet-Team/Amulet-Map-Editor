@@ -93,17 +93,21 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
         self._selection = GreenRenderSelectionGroup(
             context_identifier, self.resource_pack, structure.selection_bounds
         )
-        self._selection_transform = displacement_matrix(
-            *(
-                (self._structure.selection_bounds.min - self._structure.selection_bounds.max) / 2
+        self._origin_transform = displacement_matrix(
+            *-(
+                    (self._structure.selection_bounds.min + self._structure.selection_bounds.max) // 2
             ).astype(int)
         )
+        self._selection_transform = displacement_matrix(
+            *(
+                    (self._structure.selection_bounds.min - self._structure.selection_bounds.max) / 2
+            ).astype(int)
+        )
+
         self._create_geometry()  # TODO: move this to a different thread
 
     def _create_geometry(self):
-        offset = -numpy.floor(
-            (self._structure.selection_bounds.min + self._structure.selection_bounds.max) / 2
-        ).astype(int)
+        offset = numpy.array([0, 0, 0], dtype=int)
         sections = []
         for chunk, slices, _ in self._structure.get_chunk_slice_box(self._dimension, self._structure.selection_bounds):
             section = RenderStructureChunk(
@@ -114,10 +118,11 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
         self._sub_structures = sections
 
     def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
+        world_transform = numpy.matmul(camera_matrix, self._origin_transform)
         for chunk in sorted(
             self._sub_structures,
             key=lambda x: abs(x.cx - cam_cx) + abs(x.cz - cam_cz),
             reverse=True,
         ):
-            chunk.draw(camera_matrix)
+            chunk.draw(world_transform)
         self._selection.draw(numpy.matmul(camera_matrix, self._selection_transform))
