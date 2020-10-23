@@ -119,5 +119,5 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
             key=lambda x: abs(x.cx - cam_cx) + abs(x.cz - cam_cz),
             reverse=True,
         ):
-            chunk.draw(camera_matrix.T)
+            chunk.draw(camera_matrix)
         self._selection.draw(numpy.matmul(camera_matrix, self._selection_transform))

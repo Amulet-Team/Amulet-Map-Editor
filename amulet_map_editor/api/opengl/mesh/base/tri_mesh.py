@@ -149,7 +149,7 @@ class TriMesh(Drawable, ContextManager):
             self._transform_location,
             1,
             GL_FALSE,
-            transformation_matrix.astype(numpy.float32),
+            transformation_matrix.T.astype(numpy.float32),
         )
         glUniform1i(self._texture_location, 0)
         try:

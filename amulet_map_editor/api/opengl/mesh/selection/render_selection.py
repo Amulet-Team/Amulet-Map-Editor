@@ -254,7 +254,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
 
-        transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix).T
+        transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)
