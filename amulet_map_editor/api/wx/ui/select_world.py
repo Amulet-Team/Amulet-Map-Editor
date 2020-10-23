@@ -135,7 +135,9 @@ class WorldList(simple.SimplePanel):
                 except FormatError as e:
                     log.info(f"Could not find loader for {world_path} {e}")
                 except Exception:
-                    log.error(f"Error loading format wrapper for {world_path} {traceback.format_exc()}")
+                    log.error(
+                        f"Error loading format wrapper for {world_path} {traceback.format_exc()}"
+                    )
         if sort:
             world_formats = reversed(sorted(world_formats, key=lambda f: f.last_played))
 

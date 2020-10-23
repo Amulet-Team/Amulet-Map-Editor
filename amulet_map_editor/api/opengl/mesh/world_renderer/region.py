@@ -144,7 +144,9 @@ class RenderRegion(TriMesh):
         ] = {}
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
 
-        self.region_transform = displacement_matrix(rx * region_size * 16, 0, rz * region_size * 16)
+        self.region_transform = displacement_matrix(
+            rx * region_size * 16, 0, rz * region_size * 16
+        )
 
     @property
     def vertex_usage(self):

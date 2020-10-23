@@ -36,7 +36,9 @@ class SelectLocationUI(SimplePanel, BaseUI):
         self._structure = structure
         self._dimension = dimension
         self.canvas.structure.clear()
-        self.canvas.structure.append(structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0))
+        self.canvas.structure.append(
+            structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0)
+        )
         self.canvas.draw_structure = True
 
         self._setup_ui()

@@ -9,7 +9,11 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.matrix import rotation_matrix_yx, projection_matrix, displacement_matrix
+from amulet_map_editor.api.opengl.matrix import (
+    rotation_matrix_yx,
+    projection_matrix,
+    displacement_matrix,
+)
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -81,7 +85,7 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @staticmethod
     def rotation_matrix(yaw, pitch):
-        return rotation_matrix_yx(math.radians(yaw+180), math.radians(pitch))
+        return rotation_matrix_yx(math.radians(yaw + 180), math.radians(pitch))
 
     def projection_matrix(self):
         # camera projection
@@ -99,7 +103,7 @@ class BaseCanvas(glcanvas.GLCanvas):
                 numpy.matmul(
                     self.rotation_matrix(*self.camera_rotation),
                     displacement_matrix(*-numpy.array(self.camera_location)),
-                )
+                ),
             )
 
         return self._transformation_matrix

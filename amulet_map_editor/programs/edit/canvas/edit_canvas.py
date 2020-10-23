@@ -217,8 +217,12 @@ class EditCanvas(ControllableEditCanvas):
         )
 
     def paste(self, structure: ChunkWorld, dimension: Dimension):
-        assert isinstance(structure, ChunkWorld), "Structure given is not a subclass of ChunkWorld."
-        assert dimension in structure.dimensions, "The requested dimension does not exist for this object."
+        assert isinstance(
+            structure, ChunkWorld
+        ), "Structure given is not a subclass of ChunkWorld."
+        assert (
+            dimension in structure.dimensions
+        ), "The requested dimension does not exist for this object."
         wx.PostEvent(self, ToolChangeEvent(tool="Select"))
         wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
 
@@ -228,9 +232,7 @@ class EditCanvas(ControllableEditCanvas):
             wx.PostEvent(self, ToolChangeEvent(tool="Select"))
             wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
         else:
-            wx.MessageBox(
-                "A structure needs to be copied before one can be pasted."
-            )
+            wx.MessageBox("A structure needs to be copied before one can be pasted.")
 
     def delete(self):
         self.run_operation(

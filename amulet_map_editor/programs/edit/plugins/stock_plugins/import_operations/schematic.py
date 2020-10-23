@@ -49,10 +49,7 @@ class ImportSchematic(SimpleOperationPanel):
         ):
             wrapper = SchematicFormatWrapper(path)
             wrapper.translation_manager = world.translation_manager
-            self.canvas.paste(
-                Structure(path, wrapper),
-                wrapper.dimensions[0]
-            )
+            self.canvas.paste(Structure(path, wrapper), wrapper.dimensions[0])
         else:
             raise OperationError(
                 "Please specify a schematic file in the options before running."

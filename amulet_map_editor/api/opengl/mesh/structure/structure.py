@@ -83,7 +83,7 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
         context_identifier: Any,
         resource_pack: OpenGLResourcePack,
         structure: ChunkWorld,
-        dimension: Dimension
+        dimension: Dimension,
     ):
         OpenGLResourcePackManager.__init__(self, resource_pack)
         ContextManager.__init__(self, context_identifier)
@@ -95,12 +95,20 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
         )
         self._origin_transform = displacement_matrix(
             *-(
-                    (self._structure.selection_bounds.min + self._structure.selection_bounds.max) // 2
+                (
+                    self._structure.selection_bounds.min
+                    + self._structure.selection_bounds.max
+                )
+                // 2
             ).astype(int)
         )
         self._selection_transform = displacement_matrix(
             *(
-                    (self._structure.selection_bounds.min - self._structure.selection_bounds.max) / 2
+                (
+                    self._structure.selection_bounds.min
+                    - self._structure.selection_bounds.max
+                )
+                / 2
             ).astype(int)
         )
 
@@ -109,7 +117,9 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
     def _create_geometry(self):
         offset = numpy.array([0, 0, 0], dtype=int)
         sections = []
-        for chunk, slices, _ in self._structure.get_chunk_slice_box(self._dimension, self._structure.selection_bounds):
+        for chunk, slices, _ in self._structure.get_chunk_slice_box(
+            self._dimension, self._structure.selection_bounds
+        ):
             section = RenderStructureChunk(
                 self.context_identifier, self.resource_pack, chunk, slices, offset
             )

@@ -148,7 +148,10 @@ class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
         ContextManager.__init__(self, context_identifier)
         self._world = world
         self._camera_location: CameraLocationType = (0, 150, 0)
-        self._camera_rotation: CameraRotationType = (0, 90)  # yaw (-180 to 180), pitch (-90 to 90)
+        self._camera_rotation: CameraRotationType = (
+            0,
+            90,
+        )  # yaw (-180 to 180), pitch (-90 to 90)
         self._dimension: Dimension = "overworld"
         self._render_distance = 5
         self._garbage_distance = 10

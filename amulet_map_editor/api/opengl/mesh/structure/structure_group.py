@@ -54,7 +54,9 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         # TODO: update this to support multiple structures
         self.clear()
         self._structures.append(
-            RenderStructure(self.context_identifier, self._resource_pack, structure, dimension)
+            RenderStructure(
+                self.context_identifier, self._resource_pack, structure, dimension
+            )
         )
         self._transforms.append((location, scale, rotation))
         self._transformation_matrices.append(
