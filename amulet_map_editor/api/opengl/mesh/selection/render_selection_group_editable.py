@@ -76,20 +76,20 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     @property
     def all_selection_corners(
         self,
-    ) -> Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]:
+    ) -> List[Tuple[BlockCoordinates, BlockCoordinates]]:
         """The corners of each selection box."""
-        return tuple((tuple(box.point1), tuple(box.point2)) for box in self._boxes)
+        return [(tuple(box.point1), tuple(box.point2)) for box in self._boxes]
 
     @all_selection_corners.setter
     def all_selection_corners(
-        self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]
+        self, corners: List[Tuple[BlockCoordinates, BlockCoordinates]]
     ):
         """Set the selection corners."""
         if self.set_all_selection_corners(corners):
             self._confirm_change_event()
 
     def set_all_selection_corners(
-        self, corners: Tuple[Tuple[BlockCoordinates, BlockCoordinates], ...]
+        self, corners: List[Tuple[BlockCoordinates, BlockCoordinates]]
     ) -> bool:
         """
         Set the selection corners. Will not run _confirm_change_event. You may prefer the all_selection_corners setter.

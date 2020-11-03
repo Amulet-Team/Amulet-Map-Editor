@@ -398,10 +398,12 @@ class BaseEditCanvas(BaseCanvas):
 
     @property
     def dimension(self) -> Dimension:
+        """The currently loaded dimension in the renderer."""
         return self._render_world.dimension
 
     @dimension.setter
     def dimension(self, dimension: Dimension):
+        """Set the currently loaded dimension in the renderer."""
         self._render_world.dimension = dimension
         wx.PostEvent(self, DimensionChangeEvent(dimension=dimension))
 

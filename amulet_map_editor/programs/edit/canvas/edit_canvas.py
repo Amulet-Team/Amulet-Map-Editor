@@ -244,6 +244,30 @@ class EditCanvas(ControllableEditCanvas):
         if location:
             self.camera_location = location
 
+    def select_all(self):
+        all_chunk_coords = tuple(self.world.all_chunk_coords(self.dimension))
+        if all_chunk_coords:
+            min_x, min_z = max_x, max_z = all_chunk_coords[0]
+            for x, z in all_chunk_coords:
+                if x < min_x:
+                    min_x = x
+                elif x > max_x:
+                    max_x = x
+                if z < min_z:
+                    min_z = z
+                elif z > max_z:
+                    max_z = z
+
+            self.selection.all_selection_corners = [
+                (
+                    (min_x * self.world.sub_chunk_size, self.world.selection_bounds.min[1], min_z * self.world.sub_chunk_size),
+                    ((max_x + 1) * self.world.sub_chunk_size, self.world.selection_bounds.max[1], (max_z + 1) * self.world.sub_chunk_size)
+                )
+            ]
+
+        else:
+            self.selection.all_selection_corners = []
+
     def save(self):
         self._disable_threads()
 
