@@ -2,7 +2,7 @@ import wx
 from typing import Callable, Type, Any, TYPE_CHECKING
 import math
 
-from amulet.api.world import ChunkWorld
+from amulet.api.world import BaseLevel
 from amulet.api.data_types import BlockCoordinates, Dimension
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.util.validators import IntValidator
@@ -26,7 +26,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
         self,
         parent: wx.Window,
         canvas: "EditCanvas",
-        structure: ChunkWorld,
+        structure: BaseLevel,
         dimension: Dimension,
         confirm_callback: Callable[[], None],
     ):
@@ -111,7 +111,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
         return self._copy_lava.GetValue()
 
     @property
-    def structure(self) -> ChunkWorld:
+    def structure(self) -> BaseLevel:
         return self._structure
 
     @property

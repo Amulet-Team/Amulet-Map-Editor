@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple, Any
 import numpy
 
-from amulet.api.world import ChunkWorld
+from amulet.api.world import BaseLevel
 from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
 
 from .structure import RenderStructure
@@ -44,7 +44,7 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def append(
         self,
-        structure: ChunkWorld,
+        structure: BaseLevel,
         dimension: Dimension,
         location: LocationType,
         scale: ScaleType,

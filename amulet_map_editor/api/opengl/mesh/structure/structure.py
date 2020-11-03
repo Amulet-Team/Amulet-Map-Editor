@@ -2,7 +2,7 @@ from typing import Tuple, Any
 import weakref
 import numpy
 
-from amulet.api.world import ChunkWorld
+from amulet.api.world import BaseLevel
 from amulet.api.chunk import Chunk
 from amulet.api.data_types import Dimension
 
@@ -82,7 +82,7 @@ class RenderStructure(OpenGLResourcePackManager, Drawable, ContextManager):
         self,
         context_identifier: Any,
         resource_pack: OpenGLResourcePack,
-        structure: ChunkWorld,
+        structure: BaseLevel,
         dimension: Dimension,
     ):
         OpenGLResourcePackManager.__init__(self, resource_pack)

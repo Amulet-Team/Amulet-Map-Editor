@@ -6,7 +6,7 @@ import traceback
 
 from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimension
 from amulet.api.structure import structure_cache
-from amulet.api.world import ChunkWorld
+from amulet.api.world import BaseLevel
 
 from amulet_map_editor.api import config
 from amulet_map_editor.api.logging import log
@@ -216,10 +216,10 @@ class EditCanvas(ControllableEditCanvas):
             lambda: copy(self.world, self.dimension, self.selection_group)
         )
 
-    def paste(self, structure: ChunkWorld, dimension: Dimension):
+    def paste(self, structure: BaseLevel, dimension: Dimension):
         assert isinstance(
-            structure, ChunkWorld
-        ), "Structure given is not a subclass of ChunkWorld."
+            structure, BaseLevel
+        ), "Structure given is not a subclass of BaseLevel."
         assert (
             dimension in structure.dimensions
         ), "The requested dimension does not exist for this object."
