@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple, Any
 import numpy
 
-from amulet.api.world import BaseLevel
+from amulet.api.level import BaseLevel
 from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
 
 from .structure import RenderStructure

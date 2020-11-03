@@ -4,7 +4,7 @@ import webbrowser
 from typing import TYPE_CHECKING, Callable
 
 from amulet import world_interface
-from amulet.api.world import World
+from amulet.api.level import World
 
 from amulet_map_editor.api import lang
 from amulet_map_editor.api.logging import log

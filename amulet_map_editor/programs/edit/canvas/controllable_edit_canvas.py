@@ -24,7 +24,7 @@ from .events import (
 )
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 class ControllableEditCanvas(BaseEditCanvas):

@@ -15,7 +15,7 @@ from amulet_map_editor.programs.edit.plugins.api import loader
 from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 class EditExtension(wx.Panel, BaseProgram):

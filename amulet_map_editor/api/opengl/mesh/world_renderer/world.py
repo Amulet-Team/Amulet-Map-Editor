@@ -21,7 +21,7 @@ from amulet_map_editor.api.opengl.resource_pack import (
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 def sin(theta: Union[int, float]) -> float:

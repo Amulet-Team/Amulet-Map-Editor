@@ -9,7 +9,7 @@ from amulet_map_editor.programs.edit.plugins.api.errors import (
 )
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 def copy(world: "World", dimension: Dimension, selection: SelectionGroup):

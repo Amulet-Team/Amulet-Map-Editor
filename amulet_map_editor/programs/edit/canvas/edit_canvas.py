@@ -6,7 +6,7 @@ import traceback
 
 from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimension
 from amulet.api.structure import structure_cache
-from amulet.api.world import BaseLevel
+from amulet.api.level import BaseLevel
 
 from amulet_map_editor.api import config
 from amulet_map_editor.api.logging import log
@@ -49,7 +49,7 @@ from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import (
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 def show_loading_dialog(

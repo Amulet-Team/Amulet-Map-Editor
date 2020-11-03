@@ -2,7 +2,7 @@ import wx
 from typing import Callable, Type, Any, TYPE_CHECKING
 import math
 
-from amulet.api.world import BaseLevel
+from amulet.api.level import BaseLevel
 from amulet.api.data_types import BlockCoordinates, Dimension
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.util.validators import IntValidator

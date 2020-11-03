@@ -2,7 +2,7 @@ from typing import Tuple, Any
 import weakref
 import numpy
 
-from amulet.api.world import BaseLevel
+from amulet.api.level import BaseLevel
 from amulet.api.chunk import Chunk
 from amulet.api.data_types import Dimension
 

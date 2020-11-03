@@ -9,7 +9,7 @@ from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.d
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 def cut(

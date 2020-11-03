@@ -63,7 +63,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
 )
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 AIR = Block("universal_minecraft", "air")

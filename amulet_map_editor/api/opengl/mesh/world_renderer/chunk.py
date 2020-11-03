@@ -6,7 +6,7 @@ import itertools
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from amulet.api.chunk.blocks import Blocks
 from amulet.api.data_types import Dimension
-from amulet.api.world import World
+from amulet.api.level import World
 
 from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack

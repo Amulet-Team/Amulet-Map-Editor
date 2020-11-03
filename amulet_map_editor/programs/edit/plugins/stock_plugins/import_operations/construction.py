@@ -2,7 +2,7 @@ import os
 import wx
 from typing import TYPE_CHECKING
 
-from amulet.api.world import Structure
+from amulet.api.level import Structure
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension
 from amulet.structure_interface.construction import ConstructionFormatWrapper
@@ -13,7 +13,7 @@ from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
