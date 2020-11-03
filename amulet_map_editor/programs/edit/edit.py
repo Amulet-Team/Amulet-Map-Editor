@@ -145,22 +145,28 @@ class EditExtension(wx.Panel, BaseProgram):
         )
         # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
 
-        menu.setdefault("&Edit", {}).setdefault("history", {}).update({
-            "Undo\tCtrl+z": lambda evt: self._canvas.undo(),
-            "Redo\tCtrl+y": lambda evt: self._canvas.redo()
-        })
+        menu.setdefault("&Edit", {}).setdefault("history", {}).update(
+            {
+                "Undo\tCtrl+z": lambda evt: self._canvas.undo(),
+                "Redo\tCtrl+y": lambda evt: self._canvas.redo(),
+            }
+        )
 
-        menu.setdefault("&Edit", {}).setdefault("operation", {}).update({
-            "Cut\tCtrl+x": lambda evt: self._canvas.cut(),
-            "Copy\tCtrl+c": lambda evt: self._canvas.copy(),
-            "Paste\tCtrl+v": lambda evt: self._canvas.paste_from_cache(),
-            "Delete\tDelete": lambda evt: self._canvas.delete()
-        })
+        menu.setdefault("&Edit", {}).setdefault("operation", {}).update(
+            {
+                "Cut\tCtrl+x": lambda evt: self._canvas.cut(),
+                "Copy\tCtrl+c": lambda evt: self._canvas.copy(),
+                "Paste\tCtrl+v": lambda evt: self._canvas.paste_from_cache(),
+                "Delete\tDelete": lambda evt: self._canvas.delete(),
+            }
+        )
 
-        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).update({
-            "Goto\tCtrl+g": lambda evt: self._canvas.goto(),
-            "Select All\tCtrl+A": lambda evt: self._canvas.select_all()
-        })
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).update(
+            {
+                "Goto\tCtrl+g": lambda evt: self._canvas.goto(),
+                "Select All\tCtrl+A": lambda evt: self._canvas.select_all(),
+            }
+        )
 
         menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
             "Controls...", lambda evt: self._edit_controls()
