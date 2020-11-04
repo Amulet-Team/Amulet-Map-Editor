@@ -39,10 +39,16 @@ install:
 
 script:
   - if [ "$TRAVIS_OS_NAME" = "windows" ] ; then 7z a "${ZIPFILE_NAME}.zip" -r ./dist/* ; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then cd dist/ ; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then zip -r "${ZIPFILE_NAME}.zip" "Amulet" -x "*/\.DS_Store" ; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then cp "${ZIPFILE_NAME}.zip" ../ ; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ] ; then cd .. ; fi
+
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then cd dist/ ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then zip -r "${ZIPFILE_NAME}.zip" "Amulet" -x "*/\.DS_Store" ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then cp "${ZIPFILE_NAME}.zip" ../ ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] ; then cd .. ; fi
+
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] ; then cd dist/ ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] ; then zip -r "${ZIPFILE_NAME}.zip" "amulet.app" -x "*/\.DS_Store" ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] ; then cp "${ZIPFILE_NAME}.zip" ../ ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] ; then cd .. ; fi
 
 deploy:
   - provider: releases
