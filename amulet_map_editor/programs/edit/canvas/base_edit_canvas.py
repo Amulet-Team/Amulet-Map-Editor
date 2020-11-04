@@ -39,12 +39,7 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.mesh.level.level import (
-    RenderLevel,
-    cos,
-    tan,
-    atan,
-)
+from amulet_map_editor.api.opengl.mesh.level.level import RenderLevel
 from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
@@ -560,12 +555,12 @@ class BaseEditCanvas(BaseCanvas):
         look_vector = numpy.array([0, 0, 1, 0])
         if not self._mouse_lock:
             screen_x, screen_y = numpy.array(self.GetSize(), numpy.int) / 2
-            screen_dx = atan(
-                self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x
-            )
-            screen_dy = atan(
-                cos(screen_dx) * tan(self.fov / 2) * self._mouse_delta_y / screen_y
-            )
+            screen_dx = math.degrees(math.atan(
+                self.aspect_ratio * math.tan(math.radians(self.fov / 2)) * self._mouse_delta_x / screen_x
+            ))
+            screen_dy = math.degrees(math.atan(
+                math.cos(math.radians(screen_dx)) * math.tan(math.radians(self.fov / 2)) * self._mouse_delta_y / screen_y
+            ))
             look_vector = numpy.matmul(
                 rotation_matrix_xy(math.radians(screen_dy), -math.radians(screen_dx)),
                 look_vector,

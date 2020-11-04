@@ -1,6 +1,5 @@
 import numpy
-from typing import TYPE_CHECKING, Tuple, Generator, Union, Optional, Any, Set
-import math
+from typing import TYPE_CHECKING, Tuple, Generator, Optional, Any, Set
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
 import weakref
@@ -22,30 +21,6 @@ from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextMan
 
 if TYPE_CHECKING:
     from amulet.api.level import World
-
-
-def sin(theta: Union[int, float]) -> float:
-    return math.sin(math.radians(theta))
-
-
-def cos(theta: Union[int, float]) -> float:
-    return math.cos(math.radians(theta))
-
-
-def tan(theta: Union[int, float]) -> float:
-    return math.tan(math.radians(theta))
-
-
-def asin(x: Union[int, float]) -> float:
-    return math.degrees(math.asin(x))
-
-
-def acos(x: Union[int, float]) -> float:
-    return math.degrees(math.acos(x))
-
-
-def atan(x: Union[int, float]) -> float:
-    return math.degrees(math.atan(x))
 
 
 class ChunkGenerator(ThreadPoolExecutor):

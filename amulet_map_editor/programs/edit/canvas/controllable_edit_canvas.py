@@ -2,13 +2,13 @@ from typing import TYPE_CHECKING, Set, Generator
 import wx
 import numpy
 import time
+import math
 
 from amulet.api.data_types import OperationYieldType
 from wx.adv import RichToolTip
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor import log
-from amulet_map_editor.api.opengl.mesh.level.level import sin, cos
 from amulet_map_editor.api.wx.util.key_config import (
     serialise_key_event,
     KeybindGroup,
@@ -302,9 +302,9 @@ class ControllableEditCanvas(BaseEditCanvas):
             return
         x, y, z = self.camera_location
         ry, rx = self.camera_rotation
-        x += self._camera_move_speed * -(cos(ry) * right + sin(ry) * forward)
+        x += self._camera_move_speed * -(math.cos(math.radians(ry)) * right + math.sin(math.radians(ry)) * forward)
         y += self._camera_move_speed * up
-        z += self._camera_move_speed * (cos(ry) * forward - sin(ry) * right)
+        z += self._camera_move_speed * (math.cos(math.radians(ry)) * forward - math.sin(math.radians(ry)) * right)
 
         rx += self._camera_rotate_speed * pitch
         if not -90 <= rx <= 90:
