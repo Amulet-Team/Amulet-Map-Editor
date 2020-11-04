@@ -6,7 +6,7 @@ import itertools
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from amulet.api.chunk.blocks import Blocks
 from amulet.api.data_types import Dimension
-from amulet.api.level import World
+from amulet.api.level import BaseLevel
 
 from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
@@ -20,7 +20,7 @@ class RenderChunk(RenderChunkBuilder):
         self,
         context_identifier: str,
         resource_pack: OpenGLResourcePack,
-        world: World,
+        level: BaseLevel,
         region_size: int,
         chunk_coords: Tuple[int, int],
         dimension: Dimension,
@@ -28,7 +28,7 @@ class RenderChunk(RenderChunkBuilder):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
         super().__init__(context_identifier, resource_pack)
-        self._world_ = weakref.ref(world)
+        self._level_ = weakref.ref(level)
         self._region_size = region_size
         self._coords = chunk_coords
         self._dimension = dimension
@@ -51,8 +51,8 @@ class RenderChunk(RenderChunkBuilder):
             self._rebuild = False
 
     @property
-    def _world(self) -> World:
-        return self._world_()
+    def _level(self) -> BaseLevel:
+        return self._level_()
 
     @property
     def offset(self) -> numpy.ndarray:
@@ -78,7 +78,7 @@ class RenderChunk(RenderChunkBuilder):
 
     @property
     def chunk(self) -> "Chunk":
-        return self._world.get_chunk(self.cx, self.cz, self._dimension)
+        return self._level.get_chunk(self.cx, self.cz, self._dimension)
 
     @property
     def chunk_state(self) -> int:
@@ -105,7 +105,7 @@ class RenderChunk(RenderChunkBuilder):
         neighbour_chunks = {}
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             try:
-                neighbour_chunks[(dx, dz)] = self._world.get_chunk(
+                neighbour_chunks[(dx, dz)] = self._level.get_chunk(
                     self.cx + dx, self.cz + dz, self.dimension
                 ).blocks
             except ChunkLoadError:

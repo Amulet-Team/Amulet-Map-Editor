@@ -302,9 +302,13 @@ class ControllableEditCanvas(BaseEditCanvas):
             return
         x, y, z = self.camera_location
         ry, rx = self.camera_rotation
-        x += self._camera_move_speed * -(math.cos(math.radians(ry)) * right + math.sin(math.radians(ry)) * forward)
+        x += self._camera_move_speed * -(
+            math.cos(math.radians(ry)) * right + math.sin(math.radians(ry)) * forward
+        )
         y += self._camera_move_speed * up
-        z += self._camera_move_speed * (math.cos(math.radians(ry)) * forward - math.sin(math.radians(ry)) * right)
+        z += self._camera_move_speed * (
+            math.cos(math.radians(ry)) * forward - math.sin(math.radians(ry)) * right
+        )
 
         rx += self._camera_rotate_speed * pitch
         if not -90 <= rx <= 90:

@@ -20,21 +20,21 @@ from amulet_map_editor.api.opengl.resource_pack import (
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
 
 
 class ChunkGenerator(ThreadPoolExecutor):
-    def __init__(self, render_world: "RenderLevel"):
+    def __init__(self, render_level: "RenderLevel"):
         super().__init__(max_workers=1)
-        self._render_world = weakref.ref(render_world)
-        self._region_size = render_world.chunk_manager.region_size
+        self._render_level_ = weakref.ref(render_level)
+        self._region_size = render_level.chunk_manager.region_size
         self._enabled = False
         self._generator: Optional[Future] = None
         self._chunk_rebuilds: Set[Tuple[int, int]] = set()
 
     @property
-    def render_world(self) -> "RenderLevel":
-        return self._render_world()
+    def _render_level(self) -> "RenderLevel":
+        return self._render_level_()
 
     def start(self):
         if not self._enabled:
@@ -53,8 +53,8 @@ class ChunkGenerator(ThreadPoolExecutor):
             chunk_coords = next(
                 (
                     c
-                    for c in self.render_world.chunk_coords()
-                    if self.render_world.chunk_manager.render_chunk_needs_rebuild(c)
+                    for c in self._render_level.chunk_coords()
+                    if self._render_level.chunk_manager.render_chunk_needs_rebuild(c)
                 ),
                 None,
             )
@@ -66,7 +66,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                         chunk_coords[0] + offset[0],
                         chunk_coords[1] + offset[1],
                     )
-                    if chunk_coords_ in self.render_world.chunk_manager:
+                    if chunk_coords_ in self._render_level.chunk_manager:
                         self._chunk_rebuilds.add(chunk_coords_)
             elif self._chunk_rebuilds:
                 # if a chunk was not found that needs rebuilding due to it changing but a previously
@@ -77,8 +77,8 @@ class ChunkGenerator(ThreadPoolExecutor):
                 chunk_coords = next(
                     (
                         c
-                        for c in self.render_world.chunk_coords()
-                        if c not in self.render_world.chunk_manager
+                        for c in self._render_level.chunk_coords()
+                        if c not in self._render_level.chunk_manager
                     ),
                     None,
                 )
@@ -89,12 +89,12 @@ class ChunkGenerator(ThreadPoolExecutor):
 
                 # generate the chunk
                 chunk = RenderChunk(
-                    self.render_world.context_identifier,
-                    self.render_world.resource_pack,
-                    self.render_world.world,
+                    self._render_level.context_identifier,
+                    self._render_level.resource_pack,
+                    self._render_level.level,
                     self._region_size,
                     chunk_coords,
-                    self.render_world.dimension,
+                    self._render_level.dimension,
                 )
 
                 try:
@@ -105,7 +105,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                         exc_info=True,
                     )
 
-                self.render_world.chunk_manager.add_render_chunk(chunk)
+                self._render_level.chunk_manager.add_render_chunk(chunk)
             delta_time = time.time() - start_time
             if delta_time < 1 / 60:
                 # go to sleep so this thread doesn't lock up the main thread.
@@ -117,11 +117,11 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         self,
         context_identifier: Any,
         opengl_resource_pack: OpenGLResourcePack,
-        world: "World",
+        level: "BaseLevel",
     ):
         OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
         ContextManager.__init__(self, context_identifier)
-        self._world = world
+        self._level = level
         self._camera_location: CameraLocationType = (0, 150, 0)
         self._camera_rotation: CameraRotationType = (
             0,
@@ -134,8 +134,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         self._chunk_generator = ChunkGenerator(self)
 
     @property
-    def world(self) -> "World":
-        return self._world
+    def level(self) -> "BaseLevel":
+        return self._level
 
     @property
     def chunk_manager(self) -> ChunkManager:
@@ -206,6 +206,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
+        # This yield chunk coordinates in a spiral around the camera
+        # TODO: Perhaps redesign this to prioritise chunks in front of the camera
         cx, cz = int(self.camera_location[0]) >> 4, int(self.camera_location[2]) >> 4
 
         sign = 1
@@ -226,7 +228,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
             self._chunk_manager.unload()
-            self._world.unload()
+            self._level.unload()
         else:
             safe_area = (
                 self._dimension,
@@ -236,7 +238,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
                 self.camera_location[2] // 16 + self._garbage_distance,
             )
             self._chunk_manager.unload(safe_area[1:])
-            self._world.unload(safe_area)
+            self._level.unload(safe_area)
 
     def _rebuild(self):
         """Unload all the chunks so they can be rebuilt."""

@@ -507,13 +507,13 @@ class BaseEditCanvas(BaseCanvas):
                 cx = cx_
                 cz = cz_
                 try:
-                    chunk = self._render_world.world.get_chunk(cx, cz, self.dimension)
+                    chunk = self._render_world.level.get_chunk(cx, cz, self.dimension)
                 except ChunkLoadError:
                     chunk = None
 
             if (
                 chunk is not None
-                and self._render_world.world.block_palette[
+                and self._render_world.level.block_palette[
                     chunk.blocks[x % 16, y, z % 16]
                 ]
                 != AIR
@@ -555,12 +555,22 @@ class BaseEditCanvas(BaseCanvas):
         look_vector = numpy.array([0, 0, 1, 0])
         if not self._mouse_lock:
             screen_x, screen_y = numpy.array(self.GetSize(), numpy.int) / 2
-            screen_dx = math.degrees(math.atan(
-                self.aspect_ratio * math.tan(math.radians(self.fov / 2)) * self._mouse_delta_x / screen_x
-            ))
-            screen_dy = math.degrees(math.atan(
-                math.cos(math.radians(screen_dx)) * math.tan(math.radians(self.fov / 2)) * self._mouse_delta_y / screen_y
-            ))
+            screen_dx = math.degrees(
+                math.atan(
+                    self.aspect_ratio
+                    * math.tan(math.radians(self.fov / 2))
+                    * self._mouse_delta_x
+                    / screen_x
+                )
+            )
+            screen_dy = math.degrees(
+                math.atan(
+                    math.cos(math.radians(screen_dx))
+                    * math.tan(math.radians(self.fov / 2))
+                    * self._mouse_delta_y
+                    / screen_y
+                )
+            )
             look_vector = numpy.matmul(
                 rotation_matrix_xy(math.radians(screen_dy), -math.radians(screen_dx)),
                 look_vector,
