@@ -104,6 +104,12 @@ coll = COLLECT(exe,
                name='Amulet'
 )
 
+app = BUNDLE(coll,
+             name="amulet.app",
+             icon='icon.ico',
+             bundle_identifier="com.amulet-editor.amulet_map_editor"
+)
+
 delete_files = [
     '**/transparrency_cache.json',
     '**/config.json'
