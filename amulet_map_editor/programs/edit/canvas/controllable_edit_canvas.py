@@ -8,7 +8,7 @@ from wx.adv import RichToolTip
 
 from .base_edit_canvas import BaseEditCanvas
 from amulet_map_editor import log
-from amulet_map_editor.api.opengl.mesh.world_renderer.world import sin, cos
+from amulet_map_editor.api.opengl.mesh.level.level import sin, cos
 from amulet_map_editor.api.wx.util.key_config import (
     serialise_key_event,
     KeybindGroup,

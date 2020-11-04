@@ -39,8 +39,8 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.mesh.world_renderer.world import (
-    RenderWorld,
+from amulet_map_editor.api.opengl.mesh.level.level import (
+    RenderLevel,
     cos,
     tan,
     atan,
@@ -197,7 +197,7 @@ class BaseEditCanvas(BaseCanvas):
 
         yield 1.0, "Setting up renderer"
 
-        self._render_world = RenderWorld(
+        self._render_world = RenderLevel(
             self.context_identifier, self._opengl_resource_pack, self.world,
         )
 

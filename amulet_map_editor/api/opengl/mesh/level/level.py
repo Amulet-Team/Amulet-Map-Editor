@@ -49,7 +49,7 @@ def atan(x: Union[int, float]) -> float:
 
 
 class ChunkGenerator(ThreadPoolExecutor):
-    def __init__(self, render_world: "RenderWorld"):
+    def __init__(self, render_world: "RenderLevel"):
         super().__init__(max_workers=1)
         self._render_world = weakref.ref(render_world)
         self._region_size = render_world.chunk_manager.region_size
@@ -58,7 +58,7 @@ class ChunkGenerator(ThreadPoolExecutor):
         self._chunk_rebuilds: Set[Tuple[int, int]] = set()
 
     @property
-    def render_world(self) -> "RenderWorld":
+    def render_world(self) -> "RenderLevel":
         return self._render_world()
 
     def start(self):
@@ -137,7 +137,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                 time.sleep(1 / 60 - delta_time)
 
 
-class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
+class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
     def __init__(
         self,
         context_identifier: Any,
@@ -185,6 +185,7 @@ class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
 
     @property
     def camera_location(self) -> CameraLocationType:
+        """The x, y, z coordinates of the camera."""
         return self._camera_location
 
     @camera_location.setter
@@ -207,6 +208,7 @@ class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
 
     @property
     def dimension(self) -> Dimension:
+        """The dimension currently being displayed."""
         return self._dimension
 
     @dimension.setter
@@ -218,7 +220,7 @@ class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
 
     @property
     def render_distance(self) -> int:
-        """The distance to render chunks around the camera"""
+        """The radius around the camera within which to load chunks."""
         return self._render_distance
 
     @render_distance.setter
@@ -233,7 +235,7 @@ class RenderWorld(OpenGLResourcePackManager, Drawable, ContextManager):
 
         sign = 1
         length = 1
-        for _ in range(self._render_distance * 2 + 1):
+        for _ in range(self.render_distance * 2 + 1):
             for _ in range(length):
                 yield cx, cz
                 cx += sign
