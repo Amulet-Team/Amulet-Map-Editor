@@ -7,6 +7,7 @@ from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from amulet.api.chunk.blocks import Blocks
 from amulet.api.data_types import Dimension
 from amulet.api.level import BaseLevel
+from amulet.api.selection import SelectionBox
 
 from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
@@ -118,32 +119,42 @@ class RenderChunk(RenderChunkBuilder):
             larger_blocks = numpy.zeros(
                 sub_chunk.shape + numpy.array((2, 2, 2)), sub_chunk.dtype
             )
-            larger_blocks[1:-1, 1:-1, 1:-1] = sub_chunk
-            for chunk_offset, neighbour_blocks in neighbour_chunks.items():
-                if cy not in neighbour_blocks:
-                    continue
-                if chunk_offset == (-1, 0):
-                    larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[
-                        -1, :, :
+            sub_chunk_box = SelectionBox.create_sub_chunk_box(self.cx, cy, self.cz)
+            if self._level.selection_bounds.intersects(sub_chunk_box):
+                boxes = self._level.selection_bounds.intersection(sub_chunk_box)
+                for box in boxes.selection_boxes:
+                    larger_blocks[1:-1, 1:-1, 1:-1][
+                        box.sub_chunk_slice(self.cx, cy, self.cz)
+                    ] = sub_chunk[box.sub_chunk_slice(self.cx, cy, self.cz)]
+                for chunk_offset, neighbour_blocks in neighbour_chunks.items():
+                    if cy not in neighbour_blocks:
+                        continue
+                    if chunk_offset == (-1, 0):
+                        larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
+                            cy
+                        )[-1, :, :]
+                    elif chunk_offset == (1, 0):
+                        larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
+                            cy
+                        )[0, :, :]
+                    elif chunk_offset == (0, -1):
+                        larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(
+                            cy
+                        )[:, :, -1]
+                    elif chunk_offset == (0, 1):
+                        larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(
+                            cy
+                        )[:, :, 0]
+                if cy - 1 in blocks:
+                    larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy - 1)[
+                        :, -1, :
                     ]
-                elif chunk_offset == (1, 0):
-                    larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[
-                        0, :, :
+                if cy + 1 in blocks:
+                    larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy + 1)[
+                        :, 0, :
                     ]
-                elif chunk_offset == (0, -1):
-                    larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(cy)[
-                        :, :, -1
-                    ]
-                elif chunk_offset == (0, 1):
-                    larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(cy)[
-                        :, :, 0
-                    ]
-            if cy - 1 in blocks:
-                larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy - 1)[:, -1, :]
-            if cy + 1 in blocks:
-                larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy + 1)[:, 0, :]
-            unique_blocks = numpy.unique(larger_blocks)
-            sub_chunks.append((larger_blocks, unique_blocks, (0, cy * 16, 0)))
+                unique_blocks = numpy.unique(larger_blocks)
+                sub_chunks.append((larger_blocks, unique_blocks, (0, cy * 16, 0)))
         return sub_chunks
 
     def create_geometry(self):

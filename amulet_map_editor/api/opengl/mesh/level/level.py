@@ -139,26 +139,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         self._selection = GreenRenderSelectionGroup(
             context_identifier, self.resource_pack, self.level.selection_bounds
         )
-        # self._selection_displacement = numpy.matmul(
-        #     displacement_matrix(*(
-        #         (
-        #             self.level.selection_bounds.min
-        #             + self.level.selection_bounds.max
-        #         )
-        #         / 2
-        #     ).astype(int)),
-        #     displacement_matrix(
-        #         *(
-        #                 (
-        #                         self.level.selection_bounds.min
-        #                         - self.level.selection_bounds.max
-        #                 )
-        #                 / 2
-        #         ).astype(int)
-        #     )
-        # )
         self._selection_displacement = displacement_matrix(
-            *(self.level.selection_bounds.min).astype(int)
+            *self.level.selection_bounds.min.astype(int)
         )
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
         self._chunk_generator = ChunkGenerator(self)
