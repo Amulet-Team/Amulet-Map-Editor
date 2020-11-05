@@ -12,6 +12,7 @@ from .region import ChunkManager
 from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
+    TransformationMatrix,
 )
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManager,
@@ -222,7 +223,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
             sign *= -1
             length += 1
 
-    def draw(self, camera_matrix: numpy.ndarray):
+    def draw(self, camera_matrix: TransformationMatrix):
         self._chunk_manager.draw(camera_matrix, self.camera_location)
 
     def run_garbage_collector(self, remove_all=False):
@@ -232,10 +233,10 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         else:
             safe_area = (
                 self._dimension,
-                self.camera_location[0] // 16 - self._garbage_distance,
-                self.camera_location[2] // 16 - self._garbage_distance,
-                self.camera_location[0] // 16 + self._garbage_distance,
-                self.camera_location[2] // 16 + self._garbage_distance,
+                int(self.camera_location[0] // 16 - self._garbage_distance),
+                int(self.camera_location[2] // 16 - self._garbage_distance),
+                int(self.camera_location[0] // 16 + self._garbage_distance),
+                int(self.camera_location[2] // 16 + self._garbage_distance),
             )
             self._chunk_manager.unload(safe_area[1:])
             self._level.unload(safe_area)
