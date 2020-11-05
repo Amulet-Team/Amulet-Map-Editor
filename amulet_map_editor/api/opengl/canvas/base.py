@@ -1,6 +1,18 @@
 import wx
 from wx import glcanvas
-from OpenGL.GL import *
+from OpenGL.GL import (
+    GL_DEPTH_TEST,
+    glEnable,
+    glGenTextures,
+    GL_CULL_FACE,
+    glDepthFunc,
+    GL_LEQUAL,
+    GL_BLEND,
+    glBlendFunc,
+    GL_SRC_ALPHA,
+    GL_ONE_MINUS_SRC_ALPHA,
+    glDeleteTextures,
+)
 import uuid
 import numpy
 import math

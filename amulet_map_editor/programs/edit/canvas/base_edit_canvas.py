@@ -1,5 +1,16 @@
 import wx
-from OpenGL.GL import *
+from OpenGL.GL import (
+    glClearColor,
+    glBindTexture,
+    GL_TEXTURE_2D,
+    glTexImage2D,
+    GL_RGBA,
+    GL_UNSIGNED_BYTE,
+    glViewport,
+    glClear,
+    GL_COLOR_BUFFER_BIT,
+    GL_DEPTH_BUFFER_BIT,
+)
 import os
 from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
@@ -44,7 +55,7 @@ from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
 from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
-from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy, rotation_matrix_yx
+from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 from amulet_map_editor.api.logging import log
 from .render_selection import (
     EditProgramRenderSelectionGroup,
@@ -131,7 +142,7 @@ class BaseEditCanvas(BaseCanvas):
             if os.path.isdir(os.path.join("resource_packs", rp))
         ]
         if (
-            self.world.world_wrapper.platform == "bedrock"
+            self.world.level_wrapper.platform == "bedrock"
             and experimental_bedrock_resources
         ):
             yield 0.1, "Downloading Bedrock vanilla resource pack"

@@ -1,5 +1,14 @@
 import numpy
-from OpenGL.GL import *
+from OpenGL.GL import (
+    GL_TRIANGLES,
+    glCullFace,
+    GL_FRONT,
+    GL_BACK,
+    glDisable,
+    GL_DEPTH_TEST,
+    GL_LINE_STRIP,
+    glEnable,
+)
 from typing import Tuple
 
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny

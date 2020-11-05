@@ -1,4 +1,10 @@
-from OpenGL.GL import *
+from OpenGL.GL import (
+    GL_DYNAMIC_DRAW,
+    glBindVertexArray,
+    glBindBuffer,
+    GL_ARRAY_BUFFER,
+    glBufferSubData,
+)
 from typing import Dict, Tuple
 import numpy
 import queue

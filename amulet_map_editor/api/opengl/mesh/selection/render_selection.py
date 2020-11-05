@@ -1,5 +1,15 @@
 import numpy
-from OpenGL.GL import *
+from OpenGL.GL import (
+    GL_TRIANGLES,
+    GL_DYNAMIC_DRAW,
+    glCullFace,
+    GL_FRONT,
+    GL_BACK,
+    glDisable,
+    GL_DEPTH_TEST,
+    GL_LINE_STRIP,
+    glEnable,
+)
 import itertools
 from typing import Tuple, Optional, Union
 
