@@ -24,6 +24,7 @@ class RenderChunk(RenderChunkBuilder):
         region_size: int,
         chunk_coords: Tuple[int, int],
         dimension: Dimension,
+        draw_floor: bool = True
     ):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
@@ -32,6 +33,7 @@ class RenderChunk(RenderChunkBuilder):
         self._region_size = region_size
         self._coords = chunk_coords
         self._dimension = dimension
+        self._draw_floor = draw_floor
         self._chunk_state = 0  # 0 = chunk does not exist, 1 = chunk exists but failed to load, 2 = chunk exists
         self._changed_time = 0
         self._rebuild = True
@@ -158,37 +160,42 @@ class RenderChunk(RenderChunkBuilder):
             self._changed_time = chunk.changed_time
             self._chunk_state = 2
             self._create_lod0_multi(self._sub_chunks(chunk.blocks))
-            plane: numpy.ndarray = numpy.ones(
-                (self._vert_len * 12), dtype=numpy.float32
-            ).reshape((-1, self._vert_len))
-            plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(-0.01)
-            plane[:, 5:9] = self.resource_pack.texture_bounds(
-                self.resource_pack.get_texture_path(
-                    "amulet", "amulet_ui/translucent_white"
+            if self._draw_floor:
+                plane: numpy.ndarray = numpy.ones(
+                    (self._vert_len * 12), dtype=numpy.float32
+                ).reshape((-1, self._vert_len))
+                plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(-0.01)
+                plane[:, 5:9] = self.resource_pack.texture_bounds(
+                    self.resource_pack.get_texture_path(
+                        "amulet", "amulet_ui/translucent_white"
+                    )
                 )
-            )
-            if (self.cx + self.cz) % 2:
-                plane[:, 9:12] = [0.55, 0.5, 0.9]
-            else:
-                plane[:, 9:12] = [0.4, 0.4, 0.85]
-            self.verts = numpy.concatenate([self.verts, plane.ravel()], 0)
-            self.draw_count += 12
+                if (self.cx + self.cz) % 2:
+                    plane[:, 9:12] = [0.55, 0.5, 0.9]
+                else:
+                    plane[:, 9:12] = [0.4, 0.4, 0.85]
+                self.verts = numpy.concatenate([self.verts, plane.ravel()], 0)
+                self.draw_count += 12
         self._rebuild = True
 
     def _create_empty_geometry(self):
-        plane: numpy.ndarray = numpy.ones(
-            (self._vert_len * 12), dtype=numpy.float32
-        ).reshape((-1, self._vert_len))
-        plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
-        plane[:, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
-        )
-        if (self.cx + self.cz) % 2:
-            plane[:, 9:12] = [0.3, 0.3, 0.3]
+        if self._draw_floor:
+            plane: numpy.ndarray = numpy.ones(
+                (self._vert_len * 12), dtype=numpy.float32
+            ).reshape((-1, self._vert_len))
+            plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
+            plane[:, 5:9] = self.resource_pack.texture_bounds(
+                self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
+            )
+            if (self.cx + self.cz) % 2:
+                plane[:, 9:12] = [0.3, 0.3, 0.3]
+            else:
+                plane[:, 9:12] = [0.2, 0.2, 0.2]
+            self.verts = plane.ravel()
+            self.draw_count = 12
         else:
-            plane[:, 9:12] = [0.2, 0.2, 0.2]
-        self.verts = plane.ravel()
-        self.draw_count = 12
+            self.verts = numpy.ones(0, numpy.float32)
+            self.draw_count = 0
 
     def _create_chunk_plane(
         self, height: Union[int, float]
@@ -224,19 +231,23 @@ class RenderChunk(RenderChunkBuilder):
         )
 
     def _create_error_geometry(self):
-        plane: numpy.ndarray = numpy.ones(
-            (self._vert_len * 12), dtype=numpy.float32
-        ).reshape((-1, self._vert_len))
-        plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
-        plane[:, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
-        )
-        if (self.cx + self.cz) % 2:
-            plane[:, 9:12] = [1, 0.2, 0.2]
+        if self._draw_floor:
+            plane: numpy.ndarray = numpy.ones(
+                (self._vert_len * 12), dtype=numpy.float32
+            ).reshape((-1, self._vert_len))
+            plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
+            plane[:, 5:9] = self.resource_pack.texture_bounds(
+                self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
+            )
+            if (self.cx + self.cz) % 2:
+                plane[:, 9:12] = [1, 0.2, 0.2]
+            else:
+                plane[:, 9:12] = [0.75, 0.2, 0.2]
+            self.verts = plane.ravel()
+            self.draw_count = 12
         else:
-            plane[:, 9:12] = [0.75, 0.2, 0.2]
-        self.verts = plane.ravel()
-        self.draw_count = 12
+            self.verts = numpy.ones(0, numpy.float32)
+            self.draw_count = 0
 
     def _create_lod1(
         self,

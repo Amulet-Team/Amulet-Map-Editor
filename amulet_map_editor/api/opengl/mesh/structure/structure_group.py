@@ -6,6 +6,7 @@ from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
 
 from .structure import RenderStructure
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
+from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.matrix import transform_matrix
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManager,
@@ -26,7 +27,7 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
     ):
         OpenGLResourcePackManager.__init__(self, resource_pack)
         ContextManager.__init__(self, context_identifier)
-        self._structures: List[RenderStructure] = []
+        self._structures: List[RenderLevel] = []
         self._transforms: List[TransformType] = []
         self._transformation_matrices: List[numpy.ndarray] = []
         self._active_structure: Optional[int] = None
@@ -44,7 +45,7 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def append(
         self,
-        structure: BaseLevel,
+        level: BaseLevel,
         dimension: Dimension,
         location: LocationType,
         scale: ScaleType,
@@ -53,10 +54,12 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         """Append a structure to the list and activate it."""
         # TODO: update this to support multiple structures
         self.clear()
+        render_level = RenderLevel(
+            self.context_identifier, self._resource_pack, level, draw_floor=False, draw_box=True
+        )
+        render_level.dimension = dimension
         self._structures.append(
-            RenderStructure(
-                self.context_identifier, self._resource_pack, structure, dimension
-            )
+            render_level
         )
         self._transforms.append((location, scale, rotation))
         self._transformation_matrices.append(
@@ -67,7 +70,12 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         else:
             self._active_structure += 1
 
+    def disable(self):
+        for s in self._structures:
+            s.disable()
+
     def clear(self):
+        self.disable()
         self._structures.clear()
         self._transforms.clear()
         self._transformation_matrices.clear()
@@ -86,4 +94,4 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         for structure, transform in zip(
             self._structures, self._transformation_matrices
         ):
-            structure.draw(numpy.matmul(camera_matrix, transform), 0, 0)
+            structure.draw(numpy.matmul(camera_matrix, transform))

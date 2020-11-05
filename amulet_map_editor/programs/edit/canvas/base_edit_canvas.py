@@ -306,6 +306,7 @@ class BaseEditCanvas(BaseCanvas):
         self._gc_timer.Stop()
         self._rebuild_timer.Stop()
         self._render_world.disable()
+        self._structure.disable()
 
     def _disable_threads(self):
         """Stop the generation of new chunk geometry.

@@ -1,4 +1,3 @@
-import numpy
 from typing import TYPE_CHECKING, Tuple, Generator, Optional, Any, Set
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
@@ -96,6 +95,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                     self._region_size,
                     chunk_coords,
                     self._render_level.dimension,
+                    self._render_level.draw_floor
                 )
 
                 try:
@@ -119,18 +119,23 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         context_identifier: Any,
         opengl_resource_pack: OpenGLResourcePack,
         level: "BaseLevel",
+        draw_floor=True,
+        draw_box=False
     ):
         OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
         ContextManager.__init__(self, context_identifier)
         self._level = level
         self._camera_location: CameraLocationType = (0, 150, 0)
+        # yaw (-180 to 180), pitch (-90 to 90)
         self._camera_rotation: CameraRotationType = (
             0,
             90,
-        )  # yaw (-180 to 180), pitch (-90 to 90)
+        )
         self._dimension: Dimension = "overworld"
         self._render_distance = 5
         self._garbage_distance = 10
+        self._draw_box = draw_box
+        self._draw_floor = draw_floor
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
         self._chunk_generator = ChunkGenerator(self)
 
@@ -204,6 +209,16 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         assert isinstance(val, int), "Render distance must be an int"
         self._render_distance = val
         self._garbage_distance = val + 5
+
+    @property
+    def draw_box(self):
+        """Should the selection box around the level be drawn."""
+        return self._draw_box
+
+    @property
+    def draw_floor(self):
+        """Should the floor under the level be drawn."""
+        return self._draw_floor
 
     def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
         """Get all of the chunks to draw/load"""
