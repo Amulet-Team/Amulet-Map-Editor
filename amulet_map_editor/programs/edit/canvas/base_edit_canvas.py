@@ -285,7 +285,7 @@ class BaseEditCanvas(BaseCanvas):
         """Enable the canvas and start it working."""
         self.SetCurrent(self._context)
         self._render_world.enable()
-        self._draw_timer.Start(33)
+        self._draw_timer.Start(15)
         self._gc_timer.Start(10000)
         self._rebuild_timer.Start(1000)
 
