@@ -50,8 +50,8 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.mesh.level.level import RenderLevel
-from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
+from amulet_map_editor.api.opengl.mesh.level import RenderLevel
+from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
 from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
@@ -124,7 +124,7 @@ class BaseEditCanvas(BaseCanvas):
         self._selection_group: Optional[RenderSelectionHistoryManager] = None
 
         self._draw_structure = False
-        self._structure: Optional[StructureGroup] = None
+        self._structure: Optional[LevelGroup] = None
 
         self._draw_timer = wx.Timer(self)
         self._gc_timer = wx.Timer(self)
@@ -214,7 +214,7 @@ class BaseEditCanvas(BaseCanvas):
         )
         self.world.history_manager.register(self._selection_group, False)
 
-        self._structure: StructureGroup = StructureGroup(
+        self._structure: LevelGroup = LevelGroup(
             self.context_identifier, self._opengl_resource_pack,
         )
 
@@ -355,7 +355,7 @@ class BaseEditCanvas(BaseCanvas):
         log.info("Finished setting up texture atlas in OpenGL")
 
     @property
-    def structure(self) -> StructureGroup:
+    def structure(self) -> LevelGroup:
         return self._structure
 
     @property
@@ -423,7 +423,9 @@ class BaseEditCanvas(BaseCanvas):
         assert len(location) == 3 and all(
             isinstance(v, (int, float)) for v in location
         ), "format for camera_location is invalid"
-        self._camera_location = self._render_world.camera_location = location
+        self._camera_location = (
+            self._render_world.camera_location
+        ) = self._structure.camera_location = location
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraMoveEvent(location=self.camera_location))

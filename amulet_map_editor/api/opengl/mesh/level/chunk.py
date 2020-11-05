@@ -24,7 +24,7 @@ class RenderChunk(RenderChunkBuilder):
         region_size: int,
         chunk_coords: Tuple[int, int],
         dimension: Dimension,
-        draw_floor: bool = True
+        draw_floor: bool = True,
     ):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
@@ -185,7 +185,9 @@ class RenderChunk(RenderChunkBuilder):
             ).reshape((-1, self._vert_len))
             plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
             plane[:, 5:9] = self.resource_pack.texture_bounds(
-                self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
+                self.resource_pack.get_texture_path(
+                    "amulet", "amulet_ui/translucent_white"
+                )
             )
             if (self.cx + self.cz) % 2:
                 plane[:, 9:12] = [0.3, 0.3, 0.3]
@@ -237,7 +239,9 @@ class RenderChunk(RenderChunkBuilder):
             ).reshape((-1, self._vert_len))
             plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
             plane[:, 5:9] = self.resource_pack.texture_bounds(
-                self.resource_pack.get_texture_path("amulet", "amulet_ui/translucent_white")
+                self.resource_pack.get_texture_path(
+                    "amulet", "amulet_ui/translucent_white"
+                )
             )
             if (self.cx + self.cz) % 2:
                 plane[:, 9:12] = [1, 0.2, 0.2]

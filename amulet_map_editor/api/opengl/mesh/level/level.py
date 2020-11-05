@@ -2,17 +2,20 @@ from typing import TYPE_CHECKING, Tuple, Generator, Optional, Any, Set
 from concurrent.futures import ThreadPoolExecutor, Future
 import time
 import weakref
+import numpy
 
 from amulet.api.data_types import Dimension
 
 from amulet_map_editor.api.logging import log
 from .chunk import RenderChunk
 from .region import ChunkManager
+from .selection import GreenRenderSelectionGroup
 from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
     TransformationMatrix,
 )
+from amulet_map_editor.api.opengl.matrix import displacement_matrix
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManager,
     OpenGLResourcePack,
@@ -95,7 +98,7 @@ class ChunkGenerator(ThreadPoolExecutor):
                     self._region_size,
                     chunk_coords,
                     self._render_level.dimension,
-                    self._render_level.draw_floor
+                    self._render_level.draw_floor,
                 )
 
                 try:
@@ -120,22 +123,43 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         opengl_resource_pack: OpenGLResourcePack,
         level: "BaseLevel",
         draw_floor=True,
-        draw_box=False
+        draw_box=False,
     ):
         OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
         ContextManager.__init__(self, context_identifier)
         self._level = level
         self._camera_location: CameraLocationType = (0, 150, 0)
         # yaw (-180 to 180), pitch (-90 to 90)
-        self._camera_rotation: CameraRotationType = (
-            0,
-            90,
-        )
+        self._camera_rotation: CameraRotationType = (0, 90)
         self._dimension: Dimension = "overworld"
         self._render_distance = 5
         self._garbage_distance = 10
         self._draw_box = draw_box
         self._draw_floor = draw_floor
+        self._selection = GreenRenderSelectionGroup(
+            context_identifier, self.resource_pack, self.level.selection_bounds
+        )
+        # self._selection_displacement = numpy.matmul(
+        #     displacement_matrix(*(
+        #         (
+        #             self.level.selection_bounds.min
+        #             + self.level.selection_bounds.max
+        #         )
+        #         / 2
+        #     ).astype(int)),
+        #     displacement_matrix(
+        #         *(
+        #                 (
+        #                         self.level.selection_bounds.min
+        #                         - self.level.selection_bounds.max
+        #                 )
+        #                 / 2
+        #         ).astype(int)
+        #     )
+        # )
+        self._selection_displacement = displacement_matrix(
+            *(self.level.selection_bounds.min).astype(int)
+        )
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
         self._chunk_generator = ChunkGenerator(self)
 
@@ -240,6 +264,11 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def draw(self, camera_matrix: TransformationMatrix):
         self._chunk_manager.draw(camera_matrix, self.camera_location)
+        if self._draw_box:
+            self._selection.draw(
+                numpy.matmul(camera_matrix, self._selection_displacement),
+                self.camera_location,
+            )
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
