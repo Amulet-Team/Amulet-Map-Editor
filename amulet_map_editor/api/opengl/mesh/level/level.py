@@ -153,19 +153,22 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
     def chunk_manager(self) -> ChunkManager:
         return self._chunk_manager
 
-    @property
-    def chunk_generator(self) -> ChunkGenerator:
-        return self._chunk_generator
-
     def is_closeable(self):
         return True
 
     def enable(self):
+        """Enable chunk generation in a new thread."""
         self._chunk_generator.start()
 
-    def disable(self):
+    def disable(self, unload_data: bool = False):
+        """Disable the chunk generation thread.
+        This makes it safe to access and modify world data.
+        :param unload_data: Unload the data stored in the world
+        :return:
+        """
         self._chunk_generator.stop()
-        self.run_garbage_collector(True)
+        if unload_data:
+            self.run_garbage_collector(True)
 
     def close(self):
         self.disable()

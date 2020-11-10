@@ -127,7 +127,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
 
     def _on_transform_change(self, evt):
         location, scale, rotation = self.canvas.structure.active_transform
-        self.canvas.structure.set_active_transform(self.location, scale, rotation)
+        self.canvas.structure.active_transform = self.location, scale, rotation
 
     def _cursor_move(self, evt):
         if not self._clicked:
@@ -198,6 +198,8 @@ class SelectTransformUI(SelectLocationUI):
             ctrl.SetValue(
                 round((ctrl.GetValue() % 360) / 90) * 90
             )  # TODO: change this if smaller increments are allowed
-        self.canvas.structure.set_active_transform(
-            self.location, self.scale, tuple(math.radians(r) for r in self.rotation)
+        self.canvas.structure.active_transform = (
+            self.location,
+            self.scale,
+            tuple(math.radians(r) for r in self.rotation),
         )

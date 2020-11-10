@@ -7,6 +7,7 @@ from amulet.utils.matrix import (
     rotation_matrix_xyz,
     transform_matrix,
     displacement_matrix,
+    inverse_transform_matrix,
 )
 
 

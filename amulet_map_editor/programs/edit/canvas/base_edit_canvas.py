@@ -104,7 +104,7 @@ class BaseEditCanvas(BaseCanvas):
         ] = None
         self._opengl_resource_pack: Optional[OpenGLResourcePack] = None
 
-        self._render_world = None
+        self._render_world: Optional[RenderLevel] = None
 
         self._camera_location: CameraLocationType = (0.0, 100.0, 0.0)
         self._camera_rotation: CameraRotationType = (
@@ -296,6 +296,7 @@ class BaseEditCanvas(BaseCanvas):
         """Enable the canvas and start it working."""
         self.SetCurrent(self._context)
         self._render_world.enable()
+        self._structure.enable()
         self._draw_timer.Start(15)
         self._gc_timer.Start(10000)
         self._rebuild_timer.Start(1000)
@@ -305,21 +306,24 @@ class BaseEditCanvas(BaseCanvas):
         self._draw_timer.Stop()
         self._gc_timer.Stop()
         self._rebuild_timer.Stop()
-        self._render_world.disable()
-        self._structure.disable()
+        self._render_world.disable(True)
+        self._structure.disable(True)
 
     def _disable_threads(self):
         """Stop the generation of new chunk geometry.
         Makes it safe to modify the world data."""
-        self._render_world.chunk_generator.stop()
+        self._render_world.disable()
+        self._structure.disable()
 
     def _enable_threads(self):
         """Start the generation of new chunk geometry."""
-        self._render_world.chunk_generator.start()
+        self._render_world.enable()
+        self._structure.enable()
 
     def close(self):
         """Close and destroy the canvas and all contained data."""
         self._render_world.close()
+        self._structure.clear()
         super()._close()
 
     def is_closeable(self):
@@ -423,9 +427,8 @@ class BaseEditCanvas(BaseCanvas):
         assert len(location) == 3 and all(
             isinstance(v, (int, float)) for v in location
         ), "format for camera_location is invalid"
-        self._camera_location = (
-            self._render_world.camera_location
-        ) = self._structure.camera_location = location
+        self._camera_location = self._render_world.camera_location = location
+        self._structure.set_camera_location(*location)
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraMoveEvent(location=self.camera_location))
@@ -446,6 +449,7 @@ class BaseEditCanvas(BaseCanvas):
             isinstance(v, (int, float)) for v in rotation
         ), "format for camera_rotation is invalid"
         self._camera_rotation = self._render_world.camera_rotation = rotation
+        self._structure.set_camera_rotation(*rotation)
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraRotateEvent(rotation=self.camera_rotation))
@@ -668,8 +672,10 @@ class BaseEditCanvas(BaseCanvas):
 
     def _gc(self, event):
         self._render_world.run_garbage_collector()
+        self._structure.run_garbage_collector()
         event.Skip()
 
     def _rebuild(self, evt):
         self._render_world.chunk_manager.rebuild()
+        self._structure.rebuild()
         evt.Skip()
