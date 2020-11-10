@@ -196,12 +196,20 @@ def _load_operations(operations_: OperationStorageType, path: str):
             if fpath.endswith("__init__.py"):
                 continue
 
-            mod = _load_module_file(fpath)
-            get_export_dict(mod, operations_, fpath)
+            try:
+                mod = _load_module_file(fpath)
+            except ImportError as e:
+                log.warn(f"Failed to import {fpath}.\n{e}")
+            else:
+                get_export_dict(mod, operations_, fpath)
 
         for dpath in glob.iglob(os.path.join(glob.escape(path), "**", "__init__.py")):
-            mod = _load_module_directory(dpath)
-            get_export_dict(mod, operations_, os.path.basename(os.path.dirname(dpath)))
+            try:
+                mod = _load_module_directory(dpath)
+            except ImportError as e:
+                log.warn(f"Failed to import {dpath}.\n{e}")
+            else:
+                get_export_dict(mod, operations_, os.path.basename(os.path.dirname(dpath)))
 
 
 def _load_operations_group(dir_paths: List[str]):
