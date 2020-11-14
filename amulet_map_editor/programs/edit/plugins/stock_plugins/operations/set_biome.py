@@ -54,9 +54,7 @@ class SetBiome(SimpleOperationPanel):
         )
         self._sizer.Add(self._mode_description, 0, Border, 5)
 
-        self._mode_description.SetLabel(
-            MODES[self._mode.GetCurrentObject()]
-        )
+        self._mode_description.SetLabel(MODES[self._mode.GetCurrentObject()])
         self._mode_description.Fit()
 
         self._biome_choice = BiomeDefine(
@@ -78,9 +76,7 @@ class SetBiome(SimpleOperationPanel):
         self.Thaw()
 
     def _on_mode_change(self, evt):
-        self._mode_description.SetLabel(
-            MODES[self._mode.GetCurrentObject()]
-        )
+        self._mode_description.SetLabel(MODES[self._mode.GetCurrentObject()])
         self._mode_description.Fit()
         self.Layout()
         evt.Skip()
@@ -120,7 +116,9 @@ class SetBiome(SimpleOperationPanel):
         mode = self._mode.GetCurrentObject()
 
         iter_count = len(list(world.get_chunk_slices(selection, dimension, False)))
-        for count, (chunk, slices, _) in enumerate(world.get_chunk_slices(selection, dimension, False)):
+        for count, (chunk, slices, _) in enumerate(
+            world.get_chunk_slices(selection, dimension, False)
+        ):
             new_biome = chunk.biome_palette.get_add_biome(
                 self._biome_choice.universal_biome
             )

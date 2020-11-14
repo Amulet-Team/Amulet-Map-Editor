@@ -209,7 +209,9 @@ def _load_operations(operations_: OperationStorageType, path: str):
             except ImportError as e:
                 log.warn(f"Failed to import {dpath}.\n{e}")
             else:
-                get_export_dict(mod, operations_, os.path.basename(os.path.dirname(dpath)))
+                get_export_dict(
+                    mod, operations_, os.path.basename(os.path.dirname(dpath))
+                )
 
 
 def _load_operations_group(dir_paths: List[str]):

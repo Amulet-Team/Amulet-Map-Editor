@@ -19,7 +19,9 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     """A group of selection boxes to be drawn with an added editable box."""
 
     def __init__(
-        self, context_identifier: str, resource_pack: OpenGLResourcePack,
+        self,
+        context_identifier: str,
+        resource_pack: OpenGLResourcePack,
     ):
         super().__init__(context_identifier, resource_pack)
         # the block coordinate of the mouse pointer. This needs updating via `update_cursor_position` when the mouse moves

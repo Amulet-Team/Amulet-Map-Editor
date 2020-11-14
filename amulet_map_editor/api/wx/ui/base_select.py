@@ -20,7 +20,10 @@ from amulet_map_editor.api.image import COLOUR_PICKER
 ) = (
     newevent.NewCommandEvent()
 )  # the name or namespace changed. Generated after EVT_ITEM_NAME_CHANGE
-(PickEvent, EVT_PICK,) = newevent.NewCommandEvent()  # The pick button was pressed
+(
+    PickEvent,
+    EVT_PICK,
+) = newevent.NewCommandEvent()  # The pick button was pressed
 
 
 class BaseSelect(wx.Panel):

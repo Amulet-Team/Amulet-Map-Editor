@@ -22,7 +22,9 @@ class StructureGroup(OpenGLResourcePackManager, Drawable, ContextManager):
     """A group of RenderStructure classes with transforms"""
 
     def __init__(
-        self, context_identifier: Any, resource_pack: OpenGLResourcePack,
+        self,
+        context_identifier: Any,
+        resource_pack: OpenGLResourcePack,
     ):
         OpenGLResourcePackManager.__init__(self, resource_pack)
         ContextManager.__init__(self, context_identifier)

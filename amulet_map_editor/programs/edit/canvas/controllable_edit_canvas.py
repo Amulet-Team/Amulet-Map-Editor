@@ -38,8 +38,12 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._mouse_moved = False  # has the mouse position changed since the last frame
         self._persistent_actions: Set[
             str
-        ] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
-        self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
+        ] = (
+            set()
+        )  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
+        self._key_binds: ActionLookupType = (
+            {}
+        )  # a store for which keys run which actions
         self._box_select_time = 0
         self._toggle_mouse_time = 0
         self._selection_undo_timeout = 0
@@ -185,13 +189,10 @@ class ControllableEditCanvas(BaseEditCanvas):
             platform = self.world.world_wrapper.platform
             version = self.world.world_wrapper.version
             translator = self.world.translation_manager.get_version(
-                platform, version,
+                platform,
+                version,
             )
-            (
-                version_block,
-                version_block_entity,
-                _,
-            ) = translator.block.from_universal(
+            (version_block, version_block_entity, _,) = translator.block.from_universal(
                 block, block_entity, block_location=(x, y, z)
             )
             if isinstance(version, tuple):
@@ -201,9 +202,7 @@ class ControllableEditCanvas(BaseEditCanvas):
             block_data_text = f"x: {x}, y: {y}, z: {z}\n\n{platform.capitalize()} {version_str}\n{version_block}"
             if version_block_entity:
                 version_block_entity_str = str(version_block_entity)
-                block_data_text = (
-                    f"{block_data_text}\n{version_block_entity_str}"
-                )
+                block_data_text = f"{block_data_text}\n{version_block_entity_str}"
 
             block_data_text = f"{block_data_text}\n\nUniversal\n{block}"
             if block_entity:
@@ -213,13 +212,17 @@ class ControllableEditCanvas(BaseEditCanvas):
             if chunk.biomes.dimension == 2:
                 biome = chunk.biomes[x % 16, z % 16]
                 try:
-                    block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                    block_data_text = (
+                        f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                    )
                 except Exception as e:
                     log.error(e)
             elif chunk.biomes.dimension == 3:
                 biome = chunk.biomes[(x % 16) // 4, y // 4, (z % 16) // 4]
                 try:
-                    block_data_text = f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                    block_data_text = (
+                        f"{block_data_text}\n\nBiome: {self.world.biome_palette[biome]}"
+                    )
                 except Exception as e:
                     log.error(e)
 
@@ -247,9 +250,7 @@ class ControllableEditCanvas(BaseEditCanvas):
             full_msg = self._get_block_info_message()
             msg = truncate(full_msg, 150)
             tooltip = RichToolTip("Inspect Block", msg)
-            tooltip.ShowFor(
-                self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1)
-            )
+            tooltip.ShowFor(self, wx.Rect(self._mouse_x, self._mouse_y, 1, 1))
 
     def _deselect(self) -> bool:
         """
