@@ -92,10 +92,18 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         if len(options) in {0, 1, 3} and all(isinstance(o, int) for o in options):
             sizer = self._create_horizontal_options_sizer(option_name)
             if len(options) == 0:
-                option = wx.SpinCtrl(self, min=-30_000_000, max=30_000_000, initial=0,)
+                option = wx.SpinCtrl(
+                    self,
+                    min=-30_000_000,
+                    max=30_000_000,
+                    initial=0,
+                )
             elif len(options) == 1:
                 option = wx.SpinCtrl(
-                    self, min=-30_000_000, max=30_000_000, initial=options[0],
+                    self,
+                    min=-30_000_000,
+                    max=30_000_000,
+                    initial=options[0],
                 )
             elif len(options) == 3:
                 option = wx.SpinCtrl(
@@ -117,11 +125,17 @@ class FixedFunctionUI(wx.Panel, OperationUI):
             sizer = self._create_horizontal_options_sizer(option_name)
             if len(options) == 0:
                 option = wx.SpinCtrlDouble(
-                    self, min=-30_000_000, max=30_000_000, initial=0,
+                    self,
+                    min=-30_000_000,
+                    max=30_000_000,
+                    initial=0,
                 )
             elif len(options) == 1:
                 option = wx.SpinCtrlDouble(
-                    self, min=-30_000_000, max=30_000_000, initial=options[0],
+                    self,
+                    min=-30_000_000,
+                    max=30_000_000,
+                    initial=options[0],
                 )
             elif len(options) == 3:
                 option = wx.SpinCtrlDouble(
@@ -176,7 +190,13 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         options = {}
         for key, window in self._options.items():
             if isinstance(
-                window, (wx.CheckBox, wx.SpinCtrl, wx.SpinCtrlDouble, wx.TextCtrl,)
+                window,
+                (
+                    wx.CheckBox,
+                    wx.SpinCtrl,
+                    wx.SpinCtrlDouble,
+                    wx.TextCtrl,
+                ),
             ):
                 options[key] = window.GetValue()
             elif isinstance(window, wx.Choice):

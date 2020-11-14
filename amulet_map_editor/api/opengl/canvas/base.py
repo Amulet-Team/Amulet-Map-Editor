@@ -5,6 +5,7 @@ import uuid
 import numpy
 import math
 from typing import Optional
+import sys
 from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
@@ -20,13 +21,17 @@ class BaseCanvas(glcanvas.GLCanvas):
         ).EndList()
         super().__init__(parent, display_attributes, size=parent.GetClientSize())
         self._projection = [70.0, 4 / 3, 0.1, 10000.0]
-        context_attributes = wx.glcanvas.GLContextAttrs()
-        context_attributes.CoreProfile().OGLVersion(
-            3, 3
-        ).Robust().ResetIsolation().EndList()
-        self._context = glcanvas.GLContext(
-            self, ctxAttrs=context_attributes
-        )  # setup the OpenGL context
+        if sys.platform == "linux":
+            # setup the OpenGL context. This apparently fixes #84
+            self._context = glcanvas.GLContext(self)
+        else:
+            context_attributes = wx.glcanvas.GLContextAttrs()
+            context_attributes.CoreProfile().OGLVersion(
+                3, 3
+            ).Robust().ResetIsolation().EndList()
+            self._context = glcanvas.GLContext(
+                self, ctxAttrs=context_attributes
+            )  # setup the OpenGL context
         self.SetCurrent(self._context)
         self._context_identifier = str(
             uuid.uuid4()

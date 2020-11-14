@@ -1,0 +1,85 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Build
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine pyinstaller
+        pip install -r requirements.txt
+    - name: setup.py sdist bdist_wheel
+      run: |
+        python setup.py sdist bdist_wheel
+    - name: PyInstaller build
+      run: |
+        PyInstaller -y Amulet.spec
+        7z a Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip dist/Amulet
+    - name: Publish to PyPi
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.AMULET_MAP_EDITOR_PYPI_PASSWORD }}
+      run: |
+        twine upload dist/*
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
+        asset_name: Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
+        asset_content_type: application/zip
+
+  deploy-mac:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine pyinstaller
+        pip install -r requirements.txt
+    - name: setup.py build
+      run: |
+        python setup.py build
+    - name: PyInstaller build
+      run: |
+        PyInstaller -y Amulet.spec
+        zip -r Amulet-v${{ github.event.release.tag_name }}-osx.zip dist/Amulet
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./Amulet-v${{ github.event.release.tag_name }}-osx.zip
+        asset_name: Amulet-v${{ github.event.release.tag_name }}-osx.zip
+        asset_content_type: application/zip
