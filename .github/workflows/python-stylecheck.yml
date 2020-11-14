@@ -29,4 +29,4 @@ jobs:
     - name: run stylecheck
       run: |
         python -m black --check --diff amulet_map_editor
-        #python -m black --check --diff tests
+        python -m black --check --diff tests
