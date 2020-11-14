@@ -1,3 +1,4 @@
+from typing import List
 from setuptools import setup, find_packages
 import os
 import glob
@@ -9,17 +10,21 @@ for d in glob.glob("*.egg-info"):
     shutil.rmtree(d)
 
 
-def remove_git_and_http_package_links(uris):
-    for uri in uris:
-        if uri.startswith("git+") or uri.startswith("https:"):
-            continue
-        yield uri
+def load_requirements(path: str) -> List[str]:
+    requirements = []
+    with open(path) as f:
+        for line in f.readlines():
+            line = line.strip()
+            if line.startswith("git+") or line.startswith("https:"):
+                continue
+            elif line.startswith("-r "):
+                requirements += load_requirements(line[3:])
+            else:
+                requirements.append(line)
+    return requirements
 
 
-with open("./requirements.txt") as requirements_fp:
-    required_packages = [
-        line for line in remove_git_and_http_package_links(requirements_fp.readlines())
-    ]
+required_packages = load_requirements("./requirements.txt")
 
 package_data = [
     os.path.relpath(path, "amulet_map_editor") for path in
@@ -47,7 +52,7 @@ package_data = [
 setup(
     name="amulet-map-editor",
     version=versioneer.get_version(),
-    description="A Python library for reading/writing Minecraft's various save formats.",
+    description="A new Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.",
     author="James Clare, Ben Gothard et al.",
     author_email="amuleteditor@gmail.com",
     install_requires=required_packages,
