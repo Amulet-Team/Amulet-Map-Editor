@@ -204,7 +204,9 @@ class BaseEditCanvas(BaseCanvas):
         yield 1.0, "Setting up renderer"
 
         self._render_world = RenderLevel(
-            self.context_identifier, self._opengl_resource_pack, self.world,
+            self.context_identifier,
+            self._opengl_resource_pack,
+            self.world,
         )
 
         self._selection_group = RenderSelectionHistoryManager(
@@ -215,7 +217,8 @@ class BaseEditCanvas(BaseCanvas):
         self.world.history_manager.register(self._selection_group, False)
 
         self._structure: LevelGroup = LevelGroup(
-            self.context_identifier, self._opengl_resource_pack,
+            self.context_identifier,
+            self._opengl_resource_pack,
         )
 
         self._bind_base_events()

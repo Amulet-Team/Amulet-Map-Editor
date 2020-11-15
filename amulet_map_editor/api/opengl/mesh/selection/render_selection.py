@@ -235,7 +235,8 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     def _create_geometry_(self):
         self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(
-            self.min % 16 - 0.005, self.min % 16 + self.max - self.min + 0.005,
+            self.min % 16 - 0.005,
+            self.min % 16 + self.max - self.min + 0.005,
         )
         self.verts[:36, 3:5] /= 16
 

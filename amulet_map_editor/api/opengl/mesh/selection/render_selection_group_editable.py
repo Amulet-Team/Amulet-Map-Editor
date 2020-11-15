@@ -76,7 +76,9 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self._confirm_change_event()
 
     @property
-    def all_selection_corners(self,) -> List[Tuple[BlockCoordinates, BlockCoordinates]]:
+    def all_selection_corners(
+        self,
+    ) -> List[Tuple[BlockCoordinates, BlockCoordinates]]:
         """The corners of each selection box."""
         return [(tuple(box.point1), tuple(box.point2)) for box in self._boxes]
 

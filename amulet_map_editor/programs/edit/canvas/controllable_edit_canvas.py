@@ -38,8 +38,12 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._mouse_moved = False  # has the mouse position changed since the last frame
         self._persistent_actions: Set[
             str
-        ] = set()  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
-        self._key_binds: ActionLookupType = {}  # a store for which keys run which actions
+        ] = (
+            set()
+        )  # wx only fires events for when a key is initially pressed or released. This stores actions for keys that are held down.
+        self._key_binds: ActionLookupType = (
+            {}
+        )  # a store for which keys run which actions
         self._box_select_time = 0
         self._toggle_mouse_time = 0
         self._selection_undo_timeout = 0
@@ -184,7 +188,10 @@ class ControllableEditCanvas(BaseEditCanvas):
             block_entity = chunk.block_entities.get((x, y, z), None)
             platform = self.world.world_wrapper.platform
             version = self.world.world_wrapper.version
-            translator = self.world.translation_manager.get_version(platform, version,)
+            translator = self.world.translation_manager.get_version(
+                platform,
+                version,
+            )
             (version_block, version_block_entity, _,) = translator.block.from_universal(
                 block, block_entity, block_location=(x, y, z)
             )
