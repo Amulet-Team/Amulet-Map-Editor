@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Tuple
 import urllib.request
 import threading
 import json
@@ -9,77 +10,103 @@ import webbrowser
 import wx
 
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
-TAG_REGEX = re.compile(
-    r"^v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)\.(?P<bugfix>\d+)$"
-)
 VERSION_REGEX = re.compile(
-    r"^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)\.(?P<bugfix>\d+)$"
+    r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<bugfix>\d+))?(b(?P<beta>\d+))?$"
 )
 
 _EVT_UPDATE_CHECK = wx.NewEventType()
 EVT_UPDATE_CHECK = wx.PyEventBinder(_EVT_UPDATE_CHECK, 1)
 
 
-class ReleaseStageFilter:
-    @staticmethod
-    def pre_release_stage(d):
-        return d["prerelease"]
+def get_version(version_string: str) -> Tuple[bool, Tuple[int, ...]]:
+    """Parse the version into a more usable format
 
-    @staticmethod
-    def release_stage(d):
-        return not d["prerelease"]
+    :param version_string: The version string. Eg 1.2 or 1.2.3.4 or 1.2.3.4b0
+    :return: (bool(full_version), (major, minor, patch, bugfix, <beta>)) beta will not exist if it is not a beta
+    """
+    version_match = VERSION_REGEX.match(version_string)
+    if version_match:
+        v = version_match.groupdict()
+        version = (
+            int(v["major"]),
+            int(v["minor"]),
+            int(v["patch"] or 0,),
+            int(v["bugfix"] or 0,),
+        )
+        if v["beta"] is None:
+            # full release
+            return (
+                True,
+                version
+            )
+        else:
+            # beta release
+            return (
+                False,
+                version + (int(v["beta"]),)
+            )
+
+    raise Exception(f"Invalid version string {version_string}")
 
 
 class UpdateEvent(wx.PyCommandEvent):
-    def __init__(self, etype, eid, new_version):
+    def __init__(self, etype, eid, new_version: str):
         wx.PyCommandEvent.__init__(self, etype, eid)
         self._new_version = new_version
 
-    def GetVersion(self):
+    def GetVersion(self) -> str:
         return self._new_version
 
 
 class CheckForUpdate(threading.Thread):
-    def __init__(self, url, current_version, parent, release_stage):
+    def __init__(self, url, current_version, parent):
         threading.Thread.__init__(self)
         self.url = url
         self.current_version = current_version
         self._parent = parent
-        self._release_stage = release_stage
-        self.data = None
+        self._new_version = None
 
     def run(self):
         try:
             conn = urllib.request.urlopen(self.url, timeout=5)
             data = conn.read()
             data = json.loads(data)
-            version_match = VERSION_REGEX.match(self.current_version)
-            if not version_match:
+            try:
+                current_version = get_version(self.current_version)
+            except Exception:
                 return
 
             for release in data:
-                match = TAG_REGEX.match(release["tag_name"])
-                if not match:
-                    continue
-                tag_tuple = tuple(map(int, match.groups()))
-                version_tuple = tuple(map(int, version_match.groups()))
-
-                if not self._release_stage(release):
+                try:
+                    release_version = get_version(release["tag_name"])
+                except Exception:
                     continue
 
-                if tag_tuple > version_tuple:
-                    self.data = (True, tag_tuple)
-                    break
+                if current_version[0] == release_version[0]:
+                    # if they are both full releases or betas
+                    if release_version[1] > current_version[1]:
+                        self._new_version = release["tag_name"]
+                        break
+                elif not current_version[0]:
+                    # if current is beta
+                    if release_version[0]:
+                        release_version = (
+                            release_version[0],
+                            release_version[1] + (float("inf"),)
+                        )
+                    if release_version[1] > current_version[1]:
+                        self._new_version = release["tag_name"]
+                        break
 
-            if self.data[0]:
-                evt = UpdateEvent(_EVT_UPDATE_CHECK, -1, self.data[1])
+            if self._new_version:
+                evt = UpdateEvent(_EVT_UPDATE_CHECK, -1, self._new_version)
                 wx.PostEvent(self._parent, evt)
         except Exception:
             pass
 
 
 class UpdateDialog(wx.Dialog):
-    def __init__(self, parent, current_version, new_version):
+    def __init__(self, parent, current_version: str, new_version: str):
         wx.Dialog.__init__(self, parent)
 
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -114,19 +141,19 @@ class UpdateDialog(wx.Dialog):
         )
         ok_button.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
-    def goto_download_page(self, new_version, _):
+    @staticmethod
+    def goto_download_page(new_version, _):
         webbrowser.open(
-            f"https://github.com/Amulet-Team/Amulet-Map-Editor/releases/tag/v{new_version}"
+            f"https://github.com/Amulet-Team/Amulet-Map-Editor/releases/tag/{new_version}"
         )
 
 
-def show_update_window(parent, current_version, evt):
-    new_version = ".".join(map(str, evt.GetVersion()))
-    UpdateDialog(parent, current_version, new_version).ShowModal()
+def show_update_window(parent, current_version: str, evt: UpdateEvent):
+    UpdateDialog(parent, current_version, evt.GetVersion()).ShowModal()
 
 
 def check_for_update(
-    version, listening_parent, release_stage=ReleaseStageFilter.pre_release_stage
+    version, listening_parent
 ):
-    update_thread = CheckForUpdate(URL, version, listening_parent, release_stage)
+    update_thread = CheckForUpdate(URL, version, listening_parent)
     update_thread.start()
