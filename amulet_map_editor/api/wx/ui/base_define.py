@@ -38,7 +38,11 @@ class BaseDefine(wx.Panel):
             self._sizer.Add(left_sizer, 2, wx.EXPAND)
 
         self._version_picker = VersionSelect(
-            self, translation_manager, platform, version_number, **kwargs,
+            self,
+            translation_manager,
+            platform,
+            version_number,
+            **kwargs,
         )
         left_sizer.Add(self._version_picker, 0, wx.EXPAND)
         self._version_picker.Bind(EVT_VERSION_CHANGE, self._on_version_change)

@@ -19,7 +19,9 @@ def cut(
         structure = world.extract_structure(selection, dimension)
         structure_cache.add_structure(structure, structure.dimensions[0])
         yield from delete(
-            world, dimension, selection,
+            world,
+            dimension,
+            selection,
         )
     else:
         raise OperationError(

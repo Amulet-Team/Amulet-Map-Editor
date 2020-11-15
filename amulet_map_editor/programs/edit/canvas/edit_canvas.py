@@ -165,7 +165,12 @@ class EditCanvas(ControllableEditCanvas):
         err = None
         out = None
         try:
-            out = show_loading_dialog(operation_wrapper, title, msg, self,)
+            out = show_loading_dialog(
+                operation_wrapper,
+                title,
+                msg,
+                self,
+            )
             self.world.create_undo_point()
             wx.PostEvent(self, CreateUndoEvent())
         except OperationError as e:

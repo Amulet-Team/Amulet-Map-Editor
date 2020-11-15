@@ -5,7 +5,8 @@ import traceback
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
-from amulet_map_editor.api import version, lang
+from amulet_map_editor import __version__
+from amulet_map_editor.api import lang
 from amulet_map_editor.api.logging import log
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
@@ -39,7 +40,7 @@ class AmuletUI(wx.Frame):
             self,
             parent,
             id=wx.ID_ANY,
-            title=f"Amulet V{version}",
+            title=f"Amulet V{__version__}",
             pos=wx.DefaultPosition,
             size=wx.Size(560, 400),
             style=wx.CAPTION
@@ -78,12 +79,12 @@ class AmuletUI(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self._on_close_app)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
-        if update_check is not None:
+        if update_check:
             self.Bind(
                 update_check.EVT_UPDATE_CHECK,
-                lambda evt: update_check.show_update_window(self, version, evt),
+                lambda evt: update_check.show_update_window(self, __version__, evt),
             )
-            update_check.check_for_update(version, self)
+            update_check.check_for_update(__version__, self)
 
         self.Show()
 
