@@ -1,7 +1,9 @@
 # Amulet Map Editor
 
-<a href="https://github.com/Amulet-Team/Amulet-Map-Editor/releases"><img alt="TravisCI" src="https://travis-ci.org/Amulet-Team/Amulet-Map-Editor.svg"></a>
-[![Documentation Status](https://readthedocs.org/projects/amulet-map-editor/badge/?version=develop)](https://amulet-map-editor.readthedocs.io/en/develop/?badge=develop)
+![Build](../../workflows/Build/badge.svg)
+![Unittests](../../workflows/Unittests/badge.svg?event=push)
+![Stylecheck](../../workflows/Stylecheck/badge.svg?event=push)
+[![Documentation Status](https://readthedocs.org/projects/amulet-map-editor/badge)](https://amulet-map-editor.readthedocs.io)
 
 A new Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
 
@@ -15,15 +17,18 @@ Extract the contained folder to a location on your computer and run the executab
 
 ## Running from Source
 
-### Requirements
+**If you are running a compiled build you do NOT need to do this.**
 
-[Python 3.7.0+](https://www.python.org/)
+1) Install [Python 3.7+](https://www.python.org/)
+2) We recommend setting up a [python virtual environment](https://docs.python.org/3/tutorial/venv.html) so you don't run into issues with dependency conflicts.
+3) run `python -m pip install amulet-map-editor` to install the library and all its dependencies.
+4) run `python amulet_map_editor` to run the program
 
-In order to run Amulet from source, you will need to install the following packages and the dependancies for those packages:
+### Notes
 
-The following can be easily installed using `python -m pip install -r requirements.txt`
+If you have python 2 installed `python` may point to the wrong version in which case you will have to swap out `python` for `python3`
 
-For linux run `python -m pip install -r requirements_linux.txt`
+When installing from source the following dependencies will be installed
 
 - numpy
 - wxpython
@@ -32,8 +37,6 @@ For linux run `python -m pip install -r requirements_linux.txt`
 - [Amulet-NBT](https://github.com/Amulet-Team/Amulet-NBT)  The library to handle reading and saving NBT and SNBT.
 - [PyMCTranslate](https://github.com/gentlegiantJGC/PyMCTranslate)  The library to handle block, block entity, entity and biome translation. between versions
 - [Minecraft-Model-Reader](https://github.com/gentlegiantJGC/Minecraft-Model-Reader)  The library to handle loading block models and textures from a resource pack for use in the renderer.
-
-run `python main.py`
 
 ## Contributing
 
