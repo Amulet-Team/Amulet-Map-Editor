@@ -1,6 +1,5 @@
 import wx
-from amulet_map_editor import AmuletUI
-from amulet_map_editor import log
+from amulet_map_editor.api import AmuletUI, log
 import traceback
 
 if __name__ == "__main__":
