@@ -6,8 +6,6 @@ from PyInstaller.utils.hooks import collect_submodules
 
 import sys
 import os
-import shutil
-import glob
 import amulet
 import PyMCTranslate
 import minecraft_model_reader
