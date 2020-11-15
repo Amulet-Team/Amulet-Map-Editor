@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from amulet.api.structure import structure_cache, Structure
+from amulet.api.structure import structure_cache
 from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.api.selection import SelectionGroup
 from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.delete import (
@@ -9,15 +9,15 @@ from amulet_map_editor.programs.edit.plugins.stock_plugins.internal_operations.d
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 def cut(
     world: "World", dimension: Dimension, selection: SelectionGroup
 ) -> OperationReturnType:
     if selection:
-        structure = Structure.from_world(world, selection, dimension)
-        structure_cache.add_structure(structure)
+        structure = world.extract_structure(selection, dimension)
+        structure_cache.add_structure(structure, structure.dimensions[0])
         yield from delete(
             world,
             dimension,

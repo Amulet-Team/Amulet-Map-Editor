@@ -2,9 +2,12 @@ import math
 import numpy
 from amulet.utils.matrix import (
     scale_matrix,
-    rotation_matrix,
+    rotation_matrix_xy,
+    rotation_matrix_yx,
+    rotation_matrix_xyz,
     transform_matrix,
     displacement_matrix,
+    inverse_transform_matrix,
 )
 
 
@@ -20,8 +23,13 @@ def projection_matrix(
         [
             [f / aspect, 0, 0, 0],
             [0, f, 0, 0],
-            [0, 0, (z_far + z_near) / (z_near - z_far), -1],
-            [0, 0, (2 * z_far * z_near) / (z_near - z_far), 0],
+            [
+                0,
+                0,
+                (z_far + z_near) / (z_near - z_far),
+                (2 * z_far * z_near) / (z_near - z_far),
+            ],
+            [0, 0, -1, 0],
         ],
         dtype=numpy.float64,
     )

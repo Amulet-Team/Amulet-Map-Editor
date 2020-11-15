@@ -7,7 +7,7 @@ from amulet.api.data_types import Dimension, OperationReturnType
 from .operation_ui import OperationUI
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 

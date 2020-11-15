@@ -1,6 +1,18 @@
 import wx
 from wx import glcanvas
-from OpenGL.GL import *
+from OpenGL.GL import (
+    GL_DEPTH_TEST,
+    glEnable,
+    glGenTextures,
+    GL_CULL_FACE,
+    glDepthFunc,
+    GL_LEQUAL,
+    GL_BLEND,
+    glBlendFunc,
+    GL_SRC_ALPHA,
+    GL_ONE_MINUS_SRC_ALPHA,
+    glDeleteTextures,
+)
 import uuid
 import numpy
 import math
@@ -10,7 +22,11 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.matrix import rotation_matrix, projection_matrix
+from amulet_map_editor.api.opengl.matrix import (
+    rotation_matrix_yx,
+    projection_matrix,
+    displacement_matrix,
+)
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -61,6 +77,9 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @property
     def camera_rotation(self) -> CameraRotationType:
+        """The rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         raise NotImplementedError
 
     @property
@@ -82,8 +101,8 @@ class BaseCanvas(glcanvas.GLCanvas):
         self._transformation_matrix = None
 
     @staticmethod
-    def rotation_matrix(pitch, yaw):
-        return rotation_matrix(math.radians(pitch), math.radians(yaw))
+    def rotation_matrix(yaw, pitch):
+        return rotation_matrix_yx(math.radians(yaw + 180), math.radians(pitch))
 
     def projection_matrix(self):
         # camera projection
@@ -93,16 +112,15 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:
+        """The world to projection matrix."""
         # camera translation
         if self._transformation_matrix is None:
-            transformation_matrix = numpy.eye(4, dtype=numpy.float64)
-            transformation_matrix[3, :3] = numpy.array(self.camera_location) * -1
-
-            transformation_matrix = numpy.matmul(
-                transformation_matrix, self.rotation_matrix(*self.camera_rotation)
-            )
             self._transformation_matrix = numpy.matmul(
-                transformation_matrix, self.projection_matrix()
+                self.projection_matrix(),
+                numpy.matmul(
+                    self.rotation_matrix(*self.camera_rotation),
+                    displacement_matrix(*-numpy.array(self.camera_location)),
+                ),
             )
 
         return self._transformation_matrix

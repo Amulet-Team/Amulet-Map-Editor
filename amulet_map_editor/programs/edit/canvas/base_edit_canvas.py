@@ -1,9 +1,21 @@
 import wx
-from OpenGL.GL import *
+from OpenGL.GL import (
+    glClearColor,
+    glBindTexture,
+    GL_TEXTURE_2D,
+    glTexImage2D,
+    GL_RGBA,
+    GL_UNSIGNED_BYTE,
+    glViewport,
+    glClear,
+    GL_COLOR_BUFFER_BIT,
+    GL_DEPTH_BUFFER_BIT,
+)
 import os
 from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
 import weakref
+import math
 
 from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
@@ -38,16 +50,12 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
 )
-from amulet_map_editor.api.opengl.mesh.world_renderer.world import (
-    RenderWorld,
-    cos,
-    tan,
-    atan,
-)
-from amulet_map_editor.api.opengl.mesh.structure import StructureGroup
+from amulet_map_editor.api.opengl.mesh.level import RenderLevel
+from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
 from amulet_map_editor.api.opengl import textureatlas
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
+from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 from amulet_map_editor.api.logging import log
 from .render_selection import (
     EditProgramRenderSelectionGroup,
@@ -61,7 +69,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
 )
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 AIR = Block("universal_minecraft", "air")
@@ -96,10 +104,13 @@ class BaseEditCanvas(BaseCanvas):
         ] = None
         self._opengl_resource_pack: Optional[OpenGLResourcePack] = None
 
-        self._render_world = None
+        self._render_world: Optional[RenderLevel] = None
 
         self._camera_location: CameraLocationType = (0.0, 100.0, 0.0)
-        self._camera_rotation: CameraRotationType = (45.0, 45.0)
+        self._camera_rotation: CameraRotationType = (
+            45.0,
+            45.0,
+        )  # yaw (-180 to 180), pitch (-90 to 90)
         self._camera_move_speed = 2.0
         self._camera_rotate_speed = 2.0
         self._selection_location: BlockCoordinates = (0, 0, 0)
@@ -113,7 +124,7 @@ class BaseEditCanvas(BaseCanvas):
         self._selection_group: Optional[RenderSelectionHistoryManager] = None
 
         self._draw_structure = False
-        self._structure: Optional[StructureGroup] = None
+        self._structure: Optional[LevelGroup] = None
 
         self._draw_timer = wx.Timer(self)
         self._gc_timer = wx.Timer(self)
@@ -131,7 +142,7 @@ class BaseEditCanvas(BaseCanvas):
             if os.path.isdir(os.path.join("resource_packs", rp))
         ]
         if (
-            self.world.world_wrapper.platform == "bedrock"
+            self.world.level_wrapper.platform == "bedrock"
             and experimental_bedrock_resources
         ):
             yield 0.1, "Downloading Bedrock vanilla resource pack"
@@ -192,7 +203,7 @@ class BaseEditCanvas(BaseCanvas):
 
         yield 1.0, "Setting up renderer"
 
-        self._render_world = RenderWorld(
+        self._render_world = RenderLevel(
             self.context_identifier,
             self._opengl_resource_pack,
             self.world,
@@ -205,7 +216,7 @@ class BaseEditCanvas(BaseCanvas):
         )
         self.world.history_manager.register(self._selection_group, False)
 
-        self._structure: StructureGroup = StructureGroup(
+        self._structure: LevelGroup = LevelGroup(
             self.context_identifier,
             self._opengl_resource_pack,
         )
@@ -288,7 +299,8 @@ class BaseEditCanvas(BaseCanvas):
         """Enable the canvas and start it working."""
         self.SetCurrent(self._context)
         self._render_world.enable()
-        self._draw_timer.Start(33)
+        self._structure.enable()
+        self._draw_timer.Start(15)
         self._gc_timer.Start(10000)
         self._rebuild_timer.Start(1000)
 
@@ -297,20 +309,24 @@ class BaseEditCanvas(BaseCanvas):
         self._draw_timer.Stop()
         self._gc_timer.Stop()
         self._rebuild_timer.Stop()
-        self._render_world.disable()
+        self._render_world.disable(True)
+        self._structure.disable(True)
 
     def _disable_threads(self):
         """Stop the generation of new chunk geometry.
         Makes it safe to modify the world data."""
-        self._render_world.chunk_generator.stop()
+        self._render_world.disable()
+        self._structure.disable()
 
     def _enable_threads(self):
         """Start the generation of new chunk geometry."""
-        self._render_world.chunk_generator.start()
+        self._render_world.enable()
+        self._structure.enable()
 
     def close(self):
         """Close and destroy the canvas and all contained data."""
         self._render_world.close()
+        self._structure.clear()
         super()._close()
 
     def is_closeable(self):
@@ -346,7 +362,7 @@ class BaseEditCanvas(BaseCanvas):
         log.info("Finished setting up texture atlas in OpenGL")
 
     @property
-    def structure(self) -> StructureGroup:
+    def structure(self) -> LevelGroup:
         return self._structure
 
     @property
@@ -396,10 +412,12 @@ class BaseEditCanvas(BaseCanvas):
 
     @property
     def dimension(self) -> Dimension:
+        """The currently loaded dimension in the renderer."""
         return self._render_world.dimension
 
     @dimension.setter
     def dimension(self, dimension: Dimension):
+        """Set the currently loaded dimension in the renderer."""
         self._render_world.dimension = dimension
         wx.PostEvent(self, DimensionChangeEvent(dimension=dimension))
 
@@ -413,20 +431,28 @@ class BaseEditCanvas(BaseCanvas):
             isinstance(v, (int, float)) for v in location
         ), "format for camera_location is invalid"
         self._camera_location = self._render_world.camera_location = location
+        self._structure.set_camera_location(*location)
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraMoveEvent(location=self.camera_location))
 
     @property
     def camera_rotation(self) -> CameraRotationType:
+        """The rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         return self._camera_rotation
 
     @camera_rotation.setter
     def camera_rotation(self, rotation: CameraRotationType):
+        """Set the rotation of the camera. (yaw, pitch).
+        This should behave the same as how Minecraft handles it.
+        """
         assert len(rotation) == 2 and all(
             isinstance(v, (int, float)) for v in rotation
         ), "format for camera_rotation is invalid"
         self._camera_rotation = self._render_world.camera_rotation = rotation
+        self._structure.set_camera_rotation(*rotation)
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraRotateEvent(rotation=self.camera_rotation))
@@ -502,13 +528,15 @@ class BaseEditCanvas(BaseCanvas):
                 cx = cx_
                 cz = cz_
                 try:
-                    chunk = self._render_world.world.get_chunk(cx, cz, self.dimension)
+                    chunk = self._render_world.level.get_chunk(cx, cz, self.dimension)
                 except ChunkLoadError:
                     chunk = None
 
             if (
                 chunk is not None
-                and self._render_world.world.palette[chunk.blocks[x % 16, y, z % 16]]
+                and self._render_world.level.block_palette[
+                    chunk.blocks[x % 16, y, z % 16]
+                ]
                 != AIR
             ):
                 # the block is not air
@@ -545,20 +573,32 @@ class BaseEditCanvas(BaseCanvas):
         The x,y,z vector for the direction the camera is facing
         :return: (x, y, z) numpy float array ranging from -1 to 1
         """
-        look_vector = numpy.array([0, 0, -1, 0])
+        look_vector = numpy.array([0, 0, 1, 0])
         if not self._mouse_lock:
             screen_x, screen_y = numpy.array(self.GetSize(), numpy.int) / 2
-            screen_dx = atan(
-                self.aspect_ratio * tan(self.fov / 2) * self._mouse_delta_x / screen_x
+            screen_dx = math.degrees(
+                math.atan(
+                    self.aspect_ratio
+                    * math.tan(math.radians(self.fov / 2))
+                    * self._mouse_delta_x
+                    / screen_x
+                )
             )
-            screen_dy = atan(
-                cos(screen_dx) * tan(self.fov / 2) * self._mouse_delta_y / screen_y
+            screen_dy = math.degrees(
+                math.atan(
+                    math.cos(math.radians(screen_dx))
+                    * math.tan(math.radians(self.fov / 2))
+                    * self._mouse_delta_y
+                    / screen_y
+                )
             )
             look_vector = numpy.matmul(
-                self.rotation_matrix(screen_dy, screen_dx), look_vector
+                rotation_matrix_xy(math.radians(screen_dy), -math.radians(screen_dx)),
+                look_vector,
             )
+        ry, rx = self.camera_rotation
         look_vector = numpy.matmul(
-            self.rotation_matrix(*self.camera_rotation), look_vector
+            rotation_matrix_xy(*numpy.radians([rx, -ry])), look_vector
         )[:3]
         look_vector[abs(look_vector) < 0.000001] = 0.000001
         return look_vector
@@ -635,8 +675,10 @@ class BaseEditCanvas(BaseCanvas):
 
     def _gc(self, event):
         self._render_world.run_garbage_collector()
+        self._structure.run_garbage_collector()
         event.Skip()
 
     def _rebuild(self, evt):
         self._render_world.chunk_manager.rebuild()
+        self._structure.rebuild()
         evt.Skip()

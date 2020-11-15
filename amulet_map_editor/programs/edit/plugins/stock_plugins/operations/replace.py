@@ -11,7 +11,7 @@ from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
@@ -142,23 +142,23 @@ class Replace(SimpleScrollablePanel, OperationUI):
         )
         replacement_block = self._get_replacement_block()
 
-        replacement_block_id = world.palette.get_add_block(replacement_block)
+        replacement_block_id = world.block_palette.get_add_block(replacement_block)
 
         original_block_matches = []
         universal_block_count = 0
 
-        iter_count = len(list(world.get_chunk_slices(selection, dimension)))
+        iter_count = len(list(world.get_chunk_slice_box(dimension, selection)))
         count = 0
 
-        for chunk, slices, _ in world.get_chunk_slices(selection, dimension):
-            if universal_block_count < len(world.palette):
+        for chunk, slices, _ in world.get_chunk_slice_box(dimension, selection):
+            if universal_block_count < len(world.block_palette):
                 for universal_block_id in range(
-                    universal_block_count, len(world.palette)
+                    universal_block_count, len(world.block_palette)
                 ):
                     version_block = world.translation_manager.get_version(
                         original_platform, original_version
                     ).block.from_universal(
-                        world.palette[universal_block_id],
+                        world.block_palette[universal_block_id],
                         force_blockstate=original_blockstate,
                     )[
                         0
@@ -173,7 +173,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
                     ):
                         original_block_matches.append(universal_block_id)
 
-                universal_block_count = len(world.palette)
+                universal_block_count = len(world.block_palette)
             blocks = chunk.blocks[slices]
             blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
             chunk.blocks[slices] = blocks

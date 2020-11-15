@@ -1,5 +1,15 @@
 import numpy
-from OpenGL.GL import *
+from OpenGL.GL import (
+    GL_TRIANGLES,
+    GL_DYNAMIC_DRAW,
+    glCullFace,
+    GL_FRONT,
+    GL_BACK,
+    glDisable,
+    GL_DEPTH_TEST,
+    GL_LINE_STRIP,
+    glEnable,
+)
 import itertools
 from typing import Tuple, Optional, Union
 
@@ -9,6 +19,7 @@ from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManagerStatic,
 )
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
+from amulet_map_editor.api.opengl.matrix import displacement_matrix
 
 
 class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
@@ -224,8 +235,8 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     def _create_geometry_(self):
         self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(
-            (-0.005, -0.005, -0.005) + (self.min % 16),
-            self.max - self.min + (self.min % 16) + 0.005,
+            self.min % 16 - 0.005,
+            self.min % 16 + self.max - self.min + 0.005,
         )
         self.verts[:36, 3:5] /= 16
 
@@ -233,7 +244,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         self._setup()
         self._create_geometry_()
 
-        self.transformation_matrix[3, :3] = self.min - (self.min % 16)
+        self.transformation_matrix = displacement_matrix(*self.min - self.min % 16)
 
         self.change_verts()
         self._volume = numpy.product(self.max - self.min)
@@ -253,7 +264,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
 
-        transformation_matrix = numpy.matmul(self.transformation_matrix, camera_matrix)
+        transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)

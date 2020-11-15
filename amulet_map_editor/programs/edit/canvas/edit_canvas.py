@@ -4,8 +4,9 @@ from types import GeneratorType
 import time
 import traceback
 
-from amulet.api.data_types import OperationReturnType, OperationYieldType
-from amulet.api.structure import Structure, structure_cache
+from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimension
+from amulet.api.structure import structure_cache
+from amulet.api.level import BaseLevel
 
 from amulet_map_editor.api import config
 from amulet_map_editor.api.logging import log
@@ -48,7 +49,7 @@ from amulet_map_editor.programs.edit.canvas.controllable_edit_canvas import (
 from amulet_map_editor.programs.edit.canvas.ui.file import FilePanel
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 def show_loading_dialog(
@@ -220,17 +221,23 @@ class EditCanvas(ControllableEditCanvas):
             lambda: copy(self.world, self.dimension, self.selection_group)
         )
 
-    def paste(self, structure: Structure = None):
-        if not isinstance(structure, Structure):
-            if structure_cache:
-                structure = structure_cache.get_structure()
-            else:
-                wx.MessageBox(
-                    "A structure needs to be copied before one can be pasted."
-                )
-                return
+    def paste(self, structure: BaseLevel, dimension: Dimension):
+        assert isinstance(
+            structure, BaseLevel
+        ), "Structure given is not a subclass of BaseLevel."
+        assert (
+            dimension in structure.dimensions
+        ), "The requested dimension does not exist for this object."
         wx.PostEvent(self, ToolChangeEvent(tool="Select"))
-        wx.PostEvent(self, PasteEvent(structure=structure))
+        wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
+
+    def paste_from_cache(self):
+        if structure_cache:
+            structure, dimension = structure_cache.get_structure()
+            wx.PostEvent(self, ToolChangeEvent(tool="Select"))
+            wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
+        else:
+            wx.MessageBox("A structure needs to be copied before one can be pasted.")
 
     def delete(self):
         self.run_operation(
@@ -241,6 +248,38 @@ class EditCanvas(ControllableEditCanvas):
         location = show_goto(self, *self.camera_location)
         if location:
             self.camera_location = location
+
+    def select_all(self):
+        all_chunk_coords = tuple(self.world.all_chunk_coords(self.dimension))
+        if all_chunk_coords:
+            min_x, min_z = max_x, max_z = all_chunk_coords[0]
+            for x, z in all_chunk_coords:
+                if x < min_x:
+                    min_x = x
+                elif x > max_x:
+                    max_x = x
+                if z < min_z:
+                    min_z = z
+                elif z > max_z:
+                    max_z = z
+
+            self.selection.all_selection_corners = [
+                (
+                    (
+                        min_x * self.world.sub_chunk_size,
+                        self.world.selection_bounds.min[1],
+                        min_z * self.world.sub_chunk_size,
+                    ),
+                    (
+                        (max_x + 1) * self.world.sub_chunk_size,
+                        self.world.selection_bounds.max[1],
+                        (max_z + 1) * self.world.sub_chunk_size,
+                    ),
+                )
+            ]
+
+        else:
+            self.selection.all_selection_corners = []
 
     def save(self):
         self._disable_threads()

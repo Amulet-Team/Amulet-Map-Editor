@@ -6,7 +6,7 @@ from amulet_map_editor.api.wx.ui.select_world import WorldUI
 from amulet_map_editor.api.framework.programs import BaseProgram
 
 if TYPE_CHECKING:
-    from amulet.api.world import World
+    from amulet.api.level import World
 
 
 class AboutProgram(SimplePanel, BaseProgram):
