@@ -31,7 +31,9 @@ jobs:
     - name: PyInstaller build
       run: |
         PyInstaller -y Amulet.spec
-        7z a Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip dist/Amulet
+        cd dist
+        7z a Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip Amulet
+        cd ..
     - name: Publish to PyPi
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
@@ -45,7 +47,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
+        asset_path: ./dist/Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
         asset_name: Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
         asset_content_type: application/zip
 
@@ -72,7 +74,9 @@ jobs:
     - name: PyInstaller build
       run: |
         PyInstaller -y Amulet.spec
-        zip -r Amulet-v${{ github.event.release.tag_name }}-osx.zip dist/Amulet
+        cd dist
+        zip -r Amulet-v${{ github.event.release.tag_name }}-osx.zip Amulet
+        cd ..
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
@@ -80,6 +84,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./Amulet-v${{ github.event.release.tag_name }}-osx.zip
+        asset_path: ./dist/Amulet-v${{ github.event.release.tag_name }}-osx.zip
         asset_name: Amulet-v${{ github.event.release.tag_name }}-osx.zip
         asset_content_type: application/zip
