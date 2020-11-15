@@ -30,21 +30,19 @@ def get_version(version_string: str) -> Tuple[bool, Tuple[int, ...]]:
         version = (
             int(v["major"]),
             int(v["minor"]),
-            int(v["patch"] or 0,),
-            int(v["bugfix"] or 0,),
+            int(
+                v["patch"] or 0,
+            ),
+            int(
+                v["bugfix"] or 0,
+            ),
         )
         if v["beta"] is None:
             # full release
-            return (
-                True,
-                version
-            )
+            return (True, version)
         else:
             # beta release
-            return (
-                False,
-                version + (int(v["beta"]),)
-            )
+            return (False, version + (int(v["beta"]),))
 
     raise Exception(f"Invalid version string {version_string}")
 
@@ -92,7 +90,7 @@ class CheckForUpdate(threading.Thread):
                     if release_version[0]:
                         release_version = (
                             release_version[0],
-                            release_version[1] + (float("inf"),)
+                            release_version[1] + (float("inf"),),
                         )
                     if release_version[1] > current_version[1]:
                         self._new_version = release["tag_name"]
@@ -152,8 +150,6 @@ def show_update_window(parent, current_version: str, evt: UpdateEvent):
     UpdateDialog(parent, current_version, evt.GetVersion()).ShowModal()
 
 
-def check_for_update(
-    version, listening_parent
-):
+def check_for_update(version, listening_parent):
     update_thread = CheckForUpdate(URL, version, listening_parent)
     update_thread.start()
