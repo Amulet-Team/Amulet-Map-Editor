@@ -25,95 +25,118 @@ from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextMan
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
 
+ThreadingEnabled = False
 
-class ChunkGenerator(ThreadPoolExecutor):
+
+class BaseChunkGenerator:
     def __init__(self, render_level: "RenderLevel"):
-        super().__init__(max_workers=1)
         self._render_level_ = weakref.ref(render_level)
         self._region_size = render_level.chunk_manager.region_size
-        self._enabled = False
-        self._generator: Optional[Future] = None
         self._chunk_rebuilds: Set[Tuple[int, int]] = set()
 
     @property
     def _render_level(self) -> "RenderLevel":
         return self._render_level_()
 
-    def start(self):
-        if not self._enabled:
-            self._enabled = True
-            self._generator = self.submit(self._generate_chunks)
-
-    def stop(self):
-        if self._enabled:
-            self._enabled = False
-            self._generator.result()
-
-    def _generate_chunks(self):
-        while self._enabled:
-            start_time = time.time()
-            # first check if there is a chunk that exists and needs rebuilding
+    def generate_chunk(self):
+        # first check if there is a chunk that exists and needs rebuilding
+        chunk_coords = next(
+            (
+                c
+                for c in self._render_level.chunk_coords()
+                if self._render_level.chunk_manager.render_chunk_needs_rebuild(c)
+            ),
+            None,
+        )
+        if chunk_coords is not None:
+            # if there was a chunk found that needs rebuilding then add the surrounding chunks for rebuilding
+            # (this deals with if the chunk was deleted or the blocks up to the chunk boundary were deleted)
+            for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                chunk_coords_ = (
+                    chunk_coords[0] + offset[0],
+                    chunk_coords[1] + offset[1],
+                )
+                if chunk_coords_ in self._render_level.chunk_manager:
+                    self._chunk_rebuilds.add(chunk_coords_)
+        elif self._chunk_rebuilds:
+            # if a chunk was not found that needs rebuilding due to it changing but a previously
+            # identified neighbour chunk needs rebuilding do that.
+            chunk_coords = self._chunk_rebuilds.pop()
+        else:
+            # if no chunks need rebuilding then find a new chunk to load.
             chunk_coords = next(
                 (
                     c
                     for c in self._render_level.chunk_coords()
-                    if self._render_level.chunk_manager.render_chunk_needs_rebuild(c)
+                    if c not in self._render_level.chunk_manager
                 ),
                 None,
             )
-            if chunk_coords is not None:
-                # if there was a chunk found that needs rebuilding then add the surrounding chunks for rebuilding
-                # (this deals with if the chunk was deleted or the blocks up to the chunk boundary were deleted)
-                for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    chunk_coords_ = (
-                        chunk_coords[0] + offset[0],
-                        chunk_coords[1] + offset[1],
-                    )
-                    if chunk_coords_ in self._render_level.chunk_manager:
-                        self._chunk_rebuilds.add(chunk_coords_)
-            elif self._chunk_rebuilds:
-                # if a chunk was not found that needs rebuilding due to it changing but a previously
-                # identified neighbour chunk needs rebuilding do that.
-                chunk_coords = self._chunk_rebuilds.pop()
-            else:
-                # if no chunks need rebuilding then find a new chunk to load.
-                chunk_coords = next(
-                    (
-                        c
-                        for c in self._render_level.chunk_coords()
-                        if c not in self._render_level.chunk_manager
-                    ),
-                    None,
-                )
-            if chunk_coords is not None:
-                # if chunk coords is in here then remove it so it doesn't get generated twice.
-                if chunk_coords in self._chunk_rebuilds:
-                    self._chunk_rebuilds.remove(chunk_coords)
+        if chunk_coords is not None:
+            # if chunk coords is in here then remove it so it doesn't get generated twice.
+            if chunk_coords in self._chunk_rebuilds:
+                self._chunk_rebuilds.remove(chunk_coords)
 
-                # generate the chunk
-                chunk = RenderChunk(
-                    self._render_level.context_identifier,
-                    self._render_level.resource_pack,
-                    self._render_level.level,
-                    self._region_size,
-                    chunk_coords,
-                    self._render_level.dimension,
-                    self._render_level.draw_floor,
+            # generate the chunk
+            chunk = RenderChunk(
+                self._render_level.context_identifier,
+                self._render_level.resource_pack,
+                self._render_level.level,
+                self._region_size,
+                chunk_coords,
+                self._render_level.dimension,
+                self._render_level.draw_floor,
+            )
+
+            try:
+                chunk.create_geometry()
+            except:
+                log.error(
+                    f"Failed generating chunk geometry for chunk {chunk_coords}",
+                    exc_info=True,
                 )
 
-                try:
-                    chunk.create_geometry()
-                except:
-                    log.error(
-                        f"Failed generating chunk geometry for chunk {chunk_coords}",
-                        exc_info=True,
-                    )
+            self._render_level.chunk_manager.add_render_chunk(chunk)
 
-                self._render_level.chunk_manager.add_render_chunk(chunk)
-            delta_time = time.time() - start_time
-            if delta_time < 1 / 60:
-                # go to sleep so this thread doesn't lock up the main thread.
-                time.sleep(1 / 60 - delta_time)
+
+if ThreadingEnabled:
+    class ChunkGenerator(BaseChunkGenerator, ThreadPoolExecutor):
+        def __init__(self, render_level: "RenderLevel"):
+            BaseChunkGenerator.__init__(self, render_level)
+            ThreadPoolExecutor.__init__(self, max_workers=1)
+            self._enabled = False
+            self._generator: Optional[Future] = None
+
+        @property
+        def _render_level(self) -> "RenderLevel":
+            return self._render_level_()
+
+        def start(self):
+            if not self._enabled:
+                self._enabled = True
+                self._generator = self.submit(self._generate_chunks)
+
+        def stop(self):
+            if self._enabled:
+                self._enabled = False
+                self._generator.result()
+
+        def _generate_chunks(self):
+            while self._enabled:
+                start_time = time.time()
+                self.generate_chunk()
+                delta_time = time.time() - start_time
+                if delta_time < 1 / 60:
+                    # go to sleep so this thread doesn't lock up the main thread.
+                    time.sleep(1 / 60 - delta_time)
+
+else:
+    class ChunkGenerator(BaseChunkGenerator):
+        def start(self):
+            pass
+
+        def stop(self):
+            pass
 
 
 class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
@@ -254,6 +277,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
                 numpy.matmul(camera_matrix, self._selection_displacement),
                 self.camera_location,
             )
+        if not ThreadingEnabled:
+            self._chunk_generator.generate_chunk()
 
     def run_garbage_collector(self, remove_all=False):
         if remove_all:
