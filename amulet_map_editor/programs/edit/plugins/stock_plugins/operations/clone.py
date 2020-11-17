@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 import wx
 
+from amulet.api.structure import Structure
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension, OperationReturnType
 
@@ -10,7 +11,7 @@ from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationSilentAbort
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
@@ -25,8 +26,8 @@ class Clone(SimpleOperationPanel):
     def _operation(
         self, world: "World", dimension: Dimension, selection: SelectionGroup
     ) -> OperationReturnType:
-        structure = world.extract_structure(selection, dimension)
-        self.canvas.paste(structure, structure.dimensions[0])
+        structure = Structure.from_world(world, selection, dimension)
+        self.canvas.paste(structure)
         raise OperationSilentAbort
 
     def unload(self):

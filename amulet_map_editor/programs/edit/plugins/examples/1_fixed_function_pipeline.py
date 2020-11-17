@@ -4,7 +4,7 @@
 
 
 from amulet.api.selection import SelectionGroup
-from amulet.api.level import World
+from amulet.api.world import World
 from amulet.api.data_types import Dimension
 
 

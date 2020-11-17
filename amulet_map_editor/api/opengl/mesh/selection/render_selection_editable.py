@@ -1,14 +1,5 @@
 import numpy
-from OpenGL.GL import (
-    GL_TRIANGLES,
-    glCullFace,
-    GL_FRONT,
-    GL_BACK,
-    glDisable,
-    GL_DEPTH_TEST,
-    GL_LINE_STRIP,
-    glEnable,
-)
+from OpenGL.GL import *
 from typing import Tuple
 
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
@@ -128,7 +119,7 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
 
-        transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
+        transformation_matrix = numpy.matmul(self.transformation_matrix, camera_matrix)
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)

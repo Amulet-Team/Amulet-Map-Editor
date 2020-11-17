@@ -4,7 +4,7 @@ import webbrowser
 from typing import TYPE_CHECKING, Callable
 
 from amulet import world_interface
-from amulet.api.level import World
+from amulet.api.world import World
 
 from amulet_map_editor.api import lang
 from amulet_map_editor.api.logging import log
@@ -145,14 +145,16 @@ class ConvertExtension(SimplePanel, BaseProgram):
         global work_count
         try:
             out_world = world_interface.load_format(self.out_world_path)
-            log.info(f"Converting world {self.world.world_path} to {out_world.path}")
+            log.info(
+                f"Converting world {self.world.world_path} to {out_world.world_path}"
+            )
             out_world: WorldFormatWrapper
             out_world.open()
             self.world.save(out_world, self._update_loading_bar)
             out_world.close()
             message = "World conversion completed"
             log.info(
-                f"Finished converting world {self.world.world_path} to {out_world.path}"
+                f"Finished converting world {self.world.world_path} to {out_world.world_path}"
             )
         except Exception as e:
             message = f"Error during conversion\n{e}"

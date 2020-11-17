@@ -2,8 +2,10 @@ import os
 import wx
 from typing import TYPE_CHECKING
 
-from amulet.api.level import Structure
+from amulet.api.registry import BlockManager
+from amulet.api.structure import Structure
 from amulet.api.selection import SelectionGroup
+from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension
 from amulet.structure_interface.construction import ConstructionFormatWrapper
 
@@ -13,7 +15,7 @@ from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
@@ -47,9 +49,25 @@ class ImportConstruction(SimpleOperationPanel):
             and path.endswith(".construction")
             and os.path.isfile(path)
         ):
-            wrapper = ConstructionFormatWrapper(path)
+            wrapper = ConstructionFormatWrapper(path, "r")
             wrapper.translation_manager = world.translation_manager
-            self.canvas.paste(Structure(path, wrapper), wrapper.dimensions[0])
+            wrapper.open()
+            selection = wrapper.selection
+
+            global_palette = BlockManager()
+            chunks = {}
+            chunk_count = len(list(wrapper.all_chunk_coords()))
+            yield 0, f"Importing {os.path.basename(path)}"
+            for chunk_index, (cx, cz) in enumerate(wrapper.all_chunk_coords()):
+                try:
+                    chunk = chunks[(cx, cz)] = wrapper.load_chunk(cx, cz)
+                    chunk.block_palette = global_palette
+                except ChunkLoadError:
+                    pass
+                yield (chunk_index + 1) / chunk_count
+
+            wrapper.close()
+            self.canvas.paste(Structure(chunks, global_palette, selection))
         else:
             raise OperationError(
                 "Please specify a construction file in the options before running."

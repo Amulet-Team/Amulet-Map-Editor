@@ -14,7 +14,7 @@ from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
 from amulet_map_editor.programs.edit.plugins.api.errors import OperationError
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 
@@ -58,29 +58,28 @@ class ExportConstruction(SimpleOperationPanel):
         path = self._file_picker.GetPath()
         platform = self._version_define.platform
         version = self._version_define.version_number
-        if isinstance(path, str) and platform and version:
-            wrapper = ConstructionFormatWrapper(path)
-            if wrapper.exists:
-                response = wx.MessageDialog(
-                    self,
-                    f"A file is already present at {path}. Do you want to continue?",
-                    style=wx.YES | wx.NO,
-                ).ShowModal()
-                if response == wx.ID_CANCEL:
-                    return
-            wrapper.create_and_open(platform, version, selection)
+        if (
+            isinstance(path, str)
+            and path.endswith(".construction")
+            and platform
+            and version
+        ):
+            wrapper = ConstructionFormatWrapper(path, "w")
+            wrapper.platform = platform
+            wrapper.version = version
+            wrapper.selection = selection
             wrapper.translation_manager = world.translation_manager
-            wrapper_dimension = wrapper.dimensions[0]
+            wrapper.open()
             chunk_count = len(list(selection.chunk_locations()))
             yield 0, f"Exporting {os.path.basename(path)}"
             for chunk_index, (cx, cz) in enumerate(selection.chunk_locations()):
                 try:
                     chunk = world.get_chunk(cx, cz, dimension)
-                    wrapper.commit_chunk(chunk, wrapper_dimension)
+                    wrapper.commit_chunk(chunk, world.palette)
                 except ChunkLoadError:
                     continue
                 yield (chunk_index + 1) / chunk_count
-            wrapper.save()
+
             wrapper.close()
         else:
             raise OperationError(

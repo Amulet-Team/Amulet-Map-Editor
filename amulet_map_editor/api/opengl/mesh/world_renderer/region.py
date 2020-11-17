@@ -1,18 +1,10 @@
-from OpenGL.GL import (
-    GL_DYNAMIC_DRAW,
-    glBindVertexArray,
-    glBindBuffer,
-    GL_ARRAY_BUFFER,
-    glBufferSubData,
-)
+from OpenGL.GL import *
 from typing import Dict, Tuple
 import numpy
 import queue
 from .chunk import RenderChunk
 from amulet_map_editor.api.opengl.mesh.base.tri_mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
-from amulet_map_editor.api.opengl.matrix import displacement_matrix
-from amulet_map_editor.api.opengl.data_types import TransformationMatrix
 
 
 class ChunkManager:
@@ -83,7 +75,7 @@ class ChunkManager:
     def region_coords(self, cx, cz):
         return cx // self.region_size, cz // self.region_size
 
-    def draw(self, camera_matrix: TransformationMatrix, camera):
+    def draw(self, camera_matrix, camera):
         cam_rx, cam_rz = numpy.floor(
             numpy.array(camera)[[0, 2]] / (16 * self.region_size)
         )
@@ -151,9 +143,8 @@ class RenderRegion(TriMesh):
         ] = {}
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
 
-        self.region_transform = displacement_matrix(
-            rx * region_size * 16, 0, rz * region_size * 16
-        )
+        self.region_transform = numpy.eye(4, dtype=numpy.float64)
+        self.region_transform[3, [0, 2]] = numpy.array([rx, rz]) * region_size * 16
 
     @property
     def vertex_usage(self):
@@ -248,8 +239,8 @@ class RenderRegion(TriMesh):
             chunk.unload()
         self._chunks.clear()
 
-    def draw(self, camera_matrix: TransformationMatrix, cam_cx, cam_cz):
-        transformation_matrix = numpy.matmul(camera_matrix, self.region_transform)
+    def draw(self, camera_matrix: numpy.ndarray, cam_cx, cam_cz):
+        transformation_matrix = numpy.matmul(self.region_transform, camera_matrix)
         super().draw(transformation_matrix)
         for chunk in sorted(
             self._manual_chunks.values(),

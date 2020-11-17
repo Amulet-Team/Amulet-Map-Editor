@@ -1,7 +1,4 @@
-from typing import Tuple
-import numpy
+from typing import Tuple, Union
 
-
-TransformationMatrix = numpy.ndarray  # 4x4 matrix
-CameraLocationType = Tuple[float, float, float]
-CameraRotationType = Tuple[float, float]
+CameraLocationType = Tuple[Union[int, float], Union[int, float], Union[int, float]]
+CameraRotationType = Tuple[Union[int, float], Union[int, float]]

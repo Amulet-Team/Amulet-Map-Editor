@@ -1,30 +1,5 @@
-from OpenGL.GL import (
-    glBindTexture,
-    GL_TEXTURE_2D,
-    GL_TRIANGLES,
-    glBindVertexArray,
-    glBindBuffer,
-    GL_ARRAY_BUFFER,
-    GL_STATIC_DRAW,
-    glUseProgram,
-    glGetUniformLocation,
-    glGenVertexArrays,
-    glGenBuffers,
-    glVertexAttribPointer,
-    GL_FLOAT,
-    GL_FALSE,
-    glEnableVertexAttribArray,
-    glBufferData,
-    glDeleteBuffers,
-    glDeleteVertexArrays,
-    glUniformMatrix4fv,
-    glUniform1i,
-    glActiveTexture,
-    GL_TEXTURE0,
-    glDrawArrays,
-)
+from OpenGL.GL import *
 from OpenGL.error import GLError
-import ctypes
 import numpy
 from amulet_map_editor.api.opengl.shaders import get_shader
 from amulet_map_editor.api.logging import log
@@ -174,7 +149,7 @@ class TriMesh(Drawable, ContextManager):
             self._transform_location,
             1,
             GL_FALSE,
-            transformation_matrix.T.astype(numpy.float32),
+            transformation_matrix.astype(numpy.float32),
         )
         glUniform1i(self._texture_location, 0)
         try:

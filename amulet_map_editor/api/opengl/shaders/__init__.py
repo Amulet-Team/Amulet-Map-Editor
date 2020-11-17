@@ -1,10 +1,4 @@
-from OpenGL.GL import (
-    glClearColor,
-    glBindVertexArray,
-    glGenVertexArrays,
-    GL_VERTEX_SHADER,
-    GL_FRAGMENT_SHADER,
-)
+from OpenGL.GL import *
 import OpenGL.GL.shaders
 import os
 from typing import Dict, Tuple, Any

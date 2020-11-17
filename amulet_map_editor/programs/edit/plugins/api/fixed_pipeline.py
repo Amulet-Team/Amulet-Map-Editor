@@ -8,7 +8,7 @@ from .operation_ui import OperationUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
-    from amulet.api.level import World
+    from amulet.api.world import World
 
 FixedOperationType = Callable[
     ["World", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType

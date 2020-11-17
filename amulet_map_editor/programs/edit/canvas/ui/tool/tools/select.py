@@ -36,7 +36,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         cut_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.cut())
         paste_button = wx.Button(self._button_panel, label="Paste")
         button_sizer.Add(paste_button, 0, wx.ALL | wx.EXPAND, 5)
-        paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste_from_cache())
+        paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste())
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
         self._paste_panel: Optional[SelectTransformUI] = None
@@ -105,12 +105,11 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
 
     def _paste(self, evt):
         structure = evt.structure
-        dimension = evt.dimension
         self._button_panel.Hide()
         self._remove_paste()
         self.canvas.selection_editable = False
         self._paste_panel = SelectTransformUI(
-            self.canvas, self.canvas, structure, dimension, self._paste_confirm
+            self.canvas, self.canvas, structure, self._paste_confirm
         )
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
         self.Layout()
@@ -121,7 +120,6 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
                 self.canvas.world,
                 self.canvas.dimension,
                 self._paste_panel.structure,
-                self._paste_panel.dimension,
                 self._paste_panel.location,
                 (1, 1, 1),
                 self._paste_panel.rotation,

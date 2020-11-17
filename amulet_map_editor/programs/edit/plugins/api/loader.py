@@ -14,7 +14,7 @@ from .data_types import OperationStorageType
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas import EditCanvas
-    from amulet.api.level import World
+    from amulet.api.world import World
 
 STOCK_PLUGINS_DIR = os.path.abspath(
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "stock_plugins")

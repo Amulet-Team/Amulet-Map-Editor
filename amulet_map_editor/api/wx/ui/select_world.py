@@ -3,17 +3,12 @@ import wx
 import glob
 from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
-import traceback
-
-from amulet import world_interface
-from amulet.api.errors import FormatError
-
 from amulet_map_editor.api import lang
+from amulet import world_interface
 from amulet_map_editor.api.wx.ui import simple
 from amulet_map_editor.api.logging import log
 from amulet_map_editor.api import config
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
-
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
@@ -132,12 +127,8 @@ class WorldList(simple.SimplePanel):
             if os.path.isdir(world_path):
                 try:
                     world_formats.append(world_interface.load_format(world_path))
-                except FormatError as e:
+                except Exception as e:
                     log.info(f"Could not find loader for {world_path} {e}")
-                except Exception:
-                    log.error(
-                        f"Error loading format wrapper for {world_path} {traceback.format_exc()}"
-                    )
         if sort:
             world_formats = reversed(sorted(world_formats, key=lambda f: f.last_played))
 
@@ -147,7 +138,9 @@ class WorldList(simple.SimplePanel):
                 self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
                 self.worlds.append(world_button)
             except Exception as e:
-                log.info(f"Failed to display world button for {world_format.path} {e}")
+                log.info(
+                    f"Failed to display world button for {world_format.world_path} {e}"
+                )
 
         self.Layout()
 

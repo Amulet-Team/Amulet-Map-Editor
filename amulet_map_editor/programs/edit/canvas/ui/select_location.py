@@ -2,8 +2,8 @@ import wx
 from typing import Callable, Type, Any, TYPE_CHECKING
 import math
 
-from amulet.api.level import BaseLevel
-from amulet.api.data_types import BlockCoordinates, Dimension
+from amulet.api.structure import Structure
+from amulet.api.data_types import BlockCoordinates
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.canvas.ui.base_ui import BaseUI
@@ -26,19 +26,15 @@ class SelectLocationUI(SimplePanel, BaseUI):
         self,
         parent: wx.Window,
         canvas: "EditCanvas",
-        structure: BaseLevel,
-        dimension: Dimension,
+        structure: Structure,
         confirm_callback: Callable[[], None],
     ):
         SimplePanel.__init__(self, parent)
         BaseUI.__init__(self, canvas)
 
         self._structure = structure
-        self._dimension = dimension
         self.canvas.structure.clear()
-        self.canvas.structure.append(
-            structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0)
-        )
+        self.canvas.structure.append(structure, (0, 0, 0), (1, 1, 1), (0, 0, 0))
         self.canvas.draw_structure = True
 
         self._setup_ui()
@@ -111,12 +107,8 @@ class SelectLocationUI(SimplePanel, BaseUI):
         return self._copy_lava.GetValue()
 
     @property
-    def structure(self) -> BaseLevel:
+    def structure(self) -> Structure:
         return self._structure
-
-    @property
-    def dimension(self) -> Dimension:
-        return self._dimension
 
     def _save_config(self, evt):
         select_config = config.get("edit_select_location", {})
@@ -127,7 +119,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
 
     def _on_transform_change(self, evt):
         location, scale, rotation = self.canvas.structure.active_transform
-        self.canvas.structure.active_transform = self.location, scale, rotation
+        self.canvas.structure.set_active_transform(self.location, scale, rotation)
 
     def _cursor_move(self, evt):
         if not self._clicked:
@@ -198,8 +190,6 @@ class SelectTransformUI(SelectLocationUI):
             ctrl.SetValue(
                 round((ctrl.GetValue() % 360) / 90) * 90
             )  # TODO: change this if smaller increments are allowed
-        self.canvas.structure.active_transform = (
-            self.location,
-            self.scale,
-            tuple(math.radians(r) for r in self.rotation),
+        self.canvas.structure.set_active_transform(
+            self.location, self.scale, tuple(math.radians(r) for r in self.rotation)
         )

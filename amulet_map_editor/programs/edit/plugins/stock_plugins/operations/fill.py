@@ -9,7 +9,7 @@ from amulet_map_editor.programs.edit.plugins import OperationUI
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
 
 

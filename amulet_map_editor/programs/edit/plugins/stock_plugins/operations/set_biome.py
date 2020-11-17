@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import wx
 import math
 
-from amulet.utils import block_coords_to_chunk_coords
+from amulet import block_coords_to_chunk_coords
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.biome_select import BiomeDefine
 from amulet_map_editor.programs.edit.canvas.events import EVT_BOX_CLICK
@@ -13,9 +13,9 @@ from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.world import World
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
-    from amulet.api.selection import SelectionGroup
+    from amulet import SelectionGroup
     from amulet.api.data_types import Dimension, OperationReturnType
 
 
@@ -97,9 +97,7 @@ class SetBiome(SimpleOperationPanel):
         x, y, z = self.canvas.cursor_location
 
         # TODO: replace with "get_biome(x, y, z)" if it'll be created
-        cx, cz = block_coords_to_chunk_coords(
-            x, z, sub_chunk_size=self.world.sub_chunk_size
-        )
+        cx, cz = block_coords_to_chunk_coords(x, z, chunk_size=self.world.chunk_size[0])
         offset_x, offset_z = x - 16 * cx, z - 16 * cz
         chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
 
@@ -117,9 +115,9 @@ class SetBiome(SimpleOperationPanel):
     ) -> "OperationReturnType":
         mode = self._mode.GetCurrentObject()
 
-        iter_count = len(list(world.get_chunk_slice_box(dimension, selection, False)))
+        iter_count = len(list(world.get_chunk_slices(selection, dimension, False)))
         for count, (chunk, slices, _) in enumerate(
-            world.get_chunk_slice_box(dimension, selection, False)
+            world.get_chunk_slices(selection, dimension, False)
         ):
             new_biome = chunk.biome_palette.get_add_biome(
                 self._biome_choice.universal_biome

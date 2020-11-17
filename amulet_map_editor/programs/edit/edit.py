@@ -15,7 +15,7 @@ from amulet_map_editor.programs.edit.plugins.api import loader
 from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.world import World
 
 
 class EditExtension(wx.Panel, BaseProgram):
@@ -144,30 +144,27 @@ class EditExtension(wx.Panel, BaseProgram):
             "Save\tCtrl+s", lambda evt: self._canvas.save()
         )
         # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
-
-        menu.setdefault("&Edit", {}).setdefault("history", {}).update(
-            {
-                "Undo\tCtrl+z": lambda evt: self._canvas.undo(),
-                "Redo\tCtrl+y": lambda evt: self._canvas.redo(),
-            }
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
+            "Undo\tCtrl+z", lambda evt: self._canvas.undo()
         )
-
-        menu.setdefault("&Edit", {}).setdefault("operation", {}).update(
-            {
-                "Cut\tCtrl+x": lambda evt: self._canvas.cut(),
-                "Copy\tCtrl+c": lambda evt: self._canvas.copy(),
-                "Paste\tCtrl+v": lambda evt: self._canvas.paste_from_cache(),
-                "Delete\tDelete": lambda evt: self._canvas.delete(),
-            }
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
+            "Redo\tCtrl+y", lambda evt: self._canvas.redo()
         )
-
-        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).update(
-            {
-                "Goto\tCtrl+g": lambda evt: self._canvas.goto(),
-                "Select All\tCtrl+A": lambda evt: self._canvas.select_all(),
-            }
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
+            "Cut\tCtrl+x", lambda evt: self._canvas.cut()
         )
-
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
+            "Copy\tCtrl+c", lambda evt: self._canvas.copy()
+        )
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
+            "Paste\tCtrl+v", lambda evt: self._canvas.paste()
+        )
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
+            "Delete\tDelete", lambda evt: self._canvas.delete()
+        )
+        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).setdefault(
+            "Goto\tCtrl+g", lambda evt: self._canvas.goto()
+        )
         menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
             "Controls...", lambda evt: self._edit_controls()
         )

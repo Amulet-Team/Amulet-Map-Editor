@@ -6,7 +6,7 @@ import weakref
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
-    from amulet.api.level import World
+    from amulet.api.world import World
 
 OperationUIType = Union[wx.Window, wx.Sizer, "OperationUI"]
 
