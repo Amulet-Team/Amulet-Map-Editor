@@ -4,7 +4,7 @@ import time
 import weakref
 import numpy
 
-from amulet.api.data_types import Dimension
+from amulet.api.data_types import Dimension, ChunkCoordinates
 
 from amulet_map_editor.api.logging import log
 from .chunk import RenderChunk
@@ -33,57 +33,58 @@ class BaseChunkGenerator:
         self._render_level_ = weakref.ref(render_level)
         self._region_size = render_level.chunk_manager.region_size
         self._coords: Optional[numpy.ndarray] = None  # x, z camera location
-        self._chunk_rebuilds: List[List[Tuple[int, int]]] = []
         self.rebuild = True
+        self.changed = False
+        self._chunk_rebuilds = self._rebuild_generator()
 
     @property
     def _render_level(self) -> "RenderLevel":
         return self._render_level_()
 
-    def _rebuild_todo(self):
-        """Rebuild the sequence of chunks that need (re)building"""
-        self.rebuild = False
-        chunk_changed = []  # a list of chunks that have changed
-        chunk_not_changed = set()  # a set of chunks that are loaded but have not changed
-        chunk_rebuild = set()  # a sub-set of chunk_not_changed that are next to chunks that have changed
-        chunk_not_loaded = []  # a list of chunks that have not been loaded
+    def _rebuild_generator(self) -> Generator[Optional[ChunkCoordinates], None, None]:
+        """A generator of chunk coordinates to rebuild.
+        This is an infinite length generator."""
+        while True:
+            if self.rebuild:
+                self.rebuild = False
+                chunk_rebuild = set()  # a sub-set of chunk_not_changed that are next to chunks that have changed
+                chunk_not_loaded = []  # a list of chunks that have not been loaded
 
-        if len(self._chunk_rebuilds) > 1:
-            chunks = self._chunk_rebuilds[0]
-            self._chunk_rebuilds.clear()
-            self._chunk_rebuilds.append(chunks)
-            chunk_rebuild = set(chunks)
-
-        for chunk_coords in self._render_level.chunk_coords():
-            if self._render_level.chunk_manager.render_chunk_needs_rebuild(chunk_coords):
-                chunk_changed.append(chunk_coords)
-            elif chunk_coords in self._render_level.chunk_manager:
-                chunk_not_changed.add(chunk_coords)
+                for chunk_coords in self._render_level.chunk_coords():
+                    if self.changed and self._render_level.chunk_manager.render_chunk_needs_rebuild(chunk_coords):
+                        yield chunk_coords
+                        for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                            chunk_coords_ = (
+                                chunk_coords[0] + offset[0],
+                                chunk_coords[1] + offset[1],
+                            )
+                            if chunk_coords_ not in chunk_rebuild and chunk_coords in self._render_level.chunk_manager:
+                                yield chunk_coords_
+                                chunk_rebuild.add(chunk_coords_)  # so that it doesn't get picked up again
+                        if self.rebuild:
+                            break
+                    elif chunk_coords not in self._render_level.chunk_manager:
+                        chunk_not_loaded.append(chunk_coords)
+                self.changed = False
+                if self.rebuild:
+                    continue
+                for chunk_coords in chunk_not_loaded:
+                    if self.rebuild:
+                        break
+                    yield chunk_coords
             else:
-                chunk_not_loaded.append([chunk_coords])
-
-        for chunk_coords in chunk_changed:
-            self._chunk_rebuilds.append([chunk_coords])
-            for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                chunk_coords_ = (
-                    chunk_coords[0] + offset[0],
-                    chunk_coords[1] + offset[1],
-                )
-                if chunk_coords_ in chunk_not_changed and chunk_coords_ not in chunk_rebuild:
-                    self._chunk_rebuilds[-1].append(chunk_coords_)
-                    chunk_rebuild.add(chunk_coords_)  # so that it doesn't get picked up again
-        self._chunk_rebuilds += chunk_not_loaded
+                yield None
 
     def generate_chunk(self):
         # first check if there is a chunk that exists and needs rebuilding
-        if self.rebuild or numpy.sum(
-                (self._coords - numpy.asarray(self._render_level.camera_location)[[0, 2]])**2
+        if self._coords is None or numpy.sum(
+            (self._coords - numpy.asarray(self._render_level.camera_location)[[0, 2]])**2
         ) > min(2048, self._render_level.render_distance*16-8):
-            self._rebuild_todo()
+            self.rebuild = True
             self._coords = numpy.asarray(self._render_level.camera_location)[[0, 2]]
 
-        if self._chunk_rebuilds:
-            chunk_coords = self._chunk_rebuilds[0].pop(0)
+        chunk_coords = next(self._chunk_rebuilds)
+        if chunk_coords is not None:
             # generate the chunk
             chunk = RenderChunk(
                 self._render_level.context_identifier,
@@ -104,8 +105,6 @@ class BaseChunkGenerator:
                 )
 
             self._render_level.chunk_manager.add_render_chunk(chunk)
-            if not self._chunk_rebuilds[0]:
-                del self._chunk_rebuilds[0]
 
 
 if ThreadingEnabled:
@@ -190,7 +189,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def enable(self):
         """Enable chunk generation in a new thread."""
-        self.rebuild_changed()
+        self._chunk_generator.rebuild = True
         self._chunk_generator.start()
 
     def disable(self, unload_data: bool = False):
@@ -251,7 +250,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         assert isinstance(val, int), "Render distance must be an int"
         self._render_distance = val
         self._garbage_distance = val + 5
-        self.rebuild_changed()
+        self._chunk_generator.rebuild = True
 
     @property
     def draw_box(self):
@@ -263,7 +262,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
         """Should the floor under the level be drawn."""
         return self._draw_floor
 
-    def chunk_coords(self) -> Generator[Tuple[int, int], None, None]:
+    def chunk_coords(self) -> Generator[ChunkCoordinates, None, None]:
         """Get all of the chunks to draw/load"""
         # This yield chunk coordinates in a spiral around the camera
         # TODO: Perhaps redesign this to prioritise chunks in front of the camera
@@ -313,3 +312,4 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ContextManager):
     def rebuild_changed(self):
         """Rebuild the chunks that have changed."""
         self._chunk_generator.rebuild = True
+        self._chunk_generator.changed = True

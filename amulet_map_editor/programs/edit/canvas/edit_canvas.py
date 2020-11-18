@@ -199,6 +199,7 @@ class EditCanvas(ControllableEditCanvas):
             err = e
 
         self._enable_threads()
+        self._render_world.rebuild_changed()
         if err is not None and throw_exceptions:
             raise err
         return out
