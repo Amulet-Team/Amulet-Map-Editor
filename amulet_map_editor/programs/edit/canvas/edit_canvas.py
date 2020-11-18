@@ -205,10 +205,12 @@ class EditCanvas(ControllableEditCanvas):
 
     def undo(self):
         self.world.undo()
+        self._render_world.rebuild_changed()
         wx.PostEvent(self, UndoEvent())
 
     def redo(self):
         self.world.redo()
+        self._render_world.rebuild_changed()
         wx.PostEvent(self, RedoEvent())
 
     def cut(self):
