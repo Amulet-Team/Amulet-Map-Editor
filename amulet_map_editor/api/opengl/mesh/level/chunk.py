@@ -170,7 +170,8 @@ class RenderChunk(RenderChunkBuilder):
         else:
             self._changed_time = chunk.changed_time
             self._chunk_state = 2
-            self._create_lod0_multi(self._sub_chunks(chunk.blocks))
+            chunk_verts, chunk_verts_translucent = self._create_lod0_multi(self._sub_chunks(chunk.blocks))
+            self._set_verts(chunk_verts, chunk_verts_translucent)
             if self._draw_floor:
                 plane: numpy.ndarray = numpy.ones(
                     (self._vert_len * 12), dtype=numpy.float32
