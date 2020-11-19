@@ -39,6 +39,7 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         self._world_translation: List[LocationType] = []
         self._transformation_matrices: List[numpy.ndarray] = []
         self._active_level: Optional[int] = None
+        self._camera_location: LocationType = (0.0, 100.0, 0.0)
 
     @property
     def active_level(self) -> Optional[int]:
@@ -67,14 +68,20 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
                 transform_matrix(scale, rotation, location),
                 displacement_matrix(*self._world_translation[self._active_level]),
             )
+            self._set_camera_location()
 
     def set_camera_location(self, x: float, y: float, z: float):
         """Set the location of the camera for each of the levels."""
-        for level, (displacement, scale, rotation) in zip(
-            self._levels, self._transforms
+        self._camera_location = (x, y, z)
+        self._set_camera_location()
+
+    def _set_camera_location(self):
+        for level, transform in zip(
+            self._levels, self._transformation_matrices
         ):
             level.camera_location = numpy.matmul(
-                inverse_transform_matrix(scale, rotation, displacement), (x, y, z, 1)
+                numpy.linalg.inv(transform),
+                (*self._camera_location, 1)
             ).tolist()[:-1]
 
     def set_camera_rotation(self, yaw: float, pitch: float):
