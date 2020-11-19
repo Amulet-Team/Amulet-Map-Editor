@@ -1,1 +1,1 @@
-from .chunk import Chunk
+from .chunk import RenderChunk
