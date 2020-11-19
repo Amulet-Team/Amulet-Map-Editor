@@ -1,7 +1,7 @@
 import numpy
 from typing import List, Union
 
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
+from amulet_map_editor.api.opengl import Drawable, ContextManager
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePack,
     OpenGLResourcePackManagerStatic,

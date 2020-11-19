@@ -20,7 +20,7 @@ from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManager,
     OpenGLResourcePack,
 )
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
+from amulet_map_editor.api.opengl import Drawable, ContextManager
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel

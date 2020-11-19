@@ -4,7 +4,7 @@ import numpy
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
 
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import Drawable, ContextManager
+from amulet_map_editor.api.opengl import Drawable, ContextManager
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.matrix import (
     transform_matrix,
