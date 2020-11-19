@@ -9,7 +9,7 @@ from amulet.api.data_types import Dimension
 from amulet.api.level import BaseLevel
 from amulet.api.selection import SelectionBox
 
-from amulet_map_editor.api.opengl.mesh.base.chunk_builder import RenderChunkBuilder
+from .chunk_builder import RenderChunkBuilder
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
 if TYPE_CHECKING:
