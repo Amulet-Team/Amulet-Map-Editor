@@ -123,9 +123,7 @@ def create_lod0_array(
 
             vert_index = 0
             for texture_index in model.texture_index[cull_dir]:
-                tex_bounds = texture_bounds[
-                    model.textures[texture_index]
-                ]
+                tex_bounds = texture_bounds[model.textures[texture_index]]
 
                 vert_table[:, vert_index : vert_index + 3, 5:9] = tex_bounds
                 vert_index += 3
@@ -202,14 +200,19 @@ class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
                 for block_temp_id in unique_blocks
             }
             texture_bounds: Dict[str, Tuple[float, float, float, float]] = {
-                texture_path: self.resource_pack.texture_bounds(
-                    texture_path
-                )
+                texture_path: self.resource_pack.texture_bounds(texture_path)
                 for model in models.values()
                 for texture_path in model.textures
             }
 
-            chunk_verts_, chunk_verts_translucent_ = create_lod0_array(models, texture_bounds, larger_blocks, self._vert_len, self.offset, offset)
+            chunk_verts_, chunk_verts_translucent_ = create_lod0_array(
+                models,
+                texture_bounds,
+                larger_blocks,
+                self._vert_len,
+                self.offset,
+                offset,
+            )
             chunk_verts += chunk_verts_
             chunk_verts_translucent += chunk_verts_translucent_
 

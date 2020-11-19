@@ -4,7 +4,11 @@ import numpy
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
 
-from amulet_map_editor.api.opengl import Drawable, ContextManager, ThreadedObjectContainer
+from amulet_map_editor.api.opengl import (
+    Drawable,
+    ContextManager,
+    ThreadedObjectContainer,
+)
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.matrix import (
     transform_matrix,
@@ -21,7 +25,9 @@ RotationType = FloatTriplet
 TransformType = Tuple[LocationType, ScaleType, RotationType]
 
 
-class LevelGroup(OpenGLResourcePackManager, Drawable, ThreadedObjectContainer, ContextManager):
+class LevelGroup(
+    OpenGLResourcePackManager, Drawable, ThreadedObjectContainer, ContextManager
+):
     """A group of RenderLevel classes with transforms"""
 
     def __init__(
@@ -74,12 +80,9 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ThreadedObjectContainer, C
         self._set_camera_location()
 
     def _set_camera_location(self):
-        for level, transform in zip(
-            self._objects, self._transformation_matrices
-        ):
+        for level, transform in zip(self._objects, self._transformation_matrices):
             level.camera_location = numpy.matmul(
-                numpy.linalg.inv(transform),
-                (*self._camera_location, 1)
+                numpy.linalg.inv(transform), (*self._camera_location, 1)
             ).tolist()[:-1]
 
     def set_camera_rotation(self, yaw: float, pitch: float):

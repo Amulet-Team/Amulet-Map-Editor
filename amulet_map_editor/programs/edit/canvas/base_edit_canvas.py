@@ -78,6 +78,7 @@ ThreadingEnabled = True
 
 
 if ThreadingEnabled:
+
     class ChunkGenerator(ThreadedObjectContainer, ThreadPoolExecutor):
         def __init__(self):
             ThreadedObjectContainer.__init__(self)
@@ -104,7 +105,9 @@ if ThreadingEnabled:
                     # go to sleep so this thread doesn't lock up the main thread.
                     time.sleep(1 / 60 - delta_time)
 
+
 else:
+
     class ChunkGenerator(ThreadedObjectContainer):
         def start(self):
             pass

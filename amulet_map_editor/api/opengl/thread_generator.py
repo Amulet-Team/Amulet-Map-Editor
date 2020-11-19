@@ -3,6 +3,7 @@ from typing import List
 
 class ThreadedObject:
     """Data/Geometry generation controlled by an external thread."""
+
     def thread_action(self):
         """The action the thread will call."""
         raise NotImplementedError
@@ -37,7 +38,10 @@ class ThreadedObjectContainer(ThreadedObject):
             self._obj_index = 0
             self._obj_sub_index = 0
         # while self._obj_index < len(self._objects) and
-        while self._obj_index < len(self._objects) and self._objects[self._obj_index].thread_weighting < self._obj_sub_index:
+        while (
+            self._obj_index < len(self._objects)
+            and self._objects[self._obj_index].thread_weighting < self._obj_sub_index
+        ):
             self._obj_index += 1
             self._obj_sub_index = 0
 

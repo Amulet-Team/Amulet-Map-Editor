@@ -51,8 +51,12 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         )
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
 
-        self._last_rebuild_camera_location: Optional[numpy.ndarray] = None  # x, z camera location
-        self._rebuild = True  # Should we go back to the beginning and re-find chunks to rebuild
+        self._last_rebuild_camera_location: Optional[
+            numpy.ndarray
+        ] = None  # x, z camera location
+        self._rebuild = (
+            True  # Should we go back to the beginning and re-find chunks to rebuild
+        )
         self._changed = False  # Should we look for chunks that have changed to rebuild
         self._chunk_rebuilds = self._rebuild_generator()
 
@@ -73,20 +77,29 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         while True:
             if self._rebuild:
                 self._rebuild = False
-                chunk_rebuild = set()  # a sub-set of chunk_not_changed that are next to chunks that have changed
+                chunk_rebuild = (
+                    set()
+                )  # a sub-set of chunk_not_changed that are next to chunks that have changed
                 chunk_not_loaded = []  # a list of chunks that have not been loaded
 
                 for chunk_coords in self.chunk_coords():
-                    if self._changed and self.chunk_manager.render_chunk_needs_rebuild(chunk_coords):
+                    if self._changed and self.chunk_manager.render_chunk_needs_rebuild(
+                        chunk_coords
+                    ):
                         yield chunk_coords
                         for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                             chunk_coords_ = (
                                 chunk_coords[0] + offset[0],
                                 chunk_coords[1] + offset[1],
                             )
-                            if chunk_coords_ not in chunk_rebuild and chunk_coords in self.chunk_manager:
+                            if (
+                                chunk_coords_ not in chunk_rebuild
+                                and chunk_coords in self.chunk_manager
+                            ):
                                 yield chunk_coords_
-                                chunk_rebuild.add(chunk_coords_)  # so that it doesn't get picked up again
+                                chunk_rebuild.add(
+                                    chunk_coords_
+                                )  # so that it doesn't get picked up again
                         if self._rebuild:
                             break
                     elif chunk_coords not in self.chunk_manager:
@@ -104,10 +117,16 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def thread_action(self):
         # first check if there is a chunk that exists and needs rebuilding
         if self._last_rebuild_camera_location is None or numpy.sum(
-                (self._last_rebuild_camera_location - numpy.asarray(self.camera_location)[[0, 2]]) ** 2
-        ) > min(2048, self.render_distance*16-8):
+            (
+                self._last_rebuild_camera_location
+                - numpy.asarray(self.camera_location)[[0, 2]]
+            )
+            ** 2
+        ) > min(2048, self.render_distance * 16 - 8):
             self._rebuild = True
-            self._last_rebuild_camera_location = numpy.asarray(self.camera_location)[[0, 2]]
+            self._last_rebuild_camera_location = numpy.asarray(self.camera_location)[
+                [0, 2]
+            ]
 
         chunk_coords = next(self._chunk_rebuilds)
         if chunk_coords is not None:
