@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING, Optional, Any, Dict, Tuple, List, Generator
 import numpy
 import weakref
 import math
+from concurrent.futures import ThreadPoolExecutor, Future
+import time
 
 from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
@@ -35,7 +37,7 @@ from minecraft_model_reader.api.resource_pack import (
     load_resource_pack_manager,
 )
 from amulet.api.chunk import Chunk
-from amulet.api.block import Block
+from amulet.api.block import UniversalAirBlock
 from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import (
     PointCoordinatesNDArray,
@@ -52,7 +54,7 @@ from amulet_map_editor.api.opengl.data_types import (
 )
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
-from amulet_map_editor.api.opengl import textureatlas
+from amulet_map_editor.api.opengl import textureatlas, ThreadedObjectContainer
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
@@ -72,7 +74,43 @@ if TYPE_CHECKING:
     from amulet.api.level import World
 
 
-AIR = Block("universal_minecraft", "air")
+ThreadingEnabled = True
+
+
+if ThreadingEnabled:
+    class ChunkGenerator(ThreadedObjectContainer, ThreadPoolExecutor):
+        def __init__(self):
+            ThreadedObjectContainer.__init__(self)
+            ThreadPoolExecutor.__init__(self, max_workers=1)
+            self._enabled = False
+            self._generator: Optional[Future] = None
+
+        def start(self):
+            if not self._enabled:
+                self._enabled = True
+                self._generator = self.submit(self._generate_chunks)
+
+        def stop(self):
+            if self._enabled:
+                self._enabled = False
+                self._generator.result()
+
+        def _generate_chunks(self):
+            while self._enabled:
+                start_time = time.time()
+                self.thread_action()
+                delta_time = time.time() - start_time
+                if delta_time < 1 / 60:
+                    # go to sleep so this thread doesn't lock up the main thread.
+                    time.sleep(1 / 60 - delta_time)
+
+else:
+    class ChunkGenerator(ThreadedObjectContainer):
+        def start(self):
+            pass
+
+        def stop(self):
+            pass
 
 
 class BaseEditCanvas(BaseCanvas):
@@ -125,6 +163,8 @@ class BaseEditCanvas(BaseCanvas):
 
         self._draw_structure = False
         self._structure: Optional[LevelGroup] = None
+
+        self._chunk_generator = ChunkGenerator()
 
         self._draw_timer = wx.Timer(self)
         self._gc_timer = wx.Timer(self)
@@ -208,6 +248,7 @@ class BaseEditCanvas(BaseCanvas):
             self._opengl_resource_pack,
             self.world,
         )
+        self._chunk_generator.register(self._render_world)
 
         self._selection_group = RenderSelectionHistoryManager(
             EditProgramRenderSelectionGroup(
@@ -220,6 +261,7 @@ class BaseEditCanvas(BaseCanvas):
             self.context_identifier,
             self._opengl_resource_pack,
         )
+        self._chunk_generator.register(self._structure)
 
         self._bind_base_events()
 
@@ -300,6 +342,7 @@ class BaseEditCanvas(BaseCanvas):
         self.SetCurrent(self._context)
         self._render_world.enable()
         self._structure.enable()
+        self._enable_threads()
         self._draw_timer.Start(15)
         self._gc_timer.Start(10000)
         self._rebuild_timer.Start(1000)
@@ -309,19 +352,18 @@ class BaseEditCanvas(BaseCanvas):
         self._draw_timer.Stop()
         self._gc_timer.Stop()
         self._rebuild_timer.Stop()
-        self._render_world.disable(True)
-        self._structure.disable(True)
+        self._disable_threads()
+        self._render_world.unload()
+        self._structure.unload()
 
     def _disable_threads(self):
         """Stop the generation of new chunk geometry.
         Makes it safe to modify the world data."""
-        self._render_world.disable()
-        self._structure.disable()
+        self._chunk_generator.stop()
 
     def _enable_threads(self):
         """Start the generation of new chunk geometry."""
-        self._render_world.enable()
-        self._structure.enable()
+        self._chunk_generator.start()
 
     def close(self):
         """Close and destroy the canvas and all contained data."""
@@ -537,7 +579,7 @@ class BaseEditCanvas(BaseCanvas):
                 and self._render_world.level.block_palette[
                     chunk.blocks[x % 16, y, z % 16]
                 ]
-                != AIR
+                != UniversalAirBlock
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block
@@ -672,6 +714,8 @@ class BaseEditCanvas(BaseCanvas):
             self.transformation_matrix, tuple(self.camera_location), self.draw_selection
         )
         self.SwapBuffers()
+        if not ThreadingEnabled:
+            self._chunk_generator.thread_action()
 
     def _gc(self, event):
         self._render_world.run_garbage_collector()

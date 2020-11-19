@@ -4,19 +4,16 @@ import numpy
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
 
-from amulet_map_editor.api.opengl import Drawable, ContextManager
+from amulet_map_editor.api.opengl import Drawable, ContextManager, ThreadedObjectContainer
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.matrix import (
     transform_matrix,
     displacement_matrix,
-    inverse_transform_matrix,
 )
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManager,
     OpenGLResourcePack,
 )
-
-numpy.seterr(all="raise")
 
 LocationType = PointCoordinates
 ScaleType = FloatTriplet
@@ -24,7 +21,7 @@ RotationType = FloatTriplet
 TransformType = Tuple[LocationType, ScaleType, RotationType]
 
 
-class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
+class LevelGroup(OpenGLResourcePackManager, Drawable, ThreadedObjectContainer, ContextManager):
     """A group of RenderLevel classes with transforms"""
 
     def __init__(
@@ -33,8 +30,9 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         resource_pack: OpenGLResourcePack,
     ):
         OpenGLResourcePackManager.__init__(self, resource_pack)
+        ThreadedObjectContainer.__init__(self)
         ContextManager.__init__(self, context_identifier)
-        self._levels: List[RenderLevel] = []
+        self._objects: List[RenderLevel] = []
         self._transforms: List[TransformType] = []
         self._world_translation: List[LocationType] = []
         self._transformation_matrices: List[numpy.ndarray] = []
@@ -77,7 +75,7 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def _set_camera_location(self):
         for level, transform in zip(
-            self._levels, self._transformation_matrices
+            self._objects, self._transformation_matrices
         ):
             level.camera_location = numpy.matmul(
                 numpy.linalg.inv(transform),
@@ -86,7 +84,7 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def set_camera_rotation(self, yaw: float, pitch: float):
         """Set the rotation of the camera for each of the levels."""
-        for level in self._levels:
+        for level in self._objects:
             level.camera_rotation = yaw, pitch
 
     def append(
@@ -109,7 +107,7 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
         )
         render_level.dimension = dimension
         # the level objects to be drawn
-        self._levels.append(render_level)
+        self.register(render_level)
         # the transforms (tuple) applied by the user
         self._transforms.append((location, scale, rotation))
         self._world_translation.append(
@@ -133,38 +131,37 @@ class LevelGroup(OpenGLResourcePackManager, Drawable, ContextManager):
 
     def enable(self):
         """Enable chunk generation in a new thread."""
-        for level in self._levels:
+        for level in self._objects:
             level.enable()
 
-    def disable(self, unload_data: bool = False):
-        """Disable the chunk generation thread.
-        This makes it safe to access and modify world data.
-        :param unload_data: Unload the data stored in the world
-        :return:
-        """
-        for level in self._levels:
-            level.disable(unload_data)
+    def unload(self):
+        for level in self._objects:
+            level.unload()
 
     def clear(self):
         """Destroy and unload all level objects."""
-        self.disable(True)
-        self._levels.clear()
+        self.unload()
+        for level in self._objects.copy():
+            self.unregister(level)
         self._transforms.clear()
         self._world_translation.clear()
         self._transformation_matrices.clear()
         self._active_level = None
 
     def run_garbage_collector(self):
-        for level in self._levels:
+        for level in self._objects:
             level.run_garbage_collector()
 
     def rebuild(self):
         """Rebuild a single region which was last rebuild the longest ago.
         Put this on a semi-fast clock to rebuild all regions."""
-        for level in self._levels:
+        for level in self._objects:
             level.chunk_manager.rebuild()
+
+    def _rebuild(self):
+        pass
 
     def draw(self, camera_matrix: numpy.ndarray):
         """Draw all of the levels."""
-        for level, transform in zip(self._levels, self._transformation_matrices):
+        for level, transform in zip(self._objects, self._transformation_matrices):
             level.draw(numpy.matmul(camera_matrix, transform))
