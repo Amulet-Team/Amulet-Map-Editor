@@ -54,6 +54,7 @@ from amulet_map_editor.api.opengl.data_types import (
 )
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
+from amulet_map_editor.api.opengl.mesh.sky_box import SkyBox
 from amulet_map_editor.api.opengl import textureatlas, ThreadedObjectContainer
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
@@ -167,6 +168,8 @@ class BaseEditCanvas(BaseCanvas):
         self._draw_structure = False
         self._structure: Optional[LevelGroup] = None
 
+        self._sky_box: Optional[SkyBox] = None
+
         self._chunk_generator = ChunkGenerator()
 
         self._draw_timer = wx.Timer(self)
@@ -265,6 +268,11 @@ class BaseEditCanvas(BaseCanvas):
             self._opengl_resource_pack,
         )
         self._chunk_generator.register(self._structure)
+
+        self._sky_box: Optional[SkyBox] = SkyBox(
+            self.context_identifier,
+            self._opengl_resource_pack,
+        )
 
         self._bind_base_events()
 
@@ -477,6 +485,7 @@ class BaseEditCanvas(BaseCanvas):
         ), "format for camera_location is invalid"
         self._camera_location = self._render_world.camera_location = location
         self._structure.set_camera_location(*location)
+        self._sky_box.set_camera_location(location)
         self._transformation_matrix = None
         self._selection_moved = True
         wx.PostEvent(self, CameraMoveEvent(location=self.camera_location))
@@ -707,6 +716,7 @@ class BaseEditCanvas(BaseCanvas):
 
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        self._sky_box.draw(self.transformation_matrix)
         self._render_world.draw(self.transformation_matrix)
         if self._draw_structure:
             self._structure.draw(self.transformation_matrix)
