@@ -3,7 +3,10 @@ import numpy
 from minecraft_model_reader.api.mesh.block.cube import get_cube
 
 from .tri_mesh import TriMesh
-from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePackManager, OpenGLResourcePack
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePackManager,
+    OpenGLResourcePack,
+)
 from amulet_map_editor.api.opengl.data_types import CameraLocationType
 from amulet_map_editor.api.opengl.matrix import displacement_matrix
 
@@ -29,7 +32,7 @@ class SkyBox(TriMesh, OpenGLResourcePackManager):
             self.resource_pack.get_texture_path("amulet", "amulet_ui/cubemap/south"),
             self.resource_pack.get_texture_path("amulet", "amulet_ui/cubemap/east"),
             bounds=((Radius, -Radius), (-Radius, Radius), (-Radius, Radius)),
-            do_not_cull=(True,)*6
+            do_not_cull=(True,) * 6,
         )
 
         verts = model.verts[None].reshape((-1, 3))
@@ -37,22 +40,20 @@ class SkyBox(TriMesh, OpenGLResourcePackManager):
         faces = model.faces[None]
 
         # each slice in the first axis is a new block, each slice in the second is a new vertex
-        vert_table = numpy.zeros(
-            (faces.size, self._vert_len), dtype=numpy.float32
-        )
+        vert_table = numpy.zeros((faces.size, self._vert_len), dtype=numpy.float32)
         vert_table[:, :3] = verts[faces]
         vert_table[:, 3:5] = tverts[faces]
 
         vert_index = 0
         for texture_index in model.texture_index[None]:
-            tex_bounds = self.resource_pack.texture_bounds(model.textures[texture_index])
+            tex_bounds = self.resource_pack.texture_bounds(
+                model.textures[texture_index]
+            )
 
             vert_table[vert_index : vert_index + 3, 5:9] = tex_bounds
             vert_index += 3
 
-        vert_table[:, 9:12] = (
-            model.tint_verts[None].reshape((-1, 3))[faces]
-        )
+        vert_table[:, 9:12] = model.tint_verts[None].reshape((-1, 3))[faces]
         self.verts = numpy.ravel(vert_table)
         self.draw_count = int(self.verts.size // self._vert_len)
 
@@ -62,7 +63,6 @@ class SkyBox(TriMesh, OpenGLResourcePackManager):
     def draw(self, transformation_matrix: numpy.ndarray):
         super().draw(
             numpy.matmul(
-                transformation_matrix,
-                displacement_matrix(*self._camera_location)
+                transformation_matrix, displacement_matrix(*self._camera_location)
             )
         )
