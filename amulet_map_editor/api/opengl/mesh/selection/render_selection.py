@@ -13,7 +13,7 @@ from OpenGL.GL import (
 import itertools
 from typing import Tuple, Optional, Union
 
-from amulet_map_editor.api.opengl.mesh.base.tri_mesh import TriMesh
+from amulet_map_editor.api.opengl.mesh.tri_mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePack,
     OpenGLResourcePackManagerStatic,

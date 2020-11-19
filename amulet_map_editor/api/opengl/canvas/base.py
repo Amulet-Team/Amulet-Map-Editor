@@ -37,6 +37,7 @@ class BaseCanvas(glcanvas.GLCanvas):
         ).EndList()
         super().__init__(parent, display_attributes, size=parent.GetClientSize())
         self._projection = [70.0, 4 / 3, 0.1, 10000.0]
+        self._projection_matrix: Optional[numpy.ndarray] = None
         if sys.platform == "linux":
             # setup the OpenGL context. This apparently fixes #84
             self._context = glcanvas.GLContext(self)
@@ -89,6 +90,7 @@ class BaseCanvas(glcanvas.GLCanvas):
     @fov.setter
     def fov(self, fov: float):
         self._projection[0] = fov
+        self._projection_matrix = None
         self._transformation_matrix = None
 
     @property
@@ -98,17 +100,30 @@ class BaseCanvas(glcanvas.GLCanvas):
     @aspect_ratio.setter
     def aspect_ratio(self, aspect_ratio: float):
         self._projection[1] = aspect_ratio
+        self._projection_matrix = None
         self._transformation_matrix = None
 
     @staticmethod
     def rotation_matrix(yaw, pitch):
         return rotation_matrix_yx(math.radians(yaw + 180), math.radians(pitch))
 
-    def projection_matrix(self):
-        # camera projection
-        fovy, aspect, z_near, z_far = self._projection
-        fovy = math.radians(fovy)
-        return projection_matrix(fovy, aspect, z_near, z_far)
+    @property
+    def camera_matrix(self) -> numpy.ndarray:
+        """The matrix to convert world space to camera space."""
+        return numpy.matmul(
+            self.rotation_matrix(*self.camera_rotation),
+            displacement_matrix(*-numpy.array(self.camera_location)),
+        )
+
+    @property
+    def projection_matrix(self) -> numpy.ndarray:
+        """The matrix to convert camera space to screen space."""
+        if self._projection_matrix is None:
+            fovy, aspect, z_near, z_far = self._projection
+            fovy = math.radians(fovy)
+            self._projection_matrix = projection_matrix(fovy, aspect, z_near, z_far)
+
+        return self._projection_matrix
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:
@@ -116,11 +131,8 @@ class BaseCanvas(glcanvas.GLCanvas):
         # camera translation
         if self._transformation_matrix is None:
             self._transformation_matrix = numpy.matmul(
-                self.projection_matrix(),
-                numpy.matmul(
-                    self.rotation_matrix(*self.camera_rotation),
-                    displacement_matrix(*-numpy.array(self.camera_location)),
-                ),
+                self.projection_matrix,
+                self.camera_matrix,
             )
 
         return self._transformation_matrix
