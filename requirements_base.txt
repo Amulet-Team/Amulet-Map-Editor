@@ -1,6 +1,6 @@
 numpy==1.17.4
 pyopengl==3.1.5
 amulet-core~=1.1.0b0
-amulet-nbt~=1.0
-pymctranslate~=1.0
-minecraft-resource-pack~=1.0
+amulet-nbt~=1.0.3
+pymctranslate~=1.0.0
+minecraft-resource-pack~=1.0.0
