@@ -194,6 +194,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def dimension(self, dimension: Dimension):
         self._dimension = dimension
         self.run_garbage_collector(True)
+        self._rebuild = True
 
     @property
     def render_distance(self) -> int:

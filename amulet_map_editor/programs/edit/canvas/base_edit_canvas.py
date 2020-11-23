@@ -471,8 +471,11 @@ class BaseEditCanvas(BaseCanvas):
     @dimension.setter
     def dimension(self, dimension: Dimension):
         """Set the currently loaded dimension in the renderer."""
-        self._render_world.dimension = dimension
-        wx.PostEvent(self, DimensionChangeEvent(dimension=dimension))
+        if dimension != self.dimension:
+            self._disable_threads()
+            self._render_world.dimension = dimension
+            wx.PostEvent(self, DimensionChangeEvent(dimension=dimension))
+            self._enable_threads()
 
     @property
     def camera_location(self) -> CameraLocationType:
