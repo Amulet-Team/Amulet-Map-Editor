@@ -24,9 +24,13 @@ from amulet_map_editor.api.opengl.data_types import (
 )
 from amulet_map_editor.api.opengl.matrix import (
     rotation_matrix_yx,
-    projection_matrix,
+    perspective_matrix,
     displacement_matrix,
+    orthographic_matrix,
 )
+
+Orthographic = 0
+Perspective = 1
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -36,7 +40,13 @@ class BaseCanvas(glcanvas.GLCanvas):
             24
         ).EndList()
         super().__init__(parent, display_attributes, size=parent.GetClientSize())
-        self._projection = [70.0, 4 / 3, 0.1, 10000.0]
+        self._projection_mode = Perspective
+        self._fov = [100.0, 70.0]
+        self._clipping = [
+            (-10000.0, 10000.0),
+            (0.1, 10000.0)
+        ]
+        self._aspect_ratio = 4 / 3
         self._projection_matrix: Optional[numpy.ndarray] = None
         if sys.platform == "linux":
             # setup the OpenGL context. This apparently fixes #84
@@ -72,6 +82,10 @@ class BaseCanvas(glcanvas.GLCanvas):
     def _close(self):
         glDeleteTextures([self._gl_texture_atlas])
 
+    def _reset_matrix(self):
+        self._projection_matrix = None
+        self._transformation_matrix = None
+
     @property
     def camera_location(self) -> CameraLocationType:
         raise NotImplementedError
@@ -85,23 +99,21 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @property
     def fov(self) -> float:
-        return self._projection[0]
+        return self._fov[self._projection_mode]
 
     @fov.setter
     def fov(self, fov: float):
-        self._projection[0] = fov
-        self._projection_matrix = None
-        self._transformation_matrix = None
+        self._fov[self._projection_mode] = fov
+        self._reset_matrix()
 
     @property
     def aspect_ratio(self) -> float:
-        return self._projection[1]
+        return self._aspect_ratio
 
     @aspect_ratio.setter
     def aspect_ratio(self, aspect_ratio: float):
-        self._projection[1] = aspect_ratio
-        self._projection_matrix = None
-        self._transformation_matrix = None
+        self._aspect_ratio = aspect_ratio
+        self._reset_matrix()
 
     @staticmethod
     def rotation_matrix(yaw, pitch):
@@ -119,11 +131,24 @@ class BaseCanvas(glcanvas.GLCanvas):
     def projection_matrix(self) -> numpy.ndarray:
         """The matrix to convert camera space to screen space."""
         if self._projection_matrix is None:
-            fovy, aspect, z_near, z_far = self._projection
-            fovy = math.radians(fovy)
-            self._projection_matrix = projection_matrix(fovy, aspect, z_near, z_far)
+            if self._projection_mode == Orthographic:
+                self._projection_matrix = self.orthographic_matrix
+            else:
+                self._projection_matrix = self.perspective_matrix
 
         return self._projection_matrix
+
+    @property
+    def orthographic_matrix(self) -> numpy.ndarray:
+        """The orthographic matrix to convert camera space to screen space."""
+        near, far = self._clipping[self._projection_mode]
+        return orthographic_matrix(self.fov, self.aspect_ratio, near, far)
+
+    @property
+    def perspective_matrix(self) -> numpy.ndarray:
+        """The perspective matrix to convert camera space to screen space."""
+        z_near, z_far = self._clipping[self._projection_mode]
+        return perspective_matrix(math.radians(self.fov), self.aspect_ratio, z_near, z_far)
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:

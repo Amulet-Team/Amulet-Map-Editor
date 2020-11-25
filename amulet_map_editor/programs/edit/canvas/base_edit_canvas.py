@@ -56,7 +56,7 @@ from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
 from amulet_map_editor.api.opengl.mesh.sky_box import SkyBox
 from amulet_map_editor.api.opengl import textureatlas, ThreadedObjectContainer
-from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
+from amulet_map_editor.api.opengl.canvas import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 from amulet_map_editor.api.logging import log
