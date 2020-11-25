@@ -100,11 +100,9 @@ if ThreadingEnabled:
         def _generate_chunks(self):
             while self._enabled:
                 start_time = time.time()
-                self.thread_action()
-                delta_time = time.time() - start_time
-                if delta_time < 1 / 60:
-                    # go to sleep so this thread doesn't lock up the main thread.
-                    time.sleep(1 / 60 - delta_time)
+                while time.time() - start_time < 1/120:
+                    self.thread_action()
+                time.sleep(1/60)
 
 
 else:
