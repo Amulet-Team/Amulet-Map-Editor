@@ -5,7 +5,7 @@ from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
 import traceback
 
-from amulet import world_interface
+from amulet import load_format
 from amulet.api.errors import FormatError
 
 from amulet_map_editor.api import lang
@@ -131,7 +131,7 @@ class WorldList(simple.SimplePanel):
         for world_path in world_dirs:
             if os.path.isdir(world_path):
                 try:
-                    world_formats.append(world_interface.load_format(world_path))
+                    world_formats.append(load_format(world_path))
                 except FormatError as e:
                     log.info(f"Could not find loader for {world_path} {e}")
                 except Exception:
