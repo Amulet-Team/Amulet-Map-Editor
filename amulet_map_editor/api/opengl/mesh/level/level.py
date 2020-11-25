@@ -104,9 +104,10 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                             break
                     elif chunk_coords not in self.chunk_manager:
                         chunk_not_loaded.append(chunk_coords)
-                self._changed = False
                 if self._rebuild:
                     continue
+                else:
+                    self._changed = False
                 for chunk_coords in chunk_not_loaded:
                     if self._rebuild:
                         break

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from amulet.api.level import Structure
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension
-from amulet.structure_interface.schematic import SchematicFormatWrapper
+from amulet.level.formats.schematic import SchematicFormatWrapper
 
 from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
     SimpleOperationPanel,

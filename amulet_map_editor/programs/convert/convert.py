@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 import webbrowser
 from typing import TYPE_CHECKING, Callable
 
-from amulet import world_interface
+from amulet import load_format
 from amulet.api.level import World
 
 from amulet_map_editor.api import lang
@@ -114,7 +114,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             wx.MessageBox("The input and output worlds must be different")
             return
         try:
-            out_world_format = world_interface.load_format(path)
+            out_world_format = load_format(path)
             self.out_world_path = path
 
         except Exception:
@@ -144,7 +144,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
     def _convert_method(self):
         global work_count
         try:
-            out_world = world_interface.load_format(self.out_world_path)
+            out_world = load_format(self.out_world_path)
             log.info(f"Converting world {self.world.world_path} to {out_world.path}")
             out_world: WorldFormatWrapper
             out_world.open()
