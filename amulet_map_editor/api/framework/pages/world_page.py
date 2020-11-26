@@ -6,7 +6,7 @@ import importlib
 import pkgutil
 
 from amulet.api.errors import LoaderNoneMatched
-from amulet import world_interface
+from amulet import load_level
 
 from amulet_map_editor import programs
 from amulet_map_editor.api.logging import log
@@ -45,11 +45,11 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         self._path = path
         self._close_self_callback = close_self_callback
         try:
-            self.world = world_interface.load_world(path)
+            self.world = load_level(path)
         except LoaderNoneMatched as e:
             self.Destroy()
             raise e
-        self.world_name = self.world.world_wrapper.world_name
+        self.world_name = self.world.level_wrapper.world_name
         self._extensions: List[BaseProgram] = []
         self._last_extension: int = -1
         self._load_extensions()

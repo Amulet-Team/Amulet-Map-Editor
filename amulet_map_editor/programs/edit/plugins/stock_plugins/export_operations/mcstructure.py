@@ -5,7 +5,7 @@ import os
 from amulet.api.selection import SelectionGroup
 from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension, OperationReturnType
-from amulet.structure_interface.mcstructure import MCStructureFormatWrapper
+from amulet.level.formats.mcstructure import MCStructureFormatWrapper
 
 from amulet_map_editor.api.wx.ui.version_select import VersionSelect
 from amulet_map_editor.programs.edit.plugins.api.simple_operation_panel import (
