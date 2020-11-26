@@ -10,6 +10,7 @@ from amulet_map_editor.programs.edit.canvas.events import (
     EVT_CREATE_UNDO,
     EVT_SAVE,
 )
+from amulet_map_editor.api import image
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
@@ -48,18 +49,26 @@ class FilePanel(wx.BoxSizer, BaseUI):
             return button
 
         self._undo_button: Optional[wx.Button] = create_button(
-            "Undo", lambda evt: self.canvas.undo()
+            "0", lambda evt: self.canvas.undo()
         )
+        self._undo_button.SetBitmap(image.icon.tablericons.arrow_back_up.bitmap(20, 20))
+
         self._redo_button: Optional[wx.Button] = create_button(
-            "Redo", lambda evt: self.canvas.redo()
+            "0", lambda evt: self.canvas.redo()
         )
+        self._redo_button.SetBitmap(image.icon.tablericons.arrow_forward_up.bitmap(20, 20))
+
         self._save_button: Optional[wx.Button] = create_button(
-            "Save", lambda evt: self.canvas.save()
+            "0", lambda evt: self.canvas.save()
         )
-        create_button("Close", lambda evt: self.canvas.close())
+        self._save_button.SetBitmap(image.icon.tablericons.device_floppy.bitmap(20, 20))
+
+        close_button = wx.BitmapButton(canvas, bitmap=image.icon.tablericons.square_x.bitmap(20, 20))
+        close_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.close())
+        self.Add(close_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+
         self._update_buttons()
 
-        # self.Fit(self)
         self.Layout()
 
     def bind_events(self):
@@ -75,13 +84,13 @@ class FilePanel(wx.BoxSizer, BaseUI):
 
     def _update_buttons(self):
         self._undo_button.SetLabel(
-            f"Undo | {self.canvas.world.history_manager.undo_count}"
+            f"{self.canvas.world.history_manager.undo_count}"
         )
         self._redo_button.SetLabel(
-            f"Redo | {self.canvas.world.history_manager.redo_count}"
+            f"{self.canvas.world.history_manager.redo_count}"
         )
         self._save_button.SetLabel(
-            f"Save | {self.canvas.world.history_manager.unsaved_changes}"
+            f"{self.canvas.world.history_manager.unsaved_changes}"
         )
 
     def _on_dimension_change(self, evt):
