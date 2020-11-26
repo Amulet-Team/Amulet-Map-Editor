@@ -117,11 +117,8 @@ class EditCanvas(ControllableEditCanvas):
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
-        file_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        file_sizer.AddStretchSpacer(1)
         self._file_panel = FilePanel(self)
-        file_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
-        canvas_sizer.Add(file_sizer, 0, wx.EXPAND, 0)
+        canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
 
         self._tool_sizer = ToolManagerSizer(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)

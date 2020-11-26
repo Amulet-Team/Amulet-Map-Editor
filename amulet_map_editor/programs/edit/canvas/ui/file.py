@@ -20,6 +20,10 @@ class FilePanel(wx.BoxSizer, BaseUI):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         BaseUI.__init__(self, canvas)
 
+        level = self.canvas.world
+        self._version_text = wx.StaticText(canvas, label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}")
+        self.Add(self._version_text, 0)
+        self.AddStretchSpacer(1)
         self._location_button = wx.Button(
             canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera_location])
         )
