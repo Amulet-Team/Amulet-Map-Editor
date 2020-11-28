@@ -153,7 +153,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                 elif action == "inspect block":
                     self._inspect_block()
                 elif action == "toggle 2d/3d":
-                    self._set_projection(int(not self._projection_mode))
+                    self.projection_mode = not self.projection_mode
 
             else:  # run once on button release
                 if action == "box click":
@@ -170,14 +170,14 @@ class ControllableEditCanvas(BaseEditCanvas):
                     else:
                         self._capture_mouse()
                 elif action == "speed+":
-                    if self._projection_mode == Perspective:
+                    if self.projection_mode == Perspective:
                         self._camera_move_speed *= 1.1
-                    elif self._projection_mode == Orthographic:
+                    elif self.projection_mode == Orthographic:
                         self.fov = max(0.5, self.fov / 1.1)
                 elif action == "speed-":
-                    if self._projection_mode == Perspective:
+                    if self.projection_mode == Perspective:
                         self._camera_move_speed /= 1.1
-                    elif self._projection_mode == Orthographic:
+                    elif self.projection_mode == Orthographic:
                         self.fov = min(1000.0, self.fov * 1.1)
 
         elif key[1] == Escape:

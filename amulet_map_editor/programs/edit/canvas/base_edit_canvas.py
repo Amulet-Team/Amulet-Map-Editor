@@ -717,7 +717,7 @@ class BaseEditCanvas(BaseCanvas):
 
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        if self._projection_mode == Perspective:
+        if self.projection_mode == Perspective:
             self._sky_box.draw(self.transformation_matrix)
         self._render_world.draw(self.transformation_matrix)
         if self._draw_structure:

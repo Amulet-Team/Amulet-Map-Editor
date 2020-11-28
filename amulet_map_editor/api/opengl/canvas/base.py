@@ -88,10 +88,16 @@ class BaseCanvas(glcanvas.GLCanvas):
         self._projection_matrix = None
         self._transformation_matrix = None
 
-    def _set_projection(self, projection: int):
-        assert isinstance(projection, int) and 0 <= projection <= 1
-        self._projection_mode = projection
-        self._reset_matrix()
+    @property
+    def projection_mode(self) -> int:
+        return self._projection_mode
+
+    @projection_mode.setter
+    def projection_mode(self, projection_mode: int):
+        assert isinstance(projection_mode, int) and 0 <= projection_mode <= 1
+        if self._projection_mode != projection_mode:
+            self._projection_mode = projection_mode
+            self._reset_matrix()
 
     @property
     def camera_location(self) -> CameraLocationType:
@@ -106,11 +112,11 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     @property
     def fov(self) -> float:
-        return self._fov[self._projection_mode]
+        return self._fov[self.projection_mode]
 
     @fov.setter
     def fov(self, fov: float):
-        self._fov[self._projection_mode] = fov
+        self._fov[self.projection_mode] = fov
         self._reset_matrix()
 
     @property
@@ -138,7 +144,7 @@ class BaseCanvas(glcanvas.GLCanvas):
     def projection_matrix(self) -> numpy.ndarray:
         """The matrix to convert camera space to screen space."""
         if self._projection_matrix is None:
-            if self._projection_mode == Orthographic:
+            if self.projection_mode == Orthographic:
                 self._projection_matrix = self.orthographic_matrix
             else:
                 self._projection_matrix = self.perspective_matrix
@@ -148,13 +154,13 @@ class BaseCanvas(glcanvas.GLCanvas):
     @property
     def orthographic_matrix(self) -> numpy.ndarray:
         """The orthographic matrix to convert camera space to screen space."""
-        near, far = self._clipping[self._projection_mode]
+        near, far = self._clipping[self.projection_mode]
         return orthographic_matrix(self.fov, self.aspect_ratio, near, far)
 
     @property
     def perspective_matrix(self) -> numpy.ndarray:
         """The perspective matrix to convert camera space to screen space."""
-        z_near, z_far = self._clipping[self._projection_mode]
+        z_near, z_far = self._clipping[self.projection_mode]
         return perspective_matrix(
             math.radians(self.fov), self.aspect_ratio, z_near, z_far
         )
