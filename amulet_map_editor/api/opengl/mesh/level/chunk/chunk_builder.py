@@ -192,10 +192,11 @@ class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
         chunk_verts = []
         chunk_verts_translucent = []
 
+        block_palette = self.chunk.block_palette
         for larger_blocks, unique_blocks, offset in blocks:
             models: Dict[int, minecraft_model_reader.BlockMesh] = {
                 block_temp_id: self.resource_pack.get_block_model(
-                    self.chunk.block_palette[block_temp_id]
+                    block_palette[block_temp_id]
                 )
                 for block_temp_id in unique_blocks
             }

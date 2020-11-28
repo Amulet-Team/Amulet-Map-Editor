@@ -42,10 +42,7 @@ class BaseCanvas(glcanvas.GLCanvas):
         super().__init__(parent, display_attributes, size=parent.GetClientSize())
         self._projection_mode = Perspective
         self._fov = [100.0, 70.0]
-        self._clipping = [
-            (-10000.0, 10000.0),
-            (0.1, 10000.0)
-        ]
+        self._clipping = [(-(10 ** 6), 10 ** 6), (0.1, 10000.0)]
         self._aspect_ratio = 4 / 3
         self._projection_matrix: Optional[numpy.ndarray] = None
         if sys.platform == "linux":
@@ -148,7 +145,9 @@ class BaseCanvas(glcanvas.GLCanvas):
     def perspective_matrix(self) -> numpy.ndarray:
         """The perspective matrix to convert camera space to screen space."""
         z_near, z_far = self._clipping[self._projection_mode]
-        return perspective_matrix(math.radians(self.fov), self.aspect_ratio, z_near, z_far)
+        return perspective_matrix(
+            math.radians(self.fov), self.aspect_ratio, z_near, z_far
+        )
 
     @property
     def transformation_matrix(self) -> numpy.ndarray:

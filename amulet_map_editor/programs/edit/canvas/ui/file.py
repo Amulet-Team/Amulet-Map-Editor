@@ -22,7 +22,10 @@ class FilePanel(wx.BoxSizer, BaseUI):
         BaseUI.__init__(self, canvas)
 
         level = self.canvas.world
-        self._version_text = wx.StaticText(canvas, label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}")
+        self._version_text = wx.StaticText(
+            canvas,
+            label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}",
+        )
         self.Add(self._version_text, 0)
         self.AddStretchSpacer(1)
         self._location_button = wx.Button(
@@ -56,14 +59,18 @@ class FilePanel(wx.BoxSizer, BaseUI):
         self._redo_button: Optional[wx.Button] = create_button(
             "0", lambda evt: self.canvas.redo()
         )
-        self._redo_button.SetBitmap(image.icon.tablericons.arrow_forward_up.bitmap(20, 20))
+        self._redo_button.SetBitmap(
+            image.icon.tablericons.arrow_forward_up.bitmap(20, 20)
+        )
 
         self._save_button: Optional[wx.Button] = create_button(
             "0", lambda evt: self.canvas.save()
         )
         self._save_button.SetBitmap(image.icon.tablericons.device_floppy.bitmap(20, 20))
 
-        close_button = wx.BitmapButton(canvas, bitmap=image.icon.tablericons.square_x.bitmap(20, 20))
+        close_button = wx.BitmapButton(
+            canvas, bitmap=image.icon.tablericons.square_x.bitmap(20, 20)
+        )
         close_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.close())
         self.Add(close_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
@@ -83,12 +90,8 @@ class FilePanel(wx.BoxSizer, BaseUI):
         evt.Skip()
 
     def _update_buttons(self):
-        self._undo_button.SetLabel(
-            f"{self.canvas.world.history_manager.undo_count}"
-        )
-        self._redo_button.SetLabel(
-            f"{self.canvas.world.history_manager.redo_count}"
-        )
+        self._undo_button.SetLabel(f"{self.canvas.world.history_manager.undo_count}")
+        self._redo_button.SetLabel(f"{self.canvas.world.history_manager.redo_count}")
         self._save_button.SetLabel(
             f"{self.canvas.world.history_manager.unsaved_changes}"
         )
