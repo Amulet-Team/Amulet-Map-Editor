@@ -319,7 +319,10 @@ class ControllableEditCanvas(BaseEditCanvas):
                 self._selection_moved = True
             return
         x, y, z = self.camera_location
-        ry, rx = self.camera_rotation
+        if self.projection_mode == Perspective:
+            ry, rx = self.camera_rotation
+        else:
+            ry, rx = 180, 90
         x += self._camera_move_speed * -(
             math.cos(math.radians(ry)) * right + math.sin(math.radians(ry)) * forward
         )
@@ -328,15 +331,28 @@ class ControllableEditCanvas(BaseEditCanvas):
             math.cos(math.radians(ry)) * forward - math.sin(math.radians(ry)) * right
         )
 
-        rx += self._camera_rotate_speed * pitch
-        if not -90 <= rx <= 90:
-            rx = max(min(rx, 90), -90)
-        ry += self._camera_rotate_speed * yaw
-        if not -180 <= ry <= 180:
-            ry += -int(numpy.sign(ry)) * 360
+        if self.projection_mode == Perspective:
+            rx += self._camera_rotate_speed * pitch
+            if not -90 <= rx <= 90:
+                rx = max(min(rx, 90), -90)
+            ry += self._camera_rotate_speed * yaw
+            if not -180 <= ry <= 180:
+                ry += -int(numpy.sign(ry)) * 360
         self.camera_location = (x, y, z)
         self.camera_rotation = (ry, rx)
 
+    @property
+    def projection_mode(self) -> int:
+        return self._projection_mode
+
+    @projection_mode.setter
+    def projection_mode(self, projection_mode: int):
+        assert isinstance(projection_mode, int) and 0 <= projection_mode <= 1
+        if self._projection_mode != projection_mode:
+            self._projection_mode = projection_mode
+            self._reset_matrix()
+            if self.projection_mode == Orthographic:
+                self.camera_rotation = 180, 90
     def _capture_mouse(self):
         self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
         self._mouse_delta_x = (
