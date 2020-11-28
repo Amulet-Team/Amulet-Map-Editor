@@ -56,7 +56,7 @@ from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
 from amulet_map_editor.api.opengl.mesh.sky_box import SkyBox
 from amulet_map_editor.api.opengl import textureatlas, ThreadedObjectContainer
-from amulet_map_editor.api.opengl.canvas import BaseCanvas, Perspective
+from amulet_map_editor.api.opengl.canvas import BaseCanvas, Perspective, Orthographic
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 from amulet_map_editor.api.logging import log
@@ -536,14 +536,17 @@ class BaseEditCanvas(BaseCanvas):
         return self.selection.cursor_position
 
     def _change_box_location(self):
-        if self.selection.reediting:
-            position, box_index = self._box_location_distance(self.select_distance2)
-        elif self._mouse_lock:
-            position, box_index = self._box_location_distance(self.select_distance)
+        if self.projection_mode == Orthographic:
+            position, box_index = self._box_location_closest_2d()
         else:
-            position, box_index = self._box_location_closest()
+            if self.selection.reediting:
+                position, box_index = self._box_location_distance(self.select_distance2)
+            elif self._mouse_lock:
+                position, box_index = self._box_location_distance(self.select_distance)
+            else:
+                position, box_index = self._box_location_closest()
         self._selection_location = position.tolist()
-        wx.PostEvent(self, SelectionPointChangeEvent(location=position.tolist()))
+        wx.PostEvent(self, SelectionPointChangeEvent(location=self._selection_location))
         self.selection.update_cursor_position(position, box_index)
 
     def ray_collision(self):
@@ -600,6 +603,43 @@ class BaseEditCanvas(BaseCanvas):
             elif not in_air:
                 in_air = True
         return location, None
+
+    def _box_location_closest_2d(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+        x, _, z = numpy.floor(self.camera_location) + 0.5
+        box_index, nearest_selection_box = self.selection.closest_intersection(
+            (x, 2*32, z), (0, -1, 0)
+        )
+
+        sub_chunk_size = self.world.sub_chunk_size
+        y = 0
+        try:
+            chunk = self.world.get_chunk(int(x//sub_chunk_size), int(z//sub_chunk_size), self.dimension)
+        except ChunkLoadError:
+            if nearest_selection_box is not None:
+                y = nearest_selection_box.max[1] - 1
+        else:
+            if nearest_selection_box is None:
+                box_max = -2*32
+            else:
+                box_max: int = nearest_selection_box.max[1] - 1
+            box_max_chunk = int(box_max // sub_chunk_size)
+            sub_chunks = sorted([cy for cy in chunk.blocks.sub_chunks if cy >= box_max_chunk], reverse=True)
+            if sub_chunks:
+                dx, _, dz = (numpy.floor(self.camera_location) % sub_chunk_size).astype(numpy.int64)
+                for sy in sub_chunks:
+                    blocks = chunk.blocks.get_section(sy)[dx, ::-1, dz] != chunk.block_palette.get_add_block(UniversalAirBlock)
+                    if numpy.any(blocks):
+                        y = sub_chunk_size - 1 - numpy.argmax(blocks) + sy * sub_chunk_size
+                        break
+                else:
+                    if nearest_selection_box is not None:
+                        y = nearest_selection_box.max[1] - 1
+                y = max(box_max, y)
+            elif nearest_selection_box is not None:
+                y = nearest_selection_box.max[1] - 1
+
+
+        return numpy.asarray((x, y, z)), box_index
 
     def _box_location_distance(
         self, distance: int
