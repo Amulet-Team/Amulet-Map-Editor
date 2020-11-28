@@ -39,7 +39,12 @@ class BaseCanvas(glcanvas.GLCanvas):
         display_attributes.PlatformDefaults().MinRGBA(8, 8, 8, 8).DoubleBuffer().Depth(
             24
         ).EndList()
-        super().__init__(parent, display_attributes, size=parent.GetClientSize())
+        super().__init__(
+            parent,
+            display_attributes,
+            size=parent.GetClientSize(),
+            style=wx.WANTS_CHARS,
+        )
         self._projection_mode = Perspective
         self._fov = [100.0, 70.0]
         self._clipping = [(-(10 ** 6), 10 ** 6), (0.1, 10000.0)]

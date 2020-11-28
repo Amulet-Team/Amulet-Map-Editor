@@ -13,6 +13,7 @@ from amulet_map_editor.api.wx.util.key_config import (
     Control,
     Numpad_Add,
     Alt,
+    Tab,
 )
 
 KeybindKeys: List[KeyActionType] = [
@@ -32,6 +33,7 @@ KeybindKeys: List[KeyActionType] = [
     "add box modifier",
     "remove box",
     "inspect block",
+    "toggle 2d/3d",
 ]
 
 PresetKeybinds: KeybindContainer = {
@@ -52,6 +54,7 @@ PresetKeybinds: KeybindContainer = {
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
+        "toggle 2d/3d": ((), Tab),
     },
     "right_laptop": {
         "up": ((), Space),
@@ -70,6 +73,7 @@ PresetKeybinds: KeybindContainer = {
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
+        "toggle 2d/3d": ((), Tab),
     },
     "left": {
         "up": ((), Space),
@@ -88,6 +92,7 @@ PresetKeybinds: KeybindContainer = {
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
+        "toggle 2d/3d": ((), Tab),
     },
     "left_laptop": {
         "up": ((), Space),
@@ -106,6 +111,7 @@ PresetKeybinds: KeybindContainer = {
         "add box modifier": ((), Numpad_Add),
         "remove box": ((Control,), "D"),
         "inspect block": ((), Alt),
+        "toggle 2d/3d": ((), Tab),
     },
 }
 

@@ -8,6 +8,7 @@ from amulet.api.data_types import OperationYieldType
 from wx.adv import RichToolTip
 
 from .base_edit_canvas import BaseEditCanvas
+from amulet_map_editor.api.opengl.canvas import Orthographic, Perspective
 from amulet_map_editor import log
 from amulet_map_editor.api.wx.util.key_config import (
     serialise_key_event,
@@ -71,6 +72,7 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(wx.EVT_RIGHT_UP, self._release)
         self.Bind(wx.EVT_KEY_DOWN, self._press)
         self.Bind(wx.EVT_KEY_UP, self._release)
+        self.Bind(wx.EVT_NAVIGATION_KEY, self._press)
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
 
         self.Bind(EVT_EDIT_ESCAPE, self.selection.escape_event)
@@ -104,6 +106,7 @@ class ControllableEditCanvas(BaseEditCanvas):
     def _process_action(self, evt, press: bool):
         """Logic to handle a key being pressed or released."""
         key = serialise_key_event(evt)
+        evt.Skip()
         if key is None:
             return
         if key in self._key_binds:
@@ -149,6 +152,8 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._toggle_mouse_time = time.time()
                 elif action == "inspect block":
                     self._inspect_block()
+                elif action == "toggle 2d/3d":
+                    self._set_projection(int(not self._projection_mode))
 
             else:  # run once on button release
                 if action == "box click":
@@ -165,9 +170,15 @@ class ControllableEditCanvas(BaseEditCanvas):
                     else:
                         self._capture_mouse()
                 elif action == "speed+":
-                    self._camera_move_speed *= 1.1
+                    if self._projection_mode == Perspective:
+                        self._camera_move_speed *= 1.1
+                    elif self._projection_mode == Orthographic:
+                        self.fov = max(0.5, self.fov / 1.1)
                 elif action == "speed-":
-                    self._camera_move_speed /= 1.1
+                    if self._projection_mode == Perspective:
+                        self._camera_move_speed /= 1.1
+                    elif self._projection_mode == Orthographic:
+                        self.fov = min(1000.0, self.fov * 1.1)
 
         elif key[1] == Escape:
             self._escape()

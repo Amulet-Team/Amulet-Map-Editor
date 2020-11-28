@@ -119,7 +119,7 @@ class BaseEditCanvas(BaseCanvas):
     """Adds base logic for drawing everything related to the edit program to the BaseCanvas.
     All the user interaction code is implemented in ControllableEditCanvas to make them easier to read."""
 
-    background_colour = (0.5, 0.66, 1.0)
+    background_colour = (0.61, 0.70, 0.85)
 
     def __init__(self, parent: wx.Window, world: "World", auto_setup=True):
         super().__init__(parent)

@@ -267,7 +267,11 @@ def stringify_key(key: SerialisedKeyType) -> str:
 
 class KeyCatcher(wx.Dialog):
     def __init__(self, parent: wx.Window, action: str):
-        super().__init__(parent, title=f"Press the key you want assigned to {action}")
+        super().__init__(
+            parent,
+            title=f"Press the key you want assigned to {action}",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS,
+        )
 
         self._key = ((), "NONE")
 
