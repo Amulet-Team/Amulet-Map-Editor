@@ -47,7 +47,7 @@ class BaseCanvas(glcanvas.GLCanvas):
         )
         self._projection_mode = Perspective
         self._fov = [100.0, 70.0]
-        self._clipping = [(-(10 ** 6), 10 ** 6), (0.1, 10000.0)]
+        self._clipping = [(-(10 ** 5), 10 ** 5), (0.1, 10000.0)]
         self._aspect_ratio = 4 / 3
         self._projection_matrix: Optional[numpy.ndarray] = None
         if sys.platform == "linux":

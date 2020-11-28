@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Set, Generator
+from typing import TYPE_CHECKING, Set, Generator, Tuple
 import wx
 import numpy
 import time
@@ -164,9 +164,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     ):
                         self.selection.box_select_disable()
                 elif action == "toggle mouse mode":
-                    if time.time() - self._toggle_mouse_time > 0.1:
-                        self._release_mouse()
-                    elif self._previous_mouse_lock:
+                    if self._previous_mouse_lock or time.time() - self._toggle_mouse_time > 0.1:
                         self._release_mouse()
                     else:
                         self._capture_mouse()
@@ -287,7 +285,7 @@ class ControllableEditCanvas(BaseEditCanvas):
 
     def _process_persistent_inputs(self, evt):
         """Handle actions run by keys that are being held down."""
-        forward, up, right, pitch, yaw = 0, 0, 0, 0, 0
+        forward = up = right = pitch = yaw = 0
         if "up" in self._persistent_actions:
             up += 1
         if "down" in self._persistent_actions:
@@ -301,14 +299,20 @@ class ControllableEditCanvas(BaseEditCanvas):
         if "right" in self._persistent_actions:
             right += 1
 
-        if self._mouse_lock:
-            pitch = self._mouse_delta_y * 0.07
-            yaw = self._mouse_delta_x * 0.07
-            self._mouse_delta_x = 0
-            self._mouse_delta_y = 0
-        else:
-            pitch = 0
-            yaw = 0
+        if self.projection_mode == Perspective:
+            if self._mouse_lock:
+                pitch = self._mouse_delta_y * 0.07
+                yaw = self._mouse_delta_x * 0.07
+                self._mouse_delta_x = 0
+                self._mouse_delta_y = 0
+        elif self.projection_mode == Orthographic:
+            if self._mouse_lock:
+                width, height = self.GetSize()
+                forward += self.fov * self._mouse_delta_y / height
+                right -= self.fov * self.aspect_ratio * self._mouse_delta_x / width
+                self._mouse_delta_x = 0
+                self._mouse_delta_y = 0
+
         self.move_camera_relative(forward, up, right, pitch, yaw)
         evt.Skip()
 
@@ -358,9 +362,8 @@ class ControllableEditCanvas(BaseEditCanvas):
 
     def _capture_mouse(self):
         self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
-        self._mouse_delta_x = (
-            self._mouse_delta_y
-        ) = self._last_mouse_x = self._last_mouse_y = 0
+        self._mouse_delta_x = self._mouse_delta_y = 0
+        self._last_mouse_x = self._last_mouse_y = 0
         self._mouse_lock = True
         self._selection_moved = True
 
@@ -370,25 +373,28 @@ class ControllableEditCanvas(BaseEditCanvas):
         self._mouse_lock = False
         self._selection_moved = True
 
+    def _screen_middle(self) -> Tuple[int, int]:
+        """Get the pixel coordinate of the middle of the screen"""
+        return (
+            int(self.GetSize()[0] / 2),
+            int(self.GetSize()[1] / 2),
+        )
+
     def _on_mouse_motion(self, evt):
         """Event fired when the mouse is moved."""
         self.SetFocus()
         self._mouse_x, self._mouse_y = evt.GetPosition()
         if self._mouse_lock:
             if self._last_mouse_x == 0:
-                self._last_mouse_x, self._last_mouse_y = (
-                    int(self.GetSize()[0] / 2),
-                    int(self.GetSize()[1] / 2),
-                )
+                # when lock starts self._last_mouse_x will be 0.
+                # This sets up some things so that the screen does not jump to the cursor position
+                self._last_mouse_x, self._last_mouse_y = self._screen_middle()
                 self.WarpPointer(self._last_mouse_x, self._last_mouse_y)
                 self._mouse_delta_x = self._mouse_delta_y = 0
             else:
                 dx = self._mouse_x - self._last_mouse_x
                 dy = self._mouse_y - self._last_mouse_y
-                self._last_mouse_x, self._last_mouse_y = (
-                    int(self.GetSize()[0] / 2),
-                    int(self.GetSize()[1] / 2),
-                )
+                self._last_mouse_x, self._last_mouse_y = self._screen_middle()
                 # only if location actually changed from the center, because WarpPointer may generate a mouse motion event
                 # this check avoids using WarpPointer for events caused by WarpPointer
                 if dx or dy:
@@ -396,10 +402,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self._mouse_delta_x += dx
                     self._mouse_delta_y += dy
         else:
-            self._last_mouse_x, self._last_mouse_y = (
-                int(self.GetSize()[0] / 2),
-                int(self.GetSize()[1] / 2),
-            )
+            self._last_mouse_x, self._last_mouse_y = self._screen_middle()
             self._mouse_delta_x = self._mouse_x - self._last_mouse_x
             self._mouse_delta_y = self._mouse_y - self._last_mouse_y
             self._mouse_moved = True
