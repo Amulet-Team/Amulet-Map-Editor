@@ -56,7 +56,7 @@ from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
 from amulet_map_editor.api.opengl.mesh.sky_box import SkyBox
 from amulet_map_editor.api.opengl import textureatlas, ThreadedObjectContainer
-from amulet_map_editor.api.opengl.canvas import BaseCanvas
+from amulet_map_editor.api.opengl.canvas import BaseCanvas, Perspective
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 from amulet_map_editor.api.logging import log
@@ -717,7 +717,8 @@ class BaseEditCanvas(BaseCanvas):
 
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self._sky_box.draw(self.transformation_matrix)
+        if self._projection_mode == Perspective:
+            self._sky_box.draw(self.transformation_matrix)
         self._render_world.draw(self.transformation_matrix)
         if self._draw_structure:
             self._structure.draw(self.transformation_matrix)
