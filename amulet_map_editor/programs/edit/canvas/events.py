@@ -4,6 +4,8 @@ CameraMoveEvent, EVT_CAMERA_MOVE = newevent.NewEvent()
 CameraRotateEvent, EVT_CAMERA_ROTATE = newevent.NewEvent()
 DimensionChangeEvent, EVT_DIMENSION_CHANGE = newevent.NewEvent()
 
+ProjectionChangeEvent, EVT_PROJECTION_CHANGE = newevent.NewEvent()
+
 # the active tool changed
 ToolChangeEvent, EVT_TOOL_CHANGE = newevent.NewEvent()
 PasteEvent, EVT_PASTE = newevent.NewEvent()

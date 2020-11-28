@@ -9,8 +9,10 @@ from amulet_map_editor.programs.edit.canvas.events import (
     EVT_REDO,
     EVT_CREATE_UNDO,
     EVT_SAVE,
+    EVT_PROJECTION_CHANGE,
 )
 from amulet_map_editor.api import image
+from amulet_map_editor.api.opengl.canvas import Perspective, Orthographic
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.canvas.edit_canvas import EditCanvas
@@ -28,6 +30,11 @@ class FilePanel(wx.BoxSizer, BaseUI):
         )
         self.Add(self._version_text, 0)
         self.AddStretchSpacer(1)
+        self._projection_button = wx.Button(
+            canvas, label="3D"
+        )
+        self._projection_button.Bind(wx.EVT_BUTTON, self._on_projection_button)
+        self.Add(self._projection_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
         self._location_button = wx.Button(
             canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera_location])
         )
@@ -84,6 +91,7 @@ class FilePanel(wx.BoxSizer, BaseUI):
         self.canvas.Bind(EVT_REDO, self._on_update_buttons)
         self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
         self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
+        self.canvas.Bind(EVT_PROJECTION_CHANGE, self._on_projection_change)
 
     def _on_update_buttons(self, evt):
         self._update_buttons()
@@ -101,6 +109,17 @@ class FilePanel(wx.BoxSizer, BaseUI):
         dimension = self._dim_options.GetCurrentObject()
         if dimension is not None:
             self.canvas.dimension = dimension
+        evt.Skip()
+
+    def _on_projection_change(self, evt):
+        if self.canvas.projection_mode == Perspective:
+            self._projection_button.SetLabel("3D")
+        elif self.canvas.projection_mode == Orthographic:
+            self._projection_button.SetLabel("2D")
+        evt.Skip()
+
+    def _on_projection_button(self, evt):
+        self.canvas.projection_mode = not self.canvas.projection_mode
         evt.Skip()
 
     def _change_dimension(self, evt):

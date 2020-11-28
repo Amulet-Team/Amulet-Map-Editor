@@ -22,6 +22,7 @@ from .events import (
     BoxClickEvent,
     EVT_BOX_CHANGE_CONFIRM,
     CreateUndoEvent,
+    ProjectionChangeEvent,
 )
 
 if TYPE_CHECKING:
@@ -353,6 +354,8 @@ class ControllableEditCanvas(BaseEditCanvas):
             self._reset_matrix()
             if self.projection_mode == Orthographic:
                 self.camera_rotation = 180, 90
+            wx.PostEvent(self, ProjectionChangeEvent(mode=self.projection_mode))
+
     def _capture_mouse(self):
         self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
         self._mouse_delta_x = (
