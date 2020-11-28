@@ -308,8 +308,8 @@ class ControllableEditCanvas(BaseEditCanvas):
         elif self.projection_mode == Orthographic:
             if self._mouse_lock:
                 width, height = self.GetSize()
-                forward += self.fov * self._mouse_delta_y / height
-                right -= self.fov * self.aspect_ratio * self._mouse_delta_x / width
+                forward += 2 * self.fov * self._mouse_delta_y / height
+                right -= 2 * self.fov * self.aspect_ratio * self._mouse_delta_x / width
                 self._mouse_delta_x = 0
                 self._mouse_delta_y = 0
 
