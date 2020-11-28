@@ -1,1 +1,1 @@
-from .base import BaseCanvas
+from .base import BaseCanvas, Perspective, Orthographic

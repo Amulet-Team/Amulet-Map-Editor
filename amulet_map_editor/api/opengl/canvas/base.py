@@ -83,6 +83,11 @@ class BaseCanvas(glcanvas.GLCanvas):
         self._projection_matrix = None
         self._transformation_matrix = None
 
+    def _set_projection(self, projection: int):
+        assert isinstance(projection, int) and 0 <= projection <= 1
+        self._projection_mode = projection
+        self._reset_matrix()
+
     @property
     def camera_location(self) -> CameraLocationType:
         raise NotImplementedError
