@@ -326,23 +326,24 @@ class ControllableEditCanvas(BaseEditCanvas):
         x, y, z = self.camera_location
         if self.projection_mode == Perspective:
             ry, rx = self.camera_rotation
-        else:
-            ry, rx = 180, 90
-        x += self._camera_move_speed * -(
-            math.cos(math.radians(ry)) * right + math.sin(math.radians(ry)) * forward
-        )
-        y += self._camera_move_speed * up
-        z += self._camera_move_speed * (
-            math.cos(math.radians(ry)) * forward - math.sin(math.radians(ry)) * right
-        )
-
-        if self.projection_mode == Perspective:
+            x += self._camera_move_speed * -(
+                math.cos(math.radians(ry)) * right + math.sin(math.radians(ry)) * forward
+            )
+            y += self._camera_move_speed * up
+            z += self._camera_move_speed * (
+                math.cos(math.radians(ry)) * forward - math.sin(math.radians(ry)) * right
+            )
             rx += self._camera_rotate_speed * pitch
             if not -90 <= rx <= 90:
                 rx = max(min(rx, 90), -90)
             ry += self._camera_rotate_speed * yaw
             if not -180 <= ry <= 180:
                 ry += -int(numpy.sign(ry)) * 360
+        else:
+            ry, rx = 180, 90
+            x += right
+            z -= forward
+
         self.camera_location = (x, y, z)
         self.camera_rotation = (ry, rx)
 
