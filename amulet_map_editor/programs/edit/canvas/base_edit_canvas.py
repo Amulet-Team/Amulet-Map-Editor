@@ -612,29 +612,41 @@ class BaseEditCanvas(BaseCanvas):
         x += 2 * self.fov * self.aspect_ratio * self._mouse_delta_x / width
         x, z = numpy.floor([x, z]) + 0.5
         box_index, nearest_selection_box = self.selection.closest_intersection(
-            (x, 2*32, z), (0, -1, 0)
+            (x, 2 * 32, z), (0, -1, 0)
         )
 
         sub_chunk_size = self.world.sub_chunk_size
         y = 0
         try:
-            chunk = self.world.get_chunk(int(x//sub_chunk_size), int(z//sub_chunk_size), self.dimension)
+            chunk = self.world.get_chunk(
+                int(x // sub_chunk_size), int(z // sub_chunk_size), self.dimension
+            )
         except ChunkLoadError:
             if nearest_selection_box is not None:
                 y = nearest_selection_box.max[1] - 1
         else:
             if nearest_selection_box is None:
-                box_max = -2*32
+                box_max = -2 * 32
             else:
                 box_max: int = nearest_selection_box.max[1] - 1
             box_max_chunk = int(box_max // sub_chunk_size)
-            sub_chunks = sorted([cy for cy in chunk.blocks.sub_chunks if cy >= box_max_chunk], reverse=True)
+            sub_chunks = sorted(
+                [cy for cy in chunk.blocks.sub_chunks if cy >= box_max_chunk],
+                reverse=True,
+            )
             if sub_chunks:
                 dx, dz = (numpy.floor([x, z]) % sub_chunk_size).astype(numpy.int64)
                 for sy in sub_chunks:
-                    blocks = chunk.blocks.get_section(sy)[dx, ::-1, dz] != chunk.block_palette.get_add_block(UniversalAirBlock)
+                    blocks = chunk.blocks.get_section(sy)[
+                        dx, ::-1, dz
+                    ] != chunk.block_palette.get_add_block(UniversalAirBlock)
                     if numpy.any(blocks):
-                        y = sub_chunk_size - 1 - numpy.argmax(blocks) + sy * sub_chunk_size
+                        y = (
+                            sub_chunk_size
+                            - 1
+                            - numpy.argmax(blocks)
+                            + sy * sub_chunk_size
+                        )
                         break
                 else:
                     if nearest_selection_box is not None:
@@ -642,7 +654,6 @@ class BaseEditCanvas(BaseCanvas):
                 y = max(box_max, y)
             elif nearest_selection_box is not None:
                 y = nearest_selection_box.max[1] - 1
-
 
         return numpy.asarray((x, y, z)), box_index
 

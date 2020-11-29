@@ -30,11 +30,11 @@ class FilePanel(wx.BoxSizer, BaseUI):
         )
         self.Add(self._version_text, 0)
         self.AddStretchSpacer(1)
-        self._projection_button = wx.Button(
-            canvas, label="3D"
-        )
+        self._projection_button = wx.Button(canvas, label="3D")
         self._projection_button.Bind(wx.EVT_BUTTON, self._on_projection_button)
-        self.Add(self._projection_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
+        self.Add(
+            self._projection_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5
+        )
         self._location_button = wx.Button(
             canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera_location])
         )

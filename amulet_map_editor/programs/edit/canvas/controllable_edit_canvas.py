@@ -164,7 +164,10 @@ class ControllableEditCanvas(BaseEditCanvas):
                     ):
                         self.selection.box_select_disable()
                 elif action == "toggle mouse mode":
-                    if self._previous_mouse_lock or time.time() - self._toggle_mouse_time > 0.1:
+                    if (
+                        self._previous_mouse_lock
+                        or time.time() - self._toggle_mouse_time > 0.1
+                    ):
                         self._release_mouse()
                     else:
                         self._capture_mouse()
@@ -327,11 +330,13 @@ class ControllableEditCanvas(BaseEditCanvas):
         if self.projection_mode == Perspective:
             ry, rx = self.camera_rotation
             x += self._camera_move_speed * -(
-                math.cos(math.radians(ry)) * right + math.sin(math.radians(ry)) * forward
+                math.cos(math.radians(ry)) * right
+                + math.sin(math.radians(ry)) * forward
             )
             y += self._camera_move_speed * up
             z += self._camera_move_speed * (
-                math.cos(math.radians(ry)) * forward - math.sin(math.radians(ry)) * right
+                math.cos(math.radians(ry)) * forward
+                - math.sin(math.radians(ry)) * right
             )
             rx += self._camera_rotate_speed * pitch
             if not -90 <= rx <= 90:
