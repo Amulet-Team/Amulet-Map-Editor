@@ -605,10 +605,11 @@ class BaseEditCanvas(BaseCanvas):
         return location, None
 
     def _box_location_closest_2d(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
-        x, _, z = numpy.floor(self.camera_location) + 0.5
+        x, _, z = self.camera_location
         width, height = self.GetSize()
         z += 2 * self.fov * self._mouse_delta_y / height
         x += 2 * self.fov * self.aspect_ratio * self._mouse_delta_x / width
+        x, z = numpy.floor([x, z]) + 0.5
         box_index, nearest_selection_box = self.selection.closest_intersection(
             (x, 2*32, z), (0, -1, 0)
         )
