@@ -31,7 +31,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
             self, context_identifier, resource_pack.get_atlas_id(context_identifier)
         )
         self._points: numpy.ndarray = numpy.zeros(
-            (2, 3), dtype=numpy.int
+            (2, 3), dtype=numpy.int64
         )  # The points set using point1 and point2
         self._bounds: Optional[numpy.ndarray] = None  # The min and max locations
         self.transformation_matrix = numpy.eye(4, dtype=numpy.float64)
@@ -126,9 +126,9 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         return self._points[0]
 
     @point1.setter
-    def point1(self, val):
+    def point1(self, val: PointCoordinatesAny):
         if not numpy.array_equal(self._points[0], val):
-            self._points[0] = val
+            self._points[0] = numpy.floor(val)
             self._mark_recreate()
 
     @property
@@ -136,9 +136,9 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         return self._points[1]
 
     @point2.setter
-    def point2(self, val):
+    def point2(self, val: PointCoordinatesAny):
         if not numpy.array_equal(self._points[1], val):
-            self._points[1] = val
+            self._points[1] = numpy.floor(val)
             self._mark_recreate()
 
     @property

@@ -545,6 +545,7 @@ class BaseEditCanvas(BaseCanvas):
                 position, box_index = self._box_location_distance(self.select_distance)
             else:
                 position, box_index = self._box_location_closest()
+        position = numpy.floor(position).astype(numpy.int64)
         self._selection_location = position.tolist()
         wx.PostEvent(self, SelectionPointChangeEvent(location=self._selection_location))
         self.selection.update_cursor_position(position, box_index)
@@ -629,7 +630,7 @@ class BaseEditCanvas(BaseCanvas):
             box_max_chunk = int(box_max // sub_chunk_size)
             sub_chunks = sorted([cy for cy in chunk.blocks.sub_chunks if cy >= box_max_chunk], reverse=True)
             if sub_chunks:
-                dx, _, dz = (numpy.floor(self.camera_location) % sub_chunk_size).astype(numpy.int64)
+                dx, dz = (numpy.floor([x, z]) % sub_chunk_size).astype(numpy.int64)
                 for sy in sub_chunks:
                     blocks = chunk.blocks.get_section(sy)[dx, ::-1, dz] != chunk.block_palette.get_add_block(UniversalAirBlock)
                     if numpy.any(blocks):
