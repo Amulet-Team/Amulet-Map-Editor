@@ -132,6 +132,7 @@ def create_lod0_array(
                 model.tint_verts[cull_dir].reshape((-1, 3))[faces]
                 * _brightness_multiplier[cull_dir]
             )
+            vert_table[:, :, 9:12] *= 0.9 + 0.2 * numpy.abs((numpy.remainder(vert_table[:, :, 1:2]/32, 2) - 1))
 
             if model.is_transparent == 1:
                 chunk_verts_translucent.append(vert_table.ravel())
