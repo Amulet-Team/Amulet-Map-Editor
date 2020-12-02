@@ -26,7 +26,7 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
         self._active_tool: Optional[BaseToolUIType] = None
 
         self._tool_option_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.Add(self._tool_option_sizer, 1, wx.EXPAND, 0)
+        self.Add(self._tool_option_sizer, 1, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
 
         tool_select_sizer = wx.BoxSizer(wx.HORIZONTAL)
         tool_select_sizer.AddStretchSpacer(1)
