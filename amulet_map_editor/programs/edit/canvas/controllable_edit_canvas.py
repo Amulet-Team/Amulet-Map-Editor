@@ -308,6 +308,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                 yaw = self._mouse_delta_x * 0.07
                 self._mouse_delta_x = 0
                 self._mouse_delta_y = 0
+            self.move_camera_relative(forward, up, right, pitch, yaw)
         elif self.projection_mode == Orthographic:
             if self._mouse_lock:
                 width, height = self.GetSize()
@@ -315,8 +316,14 @@ class ControllableEditCanvas(BaseEditCanvas):
                 right -= 2 * self.fov * self.aspect_ratio * self._mouse_delta_x / width
                 self._mouse_delta_x = 0
                 self._mouse_delta_y = 0
+                self.move_camera_relative(forward, up, right, pitch, yaw)
+            else:
+                x, y, z = self.camera_location
+                x += right * self.fov / 30
+                z -= forward * self.fov / 30
+                self.camera_location = (x, y, z)
+                self.camera_rotation = (180, 90)
 
-        self.move_camera_relative(forward, up, right, pitch, yaw)
         evt.Skip()
 
     def move_camera_relative(self, forward, up, right, pitch, yaw):
