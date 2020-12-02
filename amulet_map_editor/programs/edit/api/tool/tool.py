@@ -11,7 +11,13 @@ from amulet_map_editor.programs.edit.api.ui.canvas.events import (
     EVT_TOOL_CHANGE,
 )
 
-from amulet_map_editor.programs.edit.plugins.tools import SelectImportOperationUI, SelectExportOperationUI, SelectOperationUI, SelectOptions, ChunkTool
+from amulet_map_editor.programs.edit.plugins.tools import (
+    SelectImportOperationUI,
+    SelectExportOperationUI,
+    SelectOperationUI,
+    SelectOptions,
+    ChunkTool,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
@@ -26,7 +32,9 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
         self._active_tool: Optional[BaseToolUIType] = None
 
         self._tool_option_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.Add(self._tool_option_sizer, 1, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.Add(
+            self._tool_option_sizer, 1, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0
+        )
 
         tool_select_sizer = wx.BoxSizer(wx.HORIZONTAL)
         tool_select_sizer.AddStretchSpacer(1)

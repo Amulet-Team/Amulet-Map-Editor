@@ -9,7 +9,7 @@ from amulet.level.formats.construction import ConstructionFormatWrapper
 
 from amulet_map_editor.programs.edit.api.operations import (
     SimpleOperationPanel,
-    OperationError
+    OperationError,
 )
 
 if TYPE_CHECKING:

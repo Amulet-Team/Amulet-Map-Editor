@@ -9,7 +9,7 @@ from amulet.level.formats.schematic import SchematicFormatWrapper
 
 from amulet_map_editor.programs.edit.api.operations import (
     SimpleOperationPanel,
-    OperationError
+    OperationError,
 )
 
 if TYPE_CHECKING:

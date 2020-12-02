@@ -1,5 +1,8 @@
 from amulet_map_editor.programs.edit.api.tool import BaseSelectOperationUI
-from amulet_map_editor.programs.edit.api.operations import OperationStorageType, export_operations
+from amulet_map_editor.programs.edit.api.operations import (
+    OperationStorageType,
+    export_operations,
+)
 
 
 class SelectExportOperationUI(BaseSelectOperationUI):

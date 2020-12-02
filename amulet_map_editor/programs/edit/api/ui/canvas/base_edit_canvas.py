@@ -201,7 +201,9 @@ class BaseEditCanvas(BaseCanvas):
             fix_pack = get_bedrock_vanilla_fix()
             amulet_pack = load_resource_pack(
                 os.path.join(
-                    os.path.dirname(amulet_edit.__file__), "amulet_resource_pack", "bedrock"
+                    os.path.dirname(amulet_edit.__file__),
+                    "amulet_resource_pack",
+                    "bedrock",
                 )
             )
 
@@ -224,7 +226,9 @@ class BaseEditCanvas(BaseCanvas):
             fix_pack = get_java_vanilla_fix()
             amulet_pack = load_resource_pack(
                 os.path.join(
-                    os.path.dirname(amulet_edit.__file__), "amulet_resource_pack", "java"
+                    os.path.dirname(amulet_edit.__file__),
+                    "amulet_resource_pack",
+                    "java",
                 )
             )
 

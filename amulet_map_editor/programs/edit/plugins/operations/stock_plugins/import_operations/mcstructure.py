@@ -9,7 +9,7 @@ from amulet.level.formats.mcstructure import MCStructureFormatWrapper
 
 from amulet_map_editor.programs.edit.api.operations import (
     SimpleOperationPanel,
-    OperationError
+    OperationError,
 )
 
 if TYPE_CHECKING:

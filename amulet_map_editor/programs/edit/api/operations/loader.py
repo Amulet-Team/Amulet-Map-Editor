@@ -19,7 +19,9 @@ if TYPE_CHECKING:
     from amulet.api.level import World
 
 STOCK_PLUGINS_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(amulet_edit.__file__), "plugins", "operations", "stock_plugins")
+    os.path.join(
+        os.path.dirname(amulet_edit.__file__), "plugins", "operations", "stock_plugins"
+    )
 )
 CUSTOM_PLUGINS_DIR = os.path.abspath("plugins")
 
