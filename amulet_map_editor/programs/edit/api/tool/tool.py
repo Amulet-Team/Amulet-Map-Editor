@@ -11,7 +11,7 @@ from amulet_map_editor.programs.edit.api.ui.canvas.events import (
     EVT_TOOL_CHANGE,
 )
 
-from amulet_map_editor.programs.edit.plugins.tools import SelectImportOperationUI, SelectExportOperationUI, SelectOperationUI, SelectOptions
+from amulet_map_editor.programs.edit.plugins.tools import SelectImportOperationUI, SelectExportOperationUI, SelectOperationUI, SelectOptions, ChunkTool
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
@@ -40,6 +40,7 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
         self.register_tool(SelectOperationUI)
         self.register_tool(SelectImportOperationUI)
         self.register_tool(SelectExportOperationUI)
+        self.register_tool(ChunkTool)
 
     @property
     def tools(self):
