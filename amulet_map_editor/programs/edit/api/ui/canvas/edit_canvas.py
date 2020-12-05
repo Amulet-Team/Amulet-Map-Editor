@@ -91,9 +91,9 @@ class EditCanvas(ControllableEditCanvas):
     """Adds embedded UI elements to the canvas."""
 
     def __init__(
-        self, parent: wx.Window, world: "World", close_callback: Callable, **kwargs
+        self, parent: wx.Window, world: "World", close_callback: Callable
     ):
-        super().__init__(parent, world, **kwargs)
+        super().__init__(parent, world)
         self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
@@ -108,8 +108,8 @@ class EditCanvas(ControllableEditCanvas):
             keybinds = DefaultKeys
         self.set_key_binds(keybinds)
 
-    def setup(self) -> Generator[OperationYieldType, None, None]:
-        yield from super().setup()
+    def _setup(self) -> Generator[OperationYieldType, None, None]:
+        yield from super()._setup()
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
@@ -118,19 +118,21 @@ class EditCanvas(ControllableEditCanvas):
 
         self._tool_sizer = ToolManagerSizer(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
-        self._bind_events()
 
-    def _bind_events(self):
+    def _finalise(self):
+        super()._finalise()
+        self._tool_sizer.enable_default_tool()
+
+    def set_up_events(self):
+        """Set up all events required to run.
+        Note this will also bind subclass events."""
+        super().set_up_events()
         self._file_panel.bind_events()
         self._tool_sizer.bind_events()
         self.Bind(EVT_EDIT_CLOSE, self._on_close)
 
     def _on_close(self, _):
         self._close_callback()
-
-    def reset_bound_events(self):
-        super().reset_bound_events()
-        self._bind_events()
 
     @property
     def tools(self):

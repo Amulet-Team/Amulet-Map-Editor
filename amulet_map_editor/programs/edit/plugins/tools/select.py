@@ -11,6 +11,7 @@ from amulet_map_editor.programs.edit.api.ui.canvas.events import (
     EVT_BOX_CHANGE,
     EVT_BOX_DISABLE_INPUTS,
     EVT_BOX_ENABLE_INPUTS,
+    EVT_DRAW,
 )
 
 if TYPE_CHECKING:
@@ -93,10 +94,11 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         return "Select"
 
     def bind_events(self):
+        BaseToolUI.bind_events(self)
         self.canvas.Bind(EVT_PASTE, self._paste)
-        self._canvas().Bind(EVT_BOX_CHANGE, self._box_renderer_change)
-        self._canvas().Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
-        self._canvas().Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
+        self.canvas.Bind(EVT_BOX_CHANGE, self._box_renderer_change)
+        self.canvas.Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
+        self.canvas.Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
 
     def _remove_paste(self):
         if self._paste_panel is not None:

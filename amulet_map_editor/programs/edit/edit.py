@@ -49,7 +49,7 @@ class EditExtension(wx.Panel, BaseProgram):
             self.Update()
 
             self._canvas = EditCanvas(
-                self, self._world, self._close_self_callback, auto_setup=False
+                self, self._world, self._close_self_callback
             )
             for arg in self._canvas.setup():
                 if isinstance(arg, (int, float)):
@@ -78,13 +78,11 @@ class EditExtension(wx.Panel, BaseProgram):
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
             self.Bind(wx.EVT_SIZE, self._on_resize)
             self._canvas.Show()
-            self._canvas.draw()
 
             self.Layout()
         self._canvas.Update()
         self._canvas.enable()
         self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
-        self._canvas.draw()
 
     def disable(self):
         if self._canvas is not None:

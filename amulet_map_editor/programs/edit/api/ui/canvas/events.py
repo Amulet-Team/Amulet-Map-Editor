@@ -1,5 +1,7 @@
 from wx.lib import newevent
 
+DrawEvent, EVT_DRAW = newevent.NewEvent()
+
 CameraMoveEvent, EVT_CAMERA_MOVE = newevent.NewEvent()
 CameraRotateEvent, EVT_CAMERA_ROTATE = newevent.NewEvent()
 DimensionChangeEvent, EVT_DIMENSION_CHANGE = newevent.NewEvent()

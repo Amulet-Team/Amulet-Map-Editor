@@ -32,8 +32,8 @@ if TYPE_CHECKING:
 class ControllableEditCanvas(BaseEditCanvas):
     """Adds the user interaction logic to BaseEditCanvas"""
 
-    def __init__(self, world_panel: wx.Window, world: "World", **kwargs):
-        super().__init__(world_panel, world, **kwargs)
+    def __init__(self, world_panel: wx.Window, world: "World"):
+        super().__init__(world_panel, world)
         self._mouse_x = self._mouse_y = 0
         self._last_mouse_x = 0
         self._last_mouse_y = 0
@@ -54,13 +54,10 @@ class ControllableEditCanvas(BaseEditCanvas):
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self)
 
-    def reset_bound_events(self):
-        """Unbind all events and re-bind the default events.
-        We are allowing users to bind custom events so we should have a way to reset what is bound."""
-        super().reset_bound_events()
-        self._bind_controllable_events()
-
-    def _bind_controllable_events(self):
+    def set_up_events(self):
+        """Set up all events required to run.
+        Note this will also bind subclass events."""
+        super().set_up_events()
         self.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
         self.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
@@ -80,10 +77,6 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(EVT_BOX_CHANGE_CONFIRM, self._on_box_change_confirm)
 
         self.Bind(wx.EVT_TIMER, self._process_persistent_inputs, self._input_timer)
-
-    def setup(self) -> Generator[OperationYieldType, None, None]:
-        yield from super().setup()
-        self._bind_controllable_events()
 
     def enable(self):
         super().enable()

@@ -16,9 +16,6 @@ class ChunkTool(wx.BoxSizer, BaseToolUI):
     def name(self) -> str:
         return "Chunk"
 
-    def bind_events(self):
-        pass
-
     def enable(self):
         self.Layout()
         self.canvas.draw_structure = False

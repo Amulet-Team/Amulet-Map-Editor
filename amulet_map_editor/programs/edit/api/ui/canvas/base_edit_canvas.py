@@ -69,16 +69,17 @@ from amulet_map_editor.programs.edit.api.ui.canvas.events import (
     CameraRotateEvent,
     DimensionChangeEvent,
     SelectionPointChangeEvent,
+    DrawEvent,
 )
 import amulet_map_editor.programs.edit as amulet_edit
 
 if TYPE_CHECKING:
     from amulet.api.level import World
 
+BlockSelectionMode = 0
+ChunkSelectionMode = 1
 
 ThreadingEnabled = True
-
-
 if ThreadingEnabled:
 
     class ChunkGenerator(ThreadedObjectContainer, ThreadPoolExecutor):
@@ -122,7 +123,7 @@ class BaseEditCanvas(BaseCanvas):
 
     background_colour = (0.61, 0.70, 0.85)
 
-    def __init__(self, parent: wx.Window, world: "World", auto_setup=True):
+    def __init__(self, parent: wx.Window, world: "World"):
         super().__init__(parent)
         glClearColor(*self.background_colour, 1.0)
         self.Hide()
@@ -130,6 +131,7 @@ class BaseEditCanvas(BaseCanvas):
         self._bound_events: List[Tuple[wx.PyEventBinder, Any, Any]] = []
 
         self._world = weakref.ref(world)
+
         self._mouse_delta_x = 0
         self._mouse_delta_y = 0
         self._mouse_lock = False
@@ -169,17 +171,19 @@ class BaseEditCanvas(BaseCanvas):
 
         self._sky_box: Optional[SkyBox] = None
 
-        self._chunk_generator = ChunkGenerator()
+        self.chunk_generator = ChunkGenerator()
 
         self._draw_timer = wx.Timer(self)
         self._gc_timer = wx.Timer(self)
         self._rebuild_timer = wx.Timer(self)
 
-        if auto_setup:
-            for _ in self.setup():
-                pass
-
     def setup(self) -> Generator[OperationYieldType, None, None]:
+        """Set up objects that take a while to set up.
+        If you want to extend setup subclass the _setup method not this method."""
+        yield from self._setup()
+        self._finalise()
+
+    def _setup(self) -> Generator[OperationYieldType, None, None]:
         """Set up objects that take a while to set up."""
         user_packs = [
             load_resource_pack(os.path.join("resource_packs", rp))
@@ -257,7 +261,7 @@ class BaseEditCanvas(BaseCanvas):
             self._opengl_resource_pack,
             self.world,
         )
-        self._chunk_generator.register(self._render_world)
+        self.chunk_generator.register(self._render_world)
 
         self._selection_group = RenderSelectionHistoryManager(
             EditProgramRenderSelectionGroup(
@@ -270,17 +274,25 @@ class BaseEditCanvas(BaseCanvas):
             self.context_identifier,
             self._opengl_resource_pack,
         )
-        self._chunk_generator.register(self._structure)
+        self.chunk_generator.register(self._structure)
 
         self._sky_box: Optional[SkyBox] = SkyBox(
             self.context_identifier,
             self._opengl_resource_pack,
         )
 
-        self._bind_base_events()
+    def _finalise(self):
+        """Any logic that needs to be run after everything has been set up."""
+        pass
 
     def reset_bound_events(self):
         """Unbind all events and re-bind the default events.
+        We are allowing users to bind custom events so we should have a way to reset what is bound."""
+        self.tear_down_events()
+        self.set_up_events()
+
+    def tear_down_events(self):
+        """Unbind all events.
         We are allowing users to bind custom events so we should have a way to reset what is bound."""
         handled_events = set()
         for event, handler, source in self._bound_events:
@@ -291,10 +303,11 @@ class BaseEditCanvas(BaseCanvas):
             else:
                 if not self.Unbind(event, source, handler=handler):
                     log.error(f"Failed to unbind {event}, {handler}, {source}")
-        self._bind_base_events()
 
-    def _bind_base_events(self):
-        self.Bind(wx.EVT_TIMER, self._on_draw, self._draw_timer)
+    def set_up_events(self):
+        """Set up all events required to run.
+        Note this will also bind subclass events."""
+        self.Bind(wx.EVT_TIMER, lambda evt: wx.PostEvent(self, DrawEvent()), self._draw_timer)
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
         self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
 
@@ -373,11 +386,11 @@ class BaseEditCanvas(BaseCanvas):
     def _disable_threads(self):
         """Stop the generation of new chunk geometry.
         Makes it safe to modify the world data."""
-        self._chunk_generator.stop()
+        self.chunk_generator.stop()
 
     def _enable_threads(self):
         """Start the generation of new chunk geometry."""
-        self._chunk_generator.start()
+        self.chunk_generator.start()
 
     def close(self):
         """Close and destroy the canvas and all contained data."""
@@ -772,17 +785,24 @@ class BaseEditCanvas(BaseCanvas):
             0, 0, width, height, 0
         )  # I don't know if this is how you are supposed to do this
 
-    def _on_draw(self, event):
-        self.draw()
-        event.Skip()
+    def draw_sky_box(self):
+        self._sky_box.draw(self.transformation_matrix)
+
+    def draw_level(self):
+        """Draw the main level."""
+        self._render_world.draw(self.transformation_matrix)
+
+    def draw_fake_levels(self):
+        """Draw the floating structure levels."""
+        self._structure.draw(self.transformation_matrix)
 
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         if self.projection_mode == Perspective:
-            self._sky_box.draw(self.transformation_matrix)
-        self._render_world.draw(self.transformation_matrix)
+            self.draw_sky_box()
+        self.draw_level()
         if self._draw_structure:
-            self._structure.draw(self.transformation_matrix)
+            self.draw_fake_levels()
         if self._selection_moved:
             self._selection_moved = False
             self._change_box_location()
@@ -791,7 +811,7 @@ class BaseEditCanvas(BaseCanvas):
         )
         self.SwapBuffers()
         if not ThreadingEnabled:
-            self._chunk_generator.thread_action()
+            self.chunk_generator.thread_action()
 
     def _gc(self, event):
         self._render_world.run_garbage_collector()

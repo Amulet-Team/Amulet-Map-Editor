@@ -44,7 +44,6 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
         self.register_tool(SelectOptions)
-        self._enable_tool("Select")
         self.register_tool(SelectOperationUI)
         self.register_tool(SelectImportOperationUI)
         self.register_tool(SelectExportOperationUI)
@@ -55,8 +54,8 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
         return self._tools.copy()
 
     def bind_events(self):
-        for tool in self._tools.values():
-            tool.bind_events()
+        if self._active_tool is not None:
+            self._active_tool.bind_events()
         self.canvas.Bind(EVT_TOOL_CHANGE, self._enable_tool_event)
 
     def register_tool(self, tool_cls: Type[BaseToolUIType]):
@@ -74,7 +73,7 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
 
     def _enable_tool_event(self, evt):
         self._enable_tool(evt.tool)
-        evt.Skip()
+        # evt.Skip() # this causes issues if uncommented
 
     def enable_default_tool(self) -> bool:
         """
@@ -89,6 +88,8 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
     def _enable_tool(self, tool: str):
         if tool in self._tools:
             if self._active_tool is not None:
+                if self._active_tool.name == tool:
+                    return
                 self._active_tool.disable()
                 if isinstance(self._active_tool, wx.Window):
                     self._active_tool.Hide()
@@ -99,6 +100,8 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
                 self._active_tool.Show()
             elif isinstance(self._active_tool, wx.Sizer):
                 self._active_tool.ShowItems(show=True)
+            self.canvas.tear_down_events()
+            self.canvas.set_up_events()
             self._active_tool.enable()
             self.canvas.Layout()
 
@@ -116,6 +119,7 @@ class ToolSelect(wx.Panel, BaseUI):
         self._sizer.Add(button)
         self._sizer.Fit(self)
         self.Layout()
+
         button.Bind(
             wx.EVT_BUTTON,
             lambda evt: wx.PostEvent(self.canvas, ToolChangeEvent(tool=name)),
