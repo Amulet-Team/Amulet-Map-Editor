@@ -805,16 +805,6 @@ class BaseEditCanvas(BaseCanvas):
             self.SwapBuffers()
             self.chunk_generator.thread_action()
 
-    def draw(self):
-        self.start_draw()
-        if self.projection_mode == Perspective:
-            self.draw_sky_box()
-        self.draw_level()
-        if self._draw_structure:
-            self.draw_fake_levels()
-        self.draw_selection()
-        self.end_draw()
-
     def _gc(self, event):
         self._render_world.run_garbage_collector()
         self._structure.run_garbage_collector()
