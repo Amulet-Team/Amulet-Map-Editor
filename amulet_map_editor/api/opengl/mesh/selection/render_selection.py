@@ -84,7 +84,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         :return: Multiplier of the vector to the collision location. None if it does not collide
         """
         # Logic based on https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-
+        vector[vector == 0] = 0.000001
         (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort(
             (self.bounds - numpy.array(origin)) / numpy.array(vector), axis=0
         )
