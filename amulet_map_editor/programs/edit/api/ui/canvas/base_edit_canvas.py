@@ -796,8 +796,18 @@ class BaseEditCanvas(BaseCanvas):
         """Draw the floating structure levels."""
         self._structure.draw(self.transformation_matrix)
 
-    def draw(self):
+    def start_draw(self):
+        """Run commands before drawing."""
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    def end_draw(self):
+        """Run commands after drawing."""
+        self.SwapBuffers()
+        if not ThreadingEnabled:
+            self.chunk_generator.thread_action()
+
+    def draw(self):
+        self.start_draw()
         if self.projection_mode == Perspective:
             self.draw_sky_box()
         self.draw_level()
@@ -809,9 +819,7 @@ class BaseEditCanvas(BaseCanvas):
         self.selection.draw(
             self.transformation_matrix, tuple(self.camera_location), self.draw_selection
         )
-        self.SwapBuffers()
-        if not ThreadingEnabled:
-            self.chunk_generator.thread_action()
+        self.end_draw()
 
     def _gc(self, event):
         self._render_world.run_garbage_collector()
