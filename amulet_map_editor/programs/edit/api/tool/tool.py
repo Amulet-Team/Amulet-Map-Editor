@@ -88,8 +88,6 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
     def _enable_tool(self, tool: str):
         if tool in self._tools:
             if self._active_tool is not None:
-                if self._active_tool.name == tool:
-                    return
                 self._active_tool.disable()
                 if isinstance(self._active_tool, wx.Window):
                     self._active_tool.Hide()
