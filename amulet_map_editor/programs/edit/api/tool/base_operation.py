@@ -2,6 +2,7 @@ import wx
 from typing import TYPE_CHECKING, Optional
 
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.opengl.canvas import Perspective
 from amulet_map_editor.programs.edit.api.operations import (
     OperationUIType,
     OperationStorageType,
@@ -98,7 +99,6 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
 
     def enable(self):
         self._operation_change()
-        self.canvas.draw_structure = False
         self.canvas.selection_editable = False
 
     def disable(self):

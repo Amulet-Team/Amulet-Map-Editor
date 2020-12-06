@@ -435,15 +435,6 @@ class BaseEditCanvas(BaseCanvas):
     def structure(self) -> LevelGroup:
         return self._structure
 
-    @property
-    def draw_structure(self) -> bool:
-        """Should the moveable structure be drawn"""
-        return self._draw_structure
-
-    @draw_structure.setter
-    def draw_structure(self, draw_structure: bool):
-        self._draw_structure = bool(draw_structure)
-
 
     @property
     def selection_editable(self) -> bool:

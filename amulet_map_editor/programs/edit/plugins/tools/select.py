@@ -137,7 +137,6 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._remove_paste()
         self._button_panel.Show()
         self.Layout()
-        self.canvas.draw_structure = False
         self.canvas.selection_editable = True
 
     def disable(self):
@@ -179,11 +178,3 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
     def _set_scroll_state(self, state: bool):
         for scroll in (self._x1, self._y1, self._z1, self._x2, self._y2, self._z2):
             scroll.Enable(state)
-
-    def _on_draw(self, evt):
-        self.canvas.start_draw()
-        if self.canvas.projection_mode == Perspective:
-            self.canvas.draw_sky_box()
-        self.canvas.draw_level()
-        self.canvas.draw_selection()
-        self.canvas.end_draw()

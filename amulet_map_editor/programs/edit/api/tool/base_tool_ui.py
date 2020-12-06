@@ -1,6 +1,7 @@
 import wx
 from typing import Union
 
+from amulet_map_editor.api.opengl.canvas import Perspective
 from amulet_map_editor.programs.edit.api.base_ui import BaseUI
 from amulet_map_editor.programs.edit.api.ui.canvas.events import EVT_DRAW
 
@@ -23,6 +24,8 @@ class BaseToolUI(BaseUI):
 
     def _on_draw(self, evt):
         self.canvas.start_draw()
-        self.canvas.draw_sky_box()
+        if self.canvas.projection_mode == Perspective:
+            self.canvas.draw_sky_box()
         self.canvas.draw_level()
+        self.canvas.draw_selection()
         self.canvas.end_draw()
