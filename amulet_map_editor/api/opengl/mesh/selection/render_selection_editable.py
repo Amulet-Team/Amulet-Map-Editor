@@ -44,7 +44,7 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         if self.is_dynamic:
             return 1.0, 0.7, 0.3
         else:
-            return 1.2, 1.2, 1.2
+            return 0.5, 0.5, 1.0
 
     @property
     def is_static(self) -> bool:
