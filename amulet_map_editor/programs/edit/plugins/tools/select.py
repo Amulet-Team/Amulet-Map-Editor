@@ -6,12 +6,12 @@ from amulet.operations.paste import paste_iter
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.api.tool import BaseToolUI
 from amulet_map_editor.programs.edit.api.ui.select_location import SelectTransformUI
+from amulet_map_editor.api.opengl.canvas import Perspective
 from amulet_map_editor.programs.edit.api.ui.canvas.events import (
     EVT_PASTE,
     EVT_BOX_CHANGE,
     EVT_BOX_DISABLE_INPUTS,
     EVT_BOX_ENABLE_INPUTS,
-    EVT_DRAW,
 )
 
 if TYPE_CHECKING:
@@ -138,7 +138,6 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._button_panel.Show()
         self.Layout()
         self.canvas.draw_structure = False
-        self.canvas.draw_selection = True
         self.canvas.selection_editable = True
 
     def disable(self):
@@ -183,6 +182,8 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
 
     def _on_draw(self, evt):
         self.canvas.start_draw()
-        self.canvas.draw_sky_box()
+        if self.canvas.projection_mode == Perspective:
+            self.canvas.draw_sky_box()
         self.canvas.draw_level()
+        self.canvas.draw_selection()
         self.canvas.end_draw()

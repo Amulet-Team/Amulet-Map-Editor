@@ -163,7 +163,6 @@ class BaseEditCanvas(BaseCanvas):
         # has the selection point moved and does the box need rebuilding
         self._selection_moved = True
 
-        self._draw_selection = True
         self._selection_group: Optional[RenderSelectionHistoryManager] = None
 
         self._draw_structure = False
@@ -307,7 +306,9 @@ class BaseEditCanvas(BaseCanvas):
     def set_up_events(self):
         """Set up all events required to run.
         Note this will also bind subclass events."""
-        self.Bind(wx.EVT_TIMER, lambda evt: wx.PostEvent(self, DrawEvent()), self._draw_timer)
+        self.Bind(
+            wx.EVT_TIMER, lambda evt: wx.PostEvent(self, DrawEvent()), self._draw_timer
+        )
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
         self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
 
@@ -443,14 +444,6 @@ class BaseEditCanvas(BaseCanvas):
     def draw_structure(self, draw_structure: bool):
         self._draw_structure = bool(draw_structure)
 
-    @property
-    def draw_selection(self) -> bool:
-        """Should the selection box(es) be drawn"""
-        return self._draw_selection
-
-    @draw_selection.setter
-    def draw_selection(self, draw_selection: bool):
-        self._draw_selection = bool(draw_selection)
 
     @property
     def selection_editable(self) -> bool:
@@ -796,9 +789,20 @@ class BaseEditCanvas(BaseCanvas):
         """Draw the floating structure levels."""
         self._structure.draw(self.transformation_matrix)
 
+    def draw_selection(self, draw_selection: bool = True, draw_cursor: bool = True):
+        self.selection.draw(
+            self.transformation_matrix,
+            tuple(self.camera_location),
+            draw_selection,
+            draw_cursor,
+        )
+
     def start_draw(self):
         """Run commands before drawing."""
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        if self._selection_moved:
+            self._selection_moved = False
+            self._change_box_location()
 
     def end_draw(self):
         """Run commands after drawing."""
@@ -813,12 +817,7 @@ class BaseEditCanvas(BaseCanvas):
         self.draw_level()
         if self._draw_structure:
             self.draw_fake_levels()
-        if self._selection_moved:
-            self._selection_moved = False
-            self._change_box_location()
-        self.selection.draw(
-            self.transformation_matrix, tuple(self.camera_location), self.draw_selection
-        )
+        self.draw_selection()
         self.end_draw()
 
     def _gc(self, event):

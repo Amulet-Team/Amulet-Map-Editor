@@ -99,7 +99,6 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
     def enable(self):
         self._operation_change()
         self.canvas.draw_structure = False
-        self.canvas.draw_selection = True
         self.canvas.selection_editable = False
 
     def disable(self):

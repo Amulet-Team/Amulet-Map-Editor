@@ -19,7 +19,6 @@ class ChunkTool(wx.BoxSizer, BaseToolUI):
     def enable(self):
         self.Layout()
         self.canvas.draw_structure = False
-        self.canvas.draw_selection = True
         self.canvas.selection_editable = True
 
     def disable(self):
