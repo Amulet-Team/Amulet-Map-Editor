@@ -804,10 +804,14 @@ class BaseEditCanvas(BaseCanvas):
             self._selection_moved = False
             self._change_box_location()
 
-    def end_draw(self):
-        """Run commands after drawing."""
-        self.SwapBuffers()
-        if not ThreadingEnabled:
+    if ThreadingEnabled:
+        def end_draw(self):
+            """Run commands after drawing."""
+            self.SwapBuffers()
+    else:
+        def end_draw(self):
+            """Run commands after drawing."""
+            self.SwapBuffers()
             self.chunk_generator.thread_action()
 
     def draw(self):
