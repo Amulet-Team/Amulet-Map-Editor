@@ -59,11 +59,11 @@ class SetBiome(SimpleOperationPanel):
 
         self._biome_choice = BiomeDefine(
             self,
-            world.world_wrapper.translation_manager,
+            world.level_wrapper.translation_manager,
             wx.VERTICAL,
             *(
                 options.get("original_block_options", [])
-                or [world.world_wrapper.platform]
+                or [world.level_wrapper.platform]
             ),
             show_pick_biome=True,
         )

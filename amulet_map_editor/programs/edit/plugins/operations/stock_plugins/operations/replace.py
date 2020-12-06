@@ -28,11 +28,11 @@ class Replace(SimpleScrollablePanel, OperationUI):
 
         self._original_block = BlockDefine(
             self,
-            world.world_wrapper.translation_manager,
+            world.level_wrapper.translation_manager,
             wx.VERTICAL,
             *(
                 options.get("original_block_options", [])
-                or [world.world_wrapper.platform]
+                or [world.level_wrapper.platform]
             ),
             wildcard_properties=True,
             show_pick_block=True
@@ -43,11 +43,11 @@ class Replace(SimpleScrollablePanel, OperationUI):
         )
         self._replacement_block = BlockDefine(
             self,
-            world.world_wrapper.translation_manager,
+            world.level_wrapper.translation_manager,
             wx.VERTICAL,
             *(
                 options.get("replacement_block_options", [])
-                or [world.world_wrapper.platform]
+                or [world.level_wrapper.platform]
             ),
             show_pick_block=True
         )

@@ -29,7 +29,7 @@ class Fill(wx.Panel, OperationUI):
             self,
             world.translation_manager,
             wx.VERTICAL,
-            *(options.get("fill_block_options", []) or [world.world_wrapper.platform]),
+            *(options.get("fill_block_options", []) or [world.level_wrapper.platform]),
             show_pick_block=True
         )
         self._block_click_registered = False

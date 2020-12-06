@@ -24,7 +24,7 @@ class AboutProgram(SimplePanel, BaseProgram):
         self.add_object(
             wx.StaticText(self, label="Currently Opened World: "), 0, wx.ALL | wx.CENTER
         )
-        self.add_object(WorldUI(self, self.world.world_wrapper), 0, wx.ALL | wx.CENTER)
+        self.add_object(WorldUI(self, self.world.level_wrapper), 0, wx.ALL | wx.CENTER)
         self.add_object(
             wx.StaticText(
                 self,

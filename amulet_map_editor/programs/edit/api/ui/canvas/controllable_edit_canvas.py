@@ -192,8 +192,8 @@ class ControllableEditCanvas(BaseEditCanvas):
             block = self.world.get_block(x, y, z, self.dimension)
             chunk = self.world.get_chunk(x >> 4, z >> 4, self.dimension)
             block_entity = chunk.block_entities.get((x, y, z), None)
-            platform = self.world.world_wrapper.platform
-            version = self.world.world_wrapper.version
+            platform = self.world.level_wrapper.platform
+            version = self.world.level_wrapper.version
             translator = self.world.translation_manager.get_version(
                 platform,
                 version,

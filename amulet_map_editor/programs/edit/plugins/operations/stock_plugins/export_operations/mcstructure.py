@@ -36,7 +36,7 @@ class ExportMCStructure(SimpleOperationPanel):
         self._version_define = VersionSelect(
             self,
             world.translation_manager,
-            options.get("platform", None) or world.world_wrapper.platform,
+            options.get("platform", None) or world.level_wrapper.platform,
             allowed_platforms=("bedrock",),
             allow_numerical=False,
         )

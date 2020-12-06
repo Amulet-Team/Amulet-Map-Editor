@@ -47,7 +47,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             wx.ALL | wx.CENTER,
         )
         self._input.add_object(
-            WorldUI(self._input, self.world.world_wrapper), 0, wx.ALL | wx.CENTER
+            WorldUI(self._input, self.world.level_wrapper), 0, wx.ALL | wx.CENTER
         )
 
         self._output = SimplePanel(self, wx.HORIZONTAL)
@@ -110,7 +110,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         select_world.Destroy()
 
     def _output_world_callback(self, path):
-        if path == self.world.world_path:
+        if path == self.world.level_path:
             wx.MessageBox("The input and output worlds must be different")
             return
         try:
@@ -145,14 +145,14 @@ class ConvertExtension(SimplePanel, BaseProgram):
         global work_count
         try:
             out_world = load_format(self.out_world_path)
-            log.info(f"Converting world {self.world.world_path} to {out_world.path}")
+            log.info(f"Converting world {self.world.level_path} to {out_world.path}")
             out_world: WorldFormatWrapper
             out_world.open()
             self.world.save(out_world, self._update_loading_bar)
             out_world.close()
             message = "World conversion completed"
             log.info(
-                f"Finished converting world {self.world.world_path} to {out_world.path}"
+                f"Finished converting world {self.world.level_path} to {out_world.path}"
             )
         except Exception as e:
             message = f"Error during conversion\n{e}"
@@ -165,7 +165,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
     def is_closeable(self):
         if work_count:
             log.info(
-                f"World {self.world.world_path} is still being converted. Please let it finish before closing"
+                f"World {self.world.level_path} is still being converted. Please let it finish before closing"
             )
         return work_count == 0
 
