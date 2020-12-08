@@ -6,10 +6,19 @@ import threading
 import json
 import re
 import webbrowser
+import os
+import sys
+import zipfile
+import subprocess
+import glob
 
 import wx
 
+from amulet_map_editor.api.logging import log
+
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
+DOWNLOAD_URL = "https://github.com/Podshot/AmuletUpdater/releases/download/latest/AmuletUpdater.zip"
+
 VERSION_REGEX = re.compile(
     r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<bugfix>\d+))?(b(?P<beta>\d+))?$"
 )
@@ -30,12 +39,8 @@ def get_version(version_string: str) -> Tuple[bool, Tuple[int, ...]]:
         version = (
             int(v["major"]),
             int(v["minor"]),
-            int(
-                v["patch"] or 0,
-            ),
-            int(
-                v["bugfix"] or 0,
-            ),
+            int(v["patch"] or 0),
+            int(v["bugfix"] or 0),
         )
         if v["beta"] is None:
             # full release
@@ -48,12 +53,16 @@ def get_version(version_string: str) -> Tuple[bool, Tuple[int, ...]]:
 
 
 class UpdateEvent(wx.PyCommandEvent):
-    def __init__(self, etype, eid, new_version: str):
+    def __init__(self, etype, eid, new_version: str, is_beta: bool):
         wx.PyCommandEvent.__init__(self, etype, eid)
         self._new_version = new_version
+        self._is_beta = is_beta
 
     def GetVersion(self) -> str:
         return self._new_version
+
+    def GetIsBeta(self) -> bool:
+        return self._is_beta
 
 
 class CheckForUpdate(threading.Thread):
@@ -71,7 +80,7 @@ class CheckForUpdate(threading.Thread):
             data = json.loads(data)
             try:
                 current_version = get_version(self.current_version)
-            except Exception:
+            except Exception as e:
                 return
 
             for release in data:
@@ -97,14 +106,14 @@ class CheckForUpdate(threading.Thread):
                         break
 
             if self._new_version:
-                evt = UpdateEvent(_EVT_UPDATE_CHECK, -1, self._new_version)
+                evt = UpdateEvent(_EVT_UPDATE_CHECK, -1, self._new_version, current_version[0])
                 wx.PostEvent(self._parent, evt)
         except Exception:
             pass
 
 
 class UpdateDialog(wx.Dialog):
-    def __init__(self, parent, current_version: str, new_version: str):
+    def __init__(self, parent, current_version: str, new_version: str, is_beta: bool):
         wx.Dialog.__init__(self, parent)
 
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -121,11 +130,16 @@ class UpdateDialog(wx.Dialog):
 
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
 
-        update_button = wx.Button(self, label="Go to Download Page")
+        update_page_button = wx.Button(self, label="Go to Download Page")
+        if not __debug__:
+            updater_button = wx.Button(self, label="Run Auto Updater")
         ok_button = wx.Button(self, label="Ok")
 
-        sizer_2.Add(update_button, 0, wx.ALL, 5)
+        sizer_2.Add(update_page_button, 0, wx.ALL, 5)
         sizer_2.Add((0, 0), 1, wx.EXPAND, 5)
+        if not __debug__:
+            sizer_2.Add(updater_button, 0, wx.ALL, 5)
+            sizer_2.Add((0, 0), 1, wx.EXPAND, 5)
         sizer_2.Add(ok_button, 0, wx.ALL, 5)
 
         sizer_1.Add(sizer_2, 1, wx.EXPAND, 5)
@@ -134,9 +148,13 @@ class UpdateDialog(wx.Dialog):
 
         self.Centre()
 
-        update_button.Bind(
+        update_page_button.Bind(
             wx.EVT_BUTTON, lambda evt: self.goto_download_page(new_version, evt)
         )
+        if not __debug__:
+            updater_button.Bind(
+                wx.EVT_BUTTON, lambda evt: self.auto_update(current_version, new_version, is_beta, evt)
+            )
         ok_button.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
     @staticmethod
@@ -145,9 +163,50 @@ class UpdateDialog(wx.Dialog):
             f"https://github.com/Amulet-Team/Amulet-Map-Editor/releases/tag/{new_version}"
         )
 
+    @staticmethod
+    def auto_update(current_version, target_version, is_beta, _):
+        working_directory = os.path.dirname(sys.executable)
+        temp_dir = os.path.join(working_directory, "updater-tmp")
+        try:
+            os.mkdir(temp_dir)
+        except FileExistsError:
+            pass
+
+        updater_zip = os.path.join(temp_dir, "AmuletUpdater.zip")
+        urllib.request.urlretrieve(DOWNLOAD_URL, updater_zip)
+
+        with zipfile.ZipFile(updater_zip, "r") as z:
+            z.extractall(temp_dir)
+
+        jars = glob.glob(os.path.join(temp_dir, '*.jar'))
+        updater_jar = jars[0]
+        log.info(f"Using AmuletUpdater jar: {updater_jar}")
+        args = [
+                os.path.join(temp_dir, "openjdk-14.0.2", "bin", "java.exe"),
+                "-jar",
+                updater_jar,
+                "-current_version",
+                current_version,
+                "-target_version",
+                target_version,
+                "-wd",
+                working_directory,
+                "-pid",
+                str(os.getpid()),
+            ]
+
+        if is_beta:
+            args.append('-install_beta')
+
+        p = subprocess.Popen(
+            args,
+            shell=True,
+            cwd=temp_dir,
+        )
+
 
 def show_update_window(parent, current_version: str, evt: UpdateEvent):
-    UpdateDialog(parent, current_version, evt.GetVersion()).ShowModal()
+    UpdateDialog(parent, current_version, evt.GetVersion(), evt.GetIsBeta()).ShowModal()
 
 
 def check_for_update(version, listening_parent):
