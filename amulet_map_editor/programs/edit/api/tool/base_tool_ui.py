@@ -14,7 +14,7 @@ class BaseToolUI(BaseUI):
         raise NotImplementedError
 
     def enable(self):
-        pass
+        self.canvas.projection_mode = Perspective
 
     def disable(self):
         pass

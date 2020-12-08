@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 import wx
 
+from amulet_map_editor.api.opengl.canvas import Orthographic
 from amulet_map_editor.programs.edit.api.tool import BaseToolUI
 
 if TYPE_CHECKING:
@@ -19,6 +20,7 @@ class ChunkTool(wx.BoxSizer, BaseToolUI):
     def enable(self):
         self.Layout()
         self.canvas.selection_editable = True
+        self.canvas.projection_mode = Orthographic
 
     def disable(self):
         super().disable()

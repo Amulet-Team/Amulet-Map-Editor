@@ -134,6 +134,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         )
 
     def enable(self):
+        super().enable()
         self._remove_paste()
         self._button_panel.Show()
         self.Layout()
