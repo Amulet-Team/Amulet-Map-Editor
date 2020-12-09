@@ -29,7 +29,7 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
             for box in selection.selection_boxes:
                 render_box = self._new_render_selection()
                 render_box.point1 = numpy.array(box.min) - selection.min
-                render_box.point2 = numpy.array(box.max) - selection.min - 1
+                render_box.point2 = numpy.array(box.max) - selection.min
                 self._boxes.append(render_box)
 
     def _new_render_selection(self):

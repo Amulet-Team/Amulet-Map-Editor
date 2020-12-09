@@ -21,7 +21,7 @@ class RenderSelectionHighlightable(RenderSelection):
 
     def set_active_point(self, position: BlockCoordinatesAny):
         if position in self:
-            self._highlight_edges[:] = position == self._points
+            self._highlight_edges[:] = position == self._offset_points()
             self._highlight_edges[1, self._highlight_edges[0]] = False
         else:
             self._highlight_edges[:] = False

@@ -154,13 +154,43 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         return obj
 
     def _box_input_change(self, _):
+        (x1, y1, z1) = (self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue())
+        (x2, y2, z2) = (self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue())
+        if x2 >= x1:
+            x2 += 1
+        else:
+            x1 += 1
+
+        if y2 >= y1:
+            y2 += 1
+        else:
+            y1 += 1
+
+        if z2 >= z1:
+            z2 += 1
+        else:
+            z1 += 1
         self.canvas.active_selection_corners = (
-            (self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()),
-            (self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()),
+            (x1, y1, z1),
+            (x2, y2, z2),
         )
 
     def _box_renderer_change(self, evt):
         (x1, y1, z1), (x2, y2, z2) = evt.corners
+        if x2 > x1:
+            x2 -= 1
+        else:
+            x1 -= 1
+
+        if y2 > y1:
+            y2 -= 1
+        else:
+            y1 -= 1
+
+        if z2 > z1:
+            z2 -= 1
+        else:
+            z1 -= 1
         self._x1.SetValue(x1)
         self._y1.SetValue(y1)
         self._z1.SetValue(z1)

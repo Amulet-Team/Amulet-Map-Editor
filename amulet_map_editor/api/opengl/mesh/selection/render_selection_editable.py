@@ -81,7 +81,7 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         :return:
         """
         if self.in_boundary(position):
-            self._free_edges[:] = position == self._points
+            self._free_edges[:] = position == self._offset_points()
             self._free_edges[1, self._free_edges[0]] = False
             self._being_resized = True
 
@@ -91,12 +91,14 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
     def set_active_point(self, position: BlockCoordinatesAny):
         if self.is_dynamic:
-            self._points[self._free_edges] = numpy.array([position, position])[
+            points = self._offset_points()
+            points[self._free_edges] = numpy.array([position, position])[
                 self._free_edges
             ]
+            self._from_offset_points(points)
             self._highlight_edges[:] = self._free_edges
         elif position in self:
-            self._highlight_edges[:] = position == self._points
+            self._highlight_edges[:] = position == self._offset_points()
             self._highlight_edges[1, self._highlight_edges[0]] = False
         else:
             self._highlight_edges[:] = False
@@ -105,13 +107,15 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
     def _create_geometry_(self):
         super()._create_geometry_()
+        point1 = self.point1 - self.min + (self.min % 16) - (self.point2 <= self.point1)
+        point2 = self.point2 - self.min + (self.min % 16) - (self.point2 > self.point1)
         self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(
-            self.point1 - self.min - 0.01 + (self.min % 16),
-            self.point1 - self.min + 1.01 + (self.min % 16),
+            point1 - 0.01,
+            point1 + 1.01,
         )
         self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(
-            self.point2 - self.min - 0.01 + (self.min % 16),
-            self.point2 - self.min + 1.01 + (self.min % 16),
+            point2 - 0.01,
+            point2 + 1.01,
         )
 
     def draw(

@@ -55,9 +55,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     @property
     def active_selection_corners(self) -> Tuple[BlockCoordinates, BlockCoordinates]:
         """Get the bounds of the selection box that is currently active.
-        Will be all 0 if no selection box exists.
-        The second value will be one less than the actual top edge.
-        This is the same as box selection in game works and solves some other issues."""
+        Will be all 0 if no selection box exists."""
         if self._active_box is None:
             return (0, 0, 0), (0, 0, 0)
         else:
@@ -154,10 +152,8 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             self._new_editable_render_selection()
         )  # create a new render selection
         self._last_active_box_index = self._active_box_index
-        self._active_box.point1, self._active_box.point2 = (
-            self._cursor_position,
-            self._cursor_position,
-        )
+        self._active_box.point1 = self._cursor.point1
+        self._active_box.point2 = self._cursor.point2
         self._active_box_index = None
         self._disable_inputs_event()
 
@@ -168,10 +164,8 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         )  # create a new render selection
         self._last_active_box_index = None
         active_box = self._boxes[self._active_box_index]
-        self._active_box.point1, self._active_box.point2 = (
-            active_box.point1,
-            active_box.point2,
-        )
+        self._active_box.point1 = active_box.point1
+        self._active_box.point2 = active_box.point2
         self._active_box.lock()
         self._enable_inputs_event()
 
@@ -281,7 +275,8 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     ):
         self._cursor_position[:] = position
         self._hover_box_index = box_index
-        self._cursor.point1 = self._cursor.point2 = position
+        self._cursor.point1 = position
+        self._cursor.point2 = position + 1
         if (
             self._last_highlighted_box_index is not None
             and self._last_highlighted_box_index != box_index

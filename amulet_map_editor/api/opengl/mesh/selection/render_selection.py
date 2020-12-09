@@ -64,6 +64,18 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         point = numpy.array(position)
         return numpy.all(self.min <= point) and numpy.all(point < self.max)
 
+    def _offset_points(self) -> numpy.ndarray:
+        points = self._points.copy()
+        points[0] -= self.point1 > self.point2
+        points[1] -= self.point1 <= self.point2
+        return points
+
+    def _from_offset_points(self, offset_points: numpy.ndarray):
+        points = offset_points.copy()
+        points[0] += offset_points[0] > offset_points[1]
+        points[1] += offset_points[0] <= offset_points[1]
+        self._points[:] = points
+
     def in_boundary(self, position: BlockCoordinatesAny) -> bool:
         """
         Is the block position in the surface layer of blocks inside the selection box cuboid.
@@ -71,7 +83,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         :return: True if the position is inside the box otherwise False
         """
         return position in self and numpy.any(
-            numpy.any(position == self._points, axis=0)
+            numpy.any(position == self._offset_points(), axis=0)
         )
 
     def intersects_vector(
@@ -129,7 +141,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     @point1.setter
     def point1(self, val: PointCoordinatesAny):
         if not numpy.array_equal(self._points[0], val):
-            self._points[0] = numpy.floor(val)
+            self._points[0] = val
             self._mark_recreate()
 
     @property
@@ -139,7 +151,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     @point2.setter
     def point2(self, val: PointCoordinatesAny):
         if not numpy.array_equal(self._points[1], val):
-            self._points[1] = numpy.floor(val)
+            self._points[1] = val
             self._mark_recreate()
 
     @property
@@ -147,7 +159,6 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         """The array storing min and max locations"""
         if self._bounds is None:
             self._bounds = numpy.sort(self._points, 0)
-            self.bounds[1] += 1
         return self._bounds
 
     @property
