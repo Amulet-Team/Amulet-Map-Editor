@@ -451,6 +451,7 @@ class BaseEditCanvas(BaseCanvas):
 
     @property
     def structure(self) -> LevelGroup:
+        """Floating levels that are not the main level."""
         return self._structure
 
     @property
@@ -827,6 +828,7 @@ class BaseEditCanvas(BaseCanvas):
         self._structure.draw(self.transformation_matrix)
 
     def draw_selection(self, draw_selection: bool = True, draw_cursor: bool = True):
+        """Draw the selection box."""
         self.selection.draw(
             self.transformation_matrix,
             tuple(self.camera_location),
