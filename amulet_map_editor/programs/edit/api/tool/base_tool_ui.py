@@ -4,6 +4,7 @@ from typing import Union
 from amulet_map_editor.api.opengl.canvas import Perspective
 from amulet_map_editor.programs.edit.api.base_ui import BaseUI
 from amulet_map_editor.programs.edit.api.ui.canvas.events import EVT_DRAW
+from amulet_map_editor.programs.edit.api.ui.canvas import BlockSelectionMode
 
 BaseToolUIType = Union[wx.Window, wx.Sizer, "BaseToolUI"]
 
@@ -14,6 +15,7 @@ class BaseToolUI(BaseUI):
         raise NotImplementedError
 
     def enable(self):
+        self.canvas.selection_mode = BlockSelectionMode
         self.canvas.projection_mode = Perspective
 
     def disable(self):

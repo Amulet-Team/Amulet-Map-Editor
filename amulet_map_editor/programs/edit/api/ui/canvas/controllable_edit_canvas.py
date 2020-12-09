@@ -1,10 +1,9 @@
-from typing import TYPE_CHECKING, Set, Generator, Tuple
+from typing import TYPE_CHECKING, Set, Tuple
 import wx
 import numpy
 import time
 import math
 
-from amulet.api.data_types import OperationYieldType
 from wx.adv import RichToolTip
 
 from .base_edit_canvas import BaseEditCanvas

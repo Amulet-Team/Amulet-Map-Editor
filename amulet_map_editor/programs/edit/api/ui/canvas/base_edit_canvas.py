@@ -163,6 +163,7 @@ class BaseEditCanvas(BaseCanvas):
         # has the selection point moved and does the box need rebuilding
         self._selection_moved = True
 
+        self._selection_mode = BlockSelectionMode
         self._selection_group: Optional[RenderSelectionHistoryManager] = None
 
         self._draw_structure = False
@@ -452,6 +453,32 @@ class BaseEditCanvas(BaseCanvas):
     def structure(self) -> LevelGroup:
         return self._structure
 
+    @property
+    def selection_mode(self) -> int:
+        return self._selection_mode
+
+    @selection_mode.setter
+    def selection_mode(self, selection_mode: int):
+        assert isinstance(
+            selection_mode, int
+        ), f"Expected an int, got {type(selection_mode)}"
+        if selection_mode == ChunkSelectionMode:
+            boxes = []
+            min_y = self.world.selection_bounds.min[1]
+            max_y = self.world.selection_bounds.max[1]
+            for box in self.selection.all_selection_corners:
+                point1, point2 = numpy.sort(box, 0)
+                min_x, _, min_z = (
+                    numpy.floor(point1 / self.world.sub_chunk_size)
+                    * self.world.sub_chunk_size
+                ).tolist()
+                max_x, _, max_z = (
+                    numpy.ceil(point2 / self.world.sub_chunk_size)
+                    * self.world.sub_chunk_size
+                ).tolist()
+                boxes.append(((min_x, min_y, min_z), (max_x - 1, max_y - 1, max_z - 1)))
+            self.selection.all_selection_corners = boxes
+        self._selection_mode = selection_mode
 
     @property
     def selection_editable(self) -> bool:
