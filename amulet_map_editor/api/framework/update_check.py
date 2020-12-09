@@ -106,7 +106,9 @@ class CheckForUpdate(threading.Thread):
                         break
 
             if self._new_version:
-                evt = UpdateEvent(_EVT_UPDATE_CHECK, -1, self._new_version, current_version[0])
+                evt = UpdateEvent(
+                    _EVT_UPDATE_CHECK, -1, self._new_version, current_version[0]
+                )
                 wx.PostEvent(self._parent, evt)
         except Exception:
             pass
@@ -153,7 +155,10 @@ class UpdateDialog(wx.Dialog):
         )
         if not __debug__:
             updater_button.Bind(
-                wx.EVT_BUTTON, lambda evt: self.auto_update(current_version, new_version, is_beta, evt)
+                wx.EVT_BUTTON,
+                lambda evt: self.auto_update(
+                    current_version, new_version, is_beta, evt
+                ),
             )
         ok_button.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
@@ -178,31 +183,27 @@ class UpdateDialog(wx.Dialog):
         with zipfile.ZipFile(updater_zip, "r") as z:
             z.extractall(temp_dir)
 
-        jars = glob.glob(os.path.join(temp_dir, '*.jar'))
+        jars = glob.glob(os.path.join(temp_dir, "*.jar"))
         updater_jar = jars[0]
         log.info(f"Using AmuletUpdater jar: {updater_jar}")
         args = [
-                os.path.join(temp_dir, "openjdk-14.0.2", "bin", "java.exe"),
-                "-jar",
-                updater_jar,
-                "-current_version",
-                current_version,
-                "-target_version",
-                target_version,
-                "-wd",
-                working_directory,
-                "-pid",
-                str(os.getpid()),
-            ]
+            os.path.join(temp_dir, "openjdk-14.0.2", "bin", "java.exe"),
+            "-jar",
+            updater_jar,
+            "-current_version",
+            current_version,
+            "-target_version",
+            target_version,
+            "-wd",
+            working_directory,
+            "-pid",
+            str(os.getpid()),
+        ]
 
         if is_beta:
-            args.append('-install_beta')
+            args.append("-install_beta")
 
-        p = subprocess.Popen(
-            args,
-            shell=True,
-            cwd=temp_dir,
-        )
+        p = subprocess.Popen(args, shell=True, cwd=temp_dir)
 
 
 def show_update_window(parent, current_version: str, evt: UpdateEvent):
