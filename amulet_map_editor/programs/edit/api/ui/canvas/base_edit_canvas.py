@@ -368,6 +368,20 @@ class BaseEditCanvas(BaseCanvas):
     ):
         self.selection.active_selection_corners = box_corners
 
+    @property
+    def all_selection_corners(self) -> List[Tuple[BlockCoordinates, BlockCoordinates]]:
+        """Get the bounds of all the selection boxes.
+        Will be an empty list if no selection box exists.
+        The second value will be one less than the actual top edge.
+        This is the same as box selection in game works and solves some other issues."""
+        return self.selection.all_selection_corners
+
+    @all_selection_corners.setter
+    def all_selection_corners(
+        self, box_corners: List[Tuple[BlockCoordinates, BlockCoordinates]]
+    ):
+        self.selection.all_selection_corners = box_corners
+
     def enable(self):
         """Enable the canvas and start it working."""
         self.SetCurrent(self._context)
