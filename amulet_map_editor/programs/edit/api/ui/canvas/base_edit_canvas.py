@@ -332,14 +332,17 @@ class BaseEditCanvas(BaseCanvas):
 
     @property
     def render_distance(self) -> int:
+        """The distance from the camera in chunks that should be drawn"""
         return self._render_world.render_distance
 
     @render_distance.setter
     def render_distance(self, render_distance: int):
+        """Set the distance from the camera in chunks that should be drawn"""
         self._render_world.render_distance = render_distance
 
     @property
     def selection_location(self) -> BlockCoordinates:
+        """The block coordinate of where the cursor currently is."""
         return self._selection_location
 
     @property
@@ -479,10 +482,12 @@ class BaseEditCanvas(BaseCanvas):
 
     @property
     def camera_location(self) -> CameraLocationType:
+        """The coordinates of the camera."""
         return self._camera_location
 
     @camera_location.setter
     def camera_location(self, location: CameraLocationType):
+        """Set the coordinates of the camera."""
         assert len(location) == 3 and all(
             isinstance(v, (int, float)) for v in location
         ), "format for camera_location is invalid"
@@ -796,10 +801,13 @@ class BaseEditCanvas(BaseCanvas):
             self._change_box_location()
 
     if ThreadingEnabled:
+
         def end_draw(self):
             """Run commands after drawing."""
             self.SwapBuffers()
+
     else:
+
         def end_draw(self):
             """Run commands after drawing."""
             self.SwapBuffers()
