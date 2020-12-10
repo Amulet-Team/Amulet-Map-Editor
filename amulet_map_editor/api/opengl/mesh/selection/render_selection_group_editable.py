@@ -148,26 +148,28 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     def _create_active_box_from_cursor(self):
         # create from the cursor position
         self._unload_active_box()
-        self._active_box = (
-            self._new_editable_render_selection()
-        )  # create a new render selection
-        self._last_active_box_index = self._active_box_index
-        self._active_box.point1 = self._cursor.point1
-        self._active_box.point2 = self._cursor.point2
-        self._active_box_index = None
-        self._disable_inputs_event()
+        if self.editable:
+            self._active_box = (
+                self._new_editable_render_selection()
+            )  # create a new render selection
+            self._last_active_box_index = self._active_box_index
+            self._active_box.point1 = self._cursor.point1
+            self._active_box.point2 = self._cursor.point2
+            self._active_box_index = None
+            self._disable_inputs_event()
 
     def _create_active_box_from_existing(self):
         self._unload_active_box()
-        self._active_box = (
-            self._new_editable_render_selection()
-        )  # create a new render selection
-        self._last_active_box_index = None
-        active_box = self._boxes[self._active_box_index]
-        self._active_box.point1 = active_box.point1
-        self._active_box.point2 = active_box.point2
-        self._active_box.lock()
-        self._enable_inputs_event()
+        if self.editable:
+            self._active_box = (
+                self._new_editable_render_selection()
+            )  # create a new render selection
+            self._last_active_box_index = None
+            active_box = self._boxes[self._active_box_index]
+            self._active_box.point1 = active_box.point1
+            self._active_box.point2 = active_box.point2
+            self._active_box.lock()
+            self._enable_inputs_event()
 
     @property
     def editable(self) -> bool:
@@ -367,7 +369,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             for index, box in enumerate(self._boxes):
                 if not self.editable or index != self._active_box_index:
                     box.draw(camera_matrix, camera_position)
-            if self._active_box is not None:
+            if self.editable and self._active_box is not None:
                 self._active_box.draw(camera_matrix, camera_position)
         if draw_cursor and not self.editing:
             self._cursor.draw(camera_matrix)
