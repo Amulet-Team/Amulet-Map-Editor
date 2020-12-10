@@ -21,6 +21,8 @@ KeybindContainer = Dict[KeybindGroupIdType, KeybindGroup]
 MouseLeft = "MOUSE_LEFT"
 MouseMiddle = "MOUSE_MIDDLE"
 MouseRight = "MOUSE_RIGHT"
+MouseAux1 = "MOUSE_AUX_1"
+MouseAux2 = "MOUSE_AUX_2"
 MouseWheelScrollUp = "MOUSE_WHEEL_SCROLL_UP"
 MouseWheelScrollDown = "MOUSE_WHEEL_SCROLL_DOWN"
 Control = "CTRL"
@@ -222,17 +224,18 @@ _mouse_events = {
     wx.EVT_MIDDLE_UP.evtType[0]: MouseMiddle,
     wx.EVT_RIGHT_DOWN.evtType[0]: MouseRight,
     wx.EVT_RIGHT_UP.evtType[0]: MouseRight,
+    wx.EVT_MOUSE_AUX1_DOWN.evtType[0]: MouseAux1,
+    wx.EVT_MOUSE_AUX1_UP.evtType[0]: MouseAux1,
+    wx.EVT_MOUSE_AUX2_DOWN.evtType[0]: MouseAux2,
+    wx.EVT_MOUSE_AUX2_UP.evtType[0]: MouseAux2,
 }
 
 
 def serialise_key_event(
     evt: Union[wx.KeyEvent, wx.MouseEvent]
 ) -> Optional[SerialisedKeyType]:
-    if isinstance(evt, wx.KeyEvent):
-        modifier = []
-        key = evt.GetUnicodeKey() or evt.GetKeyCode()
-        if key == wx.WXK_CONTROL:
-            return
+    modifier = []
+    def get_modifier():
         if evt.ControlDown():
             if key in (wx.WXK_SHIFT, wx.WXK_ALT):
                 return  # if control is pressed the real key must not be a modifier
@@ -242,6 +245,12 @@ def serialise_key_event(
                 modifier.append(Shift)
             if evt.AltDown():
                 modifier.append(Alt)
+    if isinstance(evt, wx.KeyEvent):
+
+        key = evt.GetUnicodeKey() or evt.GetKeyCode()
+        if key == wx.WXK_CONTROL:
+            return
+        get_modifier()
 
         if 33 <= key <= 126:
             key = chr(key).upper()
@@ -252,13 +261,14 @@ def serialise_key_event(
         return tuple(modifier), key
     elif isinstance(evt, wx.MouseEvent):
         key = evt.GetEventType()
+        get_modifier()
         if key in wx.EVT_MOUSEWHEEL.evtType:
             if evt.GetWheelRotation() < 0:
-                return (), MouseWheelScrollDown
+                return tuple(modifier), MouseWheelScrollDown
             elif evt.GetWheelRotation() > 0:
-                return (), MouseWheelScrollUp
+                return tuple(modifier), MouseWheelScrollUp
         elif key in _mouse_events:
-            return (), _mouse_events[key]
+            return tuple(modifier), _mouse_events[key]
 
 
 def stringify_key(key: SerialisedKeyType) -> str:
@@ -280,6 +290,8 @@ class KeyCatcher(wx.Dialog):
         self.Bind(wx.EVT_RIGHT_DOWN, self._on_key)
         self.Bind(wx.EVT_KEY_DOWN, self._on_key)
         self.Bind(wx.EVT_MOUSEWHEEL, self._on_key)
+        self.Bind(wx.EVT_MOUSE_AUX1_DOWN, self._on_key)
+        self.Bind(wx.EVT_MOUSE_AUX2_DOWN, self._on_key)
 
     def _on_key(self, evt):
         key = serialise_key_event(evt)
@@ -290,6 +302,14 @@ class KeyCatcher(wx.Dialog):
     @property
     def key(self) -> SerialisedKeyType:
         return self._key
+
+
+# TODO: make any key able to be a modifier. Instead of registering keys on press register them on release.
+#  When a key is pressed store it to a set of persistent keys. When a key is released that is the triggering
+#  key and all persistent keys are modifiers.
+#  In the actual program detect all keys on press/release as normal but also store the set of persistent keys.
+#  When serialising give the key that was pressed/released along with all the modifiers.
+#  Return all actions that use the triggering key as the triggering key and use a sub-set of the persistent keys.
 
 
 class KeyConfigDialog(SimpleDialog):

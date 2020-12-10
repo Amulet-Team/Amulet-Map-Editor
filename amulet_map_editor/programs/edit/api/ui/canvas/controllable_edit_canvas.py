@@ -71,6 +71,10 @@ class ControllableEditCanvas(BaseEditCanvas):
         self.Bind(wx.EVT_KEY_UP, self._release)
         self.Bind(wx.EVT_NAVIGATION_KEY, self._press)
         self.Bind(wx.EVT_MOUSEWHEEL, self._release)
+        self.Bind(wx.EVT_MOUSE_AUX1_DOWN, self._press)
+        self.Bind(wx.EVT_MOUSE_AUX1_UP, self._release)
+        self.Bind(wx.EVT_MOUSE_AUX2_DOWN, self._press)
+        self.Bind(wx.EVT_MOUSE_AUX2_UP, self._release)
 
         self.Bind(EVT_EDIT_ESCAPE, self.selection.escape_event)
         self.Bind(EVT_BOX_CHANGE_CONFIRM, self._on_box_change_confirm)
@@ -111,7 +115,6 @@ class ControllableEditCanvas(BaseEditCanvas):
                 "backwards",
                 "left",
                 "right",
-                "add box modifier",
             }:
                 if press:
                     self._persistent_actions.add(action)
@@ -135,7 +138,12 @@ class ControllableEditCanvas(BaseEditCanvas):
                         self.selection.deselect_active()
                 elif action == "box click":
                     if self.selection_editable:
-                        self.box_select("add box modifier" in self._persistent_actions)
+                        self.box_select()
+                        self._box_select_time = time.time()
+                    wx.PostEvent(self, BoxClickEvent())
+                elif action == "add box modifier":
+                    if self.selection_editable:
+                        self.box_select(True)
                         self._box_select_time = time.time()
                     wx.PostEvent(self, BoxClickEvent())
                 elif action == "toggle mouse mode":
@@ -149,7 +157,7 @@ class ControllableEditCanvas(BaseEditCanvas):
                     self.projection_mode = not self.projection_mode
 
             else:  # run once on button release
-                if action == "box click":
+                if action in ("box click", "add box modifier"):
                     if (
                         self.selection_editable
                         and time.time() - self._box_select_time > 0.1
