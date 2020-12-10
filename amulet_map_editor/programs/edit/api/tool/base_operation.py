@@ -126,3 +126,11 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self._operation_choice.SetValue(self._operation_choice.GetItems()[0])
 
         self._operation_change()
+
+    def _on_draw(self, evt):
+        self.canvas.start_draw()
+        if self.canvas.projection_mode == Perspective:
+            self.canvas.draw_sky_box()
+        self.canvas.draw_level()
+        self.canvas.draw_selection(True, False)
+        self.canvas.end_draw()
