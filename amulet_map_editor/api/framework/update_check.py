@@ -11,6 +11,7 @@ import sys
 import zipfile
 import subprocess
 import glob
+import platform
 
 import wx
 
@@ -18,6 +19,9 @@ from amulet_map_editor.api.logging import log
 
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
 DOWNLOAD_URL = "https://github.com/Podshot/AmuletUpdater/releases/download/latest/AmuletUpdater.zip"
+
+NOT_RUNNING_FROM_SOURCE = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+AUTOUPDATER_SUPPORTED_OS = platform.system() in ("Windows",)
 
 VERSION_REGEX = re.compile(
     r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<bugfix>\d+))?(b(?P<beta>\d+))?$"
@@ -133,13 +137,13 @@ class UpdateDialog(wx.Dialog):
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
 
         update_page_button = wx.Button(self, label="Go to Download Page")
-        if not __debug__:
+        if NOT_RUNNING_FROM_SOURCE and AUTOUPDATER_SUPPORTED_OS:
             updater_button = wx.Button(self, label="Run Auto Updater")
         ok_button = wx.Button(self, label="Ok")
 
         sizer_2.Add(update_page_button, 0, wx.ALL, 5)
         sizer_2.Add((0, 0), 1, wx.EXPAND, 5)
-        if not __debug__:
+        if NOT_RUNNING_FROM_SOURCE and AUTOUPDATER_SUPPORTED_OS:
             sizer_2.Add(updater_button, 0, wx.ALL, 5)
             sizer_2.Add((0, 0), 1, wx.EXPAND, 5)
         sizer_2.Add(ok_button, 0, wx.ALL, 5)
@@ -153,7 +157,7 @@ class UpdateDialog(wx.Dialog):
         update_page_button.Bind(
             wx.EVT_BUTTON, lambda evt: self.goto_download_page(new_version, evt)
         )
-        if not __debug__:
+        if NOT_RUNNING_FROM_SOURCE and AUTOUPDATER_SUPPORTED_OS:
             updater_button.Bind(
                 wx.EVT_BUTTON,
                 lambda evt: self.auto_update(
@@ -172,10 +176,7 @@ class UpdateDialog(wx.Dialog):
     def auto_update(current_version, target_version, is_beta, _):
         working_directory = os.path.dirname(sys.executable)
         temp_dir = os.path.join(working_directory, "updater-tmp")
-        try:
-            os.mkdir(temp_dir)
-        except FileExistsError:
-            pass
+        os.makedirs(temp_dir, exist_ok=True)
 
         updater_zip = os.path.join(temp_dir, "AmuletUpdater.zip")
         urllib.request.urlretrieve(DOWNLOAD_URL, updater_zip)
