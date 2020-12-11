@@ -18,7 +18,9 @@ import wx
 from amulet_map_editor.api.logging import log
 
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
-DOWNLOAD_URL = "https://github.com/Podshot/AmuletUpdater/releases/download/latest/AmuletUpdater.zip"
+
+UPDATER_DOWNLOAD_URL = "https://github.com/Podshot/AmuletUpdater/releases/download/latest/AmuletUpdater.zip"
+JAVA_DOWNLOAD_URL = "https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_windows-x64_bin.zip"
 
 NOT_RUNNING_FROM_SOURCE = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
 AUTOUPDATER_SUPPORTED_OS = platform.system() in ("Windows",)
@@ -118,6 +120,20 @@ class CheckForUpdate(threading.Thread):
             pass
 
 
+class DownloadFileThread(threading.Thread):
+    def __init__(self, url, filepath, unpack_path):
+        threading.Thread.__init__(self)
+        self._url = url
+        self._filepath = filepath
+        self._unpack_path = unpack_path
+
+    def run(self) -> None:
+        urllib.request.urlretrieve(self._url, self._filepath)
+
+        with zipfile.ZipFile(self._filepath, "r") as z_ref:
+            z_ref.extractall(self._unpack_path)
+
+
 class UpdateDialog(wx.Dialog):
     def __init__(self, parent, current_version: str, new_version: str, is_beta: bool):
         wx.Dialog.__init__(self, parent)
@@ -178,17 +194,27 @@ class UpdateDialog(wx.Dialog):
         temp_dir = os.path.join(working_directory, "updater-tmp")
         os.makedirs(temp_dir, exist_ok=True)
 
-        updater_zip = os.path.join(temp_dir, "AmuletUpdater.zip")
-        urllib.request.urlretrieve(DOWNLOAD_URL, updater_zip)
+        updater_zip_path = os.path.join(temp_dir, "AmuletUpdater.zip")
+        java_zip_path = os.path.join(temp_dir, "openjdk_14.0.2.zip")
 
-        with zipfile.ZipFile(updater_zip, "r") as z:
-            z.extractall(temp_dir)
+        updater_download_thread = DownloadFileThread(
+            UPDATER_DOWNLOAD_URL, updater_zip_path, temp_dir
+        )
+        java_download_thread = DownloadFileThread(
+            JAVA_DOWNLOAD_URL, java_zip_path, temp_dir
+        )
+
+        java_download_thread.start()
+        updater_download_thread.start()
+
+        java_download_thread.join()
+        updater_download_thread.join()
 
         jars = glob.glob(os.path.join(temp_dir, "*.jar"))
         updater_jar = jars[0]
         log.info(f"Using AmuletUpdater jar: {updater_jar}")
         args = [
-            os.path.join(temp_dir, "openjdk-14.0.2", "bin", "java.exe"),
+            os.path.join(temp_dir, "jdk-14.0.2", "bin", "java.exe"),
             "-jar",
             updater_jar,
             "-current_version",
