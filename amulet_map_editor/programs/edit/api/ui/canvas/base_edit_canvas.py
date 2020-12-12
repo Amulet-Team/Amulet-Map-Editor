@@ -70,6 +70,8 @@ from amulet_map_editor.programs.edit.api.ui.canvas.events import (
     DimensionChangeEvent,
     SelectionPointChangeEvent,
     DrawEvent,
+    CursorMoveEvent,
+    EVT_CURSOR_MOVE,
 )
 import amulet_map_editor.programs.edit as amulet_edit
 
@@ -312,6 +314,7 @@ class BaseEditCanvas(BaseCanvas):
         )
         self.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
         self.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
+        self.Bind(EVT_CURSOR_MOVE, lambda evt: self._change_box_location())
 
     def Bind(self, event, handler, source=None, id=wx.ID_ANY, id2=wx.ID_ANY):
         """Bind an event to the canvas."""
@@ -841,7 +844,7 @@ class BaseEditCanvas(BaseCanvas):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         if self._selection_moved:
             self._selection_moved = False
-            self._change_box_location()
+            self.GetEventHandler().ProcessEvent(CursorMoveEvent())
 
     if ThreadingEnabled:
 

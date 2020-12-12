@@ -19,7 +19,11 @@ SaveEvent, EVT_SAVE = newevent.NewEvent()
 EditCloseEvent, EVT_EDIT_CLOSE = newevent.NewEvent()
 EditEscapeEvent, EVT_EDIT_ESCAPE = newevent.NewEvent()  # the escape key was pressed
 
-# the block highlighted by the cursor changed position.
+# This event is created for each frame that the mouse cursor has moved.
+# It should be used to update the cursor box and selection box.
+CursorMoveEvent, EVT_CURSOR_MOVE = newevent.NewEvent()
+
+# This event should be run by the handler of EVT_CURSOR_MOVE to notify the UI that the cursor box has changed.
 SelectionPointChangeEvent, EVT_SELECTION_POINT_CHANGE = newevent.NewEvent()
 
 # events fired when the active selection box changes.  TODO: reimplement these
