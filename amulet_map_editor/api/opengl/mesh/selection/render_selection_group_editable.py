@@ -275,6 +275,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
     def update_cursor_position(
         self, position: BlockCoordinatesAny, box_index: Optional[int]
     ):
+        position = numpy.asarray(position)
         self._cursor_position[:] = position
         self._hover_box_index = box_index
         self._cursor.point1 = position

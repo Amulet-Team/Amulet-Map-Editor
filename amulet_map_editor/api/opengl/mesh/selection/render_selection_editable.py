@@ -90,6 +90,7 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         self._rebuild = True
 
     def set_active_point(self, position: BlockCoordinatesAny):
+        position = numpy.asarray(position)
         if self.is_dynamic:
             points = self._offset_points()
             points[self._free_edges] = numpy.array([position, position])[
