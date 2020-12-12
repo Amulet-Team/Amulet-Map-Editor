@@ -302,12 +302,6 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
             self._boxes[box_index].set_active_point(self.cursor_position)
             self._last_highlighted_box_index = box_index
 
-    def update_cursor_position(
-        self, position: BlockCoordinatesAny, box_index: Optional[int]
-    ):
-        self.cursor_position = position
-        self.set_box_index(box_index)
-
     def _box_change_event(self):
         """The coordinates of the box have changed."""
         pass
