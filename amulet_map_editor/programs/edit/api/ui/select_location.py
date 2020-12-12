@@ -8,7 +8,7 @@ from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.api.base_ui import BaseUI
 from amulet_map_editor.programs.edit.api.ui.canvas.events import (
-    EVT_SELECTION_POINT_CHANGE,
+    EVT_CURSOR_BOX_MOVE,
     EVT_BOX_CLICK,
 )
 from amulet_map_editor.api import config
@@ -49,7 +49,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
 
         self._confirm.Bind(wx.EVT_BUTTON, lambda evt: confirm_callback())
         self._clicked = False
-        self.canvas.Bind(EVT_SELECTION_POINT_CHANGE, self._cursor_move)
+        self.canvas.Bind(EVT_CURSOR_BOX_MOVE, self._cursor_move)
         self.canvas.Bind(EVT_BOX_CLICK, self._box_click)
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:

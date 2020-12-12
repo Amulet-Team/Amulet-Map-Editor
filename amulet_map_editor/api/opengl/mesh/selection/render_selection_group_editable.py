@@ -272,27 +272,41 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         """The block coordinate of the cursor."""
         return tuple(self._cursor_position)
 
-    def update_cursor_position(
-        self, position: BlockCoordinatesAny, box_index: Optional[int]
-    ):
-        position = numpy.asarray(position)
-        self._cursor_position[:] = position
+    @cursor_position.setter
+    def cursor_position(self, cursor_position: BlockCoordinatesAny):
+        """Set the block coordinate of the cursor and update the renderer accordingly."""
+        cursor_position = numpy.asarray(cursor_position)
+        self._cursor_position[:] = cursor_position
+        self._cursor.point1 = cursor_position
+        self._cursor.point2 = cursor_position + 1
+
+        if self._active_box:
+            self._active_box.set_active_point(self.cursor_position)
+            self._box_change_event()
+
+    def set_box_index(self, box_index: Optional[int]):
+        """highlight the selected box based on the last set cursor position.
+        Set the cursor_position property before setting this.
+        """
+        # TODO: change this to take the box_index and a bitfield for each direction so it works on 1 wide selections.
         self._hover_box_index = box_index
-        self._cursor.point1 = position
-        self._cursor.point2 = position + 1
         if (
             self._last_highlighted_box_index is not None
             and self._last_highlighted_box_index != box_index
         ):
+            # undo the highlight effect on the last highlighted box
             self._boxes[self._last_highlighted_box_index].set_highlight_edges(False)
             self._last_highlighted_box_index = None
         if box_index is not None and self._active_box_index != box_index:
-            self._boxes[box_index].set_active_point(position)
+            # highlight the new box
+            self._boxes[box_index].set_active_point(self.cursor_position)
             self._last_highlighted_box_index = box_index
 
-        if self._active_box:
-            self._active_box.set_active_point(position)
-            self._box_change_event()
+    def update_cursor_position(
+        self, position: BlockCoordinatesAny, box_index: Optional[int]
+    ):
+        self.cursor_position = position
+        self.set_box_index(box_index)
 
     def _box_change_event(self):
         """The coordinates of the box have changed."""

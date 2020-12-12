@@ -68,7 +68,7 @@ from amulet_map_editor.programs.edit.api.ui.canvas.events import (
     CameraMoveEvent,
     CameraRotateEvent,
     DimensionChangeEvent,
-    SelectionPointChangeEvent,
+    CursorBoxMoveEvent,
     DrawEvent,
     CursorMoveEvent,
     EVT_CURSOR_MOVE,
@@ -158,7 +158,6 @@ class BaseEditCanvas(BaseCanvas):
         )  # yaw (-180 to 180), pitch (-90 to 90)
         self._camera_move_speed = 2.0
         self._camera_rotate_speed = 2.0
-        self._selection_location: BlockCoordinates = (0, 0, 0)
         self._select_distance = 10
         self._select_distance2 = 10
 
@@ -347,7 +346,14 @@ class BaseEditCanvas(BaseCanvas):
     @property
     def selection_location(self) -> BlockCoordinates:
         """The block coordinate of where the cursor currently is."""
-        return self._selection_location
+        return self.selection.cursor_position
+
+    @selection_location.setter
+    def selection_location(self, selection_location: BlockCoordinates):
+        """Set the block coordinate of where the cursor currently is."""
+        assert isinstance(selection_location, (list, tuple)) and len(selection_location) == 3 and all(isinstance(i, int) for i in selection_location), f"The format of selection_location is incorrect. {selection_location}"
+        self.selection.cursor_position = tuple(selection_location)
+        wx.PostEvent(self, CursorBoxMoveEvent(location=self.selection_location))
 
     @property
     def selection(self) -> EditProgramRenderSelectionGroup:
@@ -598,9 +604,8 @@ class BaseEditCanvas(BaseCanvas):
             else:
                 position, box_index = self._box_location_closest()
         position = numpy.floor(position).astype(numpy.int64)
-        self._selection_location = position.tolist()
-        wx.PostEvent(self, SelectionPointChangeEvent(location=self._selection_location))
-        self.selection.update_cursor_position(position, box_index)
+        self.selection_location = position.tolist()
+        self.selection.set_box_index(box_index)
 
     def ray_collision(self):
         vector_start = self.camera_location
