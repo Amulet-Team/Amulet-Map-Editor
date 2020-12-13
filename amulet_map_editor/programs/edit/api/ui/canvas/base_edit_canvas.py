@@ -351,7 +351,11 @@ class BaseEditCanvas(BaseCanvas):
     @selection_location.setter
     def selection_location(self, selection_location: BlockCoordinates):
         """Set the block coordinate of where the cursor currently is."""
-        assert isinstance(selection_location, (list, tuple)) and len(selection_location) == 3 and all(isinstance(i, int) for i in selection_location), f"The format of selection_location is incorrect. {selection_location}"
+        assert (
+            isinstance(selection_location, (list, tuple))
+            and len(selection_location) == 3
+            and all(isinstance(i, int) for i in selection_location)
+        ), f"The format of selection_location is incorrect. {selection_location}"
         self.selection.cursor_position = tuple(selection_location)
         wx.PostEvent(self, CursorBoxMoveEvent(location=self.selection_location))
 
@@ -486,7 +490,7 @@ class BaseEditCanvas(BaseCanvas):
                     numpy.ceil(point2 / self.world.sub_chunk_size)
                     * self.world.sub_chunk_size
                 ).tolist()
-                boxes.append(((min_x, min_y, min_z), (max_x - 1, max_y - 1, max_z - 1)))
+                boxes.append(((min_x, min_y, min_z), (max_x, max_y, max_z)))
             self.selection.all_selection_corners = boxes
         self._selection_mode = selection_mode
 
