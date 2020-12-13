@@ -4,7 +4,7 @@ from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
 from amulet_map_editor.api.wx.util.validators import IntValidator
 
 from amulet.api.data_types import OperationReturnType
-from .operation_ui import OperationUI
+from amulet_map_editor.programs.edit.api.operations.operation_ui import OperationUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas

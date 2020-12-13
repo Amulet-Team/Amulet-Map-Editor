@@ -9,7 +9,7 @@ import hashlib
 import inspect
 import traceback
 
-from .fixed_pipeline import FixedFunctionUI
+from .ui.fixed_pipeline import FixedFunctionUI
 from .operation_ui import OperationUI, OperationUIType
 from .data_types import OperationStorageType
 import amulet_map_editor.programs.edit as amulet_edit

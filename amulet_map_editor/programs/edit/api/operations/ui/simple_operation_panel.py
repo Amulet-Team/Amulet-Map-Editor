@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension, OperationReturnType
 
-from .operation_ui import OperationUI
+from amulet_map_editor.programs.edit.api.operations.operation_ui import OperationUI
 
 if TYPE_CHECKING:
     from amulet.api.level import World
