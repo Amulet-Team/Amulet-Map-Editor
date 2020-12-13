@@ -1,7 +1,4 @@
-from typing import Dict, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .loader import OperationLoader
+from typing import Dict
 
 PathType = str
 OperationStorageType = Dict[PathType, "OperationLoader"]

@@ -15,7 +15,7 @@ from amulet_map_editor.programs.edit.api.key_config import (
     PresetKeybinds,
     KeybindKeys,
 )
-from amulet_map_editor.programs.edit.api.operations import loader
+from amulet_map_editor.programs.edit.api.operations.manager import loader
 from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
