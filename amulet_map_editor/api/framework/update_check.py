@@ -19,7 +19,7 @@ from amulet_map_editor.api.logging import log
 
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
 
-UPDATER_DOWNLOAD_URL = "https://github.com/Podshot/AmuletUpdater/releases/download/latest/AmuletUpdater.zip"
+UPDATER_DOWNLOAD_URL = "https://github.com/Amulet-Team/AmuletUpdater/releases/download/latest/AmuletUpdater.zip"
 JAVA_DOWNLOAD_URL = "https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_windows-x64_bin.zip"
 
 NOT_RUNNING_FROM_SOURCE = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
