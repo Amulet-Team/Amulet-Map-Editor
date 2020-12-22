@@ -69,14 +69,25 @@ class SimpleChoiceAny(wx.Choice):
 
     def __init__(self, parent: wx.Window, sort=True, reverse=False):
         super().__init__(parent)
-        self._values: List[Any] = []
-        self._keys: List[str] = []
+        self._values: List[Any] = []  # the data hidden behind the string
+        self._keys: List[str] = []  # the strings shown to the user
         self._sorted = sort
         self._reverse = reverse
 
     @property
-    def values(self) -> List[Any]:
-        return self._values
+    def keys(self) -> Tuple[str, ...]:
+        """Get the string values displayed to the user"""
+        return tuple(self._keys)
+
+    @property
+    def values(self) -> Tuple[Any, ...]:
+        """Get the data hidden behind the string value"""
+        return tuple(self._values)
+
+    @property
+    def items(self) -> Tuple[Tuple[str, Any], ...]:
+        """Get the string value and the data hidden behind the value"""
+        return tuple(zip(self._keys, self._values))
 
     def SetItems(
         self,
@@ -93,9 +104,7 @@ class SimpleChoiceAny(wx.Choice):
                 (str(value), key) for key, value in items.items()
             ]
             if self._sorted:
-                items = sorted(items, key=lambda x: x[0])
-                if self._reverse:
-                    items.reverse()
+                items = sorted(items, key=lambda x: x[0], reverse=self._reverse)
             self._keys = [key.strip() for key, _ in items]
             self._values = [value for _, value in items]
         else:
