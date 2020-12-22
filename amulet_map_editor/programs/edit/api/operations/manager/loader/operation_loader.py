@@ -10,10 +10,10 @@ from amulet.api.selection import SelectionGroup
 
 class OperationLoader(BaseOperationLoader):
     def __init__(self, identifier: str, export_dict: dict):
-        super().__init__(identifier, export_dict)
         self._operation: Optional[
             Callable[[BaseLevel, Dimension, SelectionGroup], Any]
         ] = None
+        super().__init__(identifier, export_dict)
 
     def _setup(self, export_dict: dict):
         """Parse the export dictionary and setup as required."""

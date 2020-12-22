@@ -21,7 +21,7 @@ class BaseOperationManager:
         :param group_name: The name of the group. This is used to pick the directory.
         """
         # The loaded operations. Stored under their identifier.
-        assert isinstance(self.OperationClass, BaseOperationLoader)
+        assert issubclass(self.OperationClass, BaseOperationLoader)
         self._group_name = group_name
         self._operations: Dict[str, BaseOperationLoader] = {}
         self.reload()
@@ -29,6 +29,12 @@ class BaseOperationManager:
     @property
     def operations(self) -> Tuple[BaseOperationLoader, ...]:
         return tuple(self._operations.values())
+
+    def get_operation(self, operation_id: str):
+        return self._operations[operation_id]
+
+    def __getitem__(self, operation_id: str):
+        return self._operations[operation_id]
 
     def reload(self):
         """Unload the old operations and reload them all.
@@ -42,7 +48,7 @@ class BaseOperationManager:
         """Load all operations in a set directory."""
         os.makedirs(path, exist_ok=True)
         for obj_name in os.listdir(path):
-            if obj_name == "__init__.py":
+            if obj_name in {"__init__.py", "__pycache__"}:
                 continue
             obj_path = os.path.join(path, obj_name)
             try:

@@ -26,10 +26,10 @@ ValidChrs = set("-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234
 
 class UIOperationLoader(BaseOperationLoader):
     def __init__(self, identifier: str, export_dict: dict):
-        super().__init__(identifier, export_dict)
         self._ui: Optional[
             Callable[[wx.Window, "EditCanvas", "BaseLevel"], OperationUI]
         ] = None
+        super().__init__(identifier, export_dict)
 
     def _setup(self, export_dict: dict):
         """Parse the export dictionary and setup as required."""

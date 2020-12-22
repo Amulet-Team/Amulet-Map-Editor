@@ -15,7 +15,6 @@ from amulet_map_editor.programs.edit.api.key_config import (
     PresetKeybinds,
     KeybindKeys,
 )
-from amulet_map_editor.programs.edit.api.operations.manager import loader
 from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
@@ -174,9 +173,6 @@ class EditExtension(wx.Panel, BaseProgram):
         menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
             "Options...", lambda evt: self._edit_options()
         )
-        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
-            "Reload all operations", lambda evt: self._reload_all_operations()
-        )
         menu.setdefault("&Help", {}).setdefault("help", {}).setdefault(
             "Controls", lambda evt: self._help_controls()
         )
@@ -278,13 +274,6 @@ class EditExtension(wx.Panel, BaseProgram):
                 self._canvas.fov = fov
                 self._canvas.render_distance = render_distance
                 self._canvas.camera_rotate_speed = camera_sensitivity
-
-    def _reload_all_operations(self):
-        loader.persistent_storage.clear()
-        loader.reload_operations()
-
-        if self._canvas:
-            self._canvas.tools["Operation"].reload_operations()
 
     @staticmethod
     def _help_controls():
