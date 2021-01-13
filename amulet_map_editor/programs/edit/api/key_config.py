@@ -11,7 +11,6 @@ from amulet_map_editor.api.wx.util.key_config import (
     MouseWheelScrollUp,
     MouseWheelScrollDown,
     Control,
-    Numpad_Add,
     Alt,
     Tab,
 )
