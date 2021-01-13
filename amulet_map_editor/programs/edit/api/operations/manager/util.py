@@ -25,12 +25,16 @@ def load_module(path: str) -> Optional[ModuleType]:
     """
     if os.path.isfile(path):
         spec = importlib.util.spec_from_file_location(path, path)
+        if spec is None:
+            raise ImportError(f"Could not import {path}")
         mod = importlib.util.module_from_spec(spec)
     elif os.path.isdir(path):
         spec = importlib.util.spec_from_file_location(
             path,
             os.path.join(path, "__init__.py"),
         )
+        if spec is None:
+            raise ImportError(f"Could not import {path}")
         mod = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = mod
     else:

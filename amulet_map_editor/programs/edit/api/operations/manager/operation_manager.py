@@ -51,6 +51,8 @@ class BaseOperationManager:
             if obj_name in {"__init__.py", "__pycache__"}:
                 continue
             obj_path = os.path.join(path, obj_name)
+            if os.path.isfile(obj_path) and not obj_path.endswith(".py"):
+                continue
             try:
                 mod = load_module(obj_path)
             except ImportError:
