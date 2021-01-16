@@ -1,5 +1,6 @@
 import numpy
 from typing import Optional, Tuple
+from enum import Enum
 import wx
 from wx import glcanvas
 import math
@@ -17,19 +18,23 @@ from amulet_map_editor.api.opengl.matrix import (
     TransformationMatrixType,
 )
 
-Orthographic = 0
-Perspective = 1
+
+class Projection(Enum):
+    TOP_DOWN = 0
+    PERSPECTIVE = 1
 
 
-_SelectionChangeEventType = wx.NewEventType()
-EVT_CAMERA_MOVE = wx.PyEventBinder(_SelectionChangeEventType)
+_CameraMoveChangeEventType = wx.NewEventType()
+EVT_CAMERA_MOVE = wx.PyEventBinder(_CameraMoveChangeEventType)
 
 
 class CameraMoveEvent(wx.PyEvent):
     """Run when the camera has moved or rotated."""
 
-    def __init__(self, camera_location: CameraLocationType, camera_rotation: CameraRotationType):
-        wx.PyEvent.__init__(self, _SelectionChangeEventType)
+    def __init__(
+        self, camera_location: CameraLocationType, camera_rotation: CameraRotationType
+    ):
+        wx.PyEvent.__init__(self, _CameraMoveChangeEventType)
         self._location = camera_location
         self._rotation = camera_rotation
 
@@ -46,14 +51,32 @@ class CameraMoveEvent(wx.PyEvent):
         return self._rotation
 
 
+_ProjectionChangeEventType = wx.NewEventType()
+EVT_PROJECTION_CHANGE = wx.PyEventBinder(_ProjectionChangeEventType)
+
+
+class ProjectionChangeEvent(wx.PyEvent):
+    """Run when the projection of the camera has changed."""
+
+    def __init__(self, projection: Projection):
+        wx.PyEvent.__init__(self, _ProjectionChangeEventType)
+        self._projection = projection
+
+    @property
+    def projection(self) -> Projection:
+        """The location of the camera. (x, y, z)"""
+        return self._projection
+
+
 class Camera(CanvasContainer):
     """A class to hold the state information of the camera."""
+
     def __init__(self, canvas: glcanvas.GLCanvas):
         super().__init__(canvas)
 
         self._location: CameraLocationType = (0.0, 0.0, 0.0)
         self._rotation: CameraRotationType = (0.0, 0.0)
-        self._projection_mode = Perspective
+        self._projection_mode = Projection.PERSPECTIVE
         self._fov = [100.0, 70.0]
         self._clipping = [(-(10 ** 5), 10 ** 5), (0.1, 10000.0)]
         self._aspect_ratio = 4 / 3
@@ -65,15 +88,18 @@ class Camera(CanvasContainer):
         self._transformation_matrix = None
 
     @property
-    def projection_mode(self) -> int:
+    def projection_mode(self) -> Projection:
         return self._projection_mode
 
     @projection_mode.setter
-    def projection_mode(self, projection_mode: int):
-        assert type(projection_mode) is int and 0 <= projection_mode <= 1
+    def projection_mode(self, projection_mode: Projection):
+        assert (
+            projection_mode in Projection
+        ), f"{projection_mode} is not a valid projection."
         if self._projection_mode != projection_mode:
             self._projection_mode = projection_mode
             self._reset_matrix()
+            wx.PostEvent(self.canvas, ProjectionChangeEvent(self.projection_mode))
 
     @property
     def location(self) -> CameraLocationType:
@@ -89,8 +115,10 @@ class Camera(CanvasContainer):
 
     def set_location(self, camera_location: CameraLocationType):
         """Set the location of the camera. (x, y, z)."""
-        assert type(camera_location) in (tuple, list) and len(camera_location) == 3 and all(
-            type(v) in (int, float) for v in camera_location
+        assert (
+            type(camera_location) in (tuple, list)
+            and len(camera_location) == 3
+            and all(type(v) in (int, float) for v in camera_location)
         ), "format for camera_location is invalid"
         self._location = tuple(camera_location)
 
@@ -111,8 +139,10 @@ class Camera(CanvasContainer):
 
     def set_rotation(self, camera_rotation: CameraRotationType):
         """Set the location of the camera. (x, y, z)."""
-        assert type(camera_rotation) in (tuple, list) and len(camera_rotation) == 3 and all(
-            type(v) in (int, float) for v in camera_rotation
+        assert (
+            type(camera_rotation) in (tuple, list)
+            and len(camera_rotation) == 3
+            and all(type(v) in (int, float) for v in camera_rotation)
         ), "format for camera_rotation is invalid"
         self._rotation = tuple(camera_rotation)
 
@@ -121,7 +151,9 @@ class Camera(CanvasContainer):
         return self.location, self.rotation
 
     @location_rotation.setter
-    def location_rotation(self, location_rotation: Tuple[CameraLocationType, CameraRotationType]):
+    def location_rotation(
+        self, location_rotation: Tuple[CameraLocationType, CameraRotationType]
+    ):
         location, rotation = location_rotation
         self.set_location(location)
         self.set_rotation(rotation)
@@ -130,13 +162,13 @@ class Camera(CanvasContainer):
     @property
     def fov(self) -> float:
         """The field of view of the camera in degrees."""
-        return self._fov[self.projection_mode]
+        return self._fov[self.projection_mode.value]
 
     @fov.setter
     def fov(self, fov: float):
         """Set the field of view of the camera in degrees."""
         assert type(fov) in (int, float)
-        self._fov[self.projection_mode] = fov
+        self._fov[self.projection_mode.value] = fov
         self._reset_matrix()
 
     @property
@@ -159,7 +191,6 @@ class Camera(CanvasContainer):
         :param pitch: Pitch in degrees
         :return:
         """
-        """"""
         return rotation_matrix_yx(math.radians(yaw + 180), math.radians(pitch))
 
     @property
@@ -174,7 +205,7 @@ class Camera(CanvasContainer):
     def projection_matrix(self) -> TransformationMatrixType:
         """The matrix to convert camera space to screen space."""
         if self._projection_matrix is None:
-            if self.projection_mode == Orthographic:
+            if self.projection_mode == Projection.TOP_DOWN:
                 self._projection_matrix = self.orthographic_matrix
             else:
                 self._projection_matrix = self.perspective_matrix
@@ -184,13 +215,13 @@ class Camera(CanvasContainer):
     @property
     def orthographic_matrix(self) -> TransformationMatrixType:
         """The orthographic matrix to convert camera space to screen space."""
-        near, far = self._clipping[self.projection_mode]
+        near, far = self._clipping[self.projection_mode.value]
         return orthographic_matrix(self.fov, self.aspect_ratio, near, far)
 
     @property
     def perspective_matrix(self) -> TransformationMatrixType:
         """The perspective matrix to convert camera space to screen space."""
-        z_near, z_far = self._clipping[self.projection_mode]
+        z_near, z_far = self._clipping[self.projection_mode.value]
         return perspective_matrix(
             math.radians(self.fov), self.aspect_ratio, z_near, z_far
         )
