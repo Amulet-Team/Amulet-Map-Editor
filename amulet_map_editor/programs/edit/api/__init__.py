@@ -1,1 +1,1 @@
-from .base_ui import BaseUI
+from .edit_canvas_container import EditCanvasContainer
