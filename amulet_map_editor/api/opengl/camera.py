@@ -132,6 +132,7 @@ class Camera(CanvasContainer):
     @rotation.setter
     def rotation(self, camera_rotation: CameraRotationType):
         """Set the rotation of the camera. (yaw, pitch).
+        yaw (-180 to 180), pitch (-90 to 90)
         This should behave the same as how Minecraft handles it.
         Generates EVT_CAMERA_MOVE on the parent canvas."""
         self.set_rotation(camera_rotation)
@@ -141,19 +142,22 @@ class Camera(CanvasContainer):
         """Set the location of the camera. (x, y, z)."""
         assert (
             type(camera_rotation) in (tuple, list)
-            and len(camera_rotation) == 3
+            and len(camera_rotation) == 2
             and all(type(v) in (int, float) for v in camera_rotation)
         ), "format for camera_rotation is invalid"
         self._rotation = tuple(camera_rotation)
 
     @property
     def location_rotation(self) -> Tuple[CameraLocationType, CameraRotationType]:
+        """Get the camera location and rotation in one property."""
         return self.location, self.rotation
 
     @location_rotation.setter
     def location_rotation(
         self, location_rotation: Tuple[CameraLocationType, CameraRotationType]
     ):
+        """Set the camera location and rotation in one property.
+        Generates EVT_CAMERA_MOVE on the parent canvas."""
         location, rotation = location_rotation
         self.set_location(location)
         self.set_rotation(rotation)
