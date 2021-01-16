@@ -7,6 +7,7 @@ from amulet_map_editor.api.opengl.canvas import BaseCanvas
 
 class EventCanvas(BaseCanvas):
     """A modification of the normal canvas to make it easier to add and remove events."""
+
     def __init__(self, parent: wx.Window):
         super().__init__(parent)
         self._bound_events: List[Tuple[wx.PyEventBinder, Any, Any]] = []

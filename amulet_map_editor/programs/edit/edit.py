@@ -9,7 +9,7 @@ from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+from amulet_map_editor.programs.edit.api.canvas.edit_canvas import EditCanvas
 from amulet_map_editor.programs.edit.api.key_config import (
     DefaultKeybindGroupId,
     PresetKeybinds,
