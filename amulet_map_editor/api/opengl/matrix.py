@@ -10,13 +10,15 @@ from amulet.utils.matrix import (
     inverse_transform_matrix,
 )
 
+TransformationMatrixType = numpy.ndarray
+
 
 def perspective_matrix(
     fovy: float,  # field of view in the vertical direction in radians
     aspect,  # aspect ratio x/y
     z_near,  # near clipping distance
     z_far,  # far clipping distance
-) -> numpy.ndarray:
+) -> TransformationMatrixType:
     # camera projection
     f = 1 / math.tan(fovy / 2)
     return numpy.array(
@@ -40,7 +42,7 @@ def orthographic_matrix(
     aspect,  # aspect ratio x/y
     near,  # near clipping distance
     far,  # far clipping distance
-) -> numpy.ndarray:
+) -> TransformationMatrixType:
     """The orthographic matrix to convert camera space to screen space."""
     bottom = -radius
     top = radius
