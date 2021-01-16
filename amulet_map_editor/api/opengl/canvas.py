@@ -16,8 +16,6 @@ from OpenGL.GL import (
 import uuid
 import sys
 
-from .camera import Camera
-
 
 class BaseCanvas(glcanvas.GLCanvas):
     def __init__(self, parent: wx.Window):
@@ -31,8 +29,6 @@ class BaseCanvas(glcanvas.GLCanvas):
             size=parent.GetClientSize(),
             style=wx.WANTS_CHARS,
         )
-
-        self._camera = Camera(self)
 
         if sys.platform == "linux":
             # setup the OpenGL context. This apparently fixes #84
@@ -55,11 +51,6 @@ class BaseCanvas(glcanvas.GLCanvas):
     @property
     def context_identifier(self) -> str:
         return self._context_identifier
-
-    @property
-    def camera(self) -> Camera:
-        """A class holding the state of the camera."""
-        return self._camera
 
     def _setup_opengl(self):
         glEnable(GL_DEPTH_TEST)
