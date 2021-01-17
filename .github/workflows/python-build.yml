@@ -73,7 +73,7 @@ jobs:
         python setup.py build
     - name: PyInstaller build
       run: |
-        PyInstaller -y Amulet.spec
+        PyInstaller -y Amulet.spec --windowed
         cd dist
         zip -r Amulet-v${{ github.event.release.tag_name }}-osx.zip Amulet
         cd ..
