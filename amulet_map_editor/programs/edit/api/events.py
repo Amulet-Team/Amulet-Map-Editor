@@ -1,12 +1,15 @@
 from wx.lib import newevent
 
+from amulet_map_editor.api.opengl.camera import (
+    CameraMovedEvent,
+    EVT_CAMERA_MOVED,
+    ProjectionChangedEvent,
+    EVT_PROJECTION_CHANGED,
+)
+
 DrawEvent, EVT_DRAW = newevent.NewEvent()
 
-CameraMoveEvent, EVT_CAMERA_MOVE = newevent.NewEvent()
-CameraRotateEvent, EVT_CAMERA_ROTATE = newevent.NewEvent()
 DimensionChangeEvent, EVT_DIMENSION_CHANGE = newevent.NewEvent()
-
-ProjectionChangeEvent, EVT_PROJECTION_CHANGE = newevent.NewEvent()
 
 # the active tool changed
 ToolChangeEvent, EVT_TOOL_CHANGE = newevent.NewEvent()

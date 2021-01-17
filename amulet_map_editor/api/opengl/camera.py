@@ -25,10 +25,10 @@ class Projection(Enum):
 
 
 _CameraMoveChangeEventType = wx.NewEventType()
-EVT_CAMERA_MOVE = wx.PyEventBinder(_CameraMoveChangeEventType)
+EVT_CAMERA_MOVED = wx.PyEventBinder(_CameraMoveChangeEventType)
 
 
-class CameraMoveEvent(wx.PyEvent):
+class CameraMovedEvent(wx.PyEvent):
     """Run when the camera has moved or rotated."""
 
     def __init__(
@@ -52,10 +52,10 @@ class CameraMoveEvent(wx.PyEvent):
 
 
 _ProjectionChangeEventType = wx.NewEventType()
-EVT_PROJECTION_CHANGE = wx.PyEventBinder(_ProjectionChangeEventType)
+EVT_PROJECTION_CHANGED = wx.PyEventBinder(_ProjectionChangeEventType)
 
 
-class ProjectionChangeEvent(wx.PyEvent):
+class ProjectionChangedEvent(wx.PyEvent):
     """Run when the projection of the camera has changed."""
 
     def __init__(self, projection: Projection):
@@ -99,7 +99,7 @@ class Camera(CanvasContainer):
         if self._projection_mode != projection_mode:
             self._projection_mode = projection_mode
             self._reset_matrix()
-            wx.PostEvent(self.canvas, ProjectionChangeEvent(self.projection_mode))
+            wx.PostEvent(self.canvas, ProjectionChangedEvent(self.projection_mode))
 
     @property
     def location(self) -> CameraLocationType:
@@ -109,9 +109,9 @@ class Camera(CanvasContainer):
     @location.setter
     def location(self, camera_location: CameraLocationType):
         """Set the location of the camera. (x, y, z).
-        Generates EVT_CAMERA_MOVE on the parent canvas."""
+        Generates EVT_CAMERA_MOVED on the parent canvas."""
         self.set_location(camera_location)
-        wx.PostEvent(self.canvas, CameraMoveEvent(self.location, self.rotation))
+        wx.PostEvent(self.canvas, CameraMovedEvent(self.location, self.rotation))
 
     def set_location(self, camera_location: CameraLocationType):
         """Set the location of the camera. (x, y, z)."""
@@ -134,9 +134,9 @@ class Camera(CanvasContainer):
         """Set the rotation of the camera. (yaw, pitch).
         yaw (-180 to 180), pitch (-90 to 90)
         This should behave the same as how Minecraft handles it.
-        Generates EVT_CAMERA_MOVE on the parent canvas."""
+        Generates EVT_CAMERA_MOVED on the parent canvas."""
         self.set_rotation(camera_rotation)
-        wx.PostEvent(self.canvas, CameraMoveEvent(self.location, self.rotation))
+        wx.PostEvent(self.canvas, CameraMovedEvent(self.location, self.rotation))
 
     def set_rotation(self, camera_rotation: CameraRotationType):
         """Set the location of the camera. (x, y, z)."""
@@ -157,11 +157,11 @@ class Camera(CanvasContainer):
         self, location_rotation: Tuple[CameraLocationType, CameraRotationType]
     ):
         """Set the camera location and rotation in one property.
-        Generates EVT_CAMERA_MOVE on the parent canvas."""
+        Generates EVT_CAMERA_MOVED on the parent canvas."""
         location, rotation = location_rotation
         self.set_location(location)
         self.set_rotation(rotation)
-        wx.PostEvent(self.canvas, CameraMoveEvent(self.location, self.rotation))
+        wx.PostEvent(self.canvas, CameraMovedEvent(self.location, self.rotation))
 
     @property
     def fov(self) -> float:
