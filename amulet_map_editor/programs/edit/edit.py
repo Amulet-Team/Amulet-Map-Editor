@@ -63,11 +63,11 @@ class EditExtension(wx.Panel, BaseProgram):
                 wx.Yield()
 
             edit_config: dict = config.get(EDIT_CONFIG_ID, {})
-            self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
+            self._canvas.camera.fov = edit_config.get("options", {}).get("fov", 70.0)
             self._canvas.render_distance = edit_config.get("options", {}).get(
                 "render_distance", 5
             )
-            self._canvas.camera_rotate_speed = edit_config.get("options", {}).get(
+            self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
                 "camera_sensitivity", 2.0
             )
 
@@ -194,7 +194,7 @@ class EditExtension(wx.Panel, BaseProgram):
 
     def _edit_options(self):
         if self._canvas is not None:
-            fov = self._canvas.fov
+            fov = self._canvas.camera.fov
             render_distance = self._canvas.render_distance
             camera_sensitivity = self._canvas.camera_rotate_speed
             dialog = SimpleDialog(self, "Options")
@@ -204,7 +204,7 @@ class EditExtension(wx.Panel, BaseProgram):
             fov_ui = wx.SpinCtrlDouble(dialog, min=0, max=180, initial=fov)
 
             def set_fov(evt):
-                self._canvas.fov = fov_ui.GetValue()
+                self._canvas.camera.fov = fov_ui.GetValue()
 
             fov_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_fov)
             sizer.Add(
@@ -271,7 +271,7 @@ class EditExtension(wx.Panel, BaseProgram):
                 ] = camera_sensitivity_ui.GetValue()
                 config.put(EDIT_CONFIG_ID, edit_config)
             elif response == wx.ID_CANCEL:
-                self._canvas.fov = fov
+                self._canvas.camera.fov = fov
                 self._canvas.render_distance = render_distance
                 self._canvas.camera_rotate_speed = camera_sensitivity
 
