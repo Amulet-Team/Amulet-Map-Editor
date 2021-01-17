@@ -4,13 +4,13 @@ from enum import Enum
 import wx
 from wx import glcanvas
 import math
-from .canvas_container import CanvasContainer
-from .data_types import (
+from ..canvas_container import CanvasContainer
+from ..data_types import (
     CameraLocationType,
     CameraRotationType,
 )
 
-from amulet_map_editor.api.opengl.matrix import (
+from ..matrix import (
     rotation_matrix_yx,
     perspective_matrix,
     displacement_matrix,
