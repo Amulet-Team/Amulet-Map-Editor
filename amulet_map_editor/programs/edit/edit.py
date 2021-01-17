@@ -73,13 +73,11 @@ class EditExtension(wx.Panel, BaseProgram):
 
             self._sizer.Clear(True)
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
-            self.Bind(wx.EVT_SIZE, self._on_resize)
             self._canvas.Show()
 
             self.Layout()
         self._canvas.Update()
         self._canvas.enable()
-        self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
 
     def disable(self):
         if self._canvas is not None:
@@ -196,7 +194,7 @@ class EditExtension(wx.Panel, BaseProgram):
         if self._canvas is not None:
             fov = self._canvas.camera.fov
             render_distance = self._canvas.render_distance
-            camera_sensitivity = self._canvas.camera_rotate_speed
+            camera_sensitivity = self._canvas.camera.rotate_speed
             dialog = SimpleDialog(self, "Options")
 
             sizer = wx.FlexGridSizer(3, 2, 0, 0)
@@ -242,7 +240,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             def set_camera_sensitivity(evt):
-                self._canvas.camera_rotate_speed = camera_sensitivity_ui.GetValue()
+                self._canvas.camera.rotate_speed = camera_sensitivity_ui.GetValue()
 
             camera_sensitivity_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_camera_sensitivity)
             sizer.Add(
@@ -273,15 +271,10 @@ class EditExtension(wx.Panel, BaseProgram):
             elif response == wx.ID_CANCEL:
                 self._canvas.camera.fov = fov
                 self._canvas.render_distance = render_distance
-                self._canvas.camera_rotate_speed = camera_sensitivity
+                self._canvas.camera.rotate_speed = camera_sensitivity
 
     @staticmethod
     def _help_controls():
         webbrowser.open(
             "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/edit/readme.md"
         )
-
-    def _on_resize(self, event):
-        if self._canvas is not None:
-            self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
-        event.Skip()
