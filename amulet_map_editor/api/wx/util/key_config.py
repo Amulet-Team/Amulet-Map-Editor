@@ -231,28 +231,26 @@ _mouse_events = {
 }
 
 
-def serialise_key_event(
-    evt: Union[wx.KeyEvent, wx.MouseEvent]
-) -> Optional[SerialisedKeyType]:
+def serialise_modifier(
+    evt: Union[wx.KeyEvent, wx.MouseEvent], key: int
+) -> ModifierType:
+
     modifier = []
-
-    def get_modifier():
-        if evt.ControlDown():
-            if key in (wx.WXK_SHIFT, wx.WXK_ALT):
-                return  # if control is pressed the real key must not be a modifier
-
+    if evt.ControlDown():
+        if key not in (wx.WXK_SHIFT, wx.WXK_ALT):
+            # if control is pressed the real key must not be a modifier
             modifier.append(Control)
             if evt.ShiftDown():
                 modifier.append(Shift)
             if evt.AltDown():
                 modifier.append(Alt)
+    return tuple(modifier)
 
+
+def serialise_key(evt: Union[wx.KeyEvent, wx.MouseEvent]) -> Optional[KeyType]:
+    """Get the serialised version of the key that was pressed/released."""
     if isinstance(evt, wx.KeyEvent):
-
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
-        if key == wx.WXK_CONTROL:
-            return
-        get_modifier()
 
         if 33 <= key <= 126:
             key = chr(key).upper()
@@ -260,17 +258,45 @@ def serialise_key_event(
             key = key_string_map[key]
         else:
             key = f"UNKNOWN KEY {key}"
-        return tuple(modifier), key
+        return key
     elif isinstance(evt, wx.MouseEvent):
         key = evt.GetEventType()
-        get_modifier()
         if key in wx.EVT_MOUSEWHEEL.evtType:
             if evt.GetWheelRotation() < 0:
-                return tuple(modifier), MouseWheelScrollDown
+                return MouseWheelScrollDown
             elif evt.GetWheelRotation() > 0:
-                return tuple(modifier), MouseWheelScrollUp
+                return MouseWheelScrollUp
         elif key in _mouse_events:
-            return tuple(modifier), _mouse_events[key]
+            return _mouse_events[key]
+
+
+def serialise_key_event(
+    evt: Union[wx.KeyEvent, wx.MouseEvent]
+) -> Optional[SerialisedKeyType]:
+    if isinstance(evt, wx.KeyEvent):
+
+        key = evt.GetUnicodeKey() or evt.GetKeyCode()
+        if key == wx.WXK_CONTROL:
+            return
+        modifier = serialise_modifier(evt, key)
+
+        if 33 <= key <= 126:
+            key = chr(key).upper()
+        elif key in key_string_map:
+            key = key_string_map[key]
+        else:
+            key = f"UNKNOWN KEY {key}"
+        return modifier, key
+    elif isinstance(evt, wx.MouseEvent):
+        key = evt.GetEventType()
+        modifier = serialise_modifier(evt, key)
+        if key in wx.EVT_MOUSEWHEEL.evtType:
+            if evt.GetWheelRotation() < 0:
+                return modifier, MouseWheelScrollDown
+            elif evt.GetWheelRotation() > 0:
+                return modifier, MouseWheelScrollUp
+        elif key in _mouse_events:
+            return modifier, _mouse_events[key]
 
 
 def stringify_key(key: SerialisedKeyType) -> str:
