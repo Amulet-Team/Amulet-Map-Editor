@@ -23,15 +23,13 @@ class AboutProgram(SimplePanel, BaseProgram):
         self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
 
         self.add_object(
-            wx.StaticText(self, label=lang.get("currently_open_world")), 0, wx.ALL | wx.CENTER
+            wx.StaticText(self, label="{}: ".format(lang.get("currently_opened_world"))), 0, wx.ALL | wx.CENTER
         )
         self.add_object(WorldUI(self, self.world.world_wrapper), 0, wx.ALL | wx.CENTER)
         self.add_object(
             wx.StaticText(
                 self,
-                label="Choose from the options on the left what you would like to do.\n"
-                "You can switch between these at any time.\n"
-                "<=================",
+                label="{}\n<=================".format(lang.get("choose_from_options")),
             ),
             0,
             wx.ALL | wx.CENTER,
