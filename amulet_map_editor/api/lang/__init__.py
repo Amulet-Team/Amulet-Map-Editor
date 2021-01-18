@@ -11,7 +11,7 @@ default_lang = "english"
 def _load_langauge(lang: str):
     lang_path = os.path.join(lang_dir, lang + ".lang")
     if os.path.isfile(lang_path):
-        with open(lang_path) as f:
+        with open(lang_path, "r", encoding = 'utf-8') as f:
             for line in f.readlines():
                 line = line.split("=", 1)
                 if len(line) != 2:
