@@ -27,7 +27,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         self.world = world
         self._close_self_callback = close_self_callback
 
-        self._close_world_button = wx.Button(self, wx.ID_ANY, label="Close World")
+        self._close_world_button = wx.Button(self, wx.ID_ANY, label=lang.get("world.close_world"))
         self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
         self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
 
@@ -37,7 +37,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             wx.StaticText(
                 self._input,
                 wx.ID_ANY,
-                "Input World: ",
+                "{}: ".format(lang.get("program_convert.input_world")),
                 wx.DefaultPosition,
                 wx.DefaultSize,
                 0,
@@ -55,7 +55,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             wx.StaticText(
                 self._output,
                 wx.ID_ANY,
-                "Output World: ",
+                "{}: ".format(lang.get("program_convert.output_world")),
                 wx.DefaultPosition,
                 wx.DefaultSize,
                 0,
@@ -65,7 +65,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         )
 
         self._select_output_button = wx.Button(
-            self, wx.ID_ANY, label="Select Output World"
+            self, wx.ID_ANY, label=lang.get("program_convert.select_output_world")
         )
         self._select_output_button.Bind(wx.EVT_BUTTON, self._show_world_select)
         self.add_object(self._select_output_button, 0, wx.ALL | wx.CENTER)
@@ -110,7 +110,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
 
     def _output_world_callback(self, path):
         if path == self.world.world_path:
-            wx.MessageBox("The input and output worlds must be different")
+            wx.MessageBox(lang.get("program_convert.input_output_must_different"))
             return
         try:
             out_world_format = load_format(path)
@@ -132,7 +132,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
 
     def _convert_event(self, evt):
         if self.out_world_path is None:
-            wx.MessageBox("Select a world before converting")
+            wx.MessageBox(lang.get("program_convert.select_before_converting"))
             return
         self.convert_button.Disable()
         global work_count
@@ -149,7 +149,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             out_world.open()
             self.world.save(out_world, self._update_loading_bar)
             out_world.close()
-            message = "World conversion completed"
+            message = lang.get("program_convert.conversion_completed")
             log.info(
                 f"Finished converting world {self.world.world_path} to {out_world.path}"
             )
