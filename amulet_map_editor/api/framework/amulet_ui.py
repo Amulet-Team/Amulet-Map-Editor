@@ -72,7 +72,7 @@ class AmuletUI(wx.Frame):
 
         self._last_page: BasePageUI = self._main_menu
 
-        self._add_world_tab(self._main_menu, lang.get("main_menu"))
+        self._add_world_tab(self._main_menu, lang.get("main_menu.tab_name"))
 
         self.Bind(wx.EVT_CLOSE, self._on_close_app)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)

@@ -1,0 +1,16 @@
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+
+select_world.open_world_button=Open other world
+select_world.open_world_dialogue=Select a Minecraft world directory
+select_world.select_directory_failed=Failed to open directory!
+select_world.recent_worlds=Recently Opened Worlds
+
+main_menu.tab_name=Main Menu
+
+program_about.tab_name=About
+
+program_convert.tab_name=Convert
+program_convert.convert_button=Convert
+
+program_3d_edit.tab_name=3D Editor
