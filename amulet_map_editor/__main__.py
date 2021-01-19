@@ -6,7 +6,8 @@ if sys.version_info[:2] < (3, 7):
     raise Exception("Must be using Python 3.7+")
 
 import wx
-from amulet_map_editor.api import AmuletUI, log
+from amulet_map_editor import log
+from amulet_map_editor.api.framework import AmuletUI
 import traceback
 
 if __name__ == "__main__":

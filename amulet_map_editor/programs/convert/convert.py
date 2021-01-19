@@ -6,8 +6,7 @@ from typing import TYPE_CHECKING, Callable
 from amulet import load_format
 from amulet.api.level import World
 
-from amulet_map_editor.api import lang
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import lang, log
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.api.datatypes import MenuData

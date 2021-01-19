@@ -8,8 +8,7 @@ import pkgutil
 from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
-from amulet_map_editor import programs
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import programs, log
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram

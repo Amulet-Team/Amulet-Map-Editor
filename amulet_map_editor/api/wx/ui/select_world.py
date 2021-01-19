@@ -8,10 +8,8 @@ import traceback
 from amulet import load_format
 from amulet.api.errors import FormatError
 
-from amulet_map_editor.api import lang
+from amulet_map_editor import lang, log, CONFIG
 from amulet_map_editor.api.wx.ui import simple
-from amulet_map_editor.api.logging import log
-from amulet_map_editor.api import config
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 
 

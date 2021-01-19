@@ -8,8 +8,7 @@ from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimen
 from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
-from amulet_map_editor.api import config
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs.edit.edit import EDIT_CONFIG_ID
 from amulet_map_editor.programs.edit.key_config import (
     DefaultKeys,
@@ -101,7 +100,7 @@ class EditCanvas(ControllableEditCanvas):
         self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
-        config_ = config.get(EDIT_CONFIG_ID, {})
+        config_ = CONFIG.get(EDIT_CONFIG_ID, {})
         user_keybinds = config_.get("user_keybinds", {})
         group = config_.get("keybind_group", DefaultKeybindGroupId)
         if group in user_keybinds:

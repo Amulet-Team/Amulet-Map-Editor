@@ -5,9 +5,7 @@ import traceback
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
-from amulet_map_editor import __version__
-from amulet_map_editor.api import lang
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import __version__, lang, log
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
 

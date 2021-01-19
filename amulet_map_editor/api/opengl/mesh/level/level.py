@@ -3,7 +3,7 @@ import numpy
 
 from amulet.api.data_types import Dimension, ChunkCoordinates
 
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import log
 from .chunk import RenderChunk
 from .region import ChunkManager
 from .selection import GreenRenderSelectionGroup

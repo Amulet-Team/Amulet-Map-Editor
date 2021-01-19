@@ -47,7 +47,7 @@ from amulet.api.data_types import (
 )
 from amulet.api.selection import SelectionGroup
 
-from amulet_map_editor import experimental_bedrock_resources
+from amulet_map_editor import experimental_bedrock_resources, log
 from amulet_map_editor.api.opengl.data_types import (
     CameraLocationType,
     CameraRotationType,
@@ -59,7 +59,6 @@ from amulet_map_editor.api.opengl import textureatlas, ThreadedObjectContainer
 from amulet_map_editor.api.opengl.canvas.base import BaseCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
-from amulet_map_editor.api.logging import log
 from .render_selection import (
     EditProgramRenderSelectionGroup,
     RenderSelectionHistoryManager,
