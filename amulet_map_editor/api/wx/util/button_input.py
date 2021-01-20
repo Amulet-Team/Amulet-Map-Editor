@@ -83,7 +83,7 @@ class Action:
         return self._modifier_keys
 
 
-class UserInput(WindowContainer):
+class ButtonInput(WindowContainer):
     """A class to detect and store user inputs."""
 
     def __init__(self, window: wx.Window):
@@ -202,6 +202,7 @@ class UserInput(WindowContainer):
                 )
 
             self._pressed_keys.add(key)
+        evt.Skip()
 
     def _release(self, evt):
         """Event to handle a number of different key releases"""
@@ -222,6 +223,7 @@ class UserInput(WindowContainer):
                     self.window,
                     InputReleaseEvent(action_id),
                 )
+        evt.Skip()
 
     def _process_continuous_inputs(self, evt):
         wx.PostEvent(
