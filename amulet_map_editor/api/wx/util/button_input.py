@@ -97,7 +97,7 @@ class ButtonInput(WindowContainer):
         self._continuous_actions: Set[ActionIDType] = set()
 
         # timer to deal with persistent actions
-        self._input_timer = wx.Timer(self)
+        self._input_timer = wx.Timer(self.window)
 
     def set_up_events(self):
         """Set up all events required to run."""

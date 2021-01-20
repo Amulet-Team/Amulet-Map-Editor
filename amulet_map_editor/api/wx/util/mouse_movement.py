@@ -5,6 +5,7 @@ from .window_container import WindowContainer
 
 class MouseMovement(WindowContainer):
     """A class to get and set the cursor position and track changes."""
+
     def __init__(self, window: wx.Window):
         super().__init__(window)
         # the current mouse position
@@ -28,6 +29,7 @@ class MouseMovement(WindowContainer):
     def _on_mouse_motion(self, evt):
         """Event fired when the mouse is moved."""
         self._x, self._y = evt.GetPosition()
+        evt.Skip()
 
     def _screen_middle(self) -> Tuple[int, int]:
         """Get the pixel coordinate of the middle of the screen"""
@@ -81,7 +83,9 @@ class MouseMovement(WindowContainer):
     def xy(self, xy: Tuple[int, int]):
         """Set the x and y pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
-        assert type(xy) is tuple and len(xy) == 2 and all(type(c) is int for c in xy), "xy must be of the form Tuple[int, int]"
+        assert (
+            type(xy) is tuple and len(xy) == 2 and all(type(c) is int for c in xy)
+        ), "xy must be of the form Tuple[int, int]"
         x, y = xy
         self._delta_x += self._x - self._start_x
         self._delta_y += self._y - self._start_y
