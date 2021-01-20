@@ -101,7 +101,6 @@ class ButtonInput(WindowContainer):
 
     def set_up_events(self):
         """Set up all events required to run."""
-        # self.window.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
         # key press actions
         self.window.Bind(wx.EVT_LEFT_DOWN, self._press)
