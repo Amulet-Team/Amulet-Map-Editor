@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from amulet_map_editor.api.opengl.canvas_container import CanvasContainer
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas_old.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class EditCanvasContainer(CanvasContainer):
