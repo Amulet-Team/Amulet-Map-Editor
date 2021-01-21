@@ -1,0 +1,238 @@
+from typing import TYPE_CHECKING, Optional, Tuple, Generator
+import numpy
+import math
+
+from amulet.api.chunk import Chunk
+from amulet.api.block import UniversalAirBlock
+from amulet.api.errors import ChunkLoadError
+
+from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
+
+# from amulet_map_editor.api.opengl.camera import Projection
+from amulet.api.data_types import PointCoordinatesNDArray
+
+from .base_behaviour import BaseBehaviour
+
+if TYPE_CHECKING:
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+
+class RaycastBehaviour(BaseBehaviour):
+    """Adds the base behaviour for behaviours that needs to do ray casting."""
+    def __init__(self, canvas: "EditCanvas"):
+        super().__init__(canvas)
+
+    def ray_collision(self):
+        vector_start = self.canvas.camera.location
+        direction_vector = self.look_vector()
+        min_point, max_point = numpy.sort(self.canvas.active_selection_corners, 0)
+        max_point += 1
+
+        point_array = max_point.copy()
+        numpy.putmask(point_array, direction_vector > 0, min_point)
+
+        t = (point_array - vector_start) / direction_vector
+
+        t_max = numpy.where(t == t.max())[0][0]
+        return t_max
+
+    def box_location_closest(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+        """Find the location of the closest non-air block or selection box"""
+        cx: Optional[int] = None
+        cz: Optional[int] = None
+        chunk: Optional[Chunk] = None
+        in_air = False
+
+        box_index, nearest_selection_box = self.canvas.selection.closest_intersection(
+            self.canvas.camera.location, self.look_vector()
+        )
+
+        location = numpy.array([0, 0, 0], dtype=numpy.int32)
+        for location in self.collision_locations():
+            if nearest_selection_box and nearest_selection_box.in_boundary(location):
+                return location, box_index
+
+            x, y, z = location
+            cx_ = x >> 4
+            cz_ = z >> 4
+            if cx is None or cx != cx_ or cz != cz_:
+                cx = cx_
+                cz = cz_
+                try:
+                    chunk = self.canvas.world.get_chunk(cx, cz, self.canvas.dimension)
+                except ChunkLoadError:
+                    chunk = None
+
+            if (
+                chunk is not None
+                and self.canvas.world.block_palette[chunk.blocks[x % 16, y, z % 16]]
+                != UniversalAirBlock
+            ):
+                # the block is not air
+                if in_air:  # if we have previously found an air block
+                    return location, None
+            elif not in_air:
+                in_air = True
+        return location, None
+
+    def box_location_closest_2d(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+        x, _, z = self.canvas.camera.location
+        width, height = self.canvas.GetSize()
+        z += 2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
+        x += (
+            2
+            * self.canvas.camera.fov
+            * self.canvas.camera.aspect_ratio
+            * self.canvas.mouse.delta_x
+            / width
+        )
+        x, z = numpy.floor([x, z]) + 0.5
+        box_index, nearest_selection_box = self.canvas.selection.closest_intersection(
+            (x, 2 * 32, z), (0, -1, 0)
+        )
+
+        sub_chunk_size = self.canvas.world.sub_chunk_size
+        y = 0
+        try:
+            chunk = self.canvas.world.get_chunk(
+                int(x // sub_chunk_size),
+                int(z // sub_chunk_size),
+                self.canvas.dimension,
+            )
+        except ChunkLoadError:
+            if nearest_selection_box is not None:
+                y = nearest_selection_box.max[1] - 1
+        else:
+            if nearest_selection_box is None:
+                box_max = -2 * 32
+            else:
+                box_max: int = nearest_selection_box.max[1] - 1
+            box_max_chunk = int(box_max // sub_chunk_size)
+            sub_chunks = sorted(
+                [cy for cy in chunk.blocks.sub_chunks if cy >= box_max_chunk],
+                reverse=True,
+            )
+            if sub_chunks:
+                dx, dz = (numpy.floor([x, z]) % sub_chunk_size).astype(numpy.int64)
+                for sy in sub_chunks:
+                    blocks = chunk.blocks.get_section(sy)[
+                        dx, ::-1, dz
+                    ] != chunk.block_palette.get_add_block(UniversalAirBlock)
+                    if numpy.any(blocks):
+                        y = (
+                            sub_chunk_size
+                            - 1
+                            - numpy.argmax(blocks)
+                            + sy * sub_chunk_size
+                        )
+                        break
+                else:
+                    if nearest_selection_box is not None:
+                        y = nearest_selection_box.max[1] - 1
+                y = max(box_max, y)
+            elif nearest_selection_box is not None:
+                y = nearest_selection_box.max[1] - 1
+
+        return numpy.asarray((x, y, z)), box_index
+
+    def box_location_distance(
+        self, distance: int
+    ) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+        """
+        The first block location along the camera's look vector that is further away than `distance`.
+        :param distance: The distance between the block and the camera.
+        :return: (x, y, z) numpy array, selection box index
+        """
+        look_vector = self.look_vector()
+        position = numpy.array(
+            self.canvas.camera.location, dtype=numpy.int
+        ) + numpy.floor(look_vector * distance).astype(numpy.int)
+        box = next(
+            (
+                index
+                for index, box in enumerate(self.canvas.selection)
+                if box.in_boundary(position)
+            ),
+            None,
+        )
+        return position, box
+
+    def look_vector(self) -> numpy.ndarray:
+        """
+        The x,y,z vector for the direction the camera is facing
+        :return: (x, y, z) numpy float array ranging from -1 to 1
+        """
+        look_vector = numpy.array([0, 0, 1, 0])
+        if not self.canvas._mouse_lock:
+            screen_x, screen_y = numpy.array(self.canvas.GetSize(), numpy.int) / 2
+            screen_dx = math.degrees(
+                math.atan(
+                    self.canvas.camera.aspect_ratio
+                    * math.tan(math.radians(self.canvas.camera.fov / 2))
+                    * self.canvas.mouse.delta_x
+                    / screen_x
+                )
+            )
+            screen_dy = math.degrees(
+                math.atan(
+                    math.cos(math.radians(screen_dx))
+                    * math.tan(math.radians(self.canvas.camera.fov / 2))
+                    * self.canvas.mouse.delta_y
+                    / screen_y
+                )
+            )
+            look_vector = numpy.matmul(
+                rotation_matrix_xy(math.radians(screen_dy), -math.radians(screen_dx)),
+                look_vector,
+            )
+        ry, rx = self.canvas.camera.rotation
+        look_vector = numpy.matmul(
+            rotation_matrix_xy(*numpy.radians([rx, -ry])), look_vector
+        )[:3]
+        look_vector[abs(look_vector) < 0.000001] = 0.000001
+        return look_vector
+
+    def collision_locations(
+        self, max_distance=100
+    ) -> Generator[numpy.ndarray, None, None]:
+        """
+        The block locations that the camera's look vector passes through.
+        :param max_distance: The maximum distance along the look vector to traverse.
+        :return: A generator of (x, y, z) numpy arrays
+        """
+        # TODO: optimise this
+
+        look_vector = self.look_vector()
+        dx, dy, dz = look_vector
+
+        vectors = numpy.array(
+            [look_vector / abs(dx), look_vector / abs(dy), look_vector / abs(dz)]
+        )
+        offsets = -numpy.eye(3)
+
+        locations = set()
+        start: numpy.ndarray = (
+            numpy.array(self.canvas.camera.location, numpy.float32) % 1
+        )
+
+        for axis in range(3):
+            location: numpy.ndarray = start.copy()
+            vector = vectors[axis]
+            offset = offsets[axis]
+            if vector[axis] > 0:
+                location = location + vector * (1 - location[axis])
+            else:
+                location = location + vector * location[axis]
+            while numpy.all(abs(location) < max_distance):
+                locations.add(tuple(numpy.floor(location).astype(numpy.int)))
+                locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
+                location += vector
+        if locations:
+            collision_locations = numpy.array(
+                sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
+            ) + numpy.floor(self.canvas.camera.location).astype(numpy.int)
+        else:
+            collision_locations = start.astype(numpy.int)
+
+        for location in collision_locations:
+            yield location

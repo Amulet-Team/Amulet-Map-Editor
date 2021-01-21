@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 
 
 class CameraBehaviour(BaseBehaviour):
+    """Adds the normal behaviour for the camera."""
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
         self._previous_mouse_lock = self._mouse_lock = False
