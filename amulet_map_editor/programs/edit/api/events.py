@@ -7,6 +7,15 @@ from amulet_map_editor.api.opengl.camera import (
     EVT_PROJECTION_CHANGED,
 )
 
+from amulet_map_editor.api.wx.util.button_input import (
+    InputPressEvent,
+    InputHeldEvent,
+    InputReleaseEvent,
+    EVT_INPUT_PRESS,
+    EVT_INPUT_HELD,
+    EVT_INPUT_RELEASE,
+)
+
 DrawEvent, EVT_DRAW = newevent.NewEvent()
 
 DimensionChangeEvent, EVT_DIMENSION_CHANGE = newevent.NewEvent()
