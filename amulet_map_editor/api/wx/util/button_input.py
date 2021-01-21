@@ -111,8 +111,10 @@ class ButtonInput(WindowContainer):
         self.window.Bind(wx.EVT_RIGHT_UP, self._release)
         self.window.Bind(wx.EVT_KEY_DOWN, self._press)
         self.window.Bind(wx.EVT_KEY_UP, self._release)
+        self.window.Bind(wx.EVT_NAVIGATION_KEY, self._release)
         self.window.Bind(wx.EVT_NAVIGATION_KEY, self._press)
         self.window.Bind(wx.EVT_MOUSEWHEEL, self._release)
+        self.window.Bind(wx.EVT_MOUSEWHEEL, self._press)
         self.window.Bind(wx.EVT_MOUSE_AUX1_DOWN, self._press)
         self.window.Bind(wx.EVT_MOUSE_AUX1_UP, self._release)
         self.window.Bind(wx.EVT_MOUSE_AUX2_DOWN, self._press)
@@ -129,13 +131,19 @@ class ButtonInput(WindowContainer):
         self._input_timer.Stop()
 
     @property
-    def pressed_keys(self) -> Tuple[KeyType, ...]:
+    def pressed_keys(self) -> Set[KeyType]:
         """A tuple of all the keys that are currently pressed."""
-        return tuple(self._pressed_keys)
+        return self._pressed_keys.copy()
 
     def is_key_pressed(self, key: KeyType):
         """Is the requested key currently in the pressed state."""
         return key in self._pressed_keys
+
+    def unpress_all(self):
+        """Unpress all keys.
+        This is useful if the window focus is lost because key release events will not be detected."""
+        self._pressed_keys.clear()
+        self._clean_up_actions()
 
     def clear_registered_actions(self):
         """Clear the previously registered actions so that they can be repopulated."""
@@ -212,6 +220,10 @@ class ButtonInput(WindowContainer):
             # remove the pressed key
             self._pressed_keys.remove(key)
 
+        self._clean_up_actions()
+        evt.Skip()
+
+    def _clean_up_actions(self):
         # find all actions that are now not valid and remove them
         for action_id in list(self._continuous_actions):
             if not self._registered_actions[action_id].required_keys.issubset(
@@ -222,7 +234,6 @@ class ButtonInput(WindowContainer):
                     self.window,
                     InputReleaseEvent(action_id),
                 )
-        evt.Skip()
 
     def _process_continuous_inputs(self, evt):
         wx.PostEvent(
