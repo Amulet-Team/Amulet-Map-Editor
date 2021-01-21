@@ -34,7 +34,7 @@ class CameraMovedEvent(wx.PyEvent):
     def __init__(
         self, camera_location: CameraLocationType, camera_rotation: CameraRotationType
     ):
-        wx.PyEvent.__init__(self, _CameraMoveChangeEventType)
+        wx.PyEvent.__init__(self, eventType=_CameraMoveChangeEventType)
         self._location = camera_location
         self._rotation = camera_rotation
 
@@ -59,7 +59,7 @@ class ProjectionChangedEvent(wx.PyEvent):
     """Run when the projection of the camera has changed."""
 
     def __init__(self, projection: Projection):
-        wx.PyEvent.__init__(self, _ProjectionChangeEventType)
+        wx.PyEvent.__init__(self, eventType=_ProjectionChangeEventType)
         self._projection = projection
 
     @property

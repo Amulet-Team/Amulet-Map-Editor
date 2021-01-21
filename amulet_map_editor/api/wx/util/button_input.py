@@ -15,7 +15,7 @@ class InputPressEvent(wx.PyEvent):
     """An action run by a button being pressed."""
 
     def __init__(self, action_id: ActionIDType):
-        wx.PyEvent.__init__(self, _InputPressEventType)
+        wx.PyEvent.__init__(self, eventType=_InputPressEventType)
         self._action_id = action_id
 
     @property
@@ -32,7 +32,7 @@ class InputReleaseEvent(wx.PyEvent):
     """An action run by a button being released."""
 
     def __init__(self, action_id: ActionIDType):
-        wx.PyEvent.__init__(self, _InputReleaseEventType)
+        wx.PyEvent.__init__(self, eventType=_InputReleaseEventType)
         self._action_id = action_id
 
     @property
@@ -50,7 +50,7 @@ class InputHeldEvent(wx.PyEvent):
     This action will run frequently."""
 
     def __init__(self, action_ids: Set[ActionIDType]):
-        wx.PyEvent.__init__(self, _InputHeldEventType)
+        wx.PyEvent.__init__(self, eventType=_InputHeldEventType)
         self._action_ids = action_ids
 
     @property
