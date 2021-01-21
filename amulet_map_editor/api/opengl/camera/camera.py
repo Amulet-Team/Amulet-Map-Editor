@@ -120,6 +120,7 @@ class Camera(CanvasContainer):
             and len(camera_location) == 3
             and all(type(v) in (int, float) for v in camera_location)
         ), "format for camera_location is invalid"
+        self._reset_matrix()
         self._location = tuple(camera_location)
 
     @property
@@ -145,6 +146,7 @@ class Camera(CanvasContainer):
             and len(camera_rotation) == 2
             and all(type(v) in (int, float) for v in camera_rotation)
         ), "format for camera_rotation is invalid"
+        self._reset_matrix()
         self._rotation = tuple(camera_rotation)
 
     @property
