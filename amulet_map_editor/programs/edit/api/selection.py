@@ -24,7 +24,7 @@ class SelectionChangeEvent(wx.PyEvent):
     """Run when the selection is changed by third party code."""
 
     def __init__(self):
-        wx.PyEvent.__init__(self, _SelectionChangeEventType)
+        wx.PyEvent.__init__(self, eventType=_SelectionChangeEventType)
 
 
 class SelectionManager(Changeable):

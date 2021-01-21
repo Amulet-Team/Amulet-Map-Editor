@@ -64,7 +64,7 @@ class EditExtension(wx.Panel, BaseProgram):
 
             edit_config: dict = config.get(EDIT_CONFIG_ID, {})
             self._canvas.camera.fov = edit_config.get("options", {}).get("fov", 70.0)
-            self._canvas.render_distance = edit_config.get("options", {}).get(
+            self._canvas.renderer.render_distance = edit_config.get("options", {}).get(
                 "render_distance", 5
             )
             self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
