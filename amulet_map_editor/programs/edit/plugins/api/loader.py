@@ -199,7 +199,7 @@ def _load_operations(operations_: OperationStorageType, path: str):
             try:
                 mod = _load_module_file(fpath)
             except ImportError as e:
-                log.warn(f"Failed to import {fpath}.\n{e}")
+                log.warning(f"Failed to import {fpath}.\n{e}")
             else:
                 get_export_dict(mod, operations_, fpath)
 
@@ -207,7 +207,7 @@ def _load_operations(operations_: OperationStorageType, path: str):
             try:
                 mod = _load_module_directory(dpath)
             except ImportError as e:
-                log.warn(f"Failed to import {dpath}.\n{e}")
+                log.warning(f"Failed to import {dpath}.\n{e}")
             else:
                 get_export_dict(
                     mod, operations_, os.path.basename(os.path.dirname(dpath))
