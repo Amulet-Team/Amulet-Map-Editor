@@ -22,7 +22,7 @@ URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
 LATEST_UPDATER_RELEASE_URL = (
     "https://api.github.com/repos/Amulet-Team/AmuletUpdater/releases/latest"
 )
-JAVA_DOWNLOAD_URL = "https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_windows-x64_bin.zip"
+JAVA_DOWNLOAD_URL = "https://github.com/AdoptOpenJDK/openjdk14-binaries/releases/download/jdk-14.0.2%2B12/OpenJDK14U-jre_x64_windows_hotspot_14.0.2_12.zip"
 
 NOT_RUNNING_FROM_SOURCE = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
 AUTOUPDATER_SUPPORTED_OS = platform.system() in ("Windows",)
@@ -231,7 +231,7 @@ class UpdateDialog(wx.Dialog):
         updater_jar = jars[0]
         log.info(f"Using AmuletUpdater jar: {updater_jar}")
         args = [
-            os.path.join(temp_dir, "jdk-14.0.2", "bin", "java.exe"),
+            os.path.join(temp_dir, "jdk-14.0.2+12-jre", "bin", "java.exe"),
             "-jar",
             updater_jar,
             "-current_version",
