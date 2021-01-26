@@ -5,6 +5,11 @@ from .camera import Camera
 class ControllableCamera(Camera):
     """A slight modification to the default camera to add speed attributes."""
 
+    __slots__ = (
+        "_move_speed",
+        "_rotate_speed",
+    )
+
     def __init__(self, canvas: glcanvas.GLCanvas):
         super().__init__(canvas)
         self._move_speed = 2.0

@@ -71,6 +71,17 @@ class ProjectionChangedEvent(wx.PyEvent):
 class Camera(CanvasContainer):
     """A class to hold the state information of the camera."""
 
+    __slots__ = (
+        "_location",
+        "_rotation",
+        "_projection_mode",
+        "_fov",
+        "_clipping",
+        "_aspect_ratio",
+        "_projection_matrix",
+        "_transformation_matrix",
+    )
+
     def __init__(self, canvas: glcanvas.GLCanvas):
         super().__init__(canvas)
 
