@@ -2,7 +2,7 @@ import wx
 from typing import TYPE_CHECKING, Type, Dict, Optional
 
 from amulet_map_editor.programs.edit.api import EditCanvasContainer
-from .base_tool_ui import (
+from amulet_map_editor.programs.edit.api.ui.tool.base_tool_ui import (
     BaseToolUI,
     BaseToolUIType,
 )
