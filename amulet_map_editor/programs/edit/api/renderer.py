@@ -21,10 +21,8 @@ from .events import (
     CameraMovedEvent,
     EVT_CAMERA_MOVED,
     PreDrawEvent,
-    EVT_PRE_DRAW,
     DrawEvent,
     PostDrawEvent,
-    EVT_POST_DRAW,
 )
 
 if TYPE_CHECKING:
@@ -78,8 +76,6 @@ class Renderer(EditCanvasContainer):
             self._do_draw,
             self._draw_timer,
         )
-        self.canvas.Bind(EVT_PRE_DRAW, self.on_pre_draw)
-        self.canvas.Bind(EVT_POST_DRAW, self.on_post_draw)
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_moved)
 
     def enable(self):
@@ -213,19 +209,13 @@ class Renderer(EditCanvasContainer):
         wx.PostEvent(self.canvas, DrawEvent())
         wx.PostEvent(self.canvas, PostDrawEvent())
 
-    def on_pre_draw(self, evt):
-        self.start_draw()
-        evt.Skip()
-
     def default_draw(self):
         """The default draw logic."""
+        self.start_draw()
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.draw_sky_box()
         self.draw_level()
-
-    def on_post_draw(self, evt):
         self.end_draw()
-        evt.Skip()
 
     def start_draw(self):
         """Run commands before drawing."""
