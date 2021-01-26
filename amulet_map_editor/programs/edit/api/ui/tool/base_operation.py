@@ -2,7 +2,7 @@ import wx
 from typing import TYPE_CHECKING, Optional
 
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
-from amulet_map_editor.api.opengl.canvas import Perspective
+from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.programs.edit.api.operations import (
     OperationUIType,
 )
@@ -14,7 +14,7 @@ from amulet_map_editor.api.image import REFRESH_ICON
 from amulet_map_editor.api.logging import log
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
@@ -94,7 +94,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
     def enable(self):
         super().enable()
         self._setup_operation()
-        self.canvas.selection_editable = False
+        # self.canvas.selection_editable = False
 
     def disable(self):
         super().disable()
@@ -133,9 +133,9 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self._setup_operation()
 
     def _on_draw(self, evt):
-        self.canvas.start_draw()
-        if self.canvas.projection_mode == Perspective:
-            self.canvas.draw_sky_box()
-        self.canvas.draw_level()
-        self.canvas.draw_selection(True, False)
-        self.canvas.end_draw()
+        # self.canvas.start_draw()
+        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+            self.canvas.renderer.draw_sky_box()
+        self.canvas.renderer.draw_level()
+        # self.canvas.draw_selection(True, False)
+        # self.canvas.end_draw()

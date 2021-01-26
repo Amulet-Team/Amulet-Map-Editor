@@ -1,12 +1,12 @@
 import wx
 from typing import TYPE_CHECKING, Type, Dict, Optional
 
-from amulet_map_editor.programs.edit.api import BaseUI
+from amulet_map_editor.programs.edit.api import EditCanvasContainer
 from .base_tool_ui import (
     BaseToolUI,
     BaseToolUIType,
 )
-from amulet_map_editor.programs.edit.api.ui.canvas.events import (
+from amulet_map_editor.programs.edit.api.events import (
     ToolChangeEvent,
     EVT_TOOL_CHANGE,
 )
@@ -20,13 +20,13 @@ from amulet_map_editor.programs.edit.plugins.tools import (
 )
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class ToolManagerSizer(wx.BoxSizer, BaseUI):
+class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
-        BaseUI.__init__(self, canvas)
+        EditCanvasContainer.__init__(self, canvas)
 
         self._tools: Dict[str, BaseToolUIType] = {}
         self._active_tool: Optional[BaseToolUIType] = None
@@ -104,10 +104,10 @@ class ToolManagerSizer(wx.BoxSizer, BaseUI):
             self.canvas.Layout()
 
 
-class ToolSelect(wx.Panel, BaseUI):
+class ToolSelect(wx.Panel, EditCanvasContainer):
     def __init__(self, canvas: "EditCanvas"):
         wx.Panel.__init__(self, canvas)
-        BaseUI.__init__(self, canvas)
+        EditCanvasContainer.__init__(self, canvas)
 
         self._sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.SetSizer(self._sizer)
