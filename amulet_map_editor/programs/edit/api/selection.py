@@ -32,7 +32,8 @@ class SelectionManager(Changeable):
 
     def __init__(self, canvas: "BaseEditCanvas"):
         super().__init__()
-        self._selections: List[BoxType] = []
+        self._selection_corners: Tuple[BoxType, ...] = ()
+        self._selection_group: SelectionGroup = SelectionGroup()
         self._canvas = weakref.ref(canvas)
 
         self._timer = wx.Timer(canvas)
@@ -63,7 +64,7 @@ class SelectionManager(Changeable):
         """Get the minimum and maximum points of each selection
         :return: The minimum and maximum points of each selection
         """
-        return tuple(self._selections)
+        return self._selection_corners
 
     @selection_corners.setter
     def selection_corners(
@@ -112,7 +113,8 @@ class SelectionManager(Changeable):
                     f"selection_corners must be of the format Tuple[Tuple[Tuple[int, int, int], Tuple[int, int, int]], ...]"
                 )
 
-        self._selections = selections
+        self._selection_corners = tuple(selections)
+        self._selection_group = SelectionGroup([SelectionBox(*box) for box in self._selection_corners])
         self._create_undo_point()
 
     @property
@@ -120,7 +122,7 @@ class SelectionManager(Changeable):
         """Get the selection as a `SelectionGroup`
         :return: `SelectionGroup`
         """
-        return SelectionGroup([SelectionBox(*box) for box in self._selections])
+        return self._selection_group
 
     @selection_group.setter
     def selection_group(self, selection_group: SelectionGroup):
@@ -141,9 +143,10 @@ class SelectionManager(Changeable):
         :param selection_group: The `SelectionGroup` to pull the data from
         :return:
         """
-        self._selections = [
+        self._selection_corners = [
             (box.min, box.max) for box in selection_group.selection_boxes
         ]
+        self._selection_group = selection_group
         self._create_undo_point()
 
 
