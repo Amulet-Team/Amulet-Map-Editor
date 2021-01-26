@@ -14,14 +14,17 @@ from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
 from amulet_map_editor.api.opengl.mesh.sky_box import SkyBox
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 
-from ..chunk_generator import ThreadingEnabled, ChunkGenerator
-from ..edit_canvas_container import EditCanvasContainer
-from ..events import (
+from .chunk_generator import ThreadingEnabled, ChunkGenerator
+from .edit_canvas_container import EditCanvasContainer
+from .events import (
     DimensionChangeEvent,
-    DrawEvent,
-    EVT_DRAW,
     CameraMovedEvent,
     EVT_CAMERA_MOVED,
+    PreDrawEvent,
+    EVT_PRE_DRAW,
+    DrawEvent,
+    PostDrawEvent,
+    EVT_POST_DRAW,
 )
 
 if TYPE_CHECKING:
@@ -42,6 +45,7 @@ class Renderer(EditCanvasContainer):
         self._render_distance = 5
 
         self._chunk_generator = ChunkGenerator()
+        self._opengl_resource_pack = opengl_resource_pack
 
         self._render_world = RenderLevel(
             context_identifier,
@@ -71,10 +75,11 @@ class Renderer(EditCanvasContainer):
         self.canvas.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
         self.canvas.Bind(
             wx.EVT_TIMER,
-            lambda evt: wx.PostEvent(self.canvas, DrawEvent()),
+            self._do_draw,
             self._draw_timer,
         )
-        self.canvas.Bind(EVT_DRAW, self.on_draw)
+        self.canvas.Bind(EVT_PRE_DRAW, self.on_pre_draw)
+        self.canvas.Bind(EVT_POST_DRAW, self.on_post_draw)
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_moved)
 
     def enable(self):
@@ -144,6 +149,10 @@ class Renderer(EditCanvasContainer):
     #     log.info("Finished setting up texture atlas in OpenGL")
 
     @property
+    def opengl_resource_pack(self) -> OpenGLResourcePack:
+        return self._opengl_resource_pack
+
+    @property
     def render_world(self) -> RenderLevel:
         return self._render_world
 
@@ -199,13 +208,24 @@ class Renderer(EditCanvasContainer):
 
         evt.Skip()
 
-    def on_draw(self, evt):
-        """The default draw logic."""
+    def _do_draw(self, evt):
+        wx.PostEvent(self.canvas, PreDrawEvent())
+        wx.PostEvent(self.canvas, DrawEvent())
+        wx.PostEvent(self.canvas, PostDrawEvent())
+
+    def on_pre_draw(self, evt):
         self.start_draw()
+        evt.Skip()
+
+    def default_draw(self):
+        """The default draw logic."""
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.draw_sky_box()
         self.draw_level()
+
+    def on_post_draw(self, evt):
         self.end_draw()
+        evt.Skip()
 
     def start_draw(self):
         """Run commands before drawing."""
