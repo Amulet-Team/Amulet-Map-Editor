@@ -5,6 +5,7 @@ import wx
 from amulet.api.data_types import PointCoordinatesAny
 
 from amulet_map_editor.api.opengl.mesh.selection.render_selection import RenderSelection
+from amulet_map_editor.api.opengl.camera import Projection
 
 from .raycast_behaviour import RaycastBehaviour
 from ..events import EVT_PRE_DRAW, EVT_CAMERA_MOVED
@@ -50,7 +51,10 @@ class PointerBehaviour(RaycastBehaviour):
         evt.Skip()
 
     def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
-        location = numpy.array(self.box_location_closest(0)[0])
+        if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+            location = self.box_location_closest_2d()[0]
+        else:
+            location = self.box_location_closest()[0]
         return location, location + 1
 
     def draw(self):
