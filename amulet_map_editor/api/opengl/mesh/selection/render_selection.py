@@ -141,7 +141,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     @point1.setter
     def point1(self, val: PointCoordinatesAny):
         if not numpy.array_equal(self._points[0], val):
-            self._points[0] = val
+            self._points[0] = numpy.floor(val)
             self._mark_recreate()
 
     @property
@@ -151,7 +151,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     @point2.setter
     def point2(self, val: PointCoordinatesAny):
         if not numpy.array_equal(self._points[1], val):
-            self._points[1] = val
+            self._points[1] = numpy.floor(val)
             self._mark_recreate()
 
     @property
