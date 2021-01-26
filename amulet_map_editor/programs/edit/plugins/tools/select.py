@@ -4,7 +4,7 @@ import wx
 from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
-from amulet_map_editor.programs.edit.api.ui.tool import BaseToolUI
+from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
 from amulet_map_editor.programs.edit.api.ui.select_location import SelectTransformUI
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.programs.edit.api.events import (
@@ -13,15 +13,18 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_BOX_DISABLE_INPUTS,
     EVT_BOX_ENABLE_INPUTS,
 )
+from amulet_map_editor.programs.edit.api.behaviour import PointerBehaviour
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class SelectOptions(wx.BoxSizer, BaseToolUI):
+class SelectOptions(wx.BoxSizer, CameraToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
-        BaseToolUI.__init__(self, canvas)
+        CameraToolUI.__init__(self, canvas)
+
+        self._pointer_behaviour = PointerBehaviour(self.canvas)
 
         self._button_panel = wx.Panel(canvas)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -94,11 +97,12 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         return "Select"
 
     def bind_events(self):
-        BaseToolUI.bind_events(self)
+        CameraToolUI.bind_events(self)
         self.canvas.Bind(EVT_PASTE, self._paste)
         self.canvas.Bind(EVT_BOX_CHANGE, self._box_renderer_change)
         self.canvas.Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
         self.canvas.Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
+        self._pointer_behaviour.set_up_events()
 
     def _remove_paste(self):
         if self._paste_panel is not None:
