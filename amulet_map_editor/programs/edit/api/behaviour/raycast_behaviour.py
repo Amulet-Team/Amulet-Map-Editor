@@ -8,7 +8,6 @@ from amulet.api.errors import ChunkLoadError
 
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 
-# from amulet_map_editor.api.opengl.camera import Projection
 from amulet.api.data_types import PointCoordinatesNDArray
 
 from .base_behaviour import BaseBehaviour
@@ -19,8 +18,41 @@ if TYPE_CHECKING:
 
 class RaycastBehaviour(BaseBehaviour):
     """Adds the base behaviour for behaviours that needs to do ray casting."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
+
+    def look_vector(self) -> numpy.ndarray:
+        """
+        The x,y,z vector for the direction the camera is facing
+        :return: (x, y, z) numpy float array ranging from -1 to 1
+        """
+        look_vector = numpy.array([0, 0, 1, 0])
+
+        if self.canvas.mouse.delta_xy != (0, 0):
+            screen_width, screen_height = numpy.array(self.canvas.GetSize(), numpy.int) / 2
+            screen_dx = math.atan(
+                self.canvas.mouse.delta_x
+                * self.canvas.camera.aspect_ratio
+                * math.tan(math.radians(self.canvas.camera.fov / 2))
+                / screen_width
+            )
+            screen_dy = math.atan(
+                self.canvas.mouse.delta_y
+                * math.cos(screen_dx)
+                * math.tan(math.radians(self.canvas.camera.fov / 2))
+                / screen_height
+            )
+            look_vector = numpy.matmul(
+                rotation_matrix_xy(screen_dy, -screen_dx),
+                look_vector,
+            )
+        ry, rx = self.canvas.camera.rotation
+        look_vector = numpy.matmul(
+            rotation_matrix_xy(*numpy.radians([rx, -ry])), look_vector
+        )[:3]
+        look_vector[abs(look_vector) < 0.000001] = 0.000001
+        return look_vector
 
     def ray_collision(self):
         vector_start = self.canvas.camera.location
@@ -36,22 +68,20 @@ class RaycastBehaviour(BaseBehaviour):
         t_max = numpy.where(t == t.max())[0][0]
         return t_max
 
-    def box_location_closest(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
-        """Find the location of the closest non-air block or selection box"""
+    def box_location_closest(self, max_distance=100) -> Tuple[PointCoordinatesNDArray, bool]:
+        """Find the location of the closest non-air block.
+        If the end is reached an a non-air block was not found the end location will be returned.
+
+        :param max_distance: The distance to search up to.
+        :return: Tuple[The block coordinate, was a non-air block found]
+        """
         cx: Optional[int] = None
         cz: Optional[int] = None
         chunk: Optional[Chunk] = None
         in_air = False
 
-        box_index, nearest_selection_box = self.canvas.selection.closest_intersection(
-            self.canvas.camera.location, self.look_vector()
-        )
-
         location = numpy.array([0, 0, 0], dtype=numpy.int32)
-        for location in self.collision_locations():
-            if nearest_selection_box and nearest_selection_box.in_boundary(location):
-                return location, box_index
-
+        for location in self.collision_locations(max_distance):
             x, y, z = location
             cx_ = x >> 4
             cz_ = z >> 4
@@ -70,10 +100,10 @@ class RaycastBehaviour(BaseBehaviour):
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block
-                    return location, None
+                    return location, True
             elif not in_air:
                 in_air = True
-        return location, None
+        return location, False
 
     def box_location_closest_2d(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
         x, _, z = self.canvas.camera.location
@@ -156,41 +186,6 @@ class RaycastBehaviour(BaseBehaviour):
             None,
         )
         return position, box
-
-    def look_vector(self) -> numpy.ndarray:
-        """
-        The x,y,z vector for the direction the camera is facing
-        :return: (x, y, z) numpy float array ranging from -1 to 1
-        """
-        look_vector = numpy.array([0, 0, 1, 0])
-        if not self.canvas._mouse_lock:
-            screen_x, screen_y = numpy.array(self.canvas.GetSize(), numpy.int) / 2
-            screen_dx = math.degrees(
-                math.atan(
-                    self.canvas.camera.aspect_ratio
-                    * math.tan(math.radians(self.canvas.camera.fov / 2))
-                    * self.canvas.mouse.delta_x
-                    / screen_x
-                )
-            )
-            screen_dy = math.degrees(
-                math.atan(
-                    math.cos(math.radians(screen_dx))
-                    * math.tan(math.radians(self.canvas.camera.fov / 2))
-                    * self.canvas.mouse.delta_y
-                    / screen_y
-                )
-            )
-            look_vector = numpy.matmul(
-                rotation_matrix_xy(math.radians(screen_dy), -math.radians(screen_dx)),
-                look_vector,
-            )
-        ry, rx = self.canvas.camera.rotation
-        look_vector = numpy.matmul(
-            rotation_matrix_xy(*numpy.radians([rx, -ry])), look_vector
-        )[:3]
-        look_vector[abs(look_vector) < 0.000001] = 0.000001
-        return look_vector
 
     def collision_locations(
         self, max_distance=100
