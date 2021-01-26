@@ -70,12 +70,14 @@ class RaycastBehaviour(BaseBehaviour):
         t_max = numpy.where(t == t.max())[0][0]
         return t_max
 
-    def box_location_closest(self, max_distance=100) -> Tuple[PointCoordinatesNDArray, bool]:
+    def box_location_closest(
+        self, max_distance: int=100
+    ) -> Tuple[PointCoordinatesNDArray, bool]:
         """Find the location of the closest non-air block.
         If the end is reached an a non-air block was not found the end location will be returned.
 
         :param max_distance: The distance to search up to.
-        :return: Tuple[The block coordinate, was a non-air block found]
+        :return: Tuple[The block coordinate, was a non-air block found in the range]
         """
         cx: Optional[int] = None
         cz: Optional[int] = None
@@ -107,7 +109,13 @@ class RaycastBehaviour(BaseBehaviour):
                 in_air = True
         return location, False
 
-    def box_location_closest_2d(self) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+    def box_location_closest_2d(self, min_y: int = 0) -> Tuple[PointCoordinatesNDArray, bool]:
+        """Find the first non-air block above a given y axis.
+        Note if there are no non-air blocks above the given axis it will return the min_y value
+
+        :param min_y: The minimum y coordinate to look to.
+        :return: Tuple[The block coordinate, was a non-air block found in the range]
+        """
         x, _, z = self.canvas.camera.location
         width, height = self.canvas.GetSize()
         z += 2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
@@ -119,12 +127,9 @@ class RaycastBehaviour(BaseBehaviour):
             / width
         )
         x, z = numpy.floor([x, z]) + 0.5
-        box_index, nearest_selection_box = self.canvas.selection.closest_intersection(
-            (x, 2 * 32, z), (0, -1, 0)
-        )
 
         sub_chunk_size = self.canvas.world.sub_chunk_size
-        y = 0
+        y = min_y
         try:
             chunk = self.canvas.world.get_chunk(
                 int(x // sub_chunk_size),
@@ -132,14 +137,9 @@ class RaycastBehaviour(BaseBehaviour):
                 self.canvas.dimension,
             )
         except ChunkLoadError:
-            if nearest_selection_box is not None:
-                y = nearest_selection_box.max[1] - 1
+            pass
         else:
-            if nearest_selection_box is None:
-                box_max = -2 * 32
-            else:
-                box_max: int = nearest_selection_box.max[1] - 1
-            box_max_chunk = int(box_max // sub_chunk_size)
+            box_max_chunk = int(min_y // sub_chunk_size)
             sub_chunks = sorted(
                 [cy for cy in chunk.blocks.sub_chunks if cy >= box_max_chunk],
                 reverse=True,
@@ -157,15 +157,9 @@ class RaycastBehaviour(BaseBehaviour):
                             - numpy.argmax(blocks)
                             + sy * sub_chunk_size
                         )
-                        break
-                else:
-                    if nearest_selection_box is not None:
-                        y = nearest_selection_box.max[1] - 1
-                y = max(box_max, y)
-            elif nearest_selection_box is not None:
-                y = nearest_selection_box.max[1] - 1
-
-        return numpy.asarray((x, y, z)), box_index
+                        y = max(min_y, y)
+                        return numpy.asarray((x, y, z)), True
+        return numpy.asarray((x, y, z)), False
 
     def box_location_distance(
         self, distance: int
