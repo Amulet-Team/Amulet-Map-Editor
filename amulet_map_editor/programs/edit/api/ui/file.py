@@ -139,3 +139,4 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self._location_button.SetLabel(label)
         if len(label) != len(old_label):
             self.canvas.Layout()
+        evt.Skip()

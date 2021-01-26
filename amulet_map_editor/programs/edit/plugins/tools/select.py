@@ -211,9 +211,11 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
             scroll.Enable(state)
 
     def _on_draw(self, evt):
+        self.canvas.renderer.start_draw()
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.canvas.renderer.draw_sky_box()
         self.canvas.renderer.draw_level()
         if self._paste_panel is not None:
             self.canvas.renderer.draw_fake_levels()
         # self.canvas.renderer.draw_selection()
+        self.canvas.renderer.end_draw()
