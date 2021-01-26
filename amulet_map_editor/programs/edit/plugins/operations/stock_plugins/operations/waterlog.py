@@ -6,12 +6,12 @@ from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.programs.edit.api.operations import OperationUI
-from amulet_map_editor.programs.edit.api.ui.canvas.events import EVT_BOX_CLICK
+from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 from amulet_map_editor.api import image
 
 if TYPE_CHECKING:
     from amulet.api.level import World
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 MODES = {
     "Overlay": "Overlay the block on the existing. If the first block is air it replaces the first block otherwise it sets the second block.",

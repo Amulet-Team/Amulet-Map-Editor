@@ -1,4 +1,4 @@
-from amulet_map_editor.programs.edit.api.tool import BaseSelectOperationUI
+from amulet_map_editor.programs.edit.api.ui.tool import BaseSelectOperationUI
 
 
 class SelectExportOperationUI(BaseSelectOperationUI):

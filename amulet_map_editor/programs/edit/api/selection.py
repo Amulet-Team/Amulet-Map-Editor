@@ -9,9 +9,7 @@ from amulet_map_editor.programs.edit.api.events import CreateUndoEvent
 from amulet_map_editor import log
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas_old.base_edit_canvas import (
-        BaseEditCanvas,
-    )
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 BoxType = Tuple[Tuple[int, int, int], Tuple[int, int, int]]  # min and max positions
 
@@ -30,7 +28,7 @@ class SelectionChangeEvent(wx.PyEvent):
 class SelectionManager(Changeable):
     """A class containing the raw representation of the selection with methods to access and change it."""
 
-    def __init__(self, canvas: "BaseEditCanvas"):
+    def __init__(self, canvas: "EditCanvas"):
         super().__init__()
         self._selection_corners: Tuple[BoxType, ...] = ()
         self._selection_group: SelectionGroup = SelectionGroup()
@@ -39,7 +37,7 @@ class SelectionManager(Changeable):
         self._timer = wx.Timer(canvas)
 
     @property
-    def canvas(self) -> "BaseEditCanvas":
+    def canvas(self) -> "EditCanvas":
         return self._canvas()
 
     def set_up_events(self):
@@ -114,7 +112,9 @@ class SelectionManager(Changeable):
                 )
 
         self._selection_corners = tuple(selections)
-        self._selection_group = SelectionGroup([SelectionBox(*box) for box in self._selection_corners])
+        self._selection_group = SelectionGroup(
+            [SelectionBox(*box) for box in self._selection_corners]
+        )
         self._create_undo_point()
 
     @property

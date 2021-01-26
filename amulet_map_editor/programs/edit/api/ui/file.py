@@ -1,27 +1,29 @@
 from typing import TYPE_CHECKING, Optional
 import wx
 
-from amulet_map_editor.programs.edit.api.base_ui import BaseUI
+from amulet_map_editor.programs.edit.api.edit_canvas_container import (
+    EditCanvasContainer,
+)
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
-from amulet_map_editor.programs.edit.api.ui.canvas.events import (
-    EVT_CAMERA_MOVE,
+from amulet_map_editor.programs.edit.api.events import (
+    EVT_CAMERA_MOVED,
     EVT_UNDO,
     EVT_REDO,
     EVT_CREATE_UNDO,
     EVT_SAVE,
-    EVT_PROJECTION_CHANGE,
+    EVT_PROJECTION_CHANGED,
 )
 from amulet_map_editor.api import image
-from amulet_map_editor.api.opengl.canvas import Perspective, Orthographic
+from amulet_map_editor.api.opengl.camera import Projection
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class FilePanel(wx.BoxSizer, BaseUI):
+class FilePanel(wx.BoxSizer, EditCanvasContainer):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
-        BaseUI.__init__(self, canvas)
+        EditCanvasContainer.__init__(self, canvas)
 
         level = self.canvas.world
         self._version_text = wx.StaticText(
@@ -36,7 +38,7 @@ class FilePanel(wx.BoxSizer, BaseUI):
             self._projection_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5
         )
         self._location_button = wx.Button(
-            canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera_location])
+            canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location])
         )
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
 
@@ -86,12 +88,12 @@ class FilePanel(wx.BoxSizer, BaseUI):
         self.Layout()
 
     def bind_events(self):
-        self.canvas.Bind(EVT_CAMERA_MOVE, self._on_camera_move)
+        self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_move)
         self.canvas.Bind(EVT_UNDO, self._on_update_buttons)
         self.canvas.Bind(EVT_REDO, self._on_update_buttons)
         self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
         self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
-        self.canvas.Bind(EVT_PROJECTION_CHANGE, self._on_projection_change)
+        self.canvas.Bind(EVT_PROJECTION_CHANGED, self._on_projection_change)
 
     def _on_update_buttons(self, evt):
         self._update_buttons()
@@ -112,14 +114,14 @@ class FilePanel(wx.BoxSizer, BaseUI):
         evt.Skip()
 
     def _on_projection_change(self, evt):
-        if self.canvas.projection_mode == Perspective:
+        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self._projection_button.SetLabel("3D")
-        elif self.canvas.projection_mode == Orthographic:
+        elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
             self._projection_button.SetLabel("2D")
         evt.Skip()
 
     def _on_projection_button(self, evt):
-        self.canvas.projection_mode = not self.canvas.projection_mode
+        self.canvas.camera.projection_mode = not self.canvas.camera.projection_mode
         evt.Skip()
 
     def _change_dimension(self, evt):
@@ -131,7 +133,7 @@ class FilePanel(wx.BoxSizer, BaseUI):
             self._dim_options.SetSelection(index)
 
     def _on_camera_move(self, evt):
-        x, y, z = evt.location
+        x, y, z = evt.camera_location
         label = f"{x:.2f}, {y:.2f}, {z:.2f}"
         old_label = self._location_button.GetLabel()
         self._location_button.SetLabel(label)

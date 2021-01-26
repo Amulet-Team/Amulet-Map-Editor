@@ -7,7 +7,7 @@ from amulet.api.data_types import OperationReturnType
 from amulet_map_editor.programs.edit.api.operations.operation_ui import OperationUI
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
     from amulet.api.level import World
 
 FixedOperationType = Callable[

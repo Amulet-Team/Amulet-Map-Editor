@@ -18,7 +18,7 @@ from amulet_map_editor.programs.edit.api.operations.operation_ui import (
 )
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
     from amulet.api.level import BaseLevel
 
 ValidChrs = set("-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")

@@ -8,7 +8,7 @@ from amulet_map_editor.programs.edit.api.operations.operation_ui import Operatio
 
 if TYPE_CHECKING:
     from amulet.api.level import World
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class SimpleOperationPanel(wx.Panel, OperationUI):

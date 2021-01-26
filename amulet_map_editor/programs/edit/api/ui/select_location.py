@@ -6,18 +6,20 @@ from amulet.api.level import BaseLevel
 from amulet.api.data_types import BlockCoordinates, Dimension
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.util.validators import IntValidator
-from amulet_map_editor.programs.edit.api.base_ui import BaseUI
-from amulet_map_editor.programs.edit.api.ui.canvas.events import (
+from amulet_map_editor.programs.edit.api.edit_canvas_container import (
+    EditCanvasContainer,
+)
+from amulet_map_editor.programs.edit.api.events import (
     EVT_CURSOR_BOX_MOVE,
     EVT_BOX_CLICK,
 )
 from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class SelectLocationUI(SimplePanel, BaseUI):
+class SelectLocationUI(SimplePanel, EditCanvasContainer):
     """A UI element that can be dropped into the EditCanvas and let the user pick a location for a structure.
     This UI does not allow for rotation.
     Will send EVT_SELECT_CONFIRM when the user confirms the selection."""
@@ -31,7 +33,7 @@ class SelectLocationUI(SimplePanel, BaseUI):
         confirm_callback: Callable[[], None],
     ):
         SimplePanel.__init__(self, parent)
-        BaseUI.__init__(self, canvas)
+        EditCanvasContainer.__init__(self, canvas)
 
         self._structure = structure
         self._dimension = dimension

@@ -6,11 +6,11 @@ from amulet.operations.fill import fill
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.programs.edit.api.operations import OperationUI
-from amulet_map_editor.programs.edit.api.ui.canvas.events import EVT_BOX_CLICK
+from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
     from amulet.api.level import World
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class Fill(wx.Panel, OperationUI):

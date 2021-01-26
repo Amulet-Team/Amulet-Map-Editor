@@ -14,7 +14,7 @@ from amulet_map_editor.programs.edit.api.operations import (
 
 if TYPE_CHECKING:
     from amulet.api.level import World
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class ImportMCStructure(SimpleOperationPanel):

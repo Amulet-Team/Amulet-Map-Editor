@@ -4,10 +4,10 @@ import wx
 from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
-from amulet_map_editor.programs.edit.api.tool import BaseToolUI
+from amulet_map_editor.programs.edit.api.ui.tool import BaseToolUI
 from amulet_map_editor.programs.edit.api.ui.select_location import SelectTransformUI
-from amulet_map_editor.api.opengl.canvas import Perspective
-from amulet_map_editor.programs.edit.api.ui.canvas.events import (
+from amulet_map_editor.api.opengl.camera import Projection
+from amulet_map_editor.programs.edit.api.events import (
     EVT_PASTE,
     EVT_BOX_CHANGE,
     EVT_BOX_DISABLE_INPUTS,
@@ -15,7 +15,7 @@ from amulet_map_editor.programs.edit.api.ui.canvas.events import (
 )
 
 if TYPE_CHECKING:
-    from amulet_map_editor.programs.edit.api.ui.canvas.edit_canvas import EditCanvas
+    from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class SelectOptions(wx.BoxSizer, BaseToolUI):
@@ -110,7 +110,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         dimension = evt.dimension
         self._button_panel.Hide()
         self._remove_paste()
-        self.canvas.selection_editable = False
+        # self.canvas.selection_editable = False
         self._paste_panel = SelectTransformUI(
             self.canvas, self.canvas, structure, dimension, self._paste_confirm
         )
@@ -138,7 +138,7 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
         self._remove_paste()
         self._button_panel.Show()
         self.Layout()
-        self.canvas.selection_editable = True
+        # self.canvas.selection_editable = True
 
     def disable(self):
         super().disable()
@@ -211,11 +211,9 @@ class SelectOptions(wx.BoxSizer, BaseToolUI):
             scroll.Enable(state)
 
     def _on_draw(self, evt):
-        self.canvas.start_draw()
-        if self.canvas.projection_mode == Perspective:
-            self.canvas.draw_sky_box()
-        self.canvas.draw_level()
+        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+            self.canvas.renderer.draw_sky_box()
+        self.canvas.renderer.draw_level()
         if self._paste_panel is not None:
-            self.canvas.draw_fake_levels()
-        self.canvas.draw_selection()
-        self.canvas.end_draw()
+            self.canvas.renderer.draw_fake_levels()
+        # self.canvas.renderer.draw_selection()
