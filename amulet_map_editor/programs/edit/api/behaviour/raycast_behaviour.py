@@ -232,7 +232,7 @@ class RaycastBehaviour(BaseBehaviour):
                 sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
             ) + numpy.floor(self.canvas.camera.location).astype(numpy.int)
         else:
-            collision_locations = start.astype(numpy.int)
+            collision_locations = start.astype(numpy.int).reshape(1, 3)
 
         for location in collision_locations:
             yield location
