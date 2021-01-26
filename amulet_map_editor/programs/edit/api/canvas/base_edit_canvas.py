@@ -25,7 +25,7 @@ from minecraft_model_reader.api.resource_pack import (
     load_resource_pack_manager,
 )
 
-from amulet.api.data_types import OperationYieldType
+from amulet.api.data_types import OperationYieldType, Dimension
 
 from amulet_map_editor import experimental_bedrock_resources
 from amulet_map_editor.api.opengl.canvas import EventCanvas
@@ -232,6 +232,16 @@ class BaseEditCanvas(EventCanvas):
     def renderer(self) -> Renderer:
         """The `Renderer` class that handles the drawable objects and draws them."""
         return self._renderer
+
+    @property
+    def dimension(self) -> Dimension:
+        """The currently loaded dimension in the renderer."""
+        return self.renderer.dimension
+
+    @dimension.setter
+    def dimension(self, dimension: Dimension):
+        """Set the currently loaded dimension in the renderer."""
+        self.renderer.dimension = dimension
 
     @property
     def camera(self) -> ControllableCamera:
