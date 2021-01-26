@@ -32,6 +32,19 @@ if TYPE_CHECKING:
 class Renderer(EditCanvasContainer):
     """This class holds the drawable objects and has methods to draw them."""
 
+    __slots__ = (
+        "_render_distance",
+        "_chunk_generator",
+        "_opengl_resource_pack",
+        "_render_world",
+        "_chunk_generator",
+        "_fake_levels",
+        "_sky_box",
+        "_draw_timer",
+        "_gc_timer",
+        "_rebuild_timer",
+    )
+
     def __init__(
         self,
         canvas: "EditCanvas",
