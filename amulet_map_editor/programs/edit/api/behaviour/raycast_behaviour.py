@@ -30,7 +30,9 @@ class RaycastBehaviour(BaseBehaviour):
         look_vector = numpy.array([0, 0, 1, 0])
 
         if self.canvas.mouse.delta_xy != (0, 0):
-            screen_width, screen_height = numpy.array(self.canvas.GetSize(), numpy.int) / 2
+            screen_width, screen_height = (
+                numpy.array(self.canvas.GetSize(), numpy.int) / 2
+            )
             screen_dx = math.atan(
                 self.canvas.mouse.delta_x
                 * self.canvas.camera.aspect_ratio

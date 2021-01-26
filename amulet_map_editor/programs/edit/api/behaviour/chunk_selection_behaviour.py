@@ -7,5 +7,6 @@ if TYPE_CHECKING:
 
 class ChunkSelectionBehaviour(BaseBehaviour):
     """Adds the behaviour for a chunk based selection."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)

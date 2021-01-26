@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 class CameraBehaviour(BaseBehaviour):
     """Adds the normal behaviour for the camera."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
         self._previous_mouse_lock = self._mouse_lock = False
@@ -63,10 +64,7 @@ class CameraBehaviour(BaseBehaviour):
     def _on_input_release(self, evt: InputReleaseEvent):
         """Logic to run each time the input release event is run."""
         if evt.action_id == "toggle mouse mode":
-            if (
-                self._previous_mouse_lock
-                or time.time() - self._toggle_mouse_time > 0.1
-            ):
+            if self._previous_mouse_lock or time.time() - self._toggle_mouse_time > 0.1:
                 self._release_mouse()
             else:
                 self._capture_mouse()

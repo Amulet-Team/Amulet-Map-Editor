@@ -7,5 +7,6 @@ if TYPE_CHECKING:
 
 class BlockSelectionBehaviour(BaseBehaviour):
     """Adds the behaviour for a block based selection."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)

@@ -7,5 +7,6 @@ if TYPE_CHECKING:
 
 class StaticSelectionBehaviour(BaseBehaviour):
     """Adds the logic for a static selection."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
