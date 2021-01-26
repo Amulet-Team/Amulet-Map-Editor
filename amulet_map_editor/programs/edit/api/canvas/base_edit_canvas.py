@@ -39,7 +39,6 @@ import amulet_map_editor.programs.edit as amulet_edit
 from amulet_map_editor.api.opengl.camera import ControllableCamera
 from amulet_map_editor.api.wx.util.button_input import ButtonInput
 from amulet_map_editor.api.wx.util.mouse_movement import MouseMovement
-from ..behaviour import StaticBehaviour, CameraBehaviour
 from ..renderer import Renderer
 
 from amulet.api.level import World
@@ -58,7 +57,10 @@ class BaseEditCanvas(EventCanvas):
 
         self._world = weakref.ref(world)
 
-        self._selection: Optional[SelectionHistoryManager] = None
+        self._selection: Optional[SelectionHistoryManager] = SelectionHistoryManager(
+            SelectionManager(self)
+        )
+        self.world.history_manager.register(self._selection, False)
 
         self._camera: ControllableCamera = ControllableCamera(self)
         self._camera.location_rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
@@ -83,10 +85,6 @@ class BaseEditCanvas(EventCanvas):
 
         # has the selection point moved and does the box need rebuilding
         self._selection_moved = True
-
-        # TODO: move this to the base tool
-        self._default_behaviour = StaticBehaviour(self)
-        self._camera_behaviour = CameraBehaviour(self)
 
     def __setattr__(self, name, value):
         if not self.__dict__.get("_init", False) or hasattr(self, name):
@@ -174,9 +172,6 @@ class BaseEditCanvas(EventCanvas):
 
         yield 1.0, "Setting up renderer"
 
-        self._selection = SelectionHistoryManager(SelectionManager(self))
-        self.world.history_manager.register(self._selection, False)
-
         self._renderer: Optional[Renderer] = Renderer(
             self,
             self.world,
@@ -193,15 +188,10 @@ class BaseEditCanvas(EventCanvas):
         """Set up all events required to run.
         Note this will also bind subclass events."""
         self.Bind(wx.EVT_SIZE, self._on_size)
-        # self.Bind(EVT_CURSOR_MOVE, lambda evt: self._change_box_location())
         self.selection_.set_up_events()  # TODO: clean this up a bit
         self.buttons.set_up_events()
         self.mouse.set_up_events()
-
-        # TODO: move these to the tool
         self._renderer.set_up_events()
-        self._default_behaviour.set_up_events()
-        self._camera_behaviour.set_up_events()
 
     def enable(self):
         """Enable the canvas and start it working."""
