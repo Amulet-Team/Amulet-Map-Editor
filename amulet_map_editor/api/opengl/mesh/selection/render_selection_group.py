@@ -52,3 +52,8 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
     ):
         for box in self._boxes:
             box.draw(camera_matrix, camera_position)
+
+    def unload(self):
+        while self._boxes:
+            box = self._boxes.pop()
+            box.unload()

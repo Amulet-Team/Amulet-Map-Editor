@@ -228,9 +228,7 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
 
     def _deselect_all(self):
         """Destroy all selection boxes. No events fired."""
-        while self._boxes:
-            box = self._boxes.pop()
-            box.unload()
+        self.unload()
         self._active_box: Optional[RenderSelectionEditable] = None
         self._active_box_index = (
             self._last_active_box_index
