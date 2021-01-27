@@ -1,7 +1,6 @@
 import wx
 from typing import Union, TYPE_CHECKING
 
-from amulet_map_editor.programs.edit.api.events import EVT_DRAW
 from .base_tool_ui import BaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import CameraBehaviour
 
@@ -21,5 +20,5 @@ class CameraToolUI(BaseToolUI):
         raise NotImplementedError
 
     def bind_events(self):
-        self.canvas.Bind(EVT_DRAW, self._on_draw)
+        super().bind_events()
         self._camera_behaviour.bind_events()

@@ -16,9 +16,11 @@ class BaseToolUI(EditCanvasContainer):
         raise NotImplementedError
 
     def enable(self):
+        """Bind any required events and start the tool."""
         self.canvas.camera.projection_mode = Projection.PERSPECTIVE
 
     def disable(self):
+        """Stop the tool. All events on the canvas will be automatically removed."""
         pass
 
     def bind_events(self):

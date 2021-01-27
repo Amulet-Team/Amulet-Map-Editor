@@ -191,7 +191,7 @@ class BaseEditCanvas(EventCanvas):
         self.selection_.bind_events()
         self.buttons.bind_events()
         self.mouse.bind_events()
-        self._renderer.bind_events()
+        self.renderer.bind_events()
 
     def enable(self):
         """Enable the canvas and start it working."""
