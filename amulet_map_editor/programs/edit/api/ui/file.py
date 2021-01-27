@@ -121,7 +121,10 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         evt.Skip()
 
     def _on_projection_button(self, evt):
-        self.canvas.camera.projection_mode = not self.canvas.camera.projection_mode
+        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+            self.canvas.camera.projection_mode = Projection.TOP_DOWN
+        else:
+            self.canvas.camera.projection_mode = Projection.PERSPECTIVE
         evt.Skip()
 
     def _change_dimension(self, evt):
