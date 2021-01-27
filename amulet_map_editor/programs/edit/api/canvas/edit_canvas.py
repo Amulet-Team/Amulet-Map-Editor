@@ -125,9 +125,10 @@ class EditCanvas(BaseEditCanvas):
     def bind_events(self):
         """Set up all events required to run.
         Note this will also bind subclass events."""
+        self._tool_sizer.bind_events()
+        # binding the tool events first will run them last so they can't accidentally block UI events.
         super().bind_events()
         self._file_panel.bind_events()
-        self._tool_sizer.bind_events()
         self.Bind(EVT_EDIT_CLOSE, self._on_close)
 
     def _on_close(self, _):
