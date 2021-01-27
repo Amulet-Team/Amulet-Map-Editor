@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING, Tuple, Optional
-import numpy
 import wx
 
 from amulet.api.data_types import PointCoordinatesAny

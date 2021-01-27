@@ -1,4 +1,4 @@
-from typing import Tuple, List, Optional, Any, TYPE_CHECKING
+from typing import Tuple, Optional, Any, TYPE_CHECKING
 import wx
 import weakref
 from amulet.api.selection import SelectionGroup, SelectionBox
