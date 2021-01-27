@@ -1,5 +1,9 @@
 from typing import TYPE_CHECKING, Type, Any
 import wx
+from OpenGL.GL import (
+    glClear,
+    GL_DEPTH_BUFFER_BIT,
+)
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
@@ -172,6 +176,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         self.canvas.renderer.start_draw()
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.canvas.renderer.draw_sky_box()
+            glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
         self._selection.draw()
         self._pointer_behaviour.draw()

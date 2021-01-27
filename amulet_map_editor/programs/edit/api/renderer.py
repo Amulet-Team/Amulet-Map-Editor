@@ -227,6 +227,7 @@ class Renderer(EditCanvasContainer):
         self.start_draw()
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.draw_sky_box()
+            glClear(GL_DEPTH_BUFFER_BIT)
         self.draw_level()
         self.end_draw()
 

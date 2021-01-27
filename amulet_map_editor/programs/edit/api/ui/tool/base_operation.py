@@ -1,5 +1,9 @@
 import wx
 from typing import TYPE_CHECKING, Optional
+from OpenGL.GL import (
+    glClear,
+    GL_DEPTH_BUFFER_BIT,
+)
 
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.opengl.camera import Projection
@@ -136,6 +140,7 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
         self.canvas.renderer.start_draw()
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.canvas.renderer.draw_sky_box()
+            glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
         # self.canvas.draw_selection(True, False)
         self.canvas.renderer.end_draw()
