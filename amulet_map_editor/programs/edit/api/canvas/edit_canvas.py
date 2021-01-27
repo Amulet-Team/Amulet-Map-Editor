@@ -214,12 +214,12 @@ class EditCanvas(BaseEditCanvas):
 
     def cut(self):
         self.run_operation(
-            lambda: cut(self.world, self.dimension, self.selection_.selection_group)
+            lambda: cut(self.world, self.dimension, self.selection.selection_group)
         )
 
     def copy(self):
         self.run_operation(
-            lambda: copy(self.world, self.dimension, self.selection_.selection_group)
+            lambda: copy(self.world, self.dimension, self.selection.selection_group)
         )
 
     def paste(self, structure: BaseLevel, dimension: Dimension):
@@ -242,7 +242,7 @@ class EditCanvas(BaseEditCanvas):
 
     def delete(self):
         self.run_operation(
-            lambda: delete(self.world, self.dimension, self.selection_.selection_group)
+            lambda: delete(self.world, self.dimension, self.selection.selection_group)
         )
 
     def goto(self):
@@ -264,7 +264,7 @@ class EditCanvas(BaseEditCanvas):
                 elif z > max_z:
                     max_z = z
 
-            self.selection_.selection_corners = [
+            self.selection.selection_corners = [
                 (
                     (
                         min_x * self.world.sub_chunk_size,
@@ -280,7 +280,7 @@ class EditCanvas(BaseEditCanvas):
             ]
 
         else:
-            self.selection_.selection_corners = []
+            self.selection.selection_corners = []
 
     def save(self):
         self.renderer.disable_threads()

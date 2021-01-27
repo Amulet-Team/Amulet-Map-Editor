@@ -70,8 +70,6 @@ class BaseEditCanvas(EventCanvas):
         self._buttons: ButtonInput = ButtonInput(self)
         self._mouse: MouseMovement = MouseMovement(self)
 
-        self._mouse_lock = False
-
         # load the resource packs
         os.makedirs("resource_packs", exist_ok=True)
         if not os.path.isfile("resource_packs/readme.txt"):
@@ -79,12 +77,6 @@ class BaseEditCanvas(EventCanvas):
                 f.write("Put the Java resource pack you want loaded in here.")
 
         self._renderer: Optional[Renderer] = None
-
-        self._select_distance = 10
-        self._select_distance2 = 10
-
-        # has the selection point moved and does the box need rebuilding
-        self._selection_moved = True
 
     def __setattr__(self, name, value):
         if not self.__dict__.get("_init", False) or hasattr(self, name):
@@ -188,7 +180,7 @@ class BaseEditCanvas(EventCanvas):
         """Set up all events required to run.
         Note this will also bind subclass events."""
         self.Bind(wx.EVT_SIZE, self._on_size)
-        self.selection_.bind_events()
+        self.selection.bind_events()
         self.buttons.bind_events()
         self.mouse.bind_events()
         self.renderer.bind_events()
@@ -249,14 +241,9 @@ class BaseEditCanvas(EventCanvas):
         return self._mouse
 
     @property
-    def selection_(self) -> SelectionManager:  # TODO: rename this to selection
+    def selection(self) -> SelectionManager:  # TODO: rename this to selection
         """A simple class for storing the selection state."""
         return self._selection.value
-
-    # @property
-    # def cursor_location(self) -> BlockCoordinates:
-    #     """The location of the cursor box in the world."""
-    #     return self.selection.cursor_position
 
     def _on_size(self, evt):
         wx.CallAfter(self._set_size)

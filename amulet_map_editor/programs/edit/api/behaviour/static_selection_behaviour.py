@@ -28,7 +28,7 @@ class StaticSelectionBehaviour(BaseBehaviour):
 
     def update_selection(self):
         """Pull the latest selection from the canvas."""
-        self._selection.selection_group = self.canvas.selection_.selection_group
+        self._selection.selection_group = self.canvas.selection.selection_group
 
     def draw(self):
         self._selection.draw(self.canvas.camera.transformation_matrix, self.canvas.camera.location)
