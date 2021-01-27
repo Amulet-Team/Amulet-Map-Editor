@@ -1,14 +1,10 @@
-from typing import TYPE_CHECKING, Type, Any, Optional
+from typing import TYPE_CHECKING, Type, Any
 import wx
-
-from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
-from amulet_map_editor.programs.edit.api.ui.select_location import SelectTransformUI
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.programs.edit.api.events import (
-    EVT_PASTE,
     EVT_BOX_CHANGE,
     EVT_BOX_DISABLE_INPUTS,
     EVT_BOX_ENABLE_INPUTS,
@@ -42,8 +38,6 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         button_sizer.Add(paste_button, 0, wx.ALL | wx.EXPAND, 5)
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.paste_from_cache())
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
-
-        self._paste_panel: Optional[SelectTransformUI] = None
 
         self._x1: wx.SpinCtrl = self._add_row(
             "x1", wx.SpinCtrl, min=-30000000, max=30000000
@@ -98,55 +92,18 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
 
     def bind_events(self):
         CameraToolUI.bind_events(self)
-        self.canvas.Bind(EVT_PASTE, self._paste)
         self.canvas.Bind(EVT_BOX_CHANGE, self._box_renderer_change)
         self.canvas.Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
         self.canvas.Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
         self._pointer_behaviour.set_up_events()
 
-    def _remove_paste(self):
-        if self._paste_panel is not None:
-            self._paste_panel.Destroy()
-            self._paste_panel = None
-
-    def _paste(self, evt):
-        structure = evt.structure
-        dimension = evt.dimension
-        self._button_panel.Hide()
-        self._remove_paste()
-        # self.canvas.selection_editable = False
-        self._paste_panel = SelectTransformUI(
-            self.canvas, self.canvas, structure, dimension, self._paste_confirm
-        )
-        self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
-        self.Layout()
-
-    def _paste_confirm(self):
-        self.canvas.run_operation(
-            lambda: paste_iter(
-                self.canvas.world,
-                self.canvas.dimension,
-                self._paste_panel.structure,
-                self._paste_panel.dimension,
-                self._paste_panel.location,
-                (1, 1, 1),
-                self._paste_panel.rotation,
-                self._paste_panel.copy_air,
-                self._paste_panel.copy_water,
-                self._paste_panel.copy_lava,
-            )
-        )
-
     def enable(self):
         super().enable()
-        self._remove_paste()
-        self._button_panel.Show()
         self.Layout()
         # self.canvas.selection_editable = True
 
     def disable(self):
         super().disable()
-        self._remove_paste()
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -219,7 +176,6 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.canvas.renderer.draw_sky_box()
         self.canvas.renderer.draw_level()
-        if self._paste_panel is not None:
-            self.canvas.renderer.draw_fake_levels()
+        self._pointer_behaviour.draw()
         # self.canvas.renderer.draw_selection()
         self.canvas.renderer.end_draw()
