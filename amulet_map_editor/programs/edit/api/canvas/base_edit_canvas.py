@@ -188,7 +188,7 @@ class BaseEditCanvas(EventCanvas):
         """Set up all events required to run.
         Note this will also bind subclass events."""
         self.Bind(wx.EVT_SIZE, self._on_size)
-        self.selection_.bind_events()  # TODO: clean this up a bit
+        self.selection_.bind_events()
         self.buttons.bind_events()
         self.mouse.bind_events()
         self._renderer.bind_events()

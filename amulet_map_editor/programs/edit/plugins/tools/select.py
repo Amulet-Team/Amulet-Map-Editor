@@ -9,7 +9,7 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_BOX_DISABLE_INPUTS,
     EVT_BOX_ENABLE_INPUTS,
 )
-from amulet_map_editor.programs.edit.api.behaviour import PointerBehaviour
+from amulet_map_editor.programs.edit.api.behaviour import PointerBehaviour, StaticSelectionBehaviour
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -21,6 +21,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         CameraToolUI.__init__(self, canvas)
 
         self._pointer_behaviour = PointerBehaviour(self.canvas)
+        self._selection = StaticSelectionBehaviour(self.canvas)
 
         self._button_panel = wx.Panel(canvas)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -96,6 +97,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         self.canvas.Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
         self.canvas.Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
         self._pointer_behaviour.bind_events()
+        self._selection.bind_events()
 
     def enable(self):
         super().enable()
@@ -176,6 +178,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self.canvas.renderer.draw_sky_box()
         self.canvas.renderer.draw_level()
+        self._selection.draw()
         self._pointer_behaviour.draw()
         # self.canvas.renderer.draw_selection()
         self.canvas.renderer.end_draw()

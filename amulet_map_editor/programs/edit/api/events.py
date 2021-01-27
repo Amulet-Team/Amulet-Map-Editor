@@ -25,6 +25,8 @@ from amulet_map_editor.api.wx.util.button_input import (
     EVT_INPUT_RELEASE,
 )
 
+from .selection import SelectionChangeEvent, EVT_SELECTION_CHANGE
+
 
 DimensionChangeEvent, EVT_DIMENSION_CHANGE = newevent.NewEvent()
 

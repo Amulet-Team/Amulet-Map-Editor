@@ -1,5 +1,6 @@
 from typing import Tuple, Optional, Any, TYPE_CHECKING
 import wx
+import numpy
 import weakref
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.history.history_manager import ObjectHistoryManager
@@ -75,7 +76,7 @@ class SelectionManager(Changeable):
         :return:
         """
         self.set_selection_corners(selection_corners)
-        wx.PostEvent(self._canvas(), SelectionChangeEvent())
+        self._start_undo_point()
 
     def set_selection_corners(
         self,
@@ -84,7 +85,7 @@ class SelectionManager(Changeable):
         ],
     ):
         """Set the minimum and maximum points of each selection
-        Note this method will not create events to cause updates.
+        Note this method will not trigger the history logic.
         You may instead want the selection_corners setter method.
 
         :param selection_corners: The minimum and maximum points of each selection
@@ -98,21 +99,24 @@ class SelectionManager(Changeable):
                 and all(
                     type(point) in (tuple, list)
                     and len(point) == 3
-                    and all(type(p) is int for p in point)
+                    and all(isinstance(p, (int, numpy.integer)) for p in point)
                     for point in points
                 )
             ):
-                selections.append((tuple(points[0]), tuple(points[1])))
+                selections.append(
+                    tuple(tuple(int(p) for p in point) for point in points)
+                )
             else:
                 log.error(
                     f"selection_corners must be of the format Tuple[Tuple[Tuple[int, int, int], Tuple[int, int, int]], ...]"
                 )
 
+        self.changed = True
         self._selection_corners = tuple(selections)
         self._selection_group = SelectionGroup(
             [SelectionBox(*box) for box in self._selection_corners]
         )
-        self._start_undo_point()
+        wx.PostEvent(self._canvas(), SelectionChangeEvent())
 
     @property
     def selection_group(self) -> SelectionGroup:
@@ -130,21 +134,22 @@ class SelectionManager(Changeable):
         :return:
         """
         self.set_selection_group(selection_group)
-        wx.PostEvent(self._canvas(), SelectionChangeEvent())
+        self._start_undo_point()
 
     def set_selection_group(self, selection_group: SelectionGroup):
         """Set the selection from a `SelectionGroup` class
-        Note this method will not create events to cause updates.
+        Note this method will not trigger the history logic.
         You may instead want the selection_group setter method.
 
         :param selection_group: The `SelectionGroup` to pull the data from
         :return:
         """
+        self.changed = True
         self._selection_corners = [
             (box.min, box.max) for box in selection_group.selection_boxes
         ]
         self._selection_group = selection_group
-        self._start_undo_point()
+        wx.PostEvent(self._canvas(), SelectionChangeEvent())
 
 
 class SelectionHistoryManager(ObjectHistoryManager):
@@ -156,7 +161,7 @@ class SelectionHistoryManager(ObjectHistoryManager):
         return self._value
 
     def _unpack_value(self, value: Optional[Any]):
-        self.value.selection_corners = value
+        self.value.set_selection_corners(value)
 
     def _pack_value(self, value: SelectionManager) -> Optional[Any]:
         return value.selection_corners

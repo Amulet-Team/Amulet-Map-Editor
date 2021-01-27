@@ -165,8 +165,7 @@ class EditCanvas(BaseEditCanvas):
                 msg,
                 self,
             )
-            self.world.create_undo_point()
-            wx.PostEvent(self, CreateUndoEvent())
+            self.create_undo_point()
         except OperationError as e:
             msg = f"Error running operation: {e}"
             log.info(msg)
@@ -200,7 +199,7 @@ class EditCanvas(BaseEditCanvas):
 
     def create_undo_point(self, world=True, non_world=True):
         self.world.create_undo_point(world, non_world)
-        wx.PostEvent(self.canvas, CreateUndoEvent())
+        wx.PostEvent(self, CreateUndoEvent())
 
     def undo(self):
         self.world.undo()

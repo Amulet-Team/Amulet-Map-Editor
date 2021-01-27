@@ -49,8 +49,8 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
         self.unload()
         for box in selection_group.selection_boxes:
             render_box = self._new_render_selection()
-            render_box.point1 = numpy.array(box.min) - selection_group.min
-            render_box.point2 = numpy.array(box.max) - selection_group.min
+            render_box.point1 = numpy.array(box.min)
+            render_box.point2 = numpy.array(box.max)
             self._boxes.append(render_box)
 
     def draw(
