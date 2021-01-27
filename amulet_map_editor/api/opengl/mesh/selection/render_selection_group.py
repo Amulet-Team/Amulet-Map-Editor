@@ -26,11 +26,7 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
         self._boxes: List[RenderSelection] = []
 
         if selection:
-            for box in selection.selection_boxes:
-                render_box = self._new_render_selection()
-                render_box.point1 = numpy.array(box.min) - selection.min
-                render_box.point2 = numpy.array(box.max) - selection.min
-                self._boxes.append(render_box)
+            self.selection_group = selection
 
     def _new_render_selection(self):
         return RenderSelection(self.context_identifier, self.resource_pack)
@@ -44,8 +40,18 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
     def __getitem__(self, index: int) -> "RenderSelection":
         return self._boxes[index]
 
-    def create_selection_group(self) -> SelectionGroup:
+    @property
+    def selection_group(self) -> SelectionGroup:
         return SelectionGroup([SelectionBox(box.min, box.max) for box in self._boxes])
+
+    @selection_group.setter
+    def selection_group(self, selection_group: SelectionGroup):
+        self.unload()
+        for box in selection_group.selection_boxes:
+            render_box = self._new_render_selection()
+            render_box.point1 = numpy.array(box.min) - selection_group.min
+            render_box.point2 = numpy.array(box.max) - selection_group.min
+            self._boxes.append(render_box)
 
     def draw(
         self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None
