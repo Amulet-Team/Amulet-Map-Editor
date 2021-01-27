@@ -122,10 +122,10 @@ class EditCanvas(BaseEditCanvas):
         super()._finalise()
         self._tool_sizer.enable_default_tool()
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run.
         Note this will also bind subclass events."""
-        super().set_up_events()
+        super().bind_events()
         self._file_panel.bind_events()
         self._tool_sizer.bind_events()
         self.Bind(EVT_EDIT_CLOSE, self._on_close)

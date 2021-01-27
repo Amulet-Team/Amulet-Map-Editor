@@ -28,7 +28,7 @@ class CameraBehaviour(BaseBehaviour):
         self._previous_mouse_lock = self._mouse_lock = False
         self._toggle_mouse_time = 0
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run."""
         self.canvas.Bind(EVT_INPUT_HELD, self._on_input_held)
         self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)

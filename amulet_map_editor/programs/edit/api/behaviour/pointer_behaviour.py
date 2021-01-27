@@ -29,8 +29,8 @@ class PointerBehaviour(RaycastBehaviour):
         # the pointer
         self._pointer: Optional[RenderSelection] = None
 
-    def set_up_events(self):
-        super().set_up_events()
+    def bind_events(self):
+        super().bind_events()
         if self._pointer is None:
             self._pointer = RenderSelection(
                 self.canvas.context_identifier,

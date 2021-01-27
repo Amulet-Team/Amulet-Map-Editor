@@ -16,7 +16,7 @@ class EventCanvas(BaseCanvas):
         """Unbind all events and re-bind the default events.
         We are allowing users to bind custom events so we should have a way to reset what is bound."""
         self.tear_down_events()
-        self.set_up_events()
+        self.bind_events()
 
     def tear_down_events(self):
         """Unbind all events.
@@ -31,7 +31,7 @@ class EventCanvas(BaseCanvas):
                 if not self.Unbind(event, source, handler=handler):
                     log.error(f"Failed to unbind {event}, {handler}, {source}")
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run.
         Note this will also bind subclass events."""
         raise NotImplementedError

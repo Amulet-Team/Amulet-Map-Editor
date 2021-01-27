@@ -184,14 +184,14 @@ class BaseEditCanvas(EventCanvas):
         self.reset_bound_events()
         self._init = True
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run.
         Note this will also bind subclass events."""
         self.Bind(wx.EVT_SIZE, self._on_size)
-        self.selection_.set_up_events()  # TODO: clean this up a bit
-        self.buttons.set_up_events()
-        self.mouse.set_up_events()
-        self._renderer.set_up_events()
+        self.selection_.bind_events()  # TODO: clean this up a bit
+        self.buttons.bind_events()
+        self.mouse.bind_events()
+        self._renderer.bind_events()
 
     def enable(self):
         """Enable the canvas and start it working."""

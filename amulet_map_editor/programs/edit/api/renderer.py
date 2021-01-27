@@ -80,7 +80,7 @@ class Renderer(EditCanvasContainer):
         self._gc_timer = wx.Timer(self.canvas)
         self._rebuild_timer = wx.Timer(self.canvas)
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run."""
         self.canvas.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
         self.canvas.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)

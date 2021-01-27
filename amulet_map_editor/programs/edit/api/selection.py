@@ -40,7 +40,7 @@ class SelectionManager(Changeable):
     def canvas(self) -> "EditCanvas":
         return self._canvas()
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run."""
 
         def create_undo_point():

@@ -22,4 +22,4 @@ class CameraToolUI(BaseToolUI):
 
     def bind_events(self):
         self.canvas.Bind(EVT_DRAW, self._on_draw)
-        self._camera_behaviour.set_up_events()
+        self._camera_behaviour.bind_events()

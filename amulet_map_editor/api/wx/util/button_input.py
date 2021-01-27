@@ -99,7 +99,7 @@ class ButtonInput(WindowContainer):
         # timer to deal with persistent actions
         self._input_timer = wx.Timer(self.window)
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run."""
 
         # key press actions

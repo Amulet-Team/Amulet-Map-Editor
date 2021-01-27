@@ -95,7 +95,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         self.canvas.Bind(EVT_BOX_CHANGE, self._box_renderer_change)
         self.canvas.Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
         self.canvas.Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
-        self._pointer_behaviour.set_up_events()
+        self._pointer_behaviour.bind_events()
 
     def enable(self):
         super().enable()

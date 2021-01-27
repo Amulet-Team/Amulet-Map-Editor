@@ -13,6 +13,6 @@ class BaseBehaviour(EditCanvasContainer):
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run."""
         pass

@@ -22,7 +22,7 @@ class MouseMovement(WindowContainer):
         self._delta_x = 0
         self._delta_y = 0
 
-    def set_up_events(self):
+    def bind_events(self):
         """Set up all events required to run."""
         self.window.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
