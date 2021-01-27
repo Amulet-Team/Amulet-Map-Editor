@@ -198,6 +198,10 @@ class EditCanvas(BaseEditCanvas):
             raise err
         return out
 
+    def create_undo_point(self, world=True, non_world=True):
+        self.world.create_undo_point(world, non_world)
+        wx.PostEvent(self.canvas, CreateUndoEvent())
+
     def undo(self):
         self.world.undo()
         self.renderer.render_world.rebuild_changed()

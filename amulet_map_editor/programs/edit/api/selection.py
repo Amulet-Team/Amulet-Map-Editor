@@ -4,7 +4,6 @@ import weakref
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.history.history_manager import ObjectHistoryManager
 from amulet.api.history import Changeable
-from amulet_map_editor.programs.edit.api.events import CreateUndoEvent
 
 from amulet_map_editor import log
 
@@ -42,15 +41,13 @@ class SelectionManager(Changeable):
 
     def bind_events(self):
         """Set up all events required to run."""
+        self.canvas.Bind(wx.EVT_TIMER, self._create_undo_point, self._timer)
 
-        def create_undo_point():
-            # TODO: move this logic into the canvas itself
-            self.canvas.world.history_manager.create_undo_point(True)
-            wx.PostEvent(self.canvas, CreateUndoEvent())
+    def _create_undo_point(self, evt):
+        self.canvas.create_undo_point(False, True)
+        evt.Skip()
 
-        self.canvas.Bind(wx.EVT_TIMER, create_undo_point, self._timer)
-
-    def _create_undo_point(self):
+    def _start_undo_point(self):
         """Start a timer to create an undo point after a period of time.
         If this is called again before the timer runs then the last call will not happen."""
         self._timer.StartOnce(100)
@@ -115,7 +112,7 @@ class SelectionManager(Changeable):
         self._selection_group = SelectionGroup(
             [SelectionBox(*box) for box in self._selection_corners]
         )
-        self._create_undo_point()
+        self._start_undo_point()
 
     @property
     def selection_group(self) -> SelectionGroup:
@@ -147,7 +144,7 @@ class SelectionManager(Changeable):
             (box.min, box.max) for box in selection_group.selection_boxes
         ]
         self._selection_group = selection_group
-        self._create_undo_point()
+        self._start_undo_point()
 
 
 class SelectionHistoryManager(ObjectHistoryManager):
