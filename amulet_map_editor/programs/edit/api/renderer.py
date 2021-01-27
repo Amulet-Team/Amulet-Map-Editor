@@ -247,15 +247,6 @@ class Renderer(EditCanvasContainer):
         """Draw the floating structure levels."""
         self.fake_levels.draw(self.canvas.camera.transformation_matrix)
 
-    def draw_selection(self, draw_selection: bool = True, draw_cursor: bool = True):
-        """Draw the selection box."""
-        # self.canvas.selection.draw(
-        #     self.canvas.camera.transformation_matrix,
-        #     tuple(self.canvas.camera.location),
-        #     draw_selection,
-        #     draw_cursor,
-        # )
-
     if ThreadingEnabled:
 
         def end_draw(self):

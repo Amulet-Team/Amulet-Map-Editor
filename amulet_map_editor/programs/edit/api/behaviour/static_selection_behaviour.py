@@ -19,12 +19,16 @@ class StaticSelectionBehaviour(BaseBehaviour):
         )
 
     def bind_events(self):
-        self.canvas.Bind(EVT_SELECTION_CHANGE, self._update_selection)
+        self.canvas.Bind(EVT_SELECTION_CHANGE, self._on_selection_change)
 
-    def _update_selection(self, evt):
+    def _on_selection_change(self, evt):
         """Update the render selection based on the updated selection."""
-        self._selection.selection_group = self.canvas.selection_.selection_group
+        self.update_selection()
         evt.Skip()
+
+    def update_selection(self):
+        """Pull the latest selection from the canvas."""
+        self._selection.selection_group = self.canvas.selection_.selection_group
 
     def draw(self):
         self._selection.draw(self.canvas.camera.transformation_matrix, self.canvas.camera.location)

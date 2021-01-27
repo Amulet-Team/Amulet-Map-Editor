@@ -36,5 +36,4 @@ class BaseToolUI(EditCanvasContainer):
             self.canvas.renderer.draw_sky_box()
             glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
-        self.canvas.renderer.draw_selection()
         self.canvas.renderer.end_draw()

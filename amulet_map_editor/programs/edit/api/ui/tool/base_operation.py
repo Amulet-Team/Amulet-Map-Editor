@@ -5,28 +5,32 @@ from OpenGL.GL import (
     GL_DEPTH_BUFFER_BIT,
 )
 
+from amulet_map_editor import log
+from amulet_map_editor.api.image import REFRESH_ICON
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.opengl.camera import Projection
+
 from amulet_map_editor.programs.edit.api.operations import (
     OperationUIType,
 )
 from amulet_map_editor.programs.edit.api.operations.manager import UIOperationManager
-from .base_tool_ui import BaseToolUI
+from .camera_tool_ui import CameraToolUI
 
-from amulet_map_editor.api.image import REFRESH_ICON
-
-from amulet_map_editor.api.logging import log
+from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
+class BaseSelectOperationUI(wx.BoxSizer, CameraToolUI):
     OperationGroupName = None
 
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
-        BaseToolUI.__init__(self, canvas)
+        CameraToolUI.__init__(self, canvas)
+
+        self._selection = StaticSelectionBehaviour(self.canvas)
+
         self._active_operation: Optional[OperationUIType] = None
 
         horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -95,10 +99,14 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             )
             self.Layout()
 
+    def bind_events(self):
+        super().bind_events()
+        self._selection.bind_events()
+
     def enable(self):
         super().enable()
+        self._selection.update_selection()
         self._setup_operation()
-        # self.canvas.selection_editable = False
 
     def disable(self):
         super().disable()
@@ -142,5 +150,5 @@ class BaseSelectOperationUI(wx.BoxSizer, BaseToolUI):
             self.canvas.renderer.draw_sky_box()
             glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
-        # self.canvas.draw_selection(True, False)
+        self._selection.draw()
         self.canvas.renderer.end_draw()

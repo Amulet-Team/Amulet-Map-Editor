@@ -6,14 +6,15 @@ from OpenGL.GL import (
 )
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
-from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
 from amulet_map_editor.api.opengl.camera import Projection
+
 from amulet_map_editor.programs.edit.api.events import (
     EVT_BOX_CHANGE,
     EVT_BOX_DISABLE_INPUTS,
     EVT_BOX_ENABLE_INPUTS,
 )
 from amulet_map_editor.programs.edit.api.behaviour import PointerBehaviour, StaticSelectionBehaviour
+from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -103,6 +104,10 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         self._pointer_behaviour.bind_events()
         self._selection.bind_events()
 
+    def enable(self):
+        super().enable()
+        self._selection.update_selection()
+
     def disable(self):
         super().disable()
 
@@ -180,5 +185,4 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         self.canvas.renderer.draw_level()
         self._selection.draw()
         self._pointer_behaviour.draw()
-        # self.canvas.renderer.draw_selection()
         self.canvas.renderer.end_draw()
