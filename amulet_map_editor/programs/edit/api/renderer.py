@@ -93,18 +93,10 @@ class Renderer(EditCanvasContainer):
 
     def enable(self):
         """Enable and start working."""
-        self.render_world.enable()
-        self.fake_levels.enable()
         self.enable_threads()
-        self._draw_timer.Start(15)
-        self._gc_timer.Start(10000)
-        self._rebuild_timer.Start(1000)
 
     def disable(self):
         """Disable and unload all geometry."""
-        self._draw_timer.Stop()
-        self._gc_timer.Stop()
-        self._rebuild_timer.Stop()
         self.disable_threads()
         self.render_world.unload()
         self.fake_levels.unload()
@@ -122,11 +114,19 @@ class Renderer(EditCanvasContainer):
     def disable_threads(self):
         """Stop the generation of new chunk geometry.
         Makes it safe to modify the world data."""
+        self._draw_timer.Stop()
+        self._gc_timer.Stop()
+        self._rebuild_timer.Stop()
         self._chunk_generator.stop()
 
     def enable_threads(self):
         """Start the generation of new chunk geometry."""
+        self.render_world.enable()
+        self.fake_levels.enable()
         self._chunk_generator.start()
+        self._draw_timer.Start(15)
+        self._gc_timer.Start(10000)
+        self._rebuild_timer.Start(1000)
 
     # TODO: move this logic into a resource pack reload method
     # def _load_resource_pack(self, *resource_packs: JavaResourcePack):
