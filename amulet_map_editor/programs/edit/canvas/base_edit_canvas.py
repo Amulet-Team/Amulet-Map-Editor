@@ -350,19 +350,10 @@ class BaseEditCanvas(BaseCanvas):
 
     def enable(self):
         """Enable the canvas and start it working."""
-        self.SetCurrent(self._context)
-        self._render_world.enable()
-        self._structure.enable()
         self._enable_threads()
-        self._draw_timer.Start(15)
-        self._gc_timer.Start(10000)
-        self._rebuild_timer.Start(1000)
 
     def disable(self):
         """Disable the canvas and unload all geometry."""
-        self._draw_timer.Stop()
-        self._gc_timer.Stop()
-        self._rebuild_timer.Stop()
         self._disable_threads()
         self._render_world.unload()
         self._structure.unload()
@@ -370,11 +361,20 @@ class BaseEditCanvas(BaseCanvas):
     def _disable_threads(self):
         """Stop the generation of new chunk geometry.
         Makes it safe to modify the world data."""
+        self._draw_timer.Stop()
+        self._gc_timer.Stop()
+        self._rebuild_timer.Stop()
         self._chunk_generator.stop()
 
     def _enable_threads(self):
         """Start the generation of new chunk geometry."""
+        self.SetCurrent(self._context)
+        self._render_world.enable()
+        self._structure.enable()
         self._chunk_generator.start()
+        self._draw_timer.Start(15)
+        self._gc_timer.Start(10000)
+        self._rebuild_timer.Start(1000)
 
     def close(self):
         """Close and destroy the canvas and all contained data."""
