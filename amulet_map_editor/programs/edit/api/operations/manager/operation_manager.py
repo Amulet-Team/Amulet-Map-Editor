@@ -56,7 +56,7 @@ class BaseOperationManager:
             try:
                 mod = load_module(obj_path)
             except ImportError:
-                log.warn(f"Failed to import {obj_path}.\n{traceback.format_exc()}")
+                log.warning(f"Failed to import {obj_path}.\n{traceback.format_exc()}")
             else:
                 if hasattr(mod, "export"):
                     export = mod.export
