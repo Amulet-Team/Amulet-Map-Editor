@@ -27,9 +27,6 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         # the block coordinate of the mouse pointer. This needs updating via `update_cursor_position` when the mouse moves
         self._cursor_position = numpy.array([0, 0, 0], dtype=numpy.int)
 
-        # the drawable box to display where the mouse is selecting. Is not always drawn
-        self._cursor = RenderSelection(context_identifier, resource_pack)
-
         # the list of all boxes in the selection
         self._boxes: List[RenderSelectionHighlightable] = []
 
@@ -153,8 +150,8 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
                 self._new_editable_render_selection()
             )  # create a new render selection
             self._last_active_box_index = self._active_box_index
-            self._active_box.point1 = self._cursor.point1
-            self._active_box.point2 = self._cursor.point2
+            self._active_box.point1 = self._cursor_position
+            self._active_box.point2 = self._cursor_position + 1
             self._active_box_index = None
             self._disable_inputs_event()
 
@@ -275,8 +272,6 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         """Set the block coordinate of the cursor and update the renderer accordingly."""
         cursor_position = numpy.asarray(cursor_position)
         self._cursor_position[:] = cursor_position
-        self._cursor.point1 = cursor_position
-        self._cursor.point2 = cursor_position + 1
 
         if self._active_box:
             self._active_box.set_active_point(self.cursor_position)
@@ -369,17 +364,12 @@ class RenderSelectionGroupEditable(RenderSelectionGroup):
         self,
         camera_matrix: numpy.ndarray,
         camera_position: PointCoordinatesAny = None,
-        draw_selection=True,
-        draw_cursor=True,
     ):
-        if draw_selection:
-            for index, box in enumerate(self._boxes):
-                if not self.editable or index != self._active_box_index:
-                    box.draw(camera_matrix, camera_position)
-            if self.editable and self._active_box is not None:
-                self._active_box.draw(camera_matrix, camera_position)
-        if draw_cursor and not self.editing:
-            self._cursor.draw(camera_matrix)
+        for index, box in enumerate(self._boxes):
+            if not self.editable or index != self._active_box_index:
+                box.draw(camera_matrix, camera_position)
+        if self.editable and self._active_box is not None:
+            self._active_box.draw(camera_matrix, camera_position)
 
     def closest_intersection(
         self, origin: PointCoordinatesAny, vector: PointCoordinatesAny
