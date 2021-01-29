@@ -241,7 +241,7 @@ class BaseEditCanvas(EventCanvas):
         return self._mouse
 
     @property
-    def selection(self) -> SelectionManager:  # TODO: rename this to selection
+    def selection(self) -> SelectionManager:
         """A simple class for storing the selection state."""
         return self._selection.value
 
