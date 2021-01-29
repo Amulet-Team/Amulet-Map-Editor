@@ -135,6 +135,10 @@ class ButtonInput(WindowContainer):
         """A tuple of all the keys that are currently pressed."""
         return self._pressed_keys.copy()
 
+    @property
+    def pressed_actions(self) -> Set[ActionIDType]:
+        return self._continuous_actions.copy()
+
     def is_key_pressed(self, key: KeyType):
         """Is the requested key currently in the pressed state."""
         return key in self._pressed_keys
@@ -201,8 +205,8 @@ class ButtonInput(WindowContainer):
             return
         if not self.is_key_pressed(key):
             action_ids = self._find_actions(key)
+            self._continuous_actions.update(action_ids)
             for action_id in action_ids:
-                self._continuous_actions.add(action_id)
                 wx.PostEvent(
                     self.window,
                     InputPressEvent(action_id),
