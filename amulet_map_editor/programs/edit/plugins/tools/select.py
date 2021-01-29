@@ -13,7 +13,7 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_BOX_DISABLE_INPUTS,
     EVT_BOX_ENABLE_INPUTS,
 )
-from amulet_map_editor.programs.edit.api.behaviour import PointerBehaviour, StaticSelectionBehaviour
+from amulet_map_editor.programs.edit.api.behaviour import BlockSelectionBehaviour
 from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
 
 if TYPE_CHECKING:
@@ -25,8 +25,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         CameraToolUI.__init__(self, canvas)
 
-        self._pointer_behaviour = PointerBehaviour(self.canvas)
-        self._selection = StaticSelectionBehaviour(self.canvas)
+        self._selection = BlockSelectionBehaviour(self.canvas)
 
         self._button_panel = wx.Panel(canvas)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -101,12 +100,11 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         self.canvas.Bind(EVT_BOX_CHANGE, self._box_renderer_change)
         self.canvas.Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
         self.canvas.Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
-        self._pointer_behaviour.bind_events()
         self._selection.bind_events()
 
     def enable(self):
         super().enable()
-        self._selection.update_selection()
+        # self._selection.update_selection()
 
     def disable(self):
         super().disable()
@@ -184,5 +182,5 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
             glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
         self._selection.draw()
-        self._pointer_behaviour.draw()
+        # self._pointer_behaviour.draw()
         self.canvas.renderer.end_draw()
