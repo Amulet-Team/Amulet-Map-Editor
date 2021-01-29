@@ -26,15 +26,13 @@ class PointerBehaviour(RaycastBehaviour):
         self._pointer_distance = 10
 
         # the pointer
-        self._pointer: Optional[RenderSelection] = None
+        self._pointer = RenderSelection(
+            self.canvas.context_identifier,
+            self.canvas.renderer.opengl_resource_pack,
+        )
 
     def bind_events(self):
         super().bind_events()
-        if self._pointer is None:
-            self._pointer = RenderSelection(
-                self.canvas.context_identifier,
-                self.canvas.renderer.opengl_resource_pack,
-            )
         self.canvas.Bind(EVT_PRE_DRAW, self._move_pointer)
         self.canvas.Bind(EVT_CAMERA_MOVED, self._invalidate_pointer)
         self.canvas.Bind(wx.EVT_MOTION, self._invalidate_pointer)
