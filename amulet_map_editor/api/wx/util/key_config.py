@@ -122,6 +122,7 @@ Numpad_Decimal = "NUMPAD_DECIMAL"
 Numpad_Divide = "NUMPAD_DIVIDE"
 
 key_string_map = {
+    wx.WXK_CONTROL: Control,
     wx.WXK_SHIFT: Shift,
     wx.WXK_ALT: Alt,
     wx.WXK_SPACE: Space,
