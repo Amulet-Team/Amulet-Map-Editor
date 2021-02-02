@@ -71,7 +71,7 @@ class RaycastBehaviour(BaseBehaviour):
         return t_max
 
     def box_location_closest(
-        self, max_distance: int=100
+        self, max_distance: float = 100
     ) -> Tuple[PointCoordinatesNDArray, bool]:
         """Find the location of the closest non-air block.
         If the end is reached an a non-air block was not found the end location will be returned.
@@ -162,38 +162,46 @@ class RaycastBehaviour(BaseBehaviour):
         return numpy.asarray((x, y, z)), False
 
     def box_location_distance(
-        self, distance: int
-    ) -> Tuple[PointCoordinatesNDArray, Optional[int]]:
+        self,
+        distance: float,
+        start_location: Optional[numpy.ndarray] = None,
+        look_vector: Optional[numpy.ndarray] = None,
+    ) -> PointCoordinatesNDArray:
         """
         The first block location along the camera's look vector that is further away than `distance`.
         :param distance: The distance between the block and the camera.
+        :param start_location: The start location. Defaults to the camera location.
+        :param look_vector: The unit look vector. Defaults to the camera look vector.
         :return: (x, y, z) numpy array, selection box index
         """
-        look_vector = self.look_vector()
+        if look_vector is None:
+            look_vector = self.look_vector()
+        if start_location is None:
+            start_location = self.canvas.camera.location
         position = numpy.array(
-            self.canvas.camera.location, dtype=numpy.int
+            start_location, dtype=numpy.int
         ) + numpy.floor(look_vector * distance).astype(numpy.int)
-        box = next(
-            (
-                index
-                for index, box in enumerate(self.canvas.selection)
-                if box.in_boundary(position)
-            ),
-            None,
-        )
-        return position, box
+        return position
 
     def collision_locations(
-        self, max_distance=100
+        self,
+        max_distance: float = 100,
+        start_location: Optional[numpy.ndarray] = None,
+        look_vector: Optional[numpy.ndarray] = None,
     ) -> Generator[numpy.ndarray, None, None]:
         """
         The block locations that the camera's look vector passes through.
         :param max_distance: The maximum distance along the look vector to traverse.
+        :param start_location: The start location. Defaults to the camera location.
+        :param look_vector: The unit look vector. Defaults to the camera look vector.
         :return: A generator of (x, y, z) numpy arrays
         """
         # TODO: optimise this
 
-        look_vector = self.look_vector()
+        if look_vector is None:
+            look_vector = self.look_vector()
+        if start_location is None:
+            start_location = self.canvas.camera.location
         dx, dy, dz = look_vector
 
         vectors = numpy.array(
@@ -203,8 +211,10 @@ class RaycastBehaviour(BaseBehaviour):
 
         locations = set()
         start: numpy.ndarray = (
-            numpy.array(self.canvas.camera.location, numpy.float32) % 1
+            numpy.array(start_location, numpy.float32) % 1
         )
+
+        max_distance_squared = max_distance ** 2
 
         for axis in range(3):
             location: numpy.ndarray = start.copy()
@@ -214,14 +224,15 @@ class RaycastBehaviour(BaseBehaviour):
                 location = location + vector * (1 - location[axis])
             else:
                 location = location + vector * location[axis]
-            while numpy.all(abs(location) < max_distance):
+            # location here should be on a block edge
+            while numpy.all(numpy.sum(location ** 2) < max_distance_squared):
                 locations.add(tuple(numpy.floor(location).astype(numpy.int)))
                 locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
                 location += vector
         if locations:
             collision_locations = numpy.array(
                 sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
-            ) + numpy.floor(self.canvas.camera.location).astype(numpy.int)
+            ) + numpy.floor(start_location).astype(numpy.int)
         else:
             collision_locations = start.astype(numpy.int).reshape(1, 3)
 
