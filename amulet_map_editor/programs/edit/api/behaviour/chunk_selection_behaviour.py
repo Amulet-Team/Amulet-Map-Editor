@@ -39,6 +39,10 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         self.canvas.Bind(EVT_INPUT_RELEASE, self._on_input_release)
         self.canvas.Bind(EVT_SELECTION_CHANGE, self._on_selection_change)
 
+    def _create_undo(self):
+        """Write the current state to the global selection triggering an undo point."""
+        self.canvas.selection.selection_group = self._selection.selection_group
+
     def enable(self):
         self._selection.selection_group = self.canvas.selection.selection_group
 
@@ -61,9 +65,11 @@ class ChunkSelectionBehaviour(PointerBehaviour):
                 self._start_box = self._pointer.bounds
         elif evt.action_id == "deselect boxes":
             self._selection.selection_group = SelectionGroup()
+            self._create_undo()
         elif evt.action_id == "remove box":
             if "deselect boxes" not in self.canvas.buttons.pressed_actions:
                 self._selection.selection_group = SelectionGroup()
+                self._create_undo()
         evt.Skip()
 
     def _on_input_release(self, evt: InputReleaseEvent):
@@ -75,7 +81,7 @@ class ChunkSelectionBehaviour(PointerBehaviour):
                     self._selection.selection_group.selection_boxes
                     + [SelectionBox(numpy.min(points, 0), numpy.max(points, 0))]
                 )
-                self.canvas.selection.selection_group = self._selection.selection_group
+                self._create_undo()
         evt.Skip()
 
     def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
