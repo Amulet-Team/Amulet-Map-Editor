@@ -135,7 +135,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
             z2 += 1
         else:
             z1 += 1
-        self.canvas.active_selection_corners = (
+        self._selection._selection.active_selection_corners = (
             (x1, y1, z1),
             (x2, y2, z2),
         )

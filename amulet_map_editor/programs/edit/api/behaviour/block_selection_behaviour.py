@@ -13,6 +13,8 @@ from ..events import (
     EVT_INPUT_PRESS,
     InputReleaseEvent,
     EVT_INPUT_RELEASE,
+    EVT_SELECTION_CHANGE,
+    EVT_BOX_CHANGE_CONFIRM
 )
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 from amulet.api.history import Changeable
@@ -62,6 +64,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
+        self._active_selection = None
         self._selection = EditProgramRenderSelectionGroup(self.canvas, self.canvas.context_identifier, self.canvas.renderer.opengl_resource_pack)
         self._editing = False
         self._press_time = 0
@@ -70,6 +73,17 @@ class BlockSelectionBehaviour(PointerBehaviour):
         super().bind_events()
         self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
         self.canvas.Bind(EVT_INPUT_RELEASE, self._on_input_release)
+        self.canvas.Bind(EVT_SELECTION_CHANGE, self._on_selection_change)
+        self.canvas.Bind(EVT_BOX_CHANGE_CONFIRM, self._push_selection)
+
+    def _on_selection_change(self, evt):
+        if tuple(self._selection.all_selection_corners) != self.canvas.selection.selection_corners:
+            self._selection.all_selection_corners = self.canvas.selection.selection_corners
+        evt.Skip()
+
+    def _push_selection(self, evt):
+        self.canvas.selection.selection_corners = self._selection.all_selection_corners
+        evt.Skip()
 
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == "box click":
@@ -103,11 +117,11 @@ class BlockSelectionBehaviour(PointerBehaviour):
             look_vector = self.look_vector()
             box, max_distance = self._selection.selection_group.closest_vector_intersection(camera_location, look_vector)
             location, hit = self.box_location_closest(min(max_distance, 100))
-            print(box, max_distance, location, hit)
             if box is not None and not hit and max_distance < 100:
                 for loc in self.collision_locations(2, camera_location + look_vector * max_distance, look_vector):
                     if self._selection[box].in_boundary(loc):
                         location = loc
+                        self._selection.set_box_index(box)
                         break
 
         return location, location + 1
