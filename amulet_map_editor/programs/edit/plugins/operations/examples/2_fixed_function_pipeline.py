@@ -4,7 +4,7 @@
 
 
 from amulet.api.selection import SelectionGroup
-from amulet.api.level import World
+from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 
 
@@ -16,7 +16,7 @@ from amulet.api.data_types import Dimension
 
 
 def operation(
-    world: World, dimension: Dimension, selection: SelectionGroup, options: dict
+    world: BaseLevel, dimension: Dimension, selection: SelectionGroup, options: dict
 ):
     for i in range(10):
         # do some logic

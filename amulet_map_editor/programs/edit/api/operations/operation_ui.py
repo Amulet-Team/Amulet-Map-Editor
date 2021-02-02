@@ -6,7 +6,7 @@ import weakref
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
 
 OperationUIType = Union[wx.Window, wx.Sizer, "OperationUI"]
 
@@ -15,7 +15,7 @@ class OperationUI:
     """The base class that all operations must inherit from."""
 
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
     ):
         self._parent = weakref.ref(parent)
         self._canvas = weakref.ref(canvas)
@@ -31,7 +31,7 @@ class OperationUI:
         return self._canvas()
 
     @property
-    def world(self) -> "World":
+    def world(self) -> "BaseLevel":
         return self._world()
 
     @property

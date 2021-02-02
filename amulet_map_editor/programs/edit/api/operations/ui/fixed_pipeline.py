@@ -8,10 +8,10 @@ from amulet_map_editor.programs.edit.api.operations.operation_ui import Operatio
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
 
 FixedOperationType = Callable[
-    ["World", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType
+    ["BaseLevel", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType
 ]
 
 
@@ -20,7 +20,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         self,
         parent: wx.Window,
         canvas: "EditCanvas",
-        world: "World",
+        world: "BaseLevel",
         options_path: str,
         operation: FixedOperationType,
         options: Dict[str, Any],

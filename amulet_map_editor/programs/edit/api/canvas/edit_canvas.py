@@ -2,7 +2,6 @@ import wx
 from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
 from types import GeneratorType
 
-from amulet.api.level.world import World
 from amulet_map_editor import CONFIG
 
 from .base_edit_canvas import BaseEditCanvas
@@ -47,7 +46,7 @@ from amulet_map_editor.programs.edit.api.events import (
 from amulet_map_editor.programs.edit.api.ui.file import FilePanel
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
 
 
 def show_loading_dialog(
@@ -90,7 +89,7 @@ def show_loading_dialog(
 
 
 class EditCanvas(BaseEditCanvas):
-    def __init__(self, parent: wx.Window, world: "World", close_callback: Callable):
+    def __init__(self, parent: wx.Window, world: "BaseLevel", close_callback: Callable):
         super().__init__(parent, world)
         self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None

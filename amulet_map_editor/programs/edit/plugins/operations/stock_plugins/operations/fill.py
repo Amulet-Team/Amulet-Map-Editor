@@ -9,13 +9,13 @@ from amulet_map_editor.programs.edit.api.operations import OperationUI
 from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class Fill(wx.Panel, OperationUI):
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
     ):
         wx.Panel.__init__(self, parent)
         OperationUI.__init__(self, parent, canvas, world, options_path)

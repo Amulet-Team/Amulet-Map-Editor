@@ -4,7 +4,7 @@ import webbrowser
 from typing import TYPE_CHECKING, Callable
 
 from amulet import load_format
-from amulet.api.level import World
+from amulet.api.level import BaseLevel
 
 from amulet_map_editor.api import lang
 from amulet_map_editor.api.logging import log
@@ -22,7 +22,7 @@ work_count = 0
 
 class ConvertExtension(SimplePanel, BaseProgram):
     def __init__(
-        self, container, world: World, close_self_callback: Callable[[], None]
+        self, container, world: BaseLevel, close_self_callback: Callable[[], None]
     ):
         SimplePanel.__init__(self, container)
         self.world = world

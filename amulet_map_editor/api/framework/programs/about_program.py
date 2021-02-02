@@ -6,12 +6,12 @@ from amulet_map_editor.api.wx.ui.select_world import WorldUI
 from amulet_map_editor.api.framework.programs import BaseProgram
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
 
 
 class AboutProgram(SimplePanel, BaseProgram):
     def __init__(
-        self, container, world: "World", close_self_callback: Callable[[], None]
+        self, container, world: "BaseLevel", close_self_callback: Callable[[], None]
     ):
         SimplePanel.__init__(self, container)
         self.world = world

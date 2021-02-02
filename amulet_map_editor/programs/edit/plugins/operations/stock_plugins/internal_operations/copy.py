@@ -10,11 +10,11 @@ from amulet_map_editor.programs.edit.api.operations import (
 from amulet.api.data_types import OperationReturnType
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
 
 
 def copy(
-    world: "World", dimension: Dimension, selection: SelectionGroup
+    world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
 ) -> OperationReturnType:
     if selection:
         yield 0, "Copying"

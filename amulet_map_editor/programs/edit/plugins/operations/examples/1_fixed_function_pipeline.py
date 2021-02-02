@@ -4,13 +4,13 @@
 
 
 from amulet.api.selection import SelectionGroup
-from amulet.api.level import World
+from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 
 
 # for those that are new to python 3 the thing after the colon is the object type that the variable should be
 def operation(
-    world: World, dimension: Dimension, selection: SelectionGroup, options: dict
+    world: BaseLevel, dimension: Dimension, selection: SelectionGroup, options: dict
 ):
     # world is the object that contains all the data related to the world
     # dimension in a string used to identify the currently loaded dimension. It can be used to access the right dimension from the world

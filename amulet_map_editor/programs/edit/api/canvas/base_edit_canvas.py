@@ -41,7 +41,7 @@ from amulet_map_editor.api.wx.util.button_input import ButtonInput
 from amulet_map_editor.api.wx.util.mouse_movement import MouseMovement
 from ..renderer import Renderer
 
-from amulet.api.level import World
+from amulet.api.level import BaseLevel
 
 
 class BaseEditCanvas(EventCanvas):
@@ -50,7 +50,7 @@ class BaseEditCanvas(EventCanvas):
 
     background_colour = (0.61, 0.70, 0.85)
 
-    def __init__(self, parent: wx.Window, world: World):
+    def __init__(self, parent: wx.Window, world: BaseLevel):
         super().__init__(parent)
         glClearColor(*self.background_colour, 1.0)
         self.Hide()
@@ -206,8 +206,8 @@ class BaseEditCanvas(EventCanvas):
         super()._close()
 
     @property
-    def world(self) -> World:
-        """The amulet-core `World` class representing the "world" that is open."""
+    def world(self) -> BaseLevel:
+        """The amulet-core `BaseLevel` subclass representing the "world" that is open."""
         return self._world()
 
     @property

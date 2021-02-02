@@ -13,7 +13,7 @@ from amulet_map_editor.programs.edit.api.operations import (
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
     from amulet.api.selection import SelectionGroup
     from amulet.api.data_types import Dimension, OperationReturnType
@@ -38,7 +38,7 @@ Border = wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND
 
 class SetBiome(SimpleOperationPanel):
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
     ):
         SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
         self.Freeze()
@@ -113,7 +113,7 @@ class SetBiome(SimpleOperationPanel):
         self._biome_choice.universal_biome = chunk.biome_palette[biome]
 
     def _operation(
-        self, world: "World", dimension: "Dimension", selection: "SelectionGroup"
+        self, world: "BaseLevel", dimension: "Dimension", selection: "SelectionGroup"
     ) -> "OperationReturnType":
         mode = self._mode.GetCurrentObject()
 

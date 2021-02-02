@@ -13,13 +13,13 @@ from amulet_map_editor.programs.edit.api.operations import (
 )
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class ImportMCStructure(SimpleOperationPanel):
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
     ):
         SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
 
@@ -39,7 +39,7 @@ class ImportMCStructure(SimpleOperationPanel):
         self._save_options({"path": self._file_picker.GetPath()})
 
     def _operation(
-        self, world: "World", dimension: Dimension, selection: SelectionGroup
+        self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
     ):
         path = self._file_picker.GetPath()
         if (

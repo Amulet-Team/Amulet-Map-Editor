@@ -7,13 +7,13 @@ from amulet.api.data_types import Dimension, OperationReturnType
 from amulet_map_editor.programs.edit.api.operations.operation_ui import OperationUI
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
 class SimpleOperationPanel(wx.Panel, OperationUI):
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "World", options_path: str
+        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
     ):
         wx.Panel.__init__(self, parent)
         OperationUI.__init__(self, parent, canvas, world, options_path)
@@ -35,6 +35,6 @@ class SimpleOperationPanel(wx.Panel, OperationUI):
         )
 
     def _operation(
-        self, world: "World", dimension: Dimension, selection: SelectionGroup
+        self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
     ) -> OperationReturnType:
         raise NotImplementedError

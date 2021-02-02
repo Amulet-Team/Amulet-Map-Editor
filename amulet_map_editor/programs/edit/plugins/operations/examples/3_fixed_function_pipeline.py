@@ -4,7 +4,7 @@
 
 
 from amulet.api.selection import SelectionGroup
-from amulet.api.level import World
+from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 
 operation_options = {  # options is a dictionary where the key is the description shown to the user and the value describes how to build the UI
@@ -60,7 +60,7 @@ operation_options = {  # options is a dictionary where the key is the descriptio
 
 
 def operation(
-    world: World, dimension: Dimension, selection: SelectionGroup, options: dict
+    world: BaseLevel, dimension: Dimension, selection: SelectionGroup, options: dict
 ):
     # When the user presses the run button this function will be run as normal but
     # since the "options" key was defined in export this function will get another

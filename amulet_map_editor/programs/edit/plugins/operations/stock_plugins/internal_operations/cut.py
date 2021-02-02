@@ -9,11 +9,11 @@ from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_o
 from amulet_map_editor.programs.edit.api.operations import OperationError
 
 if TYPE_CHECKING:
-    from amulet.api.level import World
+    from amulet.api.level import BaseLevel
 
 
 def cut(
-    world: "World", dimension: Dimension, selection: SelectionGroup
+    world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
 ) -> OperationReturnType:
     if selection:
         structure = world.extract_structure(selection, dimension)
