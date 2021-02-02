@@ -109,13 +109,8 @@ class RaycastBehaviour(BaseBehaviour):
                 in_air = True
         return location, False
 
-    def box_location_closest_2d(self, min_y: int = 0) -> Tuple[PointCoordinatesNDArray, bool]:
-        """Find the first non-air block above a given y axis.
-        Note if there are no non-air blocks above the given axis it will return the min_y value
-
-        :param min_y: The minimum y coordinate to look to.
-        :return: Tuple[The block coordinate, was a non-air block found in the range]
-        """
+    def get_2d_mouse_location(self) -> Tuple[float, float]:
+        """Get the x and z location of the cursor when in 2D mode."""
         x, _, z = self.canvas.camera.location
         width, height = self.canvas.GetSize()
         z += 2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
@@ -127,7 +122,18 @@ class RaycastBehaviour(BaseBehaviour):
             / width
         )
         x, z = numpy.floor([x, z]) + 0.5
+        return x, z
 
+    def box_location_closest_2d(
+        self, min_y: int = 0
+    ) -> Tuple[PointCoordinatesNDArray, bool]:
+        """Find the first non-air block above a given y axis.
+        Note if there are no non-air blocks above the given axis it will return the min_y value
+
+        :param min_y: The minimum y coordinate to look to.
+        :return: Tuple[The block coordinate, was a non-air block found in the range]
+        """
+        x, z = self.get_2d_mouse_location()
         sub_chunk_size = self.canvas.world.sub_chunk_size
         y = min_y
         try:
@@ -178,9 +184,9 @@ class RaycastBehaviour(BaseBehaviour):
             look_vector = self.look_vector()
         if start_location is None:
             start_location = self.canvas.camera.location
-        position = numpy.array(
-            start_location, dtype=numpy.int
-        ) + numpy.floor(look_vector * distance).astype(numpy.int)
+        position = numpy.array(start_location, dtype=numpy.int) + numpy.floor(
+            look_vector * distance
+        ).astype(numpy.int)
         return position
 
     def collision_locations(
@@ -210,9 +216,7 @@ class RaycastBehaviour(BaseBehaviour):
         offsets = -numpy.eye(3)
 
         locations = set()
-        start: numpy.ndarray = (
-            numpy.array(start_location, numpy.float32) % 1
-        )
+        start: numpy.ndarray = numpy.array(start_location, numpy.float32) % 1
 
         max_distance_squared = max_distance ** 2
 
