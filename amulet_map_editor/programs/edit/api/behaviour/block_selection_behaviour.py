@@ -77,8 +77,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         self.canvas.Bind(EVT_BOX_CHANGE_CONFIRM, self._push_selection)
 
     def _on_selection_change(self, evt):
-        if tuple(self._selection.all_selection_corners) != self.canvas.selection.selection_corners:
-            self._selection.all_selection_corners = self.canvas.selection.selection_corners
+        self._selection.set_all_selection_corners(list(self.canvas.selection.selection_corners))
         evt.Skip()
 
     def _push_selection(self, evt):
