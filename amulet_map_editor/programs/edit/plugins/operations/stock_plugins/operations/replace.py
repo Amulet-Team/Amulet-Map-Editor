@@ -17,7 +17,11 @@ if TYPE_CHECKING:
 
 class Replace(SimpleScrollablePanel, OperationUI):
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
+        self,
+        parent: wx.Window,
+        canvas: "EditCanvas",
+        world: "BaseLevel",
+        options_path: str,
     ):
         SimpleScrollablePanel.__init__(self, parent)
         OperationUI.__init__(self, parent, canvas, world, options_path)

@@ -4,7 +4,9 @@ import wx
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
 from amulet.operations.delete_chunk import delete_chunk
-from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_operations.prune_chunks import prune_chunks
+from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_operations.prune_chunks import (
+    prune_chunks,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -42,10 +44,18 @@ class ChunkTool(wx.BoxSizer, CameraToolUI):
 
     def _delete_chunks(self, evt):
         self.canvas.run_operation(
-            lambda: delete_chunk(self.canvas.world, self.canvas.dimension, self.canvas.selection.selection_group)
+            lambda: delete_chunk(
+                self.canvas.world,
+                self.canvas.dimension,
+                self.canvas.selection.selection_group,
+            )
         )
 
     def _prune_chunks(self, evt):
         self.canvas.run_operation(
-            lambda: prune_chunks(self.canvas.world, self.canvas.dimension, self.canvas.selection.selection_group)
+            lambda: prune_chunks(
+                self.canvas.world,
+                self.canvas.dimension,
+                self.canvas.selection.selection_group,
+            )
         )

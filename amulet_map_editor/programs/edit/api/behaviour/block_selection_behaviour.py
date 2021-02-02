@@ -14,7 +14,7 @@ from ..events import (
     InputReleaseEvent,
     EVT_INPUT_RELEASE,
     EVT_SELECTION_CHANGE,
-    EVT_BOX_CHANGE_CONFIRM
+    EVT_BOX_CHANGE_CONFIRM,
 )
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 from amulet.api.history import Changeable
@@ -65,7 +65,11 @@ class BlockSelectionBehaviour(PointerBehaviour):
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
         self._active_selection = None
-        self._selection = EditProgramRenderSelectionGroup(self.canvas, self.canvas.context_identifier, self.canvas.renderer.opengl_resource_pack)
+        self._selection = EditProgramRenderSelectionGroup(
+            self.canvas,
+            self.canvas.context_identifier,
+            self.canvas.renderer.opengl_resource_pack,
+        )
         self._editing = False
         self._press_time = 0
 
@@ -77,7 +81,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
         self.canvas.Bind(EVT_BOX_CHANGE_CONFIRM, self._push_selection)
 
     def _on_selection_change(self, evt):
-        self._selection.set_all_selection_corners(list(self.canvas.selection.selection_corners))
+        self._selection.set_all_selection_corners(
+            list(self.canvas.selection.selection_corners)
+        )
         evt.Skip()
 
     def _push_selection(self, evt):
@@ -89,7 +95,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
             if not self._editing:
                 self._press_time = time.time()
                 self._editing = True
-                self._selection.box_select_toggle("add box modifier" in self.canvas.buttons.pressed_actions)
+                self._selection.box_select_toggle(
+                    "add box modifier" in self.canvas.buttons.pressed_actions
+                )
         elif evt.action_id == "deselect boxes":
             self._selection.deselect_all()
         elif evt.action_id == "remove box":
@@ -114,10 +122,17 @@ class BlockSelectionBehaviour(PointerBehaviour):
         else:
             camera_location = self.canvas.camera.location
             look_vector = self.look_vector()
-            box, max_distance = self._selection.selection_group.closest_vector_intersection(camera_location, look_vector)
+            (
+                box,
+                max_distance,
+            ) = self._selection.selection_group.closest_vector_intersection(
+                camera_location, look_vector
+            )
             location, hit = self.box_location_closest(min(max_distance, 100))
             if box is not None and not hit and max_distance < 100:
-                for loc in self.collision_locations(2, camera_location + look_vector * max_distance, look_vector):
+                for loc in self.collision_locations(
+                    2, camera_location + look_vector * max_distance, look_vector
+                ):
                     if self._selection[box].in_boundary(loc):
                         location = loc
                         self._selection.set_box_index(box)
@@ -126,5 +141,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         return location, location + 1
 
     def draw(self):
-        self._selection.draw(self.canvas.camera.transformation_matrix, self.canvas.camera.location)
+        self._selection.draw(
+            self.canvas.camera.transformation_matrix, self.canvas.camera.location
+        )
         super().draw()

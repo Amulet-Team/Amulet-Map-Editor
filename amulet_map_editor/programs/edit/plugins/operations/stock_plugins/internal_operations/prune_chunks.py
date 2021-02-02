@@ -7,4 +7,4 @@ def prune_chunks(world: "BaseLevel", dimension: Dimension, selection: SelectionG
     chunks = world.all_chunk_coords(dimension).difference(selection.chunk_locations())
     for i, (cx, cz) in enumerate(chunks):
         world.delete_chunk(cx, cz, dimension)
-        yield (i+1)/len(chunks)
+        yield (i + 1) / len(chunks)

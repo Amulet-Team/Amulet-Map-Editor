@@ -38,7 +38,11 @@ Border = wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND
 
 class SetBiome(SimpleOperationPanel):
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
+        self,
+        parent: wx.Window,
+        canvas: "EditCanvas",
+        world: "BaseLevel",
+        options_path: str,
     ):
         SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
         self.Freeze()

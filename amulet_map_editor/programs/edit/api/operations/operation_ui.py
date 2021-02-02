@@ -15,7 +15,11 @@ class OperationUI:
     """The base class that all operations must inherit from."""
 
     def __init__(
-        self, parent: wx.Window, canvas: "EditCanvas", world: "BaseLevel", options_path: str
+        self,
+        parent: wx.Window,
+        canvas: "EditCanvas",
+        world: "BaseLevel",
+        options_path: str,
     ):
         self._parent = weakref.ref(parent)
         self._canvas = weakref.ref(canvas)
