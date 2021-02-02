@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 import wx
 import time
 import weakref
@@ -16,6 +16,8 @@ from ..events import (
 )
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 from amulet.api.history import Changeable
+from amulet.api.data_types import PointCoordinatesAny
+from amulet_map_editor.api.opengl.camera import Projection
 
 from .pointer_behaviour import PointerBehaviour
 
@@ -92,6 +94,23 @@ class BlockSelectionBehaviour(PointerBehaviour):
     def _move_pointer(self, evt):
         super()._move_pointer(evt)
         self._selection.cursor_position = self._pointer.point1
+
+    def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
+        if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+            location = self.box_location_closest_2d()[0]
+        else:
+            camera_location = self.canvas.camera.location
+            look_vector = self.look_vector()
+            box, max_distance = self._selection.selection_group.closest_vector_intersection(camera_location, look_vector)
+            location, hit = self.box_location_closest(min(max_distance, 100))
+            print(box, max_distance, location, hit)
+            if box is not None and not hit and max_distance < 100:
+                for loc in self.collision_locations(2, camera_location + look_vector * max_distance, look_vector):
+                    if self._selection[box].in_boundary(loc):
+                        location = loc
+                        break
+
+        return location, location + 1
 
     def draw(self):
         self._selection.draw(self.canvas.camera.transformation_matrix, self.canvas.camera.location)
