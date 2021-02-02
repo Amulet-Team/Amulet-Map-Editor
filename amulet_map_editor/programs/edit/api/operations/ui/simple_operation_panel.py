@@ -30,7 +30,7 @@ class SimpleOperationPanel(wx.Panel, OperationUI):
     def _run_operation(self, _):
         self.canvas.run_operation(
             lambda: self._operation(
-                self.world, self.canvas.dimension, self.canvas.selection_group
+                self.world, self.canvas.dimension, self.canvas.selection.selection_group
             )
         )
 

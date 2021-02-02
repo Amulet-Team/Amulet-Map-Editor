@@ -85,7 +85,7 @@ class Fill(wx.Panel, OperationUI):
             lambda: fill(
                 self.world,
                 self.canvas.dimension,
-                self.canvas.selection_group,
+                self.canvas.selection.selection_group,
                 self._get_fill_block(),
             )
         )

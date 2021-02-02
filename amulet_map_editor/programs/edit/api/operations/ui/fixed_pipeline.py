@@ -210,7 +210,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
             lambda: self._operation(
                 self.world,
                 self.canvas.dimension,
-                self.canvas.selection_group,
+                self.canvas.selection.selection_group,
                 self._get_values(),
             )
         )

@@ -148,7 +148,7 @@ class Waterlog(wx.Panel, OperationUI):
         mode = self._mode.GetString(self._mode.GetSelection())
         waterlog_block = self._get_fill_block().base_block
         world = self.world
-        selection = self.canvas.selection_group
+        selection = self.canvas.selection.selection_group
         dimension = self.canvas.dimension
         iter_count = len(list(world.get_chunk_slice_box(dimension, selection, True)))
         count = 0

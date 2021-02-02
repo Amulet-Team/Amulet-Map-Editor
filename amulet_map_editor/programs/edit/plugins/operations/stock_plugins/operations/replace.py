@@ -122,7 +122,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
 
     def _replace(self):
         world = self.world
-        selection = self.canvas.selection_group
+        selection = self.canvas.selection.selection_group
         dimension = self.canvas.dimension
 
         (
