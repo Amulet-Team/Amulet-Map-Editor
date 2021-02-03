@@ -138,11 +138,13 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         return location_min, location_max
 
     def draw(self):
-        self._selection.draw(
-            self.canvas.camera.transformation_matrix
-        )
+        if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+            camera = None
+        else:
+            camera = self.canvas.camera.location
+        self._selection.draw(self.canvas.camera.transformation_matrix, camera)
         if self._editing:
             self._editing_selection.draw(
-                self.canvas.camera.transformation_matrix
+                self.canvas.camera.transformation_matrix, camera
             )
         super().draw()

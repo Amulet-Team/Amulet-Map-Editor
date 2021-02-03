@@ -144,7 +144,11 @@ class BlockSelectionBehaviour(PointerBehaviour):
         return location, location + 1
 
     def draw(self):
+        if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+            camera = None
+        else:
+            camera = self.canvas.camera.location
         self._selection.draw(
-            self.canvas.camera.transformation_matrix, self.canvas.camera.location
+            self.canvas.camera.transformation_matrix, camera
         )
         super().draw()

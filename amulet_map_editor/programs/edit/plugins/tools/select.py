@@ -104,7 +104,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
 
     def enable(self):
         super().enable()
-        # self._selection.update_selection()
+        self._selection.enable()
 
     def disable(self):
         super().disable()
@@ -182,5 +182,4 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
             glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
         self._selection.draw()
-        # self._pointer_behaviour.draw()
         self.canvas.renderer.end_draw()

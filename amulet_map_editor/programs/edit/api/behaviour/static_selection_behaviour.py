@@ -3,6 +3,7 @@ from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionGroup
 from ..events import EVT_SELECTION_CHANGE
 
 from .base_behaviour import BaseBehaviour
+from amulet_map_editor.api.opengl.camera import Projection
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -31,6 +32,10 @@ class StaticSelectionBehaviour(BaseBehaviour):
         self._selection.selection_group = self.canvas.selection.selection_group
 
     def draw(self):
+        if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+            camera = None
+        else:
+            camera = self.canvas.camera.location
         self._selection.draw(
-            self.canvas.camera.transformation_matrix, self.canvas.camera.location
+            self.canvas.camera.transformation_matrix, camera
         )
