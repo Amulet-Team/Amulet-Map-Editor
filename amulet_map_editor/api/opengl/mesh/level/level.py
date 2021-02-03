@@ -76,9 +76,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         while True:
             if self._rebuild:
                 self._rebuild = False
-                chunk_rebuilt = (
-                    set()
-                )  # a sub-set of chunk_not_changed that are next to chunks that have changed
+                # a set of chunks that are next to chunks that have changed but have not changed themselves
+                chunk_rebuilt = set()
                 chunk_not_loaded = []  # a list of chunks that have not been loaded
 
                 for chunk_coords in self.chunk_coords():
@@ -86,6 +85,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                     if self.chunk_manager.render_chunk_needs_rebuild(chunk_coords):
                         # if the render chunk exists and the state has changed
                         # rebuild that chunk
+                        chunk_rebuilt.add(chunk_coords)
                         yield chunk_coords
                         for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                             # for all surrounding chunks
@@ -96,6 +96,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                             if (
                                 chunk_coords_ not in chunk_rebuilt
                                 and chunk_coords in self.chunk_manager
+                                and not self.chunk_manager.render_chunk_needs_rebuild(chunk_coords_)
                             ):
                                 # if the chunk has not already been rebuilt and it exists
                                 # yield it to be rebuilt
