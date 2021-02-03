@@ -5,7 +5,10 @@ import time
 from amulet.api.data_types import PointCoordinatesAny
 from amulet.api.selection import SelectionGroup, SelectionBox
 from .pointer_behaviour import PointerBehaviour
-from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionGroup, RenderSelection
+from amulet_map_editor.api.opengl.mesh.selection import (
+    RenderSelectionGroup,
+    RenderSelection,
+)
 from ..events import (
     InputPressEvent,
     EVT_INPUT_PRESS,
@@ -25,8 +28,7 @@ class ChunkSelectionBehaviour(PointerBehaviour):
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
         self._editing_selection = RenderSelection(
-            self.canvas.context_identifier,
-            self.canvas.renderer.opengl_resource_pack
+            self.canvas.context_identifier, self.canvas.renderer.opengl_resource_pack
         )
         self._selection = RenderSelectionGroup(
             self.canvas.context_identifier,
@@ -48,7 +50,23 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         self.canvas.selection.selection_group = self._selection.selection_group
 
     def enable(self):
-        self._selection.selection_group = self.canvas.selection.selection_group
+        selections = []
+        for box in self.canvas.selection.selection_group.selection_boxes:
+            min_point = (
+                numpy.floor(numpy.array(box.min) / self.canvas.world.sub_chunk_size)
+                * self.canvas.world.sub_chunk_size
+            )
+            max_point = (
+                numpy.ceil(numpy.array(box.max) / self.canvas.world.sub_chunk_size)
+                * self.canvas.world.sub_chunk_size
+            )
+            min_point[1] = self.canvas.world.selection_bounds.min[1]
+            max_point[1] = self.canvas.world.selection_bounds.max[1]
+            selections.append(SelectionBox(min_point, max_point))
+        selection_group = SelectionGroup(selections)
+        if selection_group != self.canvas.selection.selection_group:
+            self.canvas.selection.selection_group = selection_group
+
         self._editing = False
 
     def _on_selection_change(self, evt):
@@ -92,7 +110,10 @@ class ChunkSelectionBehaviour(PointerBehaviour):
 
     def _move_pointer(self, evt):
         super()._move_pointer(evt)
-        self._editing_selection.point1, self._editing_selection.point2 = self._get_editing_selection()
+        (
+            self._editing_selection.point1,
+            self._editing_selection.point2,
+        ) = self._get_editing_selection()
 
     def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
