@@ -101,10 +101,16 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         if evt.action_id == "box click":
             if self._editing and time.time() - self._press_time > 0.1:
                 self._editing = False
-                self._selection.selection_group = SelectionGroup(
-                    self._selection.selection_group.selection_boxes
-                    + [SelectionBox(*self._get_editing_selection())]
-                )
+                box = SelectionBox(*self._get_editing_selection())
+                if SelectionGroup(box).is_subset(self._selection.selection_group):
+                    # subtract
+                    self._selection.selection_group = self._selection.selection_group.subtract(
+                        box
+                    )
+                else:
+                    self._selection.selection_group = self._selection.selection_group.union(
+                        box
+                    )
                 self._create_undo()
         evt.Skip()
 
