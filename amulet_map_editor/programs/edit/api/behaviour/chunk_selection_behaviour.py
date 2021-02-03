@@ -5,7 +5,7 @@ import time
 from amulet.api.data_types import PointCoordinatesAny
 from amulet.api.selection import SelectionGroup, SelectionBox
 from .pointer_behaviour import PointerBehaviour
-from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionGroup
+from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionGroup, RenderSelection
 from ..events import (
     InputPressEvent,
     EVT_INPUT_PRESS,
@@ -24,13 +24,17 @@ class ChunkSelectionBehaviour(PointerBehaviour):
 
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
+        self._editing_selection = RenderSelection(
+            self.canvas.context_identifier,
+            self.canvas.renderer.opengl_resource_pack
+        )
         self._selection = RenderSelectionGroup(
             self.canvas.context_identifier,
             self.canvas.renderer.opengl_resource_pack,
         )
         self._editing = False
         self._press_time = 0
-        self._start_box = None
+        self._start_box = numpy.zeros((2, 3))
         self._add_box = False
 
     def bind_events(self):
@@ -45,14 +49,11 @@ class ChunkSelectionBehaviour(PointerBehaviour):
 
     def enable(self):
         self._selection.selection_group = self.canvas.selection.selection_group
+        self._editing = False
 
     def _on_selection_change(self, evt):
         self._selection.selection_group = self.canvas.selection.selection_group
         evt.Skip()
-
-    # def _push_selection(self, evt):
-    #     self.canvas.selection.selection_corners = self._selection.all_selection_corners
-    #     evt.Skip()
 
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == "box click":
@@ -72,17 +73,26 @@ class ChunkSelectionBehaviour(PointerBehaviour):
                 self._create_undo()
         evt.Skip()
 
+    def _get_editing_selection(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
+        """Get the minimum and maximum points of the editing selection.
+        This is based on the stored starting pointer and the current pointer."""
+        points = numpy.concatenate([self._start_box, self._pointer.bounds], 0)
+        return numpy.min(points, 0), numpy.max(points, 0)
+
     def _on_input_release(self, evt: InputReleaseEvent):
         if evt.action_id == "box click":
             if self._editing and time.time() - self._press_time > 0.1:
                 self._editing = False
-                points = numpy.concatenate([self._start_box, self._pointer.bounds], 0)
                 self._selection.selection_group = SelectionGroup(
                     self._selection.selection_group.selection_boxes
-                    + [SelectionBox(numpy.min(points, 0), numpy.max(points, 0))]
+                    + [SelectionBox(*self._get_editing_selection())]
                 )
                 self._create_undo()
         evt.Skip()
+
+    def _move_pointer(self, evt):
+        super()._move_pointer(evt)
+        self._editing_selection.point1, self._editing_selection.point2 = self._get_editing_selection()
 
     def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
@@ -108,6 +118,10 @@ class ChunkSelectionBehaviour(PointerBehaviour):
 
     def draw(self):
         self._selection.draw(
-            self.canvas.camera.transformation_matrix, self.canvas.camera.location
+            self.canvas.camera.transformation_matrix
         )
+        if self._editing:
+            self._editing_selection.draw(
+                self.canvas.camera.transformation_matrix
+            )
         super().draw()
