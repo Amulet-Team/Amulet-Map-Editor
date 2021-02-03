@@ -80,6 +80,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
         self.canvas.Bind(EVT_SELECTION_CHANGE, self._on_selection_change)
         self.canvas.Bind(EVT_BOX_CHANGE_CONFIRM, self._push_selection)
 
+    def enable(self):
+        self._selection.all_selection_corners = self.canvas.selection.selection_corners
+
     def _on_selection_change(self, evt):
         self._selection.set_all_selection_corners(
             list(self.canvas.selection.selection_corners)
