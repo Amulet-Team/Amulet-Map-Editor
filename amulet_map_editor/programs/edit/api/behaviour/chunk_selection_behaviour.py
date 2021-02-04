@@ -104,12 +104,12 @@ class ChunkSelectionBehaviour(PointerBehaviour):
                 box = SelectionBox(*self._get_editing_selection())
                 if SelectionGroup(box).is_subset(self._selection.selection_group):
                     # subtract
-                    self._selection.selection_group = self._selection.selection_group.subtract(
-                        box
+                    self._selection.selection_group = (
+                        self._selection.selection_group.subtract(box)
                     )
                 else:
-                    self._selection.selection_group = self._selection.selection_group.union(
-                        box
+                    self._selection.selection_group = (
+                        self._selection.selection_group.union(box)
                     )
                 self._create_undo()
         evt.Skip()

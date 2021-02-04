@@ -96,7 +96,9 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                             if (
                                 chunk_coords_ not in chunk_rebuilt
                                 and chunk_coords in self.chunk_manager
-                                and not self.chunk_manager.render_chunk_needs_rebuild(chunk_coords_)
+                                and not self.chunk_manager.render_chunk_needs_rebuild(
+                                    chunk_coords_
+                                )
                             ):
                                 # if the chunk has not already been rebuilt and it exists
                                 # yield it to be rebuilt

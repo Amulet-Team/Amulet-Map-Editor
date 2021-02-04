@@ -7,9 +7,7 @@ from amulet.utils import block_coords_to_chunk_coords
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.biome_select import BiomeDefine
 from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
-from amulet_map_editor.programs.edit.api.operations import (
-    SimpleOperationPanel,
-)
+from amulet_map_editor.programs.edit.api.operations import SimpleOperationPanel
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 
 if TYPE_CHECKING:

@@ -36,6 +36,4 @@ class StaticSelectionBehaviour(BaseBehaviour):
             camera = None
         else:
             camera = self.canvas.camera.location
-        self._selection.draw(
-            self.canvas.camera.transformation_matrix, camera
-        )
+        self._selection.draw(self.canvas.camera.transformation_matrix, camera)
