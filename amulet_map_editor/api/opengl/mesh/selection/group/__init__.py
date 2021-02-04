@@ -1,2 +1,2 @@
 from .render_selection_group import RenderSelectionGroup
-from .render_selection_group_editable import RenderSelectionGroupEditable
+from .render_selection_group_highlightable import RenderSelectionGroupHighlightable

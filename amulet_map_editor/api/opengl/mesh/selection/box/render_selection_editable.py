@@ -11,7 +11,7 @@ from OpenGL.GL import (
 )
 from typing import Tuple
 
-from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
+from amulet.api.data_types import PointCoordinatesAny
 from .render_selection_highlightable import RenderSelectionHighlightable
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
@@ -21,10 +21,8 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
     def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
         super().__init__(context_identifier, resource_pack)
-        self._being_resized = False
-        self._free_edges = numpy.array(
-            [[False, False, False], [True, True, True]], dtype=numpy.bool
-        )  # which edges can be moved by a call to set_active_point
+        # is the locked or is it being modified. Changes the colour of the faces.
+        self._locked = True
 
     def _init_verts(self):
         self.verts = numpy.zeros((6 * 2 * 3 * 3, self._vert_len), dtype=numpy.float32)
@@ -41,70 +39,24 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
     @property
     def highlight_colour(self) -> Tuple[float, float, float]:
-        if self.is_dynamic:
-            return 1.0, 0.7, 0.3
+        if self.locked:
+            return 0.5, 0.5, 1.0  # purple
         else:
-            return 0.5, 0.5, 1.0
+            return 1.0, 0.7, 0.3  # orange
 
     @property
-    def is_static(self) -> bool:
-        return not self.is_dynamic
+    def locked(self) -> bool:
+        """Is the selection locked or not.
+        If locked (True) the highlight colour will be used, if unlocked (False) the moving colour will be used."""
+        return self._locked
 
-    @property
-    def is_dynamic(self) -> bool:
-        return numpy.any(self._free_edges)
-
-    @property
-    def being_resized(self) -> bool:
-        """
-        Is the selection being modified.
-        :return:
-        """
-        return self._being_resized
-
-    def lock(self):
-        """
-        Lock all edges and make the box static
-        :return:
-        """
-        self._free_edges[:] = False
-        self._being_resized = False
-
-    def unlock(self, position: BlockCoordinatesAny):
-        """
-        Unlock 1-3 edges based on position.
-        If position is on the face that face will be unlocked.
-        If the position is on an edge the two faces will be unlocked.
-        If the position is on a corner the three faces will be unlocked.
-        If the box has a dimension of size 1 it will only resize the first point.
-        :param position:
-        :return:
-        """
-        if self.in_boundary(position):
-            self._free_edges[:] = position == self._offset_points()
-            self._free_edges[1, self._free_edges[0]] = False
-            self._being_resized = True
-
-    def _mark_recreate(self):
-        self._bounds = None
-        self._rebuild = True
-
-    def set_active_point(self, position: BlockCoordinatesAny):
-        position = numpy.asarray(position)
-        if self.is_dynamic:
-            points = self._offset_points()
-            points[self._free_edges] = numpy.array([position, position])[
-                self._free_edges
-            ]
-            self._from_offset_points(points)
-            self._highlight_edges[:] = self._free_edges
-        elif position in self:
-            self._highlight_edges[:] = position == self._offset_points()
-            self._highlight_edges[1, self._highlight_edges[0]] = False
-        else:
-            self._highlight_edges[:] = False
-
-        self._mark_recreate()
+    @locked.setter
+    def locked(self, lock: bool):
+        """Set if the selection locked or not.
+        If locked (True) the highlight colour will be used, if unlocked (False) the moving colour will be used."""
+        if not type(lock) is bool:
+            raise TypeError("lock must be a bool")
+        self._locked = lock
 
     def _create_geometry_(self):
         super()._create_geometry_()

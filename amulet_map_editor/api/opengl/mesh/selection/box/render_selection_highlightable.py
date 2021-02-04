@@ -1,7 +1,6 @@
-from typing import Tuple
+from typing import Tuple, Union
 import numpy
 
-from amulet.api.data_types import BlockCoordinatesAny
 from .render_selection import RenderSelection
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
@@ -11,24 +10,17 @@ class RenderSelectionHighlightable(RenderSelection):
 
     def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
         super().__init__(context_identifier, resource_pack)
-        self._highlight_edges = numpy.array(
-            [[False, False, False], [False, False, False]], dtype=numpy.bool
-        )  # which edges are highlighted
+        # which edges are highlighted
+        self._highlight_edges = numpy.zeros((2, 3), dtype=numpy.bool)
 
     @property
     def highlight_colour(self) -> Tuple[float, float, float]:
-        return 1.2, 1.2, 1.2
+        return 0.5, 0.5, 1.0
 
-    def set_active_point(self, position: BlockCoordinatesAny):
-        position = numpy.asarray(position)
-        if position in self:
-            self._highlight_edges[:] = position == self._offset_points()
-            self._highlight_edges[1, self._highlight_edges[0]] = False
-        else:
-            self._highlight_edges[:] = False
-        self._mark_recreate()
+    def reset_highlight_edges(self):
+        self.set_highlight_edges(False)
 
-    def set_highlight_edges(self, highlight_edges):
+    def set_highlight_edges(self, highlight_edges: Union[numpy.ndarray, bool]):
         self._highlight_edges[:] = highlight_edges
         self._mark_recreate()
 

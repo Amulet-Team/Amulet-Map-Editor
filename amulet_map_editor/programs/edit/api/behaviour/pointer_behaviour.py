@@ -56,5 +56,5 @@ class PointerBehaviour(RaycastBehaviour):
 
     def draw(self):
         self._pointer.draw(
-            self.canvas.camera.transformation_matrix, self.canvas.camera.location
+            self.canvas.camera.transformation_matrix
         )

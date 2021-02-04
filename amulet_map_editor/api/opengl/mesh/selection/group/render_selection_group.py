@@ -1,5 +1,5 @@
 import numpy
-from typing import List, Union
+from typing import List
 
 from amulet_map_editor.api.opengl import Drawable, ContextManager
 from amulet_map_editor.api.opengl.resource_pack import (
@@ -7,8 +7,8 @@ from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManagerStatic,
 )
 from amulet.api.selection import SelectionGroup, SelectionBox
-from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
-from amulet_map_editor.api.opengl.mesh.selection import RenderSelection
+from amulet.api.data_types import PointCoordinatesAny
+from amulet_map_editor.api.opengl.mesh.selection_old import RenderSelection
 
 
 class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerStatic):
@@ -31,26 +31,17 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
     def _new_render_selection(self):
         return RenderSelection(self.context_identifier, self.resource_pack)
 
-    def __iter__(self):
-        yield from self._boxes
-
-    def __contains__(self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]):
-        return any(position in box for box in self._boxes)
-
-    def __getitem__(self, index: int) -> "RenderSelection":
-        return self._boxes[index]
-
     @property
     def selection_group(self) -> SelectionGroup:
-        return SelectionGroup([SelectionBox(box.min, box.max) for box in self._boxes])
+        return SelectionGroup([SelectionBox(box.point1, box.point2) for box in self._boxes])
 
     @selection_group.setter
     def selection_group(self, selection_group: SelectionGroup):
         self.unload()
         for box in selection_group.selection_boxes:
             render_box = self._new_render_selection()
-            render_box.point1 = numpy.array(box.min)
-            render_box.point2 = numpy.array(box.max)
+            render_box.point1 = numpy.array(box.point_1)
+            render_box.point2 = numpy.array(box.point_2)
             self._boxes.append(render_box)
 
     def draw(

@@ -46,30 +46,16 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     @property
     def box_tint(self) -> Tuple[float, float, float]:
+        """The tint colour to apply to the white texture."""
         return 1, 1, 1
 
     def _init_verts(self):
+        """Initialise the vertex values"""
         self.verts = numpy.zeros((6 * 2 * 3, self._vert_len), dtype=numpy.float32)
         self.verts[:36, 5:9] = self.resource_pack.texture_bounds(
             self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
         self.verts[:, 9:12] = self.box_tint
-
-    def __contains__(
-        self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]
-    ) -> bool:
-        """
-        Is the block position inside the selection box cuboid.
-        :param position: (x, y, z)
-        :return: True if the position is inside the box otherwise False
-        """
-        # TODO: remove this
-        warnings.warn(
-            f"__contains__ is going to be removed\n{''.join(traceback.format_stack())}",
-            DeprecationWarning,
-        )
-        point = numpy.array(position)
-        return numpy.all(self.min <= point) and numpy.all(point < self.max)
 
     def _offset_points(self) -> numpy.ndarray:
         points = self._points.copy()
@@ -82,62 +68,6 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         points[0] += offset_points[0] > offset_points[1]
         points[1] += offset_points[0] <= offset_points[1]
         self._points[:] = points
-
-    def in_boundary(self, position: BlockCoordinatesAny) -> bool:
-        """
-        Is the block position in the surface layer of blocks inside the selection box cuboid.
-        :param position: (x, y, z)
-        :return: True if the position is inside the box otherwise False
-        """
-        # TODO: remove this
-        warnings.warn(
-            f"in_boundary is going to be removed\n{''.join(traceback.format_stack())}",
-            DeprecationWarning,
-        )
-        return position in self and numpy.any(
-            numpy.any(position == self._offset_points(), axis=0)
-        )
-
-    def intersects_vector(
-        self, origin: PointCoordinatesAny, vector: PointCoordinatesAny
-    ) -> Optional[float]:
-        """
-        Determine if a look vector from a given point collides with this selection box.
-        :param origin: Location of the origin of the vector
-        :param vector: The look vector
-        :return: Multiplier of the vector to the collision location. None if it does not collide
-        """
-        # TODO: remove this
-        warnings.warn(
-            f"intersects_vector is going to be removed\n{''.join(traceback.format_stack())}",
-            DeprecationWarning,
-        )
-        # Logic based on https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-        vector = numpy.array(vector)
-        vector[abs(vector) < 0.000001] = 0.000001
-        (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort(
-            (self.bounds - numpy.array(origin)) / vector, axis=0
-        )
-
-        if tmin > tymax or tymin > tmax:
-            return None
-
-        if tymin > tmin:
-            tmin = tymin
-
-        if tymax < tmax:
-            tmax = tymax
-
-        if tmin > tzmax or tzmin > tmax:
-            return None
-
-        if tzmin > tmin:
-            tmin = tzmin
-
-        if tzmax < tmax:
-            tmax = tzmax
-
-        return tmin if tmin >= 0 else tmax
 
     @property
     def vertex_usage(self):
