@@ -33,7 +33,9 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
 
     @property
     def selection_group(self) -> SelectionGroup:
-        return SelectionGroup([SelectionBox(box.point1, box.point2) for box in self._boxes])
+        return SelectionGroup(
+            [SelectionBox(box.point1, box.point2) for box in self._boxes]
+        )
 
     @selection_group.setter
     def selection_group(self, selection_group: SelectionGroup):

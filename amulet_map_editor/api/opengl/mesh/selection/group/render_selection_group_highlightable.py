@@ -1,9 +1,7 @@
 from .render_selection_group import (
     RenderSelectionGroup,
 )
-from amulet_map_editor.api.opengl.mesh.selection_old import (
-    RenderSelectionHighlightable
-)
+from amulet_map_editor.api.opengl.mesh.selection_old import RenderSelectionHighlightable
 
 
 class RenderSelectionGroupHighlightable(RenderSelectionGroup):
