@@ -7,9 +7,13 @@ from amulet.api.data_types import (
     PointCoordinatesAny,
     BlockCoordinates,
 )
-from .render_selection_group import RenderSelectionGroup
-from .render_selection_highlightable import RenderSelectionHighlightable
-from .render_selection_editable import RenderSelectionEditable
+from amulet_map_editor.api.opengl.mesh.selection.group.render_selection_group import (
+    RenderSelectionGroup,
+)
+from amulet_map_editor.api.opengl.mesh.selection import (
+    RenderSelectionHighlightable,
+    RenderSelectionEditable,
+)
 
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 

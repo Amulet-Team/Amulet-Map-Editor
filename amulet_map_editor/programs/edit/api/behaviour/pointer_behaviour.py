@@ -3,7 +3,7 @@ import wx
 
 from amulet.api.data_types import PointCoordinatesAny
 
-from amulet_map_editor.api.opengl.mesh.selection.render_selection import RenderSelection
+from amulet_map_editor.api.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.api.opengl.camera import Projection
 
 from .raycast_behaviour import RaycastBehaviour

@@ -12,6 +12,8 @@ from OpenGL.GL import (
 )
 import itertools
 from typing import Tuple, Optional, Union
+import warnings
+import traceback
 
 from amulet_map_editor.api.opengl.mesh.tri_mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import (
@@ -61,6 +63,11 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         :param position: (x, y, z)
         :return: True if the position is inside the box otherwise False
         """
+        # TODO: remove this
+        warnings.warn(
+            f"__contains__ is going to be removed\n{''.join(traceback.format_stack())}",
+            DeprecationWarning,
+        )
         point = numpy.array(position)
         return numpy.all(self.min <= point) and numpy.all(point < self.max)
 
@@ -82,6 +89,11 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         :param position: (x, y, z)
         :return: True if the position is inside the box otherwise False
         """
+        # TODO: remove this
+        warnings.warn(
+            f"in_boundary is going to be removed\n{''.join(traceback.format_stack())}",
+            DeprecationWarning,
+        )
         return position in self and numpy.any(
             numpy.any(position == self._offset_points(), axis=0)
         )
@@ -95,9 +107,14 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         :param vector: The look vector
         :return: Multiplier of the vector to the collision location. None if it does not collide
         """
+        # TODO: remove this
+        warnings.warn(
+            f"intersects_vector is going to be removed\n{''.join(traceback.format_stack())}",
+            DeprecationWarning,
+        )
         # Logic based on https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
         vector = numpy.array(vector)
-        vector[vector == 0] = 0.000001
+        vector[abs(vector) < 0.000001] = 0.000001
         (tmin, tymin, tzmin), (tmax, tymax, tzmax) = numpy.sort(
             (self.bounds - numpy.array(origin)) / vector, axis=0
         )
