@@ -8,7 +8,7 @@ from amulet_map_editor.api.opengl.resource_pack import (
 )
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.data_types import PointCoordinatesAny
-from amulet_map_editor.api.opengl.mesh.selection_old import RenderSelection
+from amulet_map_editor.api.opengl.mesh.selection import RenderSelection
 
 
 class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerStatic):
