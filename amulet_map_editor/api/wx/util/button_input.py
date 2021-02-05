@@ -172,7 +172,7 @@ class ButtonInput(WindowContainer):
         :param modifier_keys: Other keys that need to be pressed for the action to happen.
         :return:
         """
-        if not type(action_id) is str:
+        if type(action_id) is not str:
             raise TypeError("action_id must be a string.")
         if (
             type(trigger_key) not in (str, int)
