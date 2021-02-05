@@ -18,7 +18,8 @@ class RenderSelectionHighlightable(RenderSelection):
         return 0.5, 0.5, 1.0
 
     def reset_highlight_edges(self):
-        self.set_highlight_edges(False)
+        if numpy.any(self._highlight_edges):
+            self.set_highlight_edges(False)
 
     def set_highlight_edges(self, highlight_edges: Union[numpy.ndarray, bool]):
         self._highlight_edges[:] = highlight_edges
