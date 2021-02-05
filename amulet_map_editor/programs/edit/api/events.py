@@ -39,34 +39,31 @@ RedoEvent, EVT_REDO = newevent.NewEvent()
 CreateUndoEvent, EVT_CREATE_UNDO = newevent.NewEvent()
 SaveEvent, EVT_SAVE = newevent.NewEvent()
 EditCloseEvent, EVT_EDIT_CLOSE = newevent.NewEvent()
-EditEscapeEvent, EVT_EDIT_ESCAPE = newevent.NewEvent()  # the escape key was pressed
-
-# This event is created for each frame that the mouse cursor has moved.
-# It should be used to update the cursor box and selection box.
-CursorMoveEvent, EVT_CURSOR_MOVE = newevent.NewEvent()
 
 # This event is created each time the cursor box moves
 # Used to notify the UI that the cursor box has moved.
+# TODO: remove this
 CursorBoxMoveEvent, EVT_CURSOR_BOX_MOVE = newevent.NewEvent()
 
-# events fired when the active selection box changes.  TODO: reimplement these
+# events fired when the active selection box changes.
+# TODO: remove this
 (
     BoxChangeEvent,
     EVT_BOX_CHANGE,
 ) = newevent.NewEvent()  # one or more of the box coordinates have changed
 
+# TODO: remove this
 (
     BoxDisableInputsEvent,
     EVT_BOX_DISABLE_INPUTS,
 ) = newevent.NewEvent()  # the box starts being edited
+
+# TODO: remove this
 (
     BoxEnableInputsEvent,
     EVT_BOX_ENABLE_INPUTS,
 ) = newevent.NewEvent()  # the box stops being edited
-(
-    BoxChangeConfirmEvent,
-    EVT_BOX_CHANGE_CONFIRM,
-) = newevent.NewEvent()  # the coordinates of the box are confirmed
 
 # The button to select the box was clicked. (Usually left mouse) Note based on the state the box may be unchanged.
+# TODO: remove this
 BoxClickEvent, EVT_BOX_CLICK = newevent.NewEvent()
