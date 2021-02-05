@@ -13,6 +13,7 @@ from OpenGL.GL import (
 import itertools
 from typing import Tuple, Optional, Union
 
+from amulet.api.selection import SelectionBox, SelectionGroup
 from amulet_map_editor.api.opengl.mesh.tri_mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePack,
@@ -116,6 +117,21 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         if self._bounds is None:
             self._bounds = numpy.sort(self._points, 0)
         return self._bounds
+
+    @property
+    def selection_box(self) -> SelectionBox:
+        return SelectionBox(self.point1, self.point2)
+
+    @selection_box.setter
+    def selection_box(self, selection_box: SelectionBox):
+        if type(selection_box) is not SelectionBox:
+            raise TypeError("selection_box must be a SelectionBox.")
+        self.point1 = selection_box.point_1
+        self.point2 = selection_box.point_2
+
+    @property
+    def selection_group(self) -> SelectionGroup:
+        return SelectionGroup(self.selection_box)
 
     @property
     def min(self) -> numpy.ndarray:
