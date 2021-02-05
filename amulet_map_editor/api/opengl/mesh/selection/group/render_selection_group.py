@@ -28,6 +28,9 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
         if selection:
             self.selection_group = selection
 
+    def __len__(self):
+        return len(self._boxes)
+
     def _new_render_selection(self):
         return RenderSelection(self.context_identifier, self.resource_pack)
 
