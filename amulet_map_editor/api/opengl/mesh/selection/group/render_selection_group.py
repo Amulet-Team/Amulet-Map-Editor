@@ -39,6 +39,8 @@ class RenderSelectionGroup(Drawable, ContextManager, OpenGLResourcePackManagerSt
 
     @selection_group.setter
     def selection_group(self, selection_group: SelectionGroup):
+        if type(selection_group) is not SelectionGroup:
+            raise TypeError("selection_group must be a SelectionGroup.")
         self.unload()
         for box in selection_group.selection_boxes:
             render_box = self._new_render_selection()
