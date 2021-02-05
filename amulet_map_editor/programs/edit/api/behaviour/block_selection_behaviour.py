@@ -12,7 +12,10 @@ from ..events import (
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import PointCoordinatesAny
 from amulet_map_editor.api.opengl.camera import Projection
-from amulet_map_editor.api.opengl.mesh.selection import RenderSelectionEditable, RenderSelectionGroupHighlightable
+from amulet_map_editor.api.opengl.mesh.selection import (
+    RenderSelectionEditable,
+    RenderSelectionGroupHighlightable,
+)
 
 from .pointer_behaviour import PointerBehaviour
 
@@ -26,9 +29,11 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
-        self._selection: RenderSelectionGroupHighlightable = RenderSelectionGroupHighlightable(
-            self.canvas.context_identifier,
-            self.canvas.renderer.opengl_resource_pack,
+        self._selection: RenderSelectionGroupHighlightable = (
+            RenderSelectionGroupHighlightable(
+                self.canvas.context_identifier,
+                self.canvas.renderer.opengl_resource_pack,
+            )
         )
 
         self._active_selection: Optional[RenderSelectionEditable] = None
@@ -65,7 +70,10 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._editing = True
 
                 if self._active_selection is None:
-                    self._active_selection = RenderSelectionEditable(self.canvas.context_identifier, self.canvas.renderer.opengl_resource_pack)
+                    self._active_selection = RenderSelectionEditable(
+                        self.canvas.context_identifier,
+                        self.canvas.renderer.opengl_resource_pack,
+                    )
                 self._start_box = self._pointer.bounds
                 # self._selection.box_select_toggle(
                 #     "add box modifier" in self.canvas.buttons.pressed_actions
@@ -97,11 +105,11 @@ class BlockSelectionBehaviour(PointerBehaviour):
         if self._editing:
             (
                 self._active_selection.point1,
-                self._active_selection.point2
+                self._active_selection.point2,
             ) = self._get_editing_selection()
 
     @property
-    def selection_group(self):
+    def selection_group(self) -> SelectionGroup:
         """The selection group of the static and active selection.
         If the active selection is being resized it will not be included in this."""
         selection_group = self._selection.selection_group
@@ -124,7 +132,10 @@ class BlockSelectionBehaviour(PointerBehaviour):
         if len(selection_group) >= 1:
             # load the active selection
             if self._active_selection is None:
-                self._active_selection = RenderSelectionEditable(self.canvas.context_identifier, self.canvas.renderer.opengl_resource_pack)
+                self._active_selection = RenderSelectionEditable(
+                    self.canvas.context_identifier,
+                    self.canvas.renderer.opengl_resource_pack,
+                )
             self._active_selection.selection_box = selection_group[-1]
 
         if len(selection_group) >= 2:
@@ -153,10 +164,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             camera_location = self.canvas.camera.location
             look_vector = self.look_vector()
             selection_group = self.selection_group
-            (
-                box_index,
-                max_distance,
-            ) = selection_group.closest_vector_intersection(
+            box_index, max_distance = selection_group.closest_vector_intersection(
                 camera_location, look_vector
             )
             location, block_hit = self.closest_block_3d(min(max_distance, 100))
@@ -178,5 +186,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             camera = self.canvas.camera.location
         self._selection.draw(self.canvas.camera.transformation_matrix, camera)
         if self._active_selection is not None:
-            self._active_selection.draw(self.canvas.camera.transformation_matrix, camera)
+            self._active_selection.draw(
+                self.canvas.camera.transformation_matrix, camera
+            )
         super().draw()

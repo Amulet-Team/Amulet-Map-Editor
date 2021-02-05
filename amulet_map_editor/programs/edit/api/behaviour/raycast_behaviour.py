@@ -124,9 +124,7 @@ class RaycastBehaviour(BaseBehaviour):
         x, z = numpy.floor([x, z]) + 0.5
         return x, z
 
-    def closest_block_2d(
-        self, min_y: int = 0
-    ) -> Tuple[PointCoordinatesNDArray, bool]:
+    def closest_block_2d(self, min_y: int = 0) -> Tuple[PointCoordinatesNDArray, bool]:
         """Find the first non-air block above a given y axis.
         Note if there are no non-air blocks above the given axis it will return the min_y value
 
