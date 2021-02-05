@@ -121,7 +121,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
     def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
-            location = self.box_location_closest_2d()[0]
+            location = self.closest_block_2d()[0]
         else:
             camera_location = self.canvas.camera.location
             look_vector = self.look_vector()
@@ -131,7 +131,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             ) = self._selection.selection_group.closest_vector_intersection(
                 camera_location, look_vector
             )
-            location, hit = self.box_location_closest(min(max_distance, 100))
+            location, hit = self.closest_block_3d(min(max_distance, 100))
             if box is not None and not hit and max_distance < 100:
                 for loc in self.collision_locations(
                     2, camera_location + look_vector * max_distance, look_vector

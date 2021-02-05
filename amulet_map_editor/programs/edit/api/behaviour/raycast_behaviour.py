@@ -70,7 +70,7 @@ class RaycastBehaviour(BaseBehaviour):
         t_max = numpy.where(t == t.max())[0][0]
         return t_max
 
-    def box_location_closest(
+    def closest_block_3d(
         self, max_distance: float = 100
     ) -> Tuple[PointCoordinatesNDArray, bool]:
         """Find the location of the closest non-air block.
@@ -124,7 +124,7 @@ class RaycastBehaviour(BaseBehaviour):
         x, z = numpy.floor([x, z]) + 0.5
         return x, z
 
-    def box_location_closest_2d(
+    def closest_block_2d(
         self, min_y: int = 0
     ) -> Tuple[PointCoordinatesNDArray, bool]:
         """Find the first non-air block above a given y axis.
@@ -167,7 +167,7 @@ class RaycastBehaviour(BaseBehaviour):
                         return numpy.asarray((x, y, z)), True
         return numpy.asarray((x, y, z)), False
 
-    def box_location_distance(
+    def distance_block_3d(
         self,
         distance: float,
         start_location: Optional[numpy.ndarray] = None,

@@ -130,7 +130,7 @@ class ChunkSelectionBehaviour(PointerBehaviour):
             ) = self._selection.selection_group.closest_vector_intersection(
                 camera_location, look_vector
             )
-            location, hit = self.box_location_closest(min(max_distance, 100))
+            location, hit = self.closest_block_3d(min(max_distance, 100))
 
         chunk_size = self.canvas.world.sub_chunk_size
         location_min: numpy.ndarray = (location // chunk_size) * chunk_size

@@ -49,9 +49,9 @@ class PointerBehaviour(RaycastBehaviour):
 
     def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
-            location = self.box_location_closest_2d()[0]
+            location = self.closest_block_2d()[0]
         else:
-            location = self.box_location_closest()[0]
+            location = self.closest_block_3d()[0]
         return location, location + 1
 
     def draw(self):
