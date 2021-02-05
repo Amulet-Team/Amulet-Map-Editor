@@ -9,7 +9,7 @@ from ..events import (
     EVT_INPUT_RELEASE,
     EVT_SELECTION_CHANGE,
 )
-from amulet.api.selection import SelectionGroup
+from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.data_types import PointCoordinatesAny
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.api.opengl.mesh.selection import (
@@ -107,6 +107,18 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._active_selection.point1,
                 self._active_selection.point2,
             ) = self._get_editing_selection()
+        else:
+            box_index, faces = self._get_box_faces()
+            self._selection.reset_highlight_edges()
+            if box_index is None:
+                if self._active_selection is not None:
+                    self._active_selection.reset_highlight_edges()
+            else:
+                if box_index == len(self._selection):
+                    self._active_selection.set_highlight_edges(faces)
+                else:
+                    self._selection.set_highlight_edges(box_index, faces)
+                    self._active_selection.reset_highlight_edges()
 
     @property
     def selection_group(self) -> SelectionGroup:
@@ -145,17 +157,20 @@ class BlockSelectionBehaviour(PointerBehaviour):
     def _get_box_faces(self) -> Tuple[Optional[int], numpy.ndarray]:
         """Get a bool array of which faces the look vector hits.
         If the vector hits near an edge it will have two faces and three for a corner."""
+        camera = self.canvas.camera.location
         look_vector = self.look_vector()
-        (
-            box_index,
-            max_distance,
-        ) = self.selection_group.closest_vector_intersection(
-            self.canvas.camera.location, look_vector
+        selection_group = self.selection_group
+        (box_index, max_distance) = selection_group.closest_vector_intersection(
+            camera, look_vector
         )
         if box_index is None:
+            # it doesn't hit any boxes
             return None, numpy.zeros((2, 3), dtype=numpy.bool)
         else:
-            point = max_distance * look_vector
+            box: SelectionBox = selection_group[box_index]
+            point = max_distance * look_vector + camera
+            tol = numpy.min([numpy.array(box.shape) / 4, numpy.ones(3)], 0)
+            return box_index, numpy.abs(box.points_array - point) < tol
 
     def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
