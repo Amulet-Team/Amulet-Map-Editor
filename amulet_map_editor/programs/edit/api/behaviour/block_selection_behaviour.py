@@ -79,11 +79,11 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 #     "add box modifier" in self.canvas.buttons.pressed_actions
                 # )
         elif evt.action_id == "deselect boxes":
-            self._selection.selection_group = SelectionGroup()
+            self.selection_group = SelectionGroup()
             self._push_selection()
         elif evt.action_id == "remove box":
             if "deselect boxes" not in self.canvas.buttons.pressed_actions:
-                self._selection.selection_group = SelectionGroup()
+                self.selection_group = SelectionGroup()
                 self._push_selection()
         evt.Skip()
 
