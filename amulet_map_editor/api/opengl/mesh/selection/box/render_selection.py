@@ -12,8 +12,6 @@ from OpenGL.GL import (
 )
 import itertools
 from typing import Tuple, Optional, Union
-import warnings
-import traceback
 
 from amulet_map_editor.api.opengl.mesh.tri_mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import (
@@ -56,6 +54,17 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
             self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
         self.verts[:, 9:12] = self.box_tint
+
+    def __contains__(
+        self, position: Union[BlockCoordinatesAny, PointCoordinatesAny]
+    ) -> bool:
+        """
+        Is the block position inside the selection box cuboid.
+        :param position: (x, y, z)
+        :return: True if the position is inside the box otherwise False
+        """
+        point = numpy.array(position)
+        return numpy.all(self.min <= point) and numpy.all(point < self.max)
 
     def _offset_points(self) -> numpy.ndarray:
         points = self._points.copy()
