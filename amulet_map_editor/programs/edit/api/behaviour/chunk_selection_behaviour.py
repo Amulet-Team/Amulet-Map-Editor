@@ -37,7 +37,6 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         self._editing = False
         self._press_time = 0
         self._start_box = numpy.zeros((2, 3))
-        self._add_box = False
 
     def bind_events(self):
         super().bind_events()
@@ -78,9 +77,6 @@ class ChunkSelectionBehaviour(PointerBehaviour):
             if not self._editing:
                 self._press_time = time.time()
                 self._editing = True
-                self._add_box = (
-                    "add box modifier" in self.canvas.buttons.pressed_actions
-                )
                 self._start_box = self._pointer.bounds
         elif evt.action_id == "deselect boxes":
             self._selection.selection_group = SelectionGroup()
