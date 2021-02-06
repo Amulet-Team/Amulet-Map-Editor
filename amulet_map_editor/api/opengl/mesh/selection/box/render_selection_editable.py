@@ -25,17 +25,32 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         self._locked = True
 
     def _init_verts(self):
-        self.verts = numpy.zeros((6 * 2 * 3 * 3, self._vert_len), dtype=numpy.float32)
-        self.verts[:36, 5:9] = self.resource_pack.texture_bounds(
+        verts_per_box = 6 * 2 * 3  # faces * triangles * verts
+        self.verts = numpy.zeros(
+            (17 * verts_per_box, self._vert_len), dtype=numpy.float32
+        )
+        self.verts[:verts_per_box, 5:9] = self.resource_pack.texture_bounds(
             self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
-        self.verts[36:72, 5:9] = self.resource_pack.texture_bounds(
+        self.verts[
+            verts_per_box : verts_per_box * 2, 5:9
+        ] = self.resource_pack.texture_bounds(
             self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_green")
         )
-        self.verts[72:, 5:9] = self.resource_pack.texture_bounds(
+        self.verts[
+            verts_per_box * 2 : verts_per_box * 3, 5:9
+        ] = self.resource_pack.texture_bounds(
             self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_blue")
         )
+        self.verts[
+            verts_per_box * 3 : verts_per_box * 17, 5:9
+        ] = self.resource_pack.texture_bounds(
+            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
+        )
+
         self.verts[:, 9:12] = self.box_tint
+        self.verts[verts_per_box * 3 : verts_per_box * 9, 9:12] = (1, 0, 0)
+        self.verts[verts_per_box * 9 : verts_per_box * 17, 9:12] = (0, 1, 1)
 
     @property
     def highlight_colour(self) -> Tuple[float, float, float]:
@@ -60,15 +75,24 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
     def _create_geometry_(self):
         super()._create_geometry_()
-        point1 = self.point1 - self.min + (self.min % 16) - (self.point2 <= self.point1)
-        point2 = self.point2 - self.min + (self.min % 16) - (self.point2 > self.point1)
-        self.verts[36:72, :3], self.verts[36:72, 3:5] = self._create_box(
-            point1 - 0.01,
-            point1 + 1.01,
+        verts_per_box = 6 * 2 * 3  # faces * triangles * verts
+        point1, point2 = self._points - self.min + (self.min % 16)
+        size = numpy.abs(point2 - point1)
+        mult = (point1 < point2) * 2 - 1
+        (
+            self.verts[verts_per_box : verts_per_box * 2, :3],
+            self.verts[verts_per_box : verts_per_box * 2, 3:5],
+        ) = self._create_box(
+            point1 - 0.01 * mult,
+            point1 + numpy.min([numpy.ones(3), size / 4], 0) * mult,
         )
-        self.verts[72:, :3], self.verts[72:, 3:5] = self._create_box(
-            point2 - 0.01,
-            point2 + 1.01,
+        mult = (point1 > point2) * 2 - 1
+        (
+            self.verts[verts_per_box * 2 : verts_per_box * 3, :3],
+            self.verts[verts_per_box * 2 : verts_per_box * 3, 3:5],
+        ) = self._create_box(
+            point2 - 0.01 * mult,
+            point2 + numpy.min([numpy.ones(3), size / 4], 0) * mult,
         )
 
     def draw(
@@ -83,7 +107,6 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         self._setup()
         if self._rebuild:
             self._create_geometry()
-        self._draw_mode = GL_TRIANGLES
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
@@ -92,22 +115,18 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         else:
             glCullFace(GL_BACK)
 
+        self._draw_mode = GL_TRIANGLES
         self.draw_start = 0
-        self.draw_count = 36
+        self.draw_count = 108
         super()._draw(transformation_matrix)
         glCullFace(GL_BACK)
-
-        if self._volume > 1:
-            self.draw_start = 36
-            self.draw_count = 108
-            super()._draw(transformation_matrix)
-            self.draw_start = 0
-            self.draw_count = 36
 
         # draw the lines around the boxes
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
-        for start in range(0, 36 + (self._volume > 1) * 2 * 36, 36):
+        self.draw_count = 36
+        for start in range(0, 3 * 36, 36):
+            # these must be drawn individually otherwise there will be lines connecting them.
             self.draw_start = start
             super()._draw(transformation_matrix)
         glEnable(GL_DEPTH_TEST)
