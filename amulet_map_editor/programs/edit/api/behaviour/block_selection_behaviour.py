@@ -118,9 +118,11 @@ class BlockSelectionBehaviour(PointerBehaviour):
             box_index, faces = self._get_box_faces()
             self._selection.reset_highlight_edges()
             if box_index is None:
+                self._highlight = False
                 if self._active_selection is not None:
                     self._active_selection.reset_highlight_edges()
             else:
+                self._highlight = True
                 if box_index == len(self._selection):
                     self._active_selection.set_highlight_edges(faces)
                 else:
@@ -211,4 +213,5 @@ class BlockSelectionBehaviour(PointerBehaviour):
             self._active_selection.draw(
                 self.canvas.camera.transformation_matrix, camera
             )
-        super().draw()
+        if not self._highlight and not self._editing:
+            super().draw()
