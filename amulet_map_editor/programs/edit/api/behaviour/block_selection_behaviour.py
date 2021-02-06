@@ -90,8 +90,15 @@ class BlockSelectionBehaviour(PointerBehaviour):
     def _get_editing_selection(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
         """Get the minimum and maximum points of the editing selection.
         This is based on the stored starting pointer and the current pointer."""
-        points = numpy.concatenate([self._start_box, self._pointer.bounds], 0)
-        return numpy.min(points, 0), numpy.max(points, 0)
+        start_1, start_2 = self._start_box.copy()
+        point_1, point_2 = self._pointer.bounds.copy()
+        start = start_1
+        point = point_1
+        mask = numpy.abs(point - start_1) < numpy.abs(point - start_2)
+        start[mask] = start_2[mask]
+        mask = numpy.abs(start - point_1) < numpy.abs(start - point_2)
+        point[mask] = point_2[mask]
+        return start, point
 
     def _on_input_release(self, evt: InputReleaseEvent):
         if evt.action_id == "box click":
