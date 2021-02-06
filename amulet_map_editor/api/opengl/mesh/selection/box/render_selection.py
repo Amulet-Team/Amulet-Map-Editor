@@ -92,8 +92,18 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         self._rebuild = True
 
     @property
+    def points(self) -> numpy.ndarray:
+        return self._points.copy()
+
+    @points.setter
+    def points(self, points: numpy.ndarray):
+        if not type(points) is numpy.ndarray and points.shape == (2, 3):
+            raise TypeError("points must be a numpy array of size 2x3.")
+        self.point1, self.point2 = points
+
+    @property
     def point1(self) -> numpy.ndarray:
-        return self._points[0]
+        return self.points[0]
 
     @point1.setter
     def point1(self, val: PointCoordinatesAny):
@@ -103,7 +113,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     @property
     def point2(self) -> numpy.ndarray:
-        return self._points[1]
+        return self.points[1]
 
     @point2.setter
     def point2(self, val: PointCoordinatesAny):
