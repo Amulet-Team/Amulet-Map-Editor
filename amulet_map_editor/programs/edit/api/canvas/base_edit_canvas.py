@@ -69,6 +69,7 @@ class BaseEditCanvas(EventCanvas):
 
         self._buttons: ButtonInput = ButtonInput(self)
         self._mouse: MouseMovement = MouseMovement(self)
+        self._mouse.set_middle()
 
         # load the resource packs
         os.makedirs("resource_packs", exist_ok=True)
