@@ -86,13 +86,12 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
             point1 - 0.01 * mult,
             point1 + numpy.min([numpy.ones(3), size / 4], 0) * mult,
         )
-        mult = (point1 > point2) * 2 - 1
         (
             self.verts[verts_per_box * 2 : verts_per_box * 3, :3],
             self.verts[verts_per_box * 2 : verts_per_box * 3, 3:5],
         ) = self._create_box(
-            point2 - 0.01 * mult,
-            point2 + numpy.min([numpy.ones(3), size / 4], 0) * mult,
+            point2 + 0.01 * mult,
+            point2 - numpy.min([numpy.ones(3), size / 4], 0) * mult,
         )
 
     def draw(
