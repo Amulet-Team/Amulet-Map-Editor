@@ -175,10 +175,39 @@ class BlockSelectionBehaviour(PointerBehaviour):
         p1, p2 = numpy.zeros((2, 3)), numpy.zeros((2, 3))
         if self._active_selection is not None:
             p1[0], p2[0] = self._active_selection.points
-            mult = (p1[0] < p2[0]) * 2 - 1
-            p1[1] = p1[0] + 1 * mult
-            p2[1] = p2[0] - 1 * mult
+            p1[1] = p1[0] + 1
+            p2[1] = p2[0] + 1
+            mult = p1[0] < p2[0]
+            p1 -= 1 * numpy.logical_not(mult)
+            p2 -= 1 * mult
         return p1, p2
+
+    @property
+    def active_block_positions(self) -> Tuple[Tuple[int, int, int], Tuple[int, int, int]]:
+        """Get the active box positions.
+        The coordinates for the maximum point of the box will be one less because this is the block position."""
+        if self._active_selection is None:
+            return (0, 0, 0), (0, 0, 0)
+        else:
+            p1, p2 = self._get_active_points()
+            return tuple(p1.tolist()), tuple(p2.tolist())
+
+    @active_block_positions.setter
+    def active_block_positions(self, positions: Tuple[Tuple[int, int, int], Tuple[int, int, int]]):
+        """Set the active box positions.
+        This should only be used when not editing.
+        The coordinates for the maximum point of the box will be one greater because this is the block position."""
+        if self._active_selection is not None and not self._editing:
+            self._pointer_mask[:] = False
+            self._start_point_1[:] = positions[0]
+            self._start_point_2[:] = positions[1]
+            self._start_point_1[1] += 1
+            self._start_point_2[1] += 1
+            (
+                self._active_selection.point1,
+                self._active_selection.point2,
+            ) = self._get_editing_selection()
+            self._push_selection()
 
     def _get_editing_selection(self) -> Tuple[NPVector3, NPVector3]:
         """Get the minimum and maximum points of the editing selection.
