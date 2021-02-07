@@ -58,11 +58,7 @@ class MouseMovement(WindowContainer):
         self._start_x, self._start_y = 0.5, 0.5
 
     def _warp(self):
-        self.window.WarpPointer(
-            *self._to_absolute(
-                self._x, self._y
-            )
-        )
+        self.window.WarpPointer(*self._to_absolute(self._x, self._y))
 
     @property
     def x(self) -> int:
@@ -137,5 +133,5 @@ class MouseMovement(WindowContainer):
         If the pointer was warped the offset before it was warped will be added to this."""
         return self._to_absolute(
             self._x - self._start_x + self._delta_x,
-            self._y - self._start_y + self._delta_y
+            self._y - self._start_y + self._delta_y,
         )

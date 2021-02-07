@@ -43,10 +43,16 @@ class BlockSelectionBehaviour(PointerBehaviour):
         self._active_selection: Optional[RenderSelectionEditable] = None
         self._editing = False  # is the active selection being created or resized
         self._press_time = 0  # the time when the last box edit started
-        self._start_point_1: NPArray2x3 = numpy.zeros((2, 3))  # the state of the cursor when editing starts
-        self._start_point_2: NPArray2x3 = numpy.zeros((2, 3))  # the state of the cursor when editing starts
+        self._start_point_1: NPArray2x3 = numpy.zeros(
+            (2, 3)
+        )  # the state of the cursor when editing starts
+        self._start_point_2: NPArray2x3 = numpy.zeros(
+            (2, 3)
+        )  # the state of the cursor when editing starts
         self._highlight = False  # is a box being highlighted
-        self._initial_box: Optional[NPArray2x3] = None  # the state of the box when editing started
+        self._initial_box: Optional[
+            NPArray2x3
+        ] = None  # the state of the box when editing started
         self._pointer_mask: NPArray2x3 = numpy.zeros((2, 3), dtype=numpy.bool)
 
     def _load_active_selection(self):
@@ -94,7 +100,10 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     # create a new box
                     if self._active_selection is not None:
                         # move the existing active to the inactive
-                        self._selection.selection_group = self._selection.selection_group + self._active_selection.selection_group
+                        self._selection.selection_group = (
+                            self._selection.selection_group
+                            + self._active_selection.selection_group
+                        )
 
                 elif self._highlight:
                     # edit the highlighted box
@@ -107,7 +116,10 @@ class BlockSelectionBehaviour(PointerBehaviour):
                             # the active selection is highlighted
                             self._press_time = time.time()
                             self._editing = True
-                            self._start_point_1, self._start_point_2 = self._get_active_points()
+                            (
+                                self._start_point_1,
+                                self._start_point_2,
+                            ) = self._get_active_points()
                             self._active_selection.set_highlight_edges(faces)
                             self._pointer_mask = faces
                             self._active_selection.locked = False
@@ -115,8 +127,13 @@ class BlockSelectionBehaviour(PointerBehaviour):
                         else:
                             # a static selection box is highlighted
                             selection_group = self.selection_group
-                            self._selection.selection_group = selection_group[:box_index] + selection_group[box_index+1:]
-                            self._active_selection.selection_box = selection_group[box_index]
+                            self._selection.selection_group = (
+                                selection_group[:box_index]
+                                + selection_group[box_index + 1 :]
+                            )
+                            self._active_selection.selection_box = selection_group[
+                                box_index
+                            ]
 
                         default_create = False
                         self._initial_box = self._active_selection.points
@@ -129,7 +146,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     self._press_time = time.time()
                     self._editing = True
                     self._start_point_1 = self._pointer.bounds
-                    self._pointer_mask = numpy.array([[False]*3, [True]*3], dtype=numpy.bool)
+                    self._pointer_mask = numpy.array(
+                        [[False] * 3, [True] * 3], dtype=numpy.bool
+                    )
                     self._active_selection.set_highlight_edges(self._pointer_mask)
                     self._active_selection.locked = False
                     self._initial_box = None
@@ -183,7 +202,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
         return p1, p2
 
     @property
-    def active_block_positions(self) -> Tuple[Tuple[int, int, int], Tuple[int, int, int]]:
+    def active_block_positions(
+        self,
+    ) -> Tuple[Tuple[int, int, int], Tuple[int, int, int]]:
         """Get the active box positions.
         The coordinates for the maximum point of the box will be one less because this is the block position."""
         if self._active_selection is None:
@@ -193,7 +214,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
             return tuple(p1.tolist()), tuple(p2.tolist())
 
     @active_block_positions.setter
-    def active_block_positions(self, positions: Tuple[Tuple[int, int, int], Tuple[int, int, int]]):
+    def active_block_positions(
+        self, positions: Tuple[Tuple[int, int, int], Tuple[int, int, int]]
+    ):
         """Set the active box positions.
         This should only be used when not editing.
         The coordinates for the maximum point of the box will be one greater because this is the block position."""
