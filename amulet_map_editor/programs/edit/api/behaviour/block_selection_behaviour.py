@@ -24,6 +24,9 @@ from .pointer_behaviour import PointerBehaviour
 if TYPE_CHECKING:
     from ..canvas import EditCanvas
 
+NPArray2x3 = numpy.ndarray
+NPVector3 = numpy.ndarray
+
 
 class BlockSelectionBehaviour(PointerBehaviour):
     """Adds the behaviour for a block based selection."""
@@ -40,13 +43,14 @@ class BlockSelectionBehaviour(PointerBehaviour):
         self._active_selection: Optional[RenderSelectionEditable] = None
         self._editing = False  # is the active selection being created or resized
         self._press_time = 0  # the time when the last box edit started
-        self._start_point_1 = numpy.zeros((2, 3))  # the state of the cursor when editing starts
-        self._start_point_2 = numpy.zeros((2, 3))  # the state of the cursor when editing starts
+        self._start_point_1: NPArray2x3 = numpy.zeros((2, 3))  # the state of the cursor when editing starts
+        self._start_point_2: NPArray2x3 = numpy.zeros((2, 3))  # the state of the cursor when editing starts
         self._highlight = False  # is a box being highlighted
-        self._initial_box: Optional[numpy.ndarray] = None  # the state of the box when editing started
-        self._pointer_mask = numpy.zeros((2, 3), dtype=numpy.bool)
+        self._initial_box: Optional[NPArray2x3] = None  # the state of the box when editing started
+        self._pointer_mask: NPArray2x3 = numpy.zeros((2, 3), dtype=numpy.bool)
 
     def _load_active_selection(self):
+        """Create the active selection if it does not exist."""
         if self._active_selection is None:
             self._active_selection = RenderSelectionEditable(
                 self.canvas.context_identifier,
@@ -54,6 +58,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             )
 
     def _unload_active_selection(self):
+        """Unload the active selection if it exists."""
         if self._active_selection is not None:
             self._active_selection.unload()
             self._active_selection = None
@@ -165,7 +170,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._active_selection.locked = True
             self._editing = False
 
-    def _get_active_points(self):
+    def _get_active_points(self) -> Tuple[NPArray2x3, NPArray2x3]:
         """Get the 1x1x1 box coords for the active selection."""
         p1, p2 = numpy.zeros((2, 3)), numpy.zeros((2, 3))
         if self._active_selection is not None:
@@ -175,7 +180,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             p2[1] = p2[0] - 1 * mult
         return p1, p2
 
-    def _get_editing_selection(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
+    def _get_editing_selection(self) -> Tuple[NPVector3, NPVector3]:
         """Get the minimum and maximum points of the editing selection.
         This is based on the stored starting pointer and the current pointer."""
         start_point_1 = self._start_point_1.copy()
@@ -252,7 +257,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             # load the selection group
             self._selection.selection_group = selection_group[:-1]
 
-    def _get_box_faces(self) -> Tuple[Optional[int], numpy.ndarray]:
+    def _get_box_faces(self) -> Tuple[Optional[int], NPArray2x3]:
         """Get a bool array of which faces the look vector hits.
         If the vector hits near an edge it will have two faces and three for a corner."""
         camera = self.canvas.camera.location
