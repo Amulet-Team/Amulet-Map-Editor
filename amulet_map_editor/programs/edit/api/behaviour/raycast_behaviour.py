@@ -56,20 +56,6 @@ class RaycastBehaviour(BaseBehaviour):
         look_vector[abs(look_vector) < 0.000001] = 0.000001
         return look_vector
 
-    def ray_collision(self):
-        vector_start = self.canvas.camera.location
-        direction_vector = self.look_vector()
-        min_point, max_point = numpy.sort(self.canvas.active_selection_corners, 0)
-        max_point += 1
-
-        point_array = max_point.copy()
-        numpy.putmask(point_array, direction_vector > 0, min_point)
-
-        t = (point_array - vector_start) / direction_vector
-
-        t_max = numpy.where(t == t.max())[0][0]
-        return t_max
-
     def closest_block_3d(
         self, max_distance: float = 100
     ) -> Tuple[PointCoordinatesNDArray, bool]:
