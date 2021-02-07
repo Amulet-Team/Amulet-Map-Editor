@@ -7,13 +7,13 @@ from OpenGL.GL import (
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.api.opengl.camera import Projection
-
-from amulet_map_editor.programs.edit.api.events import (
-    EVT_BOX_CHANGE,
-    EVT_BOX_DISABLE_INPUTS,
-    EVT_BOX_ENABLE_INPUTS,
+from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour import (
+    BlockSelectionBehaviour,
+    EVT_RENDER_BOX_CHANGE,
+    RenderBoxChangeEvent,
+    EVT_RENDER_BOX_DISABLE_INPUTS,
+    EVT_RENDER_BOX_ENABLE_INPUTS,
 )
-from amulet_map_editor.programs.edit.api.behaviour import BlockSelectionBehaviour
 from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
 
 if TYPE_CHECKING:
@@ -97,9 +97,9 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
 
     def bind_events(self):
         super().bind_events()
-        self.canvas.Bind(EVT_BOX_CHANGE, self._box_renderer_change)
-        self.canvas.Bind(EVT_BOX_ENABLE_INPUTS, self._enable_scrolls)
-        self.canvas.Bind(EVT_BOX_DISABLE_INPUTS, self._disable_scrolls)
+        self.canvas.Bind(EVT_RENDER_BOX_CHANGE, self._box_renderer_change)
+        self.canvas.Bind(EVT_RENDER_BOX_DISABLE_INPUTS, self._disable_scrolls)
+        self.canvas.Bind(EVT_RENDER_BOX_ENABLE_INPUTS, self._enable_scrolls)
         self._selection.bind_events()
 
     def enable(self):
@@ -119,43 +119,13 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         return obj
 
     def _box_input_change(self, _):
-        (x1, y1, z1) = (self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue())
-        (x2, y2, z2) = (self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue())
-        if x2 >= x1:
-            x2 += 1
-        else:
-            x1 += 1
-
-        if y2 >= y1:
-            y2 += 1
-        else:
-            y1 += 1
-
-        if z2 >= z1:
-            z2 += 1
-        else:
-            z1 += 1
-        self._selection._selection.active_selection_corners = (
-            (x1, y1, z1),
-            (x2, y2, z2),
+        self._selection.active_block_positions = (
+            (self._x1.GetValue(), self._y1.GetValue(), self._z1.GetValue()),
+            (self._x2.GetValue(), self._y2.GetValue(), self._z2.GetValue()),
         )
 
-    def _box_renderer_change(self, evt):
-        (x1, y1, z1), (x2, y2, z2) = evt.corners
-        if x2 > x1:
-            x2 -= 1
-        else:
-            x1 -= 1
-
-        if y2 > y1:
-            y2 -= 1
-        else:
-            y1 -= 1
-
-        if z2 > z1:
-            z2 -= 1
-        else:
-            z1 -= 1
+    def _box_renderer_change(self, evt: RenderBoxChangeEvent):
+        (x1, y1, z1), (x2, y2, z2) = evt.points
         self._x1.SetValue(x1)
         self._y1.SetValue(y1)
         self._z1.SetValue(z1)
@@ -170,6 +140,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
 
     def _disable_scrolls(self, evt):
         self._set_scroll_state(False)
+        evt.Skip()
 
     def _set_scroll_state(self, state: bool):
         for scroll in (self._x1, self._y1, self._z1, self._x2, self._y2, self._z2):

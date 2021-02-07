@@ -12,7 +12,7 @@ from ..events import (
     EVT_SELECTION_CHANGE,
 )
 from amulet.api.selection import SelectionGroup, SelectionBox
-from amulet.api.data_types import PointCoordinatesAny
+from amulet.api.data_types import PointCoordinatesAny, BlockCoordinates
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.api.opengl.mesh.selection import (
     RenderSelectionEditable,
@@ -26,13 +26,36 @@ if TYPE_CHECKING:
     from ..canvas import EditCanvas
 
 # the active selection was changed from local code. Not fired by active_block_positions.setter
-RenderBoxChangeEvent, EVT_RENDER_BOX_CHANGE = newevent.NewEvent()
+_RenderBoxChangeEvent = wx.NewEventType()
+EVT_RENDER_BOX_CHANGE = wx.PyEventBinder(_RenderBoxChangeEvent)
 
-# run when self._editing is set to True. Locks external editing
-RenderBoxEditStartEvent, EVT_RENDER_BOX_EDIT_START = newevent.NewEvent()
+
+class RenderBoxChangeEvent(wx.PyEvent):
+    """Run when the selection is changed by third party code."""
+
+    def __init__(self, point1: BlockCoordinates, point2: BlockCoordinates):
+        wx.PyEvent.__init__(self, eventType=_RenderBoxChangeEvent)
+        self._point1 = point1
+        self._point2 = point2
+
+    @property
+    def point1(self) -> BlockCoordinates:
+        return self._point1
+
+    @property
+    def point2(self) -> BlockCoordinates:
+        return self._point2
+
+    @property
+    def points(self) -> Tuple[BlockCoordinates, BlockCoordinates]:
+        return self._point1, self._point2
+
+
+# run when self._editing is set to True or the active selection is removed. Locks external editing
+RenderBoxDisableInputsEvent, EVT_RENDER_BOX_DISABLE_INPUTS = newevent.NewEvent()
 
 # run when self._editing is set to False and there is an active selection. Allows external editing
-RenderBoxEditEndEvent, EVT_RENDER_BOX_EDIT_END = newevent.NewEvent()
+RenderBoxEnableInputsEvent, EVT_RENDER_BOX_ENABLE_INPUTS = newevent.NewEvent()
 
 NPArray2x3 = numpy.ndarray
 NPVector3 = numpy.ndarray
@@ -65,7 +88,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         ] = None  # the state of the box when editing started
         self._pointer_mask: NPArray2x3 = numpy.zeros((2, 3), dtype=numpy.bool)
 
-    def _load_active_selection(self):
+    def _create_active_selection(self):
         """Create the active selection if it does not exist."""
         if self._active_selection is None:
             self._active_selection = RenderSelectionEditable(
@@ -99,15 +122,24 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
     def _pull_selection(self):
         """Pull the selection from the canvas."""
+        self._escape()
         self.selection_group = self.canvas.selection.selection_group
 
     def _post_change_event(self):
-        wx.PostEvent(self.canvas, RenderBoxChangeEvent())
+        wx.PostEvent(self.canvas, RenderBoxChangeEvent(*self.active_block_positions))
+
+    def _disable_inputs(self):
+        wx.PostEvent(self.canvas, RenderBoxDisableInputsEvent())
+
+    def _enable_inputs(self):
+        wx.PostEvent(self.canvas, RenderBoxEnableInputsEvent())
 
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == "box click":
             if not self._editing:
                 default_create = True
+                self._press_time = time.time()
+                self._disable_inputs()
 
                 if "add box modifier" in self.canvas.buttons.pressed_actions:
                     # create a new box
@@ -125,20 +157,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                         # this shouldn't happen but just to be safe.
                         self._selection.selection_group = SelectionGroup()
                     else:
-                        if box_index == len(self._selection):
-                            # the active selection is highlighted
-                            self._press_time = time.time()
-                            self._editing = True
-                            wx.PostEvent(self.canvas, RenderBoxEditStartEvent())
-                            (
-                                self._start_point_1,
-                                self._start_point_2,
-                            ) = self._get_active_points()
-                            self._active_selection.set_highlight_edges(faces)
-                            self._pointer_mask = faces
-                            self._active_selection.locked = False
-                            self._initial_box = None
-                        else:
+                        if box_index < len(self._selection):
                             # a static selection box is highlighted
                             selection_group = self.selection_group
                             self._selection.selection_group = (
@@ -150,32 +169,46 @@ class BlockSelectionBehaviour(PointerBehaviour):
                             ]
                             self._post_change_event()
 
-                        default_create = False
+                        (
+                            self._start_point_1,
+                            self._start_point_2,
+                        ) = self._get_active_points()
+                        self._pointer_mask = faces
+                        self._active_selection.set_highlight_edges(faces)
                         self._initial_box = self._active_selection.points
+                        default_create = False
                 else:
                     # clear the selection
                     self._selection.selection_group = SelectionGroup()
 
-                self._load_active_selection()
+                self._create_active_selection()
+                self._active_selection.locked = False
+                self._editing = True
                 if default_create:
-                    self._press_time = time.time()
-                    self._editing = True
-                    wx.PostEvent(self.canvas, RenderBoxEditStartEvent())
                     self._start_point_1 = self._pointer.bounds
                     self._pointer_mask = numpy.array(
                         [[False] * 3, [True] * 3], dtype=numpy.bool
                     )
                     self._active_selection.set_highlight_edges(self._pointer_mask)
-                    self._active_selection.locked = False
                     self._initial_box = None
 
         elif evt.action_id == "deselect boxes":
-            self.selection_group = SelectionGroup()
-            self._push_selection()
+            self._escape()
+            if self.selection_group:
+                self.selection_group = SelectionGroup()
+                self._push_selection()
+                self._disable_inputs()
+                self._post_change_event()
         elif evt.action_id == "remove box":
             if "deselect boxes" not in self.canvas.buttons.pressed_actions:
-                self.selection_group = self.selection_group[:-1]
-                self._push_selection()
+                self._escape()
+                selection_group = self.selection_group
+                if selection_group:
+                    self.selection_group = selection_group[:-1]
+                    self._push_selection()
+                    if self._active_selection is None:
+                        self._disable_inputs()
+                        self._post_change_event()
         evt.Skip()
 
     def _on_key_press(self, evt: wx.KeyEvent):
@@ -191,21 +224,22 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 # there was no initial box
                 if self._selection:
                     # static selection exists. Load the last into the active.
-                    self._load_active_selection()
+                    self._create_active_selection()
                     selection_group = self.selection_group
                     self._selection.selection_group = selection_group[:-1]
                     self._active_selection.selection_box = selection_group[-1]
                     self._active_selection.locked = True
-                    wx.PostEvent(self.canvas, RenderBoxEditEndEvent())
+                    self._enable_inputs()
                 else:
                     self._unload_active_selection()
             else:
                 # there was an initial box
-                self._load_active_selection()
+                self._create_active_selection()
                 self._active_selection.points = self._initial_box
                 self._active_selection.locked = True
-                wx.PostEvent(self.canvas, RenderBoxEditEndEvent())
+                self._enable_inputs()
             self._editing = False
+            self._highlight = False
             self._post_change_event()
 
     def _get_active_points(self) -> Tuple[NPArray2x3, NPArray2x3]:
@@ -230,7 +264,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             return (0, 0, 0), (0, 0, 0)
         else:
             p1, p2 = self._get_active_points()
-            return tuple(p1.tolist()), tuple(p2.tolist())
+            return tuple(p1[0].tolist()), tuple(p2[0].tolist())
 
     @active_block_positions.setter
     def active_block_positions(
@@ -273,7 +307,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         if evt.action_id == "box click":
             if self._editing and time.time() - self._press_time > 0.1:
                 self._editing = False
-                wx.PostEvent(self.canvas, RenderBoxEditEndEvent())
+                self._enable_inputs()
                 self._active_selection.locked = True
                 self._push_selection()
         evt.Skip()
@@ -323,7 +357,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
         if len(selection_group) >= 1:
             # load the active selection
-            self._load_active_selection()
+            self._create_active_selection()
             self._active_selection.selection_box = selection_group[-1]
 
         if len(selection_group) >= 2:
