@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Tuple, Optional
 import time
 import numpy
 import wx
+from wx.lib import newevent
 
 from ..events import (
     InputPressEvent,
@@ -23,6 +24,15 @@ from .pointer_behaviour import PointerBehaviour
 
 if TYPE_CHECKING:
     from ..canvas import EditCanvas
+
+# the active selection was changed from local code. Not fired by active_block_positions.setter
+RenderBoxChangeEvent, EVT_RENDER_BOX_CHANGE = newevent.NewEvent()
+
+# run when self._editing is set to True. Locks external editing
+RenderBoxEditStartEvent, EVT_RENDER_BOX_EDIT_START = newevent.NewEvent()
+
+# run when self._editing is set to False and there is an active selection. Allows external editing
+RenderBoxEditEndEvent, EVT_RENDER_BOX_EDIT_END = newevent.NewEvent()
 
 NPArray2x3 = numpy.ndarray
 NPVector3 = numpy.ndarray
@@ -91,6 +101,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
         """Pull the selection from the canvas."""
         self.selection_group = self.canvas.selection.selection_group
 
+    def _post_change_event(self):
+        wx.PostEvent(self.canvas, RenderBoxChangeEvent())
+
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == "box click":
             if not self._editing:
@@ -116,6 +129,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                             # the active selection is highlighted
                             self._press_time = time.time()
                             self._editing = True
+                            wx.PostEvent(self.canvas, RenderBoxEditStartEvent())
                             (
                                 self._start_point_1,
                                 self._start_point_2,
@@ -134,6 +148,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                             self._active_selection.selection_box = selection_group[
                                 box_index
                             ]
+                            self._post_change_event()
 
                         default_create = False
                         self._initial_box = self._active_selection.points
@@ -145,6 +160,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 if default_create:
                     self._press_time = time.time()
                     self._editing = True
+                    wx.PostEvent(self.canvas, RenderBoxEditStartEvent())
                     self._start_point_1 = self._pointer.bounds
                     self._pointer_mask = numpy.array(
                         [[False] * 3, [True] * 3], dtype=numpy.bool
@@ -180,6 +196,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     self._selection.selection_group = selection_group[:-1]
                     self._active_selection.selection_box = selection_group[-1]
                     self._active_selection.locked = True
+                    wx.PostEvent(self.canvas, RenderBoxEditEndEvent())
                 else:
                     self._unload_active_selection()
             else:
@@ -187,7 +204,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._load_active_selection()
                 self._active_selection.points = self._initial_box
                 self._active_selection.locked = True
+                wx.PostEvent(self.canvas, RenderBoxEditEndEvent())
             self._editing = False
+            self._post_change_event()
 
     def _get_active_points(self) -> Tuple[NPArray2x3, NPArray2x3]:
         """Get the 1x1x1 box coords for the active selection."""
@@ -254,6 +273,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         if evt.action_id == "box click":
             if self._editing and time.time() - self._press_time > 0.1:
                 self._editing = False
+                wx.PostEvent(self.canvas, RenderBoxEditEndEvent())
                 self._active_selection.locked = True
                 self._push_selection()
         evt.Skip()
@@ -265,6 +285,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._active_selection.point1,
                 self._active_selection.point2,
             ) = self._get_editing_selection()
+            self._post_change_event()
         else:
             box_index, faces = self._get_box_faces()
             self._selection.reset_highlight_edges()
