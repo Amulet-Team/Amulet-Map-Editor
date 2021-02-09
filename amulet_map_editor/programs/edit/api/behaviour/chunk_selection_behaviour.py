@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Tuple
 import numpy
 import time
 
-from amulet.api.data_types import PointCoordinatesAny
 from amulet.api.selection import SelectionGroup, SelectionBox
 from .pointer_behaviour import PointerBehaviour
 from amulet_map_editor.api.opengl.mesh.selection import (
@@ -48,7 +47,7 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         """Write the current state to the global selection triggering an undo point."""
         self.canvas.selection.selection_group = self._selection.selection_group
 
-    def enable(self):
+    def _chunkify_selection(self):
         selections = []
         for box in self.canvas.selection.selection_group.selection_boxes:
             min_point = (
@@ -64,12 +63,19 @@ class ChunkSelectionBehaviour(PointerBehaviour):
             selections.append(SelectionBox(min_point, max_point))
         selection_group = SelectionGroup(selections)
         if selection_group != self.canvas.selection.selection_group:
+            # if the above code modified the selection
             self.canvas.selection.selection_group = selection_group
+            # this will indirectly update the renderer by updating the global selection
+        elif selection_group != self._selection.selection_group:
+            # if the above code did not change the selection but it does not match the renderer
+            self._selection.selection_group = selection_group
 
+    def enable(self):
+        self._chunkify_selection()
         self._editing = False
 
     def _on_selection_change(self, evt):
-        self._selection.selection_group = self.canvas.selection.selection_group
+        self._chunkify_selection()
         evt.Skip()
 
     def _on_input_press(self, evt: InputPressEvent):
