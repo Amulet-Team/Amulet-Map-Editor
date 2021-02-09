@@ -25,7 +25,7 @@ class CameraBehaviour(BaseBehaviour):
 
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
-        self._previous_mouse_lock = self._mouse_lock = False
+        self._previous_mouse_lock = self.canvas.camera.rotating = False
         self._toggle_mouse_time = 0
 
     def bind_events(self):
@@ -57,7 +57,7 @@ class CameraBehaviour(BaseBehaviour):
                 self.canvas.camera.projection_mode = Projection.PERSPECTIVE
         elif evt.action_id == "toggle mouse mode":
             self.canvas.SetFocus()
-            self._previous_mouse_lock = self._mouse_lock
+            self._previous_mouse_lock = self.canvas.camera.rotating
             self._capture_mouse()
             self._toggle_mouse_time = time.time()
 
@@ -87,14 +87,14 @@ class CameraBehaviour(BaseBehaviour):
         right += ("right" in evt.action_ids) - ("left" in evt.action_ids)
 
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-            if self._mouse_lock:
+            if self.canvas.camera.rotating:
                 pitch = self.canvas.mouse.delta_y * 0.07
                 yaw = self.canvas.mouse.delta_x * 0.07
                 self.canvas.mouse.warp_middle()
                 self.canvas.mouse.reset_delta()
             self.move_camera_relative(forward, up, right, pitch, yaw)
         elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
-            if self._mouse_lock:
+            if self.canvas.camera.rotating:
                 width, height = self.canvas.GetSize()
                 forward += (
                     2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
@@ -120,7 +120,7 @@ class CameraBehaviour(BaseBehaviour):
     def move_camera_relative(self, forward, up, right, pitch, yaw):
         """Move the camera relative to its current location."""
         if not any((forward, up, right, pitch, yaw)):
-            # if not self._mouse_lock and self._mouse_moved:
+            # if not self.canvas.camera.rotating and self._mouse_moved:
             #     self._mouse_moved = False
             #     self._selection_moved = True
             return
@@ -153,12 +153,12 @@ class CameraBehaviour(BaseBehaviour):
         self.canvas.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
         self.canvas.mouse.warp_middle()
         self.canvas.mouse.reset_delta()
-        self._mouse_lock = True
+        self.canvas.camera.rotating = True
 
     def _release_mouse(self):
         """Release the mouse"""
         self.canvas.SetCursor(wx.NullCursor)
-        self._mouse_lock = False
+        self.canvas.camera.rotating = False
 
     def _on_loss_focus(self, evt):
         """Event fired when the user tabs out of the window."""

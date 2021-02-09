@@ -98,6 +98,10 @@ class Camera(CanvasContainer):
         self._projection_matrix = None
         self._transformation_matrix = None
 
+    def _notify_moved(self):
+        """Post a CameraMovedEvent"""
+        wx.PostEvent(self.canvas, CameraMovedEvent(self.location, self.rotation))
+
     @property
     def projection_mode(self) -> Projection:
         return self._projection_mode
@@ -122,7 +126,7 @@ class Camera(CanvasContainer):
         """Set the location of the camera. (x, y, z).
         Generates EVT_CAMERA_MOVED on the parent canvas."""
         self.set_location(camera_location)
-        wx.PostEvent(self.canvas, CameraMovedEvent(self.location, self.rotation))
+        self._notify_moved()
 
     def set_location(self, camera_location: CameraLocationType):
         """Set the location of the camera. (x, y, z)."""
@@ -148,7 +152,7 @@ class Camera(CanvasContainer):
         This should behave the same as how Minecraft handles it.
         Generates EVT_CAMERA_MOVED on the parent canvas."""
         self.set_rotation(camera_rotation)
-        wx.PostEvent(self.canvas, CameraMovedEvent(self.location, self.rotation))
+        self._notify_moved()
 
     def set_rotation(self, camera_rotation: CameraRotationType):
         """Set the location of the camera. (x, y, z)."""
@@ -174,7 +178,7 @@ class Camera(CanvasContainer):
         location, rotation = location_rotation
         self.set_location(location)
         self.set_rotation(rotation)
-        wx.PostEvent(self.canvas, CameraMovedEvent(self.location, self.rotation))
+        self._notify_moved()
 
     @property
     def fov(self) -> float:

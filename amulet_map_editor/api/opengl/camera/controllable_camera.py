@@ -14,6 +14,7 @@ class ControllableCamera(Camera):
         super().__init__(canvas)
         self._move_speed = 2.0
         self._rotate_speed = 2.0
+        self._rotating = False
 
     @property
     def move_speed(self) -> float:
@@ -36,3 +37,14 @@ class ControllableCamera(Camera):
         """Set the speed that the camera rotates at."""
         assert type(val) in (int, float)
         self._rotate_speed = val
+
+    @property
+    def rotating(self):
+        """Is the camera rotating (True) or fixed (False)"""
+        return self._rotating
+
+    @rotating.setter
+    def rotating(self, rotating: bool):
+        """Set if the camera is rotating (True) or fixed (False)"""
+        self._rotating = bool(rotating)
+        self._notify_moved()
