@@ -60,8 +60,8 @@ class RaycastBehaviour(BaseBehaviour):
         self, max_distance: float = 100
     ) -> Tuple[PointCoordinatesNDArray, bool]:
         """Find the location of the closest non-air block.
-        If the end is reached an a non-air block was not found the end location will be returned.
 
+        If the end is reached an a non-air block was not found the end location will be returned.
         :param max_distance: The distance to search up to.
         :return: Tuple[The block coordinate, was a non-air block found in the range]
         """
@@ -157,8 +157,7 @@ class RaycastBehaviour(BaseBehaviour):
         start_location: Optional[numpy.ndarray] = None,
         look_vector: Optional[numpy.ndarray] = None,
     ) -> PointCoordinatesNDArray:
-        """
-        The first block location along the camera's look vector that is further away than `distance`.
+        """The first block location along the camera's look vector that is further away than `distance`.
         :param distance: The distance between the block and the camera.
         :param start_location: The start location. Defaults to the camera location.
         :param look_vector: The unit look vector. Defaults to the camera look vector.

@@ -206,11 +206,11 @@ class Camera(CanvasContainer):
 
     @staticmethod
     def rotation_matrix(yaw, pitch) -> TransformationMatrixType:
-        """Helper function to get a rotation matrix for yaw and pitch
+        """Helper function to get a rotation matrix for yaw and pitch.
 
-        :param yaw: Yaw in degrees
-        :param pitch: Pitch in degrees
-        :return:
+        :param yaw: Yaw in degrees.
+        :param pitch: Pitch in degrees.
+        :return: A 4x4 rotation matrix.
         """
         return rotation_matrix_yx(math.radians(yaw + 180), math.radians(pitch))
 
