@@ -1,13 +1,16 @@
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 import wx
-
-from amulet.api.data_types import PointCoordinatesAny
 
 from amulet_map_editor.api.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.api.opengl.camera import Projection
 
 from .raycast_behaviour import RaycastBehaviour
-from ..events import EVT_PRE_DRAW, EVT_CAMERA_MOVED
+from ..events import (
+    EVT_PRE_DRAW,
+    EVT_CAMERA_MOVED,
+    InputPressEvent,
+    EVT_INPUT_PRESS,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -33,26 +36,41 @@ class PointerBehaviour(RaycastBehaviour):
 
     def bind_events(self):
         super().bind_events()
-        self.canvas.Bind(EVT_PRE_DRAW, self._move_pointer)
+        self.canvas.Bind(EVT_PRE_DRAW, self._pre_draw)
         self.canvas.Bind(EVT_CAMERA_MOVED, self._invalidate_pointer)
         self.canvas.Bind(wx.EVT_MOTION, self._invalidate_pointer)
+        self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
+
+    def _on_input_press(self, evt: InputPressEvent):
+        if evt.action_id == "selection distance +":
+            self._pointer_distance += 1
+            self._pointer_moved = True
+        elif evt.action_id == "selection distance -":
+            self._pointer_distance -= 1
+            self._pointer_moved = True
+        evt.Skip()
 
     def _invalidate_pointer(self, evt):
         self._pointer_moved = True
         evt.Skip()
 
-    def _move_pointer(self, evt):
+    def _pre_draw(self, evt):
         if self._pointer_moved:
-            self._pointer.point1, self._pointer.point2 = self._get_pointer_location()
+            self._update_pointer()
             self._pointer_moved = False
         evt.Skip()
 
-    def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
+    def _update_pointer(self):
+        """Update the pointer location."""
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
             location = self.closest_block_2d()[0]
         else:
-            location = self.closest_block_3d()[0]
-        return location, location + 1
+            if self.canvas.camera.rotating:
+                location = self.distance_block_3d(self._pointer_distance)
+            else:
+                location = self.closest_block_3d()[0]
+
+        self._pointer.point1, self._pointer.point2 = location, location + 1
 
     def draw(self):
         self._pointer.draw(self.canvas.camera.transformation_matrix)

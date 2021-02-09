@@ -6,13 +6,15 @@ from wx.lib import newevent
 
 from ..events import (
     InputPressEvent,
-    EVT_INPUT_PRESS,
     InputReleaseEvent,
     EVT_INPUT_RELEASE,
     EVT_SELECTION_CHANGE,
 )
 from amulet.api.selection import SelectionGroup, SelectionBox
-from amulet.api.data_types import PointCoordinatesAny, BlockCoordinates
+from amulet.api.data_types import (
+    PointCoordinates,
+    BlockCoordinates,
+)
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.api.opengl.mesh.selection import (
     RenderSelectionEditable,
@@ -87,6 +89,8 @@ class BlockSelectionBehaviour(PointerBehaviour):
             NPArray2x3
         ] = None  # the state of the box when editing started
         self._pointer_mask: NPArray2x3 = numpy.zeros((2, 3), dtype=numpy.bool)
+        self._resizing = False  # is a box being resized
+        self._pointer_distance2 = 0  # the pointer distance used when resizing
 
     def _create_active_selection(self):
         """Create the active selection if it does not exist."""
@@ -104,26 +108,29 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
     def bind_events(self):
         super().bind_events()
-        self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
         self.canvas.Bind(EVT_INPUT_RELEASE, self._on_input_release)
         self.canvas.Bind(EVT_SELECTION_CHANGE, self._on_selection_change)
         self.canvas.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
 
     def enable(self):
-        self._pull_selection()
+        self.pull_selection()
 
     def _on_selection_change(self, evt):
-        self._pull_selection()
+        self.pull_selection()
         evt.Skip()
 
-    def _push_selection(self):
+    def push_selection(self):
         """Write the current state to the global selection triggering an undo point."""
         self.canvas.selection.selection_group = self.selection_group
 
-    def _pull_selection(self):
+    def pull_selection(self):
         """Pull the selection from the canvas."""
-        self._escape()
-        self.selection_group = self.canvas.selection.selection_group
+        selection = self.canvas.selection.selection_group
+        self.selection_group = selection
+        if selection:
+            self._enable_inputs()
+        else:
+            self._disable_inputs()
 
     def _post_change_event(self):
         wx.PostEvent(self.canvas, RenderBoxChangeEvent(*self.active_block_positions))
@@ -135,7 +142,19 @@ class BlockSelectionBehaviour(PointerBehaviour):
         wx.PostEvent(self.canvas, RenderBoxEnableInputsEvent())
 
     def _on_input_press(self, evt: InputPressEvent):
-        if evt.action_id == "box click":
+        if evt.action_id == "selection distance +":
+            if self._resizing:
+                self._pointer_distance2 += 1
+            else:
+                self._pointer_distance += 1
+            self._pointer_moved = True
+        elif evt.action_id == "selection distance -":
+            if self._resizing:
+                self._pointer_distance2 -= 1
+            else:
+                self._pointer_distance -= 1
+            self._pointer_moved = True
+        elif evt.action_id == "box click":
             if not self._editing:
                 default_create = True
                 self._press_time = time.time()
@@ -152,7 +171,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
                 elif self._highlight:
                     # edit the highlighted box
-                    box_index, faces = self._get_box_faces()
+                    box_index, distance, faces = self._get_box_faces()
                     if box_index is None:
                         # this shouldn't happen but just to be safe.
                         self._selection.selection_group = SelectionGroup()
@@ -173,10 +192,13 @@ class BlockSelectionBehaviour(PointerBehaviour):
                             self._start_point_1,
                             self._start_point_2,
                         ) = self._get_active_points()
+                        self._pointer_distance2 = distance
                         self._pointer_mask = faces
                         self._active_selection.set_highlight_edges(faces)
                         self._initial_box = self._active_selection.points
+                        self._resizing = True
                         default_create = False
+                        self._pointer_moved = True
                 else:
                     # clear the selection
                     self._selection.selection_group = SelectionGroup()
@@ -191,30 +213,42 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     )
                     self._active_selection.set_highlight_edges(self._pointer_mask)
                     self._initial_box = None
+                    self._resizing = False
 
         elif evt.action_id == "deselect boxes":
-            self._escape()
             if self.selection_group:
                 self.selection_group = SelectionGroup()
-                self._push_selection()
+                self.push_selection()
                 self._disable_inputs()
                 self._post_change_event()
+            else:
+                self._escape()
         elif evt.action_id == "remove box":
             if "deselect boxes" not in self.canvas.buttons.pressed_actions:
-                self._escape()
                 selection_group = self.selection_group
                 if selection_group:
                     self.selection_group = selection_group[:-1]
-                    self._push_selection()
+                    self.push_selection()
                     if self._active_selection is None:
                         self._disable_inputs()
                         self._post_change_event()
+                else:
+                    self._escape()
         evt.Skip()
 
     def _on_key_press(self, evt: wx.KeyEvent):
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
         if key == wx.WXK_ESCAPE:
             self._escape()
+        evt.Skip()
+
+    def _on_input_release(self, evt: InputReleaseEvent):
+        if evt.action_id == "box click":
+            if self._editing and time.time() - self._press_time > 0.1:
+                self._editing = self._resizing = False
+                self._enable_inputs()
+                self._active_selection.locked = True
+                self.push_selection()
         evt.Skip()
 
     def _escape(self):
@@ -238,7 +272,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._active_selection.points = self._initial_box
                 self._active_selection.locked = True
                 self._enable_inputs()
-            self._editing = False
+            self._editing = self._resizing = False
             self._highlight = False
             self._post_change_event()
 
@@ -283,7 +317,42 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._active_selection.point1,
                 self._active_selection.point2,
             ) = self._get_editing_selection()
-            self._push_selection()
+            self.push_selection()
+        else:
+            self._disable_inputs()
+
+    @property
+    def selection_group(self) -> SelectionGroup:
+        """The selection group of the static and active selection.
+        If the active selection is being resized it will not be included in this."""
+        selection_group = self._selection.selection_group
+        if self._active_selection is not None and not self._editing:
+            selection_group += self._active_selection.selection_group
+        return selection_group
+
+    @selection_group.setter
+    def selection_group(self, selection_group: SelectionGroup):
+        """Set the selection group of the static and active selection.
+        This will only trigger a grapical change and will not update the global selection.
+        A call to push_selection is required to push the updated selection to the global selection."""
+        self._escape()
+        if len(selection_group) == 0:
+            # unload the active selection
+            if self._active_selection is not None:
+                self._unload_active_selection()
+
+        if len(selection_group) <= 1:
+            # unload the selection group
+            self._selection.selection_group = SelectionGroup()
+
+        if len(selection_group) >= 1:
+            # load the active selection
+            self._create_active_selection()
+            self._active_selection.selection_box = selection_group[-1]
+
+        if len(selection_group) >= 2:
+            # load the selection group
+            self._selection.selection_group = selection_group[:-1]
 
     def _get_editing_selection(self) -> Tuple[NPVector3, NPVector3]:
         """Get the minimum and maximum points of the editing selection.
@@ -303,106 +372,129 @@ class BlockSelectionBehaviour(PointerBehaviour):
         start[mask] = start_2[mask]
         return start, point
 
-    def _on_input_release(self, evt: InputReleaseEvent):
-        if evt.action_id == "box click":
-            if self._editing and time.time() - self._press_time > 0.1:
-                self._editing = False
-                self._enable_inputs()
-                self._active_selection.locked = True
-                self._push_selection()
-        evt.Skip()
+    def _update_pointer(self):
+        # find the closest box position
+        # check if there are any blocks up to that position
 
-    def _move_pointer(self, evt):
-        super()._move_pointer(evt)
-        if self._editing:
-            (
-                self._active_selection.point1,
-                self._active_selection.point2,
-            ) = self._get_editing_selection()
-            self._post_change_event()
-        else:
-            box_index, faces = self._get_box_faces()
-            self._selection.reset_highlight_edges()
-            if box_index is None:
-                self._highlight = False
-                if self._active_selection is not None:
-                    self._active_selection.reset_highlight_edges()
+        # find the closest box position
+        # find the closest box or block position
+        if self._pointer_moved:
+            if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+                camera = self.canvas.camera.location
+                camera = (camera[0], 10 ** 9, camera[2])
+                look_vector = self.look_vector()
+                selection_group, box_index, max_distance = self._get_box_hit_data(
+                    camera, look_vector
+                )
+                location, hit_block = self.closest_block_2d(
+                    int(10 ** 9 - min(max_distance, 10 ** 9)) + 1
+                )
             else:
-                self._highlight = True
-                if box_index == len(self._selection):
-                    self._active_selection.set_highlight_edges(faces)
+                (
+                    camera,
+                    look_vector,
+                    selection_group,
+                    box_index,
+                    max_distance,
+                ) = self._get_default_box_hit_data()
+                if self.canvas.camera.rotating:
+                    if self._resizing:
+                        location = self.distance_block_3d(self._pointer_distance2)
+                    else:
+                        location = self.distance_block_3d(self._pointer_distance)
+                    hit_block = True
                 else:
-                    self._selection.set_highlight_edges(box_index, faces)
-                    self._active_selection.reset_highlight_edges()
+                    if self._resizing:
+                        location = self.distance_block_3d(self._pointer_distance2)
+                        hit_block = True
+                    else:
+                        location, hit_block = self.closest_block_3d(
+                            min(max_distance, 100) - 0.3
+                        )
 
-    @property
-    def selection_group(self) -> SelectionGroup:
-        """The selection group of the static and active selection.
-        If the active selection is being resized it will not be included in this."""
-        selection_group = self._selection.selection_group
-        if self._active_selection is not None and not self._editing:
-            selection_group += self._active_selection.selection_group
-        return selection_group
+            self._pointer.point1, self._pointer.point2 = location, location + 1
+            self._pointer_moved = False
+            if self._editing:
+                (
+                    self._active_selection.point1,
+                    self._active_selection.point2,
+                ) = self._get_editing_selection()
+                self._post_change_event()
+            else:
+                self._selection.reset_highlight_edges()
+                if box_index is None or hit_block:
+                    # if no box was hit or a block was hit
+                    self._highlight = False
+                    if self._active_selection is not None:
+                        self._active_selection.reset_highlight_edges()
+                else:
+                    self._highlight = True
+                    faces_hit = self._get_box_faces_manual(
+                        camera, look_vector, selection_group, box_index, max_distance
+                    )
+                    if box_index == len(self._selection):
+                        self._active_selection.set_highlight_edges(faces_hit)
+                    else:
+                        self._selection.set_highlight_edges(box_index, faces_hit)
+                        self._active_selection.reset_highlight_edges()
 
-    @selection_group.setter
-    def selection_group(self, selection_group: SelectionGroup):
-        if len(selection_group) == 0:
-            # unload the active selection
-            if self._active_selection is not None:
-                self._unload_active_selection()
-
-        if len(selection_group) <= 1:
-            # unload the selection group
-            self._selection.selection_group = SelectionGroup()
-
-        if len(selection_group) >= 1:
-            # load the active selection
-            self._create_active_selection()
-            self._active_selection.selection_box = selection_group[-1]
-
-        if len(selection_group) >= 2:
-            # load the selection group
-            self._selection.selection_group = selection_group[:-1]
-
-    def _get_box_faces(self) -> Tuple[Optional[int], NPArray2x3]:
-        """Get a bool array of which faces the look vector hits.
-        If the vector hits near an edge it will have two faces and three for a corner."""
+    def _get_default_box_hit_data(
+        self,
+    ) -> Tuple[PointCoordinates, NPVector3, SelectionGroup, Optional[int], float]:
         camera = self.canvas.camera.location
         look_vector = self.look_vector()
+        return (camera, look_vector) + self._get_box_hit_data(camera, look_vector)
+
+    def _get_box_hit_data(
+        self, camera: PointCoordinates, look_vector: NPVector3
+    ) -> Tuple[SelectionGroup, Optional[int], float]:
         selection_group = self.selection_group
-        (box_index, max_distance) = selection_group.closest_vector_intersection(
+        box_index, max_distance = selection_group.closest_vector_intersection(
             camera, look_vector
         )
+        return selection_group, box_index, max_distance
+
+    def _get_box_faces(self) -> Tuple[Optional[int], float, NPArray2x3]:
+        """Get collision information between a vector and a selection group.
+        If the vector intersects a box in the selection group it will return
+            The index of the selection box in the selection group.
+            A 2x3 bool array of the faces that were hit as corresponding to point1 and point2 x,y,z
+        If the vector does not hit the selection the same structure applies but will look like this
+            None
+            2x3 False array"""
+        (
+            camera,
+            look_vector,
+            selection_group,
+            box_index,
+            max_distance,
+        ) = self._get_default_box_hit_data()
+        return (
+            box_index,
+            max_distance,
+            self._get_box_faces_manual(
+                camera, look_vector, selection_group, box_index, max_distance
+            ),
+        )
+
+    @staticmethod
+    def _get_box_faces_manual(
+        camera: PointCoordinates,
+        look_vector: NPVector3,
+        selection_group: SelectionGroup,
+        box_index: Optional[int],
+        max_distance: float,
+    ) -> NPArray2x3:
+        """Get a 2x3 bool array of the faces the look vector first contacts.
+        point1 (x y z), point2 (x y z)"""
         if box_index is None:
             # it doesn't hit any boxes
-            return None, numpy.zeros((2, 3), dtype=numpy.bool)
+            return numpy.zeros((2, 3), dtype=numpy.bool)
         else:
             box: SelectionBox = selection_group[box_index]
             point = max_distance * look_vector + camera
             tol = numpy.min([numpy.array(box.shape) / 4, numpy.ones(3)], 0)
-            return box_index, numpy.abs(box.points_array - point) < tol
-
-    def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
-        if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
-            location = self.closest_block_2d()[0]
-        else:
-            camera_location = self.canvas.camera.location
-            look_vector = self.look_vector()
-            selection_group = self.selection_group
-            box_index, max_distance = selection_group.closest_vector_intersection(
-                camera_location, look_vector
-            )
-            location, block_hit = self.closest_block_3d(min(max_distance, 100))
-            # if box_index is not None and not block_hit and max_distance < 100:
-            #     for loc in self.collision_locations(
-            #         2, camera_location + look_vector * max_distance, look_vector
-            #     ):
-            #         if loc in selection_group[box_index]:
-            #             location = loc
-            #             self._selection.set_box_index(box_index)
-            #             break
-
-        return location, location + 1
+            return numpy.abs(box.points_array - point) < tol
 
     def draw(self):
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:

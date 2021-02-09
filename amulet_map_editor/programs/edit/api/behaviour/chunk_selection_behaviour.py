@@ -78,6 +78,7 @@ class ChunkSelectionBehaviour(PointerBehaviour):
                 self._press_time = time.time()
                 self._editing = True
                 self._start_box = self._pointer.bounds
+                self._update_pointer()
         elif evt.action_id == "deselect boxes":
             self._selection.selection_group = SelectionGroup()
             self._create_undo()
@@ -110,14 +111,8 @@ class ChunkSelectionBehaviour(PointerBehaviour):
                 self._create_undo()
         evt.Skip()
 
-    def _move_pointer(self, evt):
-        super()._move_pointer(evt)
-        (
-            self._editing_selection.point1,
-            self._editing_selection.point2,
-        ) = self._get_editing_selection()
-
-    def _get_pointer_location(self) -> Tuple[PointCoordinatesAny, PointCoordinatesAny]:
+    def _update_pointer(self):
+        """Update the pointer and selection location."""
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
             x, z = self.get_2d_mouse_location()
             location = numpy.array([x, 0, z])
@@ -137,7 +132,12 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         location_max = location_min + chunk_size
         location_min[1] = self.canvas.world.selection_bounds.min[1]
         location_max[1] = self.canvas.world.selection_bounds.max[1]
-        return location_min, location_max
+        self._pointer.point1, self._pointer.point2 = location_min, location_max
+        if self._editing:
+            (
+                self._editing_selection.point1,
+                self._editing_selection.point2,
+            ) = self._get_editing_selection()
 
     def draw(self):
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
