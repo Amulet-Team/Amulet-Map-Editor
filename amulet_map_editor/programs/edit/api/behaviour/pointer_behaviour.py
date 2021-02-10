@@ -3,6 +3,7 @@ import wx
 
 from amulet_map_editor.api.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.api.opengl.camera import Projection
+from amulet.api.data_types import BlockCoordinatesNDArray
 
 from .raycast_behaviour import RaycastBehaviour
 from ..events import (
@@ -33,6 +34,10 @@ class PointerBehaviour(RaycastBehaviour):
             self.canvas.context_identifier,
             self.canvas.renderer.opengl_resource_pack,
         )
+
+    @property
+    def pointer_base(self) -> BlockCoordinatesNDArray:
+        return self._pointer.point1
 
     def bind_events(self):
         super().bind_events()

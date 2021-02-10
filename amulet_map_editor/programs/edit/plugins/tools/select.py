@@ -7,6 +7,7 @@ from OpenGL.GL import (
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.api.opengl.camera import Projection
+from amulet_map_editor.programs.edit.api.behaviour.inspect_block_behaviour import InspectBlockBehaviour
 from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour import (
     BlockSelectionBehaviour,
     EVT_RENDER_BOX_CHANGE,
@@ -26,6 +27,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         CameraToolUI.__init__(self, canvas)
 
         self._selection = BlockSelectionBehaviour(self.canvas)
+        self._inspect_block = InspectBlockBehaviour(self.canvas, self._selection)
 
         self._button_panel = wx.Panel(canvas)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -101,6 +103,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         self.canvas.Bind(EVT_RENDER_BOX_DISABLE_INPUTS, self._disable_scrolls)
         self.canvas.Bind(EVT_RENDER_BOX_ENABLE_INPUTS, self._enable_scrolls)
         self._selection.bind_events()
+        self._inspect_block.bind_events()
 
     def enable(self):
         super().enable()
