@@ -128,7 +128,11 @@ class SelectLocationUI(SimplePanel, EditCanvasContainer):
 
     def _on_transform_change(self, evt):
         location, scale, rotation = self.canvas.renderer.fake_levels.active_transform
-        self.canvas.renderer.fake_levels.active_transform = self.location, scale, rotation
+        self.canvas.renderer.fake_levels.active_transform = (
+            self.location,
+            scale,
+            rotation,
+        )
 
     def _cursor_move(self, evt):
         if not self._clicked:
