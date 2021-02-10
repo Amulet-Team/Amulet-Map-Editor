@@ -16,6 +16,11 @@ from ..events import (
     EVT_SELECTION_CHANGE,
 )
 from amulet_map_editor.api.opengl.camera import Projection
+from ..key_config import (
+    ACT_BOX_CLICK,
+    ACT_DESELECT_ALL_BOXES,
+    ACT_DELESECT_BOX,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -79,17 +84,17 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         evt.Skip()
 
     def _on_input_press(self, evt: InputPressEvent):
-        if evt.action_id == "box click":
+        if evt.action_id == ACT_BOX_CLICK:
             if not self._editing:
                 self._press_time = time.time()
                 self._editing = True
                 self._start_box = self._pointer.bounds
                 self._update_pointer()
-        elif evt.action_id == "deselect boxes":
+        elif evt.action_id == ACT_DESELECT_ALL_BOXES:
             self._selection.selection_group = SelectionGroup()
             self._create_undo()
-        elif evt.action_id == "remove box":
-            if "deselect boxes" not in self.canvas.buttons.pressed_actions:
+        elif evt.action_id == ACT_DELESECT_BOX:
+            if ACT_DESELECT_ALL_BOXES not in self.canvas.buttons.pressed_actions:
                 self._selection.selection_group = SelectionGroup()
                 self._create_undo()
         evt.Skip()
@@ -101,7 +106,7 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         return numpy.min(points, 0), numpy.max(points, 0)
 
     def _on_input_release(self, evt: InputReleaseEvent):
-        if evt.action_id == "box click":
+        if evt.action_id == ACT_BOX_CLICK:
             if self._editing and time.time() - self._press_time > 0.1:
                 self._editing = False
                 box = SelectionBox(*self._get_editing_selection())

@@ -22,7 +22,14 @@ from amulet_map_editor.api.opengl.mesh.selection import (
 )
 
 from .pointer_behaviour import PointerBehaviour
-
+from ..key_config import (
+    ACT_BOX_CLICK,
+    ACT_BOX_CLICK_ADD,
+    ACT_INCR_SELECT_DISTANCE,
+    ACT_DECR_SELECT_DISTANCE,
+    ACT_DESELECT_ALL_BOXES,
+    ACT_DELESECT_BOX,
+)
 
 if TYPE_CHECKING:
     from ..canvas import EditCanvas
@@ -142,25 +149,25 @@ class BlockSelectionBehaviour(PointerBehaviour):
         wx.PostEvent(self.canvas, RenderBoxEnableInputsEvent())
 
     def _on_input_press(self, evt: InputPressEvent):
-        if evt.action_id == "selection distance +":
+        if evt.action_id == ACT_INCR_SELECT_DISTANCE:
             if self._resizing:
                 self._pointer_distance2 += 1
             else:
                 self._pointer_distance += 1
             self._pointer_moved = True
-        elif evt.action_id == "selection distance -":
+        elif evt.action_id == ACT_DECR_SELECT_DISTANCE:
             if self._resizing:
                 self._pointer_distance2 -= 1
             else:
                 self._pointer_distance -= 1
             self._pointer_moved = True
-        elif evt.action_id == "box click":
+        elif evt.action_id == ACT_BOX_CLICK:
             if not self._editing:
                 default_create = True
                 self._press_time = time.time()
                 self._disable_inputs()
 
-                if "add box modifier" in self.canvas.buttons.pressed_actions:
+                if ACT_BOX_CLICK_ADD in self.canvas.buttons.pressed_actions:
                     # create a new box
                     if self._active_selection is not None:
                         # move the existing active to the inactive
@@ -215,7 +222,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     self._initial_box = None
                     self._resizing = False
 
-        elif evt.action_id == "deselect boxes":
+        elif evt.action_id == ACT_DESELECT_ALL_BOXES:
             if self.selection_group:
                 self.selection_group = SelectionGroup()
                 self.push_selection()
@@ -223,8 +230,8 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._post_change_event()
             else:
                 self._escape()
-        elif evt.action_id == "remove box":
-            if "deselect boxes" not in self.canvas.buttons.pressed_actions:
+        elif evt.action_id == ACT_DELESECT_BOX:
+            if ACT_DESELECT_ALL_BOXES not in self.canvas.buttons.pressed_actions:
                 selection_group = self.selection_group
                 if selection_group:
                     self.selection_group = selection_group[:-1]
@@ -243,7 +250,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         evt.Skip()
 
     def _on_input_release(self, evt: InputReleaseEvent):
-        if evt.action_id == "box click":
+        if evt.action_id == ACT_BOX_CLICK:
             if self._editing and time.time() - self._press_time > 0.1:
                 self._editing = self._resizing = False
                 self._enable_inputs()

@@ -15,6 +15,18 @@ from ..events import (
     InputReleaseEvent,
     EVT_INPUT_RELEASE,
 )
+from ..key_config import (
+    ACT_MOVE_UP,
+    ACT_MOVE_DOWN,
+    ACT_MOVE_FORWARDS,
+    ACT_MOVE_BACKWARDS,
+    ACT_MOVE_LEFT,
+    ACT_MOVE_RIGHT,
+    ACT_CHANGE_MOUSE_MODE,
+    ACT_INCR_SPEED,
+    ACT_DECR_SPEED,
+    ACT_CHANGE_PROJECTION,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -49,13 +61,13 @@ class CameraBehaviour(BaseBehaviour):
 
     def _on_input_press(self, evt: InputPressEvent):
         """Logic to run each time the input press event is run."""
-        if evt.action_id == "toggle 2d/3d":
+        if evt.action_id == ACT_CHANGE_PROJECTION:
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
                 self.canvas.camera.rotation = 180, 90
                 self.canvas.camera.projection_mode = Projection.TOP_DOWN
             elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
                 self.canvas.camera.projection_mode = Projection.PERSPECTIVE
-        elif evt.action_id == "toggle mouse mode":
+        elif evt.action_id == ACT_CHANGE_MOUSE_MODE:
             self.canvas.SetFocus()
             self._previous_mouse_lock = self.canvas.camera.rotating
             self._capture_mouse()
@@ -63,17 +75,17 @@ class CameraBehaviour(BaseBehaviour):
 
     def _on_input_release(self, evt: InputReleaseEvent):
         """Logic to run each time the input release event is run."""
-        if evt.action_id == "toggle mouse mode":
+        if evt.action_id == ACT_CHANGE_MOUSE_MODE:
             if self._previous_mouse_lock or time.time() - self._toggle_mouse_time > 0.1:
                 self._release_mouse()
             else:
                 self._capture_mouse()
-        elif evt.action_id == "speed+":
+        elif evt.action_id == ACT_INCR_SPEED:
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
                 self.canvas.camera.move_speed *= 1.1
             elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
                 self.canvas.camera.fov = max(0.5, self.canvas.camera.fov / 1.1)
-        elif evt.action_id == "speed-":
+        elif evt.action_id == ACT_DECR_SPEED:
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
                 self.canvas.camera.move_speed /= 1.1
             elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
@@ -82,9 +94,11 @@ class CameraBehaviour(BaseBehaviour):
     def _on_input_held(self, evt: InputHeldEvent):
         """Logic to run each time the input held event is run."""
         forward = up = right = pitch = yaw = 0
-        up += ("up" in evt.action_ids) - ("down" in evt.action_ids)
-        forward += ("forwards" in evt.action_ids) - ("backwards" in evt.action_ids)
-        right += ("right" in evt.action_ids) - ("left" in evt.action_ids)
+        up += (ACT_MOVE_UP in evt.action_ids) - (ACT_MOVE_DOWN in evt.action_ids)
+        forward += (ACT_MOVE_FORWARDS in evt.action_ids) - (
+            ACT_MOVE_BACKWARDS in evt.action_ids
+        )
+        right += (ACT_MOVE_RIGHT in evt.action_ids) - (ACT_MOVE_LEFT in evt.action_ids)
 
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             if self.canvas.camera.rotating:

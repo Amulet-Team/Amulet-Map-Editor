@@ -7,7 +7,9 @@ from OpenGL.GL import (
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.api.opengl.camera import Projection
-from amulet_map_editor.programs.edit.api.behaviour.inspect_block_behaviour import InspectBlockBehaviour
+from amulet_map_editor.programs.edit.api.behaviour.inspect_block_behaviour import (
+    InspectBlockBehaviour,
+)
 from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour import (
     BlockSelectionBehaviour,
     EVT_RENDER_BOX_CHANGE,

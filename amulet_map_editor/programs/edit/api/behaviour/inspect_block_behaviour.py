@@ -9,6 +9,9 @@ from ..events import (
     InputPressEvent,
     EVT_INPUT_PRESS,
 )
+from ..key_config import (
+    ACT_INSPECT_BLOCK,
+)
 
 if TYPE_CHECKING:
     from ..canvas import EditCanvas
@@ -27,7 +30,7 @@ class InspectBlockBehaviour(BaseBehaviour):
 
     def _on_input_press(self, evt: InputPressEvent):
         """Logic to run each time the input press event is run."""
-        if evt.action_id == "inspect block":
+        if evt.action_id == ACT_INSPECT_BLOCK:
             self._inspect_block()
         evt.Skip()
 
@@ -83,17 +86,13 @@ class InspectBlockBehaviour(BaseBehaviour):
             if chunk.biomes.dimension == 2:
                 biome = chunk.biomes[x % 16, z % 16]
                 try:
-                    block_data_text = (
-                        f"{block_data_text}\n\nBiome: {self.canvas.world.biome_palette[biome]}"
-                    )
+                    block_data_text = f"{block_data_text}\n\nBiome: {self.canvas.world.biome_palette[biome]}"
                 except Exception as e:
                     log.error(e)
             elif chunk.biomes.dimension == 3:
                 biome = chunk.biomes[(x % 16) // 4, y // 4, (z % 16) // 4]
                 try:
-                    block_data_text = (
-                        f"{block_data_text}\n\nBiome: {self.canvas.world.biome_palette[biome]}"
-                    )
+                    block_data_text = f"{block_data_text}\n\nBiome: {self.canvas.world.biome_palette[biome]}"
                 except Exception as e:
                     log.error(e)
 

@@ -12,6 +12,10 @@ from ..events import (
     InputPressEvent,
     EVT_INPUT_PRESS,
 )
+from ..key_config import (
+    ACT_INCR_SELECT_DISTANCE,
+    ACT_DECR_SELECT_DISTANCE,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -47,10 +51,10 @@ class PointerBehaviour(RaycastBehaviour):
         self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
 
     def _on_input_press(self, evt: InputPressEvent):
-        if evt.action_id == "selection distance +":
+        if evt.action_id == ACT_INCR_SELECT_DISTANCE:
             self._pointer_distance += 1
             self._pointer_moved = True
-        elif evt.action_id == "selection distance -":
+        elif evt.action_id == ACT_DECR_SELECT_DISTANCE:
             self._pointer_distance -= 1
             self._pointer_moved = True
         evt.Skip()
