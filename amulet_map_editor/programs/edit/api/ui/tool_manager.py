@@ -17,6 +17,7 @@ from amulet_map_editor.programs.edit.plugins.tools import (
     SelectOperationUI,
     SelectOptions,
     ChunkTool,
+    PasteTool,
 )
 
 if TYPE_CHECKING:
@@ -44,6 +45,7 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
         self.register_tool(SelectOptions)
+        self.register_tool(PasteTool)
         self.register_tool(SelectOperationUI)
         self.register_tool(SelectImportOperationUI)
         self.register_tool(SelectExportOperationUI)

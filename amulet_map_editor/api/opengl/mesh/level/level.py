@@ -46,9 +46,6 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         self._selection = GreenRenderSelectionGroup(
             context_identifier, self.resource_pack, self.level.selection_bounds
         )
-        self._selection_displacement = displacement_matrix(
-            *self.level.selection_bounds.min.astype(int)
-        )
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
 
         self._last_rebuild_camera_location: Optional[
@@ -246,7 +243,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         self._chunk_manager.draw(camera_matrix, self.camera_location)
         if self._draw_box:
             self._selection.draw(
-                numpy.matmul(camera_matrix, self._selection_displacement),
+                camera_matrix,
                 self.camera_location,
             )
 

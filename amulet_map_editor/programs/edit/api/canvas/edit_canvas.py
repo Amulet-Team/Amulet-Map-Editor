@@ -228,14 +228,12 @@ class EditCanvas(BaseEditCanvas):
         assert (
             dimension in structure.dimensions
         ), "The requested dimension does not exist for this object."
-        wx.PostEvent(self, ToolChangeEvent(tool="Select"))
+        wx.PostEvent(self, ToolChangeEvent(tool="Paste"))
         wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
 
     def paste_from_cache(self):
         if structure_cache:
-            structure, dimension = structure_cache.get_structure()
-            wx.PostEvent(self, ToolChangeEvent(tool="Select"))
-            wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
+            self.paste(*structure_cache.get_structure())
         else:
             wx.MessageBox("A structure needs to be copied before one can be pasted.")
 

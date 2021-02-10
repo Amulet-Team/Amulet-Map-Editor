@@ -37,8 +37,8 @@ class SelectLocationUI(SimplePanel, EditCanvasContainer):
 
         self._structure = structure
         self._dimension = dimension
-        self.canvas.structure.clear()
-        self.canvas.structure.append(
+        self.canvas.renderer.fake_levels.clear()
+        self.canvas.renderer.fake_levels.append(
             structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0)
         )
 
@@ -127,8 +127,8 @@ class SelectLocationUI(SimplePanel, EditCanvasContainer):
         config.put("edit_select_location", select_config)
 
     def _on_transform_change(self, evt):
-        location, scale, rotation = self.canvas.structure.active_transform
-        self.canvas.structure.active_transform = self.location, scale, rotation
+        location, scale, rotation = self.canvas.renderer.fake_levels.active_transform
+        self.canvas.renderer.fake_levels.active_transform = self.location, scale, rotation
 
     def _cursor_move(self, evt):
         if not self._clicked:
@@ -199,7 +199,7 @@ class SelectTransformUI(SelectLocationUI):
             ctrl.SetValue(
                 round((ctrl.GetValue() % 360) / 90) * 90
             )  # TODO: change this if smaller increments are allowed
-        self.canvas.structure.active_transform = (
+        self.canvas.renderer.fake_levels.active_transform = (
             self.location,
             self.scale,
             tuple(math.radians(r) for r in self.rotation),
