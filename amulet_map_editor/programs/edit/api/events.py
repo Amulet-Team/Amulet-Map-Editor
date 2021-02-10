@@ -45,25 +45,6 @@ EditCloseEvent, EVT_EDIT_CLOSE = newevent.NewEvent()
 # TODO: remove this
 CursorBoxMoveEvent, EVT_CURSOR_BOX_MOVE = newevent.NewEvent()
 
-# events fired when the active selection box changes.
-# TODO: remove this
-(
-    BoxChangeEvent,
-    EVT_BOX_CHANGE,
-) = newevent.NewEvent()  # one or more of the box coordinates have changed
-
-# TODO: remove this
-(
-    BoxDisableInputsEvent,
-    EVT_BOX_DISABLE_INPUTS,
-) = newevent.NewEvent()  # the box starts being edited
-
-# TODO: remove this
-(
-    BoxEnableInputsEvent,
-    EVT_BOX_ENABLE_INPUTS,
-) = newevent.NewEvent()  # the box stops being edited
-
 # The button to select the box was clicked. (Usually left mouse) Note based on the state the box may be unchanged.
 # TODO: remove this
 BoxClickEvent, EVT_BOX_CLICK = newevent.NewEvent()
