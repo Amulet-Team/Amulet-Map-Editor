@@ -1,0 +1,27 @@
+world.java_platform=Java版
+world.bedrock_platform=基巖版
+world.close_world=關閉世界
+
+select_world.open_world_button=打開另外壹個世界
+select_world.open_world_dialogue=選擇壹個Minecraft存檔目錄
+select_world.select_directory_failed=無法打開目錄！
+select_world.recent_worlds=最近打開的世界
+
+main_menu.tab_name=主菜單
+main_menu.open_world=打開世界
+main_menu.help=幫助
+
+program_about.tab_name=關於
+program_about.currently_opened_world=當前打開的世界
+program_about.choose_from_options=從左邊的選項中選擇妳想進行的事項。\n妳可以隨時在這些選項之間進行切換。
+
+program_convert.tab_name=轉換
+program_convert.convert_button=轉換
+program_convert.input_world=輸入世界
+program_convert.output_world=輸出世界
+program_convert.select_output_world=選擇輸出的世界
+program_convert.input_output_must_different=輸入和輸出的世界不可以是同壹個！
+program_convert.select_before_converting=妳必須選擇壹個用於轉換的世界！
+program_convert.conversion_completed=世界轉換完成
+
+program_3d_edit.tab_name=3D 編輯器
