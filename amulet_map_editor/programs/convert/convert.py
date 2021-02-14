@@ -85,7 +85,9 @@ class ConvertExtension(SimplePanel, BaseProgram):
         self.loading_bar.SetValue(0)
 
         self.convert_button = wx.Button(
-            self._convert_bar, wx.ID_ANY, label=lang.get("program_convert.convert_button")
+            self._convert_bar,
+            wx.ID_ANY,
+            label=lang.get("program_convert.convert_button"),
         )
         self._convert_bar.add_object(self.convert_button)
         self.convert_button.Bind(wx.EVT_BUTTON, self._convert_event)
