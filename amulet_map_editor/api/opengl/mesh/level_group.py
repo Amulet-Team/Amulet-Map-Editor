@@ -138,6 +138,7 @@ class LevelGroup(
             level.enable()
 
     def unload(self):
+        """Unload the geometry. Frees VRAM."""
         for level in self._objects:
             level.unload()
 
