@@ -9,9 +9,12 @@ from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from .canvas.edit_canvas import EditCanvas
-from .key_config import DefaultKeybindGroupId, PresetKeybinds, KeybindKeys
-from amulet_map_editor.programs.edit.plugins.api import loader
+from amulet_map_editor.programs.edit.api.canvas.edit_canvas import EditCanvas
+from amulet_map_editor.programs.edit.api.key_config import (
+    DefaultKeybindGroupId,
+    PresetKeybinds,
+    KeybindKeys,
+)
 from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
@@ -44,9 +47,7 @@ class EditExtension(wx.Panel, BaseProgram):
         if self._canvas is None:
             self.Update()
 
-            self._canvas = EditCanvas(
-                self, self._world, self._close_self_callback, auto_setup=False
-            )
+            self._canvas = EditCanvas(self, self._world, self._close_self_callback)
             for arg in self._canvas.setup():
                 if isinstance(arg, (int, float)):
                     self._temp_loading_bar.SetValue(min(arg, 1) * 10000)
@@ -62,25 +63,21 @@ class EditExtension(wx.Panel, BaseProgram):
                 wx.Yield()
 
             edit_config: dict = config.get(EDIT_CONFIG_ID, {})
-            self._canvas.fov = edit_config.get("options", {}).get("fov", 70.0)
-            self._canvas.render_distance = edit_config.get("options", {}).get(
+            self._canvas.camera.fov = edit_config.get("options", {}).get("fov", 70.0)
+            self._canvas.renderer.render_distance = edit_config.get("options", {}).get(
                 "render_distance", 5
             )
-            self._canvas.camera_rotate_speed = edit_config.get("options", {}).get(
+            self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
                 "camera_sensitivity", 2.0
             )
 
             self._sizer.Clear(True)
             self._sizer.Add(self._canvas, 1, wx.EXPAND)
-            self.Bind(wx.EVT_SIZE, self._on_resize)
             self._canvas.Show()
-            self._canvas.draw()
 
             self.Layout()
         self._canvas.Update()
         self._canvas.enable()
-        self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
-        self._canvas.draw()
 
     def disable(self):
         if self._canvas is not None:
@@ -101,7 +98,7 @@ class EditExtension(wx.Panel, BaseProgram):
             if self._canvas.is_closeable():
                 return self._check_close_world()
             log.info(
-                f"The canvas in edit for world {self._world.world_wrapper.world_name} was not closeable for some reason."
+                f"The canvas in edit for world {self._world.level_wrapper.world_name} was not closeable for some reason."
             )
             return False
         return not bool(self._world.history_manager.unsaved_changes)
@@ -120,7 +117,7 @@ class EditExtension(wx.Panel, BaseProgram):
                 } {unsaved_changes} unsaved change{
                 's' if unsaved_changes >= 2 else ''
                 } in {
-                self._world.world_wrapper.world_name
+                self._world.level_wrapper.world_name
                 }. Would you like to save?""",
                 style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT,
             )
@@ -133,7 +130,7 @@ class EditExtension(wx.Panel, BaseProgram):
             elif response == wx.ID_CANCEL:
                 log.info(
                     f"""Aborting closing world {
-                    self._world.world_wrapper.world_name
+                    self._world.level_wrapper.world_name
                     } because the user pressed cancel."""
                 )
                 return False
@@ -174,9 +171,6 @@ class EditExtension(wx.Panel, BaseProgram):
         menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
             "Options...", lambda evt: self._edit_options()
         )
-        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
-            "Reload all operations", lambda evt: self._reload_all_operations()
-        )
         menu.setdefault("&Help", {}).setdefault("help", {}).setdefault(
             "Controls", lambda evt: self._help_controls()
         )
@@ -198,9 +192,9 @@ class EditExtension(wx.Panel, BaseProgram):
 
     def _edit_options(self):
         if self._canvas is not None:
-            fov = self._canvas.fov
+            fov = self._canvas.camera.fov
             render_distance = self._canvas.render_distance
-            camera_sensitivity = self._canvas.camera_rotate_speed
+            camera_sensitivity = self._canvas.camera.rotate_speed
             dialog = SimpleDialog(self, "Options")
 
             sizer = wx.FlexGridSizer(3, 2, 0, 0)
@@ -208,7 +202,7 @@ class EditExtension(wx.Panel, BaseProgram):
             fov_ui = wx.SpinCtrlDouble(dialog, min=0, max=180, initial=fov)
 
             def set_fov(evt):
-                self._canvas.fov = fov_ui.GetValue()
+                self._canvas.camera.fov = fov_ui.GetValue()
 
             fov_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_fov)
             sizer.Add(
@@ -246,7 +240,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             def set_camera_sensitivity(evt):
-                self._canvas.camera_rotate_speed = camera_sensitivity_ui.GetValue()
+                self._canvas.camera.rotate_speed = camera_sensitivity_ui.GetValue()
 
             camera_sensitivity_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_camera_sensitivity)
             sizer.Add(
@@ -275,24 +269,12 @@ class EditExtension(wx.Panel, BaseProgram):
                 ] = camera_sensitivity_ui.GetValue()
                 config.put(EDIT_CONFIG_ID, edit_config)
             elif response == wx.ID_CANCEL:
-                self._canvas.fov = fov
+                self._canvas.camera.fov = fov
                 self._canvas.render_distance = render_distance
-                self._canvas.camera_rotate_speed = camera_sensitivity
-
-    def _reload_all_operations(self):
-        loader.persistent_storage.clear()
-        loader.reload_operations()
-
-        if self._canvas:
-            self._canvas.tools["Operation"].reload_operations()
+                self._canvas.camera.rotate_speed = camera_sensitivity
 
     @staticmethod
     def _help_controls():
         webbrowser.open(
             "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/edit/readme.md"
         )
-
-    def _on_resize(self, event):
-        if self._canvas is not None:
-            self._canvas.set_size(self.GetSize()[0], self.GetSize()[1])
-        event.Skip()
