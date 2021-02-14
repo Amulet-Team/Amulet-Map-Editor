@@ -176,7 +176,9 @@ class AmuletUI(wx.Frame):
                 wx.MessageBox(f"Could not find a loader for this world.\n{e}")
             except Exception as e:
                 log.error(f"Error loading world.\n{e}\n{traceback.format_exc()}")
-                wx.MessageBox(f"Error loading world. Check the console for more details.\n{e}")
+                wx.MessageBox(
+                    f"Error loading world. Check the console for more details.\n{e}"
+                )
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)

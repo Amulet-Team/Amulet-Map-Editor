@@ -165,7 +165,7 @@ class RenderChunk(RenderChunkBuilder):
             self._create_empty_geometry()
             self._chunk_state = 0
         except ChunkLoadError:
-            log.info(f'Error loading chunk {self.coords}', exc_info=True)
+            log.info(f"Error loading chunk {self.coords}", exc_info=True)
             self._create_error_geometry()
             self._chunk_state = 1
         else:
