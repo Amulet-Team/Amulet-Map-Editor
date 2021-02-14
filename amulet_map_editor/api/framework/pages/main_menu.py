@@ -2,7 +2,7 @@ import webbrowser
 import wx
 import wx.lib.inspection
 
-from amulet_map_editor.api import image
+from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
 
@@ -30,12 +30,16 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         name_sizer.Add(amulet_converter, flag=wx.CENTER)
         name_sizer.Add(icon2, flag=wx.CENTER)
         button_font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
-        self._open_world_button = wx.Button(self, label="Open World", size=(400, 70))
+        self._open_world_button = wx.Button(
+            self, label=lang.get("main_menu.open_world"), size=(400, 70)
+        )
         self._open_world_button.SetFont(button_font)
         self._open_world_button.Bind(wx.EVT_BUTTON, self._show_world_select)
         sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
 
-        self._help_button = wx.Button(self, label="Help", size=(400, 70))
+        self._help_button = wx.Button(
+            self, label=lang.get("main_menu.help"), size=(400, 70)
+        )
         self._help_button.SetFont(button_font)
         self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
         sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)

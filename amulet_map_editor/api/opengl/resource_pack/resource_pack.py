@@ -20,7 +20,7 @@ from minecraft_model_reader import BlockMesh
 import PyMCTranslate
 from amulet.api.block import Block
 
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import log
 from amulet_map_editor.api.opengl import textureatlas
 
 

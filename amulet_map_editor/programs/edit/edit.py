@@ -4,7 +4,7 @@ import webbrowser
 
 EDIT_CONFIG_ID = "amulet_edit"
 
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import log
 from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog

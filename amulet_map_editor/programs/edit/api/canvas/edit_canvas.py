@@ -2,8 +2,6 @@ import wx
 from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
 from types import GeneratorType
 
-from amulet_map_editor import CONFIG
-
 from .base_edit_canvas import BaseEditCanvas
 from ...edit import EDIT_CONFIG_ID
 from ..key_config import (
@@ -19,7 +17,7 @@ from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimen
 from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import CONFIG, log
 from amulet_map_editor.programs.edit.api.ui.goto import show_goto
 from amulet_map_editor.programs.edit.api.ui.tool_manager import ToolManagerSizer
 from amulet_map_editor.programs.edit.api.operations import (

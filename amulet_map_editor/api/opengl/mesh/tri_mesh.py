@@ -28,7 +28,7 @@ import ctypes
 import numpy
 from amulet_map_editor.api.opengl.shaders import get_shader
 from amulet_map_editor.api.opengl import Drawable, ContextManager
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import log
 
 
 class TriMesh(Drawable, ContextManager):

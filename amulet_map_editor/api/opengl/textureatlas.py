@@ -26,7 +26,7 @@ from PIL import Image
 import numpy
 import math
 from typing import Dict, Tuple, List, Any, Optional, Generator
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import log
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
 Atlas. A companion file (.map), is created that defines where each texture is

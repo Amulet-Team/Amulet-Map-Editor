@@ -5,7 +5,7 @@ import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 from typing import Iterable, Union, Any, List, Optional, Sequence, Dict, Tuple
 
-from amulet_map_editor.api.logging import log
+from amulet_map_editor import log
 
 
 class SimpleSizer:

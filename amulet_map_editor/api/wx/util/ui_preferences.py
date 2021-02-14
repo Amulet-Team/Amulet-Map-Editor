@@ -4,13 +4,13 @@ import atexit
 
 import wx
 
-import amulet_map_editor.api.config as config
+from amulet_map_editor import CONFIG
 
-PRE_EXISTING_CONFIG = config.get("window_preferences", {})
+PRE_EXISTING_CONFIG = CONFIG.get("window_preferences", {})
 
 
 def write_config():
-    config.put("window_preferences", PRE_EXISTING_CONFIG)
+    CONFIG.put("window_preferences", PRE_EXISTING_CONFIG)
 
 
 atexit.register(write_config)

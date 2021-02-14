@@ -8,10 +8,8 @@ import traceback
 from amulet import load_format
 from amulet.api.errors import FormatError
 
-from amulet_map_editor.api import lang
+from amulet_map_editor import lang, log, CONFIG
 from amulet_map_editor.api.wx.ui import simple
-from amulet_map_editor.api.logging import log
-from amulet_map_editor.api import config
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 
 
@@ -37,10 +35,10 @@ def get_java_saves_dir():
     return os.path.join(get_java_dir(), "saves")
 
 
-minecraft_world_paths = {lang.get("java_platform"): get_java_saves_dir()}
+minecraft_world_paths = {lang.get("world.java_platform"): get_java_saves_dir()}
 
 if platform == "win32":
-    minecraft_world_paths[lang.get("bedrock_platform")] = os.path.join(
+    minecraft_world_paths[lang.get("world.bedrock_platform")] = os.path.join(
         os.getenv("LOCALAPPDATA"),
         "Packages",
         "Microsoft.MinecraftUWP_8wekyb3d8bbwe",
@@ -213,7 +211,7 @@ class WorldSelectUI(simple.SimplePanel):
         self.open_world_callback = open_world_callback
         self.header = simple.SimplePanel(self, wx.HORIZONTAL)
         self.header_open_world = wx.Button(
-            self.header, wx.ID_ANY, label=lang.get("open_world_button")
+            self.header, wx.ID_ANY, label=lang.get("select_world.open_world_button")
         )
         self.header_open_world.Bind(wx.EVT_BUTTON, self._open_world)
         self.header.add_object(self.header_open_world)
@@ -225,7 +223,7 @@ class WorldSelectUI(simple.SimplePanel):
     def _open_world(self, evt):
         dir_dialog = wx.DirDialog(
             None,
-            lang.get("open_world_dialogue"),
+            lang.get("select_world.open_world_dialogue"),
             "",
             wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST,
         )
@@ -234,7 +232,7 @@ class WorldSelectUI(simple.SimplePanel):
                 return
             path = dir_dialog.GetPath()
         except Exception:
-            wx.LogError("select_directory_failed")
+            wx.LogError(lang.get("select_world.select_directory_failed"))
             return
         finally:
             dir_dialog.Destroy()
@@ -250,7 +248,7 @@ class RecentWorldUI(simple.SimplePanel):
             wx.StaticText(
                 self,
                 wx.ID_ANY,
-                lang.get("recent_worlds"),
+                lang.get("select_world.recent_worlds"),
                 wx.DefaultPosition,
                 wx.DefaultSize,
                 0,
@@ -263,7 +261,7 @@ class RecentWorldUI(simple.SimplePanel):
         self.rebuild()
 
     def rebuild(self, new_world: str = None):
-        meta: dict = config.get("amulet_meta", {})
+        meta: dict = CONFIG.get("amulet_meta", {})
         recent_worlds: list = meta.setdefault("recent_worlds", [])
         if new_world is not None:
             while new_world in recent_worlds:
@@ -278,7 +276,7 @@ class RecentWorldUI(simple.SimplePanel):
         )
         self.add_object(self._world_list, 1, wx.EXPAND)
         self.Layout()
-        config.put("amulet_meta", meta)
+        CONFIG.put("amulet_meta", meta)
 
 
 class WorldSelectAndRecentUI(simple.SimplePanel):
