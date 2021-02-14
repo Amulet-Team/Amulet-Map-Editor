@@ -18,18 +18,27 @@ class AboutProgram(SimplePanel, BaseProgram):
         self.world = world
         self._close_self_callback = close_self_callback
 
-        self._close_world_button = wx.Button(self, wx.ID_ANY, label=lang.get("world.close_world"))
+        self._close_world_button = wx.Button(
+            self, wx.ID_ANY, label=lang.get("world.close_world")
+        )
         self._close_world_button.Bind(wx.EVT_BUTTON, self._close_world)
         self.add_object(self._close_world_button, 0, wx.ALL | wx.CENTER)
 
         self.add_object(
-            wx.StaticText(self, label="{}: ".format(lang.get("program_about.currently_opened_world"))), 0, wx.ALL | wx.CENTER
+            wx.StaticText(
+                self,
+                label="{}: ".format(lang.get("program_about.currently_opened_world")),
+            ),
+            0,
+            wx.ALL | wx.CENTER,
         )
         self.add_object(WorldUI(self, self.world.level_wrapper), 0, wx.ALL | wx.CENTER)
         self.add_object(
             wx.StaticText(
                 self,
-                label="{}\n<=================".format(lang.get("program_about.choose_from_options")),
+                label="{}\n<=================".format(
+                    lang.get("program_about.choose_from_options")
+                ),
             ),
             0,
             wx.ALL | wx.CENTER,
