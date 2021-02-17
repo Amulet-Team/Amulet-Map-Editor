@@ -1,7 +1,7 @@
 wxPython ; sys_platform != 'linux'
 numpy
 pyopengl
-amulet-core~=1.1.0b1
+amulet-core~=1.2.0b0
 amulet-nbt~=1.0.3
 pymctranslate~=1.0.0
-minecraft-resource-pack~=1.0.0
+minecraft-resource-pack~=1.0.2

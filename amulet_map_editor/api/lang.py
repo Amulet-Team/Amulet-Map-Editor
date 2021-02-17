@@ -8,7 +8,9 @@ from amulet_map_editor.api import config as CONFIG, log
 # there might be a proper way to do this but this should be enough for now
 
 _lang_dirs: Set[str] = set()  # the language directories
-_lang: Dict[str, str] = {}  # a storage for the language strings. unique_identifier: language_string
+_lang: Dict[
+    str, str
+] = {}  # a storage for the language strings. unique_identifier: language_string
 
 _default_language = "en_US"
 
@@ -33,7 +35,9 @@ def register_lang_directory(lang_dir: str):
     """
     if os.path.isdir(lang_dir):
         if lang_dir in _lang_dirs:
-            log.warning(f"The language directory {lang_dir} has already been registered.")
+            log.warning(
+                f"The language directory {lang_dir} has already been registered."
+            )
         else:
             _lang_dirs.add(lang_dir)
             default_lang_path = os.path.join(lang_dir, f"{_default_language}.lang")
@@ -46,7 +50,9 @@ def register_lang_directory(lang_dir: str):
                 # sanity check to make sure that all entries in the user language are in the default
                 diff = set(lang).difference(set(default_lang))
                 if diff:
-                    print(f"There are {len(diff)} language entries defined in {lang_path} that are not defined in {default_lang_path}\n{diff}")
+                    print(
+                        f"There are {len(diff)} language entries defined in {lang_path} that are not defined in {default_lang_path}\n{diff}"
+                    )
 
                 # merge in the user language
                 default_lang.update(lang)
@@ -54,7 +60,9 @@ def register_lang_directory(lang_dir: str):
             # merge the loaded language entries
             for unique_identifier, language_string in default_lang.items():
                 if unique_identifier in _lang:
-                    log.warning(f"The language entry {unique_identifier} added in {lang_dir} is already used. Please add a unique prefix.")
+                    log.warning(
+                        f"The language entry {unique_identifier} added in {lang_dir} is already used. Please add a unique prefix."
+                    )
                 else:
                     _lang[unique_identifier] = language_string
 
@@ -80,10 +88,7 @@ def _load_lang_file(lang_path: str) -> Dict[str, str]:
 
 # load the normal language directory
 register_lang_directory(
-    os.path.join(
-        os.path.dirname(amulet_map_editor.__file__),
-        "lang"
-    )
+    os.path.join(os.path.dirname(amulet_map_editor.__file__), "lang")
 )
 
 
