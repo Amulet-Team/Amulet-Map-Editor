@@ -1,0 +1,27 @@
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Welt schließen
+
+select_world.open_world_button=Andere Welt öffnen
+select_world.open_world_dialogue=Minecraft-Welt-Verzeichnis auswählen
+select_world.select_directory_failed=Verzeichnis konnte nicht überprüft werden!
+select_world.recent_worlds=Kürzlich geöffnete Welten
+
+main_menu.tab_name=Hauptmenü
+main_menu.open_world=Welt öffnen
+main_menu.help=Hilfe
+
+program_about.tab_name=Impressum
+program_about.currently_opened_world=Derzeit geöffnet Welt
+program_about.choose_from_options=Auswählen von die linkerseits Optionen, für was man machen will.\nImmer kann man zwischen diese wechseln. 
+
+program_convert.tab_name=Wandele um
+program_convert.convert_button=Wandele um
+program_convert.input_world=Eingabewelt
+program_convert.output_world=Ausgabewelt
+program_convert.select_output_world=Ausgabewelt auswählen
+program_convert.input_output_must_different=Die Eingabewelt und Ausgabewelt müssen verschiedene sein!
+program_convert.select_before_converting=Wählen Sie vor umwandeln eine Welt aus! 
+program_convert.conversion_completed=Welt umwandeln komplett!
+
+program_3d_edit.tab_name=3D-Editor
