@@ -13,8 +13,12 @@ from OpenGL.GL import (
     GL_ONE_MINUS_SRC_ALPHA,
     glDeleteTextures,
 )
+from OpenGL.error import GLError
+
 import uuid
 import sys
+
+from amulet_map_editor import log
 
 
 class BaseCanvas(glcanvas.GLCanvas):
@@ -30,22 +34,40 @@ class BaseCanvas(glcanvas.GLCanvas):
             style=wx.WANTS_CHARS,
         )
 
+        # create a UUID for the context. Used to get shaders
+        self._context_identifier = str(uuid.uuid4())
+
         if sys.platform == "linux":
             # setup the OpenGL context. This apparently fixes #84
             self._context = glcanvas.GLContext(self)
+            self.SetCurrent(self._context)
+            self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
         else:
-            context_attributes = wx.glcanvas.GLContextAttrs()
-            context_attributes.CoreProfile().OGLVersion(
-                3, 3
-            ).Robust().ResetIsolation().EndList()
-            self._context = glcanvas.GLContext(
-                self, ctxAttrs=context_attributes
-            )  # setup the OpenGL context
-        self.SetCurrent(self._context)
-        self._context_identifier = str(
-            uuid.uuid4()
-        )  # create a UUID for the context. Used to get shaders
-        self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
+            try:
+                context_attributes = wx.glcanvas.GLContextAttrs()
+                context_attributes.CoreProfile().OGLVersion(
+                    3, 3
+                ).Robust().ResetIsolation().EndList()
+                self._context = glcanvas.GLContext(
+                    self, ctxAttrs=context_attributes
+                )  # setup the OpenGL context
+                self.SetCurrent(self._context)
+                self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
+            except GLError:
+                log.info("Failed setting up modern OpenGL. Falling back to legacy OpenGL.")
+                try:
+                    context_attributes = wx.glcanvas.GLContextAttrs()
+                    context_attributes.CoreProfile().OGLVersion(
+                        2, 1
+                    ).Robust().ResetIsolation().EndList()
+                    self._context = glcanvas.GLContext(
+                        self, ctxAttrs=context_attributes
+                    )  # setup the OpenGL context
+                    self.SetCurrent(self._context)
+                    self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
+                except GLError as e:
+                    log.error("Failed setting up legacy OpenGL.")
+                    raise e
         self._setup_opengl()  # set some OpenGL states
 
     @property
