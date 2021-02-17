@@ -113,7 +113,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         select_world.Destroy()
 
     def _output_world_callback(self, path):
-        if path == self.world.world_path:
+        if path == self.world.level_path:
             wx.MessageBox(lang.get("program_convert.input_output_must_different"))
             return
         try:

@@ -12,7 +12,6 @@ from amulet_map_editor.api.opengl.data_types import (
     CameraRotationType,
     TransformationMatrix,
 )
-from amulet_map_editor.api.opengl.matrix import displacement_matrix
 from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManager,
     OpenGLResourcePack,

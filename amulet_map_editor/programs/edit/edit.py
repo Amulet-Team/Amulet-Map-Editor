@@ -193,7 +193,7 @@ class EditExtension(wx.Panel, BaseProgram):
     def _edit_options(self):
         if self._canvas is not None:
             fov = self._canvas.camera.fov
-            render_distance = self._canvas.render_distance
+            render_distance = self._canvas.renderer.render_distance
             camera_sensitivity = self._canvas.camera.rotate_speed
             dialog = SimpleDialog(self, "Options")
 
@@ -221,7 +221,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             def set_render_distance(evt):
-                self._canvas.render_distance = render_distance_ui.GetValue()
+                self._canvas.renderer.render_distance = render_distance_ui.GetValue()
 
             render_distance_ui.Bind(wx.EVT_SPINCTRL, set_render_distance)
             sizer.Add(
@@ -270,7 +270,7 @@ class EditExtension(wx.Panel, BaseProgram):
                 config.put(EDIT_CONFIG_ID, edit_config)
             elif response == wx.ID_CANCEL:
                 self._canvas.camera.fov = fov
-                self._canvas.render_distance = render_distance
+                self._canvas.renderer.render_distance = render_distance
                 self._canvas.camera.rotate_speed = camera_sensitivity
 
     @staticmethod
