@@ -10,7 +10,7 @@ log.setLevel(log_level)
 _formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 os.makedirs("./logs", exist_ok=True)
-_log_file = logging.FileHandler("./logs/amulet_map_editor.log", "w")
+_log_file = logging.FileHandler("./logs/amulet_map_editor.log", "w", encoding="utf-8")
 _log_file.setLevel(log_level)
 _log_file.setFormatter(_formatter)
 log.addHandler(_log_file)
