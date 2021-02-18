@@ -1,8 +1,9 @@
-from typing import Tuple, Union
+from typing import Union
 import numpy
 
 from .render_selection import RenderSelection
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
+from amulet_map_editor.api.opengl.data_types import RGBColour
 
 
 class RenderSelectionHighlightable(RenderSelection):
@@ -14,7 +15,7 @@ class RenderSelectionHighlightable(RenderSelection):
         self._highlight_edges = numpy.zeros((2, 3), dtype=numpy.bool)
 
     @property
-    def highlight_colour(self) -> Tuple[float, float, float]:
+    def highlight_colour(self) -> RGBColour:
         return 0.5, 0.5, 1.0
 
     def reset_highlight_edges(self):

@@ -9,11 +9,11 @@ from OpenGL.GL import (
     GL_LINE_STRIP,
     glEnable,
 )
-from typing import Tuple
 
 from amulet.api.data_types import PointCoordinatesAny
 from .render_selection_highlightable import RenderSelectionHighlightable
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
+from amulet_map_editor.api.opengl.data_types import RGBColour
 
 
 class RenderSelectionEditable(RenderSelectionHighlightable):
@@ -25,39 +25,48 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         self._locked = True
 
     def _init_verts(self):
-        verts_per_box = 6 * 2 * 3  # faces * triangles * verts
+        # the first 36 verts are used for the full box which is used for lines
+        # the next 36 verts are used for the inset faces
+        # the next 144 verts are used for the edges
+        # the next 144 verts are used for the corners
+
+        verts_per_quad = 2 * 3  # triangles * verts
         self.verts = numpy.zeros(
-            (17 * verts_per_box, self._vert_len), dtype=numpy.float32
+            (
+                6 * verts_per_quad +  # original box verts (used for the lines)
+                6 * 9 * verts_per_quad,  # new verts
+                self._vert_len
+            ), dtype=numpy.float32
         )
-        self.verts[:verts_per_box, 5:9] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
-        )
-        self.verts[
-            verts_per_box : verts_per_box * 2, 5:9
-        ] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_green")
-        )
-        self.verts[
-            verts_per_box * 2 : verts_per_box * 3, 5:9
-        ] = self.resource_pack.texture_bounds(
-            self.resource_pack.get_texture_path("amulet", "amulet_ui/selection_blue")
-        )
-        self.verts[
-            verts_per_box * 3 : verts_per_box * 17, 5:9
-        ] = self.resource_pack.texture_bounds(
+        self.verts[:, 5:9] = self.resource_pack.texture_bounds(
             self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
 
-        self.verts[:, 9:12] = self.box_tint
-        self.verts[verts_per_box * 3 : verts_per_box * 9, 9:12] = (1, 0, 0)
-        self.verts[verts_per_box * 9 : verts_per_box * 17, 9:12] = (0, 1, 1)
+        self.verts[verts_per_quad * 6:, 9:12] = self.box_tint
+        self.verts[verts_per_quad * 12 : verts_per_quad * 36, 9:12] = self.edge_colour
 
     @property
-    def highlight_colour(self) -> Tuple[float, float, float]:
+    def highlight_colour(self) -> RGBColour:
         if self.locked:
             return 0.5, 0.5, 1.0  # purple
         else:
             return 1.0, 0.7, 0.3  # orange
+
+    @property
+    def edge_colour(self) -> RGBColour:
+        return 0.5, 1.0, 1.0
+
+    @property
+    def corner_colour(self) -> RGBColour:
+        return 1.0, 1.0, 0.5
+
+    @property
+    def point1_colour(self) -> RGBColour:
+        return 0.0, 1.0, 0.0
+
+    @property
+    def point2_colour(self) -> RGBColour:
+        return 0.0, 0.0, 1.0
 
     @property
     def locked(self) -> bool:
@@ -75,24 +84,175 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
     def _create_geometry_(self):
         super()._create_geometry_()
-        verts_per_box = 6 * 2 * 3  # faces * triangles * verts
+
         point1, point2 = self._points - self.min + (self.min % 16)
         size = numpy.abs(point2 - point1)
-        mult = (point1 < point2) * 2 - 1
-        (
-            self.verts[verts_per_box : verts_per_box * 2, :3],
-            self.verts[verts_per_box : verts_per_box * 2, 3:5],
-        ) = self._create_box(
-            point1 - 0.01 * mult,
-            point1 + numpy.min([numpy.ones(3), size / 4], 0) * mult,
-        )
-        (
-            self.verts[verts_per_box * 2 : verts_per_box * 3, :3],
-            self.verts[verts_per_box * 2 : verts_per_box * 3, 3:5],
-        ) = self._create_box(
-            point2 + 0.01 * mult,
-            point2 - numpy.min([numpy.ones(3), size / 4], 0) * mult,
-        )
+        verts_per_face = 2 * 3  # triangles * verts
+        # the edges of the box
+        min_point, max_point = numpy.sort([point1, point2], 0).astype(numpy.float64)
+        min_point -= 0.01
+        max_point += 0.01
+        # the edge points offset by the boundary amount.
+        min_point_1 = min_point + numpy.min([numpy.ones(3), size / 4], 0)
+        max_point_1 = max_point - numpy.min([numpy.ones(3), size / 4], 0)
+
+        # down, up
+        # west, east
+        # north, south
+
+        face_offset = verts_per_face * 6
+
+        # inset faces
+        for axis in ("y", "z", "x"):
+            (
+                self.verts[face_offset: face_offset + verts_per_face*2, :3],
+                self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+            ) = self._create_box_faces(
+                (
+                    min_point[0] if axis == "x" else min_point_1[0],
+                    min_point[1] if axis == "y" else min_point_1[1],
+                    min_point[2] if axis == "z" else min_point_1[2],
+                ),
+                (
+                    max_point[0] if axis == "x" else max_point_1[0],
+                    max_point[1] if axis == "y" else max_point_1[1],
+                    max_point[2] if axis == "z" else max_point_1[2],
+                ),
+                up=axis == "y",
+                down=axis == "y",
+                north=axis == "z",
+                south=axis == "z",
+                west=axis == "x",
+                east=axis == "x",
+            )
+            face_offset += verts_per_face*2
+
+        for y in (False, True):
+            for x in (False, True):
+                (
+                    self.verts[face_offset: face_offset + verts_per_face*2, :3],
+                    self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+                ) = self._create_box_faces(
+                    (
+                        max_point_1[0] if x else min_point[0],
+                        max_point_1[1] if y else min_point[1],
+                        min_point_1[2],
+                    ),
+                    (
+                        max_point[0] if x else min_point_1[0],
+                        max_point[1] if y else min_point_1[1],
+                        max_point_1[2],
+                    ),
+                    up=y,
+                    down=not y,
+                    west=not x,
+                    east=x,
+                )
+                face_offset += verts_per_face*2
+
+        for y in (False, True):
+            for z in (False, True):
+                (
+                    self.verts[face_offset: face_offset + verts_per_face*2, :3],
+                    self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+                ) = self._create_box_faces(
+                    (
+                        min_point_1[0],
+                        max_point_1[1] if y else min_point[1],
+                        max_point_1[2] if z else min_point[2],
+                    ),
+                    (
+                        max_point_1[0],
+                        max_point[1] if y else min_point_1[1],
+                        max_point[2] if z else min_point_1[2],
+                    ),
+                    up=y,
+                    down=not y,
+                    north=not z,
+                    south=z,
+                )
+                face_offset += verts_per_face*2
+
+        for x in (False, True):
+            for z in (False, True):
+                (
+                    self.verts[face_offset: face_offset + verts_per_face*2, :3],
+                    self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+                ) = self._create_box_faces(
+                    (
+                        max_point_1[0] if x else min_point[0],
+                        min_point_1[1],
+                        max_point_1[2] if z else min_point[2],
+                    ),
+                    (
+                        max_point[0] if x else min_point_1[0],
+                        max_point_1[1],
+                        max_point[2] if z else min_point_1[2],
+                    ),
+                    north=not z,
+                    south=z,
+                    west=not x,
+                    east=x,
+                )
+                face_offset += verts_per_face*2
+
+        self.verts[216: 360, 9:12] = self.corner_colour
+        corners = point2 >= point1
+        not_corners = numpy.invert(corners)
+        # corners
+        for y in (False, True):
+            for z in (False, True):
+                for x in (False, True):
+                    (
+                        self.verts[face_offset: face_offset + verts_per_face*3, :3],
+                        self.verts[face_offset: face_offset + verts_per_face*3, 3:5]
+                    ) = self._create_box_faces(
+                        (
+                            max_point_1[0] if x else min_point[0],
+                            max_point_1[1] if y else min_point[1],
+                            max_point_1[2] if z else min_point[2],
+                        ),
+                        (
+                            max_point[0] if x else min_point_1[0],
+                            max_point[1] if y else min_point_1[1],
+                            max_point[2] if z else min_point_1[2],
+                        ),
+                        up=y,
+                        down=not y,
+                        north=not z,
+                        south=z,
+                        west=not x,
+                        east=x,
+                    )
+                    if numpy.array_equal(corners, (x, y, z)):
+                        self.verts[face_offset: face_offset + verts_per_face*3, 9:12] = self.point2_colour
+                    elif numpy.array_equal(not_corners, (x, y, z)):
+                        self.verts[face_offset: face_offset + verts_per_face*3, 9:12] = self.point1_colour
+                    face_offset += verts_per_face*3
+
+        self.verts[:, 3:5] /= 16
+
+        self.verts[36:72, 9:12] = self.box_tint
+
+        indexes = numpy.zeros(6, numpy.uint8)
+        if self.point2[0] > self.point1[0]:
+            indexes[[4, 5]] = 0, 3
+        else:
+            indexes[[4, 5]] = 3, 0
+
+        if self.point2[1] > self.point1[1]:
+            indexes[[0, 1]] = 1, 4
+        else:
+            indexes[[0, 1]] = 4, 1
+
+        if self.point2[2] > self.point1[2]:
+            indexes[[2, 3]] = 2, 5
+        else:
+            indexes[[2, 3]] = 5, 2
+
+        self.verts[36:72][
+            numpy.repeat(self._highlight_edges.ravel()[indexes], 6), 9:12
+        ] = self.highlight_colour
 
     def draw(
         self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None
@@ -109,23 +269,22 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
+        # draw the lines around the boxes
+        self.draw_start = 0
+        self.draw_count = 36
+        glDisable(GL_DEPTH_TEST)
+        self._draw_mode = GL_LINE_STRIP
+        super()._draw(transformation_matrix)
+        glEnable(GL_DEPTH_TEST)
+
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)
         else:
             glCullFace(GL_BACK)
 
         self._draw_mode = GL_TRIANGLES
-        self.draw_start = 0
-        self.draw_count = 108
+        self.draw_start = 36
+        # 6 faces, 9 quads/face, 2 triangles/quad, 3 verts/triangle
+        self.draw_count = 324
         super()._draw(transformation_matrix)
         glCullFace(GL_BACK)
-
-        # draw the lines around the boxes
-        glDisable(GL_DEPTH_TEST)
-        self._draw_mode = GL_LINE_STRIP
-        self.draw_count = 36
-        for start in range(0, 3 * 36, 36):
-            # these must be drawn individually otherwise there will be lines connecting them.
-            self.draw_start = start
-            super()._draw(transformation_matrix)
-        glEnable(GL_DEPTH_TEST)
