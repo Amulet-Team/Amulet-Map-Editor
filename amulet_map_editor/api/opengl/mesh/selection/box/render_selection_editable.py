@@ -33,16 +33,19 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         verts_per_quad = 2 * 3  # triangles * verts
         self.verts = numpy.zeros(
             (
-                6 * verts_per_quad +  # original box verts (used for the lines)
-                6 * 9 * verts_per_quad,  # new verts
-                self._vert_len
-            ), dtype=numpy.float32
+                6 * verts_per_quad
+                + 6  # original box verts (used for the lines)
+                * 9
+                * verts_per_quad,  # new verts
+                self._vert_len,
+            ),
+            dtype=numpy.float32,
         )
         self.verts[:, 5:9] = self.resource_pack.texture_bounds(
             self.resource_pack.get_texture_path("amulet", "amulet_ui/selection")
         )
 
-        self.verts[verts_per_quad * 6:, 9:12] = self.box_tint
+        self.verts[verts_per_quad * 6 :, 9:12] = self.box_tint
         self.verts[verts_per_quad * 12 : verts_per_quad * 36, 9:12] = self.edge_colour
 
     @property
@@ -105,8 +108,8 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         # inset faces
         for axis in ("y", "z", "x"):
             (
-                self.verts[face_offset: face_offset + verts_per_face*2, :3],
-                self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+                self.verts[face_offset : face_offset + verts_per_face * 2, :3],
+                self.verts[face_offset : face_offset + verts_per_face * 2, 3:5],
             ) = self._create_box_faces(
                 (
                     min_point[0] if axis == "x" else min_point_1[0],
@@ -125,13 +128,13 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
                 west=axis == "x",
                 east=axis == "x",
             )
-            face_offset += verts_per_face*2
+            face_offset += verts_per_face * 2
 
         for y in (False, True):
             for x in (False, True):
                 (
-                    self.verts[face_offset: face_offset + verts_per_face*2, :3],
-                    self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+                    self.verts[face_offset : face_offset + verts_per_face * 2, :3],
+                    self.verts[face_offset : face_offset + verts_per_face * 2, 3:5],
                 ) = self._create_box_faces(
                     (
                         max_point_1[0] if x else min_point[0],
@@ -148,13 +151,13 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
                     west=not x,
                     east=x,
                 )
-                face_offset += verts_per_face*2
+                face_offset += verts_per_face * 2
 
         for y in (False, True):
             for z in (False, True):
                 (
-                    self.verts[face_offset: face_offset + verts_per_face*2, :3],
-                    self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+                    self.verts[face_offset : face_offset + verts_per_face * 2, :3],
+                    self.verts[face_offset : face_offset + verts_per_face * 2, 3:5],
                 ) = self._create_box_faces(
                     (
                         min_point_1[0],
@@ -171,13 +174,13 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
                     north=not z,
                     south=z,
                 )
-                face_offset += verts_per_face*2
+                face_offset += verts_per_face * 2
 
         for x in (False, True):
             for z in (False, True):
                 (
-                    self.verts[face_offset: face_offset + verts_per_face*2, :3],
-                    self.verts[face_offset: face_offset + verts_per_face*2, 3:5]
+                    self.verts[face_offset : face_offset + verts_per_face * 2, :3],
+                    self.verts[face_offset : face_offset + verts_per_face * 2, 3:5],
                 ) = self._create_box_faces(
                     (
                         max_point_1[0] if x else min_point[0],
@@ -194,9 +197,9 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
                     west=not x,
                     east=x,
                 )
-                face_offset += verts_per_face*2
+                face_offset += verts_per_face * 2
 
-        self.verts[216: 360, 9:12] = self.corner_colour
+        self.verts[216:360, 9:12] = self.corner_colour
         corners = point2 >= point1
         not_corners = numpy.invert(corners)
         # corners
@@ -204,8 +207,8 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
             for z in (False, True):
                 for x in (False, True):
                     (
-                        self.verts[face_offset: face_offset + verts_per_face*3, :3],
-                        self.verts[face_offset: face_offset + verts_per_face*3, 3:5]
+                        self.verts[face_offset : face_offset + verts_per_face * 3, :3],
+                        self.verts[face_offset : face_offset + verts_per_face * 3, 3:5],
                     ) = self._create_box_faces(
                         (
                             max_point_1[0] if x else min_point[0],
@@ -225,10 +228,14 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
                         east=x,
                     )
                     if numpy.array_equal(corners, (x, y, z)):
-                        self.verts[face_offset: face_offset + verts_per_face*3, 9:12] = self.point2_colour
+                        self.verts[
+                            face_offset : face_offset + verts_per_face * 3, 9:12
+                        ] = self.point2_colour
                     elif numpy.array_equal(not_corners, (x, y, z)):
-                        self.verts[face_offset: face_offset + verts_per_face*3, 9:12] = self.point1_colour
-                    face_offset += verts_per_face*3
+                        self.verts[
+                            face_offset : face_offset + verts_per_face * 3, 9:12
+                        ] = self.point1_colour
+                    face_offset += verts_per_face * 3
 
         self.verts[:, 3:5] /= 16
 

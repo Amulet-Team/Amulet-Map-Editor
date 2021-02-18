@@ -153,23 +153,24 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         return self.bounds[1]
 
     def _create_box(
-            self,
-            box_min: PointCoordinatesAny,
-            box_max: PointCoordinatesAny,
+        self,
+        box_min: PointCoordinatesAny,
+        box_max: PointCoordinatesAny,
     ) -> Tuple[numpy.ndarray, numpy.ndarray]:
-        return self._create_box_faces(box_min, box_max, True, True, True, True, True, True)
+        return self._create_box_faces(
+            box_min, box_max, True, True, True, True, True, True
+        )
 
     @staticmethod
     def _create_box_faces(
-            box_min: PointCoordinatesAny,
-            box_max: PointCoordinatesAny,
-            up: bool = False,
-            down: bool = False,
-            north: bool = False,
-            south: bool = False,
-            east: bool = False,
-            west: bool = False,
-
+        box_min: PointCoordinatesAny,
+        box_max: PointCoordinatesAny,
+        up: bool = False,
+        down: bool = False,
+        north: bool = False,
+        south: bool = False,
+        east: bool = False,
+        west: bool = False,
     ) -> Tuple[numpy.ndarray, numpy.ndarray]:
         box = numpy.sort([box_min, box_max], 0)
         _face_count = sum([up, down, north, south, east, west])
@@ -182,37 +183,43 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
                 4,
                 5,
                 1,  # down
-            ] * down +
-            [
+            ]
+            * down
+            + [
                 0,
                 1,
                 3,
                 2,  # west
-            ] * west +
-            [
+            ]
+            * west
+            + [
                 4,
                 0,
                 2,
                 6,  # north
-            ] * north +
-            [
+            ]
+            * north
+            + [
                 5,
                 4,
                 6,
                 7,  # east
-            ] * east +
-            [
+            ]
+            * east
+            + [
                 1,
                 5,
                 7,
                 3,  # south
-            ] * south +
-            [
+            ]
+            * south
+            + [
                 3,
                 7,
                 6,
                 2,  # up
-            ] * up
+            ]
+            * up
         )
         box = box.ravel()
         _texture_index = numpy.array(
@@ -221,46 +228,54 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
                 2,
                 3,
                 5,  # down
-            ] * down +
-            [
+            ]
+            * down
+            + [
                 2,
                 1,
                 5,
                 4,  # west
-            ] * west +
-            [
+            ]
+            * west
+            + [
                 3,
                 1,
                 0,
                 4,  # north
-            ] * north +
-            [
+            ]
+            * north
+            + [
                 5,
                 1,
                 2,
                 4,  # east
-            ] * east +
-            [
+            ]
+            * east
+            + [
                 0,
                 1,
                 3,
                 4,  # south
-            ] * south +
-            [
+            ]
+            * south
+            + [
                 0,
                 5,
                 3,
                 2,  # up
-            ] * up,
+            ]
+            * up,
             numpy.uint32,
         )
         _uv_slice = numpy.array(
             [0, 1, 2, 1, 2, 3, 0, 3] * _face_count, dtype=numpy.uint32
-        ).reshape((_face_count, 8)) + numpy.arange(0, _face_count*4, 4).reshape((_face_count, 1))
+        ).reshape((_face_count, 8)) + numpy.arange(0, _face_count * 4, 4).reshape(
+            (_face_count, 1)
+        )
 
         _tri_face = numpy.array([0, 1, 2, 2, 3, 0] * _face_count, numpy.uint32).reshape(
             (_face_count, 6)
-        ) + numpy.arange(0, _face_count*4, 4).reshape((_face_count, 1))
+        ) + numpy.arange(0, _face_count * 4, 4).reshape((_face_count, 1))
         return (
             _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)),
             box[_texture_index[_uv_slice]]
