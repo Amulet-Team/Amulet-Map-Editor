@@ -1,7 +1,7 @@
 # version 120
-in vec2 fTexCoord;
-in vec4 fTexOffset;
-in vec3 fTint;
+varying vec2 fTexCoord;
+varying vec4 fTexOffset;
+varying vec3 fTint;
 
 uniform sampler2D image;
 
