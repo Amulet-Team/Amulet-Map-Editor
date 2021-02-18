@@ -5,6 +5,7 @@ import wx
 import time
 
 from amulet_map_editor.api.opengl.camera import Projection
+from amulet_map_editor.api.opengl.data_types import CameraRotationType
 
 from .base_behaviour import BaseBehaviour
 from ..events import (
@@ -39,6 +40,7 @@ class CameraBehaviour(BaseBehaviour):
         super().__init__(canvas)
         self._previous_mouse_lock = self.canvas.camera.rotating = False
         self._toggle_mouse_time = 0
+        self._last_camera_rotation: CameraRotationType = (0.0, 0.0)
 
     def bind_events(self):
         """Set up all events required to run."""
@@ -63,9 +65,11 @@ class CameraBehaviour(BaseBehaviour):
         """Logic to run each time the input press event is run."""
         if evt.action_id == ACT_CHANGE_PROJECTION:
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+                self._last_camera_rotation = self.canvas.camera.rotation
                 self.canvas.camera.rotation = 180, 90
                 self.canvas.camera.projection_mode = Projection.TOP_DOWN
             elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+                self.canvas.camera.rotation = self._last_camera_rotation
                 self.canvas.camera.projection_mode = Projection.PERSPECTIVE
         elif evt.action_id == ACT_CHANGE_MOUSE_MODE:
             self.canvas.SetFocus()
