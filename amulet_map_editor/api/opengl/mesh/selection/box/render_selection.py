@@ -22,6 +22,7 @@ from amulet_map_editor.api.opengl.resource_pack import (
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 from amulet_map_editor.api.opengl.matrix import displacement_matrix
 from amulet_map_editor.api.opengl.data_types import RGBColour
+from .colours import colours
 
 
 class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
@@ -47,7 +48,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     @property
     def box_tint(self) -> RGBColour:
         """The tint colour to apply to the white texture."""
-        return 1, 1, 1
+        return colours.get("box_normal", (1, 1, 1))
 
     def _init_verts(self):
         """Initialise the vertex values"""

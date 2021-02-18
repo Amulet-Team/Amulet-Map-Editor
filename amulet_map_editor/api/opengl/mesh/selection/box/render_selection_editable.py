@@ -14,6 +14,7 @@ from amulet.api.data_types import PointCoordinatesAny
 from .render_selection_highlightable import RenderSelectionHighlightable
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.opengl.data_types import RGBColour
+from .colours import colours
 
 
 class RenderSelectionEditable(RenderSelectionHighlightable):
@@ -51,25 +52,25 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
     @property
     def highlight_colour(self) -> RGBColour:
         if self.locked:
-            return 0.5, 0.5, 1.0  # purple
+            return colours.get("box_highlight", (0.5, 0.5, 1.0))
         else:
-            return 1.0, 0.7, 0.3  # orange
+            return colours.get("box_highlight_move", (1.0, 0.7, 0.3))
 
     @property
     def edge_colour(self) -> RGBColour:
-        return 0.5, 1.0, 1.0
+        return colours.get("box_edge", (0.5, 1.0, 1.0))
 
     @property
     def corner_colour(self) -> RGBColour:
-        return 1.0, 1.0, 0.5
+        return colours.get("box_corner", (1.0, 1.0, 0.5))
 
     @property
     def point1_colour(self) -> RGBColour:
-        return 0.0, 1.0, 0.0
+        return colours.get("box_point1", (0.0, 1.0, 0.0))
 
     @property
     def point2_colour(self) -> RGBColour:
-        return 0.0, 0.0, 1.0
+        return colours.get("box_point2", (0.0, 0.0, 1.0))
 
     @property
     def locked(self) -> bool:

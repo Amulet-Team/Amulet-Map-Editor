@@ -1,0 +1,9 @@
+{
+	"box_normal": [1.0, 1.0, 1.0],
+	"box_highlight": [0.5, 0.5, 1.0],
+	"box_highlight_move": [1.0, 0.7, 0.3],
+	"box_edge": [0.5, 1.0, 1.0],
+	"box_corner": [1.0, 1.0, 0.5],
+	"box_point1": [0.0, 1.0, 0.0],
+	"box_point2": [0.0, 0.0, 1.0]
+}

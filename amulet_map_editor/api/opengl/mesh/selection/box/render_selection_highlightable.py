@@ -4,6 +4,7 @@ import numpy
 from .render_selection import RenderSelection
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 from amulet_map_editor.api.opengl.data_types import RGBColour
+from .colours import colours
 
 
 class RenderSelectionHighlightable(RenderSelection):
@@ -16,7 +17,7 @@ class RenderSelectionHighlightable(RenderSelection):
 
     @property
     def highlight_colour(self) -> RGBColour:
-        return 0.5, 0.5, 1.0
+        return colours.get("box_highlight", (0.5, 0.5, 1.0))
 
     def reset_highlight_edges(self):
         if numpy.any(self._highlight_edges):
