@@ -3,17 +3,17 @@ world.bedrock_platform=Bedrock
 world.close_world=Fermer le monde
 
 select_world.open_world_button=Ouvrir un monde
-select_world.open_world_dialogue=Sélectionnez un dossier d'un monde Minecraft
-select_world.select_directory_failed=Impossible d'ouvrir ce dossier!
-select_world.recent_worlds=Monde Récents
+select_world.open_world_dialogue=Sélectionnez un dossier de monde Minecraft
+select_world.select_directory_failed=Impossible d'ouvrir ce dossier !
+select_world.recent_worlds=Mondes Récents
 
 main_menu.tab_name=Menu Principal
 main_menu.open_world=Ouvrir un monde
 main_menu.help=Aide
 
-program_about.tab_name=A propos
-program_about.currently_opened_world=Monde actuellement ouverts
-program_about.choose_from_options=>Faites un choix d'opération parmis les options à gauche.\nVous pouvez changer à tout moment.
+program_about.tab_name=À propos
+program_about.currently_opened_world=Monde actuellement ouvert
+program_about.choose_from_options=>Choisissez une opération parmi les options à gauche.\nVous pouvez changer à tout moment.
 
 program_convert.tab_name=Convertir
 program_convert.convert_button=Convertir
