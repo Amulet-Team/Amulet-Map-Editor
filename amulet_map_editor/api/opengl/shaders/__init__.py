@@ -24,7 +24,9 @@ def get_shader(
 ) -> OpenGL.GL.shaders.ShaderProgram:
     shader_key = (context_identifier, shader_name)
     if shader_key not in _shaders:
-        gl_version_match = GL_VERSION_MATCH.match(glGetString(GL_SHADING_LANGUAGE_VERSION).decode("utf-8"))
+        gl_version_match = GL_VERSION_MATCH.match(
+            glGetString(GL_SHADING_LANGUAGE_VERSION).decode("utf-8")
+        )
         if gl_version_match:
             gl_version_tuple = tuple(int(v) for v in gl_version_match.groups())
             if gl_version_tuple >= (3, 30):
@@ -38,10 +40,12 @@ def get_shader(
         def compile_shader():
             return OpenGL.GL.shaders.compileProgram(
                 _load_shader(
-                    os.path.join(shader_dir, f"{shader_name}_{gl_version}.vert"), GL_VERTEX_SHADER
+                    os.path.join(shader_dir, f"{shader_name}_{gl_version}.vert"),
+                    GL_VERTEX_SHADER,
                 ),
                 _load_shader(
-                    os.path.join(shader_dir, f"{shader_name}_{gl_version}.frag"), GL_FRAGMENT_SHADER
+                    os.path.join(shader_dir, f"{shader_name}_{gl_version}.frag"),
+                    GL_FRAGMENT_SHADER,
                 ),
             )
 
