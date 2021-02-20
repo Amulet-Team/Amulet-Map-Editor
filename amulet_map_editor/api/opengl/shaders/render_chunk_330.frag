@@ -1,14 +1,12 @@
-# version 330
+# version 120
 in vec2 fTexCoord;
 in vec4 fTexOffset;
 in vec3 fTint;
 
-out vec4 outColor;
-
 uniform sampler2D image;
 
 void main(){
-    vec4 texColor = texture(
+    vec4 texColor = texture2D(
     	image,
     	vec2(
 			mix(fTexOffset.x, fTexOffset.z, mod(fTexCoord.x, 1.0)),
@@ -18,5 +16,5 @@ void main(){
 	if(texColor.a < 0.02)
         discard;
     texColor.xyz = texColor.xyz * fTint * 0.85;
-	outColor = texColor;
+	gl_FragColor = texColor;
 }

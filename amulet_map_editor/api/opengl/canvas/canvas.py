@@ -13,6 +13,7 @@ from OpenGL.GL import (
     GL_ONE_MINUS_SRC_ALPHA,
     glDeleteTextures,
 )
+
 import uuid
 import sys
 
@@ -30,21 +31,21 @@ class BaseCanvas(glcanvas.GLCanvas):
             style=wx.WANTS_CHARS,
         )
 
+        # create a UUID for the context. Used to get shaders
+        self._context_identifier = str(uuid.uuid4())
+
         if sys.platform == "linux":
             # setup the OpenGL context. This apparently fixes #84
             self._context = glcanvas.GLContext(self)
         else:
             context_attributes = wx.glcanvas.GLContextAttrs()
             context_attributes.CoreProfile().OGLVersion(
-                3, 3
+                2, 1
             ).Robust().ResetIsolation().EndList()
             self._context = glcanvas.GLContext(
                 self, ctxAttrs=context_attributes
             )  # setup the OpenGL context
         self.SetCurrent(self._context)
-        self._context_identifier = str(
-            uuid.uuid4()
-        )  # create a UUID for the context. Used to get shaders
         self._gl_texture_atlas = glGenTextures(1)  # Create the atlas texture location
         self._setup_opengl()  # set some OpenGL states
 
