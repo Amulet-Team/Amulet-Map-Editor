@@ -21,6 +21,8 @@ from amulet_map_editor.api.opengl.resource_pack import (
 )
 from amulet.api.data_types import BlockCoordinatesAny, PointCoordinatesAny
 from amulet_map_editor.api.opengl.matrix import displacement_matrix
+from amulet_map_editor.api.opengl.data_types import RGBColour
+from .colours import colours
 
 
 class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
@@ -44,9 +46,9 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         self._draw_mode = GL_TRIANGLES
 
     @property
-    def box_tint(self) -> Tuple[float, float, float]:
+    def box_tint(self) -> RGBColour:
         """The tint colour to apply to the white texture."""
-        return 1, 1, 1
+        return colours.get("box_normal", (1, 1, 1))
 
     def _init_verts(self):
         """Initialise the vertex values"""
@@ -151,9 +153,30 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     def max(self) -> numpy.ndarray:
         return self.bounds[1]
 
+    def _create_box(
+        self,
+        box_min: PointCoordinatesAny,
+        box_max: PointCoordinatesAny,
+    ) -> Tuple[numpy.ndarray, numpy.ndarray]:
+        return self._create_box_faces(
+            box_min, box_max, True, True, True, True, True, True
+        )
+
     @staticmethod
-    def _create_box(box_min, box_max) -> Tuple[numpy.ndarray, numpy.ndarray]:
-        box = numpy.array([box_min, box_max])
+    def _create_box_faces(
+        box_min: PointCoordinatesAny,
+        box_max: PointCoordinatesAny,
+        up: bool = False,
+        down: bool = False,
+        north: bool = False,
+        south: bool = False,
+        east: bool = False,
+        west: bool = False,
+    ) -> Tuple[numpy.ndarray, numpy.ndarray]:
+        box = numpy.sort([box_min, box_max], 0)
+        _face_count = sum([up, down, north, south, east, west])
+        if not _face_count:
+            raise ValueError("At least one of the faces must be enabled.")
         _box_coordinates = numpy.array(list(itertools.product(*box.T.tolist())))
         _cube_face_lut = numpy.array(
             [  # This maps to the vertices used (defined in cube_vert_lut)
@@ -161,27 +184,43 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
                 4,
                 5,
                 1,  # down
+            ]
+            * down
+            + [
                 0,
                 1,
                 3,
                 2,  # west
+            ]
+            * west
+            + [
                 4,
                 0,
                 2,
                 6,  # north
+            ]
+            * north
+            + [
                 5,
                 4,
                 6,
                 7,  # east
+            ]
+            * east
+            + [
                 1,
                 5,
                 7,
                 3,  # south
+            ]
+            * south
+            + [
                 3,
                 7,
                 6,
                 2,  # up
             ]
+            * up
         )
         box = box.ravel()
         _texture_index = numpy.array(
@@ -190,36 +229,54 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
                 2,
                 3,
                 5,  # down
+            ]
+            * down
+            + [
                 2,
                 1,
                 5,
                 4,  # west
+            ]
+            * west
+            + [
                 3,
                 1,
                 0,
                 4,  # north
+            ]
+            * north
+            + [
                 5,
                 1,
                 2,
                 4,  # east
+            ]
+            * east
+            + [
                 0,
                 1,
                 3,
                 4,  # south
+            ]
+            * south
+            + [
                 0,
                 5,
                 3,
                 2,  # up
-            ],
+            ]
+            * up,
             numpy.uint32,
         )
         _uv_slice = numpy.array(
-            [0, 1, 2, 1, 2, 3, 0, 3] * 6, dtype=numpy.uint32
-        ).reshape((6, 8)) + numpy.arange(0, 24, 4).reshape((6, 1))
+            [0, 1, 2, 1, 2, 3, 0, 3] * _face_count, dtype=numpy.uint32
+        ).reshape((_face_count, 8)) + numpy.arange(0, _face_count * 4, 4).reshape(
+            (_face_count, 1)
+        )
 
-        _tri_face = numpy.array([0, 1, 2, 2, 3, 0] * 6, numpy.uint32).reshape(
-            (6, 6)
-        ) + numpy.arange(0, 24, 4).reshape((6, 1))
+        _tri_face = numpy.array([0, 1, 2, 2, 3, 0] * _face_count, numpy.uint32).reshape(
+            (_face_count, 6)
+        ) + numpy.arange(0, _face_count * 4, 4).reshape((_face_count, 1))
         return (
             _box_coordinates[_cube_face_lut[_tri_face]].reshape((-1, 3)),
             box[_texture_index[_uv_slice]]
