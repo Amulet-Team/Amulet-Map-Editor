@@ -188,7 +188,9 @@ class EditExtension(wx.Panel, BaseProgram):
             edit_config["user_keybinds"] = user_keybinds
             edit_config["keybind_group"] = keybind_id
             config.put(EDIT_CONFIG_ID, edit_config)
-            self._canvas.set_key_binds(keybinds)
+            self._canvas.buttons.clear_registered_actions()
+            for action, (modifier_keys, trigger_key) in keybinds.items():
+                self._canvas.buttons.register_action(action, trigger_key, modifier_keys)
 
     def _edit_options(self):
         if self._canvas is not None:
