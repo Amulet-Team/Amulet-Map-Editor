@@ -5,6 +5,8 @@ from OpenGL.GL import (
     GL_DEPTH_BUFFER_BIT,
 )
 
+from amulet.api.data_types import BlockCoordinates
+
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.programs.edit.api.behaviour.inspect_block_behaviour import (
@@ -110,6 +112,7 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
     def enable(self):
         super().enable()
         self._selection.enable()
+        self._update_selection_inputs(*self._selection.active_block_positions)
 
     def disable(self):
         super().disable()
@@ -130,14 +133,19 @@ class SelectOptions(wx.BoxSizer, CameraToolUI):
         )
 
     def _box_renderer_change(self, evt: RenderBoxChangeEvent):
-        (x1, y1, z1), (x2, y2, z2) = evt.points
+        self._update_selection_inputs(*evt.points)
+        evt.Skip()
+
+    def _update_selection_inputs(
+        self, point1: BlockCoordinates, point2: BlockCoordinates
+    ):
+        (x1, y1, z1), (x2, y2, z2) = point1, point2
         self._x1.SetValue(x1)
         self._y1.SetValue(y1)
         self._z1.SetValue(z1)
         self._x2.SetValue(x2)
         self._y2.SetValue(y2)
         self._z2.SetValue(z2)
-        evt.Skip()
 
     def _enable_scrolls(self, evt):
         self._set_scroll_state(True)
