@@ -24,16 +24,13 @@ def load_extensions():
         prefix = f"{programs.__name__}."
 
         # source support
-        for _, name, _ in pkgutil.iter_modules(
-            programs.__path__, prefix
-        ):
+        for _, name, _ in pkgutil.iter_modules(programs.__path__, prefix):
             load_extension(name)
 
         # pyinstaller support
         toc = set()
         for importer in pkgutil.iter_importers(amulet_map_editor.__name__):
-            print(importer)
-            if hasattr(importer, 'toc'):
+            if hasattr(importer, "toc"):
                 toc |= importer.toc
         match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9]*$")
         for name in toc:
