@@ -4,8 +4,10 @@
 
 from PyInstaller.utils.hooks import collect_submodules
 
+from typing import Dict, Tuple, Set
 import sys
 import os
+import glob
 import amulet
 import PyMCTranslate
 import minecraft_model_reader
@@ -14,13 +16,21 @@ sys.modules["FixTk"] = None
 
 AMULET_PATH = amulet.__path__[0]
 PYMCT_PATH = os.path.abspath(os.path.dirname(PyMCTranslate.__file__))
-REAL_PYMCT_PATH = PYMCT_PATH if not os.path.islink(PYMCT_PATH) else os.readlink(PYMCT_PATH)  # I have this linked by a symbolic link
-MINECRAFT_MODEL_READER = os.path.abspath(os.path.dirname(minecraft_model_reader.__file__))
+REAL_PYMCT_PATH = (
+    PYMCT_PATH if not os.path.islink(PYMCT_PATH) else os.readlink(PYMCT_PATH)
+)  # I have this linked by a symbolic link
+MINECRAFT_MODEL_READER = os.path.abspath(
+    os.path.dirname(minecraft_model_reader.__file__)
+)
 
-AMULET_MAP_EDITOR = os.path.abspath(os.path.join(".", "build", "lib", "amulet_map_editor"))
+AMULET_MAP_EDITOR = os.path.abspath(
+    os.path.join(".", "build", "lib", "amulet_map_editor")
+)
 if not os.path.isfile(os.path.join(AMULET_MAP_EDITOR, "__main__.py")):
     print(AMULET_MAP_EDITOR)
-    raise Exception("There is no built version of amulet-map-editor. Run setup.py build first.")
+    raise Exception(
+        "There is no built version of amulet-map-editor. Run setup.py build first."
+    )
 
 block_cipher = None
 
@@ -32,10 +42,43 @@ hidden.extend(collect_submodules("OpenGL"))
 hidden.extend(collect_submodules("OpenGL.GL"))
 hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 
+if sys.platform == "linux":
+    binaries = [
+        (
+            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.so"),
+            os.path.join(".", "amulet", "libs", "leveldb"),
+        ),
+    ]
+elif sys.platform == "win32":
+    if sys.maxsize > 2 ** 32:  # 64 bit python
+        binaries = [
+            (
+                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-64.dll"),
+                os.path.join(".", "amulet", "libs", "leveldb"),
+            ),
+        ]
+    else:
+        binaries = [
+            (
+                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-32.dll"),
+                os.path.join(".", "amulet", "libs", "leveldb"),
+            )
+        ]
+
+elif sys.platform == "darwin":
+    binaries = [
+        (
+            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.dylib"),
+            os.path.join(".", "amulet", "libs", "leveldb"),
+        ),
+    ]
+else:
+    raise Exception(f"Unsupported platform {sys.platform}")
+
 a = Analysis(
     [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
     # pathex=[".", "amulet_map_editor"],
-    binaries=[],
+    binaries=binaries,
     datas=[],
     hiddenimports=hidden,
     hookspath=[],
@@ -44,23 +87,55 @@ a = Analysis(
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
-    noarchive=False
+    noarchive=False,
 )
 
-a.datas += Tree(AMULET_PATH, "amulet", excludes=["*.pyc"])
-a.datas += Tree(AMULET_MAP_EDITOR, "amulet_map_editor", excludes=["*.pyc"])
-a.datas += Tree(MINECRAFT_MODEL_READER, "minecraft_model_reader", excludes=["*.pyc"])
-a.datas += Tree(PYMCT_PATH, "PyMCTranslate", excludes=["*.pyc", "json"])
-a.datas += [(os.path.join("PyMCTranslate", "build_number"), os.path.join(PYMCT_PATH, "build_number"), "DATA")]
+# TODO: move this into hooks for each module
+# the paths to each source already added
+added_source: Set[str] = set([v[1] for v in a.pure])
+# the paths to every source
+# {absolute_path: (relative_path, import_path)}
+missing_source: Dict[str, Tuple[str, str]] = {}
+for module_path in (
+    AMULET_MAP_EDITOR,
+    AMULET_PATH,
+    PYMCT_PATH,
+    MINECRAFT_MODEL_READER,
+):
+    for path in glob.glob(
+        os.path.join(os.path.abspath(module_path), "**", "*.py"), recursive=True
+    ):
+        if path not in added_source:
+            rel_path: str = os.path.relpath(path, os.path.dirname(module_path))
+            imp_path = rel_path.replace(os.sep, ".")[:-3]
+            if imp_path.endswith(".__init__"):
+                imp_path = imp_path[:-9]
+            missing_source[path] = (rel_path, imp_path)
+
+print("added missing sources:", missing_source)
+a.pure += [
+    (imp_path, path, "PYMODULE") for path, (_, imp_path) in missing_source.items()
+]
+
+non_data_ext = ["*.pyc", "*.py", "*.dll", "*.so", "*.dylib"]
+
+a.datas += [(rel_path, path, "DATA") for path, (rel_path, _) in missing_source.items()]
+a.datas += Tree(AMULET_PATH, "amulet", excludes=non_data_ext)
+a.datas += Tree(AMULET_MAP_EDITOR, "amulet_map_editor", excludes=non_data_ext)
+a.datas += Tree(MINECRAFT_MODEL_READER, "minecraft_model_reader", excludes=non_data_ext)
+a.datas += Tree(PYMCT_PATH, "PyMCTranslate", excludes=non_data_ext + ["json"])
+a.datas += [
+    (
+        os.path.join("PyMCTranslate", "build_number"),
+        os.path.join(PYMCT_PATH, "build_number"),
+        "DATA",
+    )
+]
 
 for d in filter(lambda dt: "PyMCTranslate" in dt[0], a.datas):
     print("\t", d)
 
-pyz = PYZ(
-    a.pure,
-    a.zipped_data,
-    cipher=block_cipher
-)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
@@ -72,7 +147,7 @@ exe = EXE(
     strip=False,
     upx=True,
     console=True,
-    icon="icon.ico"
+    icon="icon.ico",
 )
 coll = COLLECT(
     exe,
@@ -82,12 +157,12 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="Amulet"
+    name="Amulet",
 )
 
 app = BUNDLE(
     coll,
     name="amulet.app",
     icon="icon.ico",
-    bundle_identifier="com.amulet-editor.amulet_map_editor"
+    bundle_identifier="com.amulet-editor.amulet_map_editor",
 )
