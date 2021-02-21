@@ -4,14 +4,11 @@ from typing import Optional
 from types import ModuleType
 import importlib.util
 
-import amulet_map_editor.programs.edit as amulet_edit
+from amulet_map_editor.programs.edit.plugins.operations import stock_plugins
 
 
-STOCK_PLUGINS_DIR = os.path.abspath(
-    os.path.join(
-        os.path.dirname(amulet_edit.__file__), "plugins", "operations", "stock_plugins"
-    )
-)
+STOCK_PLUGINS_DIR: str = stock_plugins.__path__[0]
+STOCK_PLUGINS_NAME: str = stock_plugins.__name__
 CUSTOM_PLUGINS_DIR = os.path.abspath("plugins")
 
 
