@@ -40,16 +40,19 @@ def load_extensions():
 
 def load_extension(module_name: str):
     # load module and confirm that all required attributes are defined
-    module = importlib.import_module(module_name)
-
-    if hasattr(module, "export"):
-        export = getattr(module, "export")
-        if (
-            "ui" in export
-            and issubclass(export["ui"], BaseProgram)
-            and issubclass(export["ui"], wx.Window)
-        ):
-            _extensions.append((export.get("name", "missingno"), export["ui"]))
+    try:
+        module = importlib.import_module(module_name)
+    except ImportError:
+        log.warning(f"Failed to import {module_name}.\n{traceback.format_exc()}")
+    else:
+        if hasattr(module, "export"):
+            export = getattr(module, "export")
+            if (
+                "ui" in export
+                and issubclass(export["ui"], BaseProgram)
+                and issubclass(export["ui"], wx.Window)
+            ):
+                _extensions.append((export.get("name", "missingno"), export["ui"]))
 
 
 class WorldPageUI(wx.Notebook, BasePageUI):
