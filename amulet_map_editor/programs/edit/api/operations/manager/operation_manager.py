@@ -64,7 +64,9 @@ class BaseOperationManager:
                 try:
                     mod = load_module(obj_path)
                 except ImportError:
-                    log.warning(f"Failed to import {obj_path}.\n{traceback.format_exc()}")
+                    log.warning(
+                        f"Failed to import {obj_path}.\n{traceback.format_exc()}"
+                    )
                 else:
                     self._load_module(obj_path, mod)
 
@@ -81,7 +83,9 @@ class BaseOperationManager:
                 try:
                     mod = importlib.import_module(module_name)
                 except ImportError:
-                    log.warning(f"Failed to import {module_name}.\n{traceback.format_exc()}")
+                    log.warning(
+                        f"Failed to import {module_name}.\n{traceback.format_exc()}"
+                    )
                 else:
                     self._load_module(module_name, mod)
 
