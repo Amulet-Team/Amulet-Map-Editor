@@ -11,7 +11,7 @@ A new Minecraft world editor and converter that supports all versions since Java
 
 ## Running compiled builds
 
-Download the zip file for your operating system from the list of [compiled builds](https://github.com/Amulet-Team/Amulet-Map-Editor/releases). (Currently Windows only)
+Download the zip file for your operating system from the list of [compiled builds](https://github.com/Amulet-Team/Amulet-Map-Editor/releases). (Currently Windows and Mac only)
 
 Extract the contained folder to a location on your computer and run the executable.
 
