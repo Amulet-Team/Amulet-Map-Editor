@@ -37,6 +37,9 @@ block_cipher = None
 hidden = []
 hidden.extend(collect_submodules("pkg_resources"))
 hidden.extend(collect_submodules("amulet_map_editor"))
+hidden.extend(collect_submodules("amulet"))
+hidden.extend(collect_submodules("PyMCTranslate"))
+hidden.extend(collect_submodules("minecraft_model_reader"))
 hidden.extend(collect_submodules("wx"))
 hidden.extend(collect_submodules("OpenGL"))
 hidden.extend(collect_submodules("OpenGL.GL"))
