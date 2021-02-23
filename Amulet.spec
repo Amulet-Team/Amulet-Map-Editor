@@ -37,7 +37,7 @@ block_cipher = None
 hidden = []
 hidden.extend(collect_submodules("pkg_resources"))
 hidden.extend(collect_submodules("amulet_map_editor"))
-hidden.extend(collect_submodules("amulet"))
+# hidden.extend(collect_submodules("amulet"))
 hidden.extend(collect_submodules("PyMCTranslate"))
 hidden.extend(collect_submodules("minecraft_model_reader"))
 hidden.extend(collect_submodules("wx"))
@@ -45,10 +45,49 @@ hidden.extend(collect_submodules("OpenGL"))
 hidden.extend(collect_submodules("OpenGL.GL"))
 hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 
+
+if sys.platform == "linux":
+    binaries = [
+        (
+            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.so"),
+            os.path.join(".", "amulet", "libs", "leveldb"),
+            "DATA",
+        ),
+    ]
+elif sys.platform == "win32":
+    if sys.maxsize > 2 ** 32:  # 64 bit python
+        binaries = [
+            (
+                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-64.dll"),
+                os.path.join(".", "amulet", "libs", "leveldb"),
+                "DATA",
+            ),
+        ]
+    else:
+        binaries = [
+            (
+                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-32.dll"),
+                os.path.join(".", "amulet", "libs", "leveldb"),
+                "DATA",
+            )
+        ]
+
+elif sys.platform == "darwin":
+    binaries = [
+        (
+            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.dylib"),
+            os.path.join(".", "amulet", "libs", "leveldb"),
+            "DATA",
+        ),
+    ]
+else:
+    raise Exception(f"Unsupported platform {sys.platform}")
+
+
 a = Analysis(
     [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
     # pathex=[".", "amulet_map_editor"],
-    binaries=[],
+    binaries=binaries,
     datas=[],
     hiddenimports=hidden,
     hookspath=[],
@@ -59,43 +98,6 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
-
-if sys.platform == "linux":
-    a.datas += [
-        (
-            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.so"),
-            os.path.join(".", "amulet", "libs", "leveldb"),
-            "DATA",
-        ),
-    ]
-elif sys.platform == "win32":
-    if sys.maxsize > 2 ** 32:  # 64 bit python
-        a.datas += [
-            (
-                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-64.dll"),
-                os.path.join(".", "amulet", "libs", "leveldb"),
-                "DATA",
-            ),
-        ]
-    else:
-        a.datas += [
-            (
-                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-32.dll"),
-                os.path.join(".", "amulet", "libs", "leveldb"),
-                "DATA",
-            )
-        ]
-
-elif sys.platform == "darwin":
-    a.datas += [
-        (
-            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.dylib"),
-            os.path.join(".", "amulet", "libs", "leveldb"),
-            "DATA",
-        ),
-    ]
-else:
-    raise Exception(f"Unsupported platform {sys.platform}")
 
 # the paths to each source already added
 added_source: Set[str] = set([v[1] for v in a.pure])
