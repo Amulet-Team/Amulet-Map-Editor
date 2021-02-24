@@ -8,6 +8,7 @@ from typing import Dict, Tuple, Set
 import sys
 import os
 import glob
+import amulet_map_editor
 import amulet
 import PyMCTranslate
 import minecraft_model_reader
@@ -36,7 +37,6 @@ block_cipher = None
 
 hidden = []
 hidden.extend(collect_submodules("pkg_resources"))
-hidden.extend(collect_submodules("amulet_map_editor"))
 hidden.extend(collect_submodules("minecraft_model_reader"))
 hidden.extend(collect_submodules("wx"))
 hidden.extend(collect_submodules("OpenGL"))
@@ -51,6 +51,7 @@ a = Analysis(
     datas=[],
     hiddenimports=hidden,
     hookspath=[
+        os.path.join(amulet_map_editor.__path__[0], "__pyinstaller"),
         os.path.join(amulet.__path__[0], "__pyinstaller"),
         os.path.join(PyMCTranslate.__path__[0], "__pyinstaller"),
     ],
