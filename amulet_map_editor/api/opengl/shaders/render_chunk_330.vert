@@ -1,14 +1,12 @@
-# version 120
-#extension GL_ARB_explicit_attrib_location : enable
-
+# version 330
 layout(location = 0) in vec3 positions;
 layout(location = 1) in vec2 vTexCoord;
 layout(location = 2) in vec4 vTexOffset;
 layout(location = 3) in vec3 vTint;
 
-varying vec2 fTexCoord;
-varying vec4 fTexOffset;
-varying vec3 fTint;
+out vec2 fTexCoord;
+out vec4 fTexOffset;
+out vec3 fTint;
 
 uniform mat4 transformation_matrix;
 
