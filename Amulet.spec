@@ -93,6 +93,14 @@ non_data_ext = ["*.pyc", "*.py", "*.dll", "*.so", "*.dylib"]
 a.datas += Tree(AMULET_PATH, "amulet", excludes=non_data_ext)
 a.datas += Tree(AMULET_MAP_EDITOR, "amulet_map_editor", excludes=non_data_ext)
 a.datas += Tree(MINECRAFT_MODEL_READER, "minecraft_model_reader", excludes=non_data_ext)
+a.datas += Tree(PYMCT_PATH, "PyMCTranslate", excludes=non_data_ext + ["json"])
+a.datas += [
+    (
+        os.path.join("PyMCTranslate", "build_number"),
+        os.path.join(PYMCT_PATH, "build_number"),
+        "DATA",
+    )
+]
 
 for d in filter(lambda dt: "PyMCTranslate" in dt[0], a.datas):
     print("\t", d)
