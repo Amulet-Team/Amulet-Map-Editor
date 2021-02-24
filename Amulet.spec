@@ -37,8 +37,6 @@ block_cipher = None
 hidden = []
 hidden.extend(collect_submodules("pkg_resources"))
 hidden.extend(collect_submodules("amulet_map_editor"))
-# hidden.extend(collect_submodules("amulet"))
-hidden.extend(collect_submodules("PyMCTranslate"))
 hidden.extend(collect_submodules("minecraft_model_reader"))
 hidden.extend(collect_submodules("wx"))
 hidden.extend(collect_submodules("OpenGL"))
@@ -46,51 +44,16 @@ hidden.extend(collect_submodules("OpenGL.GL"))
 hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 
 
-if sys.platform == "linux":
-    binaries = [
-        (
-            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.so"),
-            os.path.join(".", "amulet", "libs", "leveldb"),
-            "DATA",
-        ),
-    ]
-elif sys.platform == "win32":
-    if sys.maxsize > 2 ** 32:  # 64 bit python
-        binaries = [
-            (
-                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-64.dll"),
-                os.path.join(".", "amulet", "libs", "leveldb"),
-                "DATA",
-            ),
-        ]
-    else:
-        binaries = [
-            (
-                os.path.join(AMULET_PATH, "libs", "leveldb", "LevelDB-MCPE-32.dll"),
-                os.path.join(".", "amulet", "libs", "leveldb"),
-                "DATA",
-            )
-        ]
-
-elif sys.platform == "darwin":
-    binaries = [
-        (
-            os.path.join(AMULET_PATH, "libs", "leveldb", "libleveldb.dylib"),
-            os.path.join(".", "amulet", "libs", "leveldb"),
-            "DATA",
-        ),
-    ]
-else:
-    raise Exception(f"Unsupported platform {sys.platform}")
-
-
 a = Analysis(
     [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
     # pathex=[".", "amulet_map_editor"],
-    binaries=binaries,
+    binaries=[],
     datas=[],
     hiddenimports=hidden,
-    hookspath=[],
+    hookspath=[
+        os.path.join(amulet.__path__[0], "__pyinstaller"),
+        os.path.join(PyMCTranslate.__path__[0], "__pyinstaller"),
+    ],
     runtime_hooks=[],
     excludes=["FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter"],
     win_no_prefer_redirects=False,
@@ -130,14 +93,6 @@ non_data_ext = ["*.pyc", "*.py", "*.dll", "*.so", "*.dylib"]
 a.datas += Tree(AMULET_PATH, "amulet", excludes=non_data_ext)
 a.datas += Tree(AMULET_MAP_EDITOR, "amulet_map_editor", excludes=non_data_ext)
 a.datas += Tree(MINECRAFT_MODEL_READER, "minecraft_model_reader", excludes=non_data_ext)
-a.datas += Tree(PYMCT_PATH, "PyMCTranslate", excludes=non_data_ext + ["json"])
-a.datas += [
-    (
-        os.path.join("PyMCTranslate", "build_number"),
-        os.path.join(PYMCT_PATH, "build_number"),
-        "DATA",
-    )
-]
 
 for d in filter(lambda dt: "PyMCTranslate" in dt[0], a.datas):
     print("\t", d)
