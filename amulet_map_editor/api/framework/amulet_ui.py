@@ -52,7 +52,7 @@ class AmuletUI(wx.Frame):
             | wx.RESIZE_BORDER,
         )
         self.locale = wx.Locale(
-            wx.LANGUAGE_ENGLISH
+            wx.Locale.GetSystemLanguage()
         )  # TODO: work out proper localisation
         icon = wx.Icon()
         icon.CopyFromBitmap(image.logo.icon128.bitmap())
