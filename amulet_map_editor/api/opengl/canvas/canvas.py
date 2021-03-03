@@ -39,9 +39,7 @@ class BaseCanvas(glcanvas.GLCanvas):
             self._context = glcanvas.GLContext(self)
         else:
             context_attributes = wx.glcanvas.GLContextAttrs()
-            context_attributes.CoreProfile().OGLVersion(
-                2, 1
-            ).Robust().ResetIsolation().EndList()
+            context_attributes.CoreProfile().Robust().ResetIsolation().EndList()
             self._context = glcanvas.GLContext(
                 self, ctxAttrs=context_attributes
             )  # setup the OpenGL context
