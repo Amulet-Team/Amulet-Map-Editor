@@ -130,7 +130,6 @@ class BaseSelectOperationUI(wx.BoxSizer, CameraToolUI):
         )
 
         if operation_id:
-            operation_loader = self._operations[operation_id]
             identifiers = self._operation_choice.values
 
             if identifiers:

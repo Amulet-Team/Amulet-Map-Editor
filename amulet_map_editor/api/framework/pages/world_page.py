@@ -1,13 +1,14 @@
 import wx
 from typing import List, Callable, Tuple, Type
 import traceback
-import os
 import importlib
 import pkgutil
+import re
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
+import amulet_map_editor
 from amulet_map_editor import programs, log
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
@@ -20,20 +21,38 @@ _fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [("About", AboutProgram
 def load_extensions():
     if not _extensions:
         _extensions.extend(_fixed_extensions)
-        for _, name, _ in pkgutil.iter_modules(
-            [os.path.join(os.path.dirname(programs.__file__))]
-        ):
-            # load module and confirm that all required attributes are defined
-            module = importlib.import_module(f"amulet_map_editor.programs.{name}")
+        prefix = f"{programs.__name__}."
 
-            if hasattr(module, "export"):
-                export = getattr(module, "export")
-                if (
-                    "ui" in export
-                    and issubclass(export["ui"], BaseProgram)
-                    and issubclass(export["ui"], wx.Window)
-                ):
-                    _extensions.append((export.get("name", "missingno"), export["ui"]))
+        # source support
+        for _, name, _ in pkgutil.iter_modules(programs.__path__, prefix):
+            load_extension(name)
+
+        # pyinstaller support
+        toc = set()
+        for importer in pkgutil.iter_importers(amulet_map_editor.__name__):
+            if hasattr(importer, "toc"):
+                toc |= importer.toc
+        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9]*$")
+        for name in toc:
+            if match.fullmatch(name):
+                load_extension(name)
+
+
+def load_extension(module_name: str):
+    # load module and confirm that all required attributes are defined
+    try:
+        module = importlib.import_module(module_name)
+    except ImportError:
+        log.warning(f"Failed to import {module_name}.\n{traceback.format_exc()}")
+    else:
+        if hasattr(module, "export"):
+            export = getattr(module, "export")
+            if (
+                "ui" in export
+                and issubclass(export["ui"], BaseProgram)
+                and issubclass(export["ui"], wx.Window)
+            ):
+                _extensions.append((export.get("name", "missingno"), export["ui"]))
 
 
 class WorldPageUI(wx.Notebook, BasePageUI):

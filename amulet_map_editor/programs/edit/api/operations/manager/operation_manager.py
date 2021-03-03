@@ -1,14 +1,19 @@
 from typing import Tuple, Dict
+from types import ModuleType
 import os
 import traceback
+import pkgutil
+import importlib
+import re
 
 from .loader import (
     BaseOperationLoader,
     OperationLoader,
     UIOperationLoader,
 )
-from .util import STOCK_PLUGINS_DIR, CUSTOM_PLUGINS_DIR, load_module
+from .util import STOCK_PLUGINS_DIR, STOCK_PLUGINS_NAME, CUSTOM_PLUGINS_DIR, load_module
 
+import amulet_map_editor
 from amulet_map_editor import log
 
 
@@ -41,34 +46,61 @@ class BaseOperationManager:
         If new operations are created, load them.
         If old operations were removed, remove them."""
         self._operations.clear()
+        self._load_pyinstaller(f"{STOCK_PLUGINS_NAME}.{self._group_name}")
         self._load_dir(os.path.join(STOCK_PLUGINS_DIR, self._group_name))
-        self._load_dir(os.path.join(CUSTOM_PLUGINS_DIR, self._group_name))
+        self._load_dir(os.path.join(CUSTOM_PLUGINS_DIR, self._group_name), True)
 
-    def _load_dir(self, path: str):
+    def _load_dir(self, path: str, make: bool = False):
         """Load all operations in a set directory."""
-        os.makedirs(path, exist_ok=True)
-        for obj_name in os.listdir(path):
-            if obj_name in {"__init__.py", "__pycache__"}:
-                continue
-            obj_path = os.path.join(path, obj_name)
-            if os.path.isfile(obj_path) and not obj_path.endswith(".py"):
-                continue
-            try:
-                mod = load_module(obj_path)
-            except ImportError:
-                log.warning(f"Failed to import {obj_path}.\n{traceback.format_exc()}")
-            else:
-                if hasattr(mod, "export"):
-                    export = mod.export
-                    if isinstance(export, dict):
-                        self._load_operation(obj_path, export)
-                    elif isinstance(export, (list, tuple)):
-                        for i, export_dict in export:
-                            self._load_operation(f"{obj_path}[{i}]", export_dict)
-                    else:
-                        log.error(f"The format of export in {obj_path} is invalid.")
+        if make:
+            os.makedirs(path, exist_ok=True)
+        if os.path.isdir(path):
+            for obj_name in os.listdir(path):
+                if obj_name in {"__init__.py", "__pycache__"}:
+                    continue
+                obj_path = os.path.join(path, obj_name)
+                if os.path.isfile(obj_path) and not obj_path.endswith(".py"):
+                    continue
+                try:
+                    mod = load_module(obj_path)
+                except ImportError:
+                    log.warning(
+                        f"Failed to import {obj_path}.\n{traceback.format_exc()}"
+                    )
                 else:
-                    log.error(f"export is not present in {obj_path}")
+                    self._load_module(obj_path, mod)
+
+    def _load_pyinstaller(self, package: str):
+        # pyinstaller support
+        toc = set()
+        for importer in pkgutil.iter_importers(amulet_map_editor.__name__):
+            if hasattr(importer, "toc"):
+                toc |= importer.toc
+        prefix = f"{package}."
+        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9]*$")
+        for module_name in toc:
+            if match.fullmatch(module_name):
+                try:
+                    mod = importlib.import_module(module_name)
+                except ImportError:
+                    log.warning(
+                        f"Failed to import {module_name}.\n{traceback.format_exc()}"
+                    )
+                else:
+                    self._load_module(module_name, mod)
+
+    def _load_module(self, obj_path: str, mod: ModuleType):
+        if hasattr(mod, "export"):
+            export = mod.export
+            if isinstance(export, dict):
+                self._load_operation(obj_path, export)
+            elif isinstance(export, (list, tuple)):
+                for i, export_dict in export:
+                    self._load_operation(f"{obj_path}[{i}]", export_dict)
+            else:
+                log.error(f"The format of export in {obj_path} is invalid.")
+        else:
+            log.error(f"export is not present in {obj_path}")
 
     def _load_operation(self, identifier: str, export_dict: dict):
         """Create an instance of a subclass of BaseOperationLoader to load the operation.
