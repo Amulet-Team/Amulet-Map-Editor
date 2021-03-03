@@ -85,7 +85,8 @@ class RaycastBehaviour(BaseBehaviour):
 
             if (
                 chunk is not None
-                and chunk.block_palette[chunk.blocks[x % 16, y, z % 16]] not in UniversalAirLikeBlocks
+                and chunk.block_palette[chunk.blocks[x % 16, y, z % 16]]
+                not in UniversalAirLikeBlocks
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block
@@ -137,9 +138,10 @@ class RaycastBehaviour(BaseBehaviour):
                 dx, dz = (numpy.floor([x, z]) % sub_chunk_size).astype(numpy.int64)
                 for sy in sub_chunks:
                     blocks = numpy.invert(
-                        numpy.isin(chunk.blocks.get_section(sy)[
-                            dx, ::-1, dz
-                        ], UniversalAirLikeBlocks)
+                        numpy.isin(
+                            chunk.blocks.get_section(sy)[dx, ::-1, dz],
+                            UniversalAirLikeBlocks,
+                        )
                     )
                     if numpy.any(blocks):
                         y = (
