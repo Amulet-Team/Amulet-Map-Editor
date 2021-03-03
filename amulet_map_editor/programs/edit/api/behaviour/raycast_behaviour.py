@@ -3,7 +3,7 @@ import numpy
 import math
 
 from amulet.api.chunk import Chunk
-from amulet.api.block import UniversalAirBlock
+from amulet.api.block import UniversalAirLikeBlocks
 from amulet.api.errors import ChunkLoadError
 
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
@@ -85,8 +85,7 @@ class RaycastBehaviour(BaseBehaviour):
 
             if (
                 chunk is not None
-                and self.canvas.world.block_palette[chunk.blocks[x % 16, y, z % 16]]
-                != UniversalAirBlock
+                and chunk.block_palette[chunk.blocks[x % 16, y, z % 16]] not in UniversalAirLikeBlocks
             ):
                 # the block is not air
                 if in_air:  # if we have previously found an air block
@@ -137,9 +136,11 @@ class RaycastBehaviour(BaseBehaviour):
             if sub_chunks:
                 dx, dz = (numpy.floor([x, z]) % sub_chunk_size).astype(numpy.int64)
                 for sy in sub_chunks:
-                    blocks = chunk.blocks.get_section(sy)[
-                        dx, ::-1, dz
-                    ] != chunk.block_palette.get_add_block(UniversalAirBlock)
+                    blocks = numpy.invert(
+                        numpy.isin(chunk.blocks.get_section(sy)[
+                            dx, ::-1, dz
+                        ], UniversalAirLikeBlocks)
+                    )
                     if numpy.any(blocks):
                         y = (
                             sub_chunk_size
