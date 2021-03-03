@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Tuple, Generator
+from typing import TYPE_CHECKING, Optional, Tuple, Generator, List
 import numpy
 import math
 
@@ -188,8 +188,6 @@ class RaycastBehaviour(BaseBehaviour):
         :param look_vector: The unit look vector. Defaults to the camera look vector.
         :return: A generator of (x, y, z) numpy arrays
         """
-        # TODO: optimise this
-
         if look_vector is None:
             look_vector = self.look_vector()
         if start_location is None:
@@ -199,29 +197,34 @@ class RaycastBehaviour(BaseBehaviour):
         vectors = numpy.array(
             [look_vector / abs(dx), look_vector / abs(dy), look_vector / abs(dz)]
         )
-        offsets = -numpy.eye(3)
 
-        locations = set()
+        locations: List[numpy.ndarray] = []
+        # the location within the block
         start: numpy.ndarray = numpy.array(start_location, numpy.float32) % 1
 
-        max_distance_squared = max_distance ** 2
-
         for axis in range(3):
-            location: numpy.ndarray = start.copy()
             vector = vectors[axis]
-            offset = offsets[axis]
+            vector_size = numpy.sum(vector ** 2) ** 0.5
+            # move the start position to the block edge behind the vector
             if vector[axis] > 0:
-                location = location + vector * (1 - location[axis])
+                initial_offset = -vector * start[axis]
             else:
-                location = location + vector * location[axis]
-            # location here should be on a block edge
-            while numpy.all(numpy.sum(location ** 2) < max_distance_squared):
-                locations.add(tuple(numpy.floor(location).astype(numpy.int)))
-                locations.add(tuple(numpy.floor(location + offset).astype(numpy.int)))
-                location += vector
+                initial_offset = -vector * (1 - start[axis])
+
+            block_count = (max_distance + numpy.sum(initial_offset**2)**0.5 - 0.001) // vector_size
+
+            if block_count:
+                blocks = numpy.arange(block_count+1).reshape(-1, 1)
+                offsets = blocks * vector + initial_offset
+                locations_ = numpy.floor(offsets + start).astype(numpy.int)
+                if vector[axis] < 0:
+                    locations_[:, axis] -= 1
+
+                locations.append(locations_)
+
         if locations:
             collision_locations = numpy.array(
-                sorted(list(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
+                sorted(numpy.concatenate(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
             ) + numpy.floor(start_location).astype(numpy.int)
         else:
             collision_locations = start.astype(numpy.int).reshape(1, 3)
