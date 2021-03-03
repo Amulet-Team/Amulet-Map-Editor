@@ -12,7 +12,7 @@ _lang: Dict[
     str, str
 ] = {}  # a storage for the language strings. unique_identifier: language_string
 
-_default_language = "en_US"
+_default_language = "en"
 
 # find out what language the user is using.
 try:
@@ -43,19 +43,29 @@ def register_lang_directory(lang_dir: str):
             default_lang_path = os.path.join(lang_dir, f"{_default_language}.lang")
             default_lang = _load_lang_file(default_lang_path)
             if _default_language != _language:
-                # if the language set is not the default load the language
-                lang_path = os.path.join(lang_dir, f"{_language}.lang")
-                lang = _load_lang_file(lang_path)
+                # if the language set is not the default, load the language
+                def _load_lang(lang_name):
+                    lang_path = os.path.join(lang_dir, f"{lang_name}.lang")
+                    lang = _load_lang_file(lang_path)
 
-                # sanity check to make sure that all entries in the user language are in the default
-                diff = set(lang).difference(set(default_lang))
-                if diff:
-                    print(
-                        f"There are {len(diff)} language entries defined in {lang_path} that are not defined in {default_lang_path}\n{diff}"
-                    )
+                    # sanity check to make sure that all entries in the user language are in the default
+                    diff = set(lang).difference(set(default_lang))
+                    if diff:
+                        print(
+                            f"There are {len(diff)} language entries defined in {lang_path} that are not defined in {default_lang_path}\n{diff}"
+                        )
 
-                # merge in the user language
-                default_lang.update(lang)
+                    # merge in the user language
+                    default_lang.update(lang)
+
+                if "_" in _language:
+                    # first load region independent language files
+                    # eg for en_US load en.lang
+                    _load_lang(_language.split("_")[0])
+
+                # second load region specific language files
+                # eg en_US.lang
+                _load_lang(_language)
 
             # merge the loaded language entries
             for unique_identifier, language_string in default_lang.items():
