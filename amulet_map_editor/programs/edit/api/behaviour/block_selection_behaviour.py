@@ -518,5 +518,5 @@ class BlockSelectionBehaviour(PointerBehaviour):
             self._active_selection.draw(
                 self.canvas.camera.transformation_matrix, camera
             )
-        # if not self._highlight and not self._editing:
-        super().draw()
+        if not self._highlight and not self._editing:
+            super().draw()
