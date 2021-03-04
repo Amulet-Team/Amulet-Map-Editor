@@ -440,7 +440,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     faces_hit = self._get_box_faces_manual(
                         camera, look_vector, selection_group, box_index, max_distance
                     )
-                    location = numpy.floor(camera + look_vector * (max_distance + 0.01)).astype(numpy.int)
+                    location = numpy.floor(
+                        camera + look_vector * (max_distance + 0.01)
+                    ).astype(numpy.int)
                     self._pointer.point1, self._pointer.point2 = location, location + 1
                     if box_index == len(self._selection):
                         self._active_selection.set_highlight_edges(faces_hit)

@@ -211,10 +211,12 @@ class RaycastBehaviour(BaseBehaviour):
             else:
                 initial_offset = -vector * (1 - start[axis])
 
-            block_count = (max_distance + numpy.sum(initial_offset**2)**0.5 - 0.001) // vector_size
+            block_count = (
+                max_distance + numpy.sum(initial_offset ** 2) ** 0.5 - 0.001
+            ) // vector_size
 
             if block_count:
-                blocks = numpy.arange(block_count+1).reshape(-1, 1)
+                blocks = numpy.arange(block_count + 1).reshape(-1, 1)
                 offsets = blocks * vector + initial_offset
                 locations_ = numpy.floor(offsets + start).astype(numpy.int)
                 if vector[axis] < 0:
@@ -223,9 +225,14 @@ class RaycastBehaviour(BaseBehaviour):
                 locations.append(locations_)
 
         if locations:
-            collision_locations = numpy.array(
-                sorted(numpy.concatenate(locations), key=lambda loc: sum(abs(loc_) for loc_ in loc))
-            ) + numpy.floor(start_location).astype(numpy.int)
+            collision_locations = numpy.floor(start_location).astype(
+                numpy.int
+            ) + numpy.array(
+                sorted(
+                    numpy.concatenate(locations),
+                    key=lambda loc: sum(abs(loc_) for loc_ in loc),
+                )
+            )
         else:
             collision_locations = start.astype(numpy.int).reshape(1, 3)
 
