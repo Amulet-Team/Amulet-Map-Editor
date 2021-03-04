@@ -42,21 +42,25 @@ class LevelGroup(
         self._transforms: List[TransformType] = []
         self._world_translation: List[LocationType] = []
         self._transformation_matrices: List[numpy.ndarray] = []
-        self._active_level: Optional[int] = None
+        self._active_level_index: Optional[int] = None
         self._camera_location: LocationType = (0.0, 100.0, 0.0)
 
     @property
-    def active_level(self) -> Optional[int]:
+    def active_level_index(self) -> Optional[int]:
         """The index of the active level. None if no level is active."""
-        return self._active_level
+        return self._active_level_index
+
+    @property
+    def render_levels(self) -> Tuple[RenderLevel, ...]:
+        return tuple(self._objects)
 
     @property
     def active_transform(self) -> TransformType:
         """Get the transform of the active level.
         If no level is selected will return zeros."""
-        if self._active_level is None:
+        if self._active_level_index is None:
             return (0, 0, 0), (0, 0, 0), (0, 0, 0)
-        return self._transforms[self._active_level]
+        return self._transforms[self._active_level_index]
 
     @active_transform.setter
     def active_transform(self, location_scale_rotation: TransformType):
@@ -65,12 +69,12 @@ class LevelGroup(
         :param location_scale_rotation: The location, scale and rotation
         :return:
         """
-        if self._active_level is not None:
+        if self._active_level_index is not None:
             location, scale, rotation = location_scale_rotation
-            self._transforms[self._active_level] = (location, scale, rotation)
-            self._transformation_matrices[self._active_level] = numpy.matmul(
+            self._transforms[self._active_level_index] = (location, scale, rotation)
+            self._transformation_matrices[self._active_level_index] = numpy.matmul(
                 transform_matrix(scale, rotation, location),
-                displacement_matrix(*self._world_translation[self._active_level]),
+                displacement_matrix(*self._world_translation[self._active_level_index]),
             )
             self._set_camera_location()
 
@@ -127,10 +131,10 @@ class LevelGroup(
                 displacement_matrix(*self._world_translation[-1]),
             )
         )
-        if self._active_level is None:
-            self._active_level = 0
+        if self._active_level_index is None:
+            self._active_level_index = 0
         else:
-            self._active_level += 1
+            self._active_level_index += 1
 
     def enable(self):
         """Enable chunk generation in a new thread."""
@@ -150,7 +154,7 @@ class LevelGroup(
         self._transforms.clear()
         self._world_translation.clear()
         self._transformation_matrices.clear()
-        self._active_level = None
+        self._active_level_index = None
 
     def run_garbage_collector(self):
         for level in self._objects:
@@ -163,7 +167,7 @@ class LevelGroup(
             level.chunk_manager.rebuild()
 
     def _rebuild(self):
-        pass
+        self.unload()
 
     def draw(self, camera_matrix: numpy.ndarray):
         """Draw all of the levels."""

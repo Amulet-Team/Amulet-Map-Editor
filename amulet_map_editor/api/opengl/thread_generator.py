@@ -37,7 +37,6 @@ class ThreadedObjectContainer(ThreadedObject):
         if self._obj_index >= len(self._objects):
             self._obj_index = 0
             self._obj_sub_index = 0
-        # while self._obj_index < len(self._objects) and
         while (
             self._obj_index < len(self._objects)
             and self._objects[self._obj_index].thread_weighting < self._obj_sub_index

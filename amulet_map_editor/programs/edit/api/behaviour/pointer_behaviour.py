@@ -3,7 +3,7 @@ import wx
 
 from amulet_map_editor.api.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.api.opengl.camera import Projection
-from amulet.api.data_types import BlockCoordinatesNDArray
+from amulet.api.data_types import BlockCoordinatesNDArray, BlockCoordinates
 
 from .raycast_behaviour import RaycastBehaviour
 from ..events import (
@@ -19,6 +19,21 @@ from ..key_config import (
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+_PointChangeEventType = wx.NewEventType()
+EVT_POINT_CHANGE = wx.PyEventBinder(_PointChangeEventType)
+
+
+class PointChangeEvent(wx.PyEvent):
+    """Run when the cursor point changed."""
+
+    def __init__(self, point: BlockCoordinates):
+        wx.PyEvent.__init__(self, eventType=_PointChangeEventType)
+        self._point = point
+
+    @property
+    def point(self) -> BlockCoordinates:
+        return self._point
 
 
 class PointerBehaviour(RaycastBehaviour):
@@ -69,6 +84,11 @@ class PointerBehaviour(RaycastBehaviour):
             self._pointer_moved = False
         evt.Skip()
 
+    def _post_change_event(self):
+        wx.PostEvent(
+            self.canvas, PointChangeEvent(tuple(self._pointer.point1.tolist()))
+        )
+
     def _update_pointer(self):
         """Update the pointer location."""
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
@@ -80,6 +100,7 @@ class PointerBehaviour(RaycastBehaviour):
                 location = self.closest_block_3d()[0]
 
         self._pointer.point1, self._pointer.point2 = location, location + 1
+        self._post_change_event()
 
     def draw(self):
         self._pointer.draw(self.canvas.camera.transformation_matrix)

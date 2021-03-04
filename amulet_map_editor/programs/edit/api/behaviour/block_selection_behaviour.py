@@ -140,6 +140,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
             self._disable_inputs()
 
     def _post_change_event(self):
+        super()._post_change_event()
         wx.PostEvent(self.canvas, RenderBoxChangeEvent(*self.active_block_positions))
 
     def _disable_inputs(self):
