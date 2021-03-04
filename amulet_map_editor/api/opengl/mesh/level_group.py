@@ -38,7 +38,7 @@ class LevelGroup(
         OpenGLResourcePackManager.__init__(self, resource_pack)
         ThreadedObjectContainer.__init__(self)
         ContextManager.__init__(self, context_identifier)
-        self._render_levels: List[RenderLevel] = []
+        self._objects: List[RenderLevel] = []
         self._transforms: List[TransformType] = []
         self._world_translation: List[LocationType] = []
         self._transformation_matrices: List[numpy.ndarray] = []
@@ -52,7 +52,7 @@ class LevelGroup(
 
     @property
     def render_levels(self) -> Tuple[RenderLevel, ...]:
-        return tuple(self._render_levels)
+        return tuple(self._objects)
 
     @property
     def active_transform(self) -> TransformType:
@@ -84,14 +84,14 @@ class LevelGroup(
         self._set_camera_location()
 
     def _set_camera_location(self):
-        for level, transform in zip(self._render_levels, self._transformation_matrices):
+        for level, transform in zip(self._objects, self._transformation_matrices):
             level.camera_location = numpy.matmul(
                 numpy.linalg.inv(transform), (*self._camera_location, 1)
             ).tolist()[:-1]
 
     def set_camera_rotation(self, yaw: float, pitch: float):
         """Set the rotation of the camera for each of the levels."""
-        for level in self._render_levels:
+        for level in self._objects:
             level.camera_rotation = yaw, pitch
 
     def append(
@@ -138,18 +138,18 @@ class LevelGroup(
 
     def enable(self):
         """Enable chunk generation in a new thread."""
-        for level in self._render_levels:
+        for level in self._objects:
             level.enable()
 
     def unload(self):
         """Unload the geometry. Frees VRAM."""
-        for level in self._render_levels:
+        for level in self._objects:
             level.unload()
 
     def clear(self):
         """Destroy and unload all level objects."""
         self.unload()
-        for level in self._render_levels.copy():
+        for level in self._objects.copy():
             self.unregister(level)
         self._transforms.clear()
         self._world_translation.clear()
@@ -157,13 +157,13 @@ class LevelGroup(
         self._active_level_index = None
 
     def run_garbage_collector(self):
-        for level in self._render_levels:
+        for level in self._objects:
             level.run_garbage_collector()
 
     def rebuild(self):
         """Rebuild a single region which was last rebuild the longest ago.
         Put this on a semi-fast clock to rebuild all regions."""
-        for level in self._render_levels:
+        for level in self._objects:
             level.chunk_manager.rebuild()
 
     def _rebuild(self):
@@ -171,5 +171,5 @@ class LevelGroup(
 
     def draw(self, camera_matrix: numpy.ndarray):
         """Draw all of the levels."""
-        for level, transform in zip(self._render_levels, self._transformation_matrices):
+        for level, transform in zip(self._objects, self._transformation_matrices):
             level.draw(numpy.matmul(camera_matrix, transform))
