@@ -1,5 +1,5 @@
 import wx
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from OpenGL.GL import (
     glClear,
     GL_DEPTH_BUFFER_BIT,
@@ -15,6 +15,12 @@ from amulet_map_editor.programs.edit.api.events import EVT_PASTE
 from amulet_map_editor.programs.edit.api.ui.select_location import SelectTransformUI, TransformChangeEvent, EVT_TRANSFORM_CHANGE
 
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
+from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import PointerBehaviour, EVT_POINT_CHANGE, PointChangeEvent
+from amulet_map_editor.programs.edit.api.events import (
+    InputPressEvent,
+    EVT_INPUT_PRESS,
+)
+from amulet_map_editor.programs.edit.api.key_config import ACT_BOX_CLICK
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -26,6 +32,8 @@ class PasteTool(wx.BoxSizer, CameraToolUI):
         CameraToolUI.__init__(self, canvas)
 
         self._selection = StaticSelectionBehaviour(self.canvas)
+        self._cursor = PointerBehaviour(self.canvas)
+        self._moving = False
 
         self._button_panel = wx.Panel(canvas)
         self._button_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -51,15 +59,29 @@ class PasteTool(wx.BoxSizer, CameraToolUI):
         super().bind_events()
         self._selection.bind_events()
         self.canvas.Bind(EVT_PASTE, self._paste)
+        self._cursor.bind_events()
+        self.canvas.Bind(EVT_POINT_CHANGE, self._on_pointer_change)
+        self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
 
     def enable(self):
         super().enable()
         self._selection.update_selection()
+        self._moving = False
 
     def disable(self):
         super().disable()
         self._button_panel.Disable()
         self.canvas.renderer.fake_levels.clear()
+
+    def _on_pointer_change(self, evt: PointChangeEvent):
+        if self._moving:
+            self.canvas.renderer.fake_levels.active_transform = (
+                evt.point,
+                self._paste_panel.scale,
+                self._paste_panel.rotation_radians,
+            )
+            self._paste_panel.location = evt.point
+        evt.Skip()
 
     def _on_transform_change(self, evt: TransformChangeEvent):
         self.canvas.renderer.fake_levels.active_transform = (
@@ -67,6 +89,17 @@ class PasteTool(wx.BoxSizer, CameraToolUI):
             evt.scale,
             evt.rotation_radians,
         )
+        evt.Skip()
+
+    def _on_input_press(self, evt: InputPressEvent):
+        if evt.action_id == ACT_BOX_CLICK:
+            self._moving = not self._moving
+            if self._moving:
+                self.canvas.renderer.fake_levels.active_transform = (
+                self._paste_panel.location,
+                self._paste_panel.scale,
+                self._paste_panel.rotation_radians,
+            )
         evt.Skip()
 
     def _paste(self, evt):
@@ -77,6 +110,7 @@ class PasteTool(wx.BoxSizer, CameraToolUI):
         self.canvas.renderer.fake_levels.append(
             structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0)
         )
+        self._moving = True
 
     def _paste_confirm(self, evt):
         fake_levels = self.canvas.renderer.fake_levels

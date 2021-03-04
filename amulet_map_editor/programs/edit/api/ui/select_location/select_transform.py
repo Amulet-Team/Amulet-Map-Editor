@@ -1,4 +1,5 @@
 import wx
+import math
 
 from amulet.api.data_types import BlockCoordinates, FloatTriplet
 from .select_location import SelectLocationUI
@@ -53,6 +54,11 @@ class SelectTransformUI(SelectLocationUI):
     @property
     def rotation(self) -> FloatTriplet:
         return self._rx.GetValue(), self._ry.GetValue(), self._rz.GetValue()
+
+    @property
+    def rotation_radians(self) -> FloatTriplet:
+        """The rotation of the object. (x, y, z)."""
+        return tuple(math.radians(r) for r in self.rotation)
 
     def _on_rotation_change(self, evt):
         wx.PostEvent(self, RotationChangeEvent(self.rotation))
