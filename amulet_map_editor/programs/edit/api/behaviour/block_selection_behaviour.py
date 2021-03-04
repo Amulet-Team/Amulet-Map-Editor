@@ -199,7 +199,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                             self._start_point_1,
                             self._start_point_2,
                         ) = self._get_active_points()
-                        self._pointer_distance2 = distance
+                        self._pointer_distance2 = distance + 0.01
                         self._pointer_mask = faces
                         self._active_selection.set_highlight_edges(faces)
                         self._initial_box = self._active_selection.points
@@ -416,7 +416,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                         hit_block = True
                     else:
                         location, hit_block = self.closest_block_3d(
-                            min(max_distance, 100) - 0.3
+                            min(max_distance, 100)
                         )
 
             self._pointer.point1, self._pointer.point2 = location, location + 1
@@ -435,10 +435,15 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     if self._active_selection is not None:
                         self._active_selection.reset_highlight_edges()
                 else:
+
                     self._highlight = True
                     faces_hit = self._get_box_faces_manual(
                         camera, look_vector, selection_group, box_index, max_distance
                     )
+                    location = numpy.floor(
+                        camera + look_vector * (max_distance + 0.01)
+                    ).astype(numpy.int)
+                    self._pointer.point1, self._pointer.point2 = location, location + 1
                     if box_index == len(self._selection):
                         self._active_selection.set_highlight_edges(faces_hit)
                     else:
