@@ -12,10 +12,18 @@ from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 
 from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
 from amulet_map_editor.programs.edit.api.events import EVT_PASTE
-from amulet_map_editor.programs.edit.api.ui.select_location import SelectTransformUI, TransformChangeEvent, EVT_TRANSFORM_CHANGE
+from amulet_map_editor.programs.edit.api.ui.select_location import (
+    SelectTransformUI,
+    TransformChangeEvent,
+    EVT_TRANSFORM_CHANGE,
+)
 
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
-from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import PointerBehaviour, EVT_POINT_CHANGE, PointChangeEvent
+from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import (
+    PointerBehaviour,
+    EVT_POINT_CHANGE,
+    PointChangeEvent,
+)
 from amulet_map_editor.programs.edit.api.events import (
     InputPressEvent,
     EVT_INPUT_PRESS,
@@ -96,10 +104,10 @@ class PasteTool(wx.BoxSizer, CameraToolUI):
             self._moving = not self._moving
             if self._moving:
                 self.canvas.renderer.fake_levels.active_transform = (
-                self._paste_panel.location,
-                self._paste_panel.scale,
-                self._paste_panel.rotation_radians,
-            )
+                    self._paste_panel.location,
+                    self._paste_panel.scale,
+                    self._paste_panel.rotation_radians,
+                )
         evt.Skip()
 
     def _paste(self, evt):

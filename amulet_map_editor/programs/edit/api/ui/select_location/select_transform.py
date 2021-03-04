@@ -73,4 +73,6 @@ class SelectTransformUI(SelectLocationUI):
         self._on_transform_change()
 
     def _on_transform_change(self):
-        wx.PostEvent(self, TransformChangeEvent(self.location, self.rotation, self.scale))
+        wx.PostEvent(
+            self, TransformChangeEvent(self.location, self.rotation, self.scale)
+        )
