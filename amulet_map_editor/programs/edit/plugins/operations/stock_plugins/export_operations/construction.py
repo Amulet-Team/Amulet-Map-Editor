@@ -72,7 +72,7 @@ class ExportConstruction(SimpleOperationPanel):
                 ).ShowModal()
                 if response == wx.ID_CANCEL:
                     return
-            wrapper.create_and_open(platform, version, selection)
+            wrapper.create_and_open(platform, version, selection, True)
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))
