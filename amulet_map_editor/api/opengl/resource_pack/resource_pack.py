@@ -20,6 +20,7 @@ import os
 import json
 from PIL import Image
 import numpy
+import glob
 
 from minecraft_model_reader.api.resource_pack.base import BaseResourcePackManager
 from minecraft_model_reader import BlockMesh
@@ -33,6 +34,7 @@ from amulet_map_editor.api.opengl import textureatlas
 class OpenGLResourcePack:
     """This class will take a minecraft_model_reader resource pack and
     load all of the textures into a texture atlas."""
+
     _translator: PyMCTranslate.Version
     _block_models: Dict[Block, BlockMesh]
     _texture_bounds: Dict[Any, Tuple[float, float, float, float]]
@@ -88,37 +90,49 @@ class OpenGLResourcePack:
             cache_id = struct.unpack(
                 "H",
                 hashlib.sha1(
-                    "".join(self._resource_pack.pack_paths).encode('utf-8')
-                ).digest()[:2]
+                    "".join(self._resource_pack.pack_paths).encode("utf-8")
+                ).digest()[:2],
             )[0]
 
             atlas: Image.Image
+
+            mod_time = max(
+                os.stat(path).st_mtime
+                for pack in self._resource_pack.pack_paths
+                for path in glob.glob(os.path.join(pack, "**", "*.*"), recursive=True)
+            )
 
             cache_dir = os.path.join(".", "cache", "resource_pack")
             img_path = os.path.join(cache_dir, f"{cache_id}.png")
             bounds_path = os.path.join(cache_dir, f"{cache_id}.json")
             try:
                 with open(bounds_path) as f:
-                    self._texture_bounds = json.load(f)
+                    cache_mod_time, bounds = json.load(f)
+                if mod_time != cache_mod_time:
+                    raise Exception(
+                        "The resource packs have changed since last merging."
+                    )
                 atlas = Image.open(img_path)
             except:
-                atlas_iter = textureatlas.create_atlas_iter(self._resource_pack.textures)
+                atlas_iter = textureatlas.create_atlas_iter(
+                    self._resource_pack.textures
+                )
                 try:
                     while True:
                         yield next(atlas_iter)
                 except StopIteration as e:
                     (
                         atlas,
-                        self._texture_bounds,
+                        bounds,
                     ) = e.value
                     os.makedirs(cache_dir, exist_ok=True)
                     atlas.save(img_path)
                     with open(bounds_path, "w") as f:
-                        json.dump(self._texture_bounds, f)
+                        json.dump((mod_time, bounds), f)
 
             self._image_width, self._image_height = atlas.size
             self._image = numpy.array(atlas, numpy.uint8).ravel()
-
+            self._texture_bounds = bounds
 
     def _setup_texture(self, context_id: str):
         """Set up the texture for a given context"""
