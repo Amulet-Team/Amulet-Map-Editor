@@ -180,17 +180,42 @@ class Camera(CanvasContainer):
         self.set_rotation(rotation)
         self._notify_moved()
 
+    def _set_fov(self, mode: Projection, fov: float):
+        assert type(fov) in (int, float)
+        self._fov[mode.value] = fov
+        self._reset_matrix()
+
     @property
     def fov(self) -> float:
-        """The field of view of the camera in degrees."""
+        """The field of view of the camera.
+        The value will vary based on the projection mode."""
         return self._fov[self.projection_mode.value]
 
     @fov.setter
     def fov(self, fov: float):
-        """Set the field of view of the camera in degrees."""
-        assert type(fov) in (int, float)
-        self._fov[self.projection_mode.value] = fov
-        self._reset_matrix()
+        """Set the field of view of the camera.
+        The value will vary based on the projection mode."""
+        self._set_fov(self.projection_mode, fov)
+
+    @property
+    def perspective_fov(self) -> float:
+        """The field of view of the camera in degrees when in perspective mode."""
+        return self._fov[Projection.PERSPECTIVE.value]
+
+    @perspective_fov.setter
+    def perspective_fov(self, fov: float):
+        """Set the field of view of the camera in degrees when in perspective mode."""
+        self._set_fov(Projection.PERSPECTIVE, fov)
+
+    @property
+    def orthographic_fov(self) -> float:
+        """The field of view of the camera when in orthographic mode."""
+        return self._fov[Projection.TOP_DOWN.value]
+
+    @orthographic_fov.setter
+    def orthographic_fov(self, fov: float):
+        """Set the field of view of the camera when in orthographic mode."""
+        self._set_fov(Projection.TOP_DOWN, fov)
 
     @property
     def aspect_ratio(self) -> float:
