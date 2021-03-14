@@ -63,7 +63,9 @@ class EditExtension(wx.Panel, BaseProgram):
                 wx.Yield()
 
             edit_config: dict = config.get(EDIT_CONFIG_ID, {})
-            self._canvas.camera.perspective_fov = edit_config.get("options", {}).get("fov", 70.0)
+            self._canvas.camera.perspective_fov = edit_config.get("options", {}).get(
+                "fov", 70.0
+            )
             if self._canvas.camera.perspective_fov > 180:
                 self._canvas.camera.perspective_fov = 70.0
             self._canvas.renderer.render_distance = edit_config.get("options", {}).get(
