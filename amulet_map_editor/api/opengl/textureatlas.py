@@ -256,11 +256,11 @@ class TextureAtlasMap(object):
 
 def create_atlas(
     texture_tuple: Tuple[str, ...]
-) -> Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int]:
+) -> Tuple[Image.Image, Dict[str, Tuple[float, float, float, float]]]:
     atlas_iter = create_atlas_iter(texture_tuple)
     try:
         while True:
-            yield next(atlas_iter)
+            next(atlas_iter)
     except StopIteration as e:
         return e.value
 
@@ -270,7 +270,7 @@ def create_atlas_iter(
 ) -> Generator[
     float,
     None,
-    Tuple[numpy.ndarray, Dict[Any, Tuple[float, float, float, float]], int, int],
+    Tuple[Image.Image, Dict[str, Tuple[float, float, float, float]]],
 ]:
     log.info("Creating texture atlas")
     # Parse texture names
@@ -320,7 +320,7 @@ def create_atlas_iter(
 
     log.info(f"Successfully packed textures into an image of size {size}x{size}")
 
-    texture_atlas = numpy.array(atlas.generate("RGBA"), numpy.uint8).ravel()
+    texture_atlas = atlas.generate("RGBA")
 
     texture_bounds = atlas.to_dict()
     texture_bounds = {
@@ -328,4 +328,4 @@ def create_atlas_iter(
     }
 
     log.info("Finished creating texture atlas")
-    return texture_atlas, texture_bounds, atlas.width, atlas.height
+    return texture_atlas, texture_bounds
