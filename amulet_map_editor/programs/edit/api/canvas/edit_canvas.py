@@ -281,10 +281,22 @@ class EditCanvas(BaseEditCanvas):
         self.renderer.disable_threads()
 
         def save():
+            yield 0, "Running Pre-Save Operations."
+            pre_save_op = self.world.pre_save_operation()
+            try:
+                while True:
+                    yield next(pre_save_op)
+            except StopIteration as e:
+                if e.value:
+                    self.create_undo_point()
+                else:
+                    self.world.restore_last_undo_point()
+
+            yield 0, "Saving Chunks."
             for chunk_index, chunk_count in self.world.save_iter():
                 yield chunk_index / chunk_count
 
-        show_loading_dialog(lambda: save(), f"Saving world.", "Please wait.", self)
+        show_loading_dialog(save, "Saving world.", "Please wait.", self)
         wx.PostEvent(self, SaveEvent())
         self.renderer.enable_threads()
 
