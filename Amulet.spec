@@ -102,8 +102,10 @@ a.datas += [
     )
 ]
 
+print("Added data files")
 for d in filter(lambda dt: "PyMCTranslate" in dt[0], a.datas):
     print("\t", d)
+sys.stdout.flush()  # fix the log being out of order
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(

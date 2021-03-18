@@ -77,7 +77,7 @@ class BaseOperationManager:
             if hasattr(importer, "toc"):
                 toc |= importer.toc
         prefix = f"{package}."
-        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9]*$")
+        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9_]*$")
         for module_name in toc:
             if match.fullmatch(module_name):
                 try:

@@ -32,7 +32,7 @@ def load_extensions():
         for importer in pkgutil.iter_importers(amulet_map_editor.__name__):
             if hasattr(importer, "toc"):
                 toc |= importer.toc
-        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9]*$")
+        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9_]*$")
         for name in toc:
             if match.fullmatch(name):
                 load_extension(name)
