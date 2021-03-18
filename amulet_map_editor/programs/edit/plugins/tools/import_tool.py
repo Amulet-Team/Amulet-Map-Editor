@@ -64,11 +64,11 @@ class SelectImportOperationUI(wx.BoxSizer, CameraToolUI):
             wx.MessageBox(f"Could not find a matching loader for {pathname}.")
             log.error(f"Could not find a matching loader for {pathname}.")
         except Exception as e:
-            wx.MessageBox(
-                f"Could not open {pathname}. Check the console for more details.\n{e}"
-            )
             log.error(
                 f"Could not open {pathname}. Check the console for more details.\n{traceback.format_exc()}"
+            )
+            wx.MessageBox(
+                f"Could not open {pathname}. Check the console for more details.\n{e}"
             )
         else:
             self.canvas.paste(level, level.dimensions[0])

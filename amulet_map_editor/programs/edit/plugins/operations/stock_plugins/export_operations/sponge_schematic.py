@@ -5,7 +5,7 @@ import os
 from amulet.api.selection import SelectionGroup
 from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension, OperationReturnType
-from amulet.level.formats.construction import ConstructionFormatWrapper
+from amulet.level.formats.sponge_schem import SpongeSchemFormatWrapper
 
 from amulet_map_editor.api.wx.ui.version_select import VersionSelect
 from amulet_map_editor.programs.edit.api.operations import (
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class ExportConstruction(SimpleOperationPanel):
+class ExportSpongeSchematic(SimpleOperationPanel):
     def __init__(
         self,
         parent: wx.Window,
@@ -33,7 +33,7 @@ class ExportConstruction(SimpleOperationPanel):
         self._file_picker = wx.FilePickerCtrl(
             self,
             path=options.get("path", ""),
-            wildcard="Construction file (*.construction)|*.construction",
+            wildcard="sponge schematic file (*.schem)|*.schem",
             style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
@@ -41,7 +41,8 @@ class ExportConstruction(SimpleOperationPanel):
             self,
             world.translation_manager,
             options.get("platform", None) or world.level_wrapper.platform,
-            allow_universal=False,
+            allowed_platforms=("java",),
+            allow_numerical=False,
         )
         self._sizer.Add(self._version_define, 0, wx.CENTRE, 5)
         self._add_run_button("Export")
@@ -51,7 +52,6 @@ class ExportConstruction(SimpleOperationPanel):
         self._save_options(
             {
                 "path": self._file_picker.GetPath(),
-                "platform": self._version_define.platform,
                 "version": self._version_define.version_number,
             }
         )
@@ -59,11 +59,17 @@ class ExportConstruction(SimpleOperationPanel):
     def _operation(
         self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
     ) -> OperationReturnType:
+        if len(selection.selection_boxes) == 0:
+            raise OperationError("No selection was given to export.")
+        elif len(selection.selection_boxes) != 1:
+            raise OperationError(
+                "The Sponge Schematic format only supports a single selection box."
+            )
+
         path = self._file_picker.GetPath()
-        platform = self._version_define.platform
         version = self._version_define.version_number
-        if isinstance(path, str) and platform and version:
-            wrapper = ConstructionFormatWrapper(path)
+        if isinstance(path, str):
+            wrapper = SpongeSchemFormatWrapper(path)
             if wrapper.exists:
                 response = wx.MessageDialog(
                     self,
@@ -72,7 +78,7 @@ class ExportConstruction(SimpleOperationPanel):
                 ).ShowModal()
                 if response == wx.ID_CANCEL:
                     return
-            wrapper.create_and_open(platform, version, selection, True)
+            wrapper.create_and_open("java", version, selection, True)
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))
@@ -93,6 +99,6 @@ class ExportConstruction(SimpleOperationPanel):
 
 
 export = {
-    "name": "\tExport Construction",  # the name of the plugin
-    "operation": ExportConstruction,  # the UI class to display
+    "name": "Export Sponge Schematic",  # the name of the plugin
+    "operation": ExportSpongeSchematic,  # the UI class to display
 }

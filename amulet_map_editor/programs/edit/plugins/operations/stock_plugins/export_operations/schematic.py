@@ -94,7 +94,7 @@ class ExportSchematic(SimpleOperationPanel):
                 ).ShowModal()
                 if response == wx.ID_CANCEL:
                     return
-            wrapper.create_and_open(platform, (1, 12, 2), selection)
+            wrapper.create_and_open(platform, (1, 12, 2), selection, True)
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))
