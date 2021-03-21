@@ -9,7 +9,7 @@ from ..canvas_toggle_element import CanvasToggleElement
 BaseToolUIType = Union[wx.Window, wx.Sizer, "BaseToolUI"]
 
 
-class BaseToolUI(EditCanvasContainer):
+class BaseToolUI(EditCanvasContainer, CanvasToggleElement):
     """The abstract base class for all tools that are to be loaded into the canvas."""
 
     @property
@@ -18,7 +18,8 @@ class BaseToolUI(EditCanvasContainer):
         raise NotImplementedError
 
     def enable(self):
-        """Set the state of the tool for being enabled."""
+        """Set the state of the tool for being enabled.
+        Do not bind events to the canvas here because they will get removed. Do this in bind_events."""
         pass
 
     def bind_events(self):
@@ -28,5 +29,6 @@ class BaseToolUI(EditCanvasContainer):
         pass
 
     def disable(self):
-        """Stop the tool. Unload any excessive data. May get resumed again with a call to enable."""
+        """Stop the tool. Unload any excessive data. May get resumed again with a call to enable.
+        All events bound to the canvas will be automatically removed after this is run."""
         pass
