@@ -387,8 +387,6 @@ if __name__ == "__main__":
     app = wx.App()
     wx.lib.inspection.InspectionTool().Show()
     frame = wx.Frame(None)
-    NBTEditor(
-        frame, nbt.load(buffer=NBT_FILE), callback=lambda nbt_data: print(nbt_data)
-    )
+    NBTEditor(frame, nbt.load(NBT_FILE), callback=lambda nbt_data: print(nbt_data))
     frame.Show()
     app.MainLoop()
