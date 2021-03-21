@@ -34,6 +34,7 @@ from amulet_map_editor.programs.edit.api.selection import (
     SelectionManager,
     SelectionHistoryManager,
 )
+from amulet_map_editor import log
 import amulet_map_editor.programs.edit as amulet_edit
 
 from amulet_map_editor.api.opengl.camera import ControllableCamera
@@ -94,6 +95,7 @@ class BaseEditCanvas(EventCanvas):
 
     def _setup(self) -> Generator[OperationYieldType, None, None]:
         """Set up objects that take a while to set up."""
+        packs = []
         user_packs = [
             load_resource_pack(os.path.join("resource_packs", rp))
             for rp in os.listdir("resource_packs")
@@ -103,57 +105,68 @@ class BaseEditCanvas(EventCanvas):
             self.world.level_wrapper.platform == "bedrock"
             and experimental_bedrock_resources
         ):
+            packs.append(
+                load_resource_pack(
+                    os.path.join(
+                        os.path.dirname(amulet_edit.__file__),
+                        "amulet_resource_pack",
+                        "bedrock",
+                    )
+                )
+            )
             yield 0.1, "Downloading Bedrock vanilla resource pack"
             gen = get_bedrock_vanilla_latest_iter()
             try:
                 while True:
                     yield next(gen) * 0.4 + 0.1
             except StopIteration as e:
-                latest_pack = e.value
+                packs.append(e.value)
             yield 0.5, "Loading resource packs"
-            fix_pack = get_bedrock_vanilla_fix()
-            amulet_pack = load_resource_pack(
-                os.path.join(
-                    os.path.dirname(amulet_edit.__file__),
-                    "amulet_resource_pack",
-                    "bedrock",
-                )
-            )
 
-            user_packs = [
+            packs += [
                 pack for pack in user_packs if isinstance(pack, BedrockResourcePack)
             ]
+            packs.append(get_bedrock_vanilla_fix())
 
             translator = self.world.translation_manager.get_version(
                 "bedrock", (999, 0, 0)
             )
         else:
+            packs.append(
+                load_resource_pack(
+                    os.path.join(
+                        os.path.dirname(amulet_edit.__file__),
+                        "amulet_resource_pack",
+                        "java",
+                    )
+                )
+            )
             yield 0.1, "Downloading Java vanilla resource pack"
             gen = get_java_vanilla_latest_iter()
             try:
                 while True:
                     yield next(gen) * 0.4 + 0.1
             except StopIteration as e:
-                latest_pack = e.value
-            yield 0.5, "Loading resource packs"
-            fix_pack = get_java_vanilla_fix()
-            amulet_pack = load_resource_pack(
-                os.path.join(
-                    os.path.dirname(amulet_edit.__file__),
-                    "amulet_resource_pack",
-                    "java",
+                packs.append(e.value)
+            except Exception as e:
+                log.error(
+                    str(e),
+                    exc_info=True,
                 )
-            )
+                wx.MessageBox(
+                    "Failed to download the latest Java resource pack.\n"
+                    "Check your internet connection and restart Amulet.\n"
+                    "Check the console for more details.\n"
+                    f"{e}"
+                )
 
-            user_packs = [
-                pack for pack in user_packs if isinstance(pack, JavaResourcePack)
-            ]
+            yield 0.5, "Loading resource packs"
+            packs += [pack for pack in user_packs if isinstance(pack, JavaResourcePack)]
+            packs.append(get_java_vanilla_fix())
 
             translator = self.world.translation_manager.get_version("java", (999, 0, 0))
 
-        resource_pack = load_resource_pack_manager(
-            (amulet_pack, latest_pack, *user_packs, fix_pack), load=False
-        )
+        resource_pack = load_resource_pack_manager(packs, load=False)
         for i in resource_pack.reload():
             yield i / 4 + 0.5
 
