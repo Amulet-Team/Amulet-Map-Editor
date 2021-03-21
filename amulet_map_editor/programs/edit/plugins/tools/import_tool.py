@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class SelectImportOperationUI(wx.BoxSizer, CameraToolUI):
+class ImportTool(wx.BoxSizer, CameraToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         CameraToolUI.__init__(self, canvas)

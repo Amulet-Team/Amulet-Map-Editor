@@ -1,7 +1,7 @@
 from amulet_map_editor.programs.edit.api.ui.tool import BaseSelectOperationUI
 
 
-class SelectOperationUI(BaseSelectOperationUI):
+class OperationTool(BaseSelectOperationUI):
     OperationGroupName = "operations"
 
     @property
