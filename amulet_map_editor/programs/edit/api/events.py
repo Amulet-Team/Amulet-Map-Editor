@@ -39,7 +39,3 @@ RedoEvent, EVT_REDO = newevent.NewEvent()
 CreateUndoEvent, EVT_CREATE_UNDO = newevent.NewEvent()
 SaveEvent, EVT_SAVE = newevent.NewEvent()
 EditCloseEvent, EVT_EDIT_CLOSE = newevent.NewEvent()
-
-# The button to select the box was clicked. (Usually left mouse) Note based on the state the box may be unchanged.
-# TODO: remove this
-BoxClickEvent, EVT_BOX_CLICK = newevent.NewEvent()

@@ -6,7 +6,6 @@ from amulet.operations.fill import fill
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
-from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
@@ -23,7 +22,7 @@ class Fill(wx.Panel, DefaultOperationUI):
     ):
         wx.Panel.__init__(self, parent)
         DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
-
+        self.Freeze()
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
 
@@ -36,7 +35,6 @@ class Fill(wx.Panel, DefaultOperationUI):
             *(options.get("fill_block_options", []) or [world.level_wrapper.platform]),
             show_pick_block=True
         )
-        self._block_click_registered = False
         self._block_define.Bind(EVT_PICK, self._on_pick_block_button)
         self._sizer.Add(self._block_define, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
@@ -45,6 +43,7 @@ class Fill(wx.Panel, DefaultOperationUI):
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
         self.Layout()
+        self.Thaw()
 
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
@@ -52,19 +51,16 @@ class Fill(wx.Panel, DefaultOperationUI):
 
     def _on_pick_block_button(self, evt):
         """Set up listening for the block click"""
-        if not self._block_click_registered:
-            self.canvas.Bind(EVT_BOX_CLICK, self._on_pick_block)
-            self._block_click_registered = True
-        evt.Skip()
+        self._show_pointer = True
 
-    def _on_pick_block(self, evt):
-        self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
-        self._block_click_registered = False
-        x, y, z = self.canvas.cursor_location
-        self._block_define.universal_block = (
-            self.world.get_block(x, y, z, self.canvas.dimension),
-            None,
-        )
+    def _on_box_click(self):
+        if self._show_pointer:
+            self._show_pointer = False
+            x, y, z = self._pointer.pointer_base
+            self._block_define.universal_block = (
+                self.world.get_block(x, y, z, self.canvas.dimension),
+                None,
+            )
 
     def _get_fill_block(self):
         return self._block_define.universal_block[0]
