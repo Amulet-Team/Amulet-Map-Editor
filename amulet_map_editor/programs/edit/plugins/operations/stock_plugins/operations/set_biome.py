@@ -83,9 +83,6 @@ class SetBiome(SimpleOperationPanel):
         self.Layout()
         evt.Skip()
 
-    def unload(self):
-        pass
-
     def _on_pick_biome_button(self, evt):
         """Set up listening for the biome click"""
         if not self._biome_click_registered:

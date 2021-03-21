@@ -69,7 +69,7 @@ class Fill(wx.Panel, DefaultOperationUI):
     def _get_fill_block(self):
         return self._block_define.universal_block[0]
 
-    def unload(self):
+    def disable(self):
         self._save_options(
             {
                 "fill_block": self._get_fill_block(),

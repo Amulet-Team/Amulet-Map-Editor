@@ -44,9 +44,6 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         self.Layout()
         self.Show()
 
-    def unload(self):
-        pass
-
     def _create_options(self, options: Dict[str, Sequence]):
         create_functions: Dict[str, Callable[[str, Sequence], None]] = {
             "label": self._create_label,

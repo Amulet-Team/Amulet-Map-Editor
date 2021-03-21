@@ -64,7 +64,7 @@ class ExportSchematic(SimpleOperationPanel):
         self._add_run_button("Export")
         self.Layout()
 
-    def unload(self):
+    def disable(self):
         self._save_options(
             {
                 "path": self._file_picker.GetPath(),

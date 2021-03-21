@@ -98,7 +98,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
     def _get_replacement_block(self) -> Block:
         return self._replacement_block.universal_block[0]
 
-    def unload(self):
+    def disable(self):
         self._save_options(
             {
                 "original_block_options": (
