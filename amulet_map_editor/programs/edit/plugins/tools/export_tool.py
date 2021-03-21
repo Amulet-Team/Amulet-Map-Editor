@@ -1,7 +1,7 @@
-from amulet_map_editor.programs.edit.api.ui.tool import BaseSelectOperationUI
+from amulet_map_editor.programs.edit.api.ui.tool import BaseOperationToolUI
 
 
-class ExportTool(BaseSelectOperationUI):
+class ExportTool(BaseOperationToolUI):
     OperationGroupName = "export_operations"
 
     @property

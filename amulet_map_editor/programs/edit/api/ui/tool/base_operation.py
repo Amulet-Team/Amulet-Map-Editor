@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class BaseSelectOperationUI(wx.BoxSizer, CameraToolUI):
+class BaseOperationToolUI(wx.BoxSizer, CameraToolUI):
     OperationGroupName = None
 
     def __init__(self, canvas: "EditCanvas"):
@@ -64,10 +64,12 @@ class BaseSelectOperationUI(wx.BoxSizer, CameraToolUI):
 
     @property
     def name(self) -> str:
+        """The name of the group of operations."""
         raise NotImplementedError
 
     @property
     def operation(self) -> str:
+        """The identifier of the currently active operation."""
         return self._operation_choice.GetCurrentObject()
 
     def _unload_active_operation(self):
@@ -86,7 +88,7 @@ class BaseSelectOperationUI(wx.BoxSizer, CameraToolUI):
         evt.Skip()
 
     def _setup_operation(self):
-        """Create the UI for the new operation."""
+        """Remove the old operation and create the UI for the new operation."""
         operation_path = self._operation_choice.GetCurrentObject()
         if operation_path:
             operation = self._operations[operation_path]

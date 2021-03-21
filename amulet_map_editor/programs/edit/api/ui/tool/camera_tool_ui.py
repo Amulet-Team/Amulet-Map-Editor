@@ -11,6 +11,8 @@ BaseToolUIType = Union[wx.Window, wx.Sizer, "BaseToolUI"]
 
 
 class CameraToolUI(BaseToolUI):
+    """A base class to implement basic camera functionality to a tool."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
         self._camera_behaviour = CameraBehaviour(self.canvas)
