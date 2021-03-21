@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension, OperationReturnType
 
-from amulet_map_editor.programs.edit.api.operations import OperationUI
+from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class SimpleOperationPanel(wx.Panel, OperationUI):
+class SimpleOperationPanel(wx.Panel, DefaultOperationUI):
     def __init__(
         self,
         parent: wx.Window,
@@ -20,7 +20,7 @@ class SimpleOperationPanel(wx.Panel, OperationUI):
         options_path: str,
     ):
         wx.Panel.__init__(self, parent)
-        OperationUI.__init__(self, parent, canvas, world, options_path)
+        DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
 
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)

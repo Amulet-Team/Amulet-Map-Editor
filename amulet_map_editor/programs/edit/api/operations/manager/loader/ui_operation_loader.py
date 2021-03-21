@@ -12,7 +12,7 @@ from amulet.api.level import BaseLevel
 from amulet_map_editor.programs.edit.api.operations import (
     OperationUI,
     OperationUIType,
-    FixedFunctionUI
+    FixedFunctionUI,
 )
 
 if TYPE_CHECKING:

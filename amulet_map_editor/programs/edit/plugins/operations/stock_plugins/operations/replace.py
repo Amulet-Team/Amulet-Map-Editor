@@ -7,7 +7,7 @@ from amulet.api.block import Block
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
-from amulet_map_editor.programs.edit.api.operations import OperationUI
+from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class Replace(SimpleScrollablePanel, OperationUI):
+class Replace(SimpleScrollablePanel, DefaultOperationUI):
     def __init__(
         self,
         parent: wx.Window,
@@ -24,7 +24,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
         options_path: str,
     ):
         SimpleScrollablePanel.__init__(self, parent)
-        OperationUI.__init__(self, parent, canvas, world, options_path)
+        DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
         self.Freeze()
         options = self._load_options({})
 

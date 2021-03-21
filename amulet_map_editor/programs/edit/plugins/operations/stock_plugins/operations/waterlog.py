@@ -5,7 +5,7 @@ import wx
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
-from amulet_map_editor.programs.edit.api.operations import OperationUI
+from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 from amulet_map_editor.api import image
 
@@ -23,7 +23,7 @@ MODES = {
 }
 
 
-class Waterlog(wx.Panel, OperationUI):
+class Waterlog(wx.Panel, DefaultOperationUI):
     def __init__(
         self,
         parent: wx.Window,
@@ -32,7 +32,7 @@ class Waterlog(wx.Panel, OperationUI):
         options_path: str,
     ):
         wx.Panel.__init__(self, parent)
-        OperationUI.__init__(self, parent, canvas, world, options_path)
+        DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
         self.Freeze()
 
         self._sizer = wx.BoxSizer(wx.VERTICAL)

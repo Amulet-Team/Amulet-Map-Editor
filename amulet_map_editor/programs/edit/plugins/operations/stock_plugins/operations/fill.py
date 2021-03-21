@@ -5,7 +5,7 @@ from amulet.operations.fill import fill
 
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
-from amulet_map_editor.programs.edit.api.operations import OperationUI
+from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class Fill(wx.Panel, OperationUI):
+class Fill(wx.Panel, DefaultOperationUI):
     def __init__(
         self,
         parent: wx.Window,
@@ -22,7 +22,7 @@ class Fill(wx.Panel, OperationUI):
         options_path: str,
     ):
         wx.Panel.__init__(self, parent)
-        OperationUI.__init__(self, parent, canvas, world, options_path)
+        DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
 
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)

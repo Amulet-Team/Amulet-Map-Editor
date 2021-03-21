@@ -4,7 +4,7 @@ from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
 from amulet_map_editor.api.wx.util.validators import IntValidator
 
 from amulet.api.data_types import OperationReturnType
-from amulet_map_editor.programs.edit.api.operations import OperationUI
+from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -15,7 +15,7 @@ FixedOperationType = Callable[
 ]
 
 
-class FixedFunctionUI(wx.Panel, OperationUI):
+class FixedFunctionUI(wx.Panel, DefaultOperationUI):
     def __init__(
         self,
         parent: wx.Window,
@@ -26,7 +26,7 @@ class FixedFunctionUI(wx.Panel, OperationUI):
         options: Dict[str, Any],
     ):
         wx.Panel.__init__(self, parent)
-        OperationUI.__init__(self, parent, canvas, world, options_path)
+        DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
         self._operation = operation
 
         self.Hide()
