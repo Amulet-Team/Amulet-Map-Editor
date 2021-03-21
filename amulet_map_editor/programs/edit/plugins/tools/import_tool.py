@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import traceback
 
 from amulet_map_editor import log
-from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
+from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
 import amulet
 from amulet.api.errors import LoaderNoneMatched
@@ -12,10 +12,10 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class SelectImportOperationUI(wx.BoxSizer, CameraToolUI):
+class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
-        CameraToolUI.__init__(self, canvas)
+        DefaultBaseToolUI.__init__(self, canvas)
 
         self._selection = StaticSelectionBehaviour(self.canvas)
 

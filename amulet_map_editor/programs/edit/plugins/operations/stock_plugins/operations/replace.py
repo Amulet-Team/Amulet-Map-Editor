@@ -7,15 +7,14 @@ from amulet.api.block import Block
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
-from amulet_map_editor.programs.edit.api.operations import OperationUI
-from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
+from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class Replace(SimpleScrollablePanel, OperationUI):
+class Replace(SimpleScrollablePanel, DefaultOperationUI):
     def __init__(
         self,
         parent: wx.Window,
@@ -24,11 +23,9 @@ class Replace(SimpleScrollablePanel, OperationUI):
         options_path: str,
     ):
         SimpleScrollablePanel.__init__(self, parent)
-        OperationUI.__init__(self, parent, canvas, world, options_path)
+        DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
         self.Freeze()
         options = self._load_options({})
-
-        self._block_click_registered = 0
 
         self._original_block = BlockDefine(
             self,
@@ -42,9 +39,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
             show_pick_block=True
         )
         self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
-        self._original_block.Bind(
-            EVT_PICK, lambda evt: self._on_pick_block_button(evt, 1)
-        )
+        self._original_block.Bind(EVT_PICK, lambda evt: self._on_pick_block_button(1))
         self._replacement_block = BlockDefine(
             self,
             world.level_wrapper.translation_manager,
@@ -59,7 +54,7 @@ class Replace(SimpleScrollablePanel, OperationUI):
             self._replacement_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
         )
         self._replacement_block.Bind(
-            EVT_PICK, lambda evt: self._on_pick_block_button(evt, 2)
+            EVT_PICK, lambda evt: self._on_pick_block_button(2)
         )
 
         self._run_button = wx.Button(self, label="Run Operation")
@@ -73,32 +68,29 @@ class Replace(SimpleScrollablePanel, OperationUI):
     def wx_add_options(self) -> Tuple[int, ...]:
         return (1,)
 
-    def _on_pick_block_button(self, evt, code):
+    def _on_pick_block_button(self, code):
         """Set up listening for the block click"""
-        if not self._block_click_registered:
-            self.canvas.Bind(EVT_BOX_CLICK, self._on_pick_block)
-            self._block_click_registered = code
-        evt.Skip()
+        self._show_pointer = code
 
-    def _on_pick_block(self, evt):
-        self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_block)
-        x, y, z = self.canvas.cursor_location
-        if self._block_click_registered == 1:
-            self._original_block.universal_block = (
-                self.world.get_block(x, y, z, self.canvas.dimension),
-                None,
-            )
-        elif self._block_click_registered == 2:
-            self._replacement_block.universal_block = (
-                self.world.get_block(x, y, z, self.canvas.dimension),
-                None,
-            )
-        self._block_click_registered = 0
+    def _on_box_click(self):
+        if self._show_pointer:
+            x, y, z = self._pointer.pointer_base
+            if self._show_pointer == 1:
+                self._original_block.universal_block = (
+                    self.world.get_block(x, y, z, self.canvas.dimension),
+                    None,
+                )
+            elif self._show_pointer == 2:
+                self._replacement_block.universal_block = (
+                    self.world.get_block(x, y, z, self.canvas.dimension),
+                    None,
+                )
+            self._show_pointer = False
 
     def _get_replacement_block(self) -> Block:
         return self._replacement_block.universal_block[0]
 
-    def unload(self):
+    def disable(self):
         self._save_options(
             {
                 "original_block_options": (

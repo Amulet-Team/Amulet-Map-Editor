@@ -10,7 +10,7 @@ from amulet.operations.paste import paste_iter
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 
-from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
+from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.events import EVT_PASTE
 from amulet_map_editor.programs.edit.api.ui.select_location import (
     SelectTransformUI,
@@ -34,10 +34,10 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class PasteTool(wx.BoxSizer, CameraToolUI):
+class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
-        CameraToolUI.__init__(self, canvas)
+        DefaultBaseToolUI.__init__(self, canvas)
 
         self._selection = StaticSelectionBehaviour(self.canvas)
         self._cursor = PointerBehaviour(self.canvas)

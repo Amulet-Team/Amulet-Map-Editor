@@ -12,10 +12,10 @@ from amulet_map_editor.programs.edit.api.events import (
 )
 
 from amulet_map_editor.programs.edit.plugins.tools import (
-    SelectImportOperationUI,
-    SelectExportOperationUI,
-    SelectOperationUI,
-    SelectOptions,
+    ImportTool,
+    ExportTool,
+    OperationTool,
+    SelectTool,
     ChunkTool,
     PasteTool,
 )
@@ -44,11 +44,11 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         tool_select_sizer.AddStretchSpacer(1)
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
-        self.register_tool(SelectOptions)
+        self.register_tool(SelectTool)
         self.register_tool(PasteTool)
-        self.register_tool(SelectOperationUI)
-        self.register_tool(SelectImportOperationUI)
-        self.register_tool(SelectExportOperationUI)
+        self.register_tool(OperationTool)
+        self.register_tool(ImportTool)
+        self.register_tool(ExportTool)
         self.register_tool(ChunkTool)
 
     @property
@@ -82,7 +82,7 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         Enables the default tool (the select tool)
         :return: True if the selection changed, False otherwise.
         """
-        if not isinstance(self._active_tool, SelectOptions):
+        if not isinstance(self._active_tool, SelectTool):
             self._enable_tool("Select")
             return True
         return False

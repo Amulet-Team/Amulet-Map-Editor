@@ -33,9 +33,6 @@ class Clone(SimpleOperationPanel):
         self.canvas.paste(structure, structure.dimensions[0])
         raise OperationSilentAbort
 
-    def unload(self):
-        pass
-
 
 export = {
     "name": "Clone",  # the name of the plugin

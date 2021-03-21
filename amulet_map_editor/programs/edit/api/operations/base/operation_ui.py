@@ -3,6 +3,14 @@ from typing import Any, TYPE_CHECKING, Union, Tuple
 import os
 import wx
 import weakref
+import warnings
+
+from amulet_map_editor.programs.edit.api.edit_canvas_container import (
+    EditCanvasContainer,
+)
+from amulet_map_editor.programs.edit.api.ui.canvas_toggle_element import (
+    CanvasToggleElement,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -11,7 +19,7 @@ if TYPE_CHECKING:
 OperationUIType = Union[wx.Window, wx.Sizer, "OperationUI"]
 
 
-class OperationUI:
+class OperationUI(EditCanvasContainer, CanvasToggleElement):
     """The base class that all operations must inherit from."""
 
     def __init__(
@@ -21,21 +29,19 @@ class OperationUI:
         world: "BaseLevel",
         options_path: str,
     ):
+        super().__init__(canvas)
         self._parent = weakref.ref(parent)
-        self._canvas = weakref.ref(canvas)
         self._world = weakref.ref(world)
         self._options_path = options_path
 
     @property
     def parent(self) -> wx.Window:
+        """The UI element that contains this operation."""
         return self._parent()
 
     @property
-    def canvas(self) -> "EditCanvas":
-        return self._canvas()
-
-    @property
     def world(self) -> "BaseLevel":
+        """The world to operate on."""
         return self._world()
 
     @property
@@ -48,10 +54,27 @@ class OperationUI:
             return 1, wx.EXPAND
         return ()
 
-    def unload(self):
-        """Unbind any events that have been set up and make safe to destroy the UI.
-        The UI will be destroyed from externally."""
-        raise NotImplementedError
+    def enable(self):
+        """Set the state of the UI for being enabled.
+        Do not bind events to the canvas here because they will get removed. Do this in bind_events."""
+        pass
+
+    def bind_events(self):
+        """Bind all required events to the canvas.
+        All events on the canvas will be automatically removed after the UI is disabled.
+        """
+        pass
+
+    def disable(self):
+        """Stop the UI and make it safe to be destroyed.
+        Unload any excessive data. May get resumed again with a call to enable.
+        All events bound to the canvas will be automatically removed after this is run."""
+        if hasattr(self, "unload") and callable(self.unload):
+            warnings.warn(
+                "OperationUI.unload is depreciated and will be removed in the future. Please used OperationUI.disable instead",
+                DeprecationWarning,
+            )
+            self.unload()
 
     def _load_options(self, default=None) -> Any:
         """Load previously saved options from disk or return the default options."""

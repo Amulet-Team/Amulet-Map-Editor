@@ -6,6 +6,9 @@ if TYPE_CHECKING:
 
 
 class EditCanvasContainer(CanvasContainer):
+    """A helper class to store a reference to the canvas.
+    This ensures there are no memory leaks due to circular references."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
 

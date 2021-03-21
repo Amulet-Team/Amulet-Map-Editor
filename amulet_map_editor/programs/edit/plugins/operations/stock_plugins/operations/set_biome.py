@@ -6,7 +6,6 @@ import math
 from amulet.utils import block_coords_to_chunk_coords
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.biome_select import BiomeDefine
-from amulet_map_editor.programs.edit.api.events import EVT_BOX_CLICK
 from amulet_map_editor.programs.edit.api.operations import SimpleOperationPanel
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 
@@ -69,7 +68,6 @@ class SetBiome(SimpleOperationPanel):
             ),
             show_pick_biome=True,
         )
-        self._biome_click_registered = False
         self._biome_choice.Bind(EVT_PICK, self._on_pick_biome_button)
         self._sizer.Add(self._biome_choice, 1, Border, 5)
 
@@ -83,36 +81,30 @@ class SetBiome(SimpleOperationPanel):
         self.Layout()
         evt.Skip()
 
-    def unload(self):
-        pass
-
     def _on_pick_biome_button(self, evt):
         """Set up listening for the biome click"""
-        if not self._biome_click_registered:
-            self.canvas.Bind(EVT_BOX_CLICK, self._on_pick_biome)
-            self._biome_click_registered = True
-        evt.Skip()
+        self._show_pointer = True
 
-    def _on_pick_biome(self, evt):
-        self.canvas.Unbind(EVT_BOX_CLICK, handler=self._on_pick_biome)
-        self._biome_click_registered = False
-        x, y, z = self.canvas.cursor_location
+    def _on_box_click(self):
+        if self._show_pointer:
+            self._show_pointer = False
+            x, y, z = self._pointer.pointer_base
 
-        # TODO: replace with "get_biome(x, y, z)" if it'll be created
-        cx, cz = block_coords_to_chunk_coords(
-            x, z, sub_chunk_size=self.world.sub_chunk_size
-        )
-        offset_x, offset_z = x - 16 * cx, z - 16 * cz
-        chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
+            # TODO: replace with "get_biome(x, y, z)" if it'll be created
+            cx, cz = block_coords_to_chunk_coords(
+                x, z, sub_chunk_size=self.world.sub_chunk_size
+            )
+            offset_x, offset_z = x - 16 * cx, z - 16 * cz
+            chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
 
-        if chunk.biomes.dimension == 3:
-            biome = chunk.biomes[offset_x // 4, y // 4, offset_z // 4]
-        elif chunk.biomes.dimension == 2:
-            biome = chunk.biomes[offset_x, offset_z]
-        else:
-            return
+            if chunk.biomes.dimension == 3:
+                biome = chunk.biomes[offset_x // 4, y // 4, offset_z // 4]
+            elif chunk.biomes.dimension == 2:
+                biome = chunk.biomes[offset_x, offset_z]
+            else:
+                return
 
-        self._biome_choice.universal_biome = chunk.biome_palette[biome]
+            self._biome_choice.universal_biome = chunk.biome_palette[biome]
 
     def _operation(
         self, world: "BaseLevel", dimension: "Dimension", selection: "SelectionGroup"
