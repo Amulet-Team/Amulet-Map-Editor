@@ -14,7 +14,7 @@ from amulet_map_editor.programs.edit.api.operations import (
     OperationUIType,
 )
 from amulet_map_editor.programs.edit.api.operations.manager import UIOperationManager
-from .camera_tool_ui import CameraToolUI
+from .default_base_tool_ui import DefaultBaseToolUI
 
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
 
@@ -22,12 +22,12 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class BaseOperationToolUI(wx.BoxSizer, CameraToolUI):
+class BaseOperationToolUI(wx.BoxSizer, DefaultBaseToolUI):
     OperationGroupName = None
 
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
-        CameraToolUI.__init__(self, canvas)
+        DefaultBaseToolUI.__init__(self, canvas)
 
         self._selection = StaticSelectionBehaviour(self.canvas)
 

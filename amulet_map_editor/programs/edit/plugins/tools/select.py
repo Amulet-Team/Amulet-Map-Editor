@@ -20,16 +20,16 @@ from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour imp
     EVT_RENDER_BOX_DISABLE_INPUTS,
     EVT_RENDER_BOX_ENABLE_INPUTS,
 )
-from amulet_map_editor.programs.edit.api.ui.tool import CameraToolUI
+from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class SelectTool(wx.BoxSizer, CameraToolUI):
+class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
-        CameraToolUI.__init__(self, canvas)
+        DefaultBaseToolUI.__init__(self, canvas)
 
         self._selection = BlockSelectionBehaviour(self.canvas)
         self._inspect_block = InspectBlockBehaviour(self.canvas, self._selection)
