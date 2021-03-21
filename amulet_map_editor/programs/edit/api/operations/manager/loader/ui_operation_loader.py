@@ -9,12 +9,10 @@ from .base_operation_loader import BaseOperationLoader
 
 from amulet_map_editor import log
 from amulet.api.level import BaseLevel
-from amulet_map_editor.programs.edit.api.operations.ui.fixed_pipeline import (
-    FixedFunctionUI,
-)
-from amulet_map_editor.programs.edit.api.operations.operation_ui import (
+from amulet_map_editor.programs.edit.api.operations import (
     OperationUI,
     OperationUIType,
+    FixedFunctionUI
 )
 
 if TYPE_CHECKING:

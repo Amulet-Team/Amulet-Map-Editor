@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class BaseOperationToolUI(wx.BoxSizer, DefaultBaseToolUI):
+class BaseOperationChoiceToolUI(wx.BoxSizer, DefaultBaseToolUI):
     OperationGroupName = None
 
     def __init__(self, canvas: "EditCanvas"):
