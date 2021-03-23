@@ -51,6 +51,7 @@ class AmuletUI(wx.Frame):
             | wx.CLIP_CHILDREN
             | wx.RESIZE_BORDER,
         )
+        self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
         icon = wx.Icon()
         icon.CopyFromBitmap(image.logo.icon128.bitmap())
         self.SetIcon(icon)
