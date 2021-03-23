@@ -8,6 +8,7 @@ from ..key_config import (
     DefaultKeys,
     DefaultKeybindGroupId,
     PresetKeybinds,
+    KeybindGroup,
 )
 
 import time
@@ -92,17 +93,7 @@ class EditCanvas(BaseEditCanvas):
         self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
-        config_ = CONFIG.get(EDIT_CONFIG_ID, {})
-        user_keybinds = config_.get("user_keybinds", {})
-        group = config_.get("keybind_group", DefaultKeybindGroupId)
-        if group in user_keybinds:
-            keybinds = user_keybinds[group]
-        elif group in PresetKeybinds:
-            keybinds = PresetKeybinds[group]
-        else:
-            keybinds = DefaultKeys
-        for action_id, (modifier_keys, trigger_key) in keybinds.items():
-            self.buttons.register_action(action_id, trigger_key, modifier_keys)
+        self.buttons.register_actions(self.key_binds)
 
     def _setup(self) -> Generator[OperationYieldType, None, None]:
         yield from super()._setup()
@@ -134,6 +125,18 @@ class EditCanvas(BaseEditCanvas):
     @property
     def tools(self):
         return self._tool_sizer.tools
+
+    @property
+    def key_binds(self) -> KeybindGroup:
+        config_ = CONFIG.get(EDIT_CONFIG_ID, {})
+        user_keybinds = config_.get("user_keybinds", {})
+        group = config_.get("keybind_group", DefaultKeybindGroupId)
+        if group in user_keybinds:
+            return user_keybinds[group]
+        elif group in PresetKeybinds:
+            return PresetKeybinds[group]
+        else:
+            return DefaultKeys
 
     def _deselect(self) -> bool:
         return self._tool_sizer.enable_default_tool()
