@@ -4,12 +4,16 @@ from OpenGL.GL import (
     glClear,
     GL_DEPTH_BUFFER_BIT,
 )
+import weakref
+import numpy
+import math
 
 from amulet.api.data_types import BlockCoordinates
 
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.util.validators import IntValidator
-from amulet_map_editor.api.opengl.camera import Projection
+from amulet_map_editor.api.opengl.camera import Projection, Camera
+from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 from amulet_map_editor.programs.edit.api.events import EVT_SELECTION_CHANGE
 from amulet_map_editor.programs.edit.api.behaviour.inspect_block_behaviour import (
     InspectBlockBehaviour,
@@ -46,12 +50,12 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 _MoveActions = {
-        ACT_MOVE_UP,
-        ACT_MOVE_DOWN,
-        ACT_MOVE_FORWARDS,
-        ACT_MOVE_BACKWARDS,
-        ACT_MOVE_LEFT,
-        ACT_MOVE_RIGHT,
+    ACT_MOVE_UP,
+    ACT_MOVE_DOWN,
+    ACT_MOVE_FORWARDS,
+    ACT_MOVE_BACKWARDS,
+    ACT_MOVE_LEFT,
+    ACT_MOVE_RIGHT,
 }
 
 
@@ -59,10 +63,16 @@ class MovementButton(wx.Button):
     """A button that catches actions when pressed."""
 
     def __init__(
-        self, parent: wx.Window, keybinds: KeybindGroup, label: str, tooltip: str
+        self,
+        parent: wx.Window,
+        camera: Camera,
+        keybinds: KeybindGroup,
+        label: str,
+        tooltip: str,
     ):
         super().__init__(parent, label=label)
         self.SetToolTip(tooltip)
+        self._camera = weakref.ref(camera)
         self._buttons = ButtonInput(self)
         self._buttons.register_actions(keybinds)
         self._buttons.bind_events()  # this is fine here because we are binding to a custom button not the canvas.
@@ -71,6 +81,10 @@ class MovementButton(wx.Button):
         self.Bind(EVT_INPUT_HELD, self._on_held)
         self._listen = False
         self._timeout = 10
+
+    @property
+    def camera(self) -> Camera:
+        return self._camera()
 
     def enable(self):
         self._buttons.enable()
@@ -105,9 +119,21 @@ class MovementButton(wx.Button):
                 if ACT_MOVE_BACKWARDS in evt.action_ids:
                     z -= 1
                 if any((x, y, z)):
-                    self._move((x, y, z))
+                    self._move(self._rotate((x, y, z)))
             if self._timeout:
                 self._timeout -= 1
+
+    def _rotate(self, offset: Tuple[int, int, int]) -> Tuple[int, int, int]:
+        x, y, z = offset
+        ry = self.camera.rotation[0]
+        x, y, z, _ = (
+            numpy.round(
+                numpy.matmul(rotation_matrix_xy(0, -math.radians(ry)), (x, y, z, 0))
+            )
+            .astype(int)
+            .tolist()
+        )
+        return x, y, z
 
     def _move(self, offset: Tuple[int, int, int]):
         pass
@@ -117,12 +143,13 @@ class BaseSelectionMoveButton(MovementButton):
     def __init__(
         self,
         parent: wx.Window,
+        camera: Camera,
         keybinds: KeybindGroup,
         label: str,
         tooltip: str,
         selection: BlockSelectionBehaviour,
     ):
-        super().__init__(parent, keybinds, label, tooltip)
+        super().__init__(parent, camera, keybinds, label, tooltip)
         self._selection = selection
 
 
@@ -280,6 +307,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._point1_move = Point1MoveButton(
             self._button_panel,
+            self.canvas.camera,
             self.canvas.key_binds,
             lang.get("program_3d_edit.select_tool.button_point1"),
             lang.get("program_3d_edit.select_tool.button_point1_tooltip"),
@@ -291,6 +319,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._point2_move = Point2MoveButton(
             self._button_panel,
+            self.canvas.camera,
             self.canvas.key_binds,
             lang.get("program_3d_edit.select_tool.button_point2"),
             lang.get("program_3d_edit.select_tool.button_point2_tooltip"),
@@ -302,6 +331,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._selection_move = SelectionMoveButton(
             self._button_panel,
+            self.canvas.camera,
             self.canvas.key_binds,
             lang.get("program_3d_edit.select_tool.button_selection_box"),
             lang.get("program_3d_edit.select_tool.button_selection_box_tooltip"),
