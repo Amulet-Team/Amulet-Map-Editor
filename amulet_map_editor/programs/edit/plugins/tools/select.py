@@ -45,7 +45,9 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 
-        def add_button(label: str, tooltip: str, action: Callable[[wx.PyEventBinder], None]):
+        def add_button(
+            label: str, tooltip: str, action: Callable[[wx.PyEventBinder], None]
+        ):
             button = wx.Button(self._button_panel, label=label)
             button.SetToolTip(tooltip)
             button_sizer.Add(button, 0, wx.ALL | wx.EXPAND, 5)
@@ -54,34 +56,43 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         add_button(
             lang.get("program_3d_edit.select_tool.delete_button"),
             lang.get("program_3d_edit.select_tool.delete_button_tooltip"),
-            lambda evt: self.canvas.delete()
+            lambda evt: self.canvas.delete(),
         )
         add_button(
             lang.get("program_3d_edit.select_tool.copy_button"),
             lang.get("program_3d_edit.select_tool.copy_button_tooltip"),
-            lambda evt: self.canvas.copy()
+            lambda evt: self.canvas.copy(),
         )
         add_button(
             lang.get("program_3d_edit.select_tool.cut_button"),
             lang.get("program_3d_edit.select_tool.cut_button_tooltip"),
-            lambda evt: self.canvas.cut()
+            lambda evt: self.canvas.cut(),
         )
         add_button(
             lang.get("program_3d_edit.select_tool.paste_button"),
             lang.get("program_3d_edit.select_tool.paste_button_tooltip"),
-            lambda evt: self.canvas.paste_from_cache()
+            lambda evt: self.canvas.paste_from_cache(),
         )
 
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
         self._x1: wx.SpinCtrl = self._add_row(
-            lang.get("program_3d_edit.select_tool.scroll_point_x1"), wx.SpinCtrl, min=-30000000, max=30000000
+            lang.get("program_3d_edit.select_tool.scroll_point_x1"),
+            wx.SpinCtrl,
+            min=-30000000,
+            max=30000000,
         )
         self._y1: wx.SpinCtrl = self._add_row(
-            lang.get("program_3d_edit.select_tool.scroll_point_y1"), wx.SpinCtrl, min=-30000000, max=30000000
+            lang.get("program_3d_edit.select_tool.scroll_point_y1"),
+            wx.SpinCtrl,
+            min=-30000000,
+            max=30000000,
         )
         self._z1: wx.SpinCtrl = self._add_row(
-            lang.get("program_3d_edit.select_tool.scroll_point_z1"), wx.SpinCtrl, min=-30000000, max=30000000
+            lang.get("program_3d_edit.select_tool.scroll_point_z1"),
+            wx.SpinCtrl,
+            min=-30000000,
+            max=30000000,
         )
         self._x1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._y1.Bind(wx.EVT_SPINCTRL, self._box_input_change)
@@ -91,13 +102,22 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._z1.SetValidator(IntValidator())
 
         self._x2: wx.SpinCtrl = self._add_row(
-            lang.get("program_3d_edit.select_tool.scroll_point_x2"), wx.SpinCtrl, min=-30000000, max=30000000
+            lang.get("program_3d_edit.select_tool.scroll_point_x2"),
+            wx.SpinCtrl,
+            min=-30000000,
+            max=30000000,
         )
         self._y2: wx.SpinCtrl = self._add_row(
-            lang.get("program_3d_edit.select_tool.scroll_point_y2"), wx.SpinCtrl, min=-30000000, max=30000000
+            lang.get("program_3d_edit.select_tool.scroll_point_y2"),
+            wx.SpinCtrl,
+            min=-30000000,
+            max=30000000,
         )
         self._z2: wx.SpinCtrl = self._add_row(
-            lang.get("program_3d_edit.select_tool.scroll_point_z2"), wx.SpinCtrl, min=-30000000, max=30000000
+            lang.get("program_3d_edit.select_tool.scroll_point_z2"),
+            wx.SpinCtrl,
+            min=-30000000,
+            max=30000000,
         )
         self._x2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         self._y2.Bind(wx.EVT_SPINCTRL, self._box_input_change)
@@ -113,12 +133,24 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._y2.Disable()
         self._z2.Disable()
 
-        self._x1.SetToolTip(lang.get("program_3d_edit.select_tool.scroll_point_x1_tooltip"))
-        self._y1.SetToolTip(lang.get("program_3d_edit.select_tool.scroll_point_y1_tooltip"))
-        self._z1.SetToolTip(lang.get("program_3d_edit.select_tool.scroll_point_z1_tooltip"))
-        self._x2.SetToolTip(lang.get("program_3d_edit.select_tool.scroll_point_x2_tooltip"))
-        self._y2.SetToolTip(lang.get("program_3d_edit.select_tool.scroll_point_y2_tooltip"))
-        self._z2.SetToolTip(lang.get("program_3d_edit.select_tool.scroll_point_z2_tooltip"))
+        self._x1.SetToolTip(
+            lang.get("program_3d_edit.select_tool.scroll_point_x1_tooltip")
+        )
+        self._y1.SetToolTip(
+            lang.get("program_3d_edit.select_tool.scroll_point_y1_tooltip")
+        )
+        self._z1.SetToolTip(
+            lang.get("program_3d_edit.select_tool.scroll_point_z1_tooltip")
+        )
+        self._x2.SetToolTip(
+            lang.get("program_3d_edit.select_tool.scroll_point_x2_tooltip")
+        )
+        self._y2.SetToolTip(
+            lang.get("program_3d_edit.select_tool.scroll_point_y2_tooltip")
+        )
+        self._z2.SetToolTip(
+            lang.get("program_3d_edit.select_tool.scroll_point_z2_tooltip")
+        )
 
         self._x1.SetBackgroundColour((160, 215, 145))
         self._y1.SetBackgroundColour((160, 215, 145))
