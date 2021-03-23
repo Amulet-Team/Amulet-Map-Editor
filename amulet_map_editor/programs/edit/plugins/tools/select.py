@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Type, Any, Callable
+from typing import TYPE_CHECKING, Type, Any, Callable, Tuple
 import wx
 from OpenGL.GL import (
     glClear,
@@ -22,15 +22,133 @@ from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour imp
     EVT_RENDER_BOX_ENABLE_INPUTS,
 )
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
+from amulet_map_editor.programs.edit.api.key_config import (
+    KeybindGroup,
+    ACT_MOVE_UP,
+    ACT_MOVE_DOWN,
+    ACT_MOVE_FORWARDS,
+    ACT_MOVE_BACKWARDS,
+    ACT_MOVE_LEFT,
+    ACT_MOVE_RIGHT,
+    ACT_BOX_CLICK,
+)
+from amulet_map_editor.api.wx.util.button_input import (
+    ButtonInput,
+    InputPressEvent,
+    EVT_INPUT_PRESS,
+    InputReleaseEvent,
+    EVT_INPUT_RELEASE,
+    InputHeldEvent,
+    EVT_INPUT_HELD,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
+_MoveActions = {
+        ACT_MOVE_UP,
+        ACT_MOVE_DOWN,
+        ACT_MOVE_FORWARDS,
+        ACT_MOVE_BACKWARDS,
+        ACT_MOVE_LEFT,
+        ACT_MOVE_RIGHT,
+}
+
 
 class MovementButton(wx.Button):
     """A button that catches actions when pressed."""
-    def __init__(self):
+
+    def __init__(
+        self, parent: wx.Window, keybinds: KeybindGroup, label: str, tooltip: str
+    ):
+        super().__init__(parent, label=label)
+        self.SetToolTip(tooltip)
+        self._buttons = ButtonInput(self)
+        self._buttons.register_actions(keybinds)
+        self._buttons.bind_events()  # this is fine here because we are binding to a custom button not the canvas.
+        self.Bind(EVT_INPUT_PRESS, self._on_down)
+        self.Bind(EVT_INPUT_RELEASE, self._on_up)
+        self.Bind(EVT_INPUT_HELD, self._on_held)
+        self._listen = False
+        self._timeout = 10
+
+    def enable(self):
+        self._buttons.enable()
+
+    def disable(self):
+        self._buttons.disable()
+
+    def _on_down(self, evt: InputPressEvent):
+        if evt.action_id == ACT_BOX_CLICK:
+            self._listen = True
+        elif evt.action_id in _MoveActions:
+            self._timeout = 10
+
+    def _on_up(self, evt: InputReleaseEvent):
+        if evt.action_id == ACT_BOX_CLICK:
+            self._listen = False
+
+    def _on_held(self, evt: InputHeldEvent):
+        if self._listen:
+            if self._timeout == 0 or self._timeout == 10:
+                x = y = z = 0
+                if ACT_MOVE_LEFT in evt.action_ids:
+                    x += 1
+                if ACT_MOVE_RIGHT in evt.action_ids:
+                    x -= 1
+                if ACT_MOVE_UP in evt.action_ids:
+                    y += 1
+                if ACT_MOVE_DOWN in evt.action_ids:
+                    y -= 1
+                if ACT_MOVE_FORWARDS in evt.action_ids:
+                    z += 1
+                if ACT_MOVE_BACKWARDS in evt.action_ids:
+                    z -= 1
+                if any((x, y, z)):
+                    self._move((x, y, z))
+            if self._timeout:
+                self._timeout -= 1
+
+    def _move(self, offset: Tuple[int, int, int]):
         pass
+
+
+class BaseSelectionMoveButton(MovementButton):
+    def __init__(
+        self,
+        parent: wx.Window,
+        keybinds: KeybindGroup,
+        label: str,
+        tooltip: str,
+        selection: BlockSelectionBehaviour,
+    ):
+        super().__init__(parent, keybinds, label, tooltip)
+        self._selection = selection
+
+
+class Point1MoveButton(BaseSelectionMoveButton):
+    def _move(self, offset: Tuple[int, int, int]):
+        ox, oy, oz = offset
+        (x, y, z), point2 = self._selection.active_block_positions
+        self._selection.active_block_positions = (x + ox, y + oy, z + oz), point2
+
+
+class Point2MoveButton(BaseSelectionMoveButton):
+    def _move(self, offset: Tuple[int, int, int]):
+        ox, oy, oz = offset
+        point1, (x, y, z) = self._selection.active_block_positions
+        self._selection.active_block_positions = point1, (x + ox, y + oy, z + oz)
+
+
+class SelectionMoveButton(BaseSelectionMoveButton):
+    def _move(self, offset: Tuple[int, int, int]):
+        ox, oy, oz = offset
+        (x1, y1, z1), (x2, y2, z2) = self._selection.active_block_positions
+        self._selection.active_block_positions = (x1 + ox, y1 + oy, z1 + oz), (
+            x2 + ox,
+            y2 + oy,
+            z2 + oz,
+        )
 
 
 class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
@@ -160,6 +278,39 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._y2.SetBackgroundColour((150, 150, 215))
         self._z2.SetBackgroundColour((150, 150, 215))
 
+        self._point1_move = Point1MoveButton(
+            self._button_panel,
+            self.canvas.key_binds,
+            lang.get("program_3d_edit.select_tool.button_point1"),
+            lang.get("program_3d_edit.select_tool.button_point1_tooltip"),
+            self._selection,
+        )
+        self._point1_move.SetBackgroundColour((160, 215, 145))
+        self._point1_move.Disable()
+        button_sizer.Add(self._point1_move, 0, wx.ALL | wx.EXPAND, 5)
+
+        self._point2_move = Point2MoveButton(
+            self._button_panel,
+            self.canvas.key_binds,
+            lang.get("program_3d_edit.select_tool.button_point2"),
+            lang.get("program_3d_edit.select_tool.button_point2_tooltip"),
+            self._selection,
+        )
+        self._point2_move.SetBackgroundColour((150, 150, 215))
+        self._point2_move.Disable()
+        button_sizer.Add(self._point2_move, 0, wx.ALL | wx.EXPAND, 5)
+
+        self._selection_move = SelectionMoveButton(
+            self._button_panel,
+            self.canvas.key_binds,
+            lang.get("program_3d_edit.select_tool.button_selection_box"),
+            lang.get("program_3d_edit.select_tool.button_selection_box_tooltip"),
+            self._selection,
+        )
+        self._selection_move.SetBackgroundColour((255, 255, 255))
+        self._selection_move.Disable()
+        button_sizer.Add(self._selection_move, 0, wx.ALL | wx.EXPAND, 5)
+
     @property
     def name(self) -> str:
         return "Select"
@@ -167,8 +318,8 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
     def bind_events(self):
         super().bind_events()
         self.canvas.Bind(EVT_RENDER_BOX_CHANGE, self._box_renderer_change)
-        self.canvas.Bind(EVT_RENDER_BOX_DISABLE_INPUTS, self._disable_scrolls)
-        self.canvas.Bind(EVT_RENDER_BOX_ENABLE_INPUTS, self._enable_scrolls)
+        self.canvas.Bind(EVT_RENDER_BOX_DISABLE_INPUTS, self._disable_inputs)
+        self.canvas.Bind(EVT_RENDER_BOX_ENABLE_INPUTS, self._enable_inputs)
         self.canvas.Bind(EVT_SELECTION_CHANGE, self._on_selection_change)
         self._selection.bind_events()
         self._inspect_block.bind_events()
@@ -177,9 +328,15 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         super().enable()
         self._selection.enable()
         self._pull_selection()
+        self._point1_move.enable()
+        self._point2_move.enable()
+        self._selection_move.enable()
 
     def disable(self):
         super().disable()
+        self._point1_move.disable()
+        self._point2_move.disable()
+        self._selection_move.disable()
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -218,12 +375,18 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._y2.SetValue(y2)
         self._z2.SetValue(z2)
 
-    def _enable_scrolls(self, evt):
+    def _enable_inputs(self, evt):
         self._set_scroll_state(True)
+        self._point1_move.Enable()
+        self._point2_move.Enable()
+        self._selection_move.Enable()
         evt.Skip()
 
-    def _disable_scrolls(self, evt):
+    def _disable_inputs(self, evt):
         self._set_scroll_state(False)
+        self._point1_move.Disable()
+        self._point2_move.Disable()
+        self._selection_move.Disable()
         evt.Skip()
 
     def _set_scroll_state(self, state: bool):
