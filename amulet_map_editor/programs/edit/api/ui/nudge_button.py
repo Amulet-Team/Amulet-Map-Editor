@@ -107,7 +107,10 @@ class NudgeButton(wx.Button):
         ry = self.camera.rotation[0]
         x, y, z, _ = (
             numpy.round(
-                numpy.matmul(rotation_matrix_xy(0, -math.radians(ry)), (x, y, z, 0))
+                numpy.matmul(
+                    rotation_matrix_xy(0, -math.radians(round(ry / 90) * 90)),
+                    (x, y, z, 0),
+                )
             )
             .astype(int)
             .tolist()
