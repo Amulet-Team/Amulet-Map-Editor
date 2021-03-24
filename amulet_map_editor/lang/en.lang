@@ -25,3 +25,35 @@ program_convert.select_before_converting=Select a world before converting!
 program_convert.conversion_completed=World conversion completed
 
 program_3d_edit.tab_name=3D Editor
+
+program_3d_edit.select_tool.delete_button=Delete
+program_3d_edit.select_tool.delete_button_tooltip=Delete the blocks in the selected area.
+program_3d_edit.select_tool.copy_button=Copy
+program_3d_edit.select_tool.copy_button_tooltip=Copy the selected area to paste later. Can be pasted into any world and dimension.
+program_3d_edit.select_tool.cut_button=Cut
+program_3d_edit.select_tool.cut_button_tooltip=Copy the selected area to paste later and delete. Can be pasted into any world and dimension.
+program_3d_edit.select_tool.paste_button=Paste
+program_3d_edit.select_tool.paste_button_tooltip=Paste a previously copied or cut area into the world.
+
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Set the x coordinate of the active box's green corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Set the y coordinate of the active box's green corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Set the z coordinate of the active box's green corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Set the x coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Set the y coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Set the z coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
+
+program_3d_edit.select_tool.box_size_fstring=x: {x}, y: {y}, z: {z}
+program_3d_edit.select_tool.box_size_tooltip=The size of the active selection box in blocks.
+
+program_3d_edit.select_tool.button_point1=Move Point 1
+program_3d_edit.select_tool.button_point1_tooltip=Press and hold this button and use the movement controls to move the green selection point.
+program_3d_edit.select_tool.button_point2=Move Point 2
+program_3d_edit.select_tool.button_point2_tooltip=Press and hold this button and use the movement controls to move the blue selection point.
+program_3d_edit.select_tool.button_selection_box=Move Box
+program_3d_edit.select_tool.button_selection_box_tooltip=Press and hold this button and use the movement controls to move the active box.

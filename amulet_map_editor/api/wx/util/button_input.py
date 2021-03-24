@@ -2,7 +2,7 @@ import wx
 from typing import Set, Dict, Tuple
 
 from .window_container import WindowContainer
-from .key_config import KeyType, serialise_key
+from .key_config import KeyType, serialise_key, KeybindGroup
 
 ActionIDType = str
 
@@ -161,15 +161,15 @@ class ButtonInput(WindowContainer):
     def register_action(
         self,
         action_id: ActionIDType,
-        trigger_key: KeyType,
         modifier_keys: Tuple[KeyType, ...],
+        trigger_key: KeyType,
     ):
         """Register a new action for the given trigger key and optional modifier keys.
         This action will be fired when the trigger key is pressed providing all the modifier keys are already pressed.
 
         :param action_id: The unique action id. Will raise a ValueError if it is already taken.
-        :param trigger_key: The key that when pressed will start the action provided the modifier keys are pressed.
         :param modifier_keys: Other keys that need to be pressed for the action to happen.
+        :param trigger_key: The key that when pressed will start the action provided the modifier keys are pressed.
         :return:
         """
         if type(action_id) is not str:
@@ -188,6 +188,10 @@ class ButtonInput(WindowContainer):
             trigger_key,
             modifier_keys,
         )
+
+    def register_actions(self, actions: KeybindGroup):
+        for action_id, (modifier_keys, trigger_key) in actions.items():
+            self.register_action(action_id, modifier_keys, trigger_key)
 
     def _find_actions(self, key: KeyType) -> Tuple[ActionIDType, ...]:
         """A method to find all actions triggered by `key` with the modifier keys also pressed."""
