@@ -77,15 +77,25 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self._enable_tool(evt.tool)
         # evt.Skip() # this causes issues if uncommented
 
-    def enable_default_tool(self) -> bool:
+    def enable(self):
+        if isinstance(self._active_tool, SelectTool):
+            self._active_tool.enable()
+            self.canvas.reset_bound_events()
+            self.canvas.Layout()
+        else:
+            self._enable_tool("Select")
+
+    def disable(self):
+        """Disable the active tool."""
+        if self._active_tool is not None:
+            self._active_tool.disable()
+
+    def enable_default_tool(self):
         """
         Enables the default tool (the select tool)
-        :return: True if the selection changed, False otherwise.
         """
         if not isinstance(self._active_tool, SelectTool):
             self._enable_tool("Select")
-            return True
-        return False
 
     def _enable_tool(self, tool: str):
         if tool in self._tools:
