@@ -24,12 +24,6 @@ from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour imp
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.key_config import (
     KeybindGroup,
-    ACT_MOVE_UP,
-    ACT_MOVE_DOWN,
-    ACT_MOVE_FORWARDS,
-    ACT_MOVE_BACKWARDS,
-    ACT_MOVE_LEFT,
-    ACT_MOVE_RIGHT,
 )
 from amulet_map_editor.programs.edit.api.ui.nudge_button import NudgeButton
 
@@ -203,6 +197,22 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._y2.SetBackgroundColour((150, 150, 215))
         self._z2.SetBackgroundColour((150, 150, 215))
 
+        self._box_size_fstring = lang.get(
+            "program_3d_edit.select_tool.box_size_fstring"
+        )
+        try:
+            box_size_fstring = self._box_size_fstring.format(x=0, y=0, z=0)
+        except:
+            self._box_size_fstring = "x: {x}, y: {y}, z: {z}"
+            box_size_fstring = self._box_size_fstring.format(x=0, y=0, z=0)
+        self._box_size_text = wx.StaticText(
+            self._button_panel, label=box_size_fstring, style=wx.ALIGN_CENTER_HORIZONTAL
+        )
+        self._box_size_text.SetToolTip(
+            lang.get("program_3d_edit.select_tool.box_size_tooltip")
+        )
+        button_sizer.Add(self._box_size_text, 0, wx.ALL | wx.EXPAND, 5)
+
         self._point1_move = Point1MoveButton(
             self._button_panel,
             self.canvas.camera,
@@ -302,6 +312,14 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._x2.SetValue(x2)
         self._y2.SetValue(y2)
         self._z2.SetValue(z2)
+        self._box_size_text.SetLabel(
+            self._box_size_fstring.format(
+                x=int(abs(x2 - x1) + 1),
+                y=int(abs(y2 - y1) + 1),
+                z=int(abs(z2 - z1) + 1),
+            )
+        )
+        self.Layout()
 
     def _enable_inputs(self, evt):
         self._set_scroll_state(True)
