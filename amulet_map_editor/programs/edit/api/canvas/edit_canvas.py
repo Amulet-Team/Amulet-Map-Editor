@@ -108,7 +108,7 @@ class EditCanvas(BaseEditCanvas):
 
     def _finalise(self):
         super()._finalise()
-        self._tool_sizer.enable_default_tool()
+        self._tool_sizer.enable()
 
     def bind_events(self):
         """Set up all events required to run.
@@ -118,6 +118,14 @@ class EditCanvas(BaseEditCanvas):
         super().bind_events()
         self._file_panel.bind_events()
         self.Bind(EVT_EDIT_CLOSE, self._on_close)
+
+    def enable(self):
+        super().enable()
+        self._tool_sizer.enable()
+
+    def disable(self):
+        super().disable()
+        self._tool_sizer.disable()
 
     def _on_close(self, _):
         self._close_callback()
@@ -138,8 +146,9 @@ class EditCanvas(BaseEditCanvas):
         else:
             return DefaultKeys
 
-    def _deselect(self) -> bool:
-        return self._tool_sizer.enable_default_tool()
+    def _deselect(self):
+        # TODO: Re-implement this
+        self._tool_sizer.enable_default_tool()
 
     def run_operation(
         self,
