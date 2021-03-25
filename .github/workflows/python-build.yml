@@ -31,7 +31,7 @@ jobs:
     # setup
     - name: setup.py
       run: |
-        if ["${{ matrix.os }}" == "windows-latest"]; then
+        if [ "$RUNNER_OS" == "Windows" ]; then
           python setup.py sdist bdist_wheel
         else
           python setup.py build
@@ -48,11 +48,13 @@ jobs:
       run: |
         python -m PyInstaller -y Amulet.spec
         cd dist
-        if ["${{ matrix.os }}" == "windows-latest"]; then
+        if [ "$RUNNER_OS" == "Windows" ]; then
           zip -r Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip Amulet
-        fi
-        if ["${{ matrix.os }}" == "macos-latest"]; then
+        elif [ "$RUNNER_OS" == "macOS" ]; then
           zip -r Amulet-v${{ github.event.release.tag_name }}-macos.zip Amulet
+        else
+          echo "$RUNNER_OS not supported"
+          exit 1
         fi
         cd ..
       shell: bash
