@@ -2,6 +2,7 @@ from typing import Optional, Tuple
 import wx
 import re
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet.api.data_types import PointCoordinates
 
@@ -21,7 +22,7 @@ CoordRegex = re.compile(
 def show_goto(
     parent: wx.Window, x: float, y: float, z: float
 ) -> Optional[Tuple[float, float, float]]:
-    dialog = GoTo(parent, "Teleport", (x, y, z))
+    dialog = GoTo(parent, lang.get("program_3d_edit.goto_ui.title"), (x, y, z))
     if dialog.ShowModal() == wx.ID_OK:
         return dialog.location
 
@@ -30,13 +31,13 @@ class GoTo(SimpleDialog):
     def __init__(self, parent: wx.Window, title: str, start: PointCoordinates):
         super().__init__(parent, title, wx.HORIZONTAL)
         x, y, z = start
-        x_text = wx.StaticText(self, label="x:")
+        x_text = wx.StaticText(self, label=lang.get("program_3d_edit.goto_ui.x_label"))
         self.x = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=x)
-        y_text = wx.StaticText(self, label="y:")
         self.x.SetDigits(2)
+        y_text = wx.StaticText(self, label=lang.get("program_3d_edit.goto_ui.y_label"))
         self.y = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=y)
-        z_text = wx.StaticText(self, label="z:")
         self.y.SetDigits(2)
+        z_text = wx.StaticText(self, label=lang.get("program_3d_edit.goto_ui.z_label"))
         self.z = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=z)
         self.z.SetDigits(2)
         self.sizer.Add(x_text, 0, wx.CENTER | wx.ALL, 5)
