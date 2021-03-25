@@ -5,7 +5,7 @@ name: Nightly
 
 on:
   schedule:
-    - cron: '30 15 * * *'
+    - cron: '40 15 * * *'
 
 jobs:
   check-deploy:
