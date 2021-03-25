@@ -35,12 +35,15 @@ class GoTo(SimpleDialog):
         x, y, z = start
         x_text = wx.StaticText(self, label=lang.get("program_3d_edit.goto_ui.x_label"))
         self.x = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=x)
+        self.x.SetToolTip(lang.get("program_3d_edit.goto_ui.x_label_tooltip"))
         self.x.SetDigits(2)
         y_text = wx.StaticText(self, label=lang.get("program_3d_edit.goto_ui.y_label"))
         self.y = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=y)
+        self.y.SetToolTip(lang.get("program_3d_edit.goto_ui.y_label_tooltip"))
         self.y.SetDigits(2)
         z_text = wx.StaticText(self, label=lang.get("program_3d_edit.goto_ui.z_label"))
         self.z = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=z)
+        self.z.SetToolTip(lang.get("program_3d_edit.goto_ui.z_label_tooltip"))
         self.z.SetDigits(2)
         self.sizer.Add(x_text, 0, wx.CENTER | wx.ALL, 5)
         self.sizer.Add(self.x, 1, wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
@@ -56,11 +59,16 @@ class GoTo(SimpleDialog):
             self, bitmap=image.icon.tablericons.copy.bitmap(20, 20)
         )
         copy_button.Bind(wx.EVT_BUTTON, lambda evt: self._copy())
+        copy_button.SetToolTip(lang.get("program_3d_edit.goto_ui.copy_button_tooltip"))
         self.bottom_sizer.Insert(0, copy_button, 0, wx.ALL, 5)
+
         paste_button = wx.BitmapButton(
             self, bitmap=image.icon.tablericons.clipboard.bitmap(20, 20)
         )
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self._paste())
+        paste_button.SetToolTip(
+            lang.get("program_3d_edit.goto_ui.paste_button_tooltip")
+        )
         self.bottom_sizer.Insert(1, paste_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
         self.Fit()
 
