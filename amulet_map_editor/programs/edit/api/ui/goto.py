@@ -6,7 +6,15 @@ from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet.api.data_types import PointCoordinates
 
 CoordRegex = re.compile(
-    r"^\s*(?P<x>-?[0-9]+\.?[0-9]*),?\s*(?P<y>-?[0-9]+\.?[0-9]*),?\s*(?P<z>-?[0-9]+\.?[0-9]*),?\s*$"
+    r"^"  # match the start
+    r"\s*"  # leading whitespace
+    r"(?P<x>-?[0-9]+\.?[0-9]*)"  # the x coordinate
+    r"((?:,\s*)|(?:\s+))"  # separator 1
+    r"(?P<y>-?[0-9]+\.?[0-9]*)"  # the y coordinate
+    r"((?:,\s*)|(?:\s+))"  # separator 2
+    r"(?P<z>-?[0-9]+\.?[0-9]*)"  # the z coordinate
+    r",?\s*"  # trailing comma and whitespace
+    r"$"  # matches the end
 )
 
 
@@ -30,7 +38,7 @@ class GoTo(SimpleDialog):
         self.y.SetDigits(5)
         z_text = wx.StaticText(self, label="z:")
         self.z = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=z)
-        self.z.SetDigits(5)
+        self.z.SetDigits(2)
         self.sizer.Add(x_text, 0, wx.CENTER | wx.ALL, 5)
         self.sizer.Add(self.x, 1, wx.CENTER | wx.ALL, 5)
         self.sizer.Add(y_text, 0, wx.CENTER | wx.ALL, 5)
