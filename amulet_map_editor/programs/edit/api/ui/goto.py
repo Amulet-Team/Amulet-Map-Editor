@@ -32,11 +32,11 @@ class GoTo(SimpleDialog):
         x, y, z = start
         x_text = wx.StaticText(self, label="x:")
         self.x = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=x)
-        self.x.SetDigits(5)
         y_text = wx.StaticText(self, label="y:")
+        self.x.SetDigits(2)
         self.y = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=y)
-        self.y.SetDigits(5)
         z_text = wx.StaticText(self, label="z:")
+        self.y.SetDigits(2)
         self.z = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=z)
         self.z.SetDigits(2)
         self.sizer.Add(x_text, 0, wx.CENTER | wx.ALL, 5)
