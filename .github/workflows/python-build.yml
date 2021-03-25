@@ -32,9 +32,9 @@ jobs:
     - name: setup.py
       run: |
         if "${{ matrix.os }}" == "windows-latest"; then
-          setup.py sdist bdist_wheel
+          python setup.py sdist bdist_wheel
         else
-          setup.py build
+          python setup.py build
         fi
       shell: bash
 #    - if: matrix.os == 'windows-latest'
@@ -46,7 +46,7 @@ jobs:
 
     - name: PyInstaller build
       run: |
-        PyInstaller -y Amulet.spec
+        python -m PyInstaller -y Amulet.spec
         cd dist
         if "${{ matrix.os }}" == "windows-latest"; then
           zip -r Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip Amulet
