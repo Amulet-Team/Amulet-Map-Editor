@@ -1,0 +1,37 @@
+# Every day at 7am UTC check if there have been any commits or if
+# any of the dependencies have been updated
+
+name: Nightly
+
+on:
+  schedule:
+    - cron: '30 15 * * *'
+
+jobs:
+  check-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Activity Check
+      run: |
+        curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/commits | jq -r '.[0]' > $HOME/commit.json
+        date="$(jq -r '.commit.author.date' $HOME/commit.json)"
+        timestamp=$(date --utc -d "$date" +%s)
+        days=$(( ( $(date --utc +%s) - $timestamp ) / 86400 ))
+        rm -f $HOME/commit.json
+        if [ $days -lt 1 ]; then
+          echo "CREATE_BUILD=true" >> $GITHUB_ENV
+          echo "DATE=$date" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Create Release
+      if: env.CREATE_BUILD == 'true'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.CREATE_BUILD }}
+        release_name: Nightly ${{ github.ref }}
+        draft: false
+        prerelease: true
