@@ -67,7 +67,7 @@ jobs:
 
     - if: matrix.os == 'windows-latest'
       name: Upload Release Asset
-      id: upload-release-asset
+#      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +79,7 @@ jobs:
 
     - if: matrix.os == 'macos-latest'
       name: Upload Release Asset
-      id: upload-release-asset
+#      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
