@@ -29,7 +29,7 @@ jobs:
           # 0.8.1     0.8.2a0.dev*
           # 0.8.1a0   0.8.2a1.dev*
           # rm -f $HOME/release.json
-          clean_date=$(date --utc -d "$date" +%Y%m%d)
+          clean_date=$(date --utc +%Y%m%d%H%M)
           echo "DATE=$clean_date" >> $GITHUB_ENV
           echo "TAG_NAME=0.0.0a0.dev$clean_date" >> $GITHUB_ENV
         fi
@@ -39,7 +39,7 @@ jobs:
       if: ${{ env.CREATE_BUILD }} == 'true'
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.JGC_RELEASE_TOKEN }}
       with:
         tag_name: ${{ env.TAG_NAME }}
         release_name: Nightly ${{ env.DATE }}
