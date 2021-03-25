@@ -22,7 +22,16 @@ jobs:
         rm -f $HOME/commit.json
         if [ $days -lt 1 ]; then
           echo "CREATE_BUILD=true" >> $GITHUB_ENV
-          echo "DATE=$date" >> $GITHUB_ENV
+          # come back at some point and add the version number
+#          curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '[.[] | select(.tag_name | contains(["dev", "b"]) | not)][0]' > $HOME/release.json
+#          tag_name = "$(jq -r '.tag_name' $HOME/release.json)"
+          # 0.8.1b0
+          # 0.8.1     0.8.2a0.dev*
+          # 0.8.1a0   0.8.2a1.dev*
+#          rm -f $HOME/release.json
+          clean_date=$(date --utc -d "$date" +%Y%m%d)
+          echo "DATE=$clean_date" >> $GITHUB_ENV
+          echo "TAG_NAME=0.0.0a0.dev$clean_date" >> $GITHUB_ENV
         fi
       shell: bash
 
@@ -32,7 +41,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.DATE }}
+        tag_name: ${{ env.TAG_NAME }}
         release_name: Nightly ${{ env.DATE }}
         draft: false
         prerelease: true
