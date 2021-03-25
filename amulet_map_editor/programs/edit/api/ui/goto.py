@@ -2,9 +2,11 @@ from typing import Optional, Tuple
 import wx
 import re
 
+from amulet.api.data_types import PointCoordinates
+
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet.api.data_types import PointCoordinates
+from amulet_map_editor.api import image
 
 CoordRegex = re.compile(
     r"^"  # match the start
@@ -41,14 +43,25 @@ class GoTo(SimpleDialog):
         self.z = wx.SpinCtrlDouble(self, min=-30000000, max=30000000, initial=z)
         self.z.SetDigits(2)
         self.sizer.Add(x_text, 0, wx.CENTER | wx.ALL, 5)
-        self.sizer.Add(self.x, 1, wx.CENTER | wx.ALL, 5)
-        self.sizer.Add(y_text, 0, wx.CENTER | wx.ALL, 5)
-        self.sizer.Add(self.y, 1, wx.CENTER | wx.ALL, 5)
-        self.sizer.Add(z_text, 0, wx.CENTER | wx.ALL, 5)
-        self.sizer.Add(self.z, 1, wx.CENTER | wx.ALL, 5)
+        self.sizer.Add(self.x, 1, wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+        self.sizer.Add(y_text, 0, wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+        self.sizer.Add(self.y, 1, wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+        self.sizer.Add(z_text, 0, wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+        self.sizer.Add(self.z, 1, wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
         self.x.Bind(wx.EVT_CHAR, self._on_text)
         self.y.Bind(wx.EVT_CHAR, self._on_text)
         self.z.Bind(wx.EVT_CHAR, self._on_text)
+
+        copy_button = wx.BitmapButton(
+            self, bitmap=image.icon.tablericons.copy.bitmap(20, 20)
+        )
+        copy_button.Bind(wx.EVT_BUTTON, lambda evt: self._copy())
+        self.bottom_sizer.Insert(0, copy_button, 0, wx.ALL, 5)
+        paste_button = wx.BitmapButton(
+            self, bitmap=image.icon.tablericons.clipboard.bitmap(20, 20)
+        )
+        paste_button.Bind(wx.EVT_BUTTON, lambda evt: self._paste())
+        self.bottom_sizer.Insert(1, paste_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
         self.Fit()
 
     @property
@@ -58,32 +71,39 @@ class GoTo(SimpleDialog):
     def _on_text(self, evt):
         if evt.ControlDown() and evt.GetKeyCode() == 3:
             # Ctrl+C
-            if wx.TheClipboard.Open():
-                wx.TheClipboard.SetData(
-                    wx.TextDataObject(
-                        "{} {} {}".format(
-                            round(self.x.GetValue(), 5),
-                            round(self.y.GetValue(), 5),
-                            round(self.z.GetValue(), 5),
-                        )
-                    )
-                )
-                wx.TheClipboard.Close()
+            self._copy()
         elif evt.ControlDown() and evt.GetKeyCode() == 22:
             # Ctrl+V
-            text = ""
-            text_data = wx.TextDataObject()
-            if wx.TheClipboard.Open():
-                success = wx.TheClipboard.GetData(text_data)
-                wx.TheClipboard.Close()
-                if success:
-                    text = text_data.GetText()
-            match = CoordRegex.fullmatch(text)
-            if match:
-                self.x.SetValue(float(match.group("x")))
-                self.y.SetValue(float(match.group("y")))
-                self.z.SetValue(float(match.group("z")))
-            else:
+            if not self._paste():
                 evt.Skip()
         else:
             evt.Skip()
+
+    def _copy(self):
+        if wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(
+                wx.TextDataObject(
+                    "{} {} {}".format(
+                        round(self.x.GetValue(), 5),
+                        round(self.y.GetValue(), 5),
+                        round(self.z.GetValue(), 5),
+                    )
+                )
+            )
+            wx.TheClipboard.Close()
+
+    def _paste(self) -> bool:
+        text = ""
+        text_data = wx.TextDataObject()
+        if wx.TheClipboard.Open():
+            success = wx.TheClipboard.GetData(text_data)
+            wx.TheClipboard.Close()
+            if success:
+                text = text_data.GetText()
+        match = CoordRegex.fullmatch(text)
+        if match:
+            self.x.SetValue(float(match.group("x")))
+            self.y.SetValue(float(match.group("y")))
+            self.z.SetValue(float(match.group("z")))
+            return True
+        return False
