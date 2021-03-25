@@ -8,10 +8,11 @@ on:
     types: [published]
 
 jobs:
-  deploy-windows:
-    runs-on: windows-latest
+  deploy:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [windows-latest, macos-latest]
         python-version: [3.7]
 
     steps:
@@ -20,27 +21,52 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install setuptools wheel twine pyinstaller
         pip install -r requirements.txt
-    - name: setup.py sdist bdist_wheel
+
+    # setup
+    - name: setup.py
       run: |
-        python setup.py sdist bdist_wheel
+        if "${{ matrix.os }}" == "windows-latest"; then
+          setup.py sdist bdist_wheel
+        else
+          setup.py build
+        fi
+      shell: bash
+#    - if: matrix.os == 'windows-latest'
+#      name: setup.py sdist bdist_wheel
+#      run: python setup.py sdist bdist_wheel
+#    - if: matrix.os != 'windows-latest'
+#      name: setup.py build
+#      run: python setup.py build
+
     - name: PyInstaller build
       run: |
         PyInstaller -y Amulet.spec
         cd dist
-        7z a Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip Amulet
+        if "${{ matrix.os }}" == "windows-latest"; then
+          zip -r Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip Amulet
+        fi
+        if "${{ matrix.os }}" == "macos-latest"; then
+          zip -r Amulet-v${{ github.event.release.tag_name }}-macos.zip Amulet
+        fi
         cd ..
-    - name: Publish to PyPi
+      shell: bash
+
+    - if: matrix.os == 'windows-latest'
+      name: Publish to PyPi
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.AMULET_MAP_EDITOR_PYPI_PASSWORD }}
       run: |
         twine upload dist/amulet_map_editor*
-    - name: Upload Release Asset
+
+    - if: matrix.os == 'windows-latest'
+      name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
@@ -51,39 +77,14 @@ jobs:
         asset_name: Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
         asset_content_type: application/zip
 
-  deploy-mac:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: [3.7]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine pyinstaller
-        pip install -r requirements.txt
-    - name: setup.py build
-      run: |
-        python setup.py build
-    - name: PyInstaller build
-      run: |
-        PyInstaller -y Amulet.spec
-        cd dist
-        zip -r Amulet-v${{ github.event.release.tag_name }}-osx.zip Amulet
-        cd ..
-    - name: Upload Release Asset
+    - if: matrix.os == 'macos-latest'
+      name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./dist/Amulet-v${{ github.event.release.tag_name }}-osx.zip
-        asset_name: Amulet-v${{ github.event.release.tag_name }}-osx.zip
+        asset_path: ./dist/Amulet-v${{ github.event.release.tag_name }}-macos.zip
+        asset_name: Amulet-v${{ github.event.release.tag_name }}-macos.zip
         asset_content_type: application/zip
