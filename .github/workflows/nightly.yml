@@ -42,7 +42,7 @@ jobs:
           else
             create_build=false
           fi
-          if [[$create_build == 'true']]; then
+          if [["$create_build" == 'true']]; then
             clean_date=$(date --utc +%Y%m%d%H%M)
             echo "TAG_NAME=$version_number$clean_date" >> $GITHUB_ENV
           fi
