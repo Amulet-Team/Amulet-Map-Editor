@@ -49,7 +49,8 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
                     "All files (*.construction;*.mcstructure;*.schematic)|*.construction;*.mcstructure;*.schematic",
                     "Construction file (*.construction)|*.construction",
                     "Bedrock mcstructure file (*.mcstructure)|*.mcstructure",
-                    "Schematic file (*.schematic)|*.schematic",
+                    "Legacy Schematic file (*.schematic)|*.schematic",
+                    "Sponge Schematic file (*.schem)|*.schem",
                 ]
             ),
             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
