@@ -203,7 +203,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         try:
             box_size_fstring = self._box_size_fstring.format(x=0, y=0, z=0)
         except:
-            self._box_size_fstring = "x: {x}, y: {y}, z: {z}"
+            self._box_size_fstring = "dx={x},dy={y},dz={z}"
             box_size_fstring = self._box_size_fstring.format(x=0, y=0, z=0)
         self._box_size_text = wx.StaticText(
             self._button_panel, label=box_size_fstring, style=wx.ALIGN_CENTER_HORIZONTAL
