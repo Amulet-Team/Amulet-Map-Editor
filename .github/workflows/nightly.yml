@@ -30,7 +30,7 @@ jobs:
           create_build=true
           # get the most recent build number and create a new one based off it
           regex_version='^[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?(b[0-9]+)?$'
-          curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '[.[] | select(.tag_name | test('$regex_version'))][0]' > $HOME/release.json
+          curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '[.[] | select(.tag_name | test("'$regex_version'"))][0]' > $HOME/release.json
           tag_name="$(jq -r '.tag_name' $HOME/release.json)"
           rm -f $HOME/release.json
           beta_regex_version='^([0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?b)([0-9]+)$'
