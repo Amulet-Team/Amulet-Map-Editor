@@ -15,33 +15,47 @@ jobs:
     steps:
     - name: Activity Check
       run: |
+        create_build=false
         curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/commits | jq -r '.[0]' > $HOME/commit.json
         date="$(jq -r '.commit.author.date' $HOME/commit.json)"
         timestamp=$(date --utc -d "$date" +%s)
         days=$(( ( $(date --utc +%s) - $timestamp ) / 86400 ))
         rm -f $HOME/commit.json
+        # TODO: also check these
+        # https://pypi.org/pypi/amulet-core/json
+        # https://pypi.org/pypi/amulet-nbt/json
+        # https://pypi.org/pypi/PyMCTranslate/json
+        # https://pypi.org/pypi/minecraft-resource-pack/json
         if [ $days -lt 1 ]; then
-          echo "CREATE_BUILD=true" >> $GITHUB_ENV
-          # come back at some point and add the version number
-          # curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '[.[] | select(.tag_name | contains(["dev", "b"]) | not)][0]' > $HOME/release.json
-          # tag_name = "$(jq -r '.tag_name' $HOME/release.json)"
-          # 0.8.1b0
-          # 0.8.1     0.8.2a0.dev*
-          # 0.8.1a0   0.8.2a1.dev*
-          # rm -f $HOME/release.json
-          clean_date=$(date --utc +%Y%m%d%H%M)
-          echo "DATE=$clean_date" >> $GITHUB_ENV
-          echo "TAG_NAME=0.0.0a0.dev$clean_date" >> $GITHUB_ENV
+          create_build=true
+          # get the most recent build number and create a new one based off it
+          regex_version='^[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?(b[0-9]+)?$'
+          curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq -r '[.[] | select(.tag_name | test($regex_version))][0]' > $HOME/release.json
+          tag_name="$(jq -r '.tag_name' $HOME/release.json)"
+          rm -f $HOME/release.json
+          beta_regex_version='^([0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?b)([0-9]+)$'
+          release_regex_version='^([0-9]+\.[0-9]+(\.[0-9]+)?\.)([0-9]+)$'
+          if [[ $tag_name =~ $beta_regex_version ]]; then
+            version_number=${BASH_REMATCH[1]}$((${BASH_REMATCH[-1]} + 1)).dev
+          elif [[ $tag_name =~ $release_regex_version ]]; then
+            version_number=${BASH_REMATCH[1]}$((${BASH_REMATCH[-1]} + 1))b0.dev
+          else
+            create_build=false
+          fi
+          if [[$create_build == 'true']]; then
+            clean_date=$(date --utc +%Y%m%d%H%M)
+            echo "TAG_NAME=$version_number$clean_date" >> $GITHUB_ENV
+        echo "CREATE_BUILD=$create_build" >> $GITHUB_ENV
         fi
       shell: bash
 
-    - name: Create Release
-      if: ${{ env.CREATE_BUILD }} == 'true'
+    - if: ${{ env.CREATE_BUILD }} == 'true'
+      name: Create Release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.JGC_RELEASE_TOKEN }}
       with:
         tag_name: ${{ env.TAG_NAME }}
-        release_name: Nightly ${{ env.DATE }}
+        release_name: Nightly ${{ env.TAG_NAME }}
         draft: false
         prerelease: true
