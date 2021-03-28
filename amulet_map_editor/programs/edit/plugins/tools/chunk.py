@@ -37,7 +37,9 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
 
         y_sizer = wx.FlexGridSizer(2, 5, 5)
         button_sizer.Add(y_sizer, flag=wx.ALL, border=5)
-        min_y_label = wx.StaticText(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.min_y"))
+        min_y_label = wx.StaticText(
+            self._button_panel, label=lang.get("program_3d_edit.chunk_tool.min_y")
+        )
         y_sizer.Add(min_y_label, flag=wx.ALIGN_CENTER)
         self._min_y = wx.SpinCtrl(
             self._button_panel,
@@ -51,7 +53,9 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         y_sizer.Add(self._min_y, flag=wx.ALIGN_CENTER)
         self._min_y.Bind(wx.EVT_SPINCTRL, self._on_update_clipping)
 
-        max_y_label = wx.StaticText(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.max_y"))
+        max_y_label = wx.StaticText(
+            self._button_panel, label=lang.get("program_3d_edit.chunk_tool.max_y")
+        )
         y_sizer.Add(max_y_label, flag=wx.ALIGN_CENTER)
         self._max_y = wx.SpinCtrl(
             self._button_panel,
@@ -65,13 +69,25 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         y_sizer.Add(self._max_y, flag=wx.ALIGN_CENTER)
         self._max_y.Bind(wx.EVT_SPINCTRL, self._on_update_clipping)
 
-        delete_button = wx.Button(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.delete_chunks"))
-        delete_button.SetToolTip(lang.get("program_3d_edit.chunk_tool.delete_chunks_tooltip"))
-        button_sizer.Add(delete_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
+        delete_button = wx.Button(
+            self._button_panel,
+            label=lang.get("program_3d_edit.chunk_tool.delete_chunks"),
+        )
+        delete_button.SetToolTip(
+            lang.get("program_3d_edit.chunk_tool.delete_chunks_tooltip")
+        )
+        button_sizer.Add(
+            delete_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5
+        )
         delete_button.Bind(wx.EVT_BUTTON, self._delete_chunks)
 
-        prune_button = wx.Button(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.prune_chunks"))
-        prune_button.SetToolTip(lang.get("program_3d_edit.chunk_tool.prune_chunks_tooltip"))
+        prune_button = wx.Button(
+            self._button_panel,
+            label=lang.get("program_3d_edit.chunk_tool.prune_chunks"),
+        )
+        prune_button.SetToolTip(
+            lang.get("program_3d_edit.chunk_tool.prune_chunks_tooltip")
+        )
         button_sizer.Add(prune_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
         prune_button.Bind(wx.EVT_BUTTON, self._prune_chunks)
 
