@@ -187,7 +187,6 @@ class BaseEditCanvas(EventCanvas):
 
     def _finalise(self):
         """Any logic that needs to be run after everything has been set up."""
-        self.reset_bound_events()
         self._init = True
 
     def bind_events(self):
