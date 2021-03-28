@@ -33,6 +33,8 @@ class RaycastBehaviour(BaseBehaviour):
             screen_width, screen_height = (
                 numpy.array(self.canvas.GetSize(), numpy.int) / 2
             )
+            screen_width = max(1, screen_width)
+            screen_height = max(1, screen_height)
             screen_dx = math.atan(
                 self.canvas.mouse.delta_x
                 * self.canvas.camera.aspect_ratio
@@ -99,6 +101,8 @@ class RaycastBehaviour(BaseBehaviour):
         """Get the x and z location of the cursor when in 2D mode."""
         x, _, z = self.canvas.camera.location
         width, height = self.canvas.GetSize()
+        width = max(1, width)
+        height = max(1, height)
         z += 2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
         x += (
             2

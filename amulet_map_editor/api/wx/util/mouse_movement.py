@@ -29,6 +29,8 @@ class MouseMovement(WindowContainer):
     def _to_relative(self, x: int, y: int) -> Tuple[float, float]:
         """Convert the x and y values to relative values 0 to 1"""
         dx, dy = self.window.GetSize()
+        dx = max(1, dx)
+        dy = max(1, dy)
         return x / dx, y / dy
 
     def _to_absolute(self, x: float, y: float) -> Tuple[int, int]:
