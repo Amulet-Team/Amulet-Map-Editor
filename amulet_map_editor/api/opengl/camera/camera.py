@@ -128,18 +128,21 @@ class Camera(CanvasContainer):
     def location(self, camera_location: CameraLocationType):
         """Set the location of the camera. (x, y, z).
         Generates EVT_CAMERA_MOVED on the parent canvas."""
-        self.set_location(camera_location)
-        self._notify_moved()
+        if self.set_location(camera_location):
+            self._notify_moved()
 
-    def set_location(self, camera_location: CameraLocationType):
+    def set_location(self, camera_location: CameraLocationType) -> bool:
         """Set the location of the camera. (x, y, z)."""
         assert (
             type(camera_location) in (tuple, list)
             and len(camera_location) == 3
             and all(type(v) in (int, float) for v in camera_location)
         ), "format for camera_location is invalid"
-        self._reset_matrix()
-        self._location = tuple(camera_location)
+        if camera_location != self._location:
+            self._reset_matrix()
+            self._location = tuple(camera_location)
+            return True
+        return False
 
     @property
     def rotation(self) -> CameraRotationType:
@@ -154,18 +157,21 @@ class Camera(CanvasContainer):
         yaw (-180 to 180), pitch (-90 to 90)
         This should behave the same as how Minecraft handles it.
         Generates EVT_CAMERA_MOVED on the parent canvas."""
-        self.set_rotation(camera_rotation)
-        self._notify_moved()
+        if self.set_rotation(camera_rotation):
+            self._notify_moved()
 
-    def set_rotation(self, camera_rotation: CameraRotationType):
+    def set_rotation(self, camera_rotation: CameraRotationType) -> bool:
         """Set the location of the camera. (x, y, z)."""
         assert (
             type(camera_rotation) in (tuple, list)
             and len(camera_rotation) == 2
             and all(type(v) in (int, float) for v in camera_rotation)
         ), "format for camera_rotation is invalid"
-        self._reset_matrix()
-        self._rotation = tuple(camera_rotation)
+        if camera_rotation != self._rotation:
+            self._reset_matrix()
+            self._rotation = tuple(camera_rotation)
+            return True
+        return False
 
     @property
     def location_rotation(self) -> Tuple[CameraLocationType, CameraRotationType]:
@@ -179,9 +185,10 @@ class Camera(CanvasContainer):
         """Set the camera location and rotation in one property.
         Generates EVT_CAMERA_MOVED on the parent canvas."""
         location, rotation = location_rotation
-        self.set_location(location)
-        self.set_rotation(rotation)
-        self._notify_moved()
+        moved = self.set_location(location)
+        rotated = self.set_rotation(rotation)
+        if moved or rotated:
+            self._notify_moved()
 
     def _set_fov(self, mode: Projection, fov: float):
         assert type(fov) in (int, float)
