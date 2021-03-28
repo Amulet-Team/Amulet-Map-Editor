@@ -114,6 +114,8 @@ class CameraBehaviour(BaseBehaviour):
         elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
             if self.canvas.camera.rotating:
                 width, height = self.canvas.GetSize()
+                width = max(1, width)
+                height = max(1, height)
                 forward += (
                     2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
                 )
