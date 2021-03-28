@@ -58,6 +58,15 @@ program_3d_edit.select_tool.button_point2_tooltip=Press and hold this button and
 program_3d_edit.select_tool.button_selection_box=Move Box
 program_3d_edit.select_tool.button_selection_box_tooltip=Press and hold this button and use the movement controls to move the active box.
 
+program_3d_edit.chunk_tool.min_y=Min Y
+program_3d_edit.chunk_tool.min_y_tooltip=The minimum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.max_y=Max Y
+program_3d_edit.chunk_tool.max_y_tooltip=The maximum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.delete_chunks=Delete Chunks
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Delete the selected chunks. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
+program_3d_edit.chunk_tool.prune_chunks=Prune Chunks
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Delete all chunks that are not selected. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
+
 program_3d_edit.goto_ui.title=Teleport
 program_3d_edit.goto_ui.x_label=x:
 program_3d_edit.goto_ui.x_label_tooltip=The x coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.

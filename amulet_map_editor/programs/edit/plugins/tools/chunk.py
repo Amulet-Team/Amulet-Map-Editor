@@ -8,6 +8,7 @@ from OpenGL.GL import (
     glDisable,
 )
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.opengl.camera import Projection, EVT_CAMERA_MOVED
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import ChunkSelectionBehaviour
@@ -35,9 +36,9 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         max_range = 30_000_000
 
         y_sizer = wx.FlexGridSizer(2, 5, 5)
-        button_sizer.Add(y_sizer, flag=wx.LEFT | wx.TOP | wx.RIGHT, border=5)
-        min_y_label = wx.StaticText(self._button_panel, label="min_y")
-        y_sizer.Add(min_y_label, flag=wx.CENTER | wx.EXPAND)
+        button_sizer.Add(y_sizer, flag=wx.ALL, border=5)
+        min_y_label = wx.StaticText(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.min_y"))
+        y_sizer.Add(min_y_label, flag=wx.ALIGN_CENTER)
         self._min_y = wx.SpinCtrl(
             self._button_panel,
             min=min_range,
@@ -46,11 +47,12 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
                 max_range, max(min_range, self.canvas.world.selection_bounds.min[1])
             ),
         )
-        y_sizer.Add(self._min_y, flag=wx.CENTER | wx.EXPAND)
+        self._min_y.SetToolTip(lang.get("program_3d_edit.chunk_tool.min_y_tooltip"))
+        y_sizer.Add(self._min_y, flag=wx.ALIGN_CENTER)
         self._min_y.Bind(wx.EVT_SPINCTRL, self._on_update_clipping)
 
-        max_y_label = wx.StaticText(self._button_panel, label="max_y")
-        y_sizer.Add(max_y_label, flag=wx.CENTER | wx.EXPAND)
+        max_y_label = wx.StaticText(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.max_y"))
+        y_sizer.Add(max_y_label, flag=wx.ALIGN_CENTER)
         self._max_y = wx.SpinCtrl(
             self._button_panel,
             min=min_range,
@@ -59,15 +61,18 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
                 max_range, max(min_range, self.canvas.world.selection_bounds.max[1])
             ),
         )
-        y_sizer.Add(self._max_y, flag=wx.CENTER | wx.EXPAND)
+        self._max_y.SetToolTip(lang.get("program_3d_edit.chunk_tool.max_y_tooltip"))
+        y_sizer.Add(self._max_y, flag=wx.ALIGN_CENTER)
         self._max_y.Bind(wx.EVT_SPINCTRL, self._on_update_clipping)
 
-        delete_button = wx.Button(self._button_panel, label="Delete Chunks")
-        button_sizer.Add(delete_button, 0, wx.ALL | wx.EXPAND, 5)
+        delete_button = wx.Button(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.delete_chunks"))
+        delete_button.SetToolTip(lang.get("program_3d_edit.chunk_tool.delete_chunks_tooltip"))
+        button_sizer.Add(delete_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
         delete_button.Bind(wx.EVT_BUTTON, self._delete_chunks)
 
-        prune_button = wx.Button(self._button_panel, label="Prune Chunks")
-        button_sizer.Add(prune_button, 0, wx.ALL | wx.EXPAND, 5)
+        prune_button = wx.Button(self._button_panel, label=lang.get("program_3d_edit.chunk_tool.prune_chunks"))
+        prune_button.SetToolTip(lang.get("program_3d_edit.chunk_tool.prune_chunks_tooltip"))
+        button_sizer.Add(prune_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
         prune_button.Bind(wx.EVT_BUTTON, self._prune_chunks)
 
         self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
