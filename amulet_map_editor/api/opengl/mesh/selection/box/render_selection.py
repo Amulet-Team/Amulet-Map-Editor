@@ -8,7 +8,10 @@ from OpenGL.GL import (
     glDisable,
     GL_DEPTH_TEST,
     GL_LINE_STRIP,
-    glEnable,
+    glPushAttrib,
+    GL_DEPTH_BUFFER_BIT,
+    GL_POLYGON_BIT,
+    glPopAttrib,
 )
 import itertools
 from typing import Tuple, Optional, Union
@@ -317,6 +320,8 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
+        glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT)  # store opengl state
+
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)
         else:
@@ -325,10 +330,10 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         self.draw_start = 0
         self.draw_count = 36
         super()._draw(transformation_matrix)
-        glCullFace(GL_BACK)
 
         # draw the lines around the boxes
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
         super()._draw(transformation_matrix)
-        glEnable(GL_DEPTH_TEST)
+
+        glPopAttrib()  # reset to starting state
