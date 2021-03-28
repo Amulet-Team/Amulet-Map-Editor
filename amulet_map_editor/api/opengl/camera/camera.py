@@ -1,5 +1,5 @@
 import numpy
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from enum import Enum
 import wx
 from wx import glcanvas
@@ -89,7 +89,10 @@ class Camera(CanvasContainer):
         self._rotation: CameraRotationType = (0.0, 0.0)
         self._projection_mode = Projection.PERSPECTIVE
         self._fov = [100.0, 70.0]
-        self._clipping = [(-(10 ** 5), 10 ** 5), (0.1, 10000.0)]
+        self._clipping: List[Tuple[float, float]] = [
+            (-(10 ** 5), 10 ** 5),
+            (0.1, 10000.0),
+        ]
         self._aspect_ratio = 4 / 3
         self._projection_matrix: Optional[TransformationMatrixType] = None
         self._transformation_matrix: Optional[TransformationMatrixType] = None
@@ -216,6 +219,35 @@ class Camera(CanvasContainer):
     def orthographic_fov(self, fov: float):
         """Set the field of view of the camera when in orthographic mode."""
         self._set_fov(Projection.TOP_DOWN, fov)
+
+    def _set_clipping(self, mode: Projection, clipping: Tuple[float, float]):
+        assert (
+            type(clipping) is tuple
+            and len(clipping) == 2
+            and all(type(c) in (int, float) for c in clipping)
+        )
+        self._clipping[mode.value] = clipping
+        self._reset_matrix()
+
+    @property
+    def perspective_clipping(self) -> Tuple[float, float]:
+        """The near and far clipping distance when in perspective mode."""
+        return self._clipping[Projection.PERSPECTIVE.value]
+
+    @perspective_clipping.setter
+    def perspective_clipping(self, clipping: Tuple[float, float]):
+        """Set the near and far clipping distance when in perspective mode."""
+        self._set_clipping(Projection.PERSPECTIVE, clipping)
+
+    @property
+    def orthographic_clipping(self) -> Tuple[float, float]:
+        """The near and far clipping distance when in orthographic mode."""
+        return self._clipping[Projection.TOP_DOWN.value]
+
+    @orthographic_clipping.setter
+    def orthographic_clipping(self, clipping: Tuple[float, float]):
+        """Set the near and far clipping distance when in orthographic mode."""
+        self._set_clipping(Projection.TOP_DOWN, clipping)
 
     @property
     def aspect_ratio(self) -> float:
