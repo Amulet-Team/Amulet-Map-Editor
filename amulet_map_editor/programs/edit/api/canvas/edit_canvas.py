@@ -164,6 +164,8 @@ class EditCanvas(BaseEditCanvas):
             op = operation()
             if isinstance(op, GeneratorType):
                 yield from op
+            yield 0, "Creating Undo Point"
+            yield from self.create_undo_point_iter()
             return op
 
         err = None
@@ -175,7 +177,6 @@ class EditCanvas(BaseEditCanvas):
                 msg,
                 self,
             )
-            self.create_undo_point()
         except OperationError as e:
             msg = f"Error running operation: {e}"
             log.info(msg)
@@ -210,6 +211,13 @@ class EditCanvas(BaseEditCanvas):
     def create_undo_point(self, world=True, non_world=True):
         self.world.create_undo_point(world, non_world)
         wx.PostEvent(self, CreateUndoEvent())
+
+    def create_undo_point_iter(
+        self, world=True, non_world=True
+    ) -> Generator[float, None, bool]:
+        result = yield from self.world.create_undo_point_iter(world, non_world)
+        wx.PostEvent(self, CreateUndoEvent())
+        return result
 
     def undo(self):
         self.world.undo()
@@ -300,7 +308,7 @@ class EditCanvas(BaseEditCanvas):
                     yield next(pre_save_op)
             except StopIteration as e:
                 if e.value:
-                    self.create_undo_point()
+                    yield from self.create_undo_point_iter()
                 else:
                     self.world.restore_last_undo_point()
 
