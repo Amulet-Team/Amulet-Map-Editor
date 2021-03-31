@@ -27,25 +27,12 @@ def load_requirements(path: str) -> List[str]:
 required_packages = load_requirements("./requirements.txt")
 
 package_data = [
-    os.path.relpath(path, "amulet_map_editor") for path in
-    set(
-        glob.glob(
-            os.path.join(
-                "amulet_map_editor",
-                "**",
-                "*.*"
-            ),
-            recursive=True
-        )
-    ) - set(
-        glob.glob(
-            os.path.join(
-                "amulet_map_editor",
-                "**",
-                "*.py[cod]"
-            ),
-            recursive=True
-        )
+    os.path.relpath(path, "amulet_map_editor")
+    for path in set(
+        glob.glob(os.path.join("amulet_map_editor", "**", "*.*"), recursive=True)
+    )
+    - set(
+        glob.glob(os.path.join("amulet_map_editor", "**", "*.py[cod]"), recursive=True)
     )
 ]
 
@@ -70,5 +57,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires=">=3.6",
 )
