@@ -1,0 +1,70 @@
+world.java_platform=Джава
+world.bedrock_platform=Бэдрок
+world.close_world=Закрыть мир
+
+select_world.open_world_button=Открыть другой мир
+select_world.open_world_dialogue=Выбрать каталог мира Майнкрафт
+select_world.select_directory_failed=Не удалось открыть каталог!
+select_world.recent_worlds=Недавно открытые миры
+
+main_menu.tab_name=Главное Меню
+main_menu.open_world=Открыть мир
+main_menu.help=помощь
+
+program_about.tab_name=Дополнительно
+program_about.currently_opened_world=Текущий открытый мир
+program_about.choose_from_options=Выберите из вариантов слева то, что вы хотели бы сделать.\nВы может переключаться между ними в любое время.
+
+program_convert.tab_name=конвертация
+program_convert.convert_button=конвертация
+program_convert.input_world=Вхдной мир
+program_convert.output_world=Выходной мир
+program_convert.select_output_world=Выберите выходной мир
+program_convert.input_output_must_different=Входной и выходной миры должны быть разными!
+program_convert.select_before_converting=Выберите мир перед конвертацией!
+program_convert.conversion_completed=Конвертация мира завершена
+
+program_3d_edit.tab_name=3D Редактор
+
+program_3d_edit.select_tool.delete_button=Удалить
+program_3d_edit.select_tool.delete_button_tooltip=Удалить блоки в выбранной области.
+program_3d_edit.select_tool.copy_button=Скопировать
+program_3d_edit.select_tool.copy_button_tooltip=Скопировать выделенную область для последующей вставки. Может быть вставлен в любой мир и измерение.
+program_3d_edit.select_tool.cut_button=Вырезать
+program_3d_edit.select_tool.cut_button_tooltip=Скопировать выделенную область для последующей вставки и удаления. Может быть вставлен в любой мир и измерение.
+program_3d_edit.select_tool.paste_button=Вставить
+program_3d_edit.select_tool.paste_button_tooltip=Вставить ранее скопированную или вырезанную область в мир.
+
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Установить координату x зеленого угла активного поля. Введите число или колесо прокрутки при наведении курсора.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Установить координату y зеленого угла активного поля. Введите число или колесо прокрутки при наведении курсора.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Установить координату z зеленого угла активного поля. Введите число или колесо прокрутки при наведении курсора.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Установить координату x синего угла активного поля. Введите число или колесо прокрутки при наведении курсора.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Установить координату y синего угла активного поля. Введите число или колесо прокрутки при наведении курсора.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Установить координату z синего угла активного поля. Введите число или колесо прокрутки при наведении курсора.
+
+program_3d_edit.select_tool.box_size_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_tooltip=Размер активного поля выбора в блоках.
+
+program_3d_edit.select_tool.button_point1=Переместить точку 1
+program_3d_edit.select_tool.button_point1_tooltip=Нажмите и удерживайте эту кнопку и используйте элементы управления движением для перемещения зеленой точки выделения.
+program_3d_edit.select_tool.button_point2=Переместить точку 2
+program_3d_edit.select_tool.button_point2_tooltip=Нажмите и удерживайте эту кнопку и используйте элементы управления движением для перемещения синей точки выбора.
+program_3d_edit.select_tool.button_selection_box=переместить область
+program_3d_edit.select_tool.button_selection_box_tooltip=Нажмите и удерживайте эту кнопку и используйте элементы управления движением для перемещения активного окна.
+
+program_3d_edit.goto_ui.title=Телепорт
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Координата x камеры. Введите координаты, чтобы перейти к нужному местоположению. Ctrl + C для копирования координаты. Ctrl + V для вставки.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Координата y камеры. Введите координаты, чтобы перейти к нужному местоположению. Ctrl + C для копирования координаты. Ctrl + V для вставки.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Координата z камеры. Введите координаты, чтобы перейти к нужному местоположению. Ctrl + C для копирования координаты. Ctrl + V для вставки.
+program_3d_edit.goto_ui.copy_button_tooltip=Скопируйте значения x, y и z в буфер обмена в виде "0.0 0.0 0.0" (x, y и z соответственно)
+program_3d_edit.goto_ui.paste_button_tooltip=Вставьте ранее скопированную координату во входные данные. Копируемое значение должно состоять из трех чисел, разделенных пробелами или запятыми.
+
