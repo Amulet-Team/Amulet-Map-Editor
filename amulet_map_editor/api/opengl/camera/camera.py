@@ -1,5 +1,5 @@
 import numpy
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from enum import Enum
 import wx
 from wx import glcanvas
@@ -89,7 +89,10 @@ class Camera(CanvasContainer):
         self._rotation: CameraRotationType = (0.0, 0.0)
         self._projection_mode = Projection.PERSPECTIVE
         self._fov = [100.0, 70.0]
-        self._clipping = [(-(10 ** 5), 10 ** 5), (0.1, 10000.0)]
+        self._clipping: List[Tuple[float, float]] = [
+            (-(10 ** 5), 10 ** 5),
+            (0.1, 10000.0),
+        ]
         self._aspect_ratio = 4 / 3
         self._projection_matrix: Optional[TransformationMatrixType] = None
         self._transformation_matrix: Optional[TransformationMatrixType] = None
@@ -125,18 +128,21 @@ class Camera(CanvasContainer):
     def location(self, camera_location: CameraLocationType):
         """Set the location of the camera. (x, y, z).
         Generates EVT_CAMERA_MOVED on the parent canvas."""
-        self.set_location(camera_location)
-        self._notify_moved()
+        if self.set_location(camera_location):
+            self._notify_moved()
 
-    def set_location(self, camera_location: CameraLocationType):
+    def set_location(self, camera_location: CameraLocationType) -> bool:
         """Set the location of the camera. (x, y, z)."""
         assert (
             type(camera_location) in (tuple, list)
             and len(camera_location) == 3
             and all(type(v) in (int, float) for v in camera_location)
         ), "format for camera_location is invalid"
-        self._reset_matrix()
-        self._location = tuple(camera_location)
+        if camera_location != self._location:
+            self._reset_matrix()
+            self._location = tuple(camera_location)
+            return True
+        return False
 
     @property
     def rotation(self) -> CameraRotationType:
@@ -151,18 +157,21 @@ class Camera(CanvasContainer):
         yaw (-180 to 180), pitch (-90 to 90)
         This should behave the same as how Minecraft handles it.
         Generates EVT_CAMERA_MOVED on the parent canvas."""
-        self.set_rotation(camera_rotation)
-        self._notify_moved()
+        if self.set_rotation(camera_rotation):
+            self._notify_moved()
 
-    def set_rotation(self, camera_rotation: CameraRotationType):
+    def set_rotation(self, camera_rotation: CameraRotationType) -> bool:
         """Set the location of the camera. (x, y, z)."""
         assert (
             type(camera_rotation) in (tuple, list)
             and len(camera_rotation) == 2
             and all(type(v) in (int, float) for v in camera_rotation)
         ), "format for camera_rotation is invalid"
-        self._reset_matrix()
-        self._rotation = tuple(camera_rotation)
+        if camera_rotation != self._rotation:
+            self._reset_matrix()
+            self._rotation = tuple(camera_rotation)
+            return True
+        return False
 
     @property
     def location_rotation(self) -> Tuple[CameraLocationType, CameraRotationType]:
@@ -176,9 +185,10 @@ class Camera(CanvasContainer):
         """Set the camera location and rotation in one property.
         Generates EVT_CAMERA_MOVED on the parent canvas."""
         location, rotation = location_rotation
-        self.set_location(location)
-        self.set_rotation(rotation)
-        self._notify_moved()
+        moved = self.set_location(location)
+        rotated = self.set_rotation(rotation)
+        if moved or rotated:
+            self._notify_moved()
 
     def _set_fov(self, mode: Projection, fov: float):
         assert type(fov) in (int, float)
@@ -216,6 +226,35 @@ class Camera(CanvasContainer):
     def orthographic_fov(self, fov: float):
         """Set the field of view of the camera when in orthographic mode."""
         self._set_fov(Projection.TOP_DOWN, fov)
+
+    def _set_clipping(self, mode: Projection, clipping: Tuple[float, float]):
+        assert (
+            type(clipping) is tuple
+            and len(clipping) == 2
+            and all(type(c) in (int, float) for c in clipping)
+        )
+        self._clipping[mode.value] = clipping
+        self._reset_matrix()
+
+    @property
+    def perspective_clipping(self) -> Tuple[float, float]:
+        """The near and far clipping distance when in perspective mode."""
+        return self._clipping[Projection.PERSPECTIVE.value]
+
+    @perspective_clipping.setter
+    def perspective_clipping(self, clipping: Tuple[float, float]):
+        """Set the near and far clipping distance when in perspective mode."""
+        self._set_clipping(Projection.PERSPECTIVE, clipping)
+
+    @property
+    def orthographic_clipping(self) -> Tuple[float, float]:
+        """The near and far clipping distance when in orthographic mode."""
+        return self._clipping[Projection.TOP_DOWN.value]
+
+    @orthographic_clipping.setter
+    def orthographic_clipping(self, clipping: Tuple[float, float]):
+        """Set the near and far clipping distance when in orthographic mode."""
+        self._set_clipping(Projection.TOP_DOWN, clipping)
 
     @property
     def aspect_ratio(self) -> float:

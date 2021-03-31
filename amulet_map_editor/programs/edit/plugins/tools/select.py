@@ -280,9 +280,9 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._button_panel.GetSizer().Add(sizer, 0, 0)
         name_text = wx.StaticText(self._button_panel, label=label)
-        sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
+        sizer.Add(name_text, flag=wx.ALIGN_CENTER | wx.ALL, border=5)
         obj = wx_object(self._button_panel, **kwargs)
-        sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
+        sizer.Add(obj, flag=wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, border=5)
         return obj
 
     def _box_input_change(self, _):

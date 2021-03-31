@@ -8,6 +8,10 @@ from OpenGL.GL import (
     GL_DEPTH_TEST,
     GL_LINE_STRIP,
     glEnable,
+    glPushAttrib,
+    GL_DEPTH_BUFFER_BIT,
+    GL_POLYGON_BIT,
+    glPopAttrib,
 )
 
 from amulet.api.data_types import PointCoordinatesAny
@@ -277,22 +281,25 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
+        glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT)  # store opengl state
+
         # draw the lines around the boxes
         self.draw_start = 0
         self.draw_count = 36
         glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
         super()._draw(transformation_matrix)
-        glEnable(GL_DEPTH_TEST)
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)
         else:
             glCullFace(GL_BACK)
 
+        glEnable(GL_DEPTH_TEST)
         self._draw_mode = GL_TRIANGLES
         self.draw_start = 36
         # 6 faces, 9 quads/face, 2 triangles/quad, 3 verts/triangle
         self.draw_count = 324
         super()._draw(transformation_matrix)
-        glCullFace(GL_BACK)
+
+        glPopAttrib()  # reset to starting state
