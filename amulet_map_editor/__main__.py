@@ -8,6 +8,11 @@ if sys.version_info[:2] < (3, 7):
 from amulet_map_editor import log
 from amulet_map_editor.api.framework import AmuletApp
 import traceback
+import locale
+
+# there was a wxwidgets exception if this was no the case on some systems
+locale.setlocale(locale.LC_ALL, "C")
+
 
 if __name__ == "__main__":
     try:

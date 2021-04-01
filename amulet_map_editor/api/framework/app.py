@@ -1,12 +1,15 @@
 import wx
 from .amulet_ui import AmuletUI
-from amulet_map_editor import log
+# from amulet_map_editor import log
+# import locale
 
 
 class AmuletApp(wx.App):
     def __init__(self):
         super().__init__()
-        self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+        # log.info(str(locale.getdefaultlocale()))
+        # log.info(str(locale.getlocale()))
+        # self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
         self._frame = AmuletUI(None)
 
     # def InitLocale(self):
