@@ -81,8 +81,6 @@ class AmuletUI(wx.Frame):
             )
             update_check.check_for_update(__version__, self)
 
-        self.Show()
-
     def create_menu(self):
         menu_dict = {}
         menu_dict.setdefault("&File", {}).setdefault("system", {}).setdefault(

@@ -5,12 +5,14 @@ from .amulet_ui import AmuletUI
 
 
 class AmuletApp(wx.App):
-    def __init__(self):
-        super().__init__()
+    def OnInit(self):
         # log.info(str(locale.getdefaultlocale()))
         # log.info(str(locale.getlocale()))
         # self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
         self._frame = AmuletUI(None)
+        self.SetTopWindow(self._frame)
+        self._frame.Show()
+        return True
 
     # def InitLocale(self):
     #     # https://discuss.wxpython.org/t/what-is-wxpython-doing-to-the-locale-to-makes-pandas-crash/34606/18

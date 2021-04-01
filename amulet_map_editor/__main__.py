@@ -11,12 +11,14 @@ import traceback
 import locale
 
 # there was a wxwidgets exception if this was no the case on some systems
-locale.setlocale(locale.LC_ALL, "C")
+log.info(str(locale.getdefaultlocale()))
+log.info(str(locale.getlocale()))
+# locale.setlocale(locale.LC_ALL, "C")
 
 
 if __name__ == "__main__":
     try:
-        app = AmuletApp()
+        app = AmuletApp(0)
         app.MainLoop()
     except Exception as e:
         log.critical(
