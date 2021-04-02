@@ -161,7 +161,7 @@ class NBTEditor(simple.SimplePanel):
         tag_name, tag_obj = self.tree.GetItemData(evt.GetItem())
 
         menu = self._generate_menu(
-            isinstance(tag_obj, (MutableMapping, MutableSequence))
+            isinstance(tag_obj, (MutableMapping, MutableSequence, nbt.NBTFile))
         )
         self.PopupMenu(menu, evt.GetPoint())
         menu.Destroy()
@@ -265,6 +265,15 @@ class EditTagDialog(wx.Frame):
     GRID_ROWS = 3
     GRID_COLUMNS = 4
 
+    DEFAULT_VALUES = {
+        "TAG_Int": "0",
+        "TAG_Long": "0",
+        "TAG_Short": "0",
+        "TAG_Byte": "0",
+        "TAG_Float": "0.0",
+        "TAG_Double": "0.0"
+    }
+
     def __init__(
         self, parent, tag_name, tag, tag_types, create=False, save_callback=None
     ):
@@ -345,11 +354,18 @@ class EditTagDialog(wx.Frame):
 
     def value_changed(self, evt):
         tag_value = evt.GetString()
-        self.value_field.ChangeValue(str(self.data_type_func(tag_value)))
+        try:
+            self.value_field.ChangeValue(str(self.data_type_func(tag_value)))
+        except ValueError:
+            self.value_field.ChangeValue(self.DEFAULT_VALUES[tag_value])
 
     def handle_radio_button(self, tag_type, evt):
         for rd_btn in self.radio_buttons:
             rd_btn.SetValue(rd_btn.nbt_tag_class == tag_type)
+        if tag_type in ("TAG_Compound", "TAG_List"):
+            self.value_field.Disable()
+        elif not self.value_field.Enabled:
+            self.value_field.Enable()
         self.change_tag_type_func(tag_type)
 
     def change_tag_type_func(self, tag_type):
@@ -360,9 +376,12 @@ class EditTagDialog(wx.Frame):
             self.data_type_func = float
 
         if tag_type not in ("TAG_Byte_Array", "TAG_Int_Array", "TAG_Long_Array"):
-            self.value_field.ChangeValue(
-                str(self.data_type_func(self.value_field.GetValue()))
-            )
+            try:
+                self.value_field.ChangeValue(
+                    str(self.data_type_func(self.value_field.GetValue()))
+                )
+            except ValueError:
+                self.value_field.ChangeValue(self.DEFAULT_VALUES[tag_type])
 
     def get_selected_tag_type(self):
         for rd_btn in self.radio_buttons:
@@ -387,6 +406,6 @@ if __name__ == "__main__":
     app = wx.App()
     wx.lib.inspection.InspectionTool().Show()
     frame = wx.Frame(None)
-    NBTEditor(frame, nbt.load(NBT_FILE), callback=lambda nbt_data: print(nbt_data))
+    NBTEditor(frame, nbt.load(buffer=NBT_FILE), callback=lambda nbt_data: print(nbt_data))
     frame.Show()
     app.MainLoop()
