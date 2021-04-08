@@ -5,17 +5,16 @@ from OpenGL.GL import (
     GL_DEPTH_BUFFER_BIT,
 )
 import math
+import numpy
 
 from amulet.operations.paste import paste_iter
 
 from amulet_map_editor.api.opengl.camera import Projection
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
+from amulet_map_editor.api import image
 
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.events import EVT_PASTE
-from amulet_map_editor.programs.edit.api.ui.select_location import (
-    TransformChangeEvent,
-)
 
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
 from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import (
@@ -28,6 +27,7 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_INPUT_PRESS,
 )
 from amulet_map_editor.programs.edit.api.key_config import ACT_BOX_CLICK
+from amulet.utils.matrix import rotation_matrix_xyz, decompose_transformation_matrix
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -245,18 +245,26 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         self._free_rotation.Bind(wx.EVT_CHECKBOX, self._on_free_rotation_change)
 
-        sizer_6 = wx.BoxSizer(wx.HORIZONTAL)
+        rotate_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._paste_sizer.Add(
-            sizer_6, 1, wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
+            rotate_sizer,
+            1,
+            wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            5,
         )
 
-        self.button_3 = wx.Button(self._paste_panel, label="a")
-        self.button_3.SetMinSize((30, 30))
-        sizer_6.Add(self.button_3, 0, 0, 0)
+        self._rotate_left_button = wx.BitmapButton(
+            self._paste_panel, bitmap=image.icon.tablericons.rotate_2.bitmap(22, 22)
+        )
+        self._rotate_left_button.Bind(wx.EVT_BUTTON, self._on_rotate_left)
+        rotate_sizer.Add(self._rotate_left_button, 0, 0, 0)
 
-        self.button_4 = wx.Button(self._paste_panel, label="a")
-        self.button_4.SetMinSize((30, 30))
-        sizer_6.Add(self.button_4, 0, 0, 0)
+        self._rotate_right_button = wx.BitmapButton(
+            self._paste_panel,
+            bitmap=image.icon.tablericons.rotate_clockwise_2.bitmap(22, 22),
+        )
+        self._rotate_right_button.Bind(wx.EVT_BUTTON, self._on_rotate_right)
+        rotate_sizer.Add(self._rotate_right_button, 0, 0, 0)
 
         self._scale = TupleFloatInput(
             self._paste_panel, "sx", "sy", "sz", start_value=1
@@ -320,6 +328,43 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         else:
             self._rotation.increment = 90
 
+    def _on_rotate_left(self, evt):
+        self._rotate(-90)
+
+    def _on_rotate_right(self, evt):
+        self._rotate(90)
+
+    def _rotate(self, angle: int):
+        """Rotate the floating selection by the angle based on the camera rotation."""
+        angle = math.radians(angle)
+        ry, rx = self.canvas.camera.rotation
+        if rx < -45:
+            rotation_change = rotation_matrix_xyz(0, angle, 0)
+        if -45 <= rx < 45:
+            if -135 <= ry < -45:
+                # east
+                rotation_change = rotation_matrix_xyz(angle, 0, 0)
+            elif -45 <= ry < 45:
+                # south
+                rotation_change = rotation_matrix_xyz(0, 0, angle)
+            elif 45 <= ry < 135:
+                # west
+                rotation_change = rotation_matrix_xyz(-angle, 0, 0)
+            else:
+                # north
+                rotation_change = rotation_matrix_xyz(0, 0, -angle)
+        else:
+            rotation_change = rotation_matrix_xyz(0, -angle, 0)
+
+        self._rotation.value = numpy.rad2deg(
+            decompose_transformation_matrix(
+                numpy.matmul(
+                    rotation_change, rotation_matrix_xyz(*self._rotation_radians())
+                )
+            )[1]
+        )
+        self._update_transform()
+
     def _rotation_radians(self) -> Tuple[float, float, float]:
         return tuple(math.radians(v) for v in self._rotation.value)
 
@@ -333,13 +378,17 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             self._location.value = evt.point
         evt.Skip()
 
-    def _on_transform_change(self, evt: TransformChangeEvent):
+    def _on_transform_change(self, evt):
+        self._update_transform()
+        evt.Skip()
+
+    def _update_transform(self):
+        """Update the renderer with the new values."""
         self.canvas.renderer.fake_levels.active_transform = (
             self._location.value,
             self._scale.value,
             self._rotation_radians(),
         )
-        evt.Skip()
 
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == ACT_BOX_CLICK:
