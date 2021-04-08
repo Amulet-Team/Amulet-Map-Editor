@@ -161,12 +161,22 @@ class Camera(CanvasContainer):
             self._notify_moved()
 
     def set_rotation(self, camera_rotation: CameraRotationType) -> bool:
-        """Set the location of the camera. (x, y, z)."""
+        """Set the rotation of the camera. (yaw, pitch).
+        yaw (-180 to 180), pitch (-90 to 90)
+        This should behave the same as how Minecraft handles it."""
         assert (
             type(camera_rotation) in (tuple, list)
             and len(camera_rotation) == 2
             and all(type(v) in (int, float) for v in camera_rotation)
         ), "format for camera_rotation is invalid"
+        ry, rx = camera_rotation
+        if not -180 <= ry < 180:
+            ry %= 360
+            if ry >= 180:
+                ry -= 360
+        if not -90 <= rx <= 90:
+            rx = max(min(rx, 90), -90)
+        camera_rotation = (ry, rx)
         if camera_rotation != self._rotation:
             self._reset_matrix()
             self._rotation = tuple(camera_rotation)
