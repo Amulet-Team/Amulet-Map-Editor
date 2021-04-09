@@ -12,6 +12,7 @@ from OpenGL.GL import (
     GL_DEPTH_BUFFER_BIT,
     GL_POLYGON_BIT,
     glPopAttrib,
+    GL_ENABLE_BIT,
 )
 import itertools
 from typing import Tuple, Optional, Union
@@ -320,7 +321,9 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
-        glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT)  # store opengl state
+        glPushAttrib(
+            GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT | GL_ENABLE_BIT
+        )  # store opengl state
 
         if camera_position is not None and camera_position in self:
             glCullFace(GL_FRONT)
