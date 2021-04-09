@@ -27,7 +27,12 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_INPUT_PRESS,
 )
 from amulet_map_editor.programs.edit.api.key_config import ACT_BOX_CLICK
-from amulet.utils.matrix import rotation_matrix_xyz, decompose_transformation_matrix
+from amulet.utils.matrix import (
+    rotation_matrix_xyz,
+    decompose_transformation_matrix,
+    scale_matrix,
+    transform_matrix,
+)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -278,18 +283,28 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._paste_panel.Bind(wx.EVT_SPINCTRL, self._on_transform_change)
         self._paste_panel.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_transform_change)
 
-        sizer_5 = wx.BoxSizer(wx.HORIZONTAL)
+        mirror_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._paste_sizer.Add(
-            sizer_5, 1, wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
+            mirror_sizer,
+            1,
+            wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            5,
         )
 
-        self.button_1 = wx.Button(self._paste_panel, label="a")
-        self.button_1.SetMinSize((30, 30))
-        sizer_5.Add(self.button_1, 0, 0, 0)
+        # the tablericons file names are the wrong way around
+        self._mirror_horizontal_button = wx.BitmapButton(
+            self._paste_panel,
+            bitmap=image.icon.tablericons.flip_vertical.bitmap(22, 22),
+        )
+        self._mirror_horizontal_button.Bind(wx.EVT_BUTTON, self._on_mirror_horizontal)
+        mirror_sizer.Add(self._mirror_horizontal_button, 0, 0, 0)
 
-        self.button_2 = wx.Button(self._paste_panel, label="a")
-        self.button_2.SetMinSize((30, 30))
-        sizer_5.Add(self.button_2, 0, 0, 0)
+        self._mirror_vertical_button = wx.BitmapButton(
+            self._paste_panel,
+            bitmap=image.icon.tablericons.flip_horizontal.bitmap(22, 22),
+        )
+        self._mirror_vertical_button.Bind(wx.EVT_BUTTON, self._on_mirror_vertical)
+        mirror_sizer.Add(self._mirror_vertical_button, 0, 0, 0)
 
         confirm_button = wx.Button(self._paste_panel, label="Confirm")
         self._paste_sizer.Add(
@@ -340,7 +355,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         ry, rx = self.canvas.camera.rotation
         if rx < -45:
             rotation_change = rotation_matrix_xyz(0, angle, 0)
-        if -45 <= rx < 45:
+        elif -45 <= rx < 45:
             if -135 <= ry < -45:
                 # east
                 rotation_change = rotation_matrix_xyz(angle, 0, 0)
@@ -367,6 +382,45 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
     def _rotation_radians(self) -> Tuple[float, float, float]:
         return tuple(math.radians(v) for v in self._rotation.value)
+
+    def _on_mirror_vertical(self, evt):
+        ry, rx = self.canvas.camera.rotation
+        if -45 <= rx < 45:
+            # looking north, east, south or west vertical mirror is always in y
+            self._mirror(1)
+        elif -135 <= ry < -45 or 45 <= ry < 135:
+            # looking down or up facing east or west
+            self._mirror(0)
+        else:
+            # looking down or up facing north or south
+            self._mirror(2)
+
+    def _on_mirror_horizontal(self, evt):
+        ry, rx = self.canvas.camera.rotation
+        if -135 <= ry < -45 or 45 <= ry < 135:
+            # facing east or west
+            self._mirror(2)
+        else:
+            # facing north or south
+            self._mirror(0)
+
+    def _mirror(self, axis: int):
+        """Mirror the selection in the given axis.
+
+        :param axis: The axis to scale in 0=x, 1=y, 2=z
+        :return:
+        """
+        scale = [(-1, 1, 1), (1, -1, 1), (1, 1, -1)][axis]
+        self._scale.value, rotation, _ = decompose_transformation_matrix(
+            numpy.matmul(
+                scale_matrix(*scale),
+                transform_matrix(
+                    self._scale.value, self._rotation_radians(), (0, 0, 0)
+                ),
+            )
+        )
+        self._rotation.value = numpy.rad2deg(rotation)
+        self._update_transform()
 
     def _on_pointer_change(self, evt: PointChangeEvent):
         if self._moving:
