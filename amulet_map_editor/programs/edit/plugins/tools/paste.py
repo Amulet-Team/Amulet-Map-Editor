@@ -6,10 +6,12 @@ from OpenGL.GL import (
 )
 import math
 import numpy
+import weakref
 
 from amulet.operations.paste import paste_iter
+from amulet.api.data_types import PointCoordinates
 
-from amulet_map_editor.api.opengl.camera import Projection
+from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.api import image
 
@@ -32,6 +34,10 @@ from amulet.utils.matrix import (
     decompose_transformation_matrix,
     scale_matrix,
     transform_matrix,
+)
+from amulet_map_editor.programs.edit.api.ui.nudge_button import NudgeButton
+from amulet_map_editor.programs.edit.api.key_config import (
+    KeybindGroup,
 )
 
 if TYPE_CHECKING:
@@ -189,6 +195,25 @@ class RotationTupleInput(TupleFloatInput):
         self._round_value(self.z)
 
 
+class MoveButton(NudgeButton):
+    def __init__(
+        self,
+        parent: wx.Window,
+        camera: Camera,
+        keybinds: KeybindGroup,
+        label: str,
+        tooltip: str,
+        paste_tool: "PasteTool",
+    ):
+        super().__init__(parent, camera, keybinds, label, tooltip)
+        self._paste_tool = weakref.ref(paste_tool)
+
+    def _move(self, offset: Tuple[int, int, int]):
+        ox, oy, oz = offset
+        x, y, z = self._paste_tool().location
+        self._paste_tool().location = x + ox, y + oy, z + oz
+
+
 class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
@@ -229,6 +254,20 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._location = TupleIntInput(self._paste_panel, "x", "y", "z")
         self._paste_sizer.Add(
             self._location,
+            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            border=5,
+        )
+
+        self._move_button = MoveButton(
+            self._paste_panel,
+            self.canvas.camera,
+            self.canvas.key_binds,
+            "Move Selection",
+            "press to move the selection",
+            self,
+        )
+        self._paste_sizer.Add(
+            self._move_button,
             flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
             border=5,
         )
@@ -329,13 +368,27 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
     def enable(self):
         super().enable()
+        self._move_button.enable()
         self._selection.update_selection()
         self._moving = False
 
     def disable(self):
         super().disable()
+        self._move_button.disable()
         self._paste_panel.Disable()
         self.canvas.renderer.fake_levels.clear()
+
+    @property
+    def location(self) -> PointCoordinates:
+        """The location as specified in the UI."""
+        return self._location.value
+
+    @location.setter
+    def location(self, location: PointCoordinates):
+        """Set the location value.
+        Will update the UI and the renderer."""
+        self._location.value = location
+        self._update_transform()
 
     def _on_free_rotation_change(self, evt):
         if self._free_rotation.GetValue():
