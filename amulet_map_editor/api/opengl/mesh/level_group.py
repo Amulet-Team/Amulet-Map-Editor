@@ -1,5 +1,13 @@
 from typing import List, Optional, Tuple, Any
 import numpy
+from OpenGL.GL import (
+    glCullFace,
+    GL_FRONT,
+    GL_BACK,
+    glPushAttrib,
+    GL_POLYGON_BIT,
+    glPopAttrib,
+)
 
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import FloatTriplet, PointCoordinates, Dimension
@@ -42,6 +50,7 @@ class LevelGroup(
         self._transforms: List[TransformType] = []
         self._world_translation: List[LocationType] = []
         self._transformation_matrices: List[numpy.ndarray] = []
+        self._front_face: List[bool] = []
         self._active_level_index: Optional[int] = None
         self._camera_location: LocationType = (0.0, 100.0, 0.0)
 
@@ -72,6 +81,9 @@ class LevelGroup(
         if self._active_level_index is not None:
             location, scale, rotation = location_scale_rotation
             self._transforms[self._active_level_index] = (location, scale, rotation)
+            self._front_face[self._active_level_index] = bool(
+                sum(1 for s in scale if s < 0) % 2
+            )
             self._transformation_matrices[self._active_level_index] = numpy.matmul(
                 transform_matrix(scale, rotation, location),
                 displacement_matrix(*self._world_translation[self._active_level_index]),
@@ -117,6 +129,7 @@ class LevelGroup(
         self.register(render_level)
         # the transforms (tuple) applied by the user
         self._transforms.append((location, scale, rotation))
+        self._front_face.append(bool(sum(1 for s in scale if s < 0) % 2))
         self._world_translation.append(
             (
                 -(
@@ -152,6 +165,7 @@ class LevelGroup(
         for level in self._objects.copy():
             self.unregister(level)
         self._transforms.clear()
+        self._front_face.clear()
         self._world_translation.clear()
         self._transformation_matrices.clear()
         self._active_level_index = None
@@ -171,5 +185,13 @@ class LevelGroup(
 
     def draw(self, camera_matrix: numpy.ndarray):
         """Draw all of the levels."""
-        for level, transform in zip(self._objects, self._transformation_matrices):
+        for level, transform, front_face in zip(
+            self._objects, self._transformation_matrices, self._front_face
+        ):
+            glPushAttrib(GL_POLYGON_BIT)  # store opengl state
+            if front_face:
+                glCullFace(GL_FRONT)
+            else:
+                glCullFace(GL_BACK)
             level.draw(numpy.matmul(camera_matrix, transform))
+            glPopAttrib()  # reset to starting state
