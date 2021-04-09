@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+import sys
 from functools import partial
 from collections.abc import MutableMapping, MutableSequence
 
@@ -207,7 +209,7 @@ class NBTEditor(simple.SimplePanel):
             self.nbt_data[new_name] = nbt_tag = tag_type(new_tag_value)
 
             new_child = self.tree.AppendItem(
-                selected_tag, f"{new_name}: {new_tag_value}"
+                selected_tag, f"{new_name}: {new_tag_value}" if not isinstance(nbt_tag, (nbt.TAG_Compound, nbt.TAG_List)) else new_name
             )
             self.tree.SetItemImage(new_child, self.image_map.get(tag_type, self.other))
             self.tree.SetItemData(new_child, (new_name, nbt_tag))
@@ -271,7 +273,9 @@ class EditTagDialog(wx.Frame):
         "TAG_Short": "0",
         "TAG_Byte": "0",
         "TAG_Float": "0.0",
-        "TAG_Double": "0.0"
+        "TAG_Double": "0.0",
+        "TAG_List": "[]",
+        "TAG_Compound": "{}"
     }
 
     def __init__(
@@ -370,17 +374,22 @@ class EditTagDialog(wx.Frame):
 
     def change_tag_type_func(self, tag_type):
         self.data_type_func = lambda x: x
-        if tag_type in ("TAG_Int", "TAG_Long", "TAG_Short", "TAG_Short", "TAG_Byte"):
-            self.data_type_func = lambda x: int(float(x))
+        value_field = ast.literal_eval(self.value_field.GetValue())
+        if tag_type in ("TAG_Int", "TAG_Long", "TAG_Short", "TAG_Byte"):
+            self.data_type_func = int
         elif tag_type in ("TAG_Float", "TAG_Double"):
             self.data_type_func = float
+        elif tag_type == "TAG_Compound":
+            self.data_type_func = dict
+        elif tag_type == "TAG_List":
+            self.data_type_func = list
 
         if tag_type not in ("TAG_Byte_Array", "TAG_Int_Array", "TAG_Long_Array"):
             try:
                 self.value_field.ChangeValue(
-                    str(self.data_type_func(self.value_field.GetValue()))
+                    str(self.data_type_func(value_field))
                 )
-            except ValueError:
+            except (ValueError, TypeError):
                 self.value_field.ChangeValue(self.DEFAULT_VALUES[tag_type])
 
     def get_selected_tag_type(self):
@@ -392,7 +401,7 @@ class EditTagDialog(wx.Frame):
     def save(self, evt):
         self.save_callback(
             self.name_field.GetValue(),
-            self.data_type_func(self.value_field.GetValue()),
+            self.data_type_func(ast.literal_eval(self.value_field.GetValue())),
             self.get_selected_tag_type(),
             self.old_name,
         )
@@ -401,11 +410,14 @@ class EditTagDialog(wx.Frame):
 
 
 if __name__ == "__main__":
-    import wx.lib.inspection
+    #import wx.lib.inspection
 
     app = wx.App()
-    wx.lib.inspection.InspectionTool().Show()
+    #wx.lib.inspection.InspectionTool().Show()
     frame = wx.Frame(None)
-    NBTEditor(frame, nbt.load(buffer=NBT_FILE), callback=lambda nbt_data: print(nbt_data))
+    if len(sys.argv) > 1:
+        NBTEditor(frame, nbt.load(sys.argv[1]), callback=lambda nbt_data: print(nbt_data))
+    else:
+        NBTEditor(frame, nbt.load(buffer=NBT_FILE), callback=lambda nbt_data: print(nbt_data))
     frame.Show()
     app.MainLoop()
