@@ -94,10 +94,16 @@ def create_lod0_array(
     chunk_verts_translucent = []
 
     x, y, z = blocks.shape
-    block_locations = numpy.transpose(numpy.mgrid[0:x, 0:y, 0:z], (1,2,3,0)).reshape((-1, 3))
-    unique_blocks, inverse, counts = numpy.unique(blocks, return_inverse=True, return_counts=True)
+    block_locations = numpy.transpose(numpy.mgrid[0:x, 0:y, 0:z], (1, 2, 3, 0)).reshape(
+        (-1, 3)
+    )
+    unique_blocks, inverse, counts = numpy.unique(
+        blocks, return_inverse=True, return_counts=True
+    )
     block_indexes = numpy.argsort(inverse)
-    block_locations = numpy.split(block_locations[block_indexes], numpy.cumsum(counts)[:-1])
+    block_locations = numpy.split(
+        block_locations[block_indexes], numpy.cumsum(counts)[:-1]
+    )
 
     for block_temp_id, all_block_locations in zip(unique_blocks, block_locations):
         model = models[block_temp_id]
@@ -239,7 +245,9 @@ class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
             for texture_path in model.textures
         }
 
-        for (larger_blocks, offset), unique_blocks in zip(blocks, unique_sub_chunk_blocks):
+        for (larger_blocks, offset), unique_blocks in zip(
+            blocks, unique_sub_chunk_blocks
+        ):
             chunk_verts_, chunk_verts_translucent_ = create_lod0_array(
                 larger_blocks,
                 unique_blocks,
