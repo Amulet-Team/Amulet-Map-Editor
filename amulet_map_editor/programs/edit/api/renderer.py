@@ -90,6 +90,7 @@ class Renderer(EditCanvasContainer):
             self._draw_timer,
         )
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_moved)
+        self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy)
 
     def enable(self):
         """Enable and start working."""
@@ -100,6 +101,10 @@ class Renderer(EditCanvasContainer):
         self.disable_threads()
         self.render_world.unload()
         self.fake_levels.unload()
+
+    def _on_destroy(self, evt):
+        self.disable()
+        evt.Skip()
 
     def is_closeable(self):
         """Check that the data is safe to be closed."""
