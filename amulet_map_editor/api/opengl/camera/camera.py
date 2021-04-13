@@ -71,6 +71,9 @@ class ProjectionChangedEvent(wx.PyEvent):
 class Camera(CanvasContainer):
     """A class to hold the state information of the camera."""
 
+    _projection_matrix: Optional[TransformationMatrixType]
+    _transformation_matrix: Optional[TransformationMatrixType]
+
     __slots__ = (
         "_location",
         "_rotation",
@@ -304,6 +307,7 @@ class Camera(CanvasContainer):
                 self._projection_matrix = self.orthographic_matrix
             else:
                 self._projection_matrix = self.perspective_matrix
+            self._projection_matrix.flags.writeable = False
 
         return self._projection_matrix
 
@@ -330,5 +334,6 @@ class Camera(CanvasContainer):
                 self.projection_matrix,
                 self.camera_matrix,
             )
+            self._transformation_matrix.flags.writeable = False
 
         return self._transformation_matrix
