@@ -8,16 +8,24 @@ import math
 import numpy
 import weakref
 
-from amulet.operations.paste import paste_iter
 from amulet.api.data_types import PointCoordinates
+from amulet.operations.paste import paste_iter
+from amulet.utils.matrix import (
+    rotation_matrix_xyz,
+    decompose_transformation_matrix,
+    scale_matrix,
+    transform_matrix,
+)
 
+from amulet_map_editor import lang
+from amulet_map_editor.api import image
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
-from amulet_map_editor.api import image
-
+from amulet_map_editor.programs.edit.api.key_config import (
+    KeybindGroup,
+)
+from amulet_map_editor.programs.edit.api.ui.nudge_button import NudgeButton
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
-from amulet_map_editor.programs.edit.api.events import EVT_PASTE
-
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
 from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import (
     PointerBehaviour,
@@ -25,20 +33,11 @@ from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import (
     PointChangeEvent,
 )
 from amulet_map_editor.programs.edit.api.events import (
+    EVT_PASTE,
     InputPressEvent,
     EVT_INPUT_PRESS,
 )
 from amulet_map_editor.programs.edit.api.key_config import ACT_BOX_CLICK
-from amulet.utils.matrix import (
-    rotation_matrix_xyz,
-    decompose_transformation_matrix,
-    scale_matrix,
-    transform_matrix,
-)
-from amulet_map_editor.programs.edit.api.ui.nudge_button import NudgeButton
-from amulet_map_editor.programs.edit.api.key_config import (
-    KeybindGroup,
-)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -249,11 +248,11 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             self._paste_sizer.Add(line, 0, wx.BOTTOM | wx.EXPAND, 5)
 
         def add_tick_box(name: str, state: bool = True):
-            tick = wx.CheckBox(self._paste_panel, label=name, style=wx.ALIGN_RIGHT)
+            tick = wx.CheckBox(self._paste_panel, label=name)
             tick.SetValue(state)
             self._paste_sizer.Add(
                 tick,
-                flag=BottomLeftRightCentre,
+                flag=BottomLeftRight,
                 border=5,
             )
             return tick
@@ -272,8 +271,16 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             self._paste_sizer.Add(label, 0, BottomLeftRightCentre, 5)
 
         self._paste_sizer.AddSpacer(5)
-        add_label("Location")
-        self._location = TupleIntInput(self._paste_panel, "x", "y", "z")
+        add_label(lang.get("program_3d_edit.paste_tool.location_label"))
+        self._location = TupleIntInput(
+            self._paste_panel,
+            lang.get("program_3d_edit.paste_tool.location_x_label"),
+            lang.get("program_3d_edit.paste_tool.location_y_label"),
+            lang.get("program_3d_edit.paste_tool.location_z_label"),
+        )
+        self._location.x.SetToolTip(lang.get("program_3d_edit.paste_tool.location_x_tooltip"))
+        self._location.y.SetToolTip(lang.get("program_3d_edit.paste_tool.location_y_tooltip"))
+        self._location.z.SetToolTip(lang.get("program_3d_edit.paste_tool.location_z_tooltip"))
         self._paste_sizer.Add(
             self._location,
             flag=BottomLeftRightExpand,
@@ -284,29 +291,38 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             self._paste_panel,
             self.canvas.camera,
             self.canvas.key_binds,
-            "Move Selection",
-            "press to move the selection",
+            lang.get("program_3d_edit.paste_tool.move_selection_label"),
+            lang.get("program_3d_edit.paste_tool.move_selection_tooltip"),
             self,
         )
         self._paste_sizer.Add(
             self._move_button,
-            flag=BottomLeftRightCentre,
+            flag=BottomLeftRightExpand,
             border=5,
         )
 
         add_line()
 
-        add_label("Rotation")
+        add_label(lang.get("program_3d_edit.paste_tool.rotation_label"))
         self._free_rotation = wx.CheckBox(
-            self._paste_panel, label="Free Rotation", style=wx.ALIGN_RIGHT
+            self._paste_panel, label=lang.get("program_3d_edit.paste_tool.free_rotation_label")
         )
+        self._free_rotation.SetToolTip(lang.get("program_3d_edit.paste_tool.free_rotation_tooltip"))
         self._paste_sizer.Add(
             self._free_rotation,
-            flag=BottomLeftRightCentre,
+            flag=BottomLeftRight,
             border=5,
         )
 
-        self._rotation = RotationTupleInput(self._paste_panel, "x", "y", "z")
+        self._rotation = RotationTupleInput(
+            self._paste_panel,
+            lang.get("program_3d_edit.paste_tool.rotation_x_label"),
+            lang.get("program_3d_edit.paste_tool.rotation_y_label"),
+            lang.get("program_3d_edit.paste_tool.rotation_z_label"),
+        )
+        self._rotation.x.SetToolTip(lang.get("program_3d_edit.paste_tool.rotation_x_tooltip"))
+        self._rotation.y.SetToolTip(lang.get("program_3d_edit.paste_tool.rotation_y_tooltip"))
+        self._rotation.z.SetToolTip(lang.get("program_3d_edit.paste_tool.rotation_z_tooltip"))
         self._paste_sizer.Add(
             self._rotation,
             flag=BottomLeftRightExpand,
@@ -324,6 +340,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._rotate_left_button = wx.BitmapButton(
             self._paste_panel, bitmap=image.icon.tablericons.rotate_2.bitmap(22, 22)
         )
+        self._rotate_left_button.SetToolTip(lang.get("program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip"))
         self._rotate_left_button.Bind(wx.EVT_BUTTON, self._on_rotate_left)
         rotate_sizer.Add(self._rotate_left_button, 0, 0, 0)
 
@@ -331,13 +348,23 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             self._paste_panel,
             bitmap=image.icon.tablericons.rotate_clockwise_2.bitmap(22, 22),
         )
+        self._rotate_right_button.SetToolTip(lang.get("program_3d_edit.paste_tool.rotate_clockwise_tooltip"))
         self._rotate_right_button.Bind(wx.EVT_BUTTON, self._on_rotate_right)
         rotate_sizer.Add(self._rotate_right_button, 0, 0, 0)
 
         add_line()
 
-        add_label("Scale")
-        self._scale = TupleFloatInput(self._paste_panel, "x", "y", "z", start_value=1)
+        add_label(lang.get("program_3d_edit.paste_tool.scale_label"))
+        self._scale = TupleFloatInput(
+            self._paste_panel,
+            lang.get("program_3d_edit.paste_tool.scale_x_label"),
+            lang.get("program_3d_edit.paste_tool.scale_y_label"),
+            lang.get("program_3d_edit.paste_tool.scale_z_label"),
+            start_value=1
+        )
+        self._scale.x.SetToolTip(lang.get("program_3d_edit.paste_tool.scale_x_tooltip"))
+        self._scale.y.SetToolTip(lang.get("program_3d_edit.paste_tool.scale_y_tooltip"))
+        self._scale.z.SetToolTip(lang.get("program_3d_edit.paste_tool.scale_z_tooltip"))
         self._paste_sizer.Add(
             self._scale,
             flag=BottomLeftRightExpand,
@@ -359,6 +386,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             self._paste_panel,
             bitmap=image.icon.tablericons.flip_vertical.bitmap(22, 22),
         )
+        self._mirror_horizontal_button.SetToolTip(lang.get("program_3d_edit.paste_tool.mirror_horizontal_tooltip"))
         self._mirror_horizontal_button.Bind(wx.EVT_BUTTON, self._on_mirror_horizontal)
         mirror_sizer.Add(self._mirror_horizontal_button, 0, 0, 0)
 
@@ -366,14 +394,18 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             self._paste_panel,
             bitmap=image.icon.tablericons.flip_horizontal.bitmap(22, 22),
         )
+        self._mirror_vertical_button.SetToolTip(lang.get("program_3d_edit.paste_tool.mirror_vertical_tooltip"))
         self._mirror_vertical_button.Bind(wx.EVT_BUTTON, self._on_mirror_vertical)
         mirror_sizer.Add(self._mirror_vertical_button, 0, 0, 0)
 
         add_line()
 
-        self._copy_air = add_tick_box("Copy Air")
-        self._copy_water = add_tick_box("Copy Water")
-        self._copy_lava = add_tick_box("Copy Lava")
+        self._copy_air = add_tick_box(lang.get("program_3d_edit.paste_tool.copy_air_label"))
+        self._copy_air.SetToolTip(lang.get("program_3d_edit.paste_tool.copy_air_tooltip"))
+        self._copy_water = add_tick_box(lang.get("program_3d_edit.paste_tool.copy_water_label"))
+        self._copy_water.SetToolTip(lang.get("program_3d_edit.paste_tool.copy_water_tooltip"))
+        self._copy_lava = add_tick_box(lang.get("program_3d_edit.paste_tool.copy_lava_label"))
+        self._copy_lava.SetToolTip(lang.get("program_3d_edit.paste_tool.copy_lava_tooltip"))
 
         add_line()
 
