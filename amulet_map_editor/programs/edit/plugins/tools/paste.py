@@ -146,6 +146,16 @@ class RotationTupleInput(TupleFloatInput):
         self.z.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_change)
 
     @property
+    def value(self) -> Tuple[float, float, float]:
+        return self.x.GetValue(), self.y.GetValue(), self.z.GetValue()
+
+    @value.setter
+    def value(self, value: Tuple[float, float, float]):
+        self.x.SetValue(round(value[0]))
+        self.y.SetValue(round(value[1]))
+        self.z.SetValue(round(value[2]))
+
+    @property
     def rotation_radians(self) -> Tuple[float, float, float]:
         return (
             math.radians(self.x.GetValue()),
