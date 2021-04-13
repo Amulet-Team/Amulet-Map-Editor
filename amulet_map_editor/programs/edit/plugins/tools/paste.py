@@ -43,6 +43,10 @@ from amulet_map_editor.programs.edit.api.key_config import (
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
+BottomLeftRight = wx.BOTTOM | wx.LEFT | wx.RIGHT
+BottomLeftRightCentre = BottomLeftRight | wx.ALIGN_CENTER_HORIZONTAL
+BottomLeftRightExpand = BottomLeftRight | wx.EXPAND
+
 
 class TupleInput(wx.FlexGridSizer):
     WindowCls: Union[Type[wx.SpinCtrl], Type[wx.SpinCtrlDouble]] = None
@@ -61,25 +65,26 @@ class TupleInput(wx.FlexGridSizer):
         super().__init__(3, 2, 5, 5)
 
         x_label = wx.StaticText(parent, label=x_str)
-        self.Add(x_label, 0, wx.ALIGN_CENTER, 5)
+        self.Add(x_label, 0, wx.ALIGN_CENTER)
         self.x = self.WindowCls(
             parent, min=min_value, max=max_value, initial=start_value, style=style
         )
-        self.Add(self.x, 0, wx.ALIGN_CENTER, 5)
+        self.Add(self.x, 0, wx.EXPAND)
 
         y_label = wx.StaticText(parent, label=y_str)
-        self.Add(y_label, 0, wx.ALIGN_CENTER, 5)
+        self.Add(y_label, 0, wx.ALIGN_CENTER)
         self.y = self.WindowCls(
             parent, min=min_value, max=max_value, initial=start_value, style=style
         )
-        self.Add(self.y, 0, wx.ALIGN_CENTER, 0)
+        self.Add(self.y, 0, wx.EXPAND)
 
         z_label = wx.StaticText(parent, label=z_str)
-        self.Add(z_label, 0, wx.ALIGN_CENTER, 5)
+        self.Add(z_label, 0, wx.ALIGN_CENTER)
         self.z = self.WindowCls(
             parent, min=min_value, max=max_value, initial=start_value, style=style
         )
-        self.Add(self.z, 0, wx.ALIGN_CENTER, 0)
+        self.Add(self.z, 0, wx.EXPAND)
+        self.AddGrowableCol(1)
 
     @property
     def value(self):
@@ -228,33 +233,40 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._paste_panel.SetSizer(self._paste_sizer)
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
-        self._copy_air = wx.CheckBox(
-            self._paste_panel, label="Copy Air", style=wx.ALIGN_RIGHT
-        )
-        self._paste_sizer.Add(self._copy_air, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 5)
+        def add_line():
+            """add a line to the UI"""
+            line = wx.StaticLine(self._paste_panel)
+            self._paste_sizer.Add(line, 0, wx.BOTTOM | wx.EXPAND, 5)
 
-        self._copy_water = wx.CheckBox(
-            self._paste_panel, label="Copy Water", style=wx.ALIGN_RIGHT
-        )
-        self._paste_sizer.Add(
-            self._copy_water,
-            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
-            border=5,
-        )
+        def add_tick_box(name: str, state: bool = True):
+            tick = wx.CheckBox(self._paste_panel, label=name, style=wx.ALIGN_RIGHT)
+            tick.SetValue(state)
+            self._paste_sizer.Add(
+                tick,
+                flag=BottomLeftRightCentre,
+                border=5,
+            )
+            return tick
 
-        self._copy_lava = wx.CheckBox(
-            self._paste_panel, label="Copy Lava", style=wx.ALIGN_RIGHT
-        )
-        self._paste_sizer.Add(
-            self._copy_lava,
-            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
-            border=5,
-        )
+        def add_label(name: str):
+            label = wx.StaticText(self._paste_panel, label=name)
+            label.SetFont(
+                wx.Font(
+                    12,
+                    wx.FONTFAMILY_DEFAULT,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_NORMAL,
+                    True,
+                )
+            )
+            self._paste_sizer.Add(label, 0, BottomLeftRightCentre, 5)
 
+        self._paste_sizer.AddSpacer(5)
+        add_label("Location")
         self._location = TupleIntInput(self._paste_panel, "x", "y", "z")
         self._paste_sizer.Add(
             self._location,
-            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            flag=BottomLeftRightExpand,
             border=5,
         )
 
@@ -268,23 +280,26 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         self._paste_sizer.Add(
             self._move_button,
-            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            flag=BottomLeftRightCentre,
             border=5,
         )
 
+        add_line()
+
+        add_label("Rotation")
         self._free_rotation = wx.CheckBox(
             self._paste_panel, label="Free Rotation", style=wx.ALIGN_RIGHT
         )
         self._paste_sizer.Add(
             self._free_rotation,
-            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            flag=BottomLeftRightCentre,
             border=5,
         )
 
-        self._rotation = RotationTupleInput(self._paste_panel, "rx", "ry", "rz")
+        self._rotation = RotationTupleInput(self._paste_panel, "x", "y", "z")
         self._paste_sizer.Add(
             self._rotation,
-            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            flag=BottomLeftRightExpand,
             border=5,
         )
         self._free_rotation.Bind(wx.EVT_CHECKBOX, self._on_free_rotation_change)
@@ -292,9 +307,8 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         rotate_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._paste_sizer.Add(
             rotate_sizer,
-            1,
-            wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
-            5,
+            flag=BottomLeftRightCentre,
+            border=5,
         )
 
         self._rotate_left_button = wx.BitmapButton(
@@ -310,12 +324,13 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._rotate_right_button.Bind(wx.EVT_BUTTON, self._on_rotate_right)
         rotate_sizer.Add(self._rotate_right_button, 0, 0, 0)
 
-        self._scale = TupleFloatInput(
-            self._paste_panel, "sx", "sy", "sz", start_value=1
-        )
+        add_line()
+
+        add_label("Scale")
+        self._scale = TupleFloatInput(self._paste_panel, "x", "y", "z", start_value=1)
         self._paste_sizer.Add(
             self._scale,
-            flag=wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
+            flag=BottomLeftRightExpand,
             border=5,
         )
 
@@ -325,9 +340,8 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         mirror_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._paste_sizer.Add(
             mirror_sizer,
-            1,
-            wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.LEFT | wx.RIGHT,
-            5,
+            flag=BottomLeftRightCentre,
+            border=5,
         )
 
         # the tablericons file names are the wrong way around
@@ -345,10 +359,16 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._mirror_vertical_button.Bind(wx.EVT_BUTTON, self._on_mirror_vertical)
         mirror_sizer.Add(self._mirror_vertical_button, 0, 0, 0)
 
+        add_line()
+
+        self._copy_air = add_tick_box("Copy Air")
+        self._copy_water = add_tick_box("Copy Water")
+        self._copy_lava = add_tick_box("Copy Lava")
+
+        add_line()
+
         confirm_button = wx.Button(self._paste_panel, label="Confirm")
-        self._paste_sizer.Add(
-            confirm_button, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT | wx.EXPAND, 5
-        )
+        self._paste_sizer.Add(confirm_button, 0, BottomLeftRightExpand, 5)
         confirm_button.Bind(wx.EVT_BUTTON, self._paste_confirm)
 
         self._paste_panel.Disable()
