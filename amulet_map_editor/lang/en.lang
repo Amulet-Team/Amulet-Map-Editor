@@ -92,6 +92,7 @@ program_3d_edit.paste_tool.copy_lava_label=Copy Lava
 program_3d_edit.paste_tool.copy_lava_tooltip=If enabled all lava blocks in the pasted structure will be applied overwriting any existing blocks. If disabled the existing blocks at those locations will remain and lava will not be copied.
 program_3d_edit.paste_tool.confirm_label=Confirm
 program_3d_edit.paste_tool.confirm_tooltip=Click to paste the structure into the world and the specified location, rotation and scale.
+program_3d_edit.paste_tool.zero_scale_message=One of the scale values had a value of zero so nothing was copied.
 
 program_3d_edit.chunk_tool.min_y=Min Y
 program_3d_edit.chunk_tool.min_y_tooltip=The minimum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.

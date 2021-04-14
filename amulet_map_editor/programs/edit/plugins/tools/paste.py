@@ -24,6 +24,7 @@ from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.programs.edit.api.key_config import (
     KeybindGroup,
 )
+from amulet_map_editor.programs.edit.api.operations import OperationSuccessful
 from amulet_map_editor.programs.edit.api.ui.nudge_button import NudgeButton
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
@@ -597,13 +598,13 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         self._moving = True
 
-    def _paste_confirm(self, evt):
-        fake_levels = self.canvas.renderer.fake_levels
-        level_index: int = fake_levels.active_level_index
-        if level_index is not None:
-            render_level: RenderLevel = fake_levels.render_levels[level_index]
-            self.canvas.run_operation(
-                lambda: paste_iter(
+    def _paste_operation(self):
+        if all(self._scale.value):
+            fake_levels = self.canvas.renderer.fake_levels
+            level_index: int = fake_levels.active_level_index
+            if level_index is not None:
+                render_level: RenderLevel = fake_levels.render_levels[level_index]
+                yield from paste_iter(
                     self.canvas.world,
                     self.canvas.dimension,
                     render_level.level,
@@ -615,7 +616,13 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
                     self._copy_water.GetValue(),
                     self._copy_lava.GetValue(),
                 )
+        else:
+            raise OperationSuccessful(
+                lang.get("program_3d_edit.paste_tool.zero_scale_message")
             )
+
+    def _paste_confirm(self, evt):
+        self.canvas.run_operation(self._paste_operation)
 
     def _on_draw(self, evt):
         self.canvas.renderer.start_draw()

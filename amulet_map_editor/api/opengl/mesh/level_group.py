@@ -97,9 +97,12 @@ class LevelGroup(
 
     def _set_camera_location(self):
         for level, transform in zip(self._objects, self._transformation_matrices):
-            level.camera_location = numpy.matmul(
-                numpy.linalg.inv(transform), (*self._camera_location, 1)
-            ).tolist()[:-1]
+            try:
+                level.camera_location = numpy.matmul(
+                    numpy.linalg.inv(transform), (*self._camera_location, 1)
+                ).tolist()[:-1]
+            except numpy.linalg.LinAlgError:
+                pass
 
     def set_camera_rotation(self, yaw: float, pitch: float):
         """Set the rotation of the camera for each of the levels."""
