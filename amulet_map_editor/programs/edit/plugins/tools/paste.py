@@ -376,6 +376,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._scale.x.SetToolTip(lang.get("program_3d_edit.paste_tool.scale_x_tooltip"))
         self._scale.y.SetToolTip(lang.get("program_3d_edit.paste_tool.scale_y_tooltip"))
         self._scale.z.SetToolTip(lang.get("program_3d_edit.paste_tool.scale_z_tooltip"))
+        self._scale.x.SetDigits(2)
+        self._scale.y.SetDigits(2)
+        self._scale.z.SetDigits(2)
         self._paste_sizer.Add(
             self._scale,
             flag=BottomLeftRightExpand,
