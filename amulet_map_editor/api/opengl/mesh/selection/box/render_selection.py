@@ -13,6 +13,8 @@ from OpenGL.GL import (
     GL_POLYGON_BIT,
     glPopAttrib,
     GL_ENABLE_BIT,
+    glGetIntegerv,
+    GL_CULL_FACE_MODE,
 )
 import itertools
 from typing import Tuple, Optional, Union
@@ -326,9 +328,11 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         )  # store opengl state
 
         if camera_position is not None and camera_position in self:
-            glCullFace(GL_FRONT)
-        else:
-            glCullFace(GL_BACK)
+            mode = glGetIntegerv(GL_CULL_FACE_MODE)
+            if mode == GL_BACK:
+                glCullFace(GL_FRONT)
+            elif mode == GL_FRONT:
+                glCullFace(GL_BACK)
 
         self.draw_start = 0
         self.draw_count = 36
