@@ -113,6 +113,15 @@ class TupleIntInput(TupleInput):
 class TupleFloatInput(TupleInput):
     WindowCls = wx.SpinCtrlDouble
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.x.Bind(wx.EVT_MOUSEWHEEL, self._on_wheel)
+        self.y.Bind(wx.EVT_MOUSEWHEEL, self._on_wheel)
+        self.z.Bind(wx.EVT_MOUSEWHEEL, self._on_wheel)
+        self.x.SetIncrement(1)
+        self.y.SetIncrement(1)
+        self.z.SetIncrement(1)
+
     @property
     def value(self) -> Tuple[float, float, float]:
         return self.x.GetValue(), self.y.GetValue(), self.z.GetValue()
@@ -122,6 +131,24 @@ class TupleFloatInput(TupleInput):
         self.x.SetValue(value[0])
         self.y.SetValue(value[1])
         self.z.SetValue(value[2])
+
+    def _on_wheel(self, evt: wx.MouseEvent):
+        """Add scroll wheel behaviour to the input."""
+        rotation = evt.GetWheelRotation()
+        ctrl = evt.GetEventObject()
+        if rotation > 0:
+            ctrl.SetValue(ctrl.GetValue() + ctrl.GetIncrement())
+            self._changed(ctrl)
+        elif rotation < 0:
+            ctrl.SetValue(ctrl.GetValue() - ctrl.GetIncrement())
+            self._changed(ctrl)
+
+    @staticmethod
+    def _changed(ctrl: wx.SpinCtrlDouble):
+        """Create a changed event for the SpinCtrlDouble."""
+        evt = wx.SpinDoubleEvent(wx.wxEVT_SPINCTRLDOUBLE, ctrl.GetId(), ctrl.GetValue())
+        evt.SetEventObject(ctrl)
+        wx.PostEvent(ctrl, evt)
 
 
 class RotationTupleInput(TupleFloatInput):
@@ -137,9 +164,6 @@ class RotationTupleInput(TupleFloatInput):
             parent, x_str, y_str, z_str, -180, 180, style=wx.SP_ARROW_KEYS | wx.SP_WRAP
         )
         self.increment = increment
-        self.x.Bind(wx.EVT_MOUSEWHEEL, self._on_wheel)
-        self.y.Bind(wx.EVT_MOUSEWHEEL, self._on_wheel)
-        self.z.Bind(wx.EVT_MOUSEWHEEL, self._on_wheel)
         self.x.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_change)
         self.y.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_change)
         self.z.Bind(wx.EVT_SPINCTRLDOUBLE, self._on_change)
@@ -174,28 +198,14 @@ class RotationTupleInput(TupleFloatInput):
         self.z.SetIncrement(increment)
         self._round_values()
 
-    def _on_wheel(self, evt: wx.MouseEvent):
-        rotation = evt.GetWheelRotation()
-        ctrl = evt.GetEventObject()
-        if rotation > 0:
-            ctrl.SetValue(ctrl.GetValue() + ctrl.GetIncrement())
-            self._changed(ctrl)
-        elif rotation < 0:
-            ctrl.SetValue(ctrl.GetValue() - ctrl.GetIncrement())
-            self._changed(ctrl)
-
-    def _on_change(self, evt: wx.SpinDoubleEvent):
+    @staticmethod
+    def _on_change(evt: wx.SpinDoubleEvent):
         ctrl = evt.GetEventObject()
         ctrl.SetValue(
             int(round(ctrl.GetValue() / ctrl.GetIncrement())) * ctrl.GetIncrement()
         )
         evt.SetValue(ctrl.GetValue())
         evt.Skip()
-
-    def _changed(self, ctrl: wx.SpinCtrlDouble):
-        evt = wx.SpinDoubleEvent(wx.wxEVT_SPINCTRLDOUBLE, ctrl.GetId(), ctrl.GetValue())
-        evt.SetEventObject(ctrl)
-        wx.PostEvent(ctrl, evt)
 
     def _round_value(self, ctrl: wx.SpinCtrlDouble):
         ctrl.SetValue(
