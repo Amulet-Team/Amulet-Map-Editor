@@ -236,6 +236,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._selection = StaticSelectionBehaviour(self.canvas)
         self._cursor = PointerBehaviour(self.canvas)
         self._moving = False
+        self._is_enabled = False
 
         self._paste_panel = wx.Panel(canvas)
         self._paste_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -342,7 +343,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         self._rotate_left_button.SetToolTip(lang.get("program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip"))
         self._rotate_left_button.Bind(wx.EVT_BUTTON, self._on_rotate_left)
-        rotate_sizer.Add(self._rotate_left_button, 0, 0, 0)
+        rotate_sizer.Add(self._rotate_left_button)
 
         self._rotate_right_button = wx.BitmapButton(
             self._paste_panel,
@@ -350,7 +351,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         self._rotate_right_button.SetToolTip(lang.get("program_3d_edit.paste_tool.rotate_clockwise_tooltip"))
         self._rotate_right_button.Bind(wx.EVT_BUTTON, self._on_rotate_right)
-        rotate_sizer.Add(self._rotate_right_button, 0, 0, 0)
+        rotate_sizer.Add(self._rotate_right_button)
 
         add_line()
 
@@ -388,7 +389,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         self._mirror_horizontal_button.SetToolTip(lang.get("program_3d_edit.paste_tool.mirror_horizontal_tooltip"))
         self._mirror_horizontal_button.Bind(wx.EVT_BUTTON, self._on_mirror_horizontal)
-        mirror_sizer.Add(self._mirror_horizontal_button, 0, 0, 0)
+        mirror_sizer.Add(self._mirror_horizontal_button)
 
         self._mirror_vertical_button = wx.BitmapButton(
             self._paste_panel,
@@ -396,7 +397,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         self._mirror_vertical_button.SetToolTip(lang.get("program_3d_edit.paste_tool.mirror_vertical_tooltip"))
         self._mirror_vertical_button.Bind(wx.EVT_BUTTON, self._on_mirror_vertical)
-        mirror_sizer.Add(self._mirror_vertical_button, 0, 0, 0)
+        mirror_sizer.Add(self._mirror_vertical_button)
 
         add_line()
 
@@ -438,6 +439,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         super().disable()
         self._move_button.disable()
         self._paste_panel.Disable()
+        self._is_enabled = False
         self.canvas.renderer.fake_levels.clear()
 
     @property
@@ -538,7 +540,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._update_transform()
 
     def _on_pointer_change(self, evt: PointChangeEvent):
-        if self._moving:
+        if self._is_enabled and self._moving:
             self.canvas.renderer.fake_levels.active_transform = (
                 evt.point,
                 self._scale.value,
@@ -561,17 +563,19 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == ACT_BOX_CLICK:
-            self._moving = not self._moving
-            if self._moving:
-                self.canvas.renderer.fake_levels.active_transform = (
-                    self._location.value,
-                    self._scale.value,
-                    self._rotation_radians(),
-                )
+            if self._is_enabled:
+                self._moving = not self._moving
+                if self._moving:
+                    self.canvas.renderer.fake_levels.active_transform = (
+                        self._location.value,
+                        self._scale.value,
+                        self._rotation_radians(),
+                    )
         evt.Skip()
 
     def _paste(self, evt):
         self._paste_panel.Enable()
+        self._is_enabled = True
         structure = evt.structure
         dimension = evt.dimension
         self.canvas.renderer.fake_levels.clear()
