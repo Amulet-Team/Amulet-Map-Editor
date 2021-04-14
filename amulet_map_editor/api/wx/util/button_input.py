@@ -124,11 +124,18 @@ class ButtonInput(WindowContainer):
             wx.EVT_TIMER, self._process_continuous_inputs, self._input_timer
         )
 
+        # save destruction
+        self.window.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy)
+
     def enable(self):
         self._input_timer.Start(33)
 
     def disable(self):
         self._input_timer.Stop()
+
+    def _on_destroy(self, evt):
+        self.disable()
+        evt.Skip()
 
     @property
     def pressed_keys(self) -> Set[KeyType]:

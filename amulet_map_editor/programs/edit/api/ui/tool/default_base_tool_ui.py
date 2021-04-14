@@ -41,6 +41,7 @@ class DefaultBaseToolUI(BaseToolUI):
         All events on the canvas will be automatically removed after the tool is disabled.
         """
         self.canvas.Bind(EVT_DRAW, self._on_draw)
+        self.canvas.SetDropTarget(None)  # fixes #239
         self.canvas.DragAcceptFiles(True)
         self.canvas.Bind(wx.EVT_DROP_FILES, self._on_drop_files)
         self._camera_behaviour.bind_events()
