@@ -290,10 +290,11 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         self._draw_mode = GL_LINE_STRIP
         super()._draw(transformation_matrix)
 
-        if camera_position is not None and camera_position in self:
-            glCullFace(GL_FRONT)
-        else:
-            glCullFace(GL_BACK)
+        if camera_position is not None:
+            if camera_position in self:
+                glCullFace(GL_FRONT)
+            else:
+                glCullFace(GL_BACK)
 
         glEnable(GL_DEPTH_TEST)
         self._draw_mode = GL_TRIANGLES

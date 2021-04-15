@@ -5,7 +5,7 @@ world.close_world=Fermer le monde
 select_world.open_world_button=Ouvrir un monde
 select_world.open_world_dialogue=Sélectionnez un dossier de monde Minecraft
 select_world.select_directory_failed=Impossible d'ouvrir ce dossier !
-select_world.recent_worlds=Mondes Récents
+select_world.recent_worlds=Mondes récents
 
 main_menu.tab_name=Menu Principal
 main_menu.open_world=Ouvrir un monde
@@ -13,15 +13,58 @@ main_menu.help=Aide
 
 program_about.tab_name=À propos
 program_about.currently_opened_world=Monde actuellement ouvert
-program_about.choose_from_options=>Choisissez une opération parmi les options à gauche.\nVous pouvez changer à tout moment.
+program_about.choose_from_options=Choisissez une opération parmi les options à gauche.\nVous pouvez changer à tout moment.
 
 program_convert.tab_name=Convertir
 program_convert.convert_button=Convertir
 program_convert.input_world=Monde source
-program_convert.output_world=Monde destination
-program_convert.select_output_world=Sélectionner un monde destination
-program_convert.input_output_must_different=Les mondes source et destination doivent être différents !
+program_convert.output_world=Monde de destination
+program_convert.select_output_world=Sélectionner un monde de destination
+program_convert.input_output_must_different=Les mondes source et de destination doivent être différents !
 program_convert.select_before_converting=Sélectionnez un monde avant de convertir !
 program_convert.conversion_completed=Conversion terminée
 
 program_3d_edit.tab_name=Éditeur 3D
+
+program_3d_edit.select_tool.delete_button=Supprimer
+program_3d_edit.select_tool.delete_button_tooltip=Supprime les blocs dans la région sélectionnée.
+program_3d_edit.select_tool.copy_button=Copier
+program_3d_edit.select_tool.copy_button_tooltip=Copie la région sélectionnée pour la coller plus tard. Peut être collée dans n'importe quel monde ou dimension.
+program_3d_edit.select_tool.cut_button=Couper
+program_3d_edit.select_tool.cut_button_tooltip=Copie la région sélectionnée pour la coller plus tard en supprimant l'original. Peut être collée dans n'importe quel monde ou dimension.
+program_3d_edit.select_tool.paste_button=Coller
+program_3d_edit.select_tool.paste_button_tooltip=Colle une région précédemment copiée ou coupée dans le monde.
+
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Définit la coordonnée x du coin vert de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Définit la coordonnée y du coin vert de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Définit la coordonnée z du coin vert de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Définit la coordonnée x du coin bleu de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Définit la coordonnée y du coin bleu de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Définit la coordonnée z du coin bleu de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
+
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
+program_3d_edit.select_tool.box_size_tooltip=La taille en blocs de la zone de sélection active.
+
+program_3d_edit.select_tool.button_point1=Déplacer le Point 1
+program_3d_edit.select_tool.button_point1_tooltip=Restez appuyé sur ce bouton et utilisez les contrôles de déplacement pour déplacer le point de sélection vert.
+program_3d_edit.select_tool.button_point2=Déplacer le Point 2
+program_3d_edit.select_tool.button_point2_tooltip=Restez appuyé sur ce bouton et utilisez les contrôles de déplacement pour déplacer le point de sélection bleu.
+program_3d_edit.select_tool.button_selection_box=Déplacer la zone de sélection
+program_3d_edit.select_tool.button_selection_box_tooltip=Restez appuyé sur ce bouton et utilisez les contrôles de déplacement pour déplacer la zone de sélection active.
+
+program_3d_edit.goto_ui.title=Déplacement de la caméra
+program_3d_edit.goto_ui.x_label=x :
+program_3d_edit.goto_ui.x_label_tooltip=La coordonnée x de la caméra. Tapez une coordonnée pour vous y déplacer. Ctrl + C pour copier la coordonnée. Ctrl + V pour coller.
+program_3d_edit.goto_ui.y_label=y :
+program_3d_edit.goto_ui.y_label_tooltip=La coordonnée y de la caméra. Tapez une coordonnée pour vous y déplacer. Ctrl + C pour copier la coordonnée. Ctrl + V pour coller.
+program_3d_edit.goto_ui.z_label=z :
+program_3d_edit.goto_ui.z_label_tooltip=La coordonnée z de la caméra. Tapez une coordonnée pour vous y déplacer. Ctrl + C pour copier la coordonnée. Ctrl + V pour coller.
+program_3d_edit.goto_ui.copy_button_tooltip=Copier les coordonnées x, y et z dans le presse-papiers sous le format suivant : "0.0 0.0 0.0" (x, y et z respectivement).
+program_3d_edit.goto_ui.paste_button_tooltip=Coller des coordonnées précédemment copiées dans les champs correspondants. Les coordonnées copiées doivent être constituées de trois nombres séparés par des espaces ou des virgules.

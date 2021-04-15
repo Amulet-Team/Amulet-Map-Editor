@@ -48,7 +48,8 @@ program_3d_edit.select_tool.scroll_point_x2_tooltip=Установить коо�
 program_3d_edit.select_tool.scroll_point_y2_tooltip=Установить координату y синего угла активного поля. Введите число или колесо прокрутки при наведении курсора.
 program_3d_edit.select_tool.scroll_point_z2_tooltip=Установить координату z синего угла активного поля. Введите число или колесо прокрутки при наведении курсора.
 
-program_3d_edit.select_tool.box_size_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
 program_3d_edit.select_tool.box_size_tooltip=Размер активного поля выбора в блоках.
 
 program_3d_edit.select_tool.button_point1=Переместить точку 1

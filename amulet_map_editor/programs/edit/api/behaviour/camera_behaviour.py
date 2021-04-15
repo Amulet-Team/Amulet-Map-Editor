@@ -157,11 +157,7 @@ class CameraBehaviour(BaseBehaviour):
                 - math.sin(math.radians(ry)) * right
             )
             rx += self.canvas.camera.rotate_speed * pitch
-            if not -90 <= rx <= 90:
-                rx = max(min(rx, 90), -90)
             ry += self.canvas.camera.rotate_speed * yaw
-            if not -180 <= ry <= 180:
-                ry += -int(numpy.sign(ry)) * 360
         else:
             ry, rx = 180, 90
             x += right
