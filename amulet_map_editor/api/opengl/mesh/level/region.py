@@ -129,9 +129,8 @@ class ChunkManager:
             if region in self._regions:
                 self._regions[region].rebuild()
 
-MergedChunkLocationsType = Dict[
-    Tuple[int, int], Tuple[int, int, int, int]
-]
+
+MergedChunkLocationsType = Dict[Tuple[int, int], Tuple[int, int, int, int]]
 
 
 class RenderRegion(TriMesh):
