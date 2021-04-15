@@ -51,7 +51,6 @@ class AmuletUI(wx.Frame):
             | wx.CLIP_CHILDREN
             | wx.RESIZE_BORDER,
         )
-        self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
         icon = wx.Icon()
         icon.CopyFromBitmap(image.logo.icon128.bitmap())
         self.SetIcon(icon)
@@ -81,8 +80,6 @@ class AmuletUI(wx.Frame):
                 lambda evt: update_check.show_update_window(self, __version__, evt),
             )
             update_check.check_for_update(__version__, self)
-
-        self.Show()
 
     def create_menu(self):
         menu_dict = {}

@@ -5,15 +5,14 @@ import sys
 if sys.version_info[:2] < (3, 7):
     raise Exception("Must be using Python 3.7+")
 
-import wx
 from amulet_map_editor import log
-from amulet_map_editor.api.framework import AmuletUI
+from amulet_map_editor.api.framework import AmuletApp
 import traceback
+
 
 if __name__ == "__main__":
     try:
-        app = wx.App()
-        frame = AmuletUI(None)
+        app = AmuletApp(0)
         app.MainLoop()
     except Exception as e:
         log.critical(
