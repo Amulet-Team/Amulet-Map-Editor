@@ -46,10 +46,7 @@ class MouseMovement(WindowContainer):
     def _screen_middle(self) -> Tuple[int, int]:
         """Get the pixel coordinate of the middle of the screen"""
         x, y = self.window.GetSize()
-        return (
-            int(x / 2),
-            int(y / 2),
-        )
+        return (int(x / 2), int(y / 2))
 
     def warp_middle(self):
         """Warp the cursor to the middle of the screen."""
@@ -71,7 +68,7 @@ class MouseMovement(WindowContainer):
     def x(self, x: int):
         """Set the x pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
-        assert type(x) is int, "x must be an int"
+        assert isinstance(x, int), "x must be an int"
         self._delta_x += self._x - self._start_x
         self._start_x = self._x = self._to_relative(x, 0)[0]
         self._warp()
@@ -85,7 +82,7 @@ class MouseMovement(WindowContainer):
     def y(self, y: int):
         """Set the y pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
-        assert type(y) is int, "y must be an int"
+        assert isinstance(y, int), "y must be an int"
         self._delta_y += self._y - self._start_y
         self._start_y = self._y = self._to_relative(0, y)[1]
         self._warp()
@@ -100,7 +97,9 @@ class MouseMovement(WindowContainer):
         """Set the x and y pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
         assert (
-            type(xy) is tuple and len(xy) == 2 and all(type(c) is int for c in xy)
+            isinstance(xy, tuple)
+            and len(xy) == 2
+            and all(isinstance(c, int) for c in xy)
         ), "xy must be of the form Tuple[int, int]"
         x, y = xy
         self._delta_x += self._x - self._start_x

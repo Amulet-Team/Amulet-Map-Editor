@@ -5,10 +5,7 @@ import wx
 from wx import glcanvas
 import math
 from ..canvas_container import CanvasContainer
-from ..data_types import (
-    CameraLocationType,
-    CameraRotationType,
-)
+from ..data_types import CameraLocationType, CameraRotationType
 
 from ..matrix import (
     rotation_matrix_yx,
@@ -137,9 +134,9 @@ class Camera(CanvasContainer):
     def set_location(self, camera_location: CameraLocationType) -> bool:
         """Set the location of the camera. (x, y, z)."""
         assert (
-            type(camera_location) in (tuple, list)
+            isinstance(camera_location, (tuple, list))
             and len(camera_location) == 3
-            and all(type(v) in (int, float) for v in camera_location)
+            and all(isinstance(v, (int, float)) for v in camera_location)
         ), "format for camera_location is invalid"
         if camera_location != self._location:
             self._reset_matrix()
@@ -168,9 +165,9 @@ class Camera(CanvasContainer):
         yaw (-180 to 180), pitch (-90 to 90)
         This should behave the same as how Minecraft handles it."""
         assert (
-            type(camera_rotation) in (tuple, list)
+            isinstance(camera_rotation, (tuple, list))
             and len(camera_rotation) == 2
-            and all(type(v) in (int, float) for v in camera_rotation)
+            and all(isinstance(v, (int, float)) for v in camera_rotation)
         ), "format for camera_rotation is invalid"
         ry, rx = camera_rotation
         if not -180 <= ry < 180:
@@ -204,7 +201,7 @@ class Camera(CanvasContainer):
             self._notify_moved()
 
     def _set_fov(self, mode: Projection, fov: float):
-        assert type(fov) in (int, float)
+        assert isinstance(fov, (int, float))
         self._fov[mode.value] = fov
         self._reset_matrix()
 
@@ -242,9 +239,9 @@ class Camera(CanvasContainer):
 
     def _set_clipping(self, mode: Projection, clipping: Tuple[float, float]):
         assert (
-            type(clipping) is tuple
+            isinstance(clipping, tuple)
             and len(clipping) == 2
-            and all(type(c) in (int, float) for c in clipping)
+            and all(isinstance(c, (int, float)) for c in clipping)
         )
         self._clipping[mode.value] = clipping
         self._reset_matrix()
@@ -277,7 +274,7 @@ class Camera(CanvasContainer):
     @aspect_ratio.setter
     def aspect_ratio(self, aspect_ratio: float):
         """Set the aspect ratio of the camera (width/weight)"""
-        assert type(aspect_ratio) in (int, float)
+        assert isinstance(aspect_ratio, (int, float))
         self._aspect_ratio = aspect_ratio
         self._reset_matrix()
 
@@ -331,8 +328,7 @@ class Camera(CanvasContainer):
         # camera translation
         if self._transformation_matrix is None:
             self._transformation_matrix = numpy.matmul(
-                self.projection_matrix,
-                self.camera_matrix,
+                self.projection_matrix, self.camera_matrix
             )
             self._transformation_matrix.flags.writeable = False
 

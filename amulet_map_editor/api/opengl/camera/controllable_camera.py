@@ -5,10 +5,7 @@ from .camera import Camera
 class ControllableCamera(Camera):
     """A slight modification to the default camera to add speed attributes."""
 
-    __slots__ = (
-        "_move_speed",
-        "_rotate_speed",
-    )
+    __slots__ = ("_move_speed", "_rotate_speed")
 
     def __init__(self, canvas: glcanvas.GLCanvas):
         super().__init__(canvas)
@@ -24,7 +21,7 @@ class ControllableCamera(Camera):
     @move_speed.setter
     def move_speed(self, val: float):
         """Set the speed that the camera moves at."""
-        assert type(val) in (int, float)
+        assert isinstance(val, (int, float))
         self._move_speed = val
 
     @property
@@ -35,7 +32,7 @@ class ControllableCamera(Camera):
     @rotate_speed.setter
     def rotate_speed(self, val: float):
         """Set the speed that the camera rotates at."""
-        assert type(val) in (int, float)
+        assert isinstance(val, (int, float))
         self._rotate_speed = val
 
     @property
