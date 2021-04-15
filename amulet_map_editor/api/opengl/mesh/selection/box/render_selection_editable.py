@@ -276,7 +276,7 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
         :return:
         """
         self._setup()
-        if self._rebuild:
+        if self._needs_rebuild:
             self._create_geometry()
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)

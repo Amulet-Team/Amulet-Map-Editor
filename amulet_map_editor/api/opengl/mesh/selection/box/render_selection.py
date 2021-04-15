@@ -44,7 +44,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         )  # The points set using point1 and point2
         self._bounds: Optional[numpy.ndarray] = None  # The min and max locations
         self.transformation_matrix = numpy.eye(4, dtype=numpy.float64)
-        self._rebuild = True
+        self._needs_rebuild = True
         self._volume = 1
 
         self._init_verts()
@@ -97,7 +97,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     def _mark_recreate(self):
         self._bounds = None
-        self._rebuild = True
+        self._needs_rebuild = True
 
     @property
     def points(self) -> numpy.ndarray:
@@ -305,7 +305,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
         self.change_verts()
         self._volume = numpy.product(self.max - self.min)
-        self._rebuild = False
+        self._needs_rebuild = False
 
     def draw(
         self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None
@@ -317,7 +317,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         :return:
         """
         self._setup()
-        if self._rebuild:
+        if self._needs_rebuild:
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
 

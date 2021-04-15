@@ -177,12 +177,6 @@ class LevelGroup(
         for level in self._objects:
             level.run_garbage_collector()
 
-    def rebuild(self):
-        """Rebuild a single region which was last rebuild the longest ago.
-        Put this on a semi-fast clock to rebuild all regions."""
-        for level in self._objects:
-            level.chunk_manager.rebuild()
-
     def _rebuild(self):
         self.unload()
 
