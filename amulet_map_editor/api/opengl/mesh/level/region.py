@@ -5,7 +5,7 @@ from OpenGL.GL import (
     GL_ARRAY_BUFFER,
     glBufferSubData,
 )
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 import numpy
 import queue
 from .chunk import RenderChunk
@@ -129,8 +129,15 @@ class ChunkManager:
             if region in self._regions:
                 self._regions[region].rebuild()
 
+MergedChunkLocationsType = Dict[
+    Tuple[int, int], Tuple[int, int, int, int]
+]
+
 
 class RenderRegion(TriMesh):
+    _merged_chunk_locations: MergedChunkLocationsType
+    _temp_data: Optional[Tuple[numpy.ndarray, MergedChunkLocationsType]]
+
     def __init__(
         self,
         rx: int,
@@ -146,10 +153,12 @@ class RenderRegion(TriMesh):
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
-        self._merged_chunk_locations: Dict[
-            Tuple[int, int], Tuple[int, int, int, int]
-        ] = {}
+        self._merged_chunk_locations: MergedChunkLocationsType = {}
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
+
+        # Merging is done on a new thread which can't modify the opengl state.
+        # This stores the created data and the main thread loads it when drawing.
+        self._temp_data = None
 
         self.region_transform = displacement_matrix(
             rx * region_size * 16, 0, rz * region_size * 16
@@ -204,12 +213,17 @@ class RenderRegion(TriMesh):
             glBindBuffer(GL_ARRAY_BUFFER, 0)
 
     def rebuild(self):
-        """If there are any chunks that have not been merged recreate the merged vertex table"""
-        self._setup()
-        if self._manual_chunks and self._vao and self._vbo:
+        """Merges chunk geometry for the region into one large array.
+        As each chunk is added it is drawn individually.
+        After not too long the individual draw calls for each chunk will reach the bottleneck for python.
+        To solve this we take the geometry for each chunk and merge them into one large array that only requires one draw call.
+
+        :return:
+        """
+        if self._manual_chunks:
             region_verts = []
             region_verts_translucent = []
-            merged_locations: Dict[Tuple[int, int], Tuple[int, int, int, int]] = {}
+            merged_locations: MergedChunkLocationsType = {}
             offset = 0
             translucent_offset = 0
             for chunk_location, chunk in self._chunks.items():
@@ -233,13 +247,22 @@ class RenderRegion(TriMesh):
                 verts = numpy.concatenate(region_verts)
             else:
                 verts = self.new_empty_verts()
+            self._temp_data = verts, merged_locations
+
+    def _create_geometry(self):
+        """Load the temporary vertex data into opengl."""
+        if self._temp_data is not None:
+            self._setup()
+            verts, merged_locations = self._temp_data
+            self._temp_data = None
             self.draw_count = int(verts.size // self._vert_len)
             self._merged_chunk_locations = merged_locations
 
             self.change_verts(verts)
-            for chunk in self._manual_chunks.values():
-                chunk.unload()
-            self._manual_chunks.clear()
+            for coord in merged_locations:
+                chunk = self._manual_chunks.pop(coord, None)
+                if chunk is not None:
+                    chunk.unload()
 
     def unload(self):
         """Unload all opengl data"""
@@ -249,6 +272,7 @@ class RenderRegion(TriMesh):
         self._chunks.clear()
 
     def draw(self, camera_matrix: TransformationMatrix, cam_cx, cam_cz):
+        self._create_geometry()
         transformation_matrix = numpy.matmul(camera_matrix, self.region_transform)
         super().draw(transformation_matrix)
         for chunk in sorted(

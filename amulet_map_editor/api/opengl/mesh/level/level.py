@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Generator, Optional, Any
 import numpy
+import time
 
 from amulet.api.data_types import Dimension, ChunkCoordinates
 
@@ -54,6 +55,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
             True  # Should we go back to the beginning and re-find chunks to rebuild
         )
         self._chunk_rebuilds = self._rebuild_generator()
+        self._rebuild_time = 0
 
     @property
     def level(self) -> "BaseLevel":
@@ -152,6 +154,11 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                 )
 
             self.chunk_manager.add_render_chunk(chunk)
+
+        t = time.time()
+        if t > self._rebuild_time + 1:
+            self._rebuild_time = t
+            self.chunk_manager.rebuild()
 
     def enable(self):
         """Enable chunk generation in a new thread."""
