@@ -104,7 +104,12 @@ class RenderChunk(RenderChunkBuilder):
 
     def _sub_chunks(
         self, blocks: Blocks
-    ) -> List[Tuple[numpy.ndarray, numpy.ndarray, Tuple[int, int, int]]]:
+    ) -> List[Tuple[numpy.ndarray, Tuple[int, int, int]]]:
+        """Create sub-chunk arrays that extend into the neighbour sub-chunks by one block.
+
+        :param blocks: The Blocks array for the chunk.
+        :return: A list of tuples containing the larger block array and the location of the sub-chunk
+        """
         sub_chunks = []
         neighbour_chunks = {}
         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
@@ -154,8 +159,7 @@ class RenderChunk(RenderChunkBuilder):
                     larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy + 1)[
                         :, 0, :
                     ]
-                unique_blocks = numpy.unique(larger_blocks)
-                sub_chunks.append((larger_blocks, unique_blocks, (0, cy * 16, 0)))
+                sub_chunks.append((larger_blocks, (0, cy * 16, 0)))
         return sub_chunks
 
     def create_geometry(self):
