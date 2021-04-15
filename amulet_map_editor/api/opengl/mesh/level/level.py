@@ -50,7 +50,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         self._last_rebuild_camera_location: Optional[
             numpy.ndarray
         ] = None  # x, z camera location
-        self._rebuild = (
+        self._needs_rebuild = (
             True  # Should we go back to the beginning and re-find chunks to rebuild
         )
         self._chunk_rebuilds = self._rebuild_generator()
@@ -70,8 +70,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         """A generator of chunk coordinates to rebuild.
         This is an infinite length generator."""
         while True:
-            if self._rebuild:
-                self._rebuild = False
+            if self._needs_rebuild:
+                self._needs_rebuild = False
                 # a set of chunks that are next to chunks that have changed but have not changed themselves
                 chunk_rebuilt = set()
                 chunk_not_loaded = []  # a list of chunks that have not been loaded
@@ -104,17 +104,17 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                                     chunk_coords_
                                 )  # so that it doesn't get picked up again
                         # if the rebuild flag has been set go to the beginning
-                        if self._rebuild:
+                        if self._needs_rebuild:
                             break
                     elif chunk_coords not in self.chunk_manager:
                         # if the chunk is not yet loaded, mark it for loading.
                         chunk_not_loaded.append(chunk_coords)
                 # if the rebuild flag has been set go to the beginning
-                if self._rebuild:
+                if self._needs_rebuild:
                     continue
                 for chunk_coords in chunk_not_loaded:
                     # if the rebuild flag has been set go to the beginning
-                    if self._rebuild:
+                    if self._needs_rebuild:
                         break
                     yield chunk_coords
             else:
@@ -127,7 +127,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
             (self._last_rebuild_camera_location - camera) ** 2
         ) > min(2048, self.render_distance * 16 - 8):
             # if the camera has moved more than 32 blocks set the rebuild flag
-            self._rebuild = True
+            self._needs_rebuild = True
             self._last_rebuild_camera_location = camera
 
         chunk_coords = next(self._chunk_rebuilds)
@@ -155,7 +155,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
 
     def enable(self):
         """Enable chunk generation in a new thread."""
-        self._rebuild = True
+        self._needs_rebuild = True
 
     def unload(self):
         """Unload all loaded data. Can be resumed by calling enable."""
@@ -196,7 +196,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def dimension(self, dimension: Dimension):
         self._dimension = dimension
         self.run_garbage_collector(True)
-        self._rebuild = True
+        self._needs_rebuild = True
 
     @property
     def render_distance(self) -> int:
@@ -208,7 +208,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         assert isinstance(val, int), "Render distance must be an int"
         self._render_distance = val
         self._garbage_distance = val + 5
-        self._rebuild = True
+        self._needs_rebuild = True
 
     @property
     def draw_box(self):
@@ -264,8 +264,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def _rebuild(self):
         """Unload all the chunks so they can be rebuilt."""
         self._chunk_manager.unload()
-        self._rebuild = True
+        self._needs_rebuild = True
 
     def rebuild_changed(self):
         """Rebuild the chunks that have changed."""
-        self._rebuild = True
+        self._needs_rebuild = True

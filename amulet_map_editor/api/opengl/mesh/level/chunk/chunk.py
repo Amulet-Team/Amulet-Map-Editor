@@ -38,7 +38,7 @@ class RenderChunk(RenderChunkBuilder):
         self._draw_floor = draw_floor
         self._chunk_state = 0  # 0 = chunk does not exist, 1 = chunk exists but failed to load, 2 = chunk exists
         self._changed_time = 0
-        self._rebuild = True
+        self._needs_rebuild = True
         self.verts_translucent = (
             0  # the offset into the above from which the faces can be translucent
         )
@@ -50,9 +50,9 @@ class RenderChunk(RenderChunkBuilder):
     def _setup(self):
         """Set up the opengl data which cannot be set up in another thread"""
         super()._setup()
-        if self._rebuild:
+        if self._needs_rebuild:
             self.change_verts()
-            self._rebuild = False
+            self._needs_rebuild = False
 
     @property
     def _level(self) -> BaseLevel:
@@ -195,7 +195,7 @@ class RenderChunk(RenderChunkBuilder):
                     plane[:, 9:12] = [0.4, 0.4, 0.85]
                 self.verts = numpy.concatenate([self.verts, plane.ravel()], 0)
                 self.draw_count += 12
-        self._rebuild = True
+        self._needs_rebuild = True
 
     def _create_empty_geometry(self):
         if self._draw_floor:
