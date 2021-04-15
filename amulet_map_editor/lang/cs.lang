@@ -49,7 +49,8 @@ program_3d_edit.select_tool.scroll_point_x2_tooltip=Určí x souřadnici modréh
 program_3d_edit.select_tool.scroll_point_y2_tooltip=Určí y souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
 program_3d_edit.select_tool.scroll_point_z2_tooltip=Určí z souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
 
-program_3d_edit.select_tool.box_size_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
 program_3d_edit.select_tool.box_size_tooltip=Velikost aktivního výběrového boxu v blocích.
 
 program_3d_edit.select_tool.button_point1=Pohybový Bod 1

@@ -48,7 +48,8 @@ program_3d_edit.select_tool.scroll_point_x2_tooltip=Set the x coordinate of the 
 program_3d_edit.select_tool.scroll_point_y2_tooltip=Set the y coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
 program_3d_edit.select_tool.scroll_point_z2_tooltip=Set the z coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
 
-program_3d_edit.select_tool.box_size_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
 program_3d_edit.select_tool.box_size_tooltip=The size of the active selection box in blocks.
 
 program_3d_edit.select_tool.button_point1=Move Point 1
