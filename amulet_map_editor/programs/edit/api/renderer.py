@@ -87,7 +87,7 @@ class Renderer(EditCanvasContainer):
             self._draw_timer,
         )
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_moved)
-        self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy)
+        self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy, self.canvas)
 
     def enable(self):
         """Enable and start working."""
