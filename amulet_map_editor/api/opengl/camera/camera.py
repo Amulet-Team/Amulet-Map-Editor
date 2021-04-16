@@ -134,10 +134,9 @@ class Camera(CanvasContainer):
     def set_location(self, camera_location: CameraLocationType) -> bool:
         """Set the location of the camera. (x, y, z)."""
         assert (
-            isinstance(camera_location, (tuple, list))
-            and len(camera_location) == 3
-            and all(isinstance(v, (int, float)) for v in camera_location)
-        ), "format for camera_location is invalid"
+            len(camera_location) == 3
+        ), "camera_location must be an iterable of floats with a length of three"
+        camera_location = tuple(map(float, camera_location))
         if camera_location != self._location:
             self._reset_matrix()
             self._location = tuple(camera_location)
