@@ -166,11 +166,11 @@ class AmuletUI(wx.Frame):
                 )
             except LoaderNoneMatched as e:
                 log.error(f"Could not find a loader for this world.\n{e}")
-                wx.MessageBox(f"Could not find a loader for this world.\n{e}")
+                wx.MessageBox(f"{lang.get('select_world.loading_world_no_loader')}\n{e}")
             except Exception as e:
                 log.error(f"Error loading world.\n{e}\n{traceback.format_exc()}")
                 wx.MessageBox(
-                    f"Error loading world. Check the console for more details.\n{e}"
+                    f"{lang.get('select_world.loading_world_failed')}\n{e}"
                 )
             else:
                 self._open_worlds[path] = world
@@ -198,6 +198,6 @@ class AmuletUI(wx.Frame):
         for path, page in list(self._open_worlds.items()):
             self.close_world(path)
         if self.world_tab_holder.GetPageCount() > 1:
-            wx.MessageBox("A world is still being used. Please close it first")
+            wx.MessageBox(lang.get("app.world_still_used"))
         else:
             evt.Skip()
