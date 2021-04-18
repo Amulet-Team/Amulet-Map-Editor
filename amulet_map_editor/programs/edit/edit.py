@@ -35,7 +35,7 @@ class EditExtension(wx.Panel, BaseProgram):
 
         self._sizer.AddStretchSpacer(1)
         self._temp_msg = wx.StaticText(
-            self, label="Please wait while the renderer loads"
+            self, label=lang.get("program_3d_edit.canvas.please_wait")
         )
         self._temp_msg.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp_msg, 0, flag=wx.ALIGN_CENTER_HORIZONTAL)

@@ -136,3 +136,11 @@ program_3d_edit.goto_ui.z_label=z:
 program_3d_edit.goto_ui.z_label_tooltip=The z coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
 program_3d_edit.goto_ui.copy_button_tooltip=Copy the x, y and z values to the clipboard in the form "0.0 0.0 0.0" (x, y and z respectively)
 program_3d_edit.goto_ui.paste_button_tooltip=Paste a previously copied coordinate into the inputs. Copied value must three numbers separated with spaces or commas.
+
+program_3d_edit.canvas.please_wait=Please wait while the renderer loads
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Downloading Bedrock vanilla resource pack
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Downloading Java vanilla resource pack
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Failed to download the latest Java resource pack.\nCheck your internet connection and restart Amulet.\nCheck the console for more details.
+program_3d_edit.canvas.loading_resource_packs=Loading resource packs
+program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
+program_3d_edit.canvas.setting_up_renderer=Setting up renderer
