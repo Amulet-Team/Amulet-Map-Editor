@@ -12,13 +12,13 @@ main_menu.open_world=打开世界
 main_menu.help=帮助
 
 program_about.tab_name=关于
-program_about.currently_opened_world=当前打开的世界
+program_about.currently_opened_world=当前打开的世界:
 program_about.choose_from_options=从左边的选项中选择你想进行的事项。\n你可以随时在这些选项之间进行切换。
 
 program_convert.tab_name=转换
 program_convert.convert_button=转换
-program_convert.input_world=输入世界
-program_convert.output_world=输出世界
+program_convert.input_world=输入世界:
+program_convert.output_world=输出世界:
 program_convert.select_output_world=选择输出的世界
 program_convert.input_output_must_different=输入和输出的世界不可以是同一个！
 program_convert.select_before_converting=你必须选择一个用于转换的世界！

@@ -39,7 +39,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             wx.StaticText(
                 self._input,
                 wx.ID_ANY,
-                "{}: ".format(lang.get("program_convert.input_world")),
+                lang.get("program_convert.input_world"),
                 wx.DefaultPosition,
                 wx.DefaultSize,
                 0,
@@ -57,7 +57,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
             wx.StaticText(
                 self._output,
                 wx.ID_ANY,
-                "{}: ".format(lang.get("program_convert.output_world")),
+                lang.get("program_convert.output_world"),
                 wx.DefaultPosition,
                 wx.DefaultSize,
                 0,

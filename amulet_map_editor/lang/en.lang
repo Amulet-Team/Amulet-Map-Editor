@@ -17,13 +17,13 @@ menu_bar.file.open_world=Open World
 menu_bar.file.quit=Quit
 
 program_about.tab_name=About
-program_about.currently_opened_world=Currently Opened World
+program_about.currently_opened_world=Currently Opened World:
 program_about.choose_from_options=Choose from the options on the left what you would like to do.\nYou can switch between these at any time.
 
 program_convert.tab_name=Convert
 program_convert.convert_button=Convert
-program_convert.input_world=Input World
-program_convert.output_world=Output World
+program_convert.input_world=Input World:
+program_convert.output_world=Output World:
 program_convert.select_output_world=Select Output World
 program_convert.input_output_must_different=The input and output worlds must be different!
 program_convert.select_before_converting=Select a world before converting!

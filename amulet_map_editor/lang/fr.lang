@@ -12,13 +12,13 @@ main_menu.open_world=Ouvrir un monde
 main_menu.help=Aide
 
 program_about.tab_name=À propos
-program_about.currently_opened_world=Monde actuellement ouvert
+program_about.currently_opened_world=Monde actuellement ouvert :
 program_about.choose_from_options=Choisissez une opération parmi les options à gauche.\nVous pouvez changer à tout moment.
 
 program_convert.tab_name=Convertir
 program_convert.convert_button=Convertir
-program_convert.input_world=Monde source
-program_convert.output_world=Monde de destination
+program_convert.input_world=Monde source :
+program_convert.output_world=Monde de destination :
 program_convert.select_output_world=Sélectionner un monde de destination
 program_convert.input_output_must_different=Les mondes source et de destination doivent être différents !
 program_convert.select_before_converting=Sélectionnez un monde avant de convertir !
