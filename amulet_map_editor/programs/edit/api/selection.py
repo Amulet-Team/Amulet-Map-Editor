@@ -43,7 +43,7 @@ class SelectionManager(Changeable):
     def bind_events(self):
         """Set up all events required to run."""
         self.canvas.Bind(wx.EVT_TIMER, self._create_undo_point, self._timer)
-        self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy)
+        self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy, self.canvas)
 
     def _create_undo_point(self, evt):
         self.canvas.create_undo_point(False, True)

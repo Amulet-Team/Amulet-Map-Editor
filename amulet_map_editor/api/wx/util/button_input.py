@@ -125,7 +125,7 @@ class ButtonInput(WindowContainer):
         )
 
         # save destruction
-        self.window.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy)
+        self.window.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy, self.window)
 
     def enable(self):
         self._input_timer.Start(33)
