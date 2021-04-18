@@ -78,7 +78,7 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         return self._path
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault("&{}".format(lang.get("menu_bar.file.menu_name")), {}).setdefault("exit", {}).setdefault(
+        menu.setdefault(f"&{lang.get('menu_bar.file.menu_name')}", {}).setdefault("exit", {}).setdefault(
             lang.get("menu_bar.file.close_world"), lambda evt: self._close_self_callback
         )
         return self._extensions[self.GetSelection()].menu(menu)
