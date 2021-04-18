@@ -68,22 +68,24 @@ def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
     return world_images[image_path][1:3]
 
 
-class WorldUI(simple.SimplePanel):
-    # UI element that holds the world image, name and description
-    def __init__(self, parent: simple.SimplePanel, world_format: "WorldFormatWrapper"):
-        super(WorldUI, self).__init__(parent, wx.HORIZONTAL)
+class WorldUI(wx.Panel):
+    """A Panel UI element with the world image, name and description"""
+
+    def __init__(self, parent: wx.Window, world_format: "WorldFormatWrapper"):
+        super().__init__(parent)
         self.SetWindowStyle(wx.TAB_TRAVERSAL | wx.BORDER_RAISED)
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.SetSizer(sizer)
 
         img, width = get_world_image(world_format.world_image_path)
 
         self.img = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (width, 128))
-        # self.img.SetScaleMode(2)
-        self.add_object(self.img, 0)
+        sizer.Add(self.img)
 
         self.world_name = wx.StaticText(
             self,
-            wx.ID_ANY,
-            "\n".join(
+            label="\n".join(
                 [
                     world_format.world_name,
                     world_format.game_version_string,
@@ -92,22 +94,20 @@ class WorldUI(simple.SimplePanel):
                     ),
                 ]
             ),
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
         )
-        self.add_object(self.world_name, 0)
+        sizer.Add(self.world_name, 0, wx.ALL | wx.ALIGN_CENTER, 5)
 
 
 class WorldUIButton(WorldUI):
-    # a button that wraps around WorldUI so that WorldUI can be used without the button functionality
+    """A Panel UI element that behaves like a button with the world image, name and description"""
+
     def __init__(
         self,
-        parent: simple.SimplePanel,
+        parent: wx.Window,
         world_format: "WorldFormatWrapper",
         open_world_callback,
     ):
-        super(WorldUIButton, self).__init__(parent, world_format)
+        super().__init__(parent, world_format)
         self.path = world_format.path
         self.open_world_callback = open_world_callback
 
@@ -119,9 +119,13 @@ class WorldUIButton(WorldUI):
         self.open_world_callback(self.path)
 
 
-class WorldList(simple.SimplePanel):
-    def __init__(self, parent, world_dirs, open_world_callback, sort=True):
-        super(WorldList, self).__init__(parent)
+class WorldList(wx.Panel):
+    """A Panel containing zero or more `WorldUIButton`s."""
+
+    def __init__(self, parent: wx.Window, world_dirs, open_world_callback, sort=True):
+        super().__init__(parent)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
 
         self.worlds = []
 
@@ -142,7 +146,9 @@ class WorldList(simple.SimplePanel):
         for world_format in world_formats:
             try:
                 world_button = WorldUIButton(self, world_format, open_world_callback)
-                self.add_object(world_button, 0, wx.ALL | wx.EXPAND)
+                sizer.Add(
+                    world_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
+                )
                 self.worlds.append(world_button)
             except Exception as e:
                 log.info(f"Failed to display world button for {world_format.path} {e}")
@@ -150,11 +156,11 @@ class WorldList(simple.SimplePanel):
         self.Layout()
 
 
-class CollapseableWorldListUI(wx.CollapsiblePane):
-    # a drop down list of `WorldUIButton`s for a given directory
+class CollapsibleWorldListUI(wx.CollapsiblePane):
+    """a drop down list of `WorldUIButton`s for a given directory"""
+
     def __init__(self, parent, paths: List[str], group_name: str, open_world_callback):
-        # TODO: perhaps design a custom version of this. It looks kind of ugly on windows
-        super(CollapseableWorldListUI, self).__init__(parent, wx.ID_ANY, group_name)
+        super().__init__(parent, label=group_name)
         self.parent = parent
         self.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.eval_layout)
 
@@ -178,7 +184,7 @@ class ScrollableWorldsUI(simple.SimpleScrollablePanel):
         super(ScrollableWorldsUI, self).__init__(parent)
         self.open_world_callback = open_world_callback
 
-        self.dirs: Dict[str, CollapseableWorldListUI] = {}
+        self.dirs: Dict[str, CollapsibleWorldListUI] = {}
         self.reload()
 
         self.Layout()
@@ -189,7 +195,7 @@ class ScrollableWorldsUI(simple.SimpleScrollablePanel):
         self.dirs.clear()
         for group_name, directory in minecraft_world_paths.items():
             if os.path.isdir(directory):
-                world_list = CollapseableWorldListUI(
+                world_list = CollapsibleWorldListUI(
                     self,
                     glob.glob(os.path.join(glob.escape(directory), "*")),
                     group_name,
@@ -202,23 +208,25 @@ class ScrollableWorldsUI(simple.SimpleScrollablePanel):
         event.Skip()
 
 
-class WorldSelectUI(simple.SimplePanel):
+class WorldSelectUI(wx.Panel):
     # a frame containing a refresh button for the UI, a sort order for the worlds
     # and a vertical list of `WorldDirectoryUI`s for each directory
     # perhaps also a select directory option
     def __init__(self, parent, open_world_callback):
-        super(WorldSelectUI, self).__init__(parent)
+        super().__init__(parent)
         self.open_world_callback = open_world_callback
-        self.header = simple.SimplePanel(self, wx.HORIZONTAL)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+
         self.header_open_world = wx.Button(
-            self.header, wx.ID_ANY, label=lang.get("select_world.open_world_button")
+            self, label=lang.get("select_world.open_world_button")
         )
         self.header_open_world.Bind(wx.EVT_BUTTON, self._open_world)
-        self.header.add_object(self.header_open_world)
-        self.add_object(self.header, 0, 0)
+        sizer.Add(self.header_open_world)
 
-        self.content = ScrollableWorldsUI(self, open_world_callback)
-        self.add_object(self.content, 1, wx.EXPAND)
+        content = ScrollableWorldsUI(self, open_world_callback)
+        sizer.Add(content, 1, wx.EXPAND)
 
     def _open_world(self, evt):
         dir_dialog = wx.DirDialog(
@@ -239,22 +247,28 @@ class WorldSelectUI(simple.SimplePanel):
         self.open_world_callback(path)
 
 
-class RecentWorldUI(simple.SimplePanel):
+class RecentWorldUI(wx.Panel):
     def __init__(self, parent, open_world_callback):
-        super(RecentWorldUI, self).__init__(parent)
+        super().__init__(parent)
         self._open_world_callback = open_world_callback
 
-        self.add_object(
-            wx.StaticText(
-                self,
-                wx.ID_ANY,
-                lang.get("select_world.recent_worlds"),
-                wx.DefaultPosition,
-                wx.DefaultSize,
-                0,
-            ),
+        self._sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self._sizer)
+
+        text = wx.StaticText(
+            self,
+            wx.ID_ANY,
+            lang.get("select_world.recent_worlds"),
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        text.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        self._sizer.Add(
+            text,
             0,
             wx.ALL | wx.ALIGN_CENTER,
+            5,
         )
 
         self._world_list = None
@@ -274,18 +288,39 @@ class RecentWorldUI(simple.SimplePanel):
         self._world_list = WorldList(
             self, recent_worlds, self._open_world_callback, sort=False
         )
-        self.add_object(self._world_list, 1, wx.EXPAND)
+        self._sizer.Add(self._world_list, 1, wx.EXPAND, 5)
         self.Layout()
         CONFIG.put("amulet_meta", meta)
 
 
-class WorldSelectAndRecentUI(simple.SimplePanel):
+class WorldSelectAndRecentUI(wx.Panel):
     def __init__(self, parent, open_world_callback):
         super(WorldSelectAndRecentUI, self).__init__(parent, wx.HORIZONTAL)
         self._open_world_callback = open_world_callback
-        self.add_object(WorldSelectUI(self, self._update_recent), 1, wx.ALL | wx.EXPAND)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+
+        warning_text = wx.StaticText(
+            self,
+            label=lang.get("select_world.open_world_warning"),
+        )
+        warning_text.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        sizer.Add(warning_text, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, 5)
+        # bar
+
+        bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(bottom_sizer, 1, wx.EXPAND)
+
+        left_sizer = wx.BoxSizer(wx.VERTICAL)
+        bottom_sizer.Add(left_sizer, 1, wx.EXPAND)
+        select_world = WorldSelectUI(self, self._update_recent)
+        left_sizer.Add(select_world, 1, wx.ALL | wx.EXPAND, 5)
+
+        right_sizer = wx.BoxSizer(wx.VERTICAL)
+        bottom_sizer.Add(right_sizer, 1, wx.EXPAND)
         self._recent_worlds = RecentWorldUI(self, self._update_recent)
-        self.add_object(self._recent_worlds, 1, wx.EXPAND)
+        right_sizer.Add(self._recent_worlds, 1, wx.EXPAND, 5)
 
     def _update_recent(self, path):
         self._recent_worlds.rebuild(path)
