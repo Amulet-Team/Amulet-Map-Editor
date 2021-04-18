@@ -4,7 +4,7 @@ import webbrowser
 
 EDIT_CONFIG_ID = "amulet_edit"
 
-from amulet_map_editor import log
+from amulet_map_editor import log, lang
 from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
@@ -140,42 +140,42 @@ class EditExtension(wx.Panel, BaseProgram):
         return True
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault("&File", {}).setdefault("system", {}).setdefault(
-            "Save\tCtrl+s", lambda evt: self._canvas.save()
+        menu.setdefault("&{}".format(lang.get("menu_bar.file.menu_name")), {}).setdefault("system", {}).setdefault(
+            "{}\tCtrl+s".format(lang.get("menu_bar.file.save")), lambda evt: self._canvas.save()
         )
-        # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        # menu.setdefault("&{}".format(lang.get("menu_bar.file.menu_name")), {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
 
-        menu.setdefault("&Edit", {}).setdefault("history", {}).update(
+        menu.setdefault("&{}".format(lang.get("menu_bar.edit.menu_name")), {}).setdefault("history", {}).update(
             {
-                "Undo\tCtrl+z": lambda evt: self._canvas.undo(),
-                "Redo\tCtrl+y": lambda evt: self._canvas.redo(),
+                "{}\tCtrl+z".format(lang.get("menu_bar.edit.undo")): lambda evt: self._canvas.undo(),
+                "{}\tCtrl+y".format(lang.get("menu_bar.edit.redo")): lambda evt: self._canvas.redo(),
             }
         )
 
-        menu.setdefault("&Edit", {}).setdefault("operation", {}).update(
+        menu.setdefault("&{}".format(lang.get("menu_bar.edit.menu_name")), {}).setdefault("operation", {}).update(
             {
-                "Cut\tCtrl+x": lambda evt: self._canvas.cut(),
-                "Copy\tCtrl+c": lambda evt: self._canvas.copy(),
-                "Paste\tCtrl+v": lambda evt: self._canvas.paste_from_cache(),
-                "Delete\tDelete": lambda evt: self._canvas.delete(),
+                "{}\tCtrl+x".format(lang.get("menu_bar.edit.cut")): lambda evt: self._canvas.cut(),
+                "{}\tCtrl+c".format(lang.get("menu_bar.edit.copy")): lambda evt: self._canvas.copy(),
+                "{}\tCtrl+v".format(lang.get("menu_bar.edit.paste")): lambda evt: self._canvas.paste_from_cache(),
+                "{}\tDelete".format(lang.get("menu_bar.edit.delete")): lambda evt: self._canvas.delete(),
             }
         )
 
-        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).update(
+        menu.setdefault("&{}".format(lang.get("menu_bar.edit.menu_name")), {}).setdefault("shortcut", {}).update(
             {
-                "Goto\tCtrl+g": lambda evt: self._canvas.goto(),
-                "Select All\tCtrl+A": lambda evt: self._canvas.select_all(),
+                "{}\tCtrl+g".format(lang.get("menu_bar.edit.goto")): lambda evt: self._canvas.goto(),
+                "{}\tCtrl+A".format(lang.get("menu_bar.edit.select_all")): lambda evt: self._canvas.select_all(),
             }
         )
 
-        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
-            "Controls...", lambda evt: self._edit_controls()
+        menu.setdefault("&{}".format(lang.get("menu_bar.options.menu_name")), {}).setdefault("options", {}).setdefault(
+            lang.get("menu_bar.options.controls"), lambda evt: self._edit_controls()
         )
-        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
-            "Options...", lambda evt: self._edit_options()
+        menu.setdefault("&{}".format(lang.get("menu_bar.options.menu_name")), {}).setdefault("options", {}).setdefault(
+            lang.get("menu_bar.options.options"), lambda evt: self._edit_options()
         )
-        menu.setdefault("&Help", {}).setdefault("help", {}).setdefault(
-            "Controls", lambda evt: self._help_controls()
+        menu.setdefault("&{}".format(lang.get("menu_bar.help.menu_name")), {}).setdefault("help", {}).setdefault(
+            lang.get("menu_bar.help.controls"), lambda evt: self._help_controls()
         )
         return menu
 
