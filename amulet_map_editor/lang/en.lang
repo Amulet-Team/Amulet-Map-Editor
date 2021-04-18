@@ -2,6 +2,7 @@ world.java_platform=Java
 world.bedrock_platform=Bedrock
 world.close_world=Close World
 
+select_world.open_world_warning=Close the world in game and other tools before opening in Amulet.
 select_world.open_world_button=Open other world
 select_world.open_world_dialogue=Select a Minecraft world directory
 select_world.select_directory_failed=Failed to open directory!

@@ -70,6 +70,7 @@ def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
 
 class WorldUI(wx.Panel):
     """A Panel UI element with the world image, name and description"""
+
     def __init__(self, parent: wx.Window, world_format: "WorldFormatWrapper"):
         super().__init__(parent)
         self.SetWindowStyle(wx.TAB_TRAVERSAL | wx.BORDER_RAISED)
@@ -99,6 +100,7 @@ class WorldUI(wx.Panel):
 
 class WorldUIButton(WorldUI):
     """A Panel UI element that behaves like a button with the world image, name and description"""
+
     def __init__(
         self,
         parent: wx.Window,
@@ -119,6 +121,7 @@ class WorldUIButton(WorldUI):
 
 class WorldList(wx.Panel):
     """A Panel containing zero or more `WorldUIButton`s."""
+
     def __init__(self, parent: wx.Window, world_dirs, open_world_callback, sort=True):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -143,7 +146,9 @@ class WorldList(wx.Panel):
         for world_format in world_formats:
             try:
                 world_button = WorldUIButton(self, world_format, open_world_callback)
-                sizer.Add(world_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5)
+                sizer.Add(
+                    world_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
+                )
                 self.worlds.append(world_button)
             except Exception as e:
                 log.info(f"Failed to display world button for {world_format.path} {e}")
@@ -153,6 +158,7 @@ class WorldList(wx.Panel):
 
 class CollapsibleWorldListUI(wx.CollapsiblePane):
     """a drop down list of `WorldUIButton`s for a given directory"""
+
     def __init__(self, parent, paths: List[str], group_name: str, open_world_callback):
         super().__init__(parent, label=group_name)
         self.parent = parent
@@ -295,7 +301,10 @@ class WorldSelectAndRecentUI(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
-        warning_text = wx.StaticText(self, label="Close the world in game and other tools before opening in Amulet.")
+        warning_text = wx.StaticText(
+            self,
+            label=lang.get("select_world.open_world_warning"),
+        )
         warning_text.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         sizer.Add(warning_text, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, 5)
         # bar
