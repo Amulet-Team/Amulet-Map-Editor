@@ -99,12 +99,9 @@ class SelectionManager(Changeable):
         selections = []
         for points in selection_corners:
             if (
-                isinstance(points, (tuple, list))
-                and len(points) == 2
+                len(points) == 2
                 and all(
-                    isinstance(point, (tuple, list))
-                    and len(point) == 3
-                    and all(isinstance(p, (int, numpy.integer)) for p in point)
+                    len(point) == 3
                     for point in points
                 )
             ):

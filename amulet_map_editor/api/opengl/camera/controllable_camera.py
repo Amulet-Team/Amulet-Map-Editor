@@ -21,8 +21,7 @@ class ControllableCamera(Camera):
     @move_speed.setter
     def move_speed(self, val: float):
         """Set the speed that the camera moves at."""
-        assert isinstance(val, (int, float))
-        self._move_speed = val
+        self._move_speed = float(val)
 
     @property
     def rotate_speed(self) -> float:
@@ -32,8 +31,7 @@ class ControllableCamera(Camera):
     @rotate_speed.setter
     def rotate_speed(self, val: float):
         """Set the speed that the camera rotates at."""
-        assert isinstance(val, (int, float))
-        self._rotate_speed = val
+        self._rotate_speed = float(val)
 
     @property
     def rotating(self):

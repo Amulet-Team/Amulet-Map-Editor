@@ -135,11 +135,11 @@ class Camera(CanvasContainer):
         """Set the location of the camera. (x, y, z)."""
         assert (
             len(camera_location) == 3
-        ), "camera_location must be an iterable of floats with a length of three"
+        ), "camera_location must be an iterable of three floats."
         camera_location = tuple(map(float, camera_location))
         if camera_location != self._location:
             self._reset_matrix()
-            self._location = tuple(camera_location)
+            self._location = camera_location
             return True
         return False
 
@@ -164,11 +164,9 @@ class Camera(CanvasContainer):
         yaw (-180 to 180), pitch (-90 to 90)
         This should behave the same as how Minecraft handles it."""
         assert (
-            isinstance(camera_rotation, (tuple, list))
-            and len(camera_rotation) == 2
-            and all(isinstance(v, (int, float)) for v in camera_rotation)
-        ), "format for camera_rotation is invalid"
-        ry, rx = camera_rotation
+            len(camera_rotation) == 2
+        ), "camera_rotation must be an iterable of two floats."
+        ry, rx = map(float, camera_rotation)
         if not -180 <= ry < 180:
             ry %= 360
             if ry >= 180:
@@ -178,7 +176,7 @@ class Camera(CanvasContainer):
         camera_rotation = (ry, rx)
         if camera_rotation != self._rotation:
             self._reset_matrix()
-            self._rotation = tuple(camera_rotation)
+            self._rotation = camera_rotation
             return True
         return False
 
@@ -200,8 +198,7 @@ class Camera(CanvasContainer):
             self._notify_moved()
 
     def _set_fov(self, mode: Projection, fov: float):
-        assert isinstance(fov, (int, float))
-        self._fov[mode.value] = fov
+        self._fov[mode.value] = float(fov)
         self._reset_matrix()
 
     @property
@@ -238,11 +235,9 @@ class Camera(CanvasContainer):
 
     def _set_clipping(self, mode: Projection, clipping: Tuple[float, float]):
         assert (
-            isinstance(clipping, tuple)
-            and len(clipping) == 2
-            and all(isinstance(c, (int, float)) for c in clipping)
-        )
-        self._clipping[mode.value] = clipping
+            len(clipping) == 2
+        ), "camera_rotation must be an iterable of two floats."
+        self._clipping[mode.value] = tuple(map(float, clipping))
         self._reset_matrix()
 
     @property
@@ -273,8 +268,7 @@ class Camera(CanvasContainer):
     @aspect_ratio.setter
     def aspect_ratio(self, aspect_ratio: float):
         """Set the aspect ratio of the camera (width/weight)"""
-        assert isinstance(aspect_ratio, (int, float))
-        self._aspect_ratio = aspect_ratio
+        self._aspect_ratio = float(aspect_ratio)
         self._reset_matrix()
 
     @staticmethod

@@ -68,9 +68,8 @@ class MouseMovement(WindowContainer):
     def x(self, x: int):
         """Set the x pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
-        assert isinstance(x, int), "x must be an int"
         self._delta_x += self._x - self._start_x
-        self._start_x = self._x = self._to_relative(x, 0)[0]
+        self._start_x = self._x = self._to_relative(int(x), 0)[0]
         self._warp()
 
     @property
@@ -82,9 +81,8 @@ class MouseMovement(WindowContainer):
     def y(self, y: int):
         """Set the y pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
-        assert isinstance(y, int), "y must be an int"
         self._delta_y += self._y - self._start_y
-        self._start_y = self._y = self._to_relative(0, y)[1]
+        self._start_y = self._y = self._to_relative(0, int(y))[1]
         self._warp()
 
     @property
@@ -97,11 +95,9 @@ class MouseMovement(WindowContainer):
         """Set the x and y pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
         assert (
-            isinstance(xy, tuple)
-            and len(xy) == 2
-            and all(isinstance(c, int) for c in xy)
-        ), "xy must be of the form Tuple[int, int]"
-        x, y = xy
+            len(xy) == 2
+        ), "xy must be an iterable of two ints"
+        x, y = map(int, xy)
         self._delta_x += self._x - self._start_x
         self._delta_y += self._y - self._start_y
         (self._start_x, self._start_y) = (self._x, self._y) = self._to_relative(x, y)
