@@ -10,6 +10,7 @@ select_world.recent_worlds=Recently Opened Worlds
 main_menu.tab_name=Main Menu
 main_menu.open_world=Open World
 main_menu.help=Help
+main_menu.discord=Amulet Discord
 
 menu_bar.file.menu_name=File
 menu_bar.file.open_world=Open World
