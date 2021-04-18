@@ -114,7 +114,9 @@ class BaseEditCanvas(EventCanvas):
                     )
                 )
             )
-            yield 0.1, lang.get("program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack")
+            yield 0.1, lang.get(
+                "program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack"
+            )
             gen = get_bedrock_vanilla_latest_iter()
             try:
                 while True:
@@ -141,7 +143,9 @@ class BaseEditCanvas(EventCanvas):
                     )
                 )
             )
-            yield 0.1, lang.get("program_3d_edit.canvas.downloading_java_vanilla_resource_pack")
+            yield 0.1, lang.get(
+                "program_3d_edit.canvas.downloading_java_vanilla_resource_pack"
+            )
             gen = get_java_vanilla_latest_iter()
             try:
                 while True:
