@@ -94,9 +94,7 @@ class MouseMovement(WindowContainer):
     def xy(self, xy: Tuple[int, int]):
         """Set the x and y pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event."""
-        assert (
-            len(xy) == 2
-        ), "xy must be an iterable of two ints"
+        assert len(xy) == 2, "xy must be an iterable of two ints"
         x, y = map(int, xy)
         self._delta_x += self._x - self._start_x
         self._delta_y += self._y - self._start_y

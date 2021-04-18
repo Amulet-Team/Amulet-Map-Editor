@@ -234,9 +234,7 @@ class Camera(CanvasContainer):
         self._set_fov(Projection.TOP_DOWN, fov)
 
     def _set_clipping(self, mode: Projection, clipping: Tuple[float, float]):
-        assert (
-            len(clipping) == 2
-        ), "camera_rotation must be an iterable of two floats."
+        assert len(clipping) == 2, "camera_rotation must be an iterable of two floats."
         self._clipping[mode.value] = tuple(map(float, clipping))
         self._reset_matrix()
 

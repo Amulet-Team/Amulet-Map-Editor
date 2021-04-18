@@ -98,13 +98,7 @@ class SelectionManager(Changeable):
         """
         selections = []
         for points in selection_corners:
-            if (
-                len(points) == 2
-                and all(
-                    len(point) == 3
-                    for point in points
-                )
-            ):
+            if len(points) == 2 and all(len(point) == 3 for point in points):
                 selections.append(
                     tuple(tuple(int(p) for p in point) for point in points)
                 )
