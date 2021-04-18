@@ -9,13 +9,13 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
 import amulet_map_editor
-from amulet_map_editor import programs, log
+from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram
 
 _extensions: List[Tuple[str, Type[BaseProgram]]] = []
-_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [("About", AboutProgram)]
+_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [(lang.get("program_about.tab_name"), AboutProgram)]
 
 
 def load_extensions():
