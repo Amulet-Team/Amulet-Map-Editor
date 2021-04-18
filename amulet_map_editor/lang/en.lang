@@ -11,6 +11,10 @@ main_menu.tab_name=Main Menu
 main_menu.open_world=Open World
 main_menu.help=Help
 
+menu_bar.file.menu_name=File
+menu_bar.file.open_world=Open World
+menu_bar.file.quit=Quit
+
 program_about.tab_name=About
 program_about.currently_opened_world=Currently Opened World
 program_about.choose_from_options=Choose from the options on the left what you would like to do.\nYou can switch between these at any time.

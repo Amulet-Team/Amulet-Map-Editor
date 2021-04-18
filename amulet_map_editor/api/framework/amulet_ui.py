@@ -83,12 +83,12 @@ class AmuletUI(wx.Frame):
 
     def create_menu(self):
         menu_dict = {}
-        menu_dict.setdefault("&File", {}).setdefault("system", {}).setdefault(
-            "Open World", lambda evt: self._show_open_world()
+        menu_dict.setdefault("&{}".format(lang.get("menu_bar.file.menu_name")), {}).setdefault("system", {}).setdefault(
+            lang.get("menu_bar.file.open_world"), lambda evt: self._show_open_world()
         )
-        # menu_dict.setdefault('&File', {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
-        menu_dict.setdefault("&File", {}).setdefault("exit", {}).setdefault(
-            "Quit", lambda evt: self.Close()
+        # menu_dict.setdefault("&{}".format(lang.get("menu_bar.file.menu_name")), {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
+        menu_dict.setdefault("&{}".format(lang.get("menu_bar.file.menu_name")), {}).setdefault("exit", {}).setdefault(
+            lang.get("menu_bar.file.quit"), lambda evt: self.Close()
         )
         menu_dict = self._last_page.menu(menu_dict)
         menu_bar = wx.MenuBar()
