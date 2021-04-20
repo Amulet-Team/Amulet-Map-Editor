@@ -39,7 +39,15 @@ jobs:
           regex_version='^[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?(b[0-9]+)?$'
           curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq --arg reg $regex_version -r '[.[] | select(.tag_name | test($reg))][0]' > $HOME/release.json
           tag_name="$(jq -r '.tag_name' $HOME/release.json)"
+          # get the time of the commit that the release was built off
+          commit_date="$(jq -r '.created_at' $HOME/release.json)"
           rm -f $HOME/release.json
+          # convert time format into seconds
+          commit_timestamp=$(date --utc -d "&commit_date" +%s)
+          if $commit_timestamp >= $timestamp; then
+            # if the release is built off a newer or equal commit don't build
+            create_build=false
+          fi
           beta_regex_version='^([0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?b)([0-9]+)$'
           release_regex_version='^([0-9]+\.[0-9]+(\.[0-9]+)?\.)([0-9]+)$'
           if [[ $tag_name =~ $beta_regex_version ]]; then
