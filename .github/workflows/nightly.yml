@@ -43,7 +43,7 @@ jobs:
           commit_date="$(jq -r '.created_at' $HOME/release.json)"
           rm -f $HOME/release.json
           # convert time format into seconds
-          commit_timestamp=$(date --utc -d "&commit_date" +%s)
+          commit_timestamp=$(date --utc -d "$commit_date" +%s)
           if $commit_timestamp >= $timestamp; then
             # if the release is built off a newer or equal commit don't build
             create_build=false
