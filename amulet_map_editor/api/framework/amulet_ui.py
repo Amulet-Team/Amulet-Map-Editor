@@ -52,7 +52,7 @@ class AmuletUI(wx.Frame):
             | wx.RESIZE_BORDER,
         )
         icon = wx.Icon()
-        icon.CopyFromBitmap(image.logo.icon128.bitmap())
+        icon.CopyFromBitmap(image.logo.amulet_logo.bitmap())
         self.SetIcon(icon)
 
         self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}

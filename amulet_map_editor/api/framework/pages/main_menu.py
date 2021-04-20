@@ -16,7 +16,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self._open_world_callback = open_world
         name_sizer = wx.BoxSizer()
         sizer.Add(name_sizer, 0, wx.CENTER)
-        icon_img = image.logo.icon128.bitmap(64, 64)
+        icon_img = image.logo.amulet_logo.bitmap(64, 64)
 
         icon = wx.StaticBitmap(self, wx.ID_ANY, icon_img, (0, 0), (64, 64))
         icon2 = wx.StaticBitmap(self, wx.ID_ANY, icon_img, (0, 0), (64, 64))
@@ -25,9 +25,9 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         )
         name_sizer.Add(icon, flag=wx.CENTER)
 
-        amulet_converter = wx.StaticText(self, label="Amulet")
-        amulet_converter.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-        name_sizer.Add(amulet_converter, flag=wx.CENTER)
+        amulet_name = wx.StaticText(self, label="Amulet")
+        amulet_name.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        name_sizer.Add(amulet_name, flag=wx.CENTER | wx.LEFT | wx.RIGHT, border=10)
         name_sizer.Add(icon2, flag=wx.CENTER)
         button_font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
         self._open_world_button = wx.Button(
