@@ -83,13 +83,13 @@ class InspectBlockBehaviour(BaseBehaviour):
                 block_entity_str = str(block_entity)
                 block_data_text = f"{block_data_text}\n{block_entity_str}"
 
-            if chunk.biomes.dimension == 2:
+            if chunk.biomes.dimension == BiomesShape.Shape2D:
                 biome = chunk.biomes[x % 16, z % 16]
                 try:
                     block_data_text = f"{block_data_text}\n\nBiome: {self.canvas.world.biome_palette[biome]}"
                 except Exception as e:
                     log.error(e)
-            elif chunk.biomes.dimension == 3:
+            elif chunk.biomes.dimension == BiomesShape.Shape3D:
                 biome = chunk.biomes[(x % 16) // 4, y // 4, (z % 16) // 4]
                 try:
                     block_data_text = f"{block_data_text}\n\nBiome: {self.canvas.world.biome_palette[biome]}"
