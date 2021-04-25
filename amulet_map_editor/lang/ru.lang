@@ -17,7 +17,7 @@ program_about.choose_from_options=Выберите из вариантов сл�
 
 program_convert.tab_name=конвертация
 program_convert.convert_button=конвертация
-program_convert.input_world=Вхдной мир
+program_convert.input_world=Входной мир
 program_convert.output_world=Выходной мир
 program_convert.select_output_world=Выберите выходной мир
 program_convert.input_output_must_different=Входной и выходной миры должны быть разными!
