@@ -136,7 +136,11 @@ class LevelGroup(
         self._world_translation.append(
             (
                 -(
-                    (level.selection_bounds.min + level.selection_bounds.max) // 2
+                    (
+                        level.selection_bounds.min_array
+                        + level.selection_bounds.max_array
+                    )
+                    // 2
                 ).astype(int)
             ).tolist()
         )
