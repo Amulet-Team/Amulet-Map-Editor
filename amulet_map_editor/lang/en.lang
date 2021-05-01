@@ -17,12 +17,12 @@ main_menu.open_world=Open World
 main_menu.help=Help
 main_menu.discord=Amulet Discord
 
-menu_bar.file.menu_name=File
+menu_bar.file.menu_name=&File
 menu_bar.file.open_world=Open World
 menu_bar.file.close_world=Close World
 menu_bar.file.save=Save
 menu_bar.file.quit=Quit
-menu_bar.edit.menu_name=Edit
+menu_bar.edit.menu_name=&Edit
 menu_bar.edit.undo=Undo
 menu_bar.edit.redo=Redo
 menu_bar.edit.cut=Cut
@@ -31,10 +31,10 @@ menu_bar.edit.paste=Paste
 menu_bar.edit.delete=Delete
 menu_bar.edit.goto=Goto
 menu_bar.edit.select_all=Select All
-menu_bar.options.menu_name=Options
+menu_bar.options.menu_name=&Options
 menu_bar.options.controls=Controls...
 menu_bar.options.options=Options...
-menu_bar.help.menu_name=Help
+menu_bar.help.menu_name=&Help
 menu_bar.help.controls=Controls
 
 update_check.newer_version_released=A new version of Amulet has been released!

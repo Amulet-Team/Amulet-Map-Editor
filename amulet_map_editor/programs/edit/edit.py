@@ -140,14 +140,14 @@ class EditExtension(wx.Panel, BaseProgram):
         return True
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault(f"&{lang.get('menu_bar.file.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault(
             "system", {}
         ).setdefault(
             f"{lang.get('menu_bar.file.save')}\tCtrl+s", lambda evt: self._canvas.save()
         )
-        # menu.setdefault(f"&{lang.get('menu_bar.file.menu_name')}", {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        # menu.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
 
-        menu.setdefault(f"&{lang.get('menu_bar.edit.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.edit.menu_name'), {}).setdefault(
             "history", {}
         ).update(
             {
@@ -156,7 +156,7 @@ class EditExtension(wx.Panel, BaseProgram):
             }
         )
 
-        menu.setdefault(f"&{lang.get('menu_bar.edit.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.edit.menu_name'), {}).setdefault(
             "operation", {}
         ).update(
             {
@@ -167,7 +167,7 @@ class EditExtension(wx.Panel, BaseProgram):
             }
         )
 
-        menu.setdefault(f"&{lang.get('menu_bar.edit.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.edit.menu_name'), {}).setdefault(
             "shortcut", {}
         ).update(
             {
@@ -176,17 +176,17 @@ class EditExtension(wx.Panel, BaseProgram):
             }
         )
 
-        menu.setdefault(f"&{lang.get('menu_bar.options.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.options.menu_name'), {}).setdefault(
             "options", {}
         ).setdefault(
             lang.get("menu_bar.options.controls"), lambda evt: self._edit_controls()
         )
-        menu.setdefault(f"&{lang.get('menu_bar.options.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.options.menu_name'), {}).setdefault(
             "options", {}
         ).setdefault(
             lang.get("menu_bar.options.options"), lambda evt: self._edit_options()
         )
-        menu.setdefault(f"&{lang.get('menu_bar.help.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.help.menu_name'), {}).setdefault(
             "help", {}
         ).setdefault(
             lang.get("menu_bar.help.controls"), lambda evt: self._help_controls()

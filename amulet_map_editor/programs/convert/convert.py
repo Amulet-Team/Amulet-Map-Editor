@@ -97,7 +97,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         self.out_world_path = None
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault(f"&{lang.get('menu_bar.help.menu_name')}", {}).setdefault(
+        menu.setdefault(lang.get('menu_bar.help.menu_name'), {}).setdefault(
             "control", {}
         ).setdefault(
             lang.get("menu_bar.help.controls"), lambda evt: self._help_controls()
