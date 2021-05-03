@@ -140,25 +140,26 @@ class EditExtension(wx.Panel, BaseProgram):
         return True
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault(
+        menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "system", {}
         ).setdefault(
-            f"{lang.get('program_3d_edit.menu_bar.file.save')}\tCtrl+s", lambda evt: self._canvas.save()
+            f"{lang.get('program_3d_edit.menu_bar.file.save')}\tCtrl+s",
+            lambda evt: self._canvas.save(),
         )
         # menu.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
 
-        menu.setdefault(lang.get('program_3d_edit.menu_bar.edit.menu_name'), {}).setdefault(
-            "history", {}
-        ).update(
+        menu.setdefault(
+            lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
+        ).setdefault("history", {}).update(
             {
                 f"{lang.get('program_3d_edit.menu_bar.edit.undo')}\tCtrl+z": lambda evt: self._canvas.undo(),
                 f"{lang.get('program_3d_edit.menu_bar.edit.redo')}\tCtrl+y": lambda evt: self._canvas.redo(),
             }
         )
 
-        menu.setdefault(lang.get('program_3d_edit.menu_bar.edit.menu_name'), {}).setdefault(
-            "operation", {}
-        ).update(
+        menu.setdefault(
+            lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
+        ).setdefault("operation", {}).update(
             {
                 f"{lang.get('program_3d_edit.menu_bar.edit.cut')}\tCtrl+x": lambda evt: self._canvas.cut(),
                 f"{lang.get('program_3d_edit.menu_bar.edit.copy')}\tCtrl+c": lambda evt: self._canvas.copy(),
@@ -167,29 +168,32 @@ class EditExtension(wx.Panel, BaseProgram):
             }
         )
 
-        menu.setdefault(lang.get('program_3d_edit.menu_bar.edit.menu_name'), {}).setdefault(
-            "shortcut", {}
-        ).update(
+        menu.setdefault(
+            lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
+        ).setdefault("shortcut", {}).update(
             {
                 f"{lang.get('program_3d_edit.menu_bar.edit.goto')}\tCtrl+g": lambda evt: self._canvas.goto(),
                 f"{lang.get('program_3d_edit.menu_bar.edit.select_all')}\tCtrl+A": lambda evt: self._canvas.select_all(),
             }
         )
 
-        menu.setdefault(lang.get('menu_bar.options.menu_name'), {}).setdefault(
+        menu.setdefault(lang.get("menu_bar.options.menu_name"), {}).setdefault(
             "options", {}
         ).setdefault(
-            lang.get("program_3d_edit.menu_bar.options.controls"), lambda evt: self._edit_controls()
+            lang.get("program_3d_edit.menu_bar.options.controls"),
+            lambda evt: self._edit_controls(),
         )
-        menu.setdefault(lang.get('menu_bar.options.menu_name'), {}).setdefault(
+        menu.setdefault(lang.get("menu_bar.options.menu_name"), {}).setdefault(
             "options", {}
         ).setdefault(
-            lang.get("program_3d_edit.menu_bar.options.options"), lambda evt: self._edit_options()
+            lang.get("program_3d_edit.menu_bar.options.options"),
+            lambda evt: self._edit_options(),
         )
-        menu.setdefault(lang.get('menu_bar.help.menu_name'), {}).setdefault(
+        menu.setdefault(lang.get("menu_bar.help.menu_name"), {}).setdefault(
             "help", {}
         ).setdefault(
-            lang.get("program_3d_edit.menu_bar.help.controls"), lambda evt: self._help_controls()
+            lang.get("program_3d_edit.menu_bar.help.controls"),
+            lambda evt: self._help_controls(),
         )
         return menu
 
