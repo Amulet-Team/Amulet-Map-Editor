@@ -101,7 +101,7 @@ class EditExtension(wx.Panel, BaseProgram):
             if self._canvas.is_closeable():
                 return self._check_close_world()
             log.info(
-                f"The canvas in edit for world {self._world.level_wrapper.world_name} was not closeable for some reason."
+                f"The canvas in edit for world {self._world.level_wrapper.level_name} was not closeable for some reason."
             )
             return False
         return not bool(self._world.history_manager.unsaved_changes)
@@ -120,7 +120,7 @@ class EditExtension(wx.Panel, BaseProgram):
                 } {unsaved_changes} unsaved change{
                 's' if unsaved_changes >= 2 else ''
                 } in {
-                self._world.level_wrapper.world_name
+                self._world.level_wrapper.level_name
                 }. Would you like to save?""",
                 style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT,
             )
@@ -133,7 +133,7 @@ class EditExtension(wx.Panel, BaseProgram):
             elif response == wx.ID_CANCEL:
                 log.info(
                     f"""Aborting closing world {
-                    self._world.level_wrapper.world_name
+                    self._world.level_wrapper.level_name
                     } because the user pressed cancel."""
                 )
                 return False

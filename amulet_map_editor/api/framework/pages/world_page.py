@@ -67,7 +67,7 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         except LoaderNoneMatched as e:
             self.Destroy()
             raise e
-        self.world_name = self.world.level_wrapper.world_name
+        self.world_name = self.world.level_wrapper.level_name
         self._extensions: List[BaseProgram] = []
         self._last_extension: int = -1
         self._load_extensions()

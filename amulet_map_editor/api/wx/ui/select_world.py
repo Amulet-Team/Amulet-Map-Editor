@@ -87,7 +87,7 @@ class WorldUI(wx.Panel):
             self,
             label="\n".join(
                 [
-                    world_format.world_name,
+                    world_format.level_name,
                     world_format.game_version_string,
                     os.path.join(
                         *os.path.normpath(world_format.path).split(os.sep)[-3:]
