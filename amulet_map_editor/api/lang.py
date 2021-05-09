@@ -25,6 +25,9 @@ except:
 # if a language is set in the config use that
 _language = CONFIG.get("amulet_meta", {}).get("lang", _language)
 
+if _language is None:
+    _language = _default_language
+
 
 def register_lang_directory(lang_dir: str):
     """Register a new language directory.
