@@ -87,7 +87,7 @@ class WorldUI(wx.Panel):
             self,
             label="\n".join(
                 [
-                    world_format.world_name,
+                    world_format.level_name,
                     world_format.game_version_string,
                     os.path.join(
                         *os.path.normpath(world_format.path).split(os.sep)[-3:]
@@ -332,7 +332,7 @@ class WorldSelectDialog(wx.Dialog):
     def __init__(self, parent: wx.Window, open_world_callback: Callable[[str], None]):
         super().__init__(
             parent,
-            title="World Select",
+            title=lang.get("select_world.title"),
             pos=wx.Point(50, 50),
             size=wx.Size(*[int(s * 0.95) for s in parent.GetSize()]),
             style=wx.CAPTION | wx.CLOSE_BOX | wx.MAXIMIZE_BOX

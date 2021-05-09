@@ -56,11 +56,11 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         selections = []
         for box in self.canvas.selection.selection_group.selection_boxes:
             min_point = (
-                numpy.floor(numpy.array(box.min) / self.canvas.world.sub_chunk_size)
+                numpy.floor(box.min_array / self.canvas.world.sub_chunk_size)
                 * self.canvas.world.sub_chunk_size
             )
             max_point = (
-                numpy.ceil(numpy.array(box.max) / self.canvas.world.sub_chunk_size)
+                numpy.ceil(box.max_array / self.canvas.world.sub_chunk_size)
                 * self.canvas.world.sub_chunk_size
             )
             min_point[1] = self.canvas.world.selection_bounds.min[1]

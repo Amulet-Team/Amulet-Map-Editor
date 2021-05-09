@@ -34,7 +34,7 @@ from amulet_map_editor.programs.edit.api.selection import (
     SelectionManager,
     SelectionHistoryManager,
 )
-from amulet_map_editor import log
+from amulet_map_editor import log, lang
 import amulet_map_editor.programs.edit as amulet_edit
 
 from amulet_map_editor.api.opengl.camera import ControllableCamera
@@ -114,14 +114,16 @@ class BaseEditCanvas(EventCanvas):
                     )
                 )
             )
-            yield 0.1, "Downloading Bedrock vanilla resource pack"
+            yield 0.1, lang.get(
+                "program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack"
+            )
             gen = get_bedrock_vanilla_latest_iter()
             try:
                 while True:
                     yield next(gen) * 0.4 + 0.1
             except StopIteration as e:
                 packs.append(e.value)
-            yield 0.5, "Loading resource packs"
+            yield 0.5, lang.get("program_3d_edit.canvas.loading_resource_packs")
 
             packs += [
                 pack for pack in user_packs if isinstance(pack, BedrockResourcePack)
@@ -141,7 +143,9 @@ class BaseEditCanvas(EventCanvas):
                     )
                 )
             )
-            yield 0.1, "Downloading Java vanilla resource pack"
+            yield 0.1, lang.get(
+                "program_3d_edit.canvas.downloading_java_vanilla_resource_pack"
+            )
             gen = get_java_vanilla_latest_iter()
             try:
                 while True:
@@ -154,13 +158,10 @@ class BaseEditCanvas(EventCanvas):
                     exc_info=True,
                 )
                 wx.MessageBox(
-                    "Failed to download the latest Java resource pack.\n"
-                    "Check your internet connection and restart Amulet.\n"
-                    "Check the console for more details.\n"
-                    f"{e}"
+                    f"{lang.get('program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed')}\n{e}"
                 )
 
-            yield 0.5, "Loading resource packs"
+            yield 0.5, lang.get("program_3d_edit.canvas.loading_resource_packs")
             packs += [pack for pack in user_packs if isinstance(pack, JavaResourcePack)]
             packs.append(get_java_vanilla_fix())
 
@@ -172,11 +173,11 @@ class BaseEditCanvas(EventCanvas):
 
         opengl_resource_pack = OpenGLResourcePack(resource_pack, translator)
 
-        yield 0.75, "Creating texture atlas"
+        yield 0.75, lang.get("program_3d_edit.canvas.creating_texture_atlas")
         for i in opengl_resource_pack.setup():
             yield i / 4 + 0.75
 
-        yield 1.0, "Setting up renderer"
+        yield 1.0, lang.get("program_3d_edit.canvas.setting_up_renderer")
 
         self._renderer: Optional[Renderer] = Renderer(
             self,

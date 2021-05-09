@@ -12,13 +12,13 @@ main_menu.open_world=Открыть мир
 main_menu.help=помощь
 
 program_about.tab_name=Дополнительно
-program_about.currently_opened_world=Текущий открытый мир
+program_about.currently_opened_world=Текущий открытый мир:
 program_about.choose_from_options=Выберите из вариантов слева то, что вы хотели бы сделать.\nВы может переключаться между ними в любое время.
 
 program_convert.tab_name=конвертация
 program_convert.convert_button=конвертация
-program_convert.input_world=Входной мир
-program_convert.output_world=Выходной мир
+program_convert.input_world=Входной мир:
+program_convert.output_world=Выходной мир:
 program_convert.select_output_world=Выберите выходной мир
 program_convert.input_output_must_different=Входной и выходной миры должны быть разными!
 program_convert.select_before_converting=Выберите мир перед конвертацией!

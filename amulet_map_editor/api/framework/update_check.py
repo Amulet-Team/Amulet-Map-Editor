@@ -9,6 +9,8 @@ import webbrowser
 
 import wx
 
+from amulet_map_editor import lang
+
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
 VERSION_REGEX = re.compile(
     r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<bugfix>\d+))?(b(?P<beta>\d+))?$"
@@ -110,10 +112,14 @@ class UpdateDialog(wx.Dialog):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
 
         static_text_1 = wx.StaticText(
-            self, label="A new version of Amulet has been released!"
+            self, label=lang.get("update_check.newer_version_released")
         )
-        static_text_2 = wx.StaticText(self, label=f"New Version: v{new_version}")
-        static_text_3 = wx.StaticText(self, label=f"Your Version: v{current_version}")
+        static_text_2 = wx.StaticText(
+            self, label=f"{lang.get('update_check.new_version')} v{new_version}"
+        )
+        static_text_3 = wx.StaticText(
+            self, label=f"{lang.get('update_check.current_version')} v{current_version}"
+        )
 
         sizer_1.Add(static_text_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
         sizer_1.Add(static_text_2, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
@@ -121,8 +127,8 @@ class UpdateDialog(wx.Dialog):
 
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
 
-        update_button = wx.Button(self, label="Go to Download Page")
-        ok_button = wx.Button(self, label="Ok")
+        update_button = wx.Button(self, label=lang.get("update_check.update"))
+        ok_button = wx.Button(self, label=lang.get("update_check.ok"))
 
         sizer_2.Add(update_button, 0, wx.ALL, 5)
         sizer_2.Add((0, 0), 1, wx.EXPAND, 5)

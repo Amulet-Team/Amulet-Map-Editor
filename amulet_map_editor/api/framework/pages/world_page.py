@@ -1,5 +1,5 @@
 import wx
-from typing import List, Callable, Tuple, Type
+from typing import List, Callable, Tuple, Type, Union, Optional
 import traceback
 import importlib
 import pkgutil
@@ -9,13 +9,15 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
 import amulet_map_editor
-from amulet_map_editor import programs, log
+from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram
 
 _extensions: List[Tuple[str, Type[BaseProgram]]] = []
-_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [("About", AboutProgram)]
+_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [
+    (lang.get("program_about.tab_name"), AboutProgram)
+]
 
 
 def load_extensions():
@@ -23,9 +25,11 @@ def load_extensions():
         _extensions.extend(_fixed_extensions)
         prefix = f"{programs.__name__}."
 
+        extensions = []
+
         # source support
         for _, name, _ in pkgutil.iter_modules(programs.__path__, prefix):
-            load_extension(name)
+            extensions.append(load_extension(name))
 
         # pyinstaller support
         toc = set()
@@ -35,10 +39,16 @@ def load_extensions():
         match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9_]*$")
         for name in toc:
             if match.fullmatch(name):
-                load_extension(name)
+                extensions.append(load_extension(name))
+
+        _extensions.extend(
+            sorted((ext for ext in extensions if ext is not None), key=lambda x: x[0])
+        )
 
 
-def load_extension(module_name: str):
+def load_extension(
+    module_name: str,
+) -> Optional[Tuple[str, Union[Type[BaseProgram], Type[wx.Window]]]]:
     # load module and confirm that all required attributes are defined
     try:
         module = importlib.import_module(module_name)
@@ -47,12 +57,15 @@ def load_extension(module_name: str):
     else:
         if hasattr(module, "export"):
             export = getattr(module, "export")
-            if (
-                "ui" in export
-                and issubclass(export["ui"], BaseProgram)
-                and issubclass(export["ui"], wx.Window)
-            ):
-                _extensions.append((export.get("name", "missingno"), export["ui"]))
+            if isinstance(export, dict):
+                ui = export.get("ui", None)
+                name = export.get("name", None)
+                if (
+                    isinstance(name, str)
+                    and issubclass(ui, BaseProgram)
+                    and issubclass(ui, wx.Window)
+                ):
+                    return name, ui
 
 
 class WorldPageUI(wx.Notebook, BasePageUI):
@@ -67,7 +80,7 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         except LoaderNoneMatched as e:
             self.Destroy()
             raise e
-        self.world_name = self.world.level_wrapper.world_name
+        self.world_name = self.world.level_wrapper.level_name
         self._extensions: List[BaseProgram] = []
         self._last_extension: int = -1
         self._load_extensions()
@@ -78,8 +91,10 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         return self._path
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault("&File", {}).setdefault("exit", {}).setdefault(
-            "Close World", lambda evt: self._close_self_callback
+        menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
+            "exit", {}
+        ).setdefault(
+            lang.get("menu_bar.file.close_world"), lambda evt: self._close_self_callback
         )
         return self._extensions[self.GetSelection()].menu(menu)
 

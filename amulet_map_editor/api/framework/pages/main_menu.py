@@ -44,7 +44,9 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
         sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)
 
-        self._help_button = wx.Button(self, label="Amulet Discord", size=(400, 70))
+        self._help_button = wx.Button(
+            self, label=lang.get("main_menu.discord"), size=(400, 70)
+        )
         self._help_button.SetFont(button_font)
         self._help_button.Bind(wx.EVT_BUTTON, self._discord)
         sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)

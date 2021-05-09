@@ -12,13 +12,13 @@ main_menu.open_world=Welt öffnen
 main_menu.help=Hilfe
 
 program_about.tab_name=Impressum
-program_about.currently_opened_world=Derzeit geöffnet Welt
+program_about.currently_opened_world=Derzeit geöffnet Welt:
 program_about.choose_from_options=Auswählen von die linkerseits Optionen, für was man machen will.\nImmer kann man zwischen diese wechseln. 
 
 program_convert.tab_name=Wandele um
 program_convert.convert_button=Wandele um
-program_convert.input_world=Eingabewelt
-program_convert.output_world=Ausgabewelt
+program_convert.input_world=Eingabewelt:
+program_convert.output_world=Ausgabewelt:
 program_convert.select_output_world=Ausgabewelt auswählen
 program_convert.input_output_must_different=Die Eingabewelt und Ausgabewelt müssen verschiedene sein!
 program_convert.select_before_converting=Wählen Sie vor umwandeln eine Welt aus! 

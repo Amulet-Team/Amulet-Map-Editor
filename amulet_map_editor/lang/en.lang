@@ -1,25 +1,44 @@
+app.world_still_used=A world is still being used. Please close it first
+
 world.java_platform=Java
 world.bedrock_platform=Bedrock
 world.close_world=Close World
 
+select_world.title=World Select
 select_world.open_world_warning=Close the world in game and other tools before opening in Amulet.
 select_world.open_world_button=Open other world
 select_world.open_world_dialogue=Select a Minecraft world directory
 select_world.select_directory_failed=Failed to open directory!
 select_world.recent_worlds=Recently Opened Worlds
+select_world.no_loader_found=Could not find a loader for this world.
+select_world.loading_world_failed=Error loading world. Check the console for more details.
 
 main_menu.tab_name=Main Menu
 main_menu.open_world=Open World
 main_menu.help=Help
+main_menu.discord=Amulet Discord
+
+menu_bar.file.menu_name=&File
+menu_bar.file.open_world=Open World
+menu_bar.file.close_world=Close World
+menu_bar.file.quit=Quit
+menu_bar.options.menu_name=&Options
+menu_bar.help.menu_name=&Help
+
+update_check.newer_version_released=A new version of Amulet has been released!
+update_check.new_version=New Version:
+update_check.current_version=Your Version:
+update_check.update=Go to Download Page
+update_check.ok=Ok
 
 program_about.tab_name=About
-program_about.currently_opened_world=Currently Opened World
+program_about.currently_opened_world=Currently Opened World:
 program_about.choose_from_options=Choose from the options on the left what you would like to do.\nYou can switch between these at any time.
 
 program_convert.tab_name=Convert
 program_convert.convert_button=Convert
-program_convert.input_world=Input World
-program_convert.output_world=Output World
+program_convert.input_world=Input World:
+program_convert.output_world=Output World:
 program_convert.select_output_world=Select Output World
 program_convert.input_output_must_different=The input and output worlds must be different!
 program_convert.select_before_converting=Select a world before converting!
@@ -115,3 +134,25 @@ program_3d_edit.goto_ui.z_label=z:
 program_3d_edit.goto_ui.z_label_tooltip=The z coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
 program_3d_edit.goto_ui.copy_button_tooltip=Copy the x, y and z values to the clipboard in the form "0.0 0.0 0.0" (x, y and z respectively)
 program_3d_edit.goto_ui.paste_button_tooltip=Paste a previously copied coordinate into the inputs. Copied value must three numbers separated with spaces or commas.
+
+program_3d_edit.canvas.please_wait=Please wait while the renderer loads
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Downloading Bedrock vanilla resource pack
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Downloading Java vanilla resource pack
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Failed to download the latest Java resource pack.\nCheck your internet connection and restart Amulet.\nCheck the console for more details.
+program_3d_edit.canvas.loading_resource_packs=Loading resource packs
+program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
+program_3d_edit.canvas.setting_up_renderer=Setting up renderer
+
+program_3d_edit.menu_bar.file.save=Save
+program_3d_edit.menu_bar.edit.menu_name=&Edit
+program_3d_edit.menu_bar.edit.undo=Undo
+program_3d_edit.menu_bar.edit.redo=Redo
+program_3d_edit.menu_bar.edit.cut=Cut
+program_3d_edit.menu_bar.edit.copy=Copy
+program_3d_edit.menu_bar.edit.paste=Paste
+program_3d_edit.menu_bar.edit.delete=Delete
+program_3d_edit.menu_bar.edit.goto=Goto
+program_3d_edit.menu_bar.edit.select_all=Select All
+program_3d_edit.menu_bar.options.controls=Controls...
+program_3d_edit.menu_bar.options.options=Options...
+program_3d_edit.menu_bar.help.controls=Controls
