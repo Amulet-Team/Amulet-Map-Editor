@@ -6,13 +6,10 @@ from OpenGL.GL import (
     GL_FRONT,
     GL_BACK,
     glDisable,
+    glEnable,
     GL_DEPTH_TEST,
     GL_LINE_STRIP,
-    glPushAttrib,
-    GL_DEPTH_BUFFER_BIT,
-    GL_POLYGON_BIT,
-    glPopAttrib,
-    GL_ENABLE_BIT,
+    glGetBooleanv,
     glGetIntegerv,
     GL_CULL_FACE_MODE,
 )
@@ -254,15 +251,13 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
-        glPushAttrib(
-            GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT | GL_ENABLE_BIT
-        )  # store opengl state
+        depth_state = glGetBooleanv(GL_DEPTH_TEST)
+        cull_state = glGetIntegerv(GL_CULL_FACE_MODE)
 
         if camera_position is not None and camera_position in self:
-            mode = glGetIntegerv(GL_CULL_FACE_MODE)
-            if mode == GL_BACK:
+            if cull_state == GL_BACK:
                 glCullFace(GL_FRONT)
-            elif mode == GL_FRONT:
+            elif cull_state == GL_FRONT:
                 glCullFace(GL_BACK)
 
         self.draw_start = 0
@@ -270,8 +265,11 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         super()._draw(transformation_matrix)
 
         # draw the lines around the boxes
-        glDisable(GL_DEPTH_TEST)
+        if depth_state:
+            glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
         super()._draw(transformation_matrix)
+        if depth_state:
+            glEnable(GL_DEPTH_TEST)
 
-        glPopAttrib()  # reset to starting state
+        glCullFace(cull_state)
