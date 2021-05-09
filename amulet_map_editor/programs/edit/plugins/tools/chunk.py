@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 import wx
 from OpenGL.GL import (
     glClear,
@@ -6,6 +6,7 @@ from OpenGL.GL import (
     GL_DEPTH_TEST,
     glEnable,
     glDisable,
+    glGetBoolean,
 )
 
 from amulet_map_editor import lang
@@ -150,10 +151,13 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             self._selection.draw()
         else:
-            glDisable(GL_DEPTH_TEST)
+            depth_state = glGetBoolean(GL_DEPTH_TEST)
+            if depth_state:
+                glDisable(GL_DEPTH_TEST)
             clip = self.canvas.camera.orthographic_clipping
             self.canvas.camera.orthographic_clipping = -(10 ** 5), 10 ** 5
             self._selection.draw()
             self.canvas.camera.orthographic_clipping = clip
-            glEnable(GL_DEPTH_TEST)
+            if depth_state:
+                glEnable(GL_DEPTH_TEST)
         self.canvas.renderer.end_draw()

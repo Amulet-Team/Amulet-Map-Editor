@@ -4,9 +4,8 @@ from OpenGL.GL import (
     glCullFace,
     GL_FRONT,
     GL_BACK,
-    glPushAttrib,
-    GL_POLYGON_BIT,
-    glPopAttrib,
+    glGetIntegerv,
+    GL_CULL_FACE_MODE,
 )
 
 from amulet.api.level import BaseLevel
@@ -189,10 +188,10 @@ class LevelGroup(
         for level, transform, is_mirrored in zip(
             self._objects, self._transformation_matrices, self._is_mirrored
         ):
-            glPushAttrib(GL_POLYGON_BIT)  # store opengl state
+            cull_state = glGetIntegerv(GL_CULL_FACE_MODE)
             if is_mirrored:
                 glCullFace(GL_FRONT)
             else:
                 glCullFace(GL_BACK)
             level.draw(numpy.matmul(camera_matrix, transform))
-            glPopAttrib()  # reset to starting state
+            glCullFace(cull_state)
