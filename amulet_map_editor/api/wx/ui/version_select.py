@@ -29,6 +29,9 @@ from amulet.api.data_types import VersionNumberTuple, PlatformType
 
 
 class PlatformSelect(wx.Panel):
+    """
+    A UI element that allows you to pick between the platforms in the translator.
+    """
     def __init__(
         self,
         parent: wx.Window,
@@ -39,9 +42,22 @@ class PlatformSelect(wx.Panel):
         allowed_platforms: Tuple[PlatformType, ...] = None,
         **kwargs
     ):
+        """
+        Construct a :class:`PlatformSelect` UI.
+
+        :param parent: The parent window.
+        :param translation_manager: The translation manager to populate from.
+        :param platform: The default platform (optional)
+        :param allow_universal: If True the universal format will be included.
+        :param allow_vanilla: If True the vanilla formats will be included.
+        :param allowed_platforms: A whitelist of platforms.
+        :param kwargs: Keyword args to be given to the Panel.
+        """
         super().__init__(parent, style=wx.BORDER_SIMPLE)
-        self._sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(self._sizer)
+        sizer = wx.BoxSizer()
+        self.SetSizer(sizer)
+        self._sizer = wx.FlexGridSizer(2, 5, 5)
+        sizer.Add(self._sizer, 0, wx.ALL, 5)
 
         self._translation_manager = translation_manager
         self._allow_universal = allow_universal
@@ -62,12 +78,10 @@ class PlatformSelect(wx.Panel):
     def _add_ui_element(
         self, label: str, obj: Type[wx.Control], shown=True, **kwargs
     ) -> Any:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
         text = wx.StaticText(self, label=label, style=wx.ALIGN_CENTER)
-        sizer.Add(text, 1)
+        self._sizer.Add(text, 0, wx.ALIGN_CENTER)
         wx_obj = obj(self, **kwargs)
-        sizer.Add(wx_obj, 2)
+        self._sizer.Add(wx_obj, 0, wx.EXPAND)
         if not shown:
             text.Hide()
             wx_obj.Hide()
@@ -102,6 +116,9 @@ class PlatformSelect(wx.Panel):
 
 
 class VersionSelect(PlatformSelect):
+    """
+    A UI element that allows you to pick between the platforms and versions in the translator.
+    """
     def __init__(
         self,
         parent: wx.Window,
@@ -114,6 +131,19 @@ class VersionSelect(PlatformSelect):
         allow_blockstate: bool = True,
         **kwargs
     ):
+        """
+        Construct a :class:`VersionSelect` UI.
+
+        :param parent: The parent window.
+        :param translation_manager: The translation manager to populate from.
+        :param platform: The default platform (optional)
+        :param version_number: The default version number (optional)
+        :param force_blockstate: If True and the native format is numerical will use the custom blockstate format. Else will use the native format.
+        :param show_force_blockstate: Should the format selection be shown to the user.
+        :param allow_numerical: Should the numerical versions be shown to the user.
+        :param allow_blockstate: Should the blockstate versions be shown to the user.
+        :param kwargs: Keyword args to be given to the :class:`PlatformSelect` and Panel.
+        """
         super().__init__(parent, translation_manager, platform, **kwargs)
         self._allow_numerical = allow_numerical
         self._allow_blockstate = allow_blockstate
@@ -240,15 +270,21 @@ if __name__ == "__main__":
         app = wx.App()
         for cls in (
             PlatformSelect,
-            VersionSelect,
             lambda *args: VersionSelect(*args, show_force_blockstate=False),
+            VersionSelect,
         ):
             dialog = wx.Dialog(None)
             sizer = wx.BoxSizer()
             dialog.SetSizer(sizer)
-            sizer.Add(cls(dialog, translation_manager))
+            sizer.Add(cls(dialog, translation_manager), 0, wx.ALL, 5)
             dialog.Show()
             dialog.Fit()
+
+            def get_on_close(dialog_):
+                def on_close(evt):
+                    dialog_.Destroy()
+                return on_close
+            dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
         app.MainLoop()
 
     main()
