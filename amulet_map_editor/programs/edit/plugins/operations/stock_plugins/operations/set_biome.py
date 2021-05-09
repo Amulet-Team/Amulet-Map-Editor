@@ -97,9 +97,9 @@ class SetBiome(SimpleOperationPanel):
             offset_x, offset_z = x - 16 * cx, z - 16 * cz
             chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
 
-            if chunk.biomes.dimension == 3:
+            if chunk.biomes.dimension == BiomesShape.Shape3D:
                 biome = chunk.biomes[offset_x // 4, y // 4, offset_z // 4]
-            elif chunk.biomes.dimension == 2:
+            elif chunk.biomes.dimension == BiomesShape.Shape2D:
                 biome = chunk.biomes[offset_x, offset_z]
             else:
                 return
@@ -120,24 +120,24 @@ class SetBiome(SimpleOperationPanel):
             )
 
             if mode == BoxMode:
-                if chunk.biomes.dimension == 3:
+                if chunk.biomes.dimension == BiomesShape.Shape3D:
                     slices = (
                         slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
                         slice(slices[1].start // 4, math.ceil(slices[1].stop / 4)),
                         slice(slices[2].start // 4, math.ceil(slices[2].stop / 4)),
                     )
-                elif chunk.biomes.dimension == 2:
+                elif chunk.biomes.dimension == BiomesShape.Shape2D:
                     slices = (slices[0], slices[2])
                 else:
                     continue
             elif mode == ColumnMode:
-                if chunk.biomes.dimension == 3:
+                if chunk.biomes.dimension == BiomesShape.Shape3D:
                     slices = (
                         slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
                         slice(None, None, None),
                         slice(slices[2].start // 4, math.ceil(slices[2].stop / 4)),
                     )
-                elif chunk.biomes.dimension == 2:
+                elif chunk.biomes.dimension == BiomesShape.Shape2D:
                     slices = (slices[0], slices[2])
                 else:
                     continue
