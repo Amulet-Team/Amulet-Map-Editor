@@ -5,13 +5,21 @@ from typing import Tuple, Optional
 
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 from .platform_select import PlatformSelect
-from .events import PlatformChangeEvent, EVT_PLATFORM_CHANGE, VersionNumberChangeEvent, EVT_VERSION_NUMBER_CHANGE, FormatChangeEvent, EVT_VERSION_CHANGE, VersionChangeEvent, EVT_FORMAT_CHANGE
+from .events import (
+    PlatformChangeEvent,
+    EVT_PLATFORM_CHANGE,
+    VersionNumberChangeEvent,
+    EVT_VERSION_NUMBER_CHANGE,
+    FormatChangeEvent,
+    VersionChangeEvent,
+)
 
 
 class VersionSelect(PlatformSelect):
     """
     A UI element that allows you to pick between the platforms and versions in the translator.
     """
+
     def __init__(
         self,
         parent: wx.Window,
@@ -52,9 +60,7 @@ class VersionSelect(PlatformSelect):
             wx.EVT_CHOICE,
             lambda evt: wx.PostEvent(
                 self,
-                VersionNumberChangeEvent(
-                    self.GetId(), version_number=self.version_number
-                ),
+                VersionNumberChangeEvent(self.version_number),
             ),
         )
 
@@ -73,15 +79,14 @@ class VersionSelect(PlatformSelect):
     def _post_version_change(self):
         wx.PostEvent(
             self,
-            FormatChangeEvent(self.GetId(), force_blockstate=self.force_blockstate),
+            FormatChangeEvent(self.force_blockstate),
         ),
         wx.PostEvent(
             self,
             VersionChangeEvent(
-                self.GetId(),
-                platform=self.platform,
-                version_number=self.version_number,
-                force_blockstate=self.force_blockstate,
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
             ),
         )
 
@@ -94,7 +99,7 @@ class VersionSelect(PlatformSelect):
         self._set_version_number(version_number)
         wx.PostEvent(
             self,
-            VersionNumberChangeEvent(self.GetId(), version_number=self.version_number),
+            VersionNumberChangeEvent(self.version_number),
         )
 
     def _set_version_number(self, version_number: VersionNumberTuple):
@@ -145,12 +150,12 @@ class VersionSelect(PlatformSelect):
         else:
             self._blockstate_choice.Disable()
 
-    def _on_platform_change(self, evt):
+    def _on_platform_change(self, evt: PlatformChangeEvent):
         self._populate_version()
         self.version_number = None
         evt.Skip()
 
-    def _on_version_number_change(self, evt):
+    def _on_version_number_change(self, evt: VersionChangeEvent):
         self._populate_blockstate()
         self.force_blockstate = None
         evt.Skip()

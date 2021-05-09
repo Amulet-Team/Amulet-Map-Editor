@@ -11,6 +11,7 @@ class PlatformSelect(wx.Panel):
     """
     A UI element that allows you to pick between the platforms in the translator.
     """
+
     def __init__(
         self,
         parent: wx.Window,
@@ -53,9 +54,7 @@ class PlatformSelect(wx.Panel):
         self._set_platform(platform)
         self._platform_choice.Bind(
             wx.EVT_CHOICE,
-            lambda evt: wx.PostEvent(
-                self, PlatformChangeEvent(self.GetId(), platform=self.platform)
-            ),
+            lambda evt: wx.PostEvent(self, PlatformChangeEvent(self.platform)),
         )
 
     def _add_ui_element(
@@ -77,7 +76,7 @@ class PlatformSelect(wx.Panel):
     @platform.setter
     def platform(self, platform: PlatformType):
         self._set_platform(platform)
-        wx.PostEvent(self, PlatformChangeEvent(self.GetId(), platform=self.platform))
+        wx.PostEvent(self, PlatformChangeEvent(self.platform))
 
     def _set_platform(self, platform: PlatformType):
         if platform and platform in self._platform_choice.GetItems():

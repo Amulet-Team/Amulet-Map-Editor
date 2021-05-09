@@ -22,7 +22,9 @@ if __name__ == "__main__":
             def get_on_close(dialog_):
                 def on_close(evt):
                     dialog_.Destroy()
+
                 return on_close
+
             dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
         app.MainLoop()
 
