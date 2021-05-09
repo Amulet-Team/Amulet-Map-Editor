@@ -54,10 +54,13 @@ class PlatformSelect(wx.Panel):
         :param kwargs: Keyword args to be given to the Panel.
         """
         super().__init__(parent, style=wx.BORDER_SIMPLE)
-        sizer = wx.BoxSizer()
+        sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
         self._sizer = wx.FlexGridSizer(2, 5, 5)
-        sizer.Add(self._sizer, 0, wx.ALL, 5)
+        sizer.Add(self._sizer, 1, wx.ALL | wx.EXPAND, 5)
+
+        self._sizer.AddGrowableCol(0)
+        self._sizer.AddGrowableCol(1)
 
         self._translation_manager = translation_manager
         self._allow_universal = allow_universal
