@@ -9,7 +9,7 @@ select_world.open_world_button=打开另外一个世界
 select_world.open_world_dialogue=选择一个Minecraft存档目录
 select_world.select_directory_failed=无法打开目录!
 select_world.recent_worlds=最近打开的世界
-select_world.loading_world_no_loader=无法为该世界找到一个加载器.
+select_world.no_loader_found=无法为该世界找到一个加载器.
 select_world.loading_world_failed=世界加载失败. 请检查控制台输出以获取更多信息.
 
 main_menu.tab_name=主菜单

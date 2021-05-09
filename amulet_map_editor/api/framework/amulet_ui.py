@@ -169,7 +169,7 @@ class AmuletUI(wx.Frame):
             except LoaderNoneMatched as e:
                 log.error(f"Could not find a loader for this world.\n{e}")
                 wx.MessageBox(
-                    f"{lang.get('select_world.loading_world_no_loader')}\n{e}"
+                    f"{lang.get('select_world.no_loader_found')}\n{e}"
                 )
             except Exception as e:
                 log.error(f"Error loading world.\n{e}\n{traceback.format_exc()}")
