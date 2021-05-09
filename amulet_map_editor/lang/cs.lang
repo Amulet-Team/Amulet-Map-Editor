@@ -13,13 +13,13 @@ main_menu.open_world=Otevřít Svět
 main_menu.help=Pomoc
 
 program_about.tab_name=O Nás
-program_about.currently_opened_world=Nyní Otevřený Svět
+program_about.currently_opened_world=Nyní Otevřený Svět:
 program_about.choose_from_options=Vyberte si z možností na levo co budete chtít použít.\nMůžete je kdykoliv měnit.
 
 program_convert.tab_name=Konvertovat
 program_convert.convert_button=Konvertovat
-program_convert.input_world=Vstupní Svět
-program_convert.output_world=Výstupní Svět
+program_convert.input_world=Vstupní Svět:
+program_convert.output_world=Výstupní Svět:
 program_convert.select_output_world=Vyberte Výstupní Svět
 program_convert.input_output_must_different=Vstupní a výstupní světy se musí lišit!
 program_convert.select_before_converting=Vyberte svět před konvertováním!
