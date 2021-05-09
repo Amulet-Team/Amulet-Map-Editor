@@ -59,16 +59,16 @@ program_3d_edit.select_tool.scroll_point_z1=z1
 program_3d_edit.select_tool.scroll_point_x2=x2
 program_3d_edit.select_tool.scroll_point_y2=y2
 program_3d_edit.select_tool.scroll_point_z2=z2
-program_3d_edit.select_tool.scroll_point_x1_tooltip=Définit la coordonnée x du coin vert de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
-program_3d_edit.select_tool.scroll_point_y1_tooltip=Définit la coordonnée y du coin vert de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
-program_3d_edit.select_tool.scroll_point_z1_tooltip=Définit la coordonnée z du coin vert de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
-program_3d_edit.select_tool.scroll_point_x2_tooltip=Définit la coordonnée x du coin bleu de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
-program_3d_edit.select_tool.scroll_point_y2_tooltip=Définit la coordonnée y du coin bleu de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
-program_3d_edit.select_tool.scroll_point_z2_tooltip=Définit la coordonnée z du coin bleu de la zone de sélection active. Tapez une valeur ou faites défiler (scroller) en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Définit la coordonnée x du coin vert de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Définit la coordonnée y du coin vert de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Définit la coordonnée z du coin vert de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Définit la coordonnée x du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Définit la coordonnée y du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Définit la coordonnée z du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
 
 program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
-program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
-program_3d_edit.select_tool.box_size_tooltip=La taille en blocs de la zone de sélection active.
+program_3d_edit.select_tool.box_size_selector_tooltip=La taille de la zone de sélection active, suivant la notation de Minecraft.
+program_3d_edit.select_tool.box_size_tooltip=La taille de la zone de sélection active, en blocs.
 program_3d_edit.select_tool.button_point1=Déplacer le Point 1
 program_3d_edit.select_tool.button_point1_tooltip=Restez appuyé sur ce bouton et utilisez les contrôles de déplacement pour déplacer le point de sélection vert.
 program_3d_edit.select_tool.button_point2=Déplacer le Point 2

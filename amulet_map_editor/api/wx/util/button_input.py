@@ -179,22 +179,19 @@ class ButtonInput(WindowContainer):
         :param trigger_key: The key that when pressed will start the action provided the modifier keys are pressed.
         :return:
         """
-        if type(action_id) is not str:
+        if not isinstance(action_id, str):
             raise TypeError("action_id must be a string.")
         if (
-            type(trigger_key) not in (str, int)
-            or type(modifier_keys) is not tuple
-            or not all(type(k) in (str, int) for k in modifier_keys)
+            not isinstance(trigger_key, (str, int))
+            or not isinstance(modifier_keys, tuple)
+            or not all(isinstance(k, (str, int)) for k in modifier_keys)
         ):
             raise TypeError(
                 "The key inputs are not of the correct format. Expected Union[str, int], Tuple[Union[str, int], ...]"
             )
         if self.action_id_registered(action_id):
             raise ValueError(f"{action_id} has already been registered.")
-        self._registered_actions[action_id] = Action(
-            trigger_key,
-            modifier_keys,
-        )
+        self._registered_actions[action_id] = Action(trigger_key, modifier_keys)
 
     def register_actions(self, actions: KeybindGroup):
         for action_id, (modifier_keys, trigger_key) in actions.items():
@@ -218,10 +215,7 @@ class ButtonInput(WindowContainer):
             action_ids = self._find_actions(key)
             self._continuous_actions.update(action_ids)
             for action_id in action_ids:
-                wx.PostEvent(
-                    self.window,
-                    InputPressEvent(action_id),
-                )
+                wx.PostEvent(self.window, InputPressEvent(action_id))
 
             self._pressed_keys.add(key)
         evt.Skip()
@@ -245,13 +239,7 @@ class ButtonInput(WindowContainer):
                 self._pressed_keys
             ):
                 self._continuous_actions.remove(action_id)
-                wx.PostEvent(
-                    self.window,
-                    InputReleaseEvent(action_id),
-                )
+                wx.PostEvent(self.window, InputReleaseEvent(action_id))
 
     def _process_continuous_inputs(self, evt):
-        wx.PostEvent(
-            self.window,
-            InputHeldEvent(self._continuous_actions.copy()),
-        )
+        wx.PostEvent(self.window, InputHeldEvent(self._continuous_actions.copy()))

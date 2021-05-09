@@ -16,28 +16,45 @@ jobs:
     - name: Activity Check
       run: |
         create_build=false
+        # get the data for the last commit and store it to a file
         curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/commits | jq -r '.[0]' > $HOME/commit.json
+        # get the date field from the file
         date="$(jq -r '.commit.author.date' $HOME/commit.json)"
+        # parse the date format into seconds
         timestamp=$(date --utc -d "$date" +%s)
+        # work out how many days ago that was
         days=$(( ( $(date --utc +%s) - $timestamp ) / 86400 ))
+        # remove the file
         rm -f $HOME/commit.json
         # TODO: also check these
         # https://pypi.org/pypi/amulet-core/json
         # https://pypi.org/pypi/amulet-nbt/json
         # https://pypi.org/pypi/PyMCTranslate/json
         # https://pypi.org/pypi/minecraft-resource-pack/json
+        # if it was less than one day ago
         if [ $days -lt 1 ]; then
+          # trigger a build
           create_build=true
           # get the most recent build number and create a new one based off it
           regex_version='^[0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?(b[0-9]+)?$'
           curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/releases | jq --arg reg $regex_version -r '[.[] | select(.tag_name | test($reg))][0]' > $HOME/release.json
           tag_name="$(jq -r '.tag_name' $HOME/release.json)"
+          # get the time of the commit that the release was built off
+          commit_date="$(jq -r '.created_at' $HOME/release.json)"
           rm -f $HOME/release.json
+          # convert time format into seconds
+          commit_timestamp=$(date --utc -d "$commit_date" +%s)
+          if $commit_timestamp >= $timestamp; then
+            # if the release is built off a newer or equal commit don't build
+            create_build=false
+          fi
           beta_regex_version='^([0-9]+\.[0-9]+(\.[0-9]+)?(\.[0-9]+)?b)([0-9]+)$'
           release_regex_version='^([0-9]+\.[0-9]+(\.[0-9]+)?\.)([0-9]+)$'
           if [[ $tag_name =~ $beta_regex_version ]]; then
+            # if it is a beta release increment the beta number and add .dev
             version_number=${BASH_REMATCH[1]}$((${BASH_REMATCH[-1]} + 1)).dev
           elif [[ $tag_name =~ $release_regex_version ]]; then
+            # if it is a full release increment the number and add b0.dev
             version_number=${BASH_REMATCH[1]}$((${BASH_REMATCH[-1]} + 1))b0.dev
           else
             create_build=false

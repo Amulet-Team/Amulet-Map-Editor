@@ -226,38 +226,41 @@ class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
         chunk_verts = []
         chunk_verts_translucent = []
 
-        # unique blocks per sub-chunk
-        unique_sub_chunk_blocks = [numpy.unique(arr) for arr, _ in blocks]
+        if blocks:
+            # unique blocks per sub-chunk
+            unique_sub_chunk_blocks = [numpy.unique(arr) for arr, _ in blocks]
 
-        # unique blocks in the chunk
-        unique_chunk_blocks = numpy.unique(numpy.concatenate(unique_sub_chunk_blocks))
-
-        block_palette = self.chunk.block_palette
-        models: Dict[int, minecraft_model_reader.BlockMesh] = {
-            block_temp_id: self.resource_pack.get_block_model(
-                block_palette[block_temp_id]
+            # unique blocks in the chunk
+            unique_chunk_blocks = numpy.unique(
+                numpy.concatenate(unique_sub_chunk_blocks)
             )
-            for block_temp_id in unique_chunk_blocks
-        }
-        texture_bounds: Dict[str, Tuple[float, float, float, float]] = {
-            texture_path: self.resource_pack.texture_bounds(texture_path)
-            for model in models.values()
-            for texture_path in model.textures
-        }
 
-        for (larger_blocks, offset), unique_blocks in zip(
-            blocks, unique_sub_chunk_blocks
-        ):
-            chunk_verts_, chunk_verts_translucent_ = create_lod0_array(
-                larger_blocks,
-                unique_blocks,
-                models,
-                texture_bounds,
-                self._vert_len,
-                self.offset,
-                offset,
-            )
-            chunk_verts += chunk_verts_
-            chunk_verts_translucent += chunk_verts_translucent_
+            block_palette = self.chunk.block_palette
+            models: Dict[int, minecraft_model_reader.BlockMesh] = {
+                block_temp_id: self.resource_pack.get_block_model(
+                    block_palette[block_temp_id]
+                )
+                for block_temp_id in unique_chunk_blocks
+            }
+            texture_bounds: Dict[str, Tuple[float, float, float, float]] = {
+                texture_path: self.resource_pack.texture_bounds(texture_path)
+                for model in models.values()
+                for texture_path in model.textures
+            }
+
+            for (larger_blocks, offset), unique_blocks in zip(
+                blocks, unique_sub_chunk_blocks
+            ):
+                chunk_verts_, chunk_verts_translucent_ = create_lod0_array(
+                    larger_blocks,
+                    unique_blocks,
+                    models,
+                    texture_bounds,
+                    self._vert_len,
+                    self.offset,
+                    offset,
+                )
+                chunk_verts += chunk_verts_
+                chunk_verts_translucent += chunk_verts_translucent_
 
         return chunk_verts, chunk_verts_translucent
