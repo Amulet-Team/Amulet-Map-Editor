@@ -1,24 +1,43 @@
+app.world_still_used=Un monde est toujours en cours d'utilisation. Veuillez d'abord le fermer.
+
 world.java_platform=Java
 world.bedrock_platform=Bedrock
 world.close_world=Fermer le monde
 
+select_world.title=Sélection du monde
 select_world.open_world_button=Ouvrir un monde
 select_world.open_world_dialogue=Sélectionnez un dossier de monde Minecraft
 select_world.select_directory_failed=Impossible d'ouvrir ce dossier !
 select_world.recent_worlds=Mondes récents
+select_world.no_loader_found=Aucun loader n'a été trouvé pour charger ce monde.
+select_world.loading_world_failed=Erreur lors du chargement du monde. Regardez la console pour plus de détails.
 
 main_menu.tab_name=Menu Principal
 main_menu.open_world=Ouvrir un monde
 main_menu.help=Aide
+main_menu.discord=Discord d'Amulet
+
+menu_bar.file.menu_name=&Fichier
+menu_bar.file.open_world=Ouvrir un monde
+menu_bar.file.close_world=Fermer le monde
+menu_bar.file.quit=Quitter
+menu_bar.options.menu_name=&Options
+menu_bar.help.menu_name=&Aide
+
+update_check.newer_version_released=Une nouvelle version d'Amulet est disponible !
+update_check.new_version=Nouvelle version :
+update_check.current_version=Votre version :
+update_check.update=Voir la page de téléchargement
+update_check.ok=Ignorer
 
 program_about.tab_name=À propos
-program_about.currently_opened_world=Monde actuellement ouvert
+program_about.currently_opened_world=Monde actuellement ouvert :
 program_about.choose_from_options=Choisissez une opération parmi les options à gauche.\nVous pouvez changer à tout moment.
 
 program_convert.tab_name=Convertir
 program_convert.convert_button=Convertir
-program_convert.input_world=Monde source
-program_convert.output_world=Monde de destination
+program_convert.input_world=Monde source :
+program_convert.output_world=Monde de destination :
 program_convert.select_output_world=Sélectionner un monde de destination
 program_convert.input_output_must_different=Les mondes source et de destination doivent être différents !
 program_convert.select_before_converting=Sélectionnez un monde avant de convertir !
@@ -114,3 +133,25 @@ program_3d_edit.goto_ui.z_label=z :
 program_3d_edit.goto_ui.z_label_tooltip=La coordonnée z de la caméra. Tapez une coordonnée pour vous y déplacer. Ctrl + C pour copier la coordonnée. Ctrl + V pour coller.
 program_3d_edit.goto_ui.copy_button_tooltip=Copier les coordonnées x, y et z dans le presse-papiers sous le format suivant : "0.0 0.0 0.0" (x, y et z respectivement).
 program_3d_edit.goto_ui.paste_button_tooltip=Coller des coordonnées précédemment copiées dans les champs correspondants. Les coordonnées copiées doivent être constituées de trois nombres séparés par des espaces ou des virgules.
+
+program_3d_edit.canvas.please_wait=Veuillez attendre pendant que le moteur de rendu charge
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Bedrock
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Java
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Impossible de télécharger le dernier pack de ressources Java.\nVérifiez votre connexion internet et relancez Amulet.\nRegardez la console pour plus de détails.
+program_3d_edit.canvas.loading_resource_packs=Chargement des packs de ressources
+program_3d_edit.canvas.creating_texture_atlas=Création de l'atlas de texture
+program_3d_edit.canvas.setting_up_renderer=Préparation du moteur de rendu
+
+program_3d_edit.menu_bar.file.save=&Sauvegarder
+program_3d_edit.menu_bar.edit.menu_name=&Editer
+program_3d_edit.menu_bar.edit.undo=Annuler
+program_3d_edit.menu_bar.edit.redo=Rétablir
+program_3d_edit.menu_bar.edit.cut=Couper
+program_3d_edit.menu_bar.edit.copy=Copier
+program_3d_edit.menu_bar.edit.paste=Coller
+program_3d_edit.menu_bar.edit.delete=Supprimer
+program_3d_edit.menu_bar.edit.goto=Se déplacer
+program_3d_edit.menu_bar.edit.select_all=Tout sélectionner
+program_3d_edit.menu_bar.options.controls=Contrôles...
+program_3d_edit.menu_bar.options.options=Options...
+program_3d_edit.menu_bar.help.controls=Contrôles

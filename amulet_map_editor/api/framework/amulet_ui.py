@@ -83,13 +83,15 @@ class AmuletUI(wx.Frame):
 
     def create_menu(self):
         menu_dict = {}
-        menu_dict.setdefault("&File", {}).setdefault("system", {}).setdefault(
-            "Open World", lambda evt: self._show_open_world()
+        menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
+            "system", {}
+        ).setdefault(
+            lang.get("menu_bar.file.open_world"), lambda evt: self._show_open_world()
         )
-        # menu_dict.setdefault('&File', {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
-        menu_dict.setdefault("&File", {}).setdefault("exit", {}).setdefault(
-            "Quit", lambda evt: self.Close()
-        )
+        # menu_dict.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
+        menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
+            "exit", {}
+        ).setdefault(lang.get("menu_bar.file.quit"), lambda evt: self.Close())
         menu_dict = self._last_page.menu(menu_dict)
         menu_bar = wx.MenuBar()
         for menu_name, menu_data in menu_dict.items():
@@ -166,12 +168,10 @@ class AmuletUI(wx.Frame):
                 )
             except LoaderNoneMatched as e:
                 log.error(f"Could not find a loader for this world.\n{e}")
-                wx.MessageBox(f"Could not find a loader for this world.\n{e}")
+                wx.MessageBox(f"{lang.get('select_world.no_loader_found')}\n{e}")
             except Exception as e:
                 log.error(f"Error loading world.\n{e}\n{traceback.format_exc()}")
-                wx.MessageBox(
-                    f"Error loading world. Check the console for more details.\n{e}"
-                )
+                wx.MessageBox(f"{lang.get('select_world.loading_world_failed')}\n{e}")
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)
@@ -198,6 +198,6 @@ class AmuletUI(wx.Frame):
         for path, page in list(self._open_worlds.items()):
             self.close_world(path)
         if self.world_tab_holder.GetPageCount() > 1:
-            wx.MessageBox("A world is still being used. Please close it first")
+            wx.MessageBox(lang.get("app.world_still_used"))
         else:
             evt.Skip()

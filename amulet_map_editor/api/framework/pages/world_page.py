@@ -9,13 +9,15 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
 import amulet_map_editor
-from amulet_map_editor import programs, log
+from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram
 
 _extensions: List[Tuple[str, Type[BaseProgram]]] = []
-_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [("About", AboutProgram)]
+_fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [
+    (lang.get("program_about.tab_name"), AboutProgram)
+]
 
 
 def load_extensions():
@@ -89,8 +91,10 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         return self._path
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault("&File", {}).setdefault("exit", {}).setdefault(
-            "Close World", lambda evt: self._close_self_callback
+        menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
+            "exit", {}
+        ).setdefault(
+            lang.get("menu_bar.file.close_world"), lambda evt: self._close_self_callback
         )
         return self._extensions[self.GetSelection()].menu(menu)
 

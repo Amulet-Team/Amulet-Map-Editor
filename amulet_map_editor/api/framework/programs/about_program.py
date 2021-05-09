@@ -27,7 +27,7 @@ class AboutProgram(SimplePanel, BaseProgram):
         self.add_object(
             wx.StaticText(
                 self,
-                label="{}: ".format(lang.get("program_about.currently_opened_world")),
+                label=lang.get("program_about.currently_opened_world"),
             ),
             0,
             wx.ALL | wx.CENTER,
@@ -36,9 +36,7 @@ class AboutProgram(SimplePanel, BaseProgram):
         self.add_object(
             wx.StaticText(
                 self,
-                label="{}\n<=================".format(
-                    lang.get("program_about.choose_from_options")
-                ),
+                label=f"{lang.get('program_about.choose_from_options')}\n<=================",
             ),
             0,
             wx.ALL | wx.CENTER,
