@@ -197,6 +197,7 @@ if __name__ == "__main__":
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(MultiBlockDefine(dialog, translation_manager), 1, wx.EXPAND)
+        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         dialog.Show()
         dialog.Fit()
         app.MainLoop()

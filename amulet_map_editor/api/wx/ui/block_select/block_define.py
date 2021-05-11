@@ -171,6 +171,7 @@ if __name__ == "__main__":
         )
         dialog.Show()
         dialog.Fit()
+        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         app.MainLoop()
 
     main()

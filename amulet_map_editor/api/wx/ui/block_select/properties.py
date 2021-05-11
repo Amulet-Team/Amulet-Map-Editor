@@ -378,6 +378,7 @@ if __name__ == "__main__":
             wx.ALL,
             5,
         )
+        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         dialog.Show()
         dialog.Fit()
         app.MainLoop()
