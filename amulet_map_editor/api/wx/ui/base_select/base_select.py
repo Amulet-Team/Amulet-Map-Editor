@@ -59,7 +59,9 @@ class BaseSelect(wx.Panel):
         sizer.Add(header_sizer, 0, wx.EXPAND | wx.BOTTOM, 5)
         header_sizer.Add(
             wx.StaticText(
-                self, label=f"{self.type_name.capitalize()} name:", style=wx.ALIGN_CENTER
+                self,
+                label=f"{self.type_name.capitalize()} name:",
+                style=wx.ALIGN_CENTER,
             ),
             1,
             wx.ALIGN_CENTER_VERTICAL,
