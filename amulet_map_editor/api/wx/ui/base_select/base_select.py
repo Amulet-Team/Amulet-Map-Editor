@@ -1,34 +1,19 @@
 import wx
-from wx.lib import newevent
 from typing import Tuple, List, Optional
 
 import PyMCTranslate
 
 from amulet_map_editor.api.image import COLOUR_PICKER
-
-(
+from .events import (
     ItemNamespaceChangeEvent,
-    EVT_ITEM_NAMESPACE_CHANGE,
-) = newevent.NewCommandEvent()  # the namespace entry changed
-(
     ItemNameChangeEvent,
-    EVT_ITEM_NAME_CHANGE,
-) = newevent.NewCommandEvent()  # the name entry changed
-(
     ItemChangeEvent,
-    EVT_ITEM_CHANGE,
-) = (
-    newevent.NewCommandEvent()
-)  # the name or namespace changed. Generated after EVT_ITEM_NAME_CHANGE
-(
+    EVT_ITEM_NAMESPACE_CHANGE,
     PickEvent,
-    EVT_PICK,
-) = newevent.NewCommandEvent()  # The pick button was pressed
+)
 
 
 class BaseSelect(wx.Panel):
-    TypeName = "?"
-
     def __init__(
         self,
         parent: wx.Window,
@@ -74,7 +59,7 @@ class BaseSelect(wx.Panel):
         sizer.Add(header_sizer, 0, wx.EXPAND | wx.BOTTOM, 5)
         header_sizer.Add(
             wx.StaticText(
-                self, label=f"{self.TypeName.capitalize()} name:", style=wx.ALIGN_CENTER
+                self, label=f"{self.type_name.capitalize()} name:", style=wx.ALIGN_CENTER
             ),
             1,
             wx.ALIGN_CENTER_VERTICAL,
@@ -98,6 +83,10 @@ class BaseSelect(wx.Panel):
         self._populate_item_name()
         self.set_name(default_name)
         self._list_box.Bind(wx.EVT_LISTBOX, lambda evt: self._post_item_change())
+
+    @property
+    def type_name(self) -> str:
+        raise NotImplementedError
 
     def _post_namespace_change(self):
         if self._do_text_event:
@@ -175,7 +164,7 @@ class BaseSelect(wx.Panel):
     def _populate_item_name(self):
         raise NotImplementedError("This method should be overridden in child classes.")
 
-    def _on_namespace_change(self, evt):
+    def _on_namespace_change(self, evt: ItemNamespaceChangeEvent):
         self._populate_item_name()
         self.name = None
         evt.Skip()
