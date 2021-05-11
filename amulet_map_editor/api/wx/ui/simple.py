@@ -95,7 +95,7 @@ class SimpleChoiceAny(wx.Choice):
         default: StringableType = None,
     ):
         """Set items. Does not have to be strings.
-        If items is a dictionary the string of the values are show to the user and the key is returned from GetAny
+        If items is a dictionary the string of the values are show to the user and the key is returned from GetCurrentObject
         If it is just an iterable the string of the values are shown and the raw equivalent input is returned."""
         if not items:
             return
@@ -124,14 +124,6 @@ class SimpleChoiceAny(wx.Choice):
     def SetValue(self, value: Any):
         if value in self._keys:
             self.SetSelection(self._keys.index(value))
-
-    def GetAny(self) -> Optional[Any]:
-        """Return the value currently selected in the form before it was converted to a string"""
-        log.warning(
-            "SimpleChoiceAny.GetAny is being depreciated and will be removed in the future. Please use SimpleChoiceAny.GetCurrentObject instead",
-            exc_info=True,
-        )
-        return self.GetCurrentObject()
 
     def GetCurrentObject(self) -> Optional[Any]:
         """Return the value currently selected in the form before it was converted to a string"""
