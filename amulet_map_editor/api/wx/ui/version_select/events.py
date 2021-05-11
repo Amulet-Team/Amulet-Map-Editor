@@ -41,28 +41,6 @@ class VersionNumberChangeEvent(wx.PyEvent):
         return self._version_number
 
 
-_FormatChangeEventType = wx.NewEventType()
-EVT_FORMAT_CHANGE = wx.PyEventBinder(_FormatChangeEventType)
-
-
-class FormatChangeEvent(wx.PyEvent):
-    """
-    Event run when the format input is changed.
-    Is run when the user or code changes the format input.
-    """
-
-    def __init__(self, force_blockstate: bool):
-        wx.PyEvent.__init__(self, eventType=_FormatChangeEventType)
-        self._force_blockstate = force_blockstate
-
-    @property
-    def force_blockstate(self) -> bool:
-        """
-        True if the format is force blockstate, False otherwise.
-        """
-        return self._force_blockstate
-
-
 _VersionChangeEventType = wx.NewEventType()
 EVT_VERSION_CHANGE = wx.PyEventBinder(_VersionChangeEventType)
 

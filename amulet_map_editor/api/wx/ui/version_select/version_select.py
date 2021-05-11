@@ -10,7 +10,6 @@ from .events import (
     EVT_PLATFORM_CHANGE,
     VersionNumberChangeEvent,
     EVT_VERSION_NUMBER_CHANGE,
-    FormatChangeEvent,
     VersionChangeEvent,
 )
 
@@ -77,10 +76,6 @@ class VersionSelect(PlatformSelect):
         )
 
     def _post_version_change(self):
-        wx.PostEvent(
-            self,
-            FormatChangeEvent(self.force_blockstate),
-        ),
         wx.PostEvent(
             self,
             VersionChangeEvent(
