@@ -77,6 +77,11 @@ program_3d_edit.select_tool.button_point2_tooltip=Press and hold this button and
 program_3d_edit.select_tool.button_selection_box=Move Box
 program_3d_edit.select_tool.button_selection_box_tooltip=Press and hold this button and use the movement controls to move the active box.
 
+program_3d_edit.fill_tool.replace=Replace
+program_3d_edit.fill_tool.replace_mode.single=Single
+program_3d_edit.fill_tool.replace_mode.sequence=Sequence
+program_3d_edit.fill_tool.replace_mode.map=Map
+
 program_3d_edit.paste_tool.location_label=Location
 program_3d_edit.paste_tool.location_x_label=x
 program_3d_edit.paste_tool.location_x_tooltip=The x location where the centre of the selection will be placed. Type in a number, scroll wheel over or use the arrows to change.
