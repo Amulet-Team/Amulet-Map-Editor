@@ -17,6 +17,10 @@ from amulet_map_editor.api.wx.ui.block_select.properties import (
 
 
 class BlockDefine(BaseDefine):
+    """
+    A UI that merges a version select widget with a block select widget and a property select.
+    """
+
     def __init__(
         self,
         parent,
@@ -47,10 +51,8 @@ class BlockDefine(BaseDefine):
         )
 
         right_sizer = wx.BoxSizer(wx.VERTICAL)
-        if orientation == wx.HORIZONTAL:
-            self._sizer.Add(right_sizer, 1, wx.EXPAND | wx.LEFT, 5)
-        else:
-            self._sizer.Add(right_sizer, 1, wx.EXPAND | wx.TOP, 5)
+        border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
+        self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
 
         self._property_picker = PropertySelect(
             self,

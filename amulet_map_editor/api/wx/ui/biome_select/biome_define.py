@@ -8,6 +8,10 @@ from amulet_map_editor.api.wx.ui.biome_select.biome_select import BiomeSelect
 
 
 class BiomeDefine(BaseDefine):
+    """
+    A UI that merges a version select widget with a biome select widget.
+    """
+
     def __init__(
         self,
         parent,
@@ -66,3 +70,25 @@ class BiomeDefine(BaseDefine):
         self.biome = self._translation_manager.get_version(
             self.platform, self.version_number
         ).biome.from_universal(universal_biome)
+
+
+if __name__ == "__main__":
+
+    def main():
+        app = wx.App()
+        translation_manager = PyMCTranslate.new_translation_manager()
+        dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        sizer = wx.BoxSizer()
+        dialog.SetSizer(sizer)
+        sizer.Add(
+            BiomeDefine(dialog, translation_manager, wx.HORIZONTAL),
+            1,
+            wx.ALL | wx.EXPAND,
+            5,
+        )
+        dialog.Show()
+        dialog.Fit()
+        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+        app.MainLoop()
+
+    main()

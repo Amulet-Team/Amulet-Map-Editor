@@ -7,6 +7,10 @@ from amulet_map_editor.api.wx.ui.base_select import BaseSelect
 
 
 class BlockSelect(BaseSelect):
+    """
+    A UI consisting of a namespace choice, block name search box and list of block names.
+    """
+
     @property
     def type_name(self) -> str:
         return "Block"
@@ -57,7 +61,12 @@ if __name__ == "__main__":
         dialog = wx.Dialog(None)
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        sizer.Add(BlockSelect(dialog, translation_manager, "java", (1, 16, 0), False))
+        sizer.Add(
+            BlockSelect(dialog, translation_manager, "java", (1, 16, 0), False),
+            1,
+            wx.ALL | wx.EXPAND,
+            5,
+        )
         dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
         dialog.Show()
         dialog.Fit()

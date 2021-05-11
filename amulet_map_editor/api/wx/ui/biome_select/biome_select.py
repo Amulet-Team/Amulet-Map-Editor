@@ -2,6 +2,10 @@ from amulet_map_editor.api.wx.ui.base_select import BaseSelect
 
 
 class BiomeSelect(BaseSelect):
+    """
+    A UI consisting of a namespace choice, biome name search box and list of biome names.
+    """
+
     @property
     def type_name(self) -> str:
         return "Biome"
@@ -28,3 +32,28 @@ class BiomeSelect(BaseSelect):
             if biome_id.startswith(self.namespace)
         ]
         self._list_box.SetItems(self._names)
+
+
+if __name__ == "__main__":
+
+    def main():
+        import wx
+        import PyMCTranslate
+
+        app = wx.App()
+        translation_manager = PyMCTranslate.new_translation_manager()
+        dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        sizer = wx.BoxSizer()
+        dialog.SetSizer(sizer)
+        sizer.Add(
+            BiomeSelect(dialog, translation_manager, "java", (1, 16, 0), False),
+            1,
+            wx.ALL | wx.EXPAND,
+            5,
+        )
+        dialog.Show()
+        dialog.Fit()
+        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+        app.MainLoop()
+
+    main()

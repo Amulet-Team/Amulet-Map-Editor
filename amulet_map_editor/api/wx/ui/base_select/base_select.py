@@ -14,6 +14,13 @@ from .events import (
 
 
 class BaseSelect(wx.Panel):
+    """
+    BaseSelect is a base class for a UI containing
+        a namespace choice
+        a base name search
+        a list of base names
+    """
+
     def __init__(
         self,
         parent: wx.Window,
