@@ -6,7 +6,7 @@ import wx
 import PyMCTranslate
 
 from amulet_map_editor import lang
-from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny, SimpleScrollablePanel
 from amulet_map_editor.api.wx.ui.version_select import (
     VersionSelect,
     VersionChangeEvent,
@@ -53,6 +53,7 @@ class FillReplaceWidget(wx.Panel):
         top_sizer.Add(self._replace, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
 
         self._replace_mode = SimpleChoiceAny(self, sort=False)
+        self._replace_mode.Hide()
         self._replace_mode.SetItems(
             {
                 ReplaceMode.Single: lang.get(
@@ -64,11 +65,14 @@ class FillReplaceWidget(wx.Panel):
                 ReplaceMode.Map: lang.get("program_3d_edit.fill_tool.replace_mode.map"),
             }
         )
-        # self.choice_1.SetSelection(0)
-        top_sizer.Add(self._replace_mode, 1, wx.LEFT, 5)
+        top_sizer.Add(
+            self._replace_mode, 1, wx.LEFT | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5
+        )
 
+        self._operation_panel = SimpleScrollablePanel(self)
+        sizer.Add(self._operation_panel, 1, wx.EXPAND)
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self._operation_sizer, 0, wx.EXPAND, 0)
+        self._operation_panel.SetSizer(self._operation_sizer)
 
         self._operations: List[ReplaceOperationWidget] = []
         self._add_operation()
@@ -77,7 +81,9 @@ class FillReplaceWidget(wx.Panel):
 
     def _add_operation(self):
         replace_operation = ReplaceOperationWidget(
-            self, self._translation_manager, self._version_select.version
+            self._operation_panel,
+            self._translation_manager,
+            self._version_select.version,
         )
         self._operations.append(replace_operation)
         self._operation_sizer.Add(replace_operation, 0, wx.EXPAND | BottomBorder, 5)
@@ -88,6 +94,7 @@ class FillReplaceWidget(wx.Panel):
             op.version = version
 
     def _on_replace_change(self, evt):
+        self._replace_mode.Show(self.replace)
         for operation in self._operations:
             operation.replace(self.replace)
         self.GetTopLevelParent().Layout()

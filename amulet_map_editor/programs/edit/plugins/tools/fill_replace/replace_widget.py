@@ -1,10 +1,12 @@
-from typing import List, Iterable, Tuple
+from typing import List, Iterable, Tuple, Optional
 import wx
 from wx.lib import newevent
 
 import PyMCTranslate
 from amulet.api.block import Block, UniversalAirBlock
+from amulet.api.block_entity import BlockEntity
 from amulet_map_editor import lang
+from .block_dialog import BlockSelectDialog
 
 LeftRightBorder = wx.LEFT | wx.RIGHT
 BottomBorder = LeftRightBorder | wx.BOTTOM
@@ -12,6 +14,8 @@ BottomBorder = LeftRightBorder | wx.BOTTOM
 BlockCloseEvent, EVT_BLOCK_CLOSE = newevent.NewEvent()
 
 VersionType = Tuple[str, Tuple[int, ...], bool]
+
+BlockStorage = Tuple[Block, Optional[BlockEntity]]
 
 
 def _check_version(version: VersionType):
@@ -27,7 +31,7 @@ class BlockPickButton(wx.Button):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         version: VersionType,
-        block: Block,
+        block: BlockStorage,
         **kwargs,
     ):
         super().__init__(parent, **kwargs)
@@ -35,6 +39,7 @@ class BlockPickButton(wx.Button):
         self._version = version
         self._block = block
         self._update_button()
+        self.Bind(wx.EVT_BUTTON, self._on_press)
 
     @property
     def version(self) -> VersionType:
@@ -46,28 +51,50 @@ class BlockPickButton(wx.Button):
         self._version = version
         self._update_button()
 
+    def _on_press(self, evt):
+        platform, verison_number, force_blockstate = self._version
+        dialog = BlockSelectDialog(
+            self,
+            self._translation_manager,
+            self._block,
+            platform,
+            verison_number,
+            force_blockstate,
+        )
+        response = dialog.ShowModal()
+        if response == wx.ID_OK:
+            self.block = dialog.universal_block
+        dialog.Destroy()
+
     def _update_button(self):
         platform, version, force_blockstate = self._version
-        block, _, _ = self._translation_manager.get_version(
+        block, block_entity = self._block
+        block, block_entity, _ = self._translation_manager.get_version(
             platform, version
-        ).block.from_universal(self._block, force_blockstate=force_blockstate)
+        ).block.from_universal(block, block_entity, force_blockstate=force_blockstate)
         if not isinstance(block, Block):
-            block, _, _ = self._translation_manager.get_version(
+            block, block_entity, _ = self._translation_manager.get_version(
                 platform, version
             ).block.from_universal(UniversalAirBlock, force_blockstate=force_blockstate)
         self.SetLabel(block.full_blockstate)
 
     @property
-    def block(self) -> Block:
+    def block(self) -> BlockStorage:
         """The universal block object stored in this button."""
         return self._block
 
     @block.setter
-    def block(self, block: Block):
-        if not isinstance(block, Block):
-            raise ValueError(f"block must be a Block instance.")
+    def block(self, block: BlockStorage):
+        if not (
+            isinstance(block, tuple)
+            and len(block) == 2
+            and isinstance(block[0], Block)
+            and block[1] is None
+            or (isinstance(block[1], BlockEntity))
+        ):
+            raise ValueError(f"block must be a tuple of Block and BlockEntity.")
         self._block = block
-        self.SetLabel(block.full_blockstate)
+        self._update_button()
 
 
 class BlockEntry(wx.Panel):
@@ -76,7 +103,7 @@ class BlockEntry(wx.Panel):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         version: VersionType,
-        block: Block,
+        block: BlockStorage,
         show_weight=False,
         **kwargs,
     ):
@@ -108,12 +135,12 @@ class BlockEntry(wx.Panel):
         wx.PostEvent(self, evt2)
 
     @property
-    def block(self) -> Block:
+    def block(self) -> BlockStorage:
         """The universal block contained within this widget."""
         return self._block_button.block
 
     @block.setter
-    def block(self, block: Block):
+    def block(self, block: BlockStorage):
         self._block_button.block = block
 
     @property
@@ -155,7 +182,7 @@ class BaseBlockContainer(wx.Panel):
         self.SetSizer(sizer)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(top_sizer, 0, wx.EXPAND | wx.ALL, 5)
+        sizer.Add(top_sizer, 0, wx.EXPAND, 5)
         find_label = wx.StaticText(
             self, label=self.name, style=wx.ALIGN_CENTER_HORIZONTAL
         )
@@ -185,10 +212,10 @@ class BaseBlockContainer(wx.Panel):
 
     def _add_block(self):
         block = BlockEntry(
-            self, self._translation_manager, self._version, UniversalAirBlock
+            self, self._translation_manager, self._version, (UniversalAirBlock, None)
         )
         block.Bind(EVT_BLOCK_CLOSE, self._remove_block)
-        self._block_sizer.Add(block, 0, wx.EXPAND | BottomBorder, 5)
+        self._block_sizer.Add(block, 0, wx.EXPAND | wx.TOP, 5)
         self._blocks.append(block)
         if len(self._blocks) == 1:
             self._blocks[-1].enable_close(False)
@@ -202,30 +229,32 @@ class BaseBlockContainer(wx.Panel):
     def _remove_block(self, evt):
         window = evt.GetEventObject()
         if isinstance(window, BlockEntry):
-            if window in self._blocks:
-                self._blocks.remove(window)
-                window.Destroy()
-                if len(self._blocks) == 1:
-                    block = self._blocks[-1]
-                    block.enable_close(False)
-                    block.show_weight(False)
-                self.GetTopLevelParent().Layout()
+            self._destroy_window(window)
+
+    def _destroy_window(self, window: BlockEntry):
+        if window in self._blocks:
+            self._blocks.remove(window)
+            window.Destroy()
+            if len(self._blocks) == 1:
+                block = self._blocks[-1]
+                block.enable_close(False)
+                block.show_weight(False)
+            self.GetTopLevelParent().Layout()
 
     @property
     def name(self) -> str:
         raise NotImplementedError
 
     @property
-    def blocks(self) -> Tuple[Block]:
+    def blocks(self) -> Tuple[BlockStorage, ...]:
         """The universal blocks contained within this widget."""
         return tuple(entry.block for entry in self._blocks)
 
     @blocks.setter
-    def blocks(self, blocks: Iterable[Block]):
+    def blocks(self, blocks: Iterable[BlockStorage]):
         blocks = tuple(blocks)
         while len(self._blocks) > len(blocks):
-            window = self._blocks.pop()
-            window.Destroy()
+            self._destroy_window(self._blocks[-1])
         while len(self._blocks) < len(blocks):
             self._add_block()
         for block, window in zip(blocks, self._blocks):
@@ -275,17 +304,17 @@ class ReplaceOperationWidget(wx.Panel):
 
         self._find = FindWidget(self, translation_manager, version)
         self._find.Hide()
-        sizer.Add(self._find, 0, wx.EXPAND, 0)
+        sizer.Add(self._find, 0, wx.EXPAND | wx.ALL, 5)
 
         self._swap_button = wx.Button(
             self, wx.ID_ANY, lang.get("program_3d_edit.fill_tool.swap")
         )
         self._swap_button.Bind(wx.EVT_BUTTON, self._swap_blocks)
         self._swap_button.Hide()
-        sizer.Add(self._swap_button, 0, wx.EXPAND | BottomBorder, 5)
+        sizer.Add(self._swap_button, 0, wx.EXPAND | wx.ALL, 5)
 
         self._fill = FillWidget(self, translation_manager, version)
-        sizer.Add(self._fill, 0, wx.EXPAND, 0)
+        sizer.Add(self._fill, 0, wx.EXPAND | wx.ALL, 5)
 
         self.Layout()
 
@@ -307,28 +336,3 @@ class ReplaceOperationWidget(wx.Panel):
     def replace(self, replace: bool):
         self._find.Show(replace)
         self._swap_button.Show(replace)
-
-
-if __name__ == "__main__":
-
-    def main():
-        app = wx.App()
-        dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
-        sizer = wx.BoxSizer()
-        dialog.SetSizer(sizer)
-        sizer.Add(
-            ReplaceOperationWidget(
-                dialog,
-                PyMCTranslate.new_translation_manager(),
-                ("java", (1, 16, 0), False),
-            ),
-            1,
-            wx.ALL | wx.EXPAND,
-            5,
-        )
-        dialog.Show()
-        dialog.Fit()
-        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
-        app.MainLoop()
-
-    main()
