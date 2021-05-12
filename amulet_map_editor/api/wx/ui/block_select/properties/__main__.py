@@ -12,18 +12,13 @@ if __name__ == "__main__":
                 PropertySelect,
                 lambda *args: PropertySelect(*args, wildcard_mode=True),
             ):
-                dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+                dialog = wx.Dialog(
+                    None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                )
                 sizer = wx.BoxSizer()
                 dialog.SetSizer(sizer)
                 sizer.Add(
-                    cls(
-                        dialog,
-                        translation_manager,
-                        "java",
-                        (1, 16, 0),
-                        False,
-                        *block
-                    ),
+                    cls(dialog, translation_manager, "java", (1, 16, 0), False, *block),
                     1,
                     wx.ALL,
                     5,
