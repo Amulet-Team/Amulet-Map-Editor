@@ -1,5 +1,4 @@
 import wx
-from wx.lib import newevent
 from typing import Tuple, Dict, Optional, List, Union
 import weakref
 
@@ -7,15 +6,10 @@ import PyMCTranslate
 import amulet_nbt
 from amulet_nbt import SNBTType
 from amulet.api.block import PropertyDataTypes, PropertyType
+from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
+from .events import PropertiesChangeEvent
 
 WildcardSNBTType = Union[SNBTType, str]
-
-from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
-
-(
-    PropertiesChangeEvent,
-    EVT_PROPERTIES_CHANGE,
-) = newevent.NewCommandEvent()  # the properties changed
 
 
 class PropertySelect(wx.Panel):
@@ -361,26 +355,37 @@ if __name__ == "__main__":
     def main():
         translation_manager = PyMCTranslate.new_translation_manager()
         app = wx.App()
-        dialog = wx.Dialog(None)
-        sizer = wx.BoxSizer()
-        dialog.SetSizer(sizer)
-        sizer.Add(
-            PropertySelect(
-                dialog,
-                translation_manager,
-                "java",
-                (1, 16, 0),
-                False,
-                "minecraft",
-                "oak_fence",
-            ),
-            1,
-            wx.ALL,
-            5,
-        )
-        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
-        dialog.Show()
-        dialog.Fit()
+        for cls in (
+            PropertySelect,
+            lambda *args: PropertySelect(*args, wildcard_mode=True),
+        ):
+            dialog = wx.Dialog(None)
+            sizer = wx.BoxSizer()
+            dialog.SetSizer(sizer)
+            sizer.Add(
+                cls(
+                    dialog,
+                    translation_manager,
+                    "java",
+                    (1, 16, 0),
+                    False,
+                    "minecraft",
+                    "oak_fence",
+                ),
+                1,
+                wx.ALL,
+                5,
+            )
+
+            def get_on_close(dialog_):
+                def on_close(evt):
+                    dialog_.Destroy()
+
+                return on_close
+
+            dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
+            dialog.Show()
+            dialog.Fit()
         app.MainLoop()
 
     main()
