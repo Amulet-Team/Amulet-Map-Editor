@@ -1,5 +1,8 @@
 import wx
-from amulet_map_editor.programs.edit.plugins.tools.fill_replace.fill_replace_widget import FillReplaceWidget
+import PyMCTranslate
+from amulet_map_editor.programs.edit.plugins.tools.fill_replace.fill_replace_widget import (
+    FillReplaceWidget,
+)
 
 if __name__ == "__main__":
 
@@ -9,7 +12,7 @@ if __name__ == "__main__":
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(
-            FillReplaceWidget(dialog),
+            FillReplaceWidget(dialog, PyMCTranslate.new_translation_manager()),
             1,
             wx.ALL | wx.EXPAND,
             5,

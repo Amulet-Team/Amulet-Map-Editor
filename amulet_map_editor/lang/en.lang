@@ -81,6 +81,9 @@ program_3d_edit.fill_tool.replace=Replace
 program_3d_edit.fill_tool.replace_mode.single=Single
 program_3d_edit.fill_tool.replace_mode.sequence=Sequence
 program_3d_edit.fill_tool.replace_mode.map=Map
+program_3d_edit.fill_tool.swap=▲ Swap ▼
+program_3d_edit.fill_tool.find=Find
+program_3d_edit.fill_tool.fill=Fill
 
 program_3d_edit.paste_tool.location_label=Location
 program_3d_edit.paste_tool.location_x_label=x
