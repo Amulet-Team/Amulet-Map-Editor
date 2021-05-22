@@ -1,22 +1,34 @@
+# Notes importantes
+## Si vous shouaitez contribuer à la traduction de l'Interface Utilisateur (UI), veuillez lire le fichier de contribution correspondant situé à '/contributing/lang.md'
+## Chaque entrée de traduction doit être écrite comme suit : 'identifiant.unique=Le texte affiché dans le UI'
+## Les identifiants uniques sont définis par les développeurs. Pour savoir quels sont les identifiants existants, veuillez vous référer au fichier 'en.lang'
+
+# Ordre de chargement et traductions spécifiques à certaines régions
+## Premièrement, le fichier 'en.lang' est chargé pour s'assurer qu'il y ait au moins quelque chose pour chaque entrée
+## Ensuite, si le code de langue contient le symbole "_" (par exemple "fr_CA"), le fichier pour la section de langue ("fr") est chargé ("fr.lang")
+## Enfin, s'il existe, le fichier pour la région spécifique ("fr_CA.lang") est chargé. Il doit contenir uniquement les entrées qui varient pour la région donnée
+## Cela permet aux langues qui ne changent pas ou peu en fonction des régions de partager le même fichier de traduction et de minimiser les duplications de contenu
+
+# Fonctionnalités supportées dans les fichiers de traduction
+## Vous pouvez écrire une ligne de commentaires en utilisant le symbole "#" en tant que premier caractère d'une ligne (espaces non compris). Les commentaires au sein du texte ne sont pas pris en charge
+## Tout "\n" dans une traduction sera converti en une nouvelle ligne dans le UI
+
+# À propos de la barre de menu
+## Le symbole "&" est un caractère spécial dans ce contexte. Il ne sera pas affiché dans le UI mais définira le caractère suivant comme étant un raccourci en combinaison de la touche "alt" (attention : les lettres accentuées sont leur propre caractère (é =/= e))
+## Exemple : "&Fichier" sera traduit en "Fichier" dans le UI, mais permettra à l'utilisateur d'appuyer sur "alt+f" pour ouvrir le menu correspondant
+## Plus d'informations peuvent être trouvées à : https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+
+
+# Application
 app.world_still_used=Un monde est toujours en cours d'utilisation. Veuillez d'abord le fermer.
 
 world.java_platform=Java
 world.bedrock_platform=Bedrock
 world.close_world=Fermer le monde
 
-select_world.title=Sélection du monde
-select_world.open_world_button=Ouvrir un monde
-select_world.open_world_dialogue=Sélectionnez un dossier de monde Minecraft
-select_world.select_directory_failed=Impossible d'ouvrir ce dossier !
-select_world.recent_worlds=Mondes récents
-select_world.no_loader_found=Aucun loader n'a été trouvé pour charger ce monde.
-select_world.loading_world_failed=Erreur lors du chargement du monde. Regardez la console pour plus de détails.
-
-main_menu.tab_name=Menu Principal
-main_menu.open_world=Ouvrir un monde
-main_menu.help=Aide
-main_menu.discord=Discord d'Amulet
-
+# Barre de menu
+## Le menu affiché tout en haut de l'écran
 menu_bar.file.menu_name=&Fichier
 menu_bar.file.open_world=Ouvrir un monde
 menu_bar.file.close_world=Fermer le monde
@@ -24,16 +36,40 @@ menu_bar.file.quit=Quitter
 menu_bar.options.menu_name=&Options
 menu_bar.help.menu_name=&Aide
 
+# Menu principal
+## L'écran d'accueil
+main_menu.tab_name=Menu Principal
+main_menu.open_world=Ouvrir un monde
+main_menu.help=Aide
+main_menu.discord=Discord d'Amulet
+
+# Vérification de mise à jour
+## La fenêtre affichée lorsqu'une version plus récente d'Amulet est disponible
 update_check.newer_version_released=Une nouvelle version d'Amulet est disponible !
 update_check.new_version=Nouvelle version :
 update_check.current_version=Votre version :
 update_check.update=Voir la page de téléchargement
 update_check.ok=Ignorer
 
+# Sélection du monde
+## La fenêtre lorsqu'on choisit un monde à ouvrir
+select_world.title=Sélection du monde
+select_world.open_world_warning=Fermez le monde dans le jeu ou tout autre outil avant de l'ouvrir dans Amulet.
+select_world.open_world_button=Ouvrir un monde
+select_world.open_world_dialogue=Sélectionnez un dossier de monde Minecraft
+select_world.select_directory_failed=Impossible d'ouvrir ce dossier !
+select_world.recent_worlds=Mondes récents
+select_world.no_loader_found=Aucun loader n'a été trouvé pour charger ce monde.
+select_world.loading_world_failed=Erreur lors du chargement du monde. Regardez la console pour plus de détails.
+
+# À propos
+## Le programme par défaut lorsqu'on ouvre un monde
 program_about.tab_name=À propos
 program_about.currently_opened_world=Monde actuellement ouvert :
 program_about.choose_from_options=Choisissez une opération parmi les options à gauche.\nVous pouvez changer à tout moment.
 
+# Convertir
+## Le programme utilisé pour convertir un monde
 program_convert.tab_name=Convertir
 program_convert.convert_button=Convertir
 program_convert.input_world=Monde source :
@@ -43,8 +79,35 @@ program_convert.input_output_must_different=Les mondes source et de destination 
 program_convert.select_before_converting=Sélectionnez un monde avant de convertir !
 program_convert.conversion_completed=Conversion terminée
 
+# Éditeur 3D
+## Le programme utilisé pour modifier un monde avec une interface 3D
 program_3d_edit.tab_name=Éditeur 3D
 
+## Canvas
+program_3d_edit.canvas.please_wait=Veuillez attendre pendant que le moteur de rendu charge
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Bedrock
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Java
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Impossible de télécharger le dernier pack de ressources Java.\nVérifiez votre connexion internet et relancez Amulet.\nRegardez la console pour plus de détails.
+program_3d_edit.canvas.loading_resource_packs=Chargement des packs de ressources
+program_3d_edit.canvas.creating_texture_atlas=Création de l'atlas de texture
+program_3d_edit.canvas.setting_up_renderer=Préparation du moteur de rendu
+
+## Barre de menu
+program_3d_edit.menu_bar.file.save=&Sauvegarder
+program_3d_edit.menu_bar.edit.menu_name=&Editer
+program_3d_edit.menu_bar.edit.undo=Annuler
+program_3d_edit.menu_bar.edit.redo=Rétablir
+program_3d_edit.menu_bar.edit.cut=Couper
+program_3d_edit.menu_bar.edit.copy=Copier
+program_3d_edit.menu_bar.edit.paste=Coller
+program_3d_edit.menu_bar.edit.delete=Supprimer
+program_3d_edit.menu_bar.edit.goto=Se déplacer
+program_3d_edit.menu_bar.edit.select_all=Tout sélectionner
+program_3d_edit.menu_bar.options.controls=Contrôles...
+program_3d_edit.menu_bar.options.options=Options...
+program_3d_edit.menu_bar.help.controls=Contrôles
+
+## Outil de sélection
 program_3d_edit.select_tool.delete_button=Supprimer
 program_3d_edit.select_tool.delete_button_tooltip=Supprime les blocs dans la région sélectionnée.
 program_3d_edit.select_tool.copy_button=Copier
@@ -65,7 +128,6 @@ program_3d_edit.select_tool.scroll_point_z1_tooltip=Définit la coordonnée z du
 program_3d_edit.select_tool.scroll_point_x2_tooltip=Définit la coordonnée x du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
 program_3d_edit.select_tool.scroll_point_y2_tooltip=Définit la coordonnée y du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
 program_3d_edit.select_tool.scroll_point_z2_tooltip=Définit la coordonnée z du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
-
 program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
 program_3d_edit.select_tool.box_size_selector_tooltip=La taille de la zone de sélection active, suivant la notation de Minecraft.
 program_3d_edit.select_tool.box_size_tooltip=La taille de la zone de sélection active, en blocs.
@@ -76,6 +138,7 @@ program_3d_edit.select_tool.button_point2_tooltip=Restez appuyé sur ce bouton e
 program_3d_edit.select_tool.button_selection_box=Déplacer la zone de sélection
 program_3d_edit.select_tool.button_selection_box_tooltip=Restez appuyé sur ce bouton et utilisez les contrôles de déplacement pour déplacer la zone de sélection active.
 
+## Outil coller
 program_3d_edit.paste_tool.location_label=Position
 program_3d_edit.paste_tool.location_x_label=x
 program_3d_edit.paste_tool.location_x_tooltip=La position x où le centre du modèle sera placé. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
@@ -115,6 +178,7 @@ program_3d_edit.paste_tool.confirm_label=Confirmer
 program_3d_edit.paste_tool.confirm_tooltip=Cliquez pour coller le modèle dans le monde avec la position, la rotation, l'échelle, et les options spécifiées.
 program_3d_edit.paste_tool.zero_scale_message=L'échelle vaut 0 sur au moins un des axes. Rien n'a été collé.
 
+## Outil chunk (tronçon)
 program_3d_edit.chunk_tool.min_y=Min Y
 program_3d_edit.chunk_tool.min_y_tooltip=La coordonnée y minimum à afficher dans la vue du dessus. Peut être utilisée pour voir une tranche du monde et aider à visualiser le Nether ou les grottes.
 program_3d_edit.chunk_tool.max_y=Max Y
@@ -124,6 +188,7 @@ program_3d_edit.chunk_tool.delete_chunks_tooltip=Supprime les chunks (tronçons)
 program_3d_edit.chunk_tool.prune_chunks=Rogner les chunks
 program_3d_edit.chunk_tool.prune_chunks_tooltip=Supprime les chunks (tronçons) qui ne sont pas sélectionnés. Cela supprimera les chunks et toutes les données qu'ils contiennent. La prochaine fois que vous chargerez cette zone en jeu, de nouveaux chunks seront créés.
 
+## Fenêtre de déplacement de la caméra
 program_3d_edit.goto_ui.title=Déplacement de la caméra
 program_3d_edit.goto_ui.x_label=x :
 program_3d_edit.goto_ui.x_label_tooltip=La coordonnée x de la caméra. Tapez une coordonnée pour vous y déplacer. Ctrl + C pour copier la coordonnée. Ctrl + V pour coller.
@@ -133,25 +198,3 @@ program_3d_edit.goto_ui.z_label=z :
 program_3d_edit.goto_ui.z_label_tooltip=La coordonnée z de la caméra. Tapez une coordonnée pour vous y déplacer. Ctrl + C pour copier la coordonnée. Ctrl + V pour coller.
 program_3d_edit.goto_ui.copy_button_tooltip=Copier les coordonnées x, y et z dans le presse-papiers sous le format suivant : "0.0 0.0 0.0" (x, y et z respectivement).
 program_3d_edit.goto_ui.paste_button_tooltip=Coller des coordonnées précédemment copiées dans les champs correspondants. Les coordonnées copiées doivent être constituées de trois nombres séparés par des espaces ou des virgules.
-
-program_3d_edit.canvas.please_wait=Veuillez attendre pendant que le moteur de rendu charge
-program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Bedrock
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Java
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Impossible de télécharger le dernier pack de ressources Java.\nVérifiez votre connexion internet et relancez Amulet.\nRegardez la console pour plus de détails.
-program_3d_edit.canvas.loading_resource_packs=Chargement des packs de ressources
-program_3d_edit.canvas.creating_texture_atlas=Création de l'atlas de texture
-program_3d_edit.canvas.setting_up_renderer=Préparation du moteur de rendu
-
-program_3d_edit.menu_bar.file.save=&Sauvegarder
-program_3d_edit.menu_bar.edit.menu_name=&Editer
-program_3d_edit.menu_bar.edit.undo=Annuler
-program_3d_edit.menu_bar.edit.redo=Rétablir
-program_3d_edit.menu_bar.edit.cut=Couper
-program_3d_edit.menu_bar.edit.copy=Copier
-program_3d_edit.menu_bar.edit.paste=Coller
-program_3d_edit.menu_bar.edit.delete=Supprimer
-program_3d_edit.menu_bar.edit.goto=Se déplacer
-program_3d_edit.menu_bar.edit.select_all=Tout sélectionner
-program_3d_edit.menu_bar.options.controls=Contrôles...
-program_3d_edit.menu_bar.options.options=Options...
-program_3d_edit.menu_bar.help.controls=Contrôles
