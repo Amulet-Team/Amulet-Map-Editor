@@ -1,9 +1,58 @@
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+
+
+# App
 app.world_still_used=A world is still being used. Please close it first
 
 world.java_platform=Java
 world.bedrock_platform=Bedrock
 world.close_world=Close World
 
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&File
+menu_bar.file.open_world=Open World
+menu_bar.file.close_world=Close World
+menu_bar.file.quit=Quit
+menu_bar.options.menu_name=&Options
+menu_bar.help.menu_name=&Help
+
+# Main menu
+## The start screen
+main_menu.tab_name=Main Menu
+main_menu.open_world=Open World
+main_menu.help=Help
+main_menu.discord=Amulet Discord
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=A new version of Amulet has been released!
+update_check.new_version=New Version:
+update_check.current_version=Your Version:
+update_check.update=Go to Download Page
+update_check.ok=Ok
+
+# Select world
+## The window when selecting a world to open
 select_world.title=World Select
 select_world.open_world_warning=Close the world in game and other tools before opening in Amulet.
 select_world.open_world_button=Open other world
@@ -13,28 +62,14 @@ select_world.recent_worlds=Recently Opened Worlds
 select_world.no_loader_found=Could not find a loader for this world.
 select_world.loading_world_failed=Error loading world. Check the console for more details.
 
-main_menu.tab_name=Main Menu
-main_menu.open_world=Open World
-main_menu.help=Help
-main_menu.discord=Amulet Discord
-
-menu_bar.file.menu_name=&File
-menu_bar.file.open_world=Open World
-menu_bar.file.close_world=Close World
-menu_bar.file.quit=Quit
-menu_bar.options.menu_name=&Options
-menu_bar.help.menu_name=&Help
-
-update_check.newer_version_released=A new version of Amulet has been released!
-update_check.new_version=New Version:
-update_check.current_version=Your Version:
-update_check.update=Go to Download Page
-update_check.ok=Ok
-
+# About
+## The default program when a world is opened
 program_about.tab_name=About
 program_about.currently_opened_world=Currently Opened World:
 program_about.choose_from_options=Choose from the options on the left what you would like to do.\nYou can switch between these at any time.
 
+# Convert
+## The program used to convert a world
 program_convert.tab_name=Convert
 program_convert.convert_button=Convert
 program_convert.input_world=Input World:
@@ -44,8 +79,35 @@ program_convert.input_output_must_different=The input and output worlds must be 
 program_convert.select_before_converting=Select a world before converting!
 program_convert.conversion_completed=World conversion completed
 
+# 3D Editor
+## The program used to edit a world with a 3D viewer
 program_3d_edit.tab_name=3D Editor
 
+## Canvas
+program_3d_edit.canvas.please_wait=Please wait while the renderer loads
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Downloading Bedrock vanilla resource pack
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Downloading Java vanilla resource pack
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Failed to download the latest Java resource pack.\nCheck your internet connection and restart Amulet.\nCheck the console for more details.
+program_3d_edit.canvas.loading_resource_packs=Loading resource packs
+program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
+program_3d_edit.canvas.setting_up_renderer=Setting up renderer
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Save
+program_3d_edit.menu_bar.edit.menu_name=&Edit
+program_3d_edit.menu_bar.edit.undo=Undo
+program_3d_edit.menu_bar.edit.redo=Redo
+program_3d_edit.menu_bar.edit.cut=Cut
+program_3d_edit.menu_bar.edit.copy=Copy
+program_3d_edit.menu_bar.edit.paste=Paste
+program_3d_edit.menu_bar.edit.delete=Delete
+program_3d_edit.menu_bar.edit.goto=Goto
+program_3d_edit.menu_bar.edit.select_all=Select All
+program_3d_edit.menu_bar.options.controls=Controls...
+program_3d_edit.menu_bar.options.options=Options...
+program_3d_edit.menu_bar.help.controls=Controls
+
+## Select tool
 program_3d_edit.select_tool.delete_button=Delete
 program_3d_edit.select_tool.delete_button_tooltip=Delete the blocks in the selected area.
 program_3d_edit.select_tool.copy_button=Copy
@@ -66,7 +128,6 @@ program_3d_edit.select_tool.scroll_point_z1_tooltip=Set the z coordinate of the 
 program_3d_edit.select_tool.scroll_point_x2_tooltip=Set the x coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
 program_3d_edit.select_tool.scroll_point_y2_tooltip=Set the y coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
 program_3d_edit.select_tool.scroll_point_z2_tooltip=Set the z coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
-
 program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
 program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
 program_3d_edit.select_tool.box_size_tooltip=The size of the active selection box in blocks.
@@ -77,6 +138,7 @@ program_3d_edit.select_tool.button_point2_tooltip=Press and hold this button and
 program_3d_edit.select_tool.button_selection_box=Move Box
 program_3d_edit.select_tool.button_selection_box_tooltip=Press and hold this button and use the movement controls to move the active box.
 
+## Paste tool
 program_3d_edit.paste_tool.location_label=Location
 program_3d_edit.paste_tool.location_x_label=x
 program_3d_edit.paste_tool.location_x_tooltip=The x location where the centre of the selection will be placed. Type in a number, scroll wheel over or use the arrows to change.
@@ -116,6 +178,7 @@ program_3d_edit.paste_tool.confirm_label=Confirm
 program_3d_edit.paste_tool.confirm_tooltip=Click to paste the structure into the world and the specified location, rotation and scale.
 program_3d_edit.paste_tool.zero_scale_message=One of the scale values had a value of zero so nothing was copied.
 
+## Chunk tool
 program_3d_edit.chunk_tool.min_y=Min Y
 program_3d_edit.chunk_tool.min_y_tooltip=The minimum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
 program_3d_edit.chunk_tool.max_y=Max Y
@@ -125,6 +188,7 @@ program_3d_edit.chunk_tool.delete_chunks_tooltip=Delete the selected chunks. Thi
 program_3d_edit.chunk_tool.prune_chunks=Prune Chunks
 program_3d_edit.chunk_tool.prune_chunks_tooltip=Delete all chunks that are not selected. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
 
+## Goto/Teleport window
 program_3d_edit.goto_ui.title=Teleport
 program_3d_edit.goto_ui.x_label=x:
 program_3d_edit.goto_ui.x_label_tooltip=The x coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
@@ -134,25 +198,3 @@ program_3d_edit.goto_ui.z_label=z:
 program_3d_edit.goto_ui.z_label_tooltip=The z coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
 program_3d_edit.goto_ui.copy_button_tooltip=Copy the x, y and z values to the clipboard in the form "0.0 0.0 0.0" (x, y and z respectively)
 program_3d_edit.goto_ui.paste_button_tooltip=Paste a previously copied coordinate into the inputs. Copied value must three numbers separated with spaces or commas.
-
-program_3d_edit.canvas.please_wait=Please wait while the renderer loads
-program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Downloading Bedrock vanilla resource pack
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Downloading Java vanilla resource pack
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Failed to download the latest Java resource pack.\nCheck your internet connection and restart Amulet.\nCheck the console for more details.
-program_3d_edit.canvas.loading_resource_packs=Loading resource packs
-program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
-program_3d_edit.canvas.setting_up_renderer=Setting up renderer
-
-program_3d_edit.menu_bar.file.save=Save
-program_3d_edit.menu_bar.edit.menu_name=&Edit
-program_3d_edit.menu_bar.edit.undo=Undo
-program_3d_edit.menu_bar.edit.redo=Redo
-program_3d_edit.menu_bar.edit.cut=Cut
-program_3d_edit.menu_bar.edit.copy=Copy
-program_3d_edit.menu_bar.edit.paste=Paste
-program_3d_edit.menu_bar.edit.delete=Delete
-program_3d_edit.menu_bar.edit.goto=Goto
-program_3d_edit.menu_bar.edit.select_all=Select All
-program_3d_edit.menu_bar.options.controls=Controls...
-program_3d_edit.menu_bar.options.options=Options...
-program_3d_edit.menu_bar.help.controls=Controls
