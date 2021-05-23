@@ -30,9 +30,7 @@ class RaycastBehaviour(BaseBehaviour):
         look_vector = numpy.array([0, 0, 1, 0])
 
         if self.canvas.mouse.delta_xy != (0, 0):
-            screen_width, screen_height = (
-                numpy.array(self.canvas.GetSize(), numpy.int) / 2
-            )
+            screen_width, screen_height = numpy.array(self.canvas.GetSize(), int) / 2
             screen_width = max(1, screen_width)
             screen_height = max(1, screen_height)
             screen_dx = math.atan(
@@ -174,9 +172,9 @@ class RaycastBehaviour(BaseBehaviour):
             look_vector = self.look_vector()
         if start_location is None:
             start_location = self.canvas.camera.location
-        position = numpy.array(start_location, dtype=numpy.int) + numpy.floor(
+        position = numpy.array(start_location, dtype=int) + numpy.floor(
             look_vector * distance
-        ).astype(numpy.int)
+        ).astype(int)
         return position
 
     def collision_locations(
@@ -222,23 +220,21 @@ class RaycastBehaviour(BaseBehaviour):
             if block_count:
                 blocks = numpy.arange(block_count + 1).reshape(-1, 1)
                 offsets = blocks * vector + initial_offset
-                locations_ = numpy.floor(offsets + start).astype(numpy.int)
+                locations_ = numpy.floor(offsets + start).astype(int)
                 if vector[axis] < 0:
                     locations_[:, axis] -= 1
 
                 locations.append(locations_)
 
         if locations:
-            collision_locations = numpy.floor(start_location).astype(
-                numpy.int
-            ) + numpy.array(
+            collision_locations = numpy.floor(start_location).astype(int) + numpy.array(
                 sorted(
                     numpy.concatenate(locations),
                     key=lambda loc: sum(abs(loc_) for loc_ in loc),
                 )
             )
         else:
-            collision_locations = start.astype(numpy.int).reshape(1, 3)
+            collision_locations = start.astype(int).reshape(1, 3)
 
         for location in collision_locations:
             yield location

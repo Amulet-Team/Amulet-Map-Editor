@@ -13,7 +13,7 @@ class RenderSelectionHighlightable(RenderSelection):
     def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
         super().__init__(context_identifier, resource_pack)
         # which edges are highlighted
-        self._highlight_edges = numpy.zeros((2, 3), dtype=numpy.bool)
+        self._highlight_edges = numpy.zeros((2, 3), dtype=bool)
 
     @property
     def highlight_colour(self) -> RGBColour:
