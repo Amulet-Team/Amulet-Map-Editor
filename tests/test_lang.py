@@ -20,7 +20,8 @@ class LangTestCase(unittest.TestCase):
                 unique_ids = set()
                 for line_number, line in enumerate(f.readlines()):
                     line_number += 1
-                    if line.strip() and not line.startswith("#"):
+                    strip_line = line.strip()
+                    if strip_line and not strip_line.startswith("#"):
                         split_line = line.split("=", 1)
                         self.assertEqual(
                             len(split_line),
