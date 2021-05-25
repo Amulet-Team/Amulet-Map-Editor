@@ -3,9 +3,9 @@ from __future__ import annotations
 import ast
 import sys
 from collections.abc import MutableMapping, MutableSequence
-from copy import copy
+from copy import copy, deepcopy
 from functools import partial
-from typing import List, Union
+from typing import Any, List, Union, Type, Optional
 
 import wx
 
@@ -21,31 +21,31 @@ class ParsedNBT:
     __slots__ = ["_parent", "_name", "_type"]
 
     @classmethod
-    def is_container(cls):
+    def is_container(cls) -> bool:
         return False
 
     @property
-    def tag_type(self):
+    def tag_type(self) -> Type[nbt.AnyNBT]:
         return self._type
 
     @tag_type.setter
-    def tag_type(self, tag_type):
+    def tag_type(self, tag_type: Type[nbt.AnyNBT]):
         self._type = tag_type
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @name.setter
-    def name(self, name):
+    def name(self, name: str):
         self._name = name
 
     @property
-    def parent(self):
+    def parent(self) -> ParsedNBTContainer:
         return self._parent
 
     @parent.setter
-    def parent(self, parent):
+    def parent(self, parent: ParsedNBTContainer):
         self._parent = parent
 
     def remove(self):
@@ -54,13 +54,22 @@ class ParsedNBT:
     def display(self):
         raise NotImplementedError
 
+    def update(self, name: str, value: Any):
+        raise NotImplementedError
+
 
 class ParsedNBTValue(ParsedNBT):
     __slots__ = ParsedNBT.__slots__ + [
         "_value",
     ]
 
-    def __init__(self, parent, name, value, _type):
+    def __init__(
+        self,
+        parent: Optional[ParsedNBTContainer],
+        name: str,
+        value: Union[int, float, str],
+        _type: Type[nbt.AnyNBT],
+    ):
         self._parent: ParsedNBTContainer = parent
         self._name = name
         self._value = value
@@ -70,11 +79,11 @@ class ParsedNBTValue(ParsedNBT):
         return f"{self._type}({self._name}, {self._value})"
 
     @property
-    def value(self):
+    def value(self) -> Union[int, float, str]:
         return self._value
 
     @value.setter
-    def value(self, value):
+    def value(self, value: Union[int, float, str]):
         self._value = value
 
     def display(self) -> str:
@@ -83,48 +92,55 @@ class ParsedNBTValue(ParsedNBT):
     def remove(self):
         self._parent.remove_child(self)
 
-    def update(self, name, value, _type):
+    def update(self, name: str, value: Union[int, float, str]):
         self._name = name
         self._value = value
-        self._type = _type
 
 
 class ParsedNBTContainer(ParsedNBT):
     __slots__ = ParsedNBT.__slots__ + ["_children"]
 
-    def __init__(self, parent, name, _type):
+    def __init__(
+        self, parent: Optional[ParsedNBTContainer], name: str, _type: Type[nbt.AnyNBT]
+    ):
         self._parent: ParsedNBTContainer = parent
         self._name = name
         self._type = _type
         self._children: List[Union[ParsedNBTValue, ParsedNBTContainer]] = []
 
     @classmethod
-    def is_container(cls):
+    def is_container(cls) -> bool:
         return True
 
     @property
-    def children(self):
+    def children(self) -> List[Union[ParsedNBTValue, ParsedNBTContainer]]:
         return self._children
 
     def remove(self):
         if self._parent:
             self._parent.remove_child(self)
 
-    def add_child(self, child):
+    def add_child(self, child: Union[ParsedNBTValue, ParsedNBTContainer]):
         self._children.append(child)
 
-    def remove_child(self, child):
+    def remove_child(self, child: Union[ParsedNBTValue, ParsedNBTContainer]):
         self._children.remove(child)
 
-    def display(self):
+    def display(self) -> str:
         return (
             f"{self._name}: {len(self._children)} children"
             if self._name
             else f"{len(self._children)} children"
         )
 
+    def update(self, name: str, _: None):
+        self._name = name
 
-def parse_nbt(_nbt, parent=None):
+
+def parse_nbt(
+    _nbt: Union[nbt.NBTFile, nbt.TAG_Compound, MutableMapping],
+    parent: ParsedNBTContainer = None,
+):
     for key, value in _nbt.items():
         if isinstance(value, MutableMapping):
             new_parent = ParsedNBTContainer(parent, key, type(value))
@@ -150,10 +166,10 @@ def parse_nbt(_nbt, parent=None):
 
 
 class NBTRadioButton(simple.SimplePanel):
-    def __init__(self, parent, nbt_tag_class, icon):
+    def __init__(self, parent, nbt_tag_class: str, icon):
         super(NBTRadioButton, self).__init__(parent, wx.HORIZONTAL)
 
-        self.nbt_tag_class = nbt_tag_class
+        self.nbt_tag_class: str = nbt_tag_class
 
         self.radio_button = wx.RadioButton(self, wx.ID_ANY, wx.EmptyString)
         self.add_object(self.radio_button, 0, wx.ALIGN_CENTER | wx.ALL)
@@ -163,15 +179,15 @@ class NBTRadioButton(simple.SimplePanel):
 
         self.add_object(self.tag_bitmap, 0, wx.ALIGN_CENTER | wx.ALL)
 
-    def GetValue(self):
+    def GetValue(self) -> bool:
         return self.radio_button.GetValue()
 
-    def SetValue(self, val):
+    def SetValue(self, val: bool):
         self.radio_button.SetValue(val)
 
 
 class NBTEditor(simple.SimplePanel):
-    def __init__(self, parent, nbt_data):
+    def __init__(self, parent, nbt_data: Union[nbt.NBTFile, nbt.TAG_Compound]):
         super(NBTEditor, self).__init__(parent)
 
         self.image_list = wx.ImageList(16, 16)
@@ -201,14 +217,14 @@ class NBTEditor(simple.SimplePanel):
 
         self.add_object(self.tree, 1, wx.ALL | wx.CENTER | wx.EXPAND)
 
-        self.tree.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.tree_right_click)
+        self.tree.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self._tree_right_click)
 
         _parent = ParsedNBTContainer(None, "", nbt.TAG_Compound)
-        parse_nbt(nbt_data, _parent)
+        parse_nbt(deepcopy(nbt_data), _parent)
 
         self._build_tree(_parent)
 
-    def _generate_menu(self, include_add_tag=False):
+    def _generate_menu(self, include_add_tag: bool = False) -> wx.Menu:
         menu = wx.Menu()
 
         menu_items = [
@@ -226,11 +242,11 @@ class NBTEditor(simple.SimplePanel):
             item.GetId(): item.GetItemLabelText().split()[0].lower()
             for item in menu_items
         }
-        menu.Bind(wx.EVT_MENU, lambda evt: self.popup_menu_handler(op_map, evt))
+        menu.Bind(wx.EVT_MENU, lambda evt: self._popup_menu_handler(op_map, evt))
 
         return menu
 
-    def tree_right_click(self, evt):
+    def _tree_right_click(self, evt):
         parsed_nbt = self.tree.GetItemData(evt.GetItem())
 
         menu = self._generate_menu(isinstance(parsed_nbt, ParsedNBTContainer))
@@ -238,18 +254,18 @@ class NBTEditor(simple.SimplePanel):
         menu.Destroy()
         evt.Skip()
 
-    def popup_menu_handler(self, op_map, evt):
+    def _popup_menu_handler(self, op_map, evt):
         op_id = evt.GetId()
         op_name = op_map[op_id]
 
         if op_name == "add":
-            self.add_tag()
+            self._add_tag()
         elif op_name == "edit":
-            self.edit_tag()
+            self._edit_tag()
         else:
-            self.delete_tag()
+            self._delete_tag()
 
-    def add_tag(self):
+    def _add_tag(self):
         parent_element = self.tree.GetFocusedItem()
         parent_tag = self.tree.GetItemData(parent_element)
 
@@ -272,7 +288,7 @@ class NBTEditor(simple.SimplePanel):
         )
         add_dialog.Show()
 
-    def edit_tag(self):
+    def _edit_tag(self):
         selected_element = self.tree.GetFocusedItem()
         parsed_tag = self.tree.GetItemData(selected_element)
 
@@ -280,12 +296,7 @@ class NBTEditor(simple.SimplePanel):
             parent_element = self.tree.GetItemParent(selected_element)
             parent_tag = parsed_tag.parent
 
-            if parent_tag.tag_type is nbt.TAG_List:
-                index = parent_tag.children.index(parsed_tag)
-                parsed_tag.remove()
-                parent_tag.children.insert(index, edited_tag)
-            else:
-                parent_tag.add_child(edited_tag)
+            parsed_tag.update(edited_tag.name, edited_tag.value)
 
             self.tree.DeleteChildren(parent_element)
             self._build_sub_tree(parent_element, parent_tag)
@@ -294,7 +305,7 @@ class NBTEditor(simple.SimplePanel):
         edit_dialog = EditTagDialog(self, parsed_tag, save_callback)
         edit_dialog.Show()
 
-    def delete_tag(self):
+    def _delete_tag(self):
         selected_element = self.tree.GetFocusedItem()
 
         parent_element = self.tree.GetItemParent(selected_element)
@@ -308,7 +319,9 @@ class NBTEditor(simple.SimplePanel):
         self._build_sub_tree(parent_element, parent_tag)
         self.tree.SetItemText(parent_element, parent_tag.display())
 
-    def _build_sub_tree(self, tree_parent, nbt_parent):
+    def _build_sub_tree(
+        self, tree_parent: wx.TreeItemId, nbt_parent: ParsedNBTContainer
+    ):
         for nbt_child in sorted(nbt_parent.children, key=lambda t: t.name):
             if isinstance(nbt_child, ParsedNBTContainer):
                 new_child = self.tree.AppendItem(tree_parent, nbt_child.display())
@@ -373,7 +386,9 @@ class NewTagDialog(wx.Frame):
                 parent.image_list.GetBitmap(parent.image_map[getattr(nbt, tag_type)]),
             )
             self.radio_buttons.append(rd_btn)
-            rd_btn.Bind(wx.EVT_RADIOBUTTON, partial(self.handle_radio_button, tag_type))
+            rd_btn.Bind(
+                wx.EVT_RADIOBUTTON, partial(self._handle_radio_button, tag_type)
+            )
             tag_type_sizer.Add(rd_btn, 0, wx.ALL, 0)
 
         tag_type_panel.SetSizerAndFit(tag_type_sizer)
@@ -389,13 +404,13 @@ class NewTagDialog(wx.Frame):
         main_panel.add_object(tag_type_panel, space=0)
         main_panel.add_object(button_panel, space=0)
 
-        self.save_button.Bind(wx.EVT_BUTTON, self.save)
+        self.save_button.Bind(wx.EVT_BUTTON, self._save)
         self.cancel_button.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
         self.SetSize((235, 260))
         self.Layout()
 
-    def handle_radio_button(self, tag_type, evt):
+    def _handle_radio_button(self, tag_type: str, _):
         for rd_btn in self.radio_buttons:
             rd_btn.SetValue(rd_btn.nbt_tag_class == tag_type)
 
@@ -404,13 +419,13 @@ class NewTagDialog(wx.Frame):
         elif not self.value_field.Enabled:
             self.value_field.Enable()
 
-    def get_selected_tag_type(self):
+    def get_selected_tag_type(self) -> Optional[str]:
         for rd_btn in self.radio_buttons:
             if rd_btn.GetValue():
                 return rd_btn.nbt_tag_class
         return None
 
-    def save(self, evt):
+    def _save(self, _):
         selected_type = self.get_selected_tag_type()
         if not selected_type:
             wx.MessageBox("No tag type selected", "Tag Type Error", wx.OK)
@@ -450,7 +465,9 @@ class NewTagDialog(wx.Frame):
 
 
 class EditTagDialog(wx.Frame):
-    def __init__(self, parent, tag, callback=None):
+    def __init__(
+        self, parent, tag: Union[ParsedNBTValue, ParsedNBTContainer], callback=None
+    ):
         super(EditTagDialog, self).__init__(
             parent, title="Edit NBT Tag", size=(500, 280)
         )
@@ -488,7 +505,7 @@ class EditTagDialog(wx.Frame):
         main_panel.add_object(value_panel, space=0, options=wx.ALL | wx.EXPAND)
         main_panel.add_object(button_panel, space=0)
 
-        self.save_button.Bind(wx.EVT_BUTTON, self.save)
+        self.save_button.Bind(wx.EVT_BUTTON, self._save)
         self.cancel_button.Bind(wx.EVT_BUTTON, lambda evt: self.Close())
 
         self.SetSize((235, 260))
@@ -500,7 +517,7 @@ class EditTagDialog(wx.Frame):
         if tag.parent.tag_type is nbt.TAG_List:
             self.name_field.Disable()
 
-    def save(self, evt):
+    def _save(self, _):
         tag_type = self.tag.tag_type
 
         if tag_type not in (nbt.TAG_List, nbt.TAG_Compound):
@@ -525,6 +542,8 @@ class EditTagDialog(wx.Frame):
                     wx.OK,
                 )
                 return
+            except SyntaxError:
+                value = self.tag.value
             self.tag.name = self.name_field.GetValue()
             self.tag.value = value
         else:
