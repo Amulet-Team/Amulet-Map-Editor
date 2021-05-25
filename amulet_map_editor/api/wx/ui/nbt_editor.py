@@ -57,6 +57,9 @@ class ParsedNBT:
     def update(self, name: str, value: Any):
         raise NotImplementedError
 
+    def build_nbt(self):
+        raise NotImplementedError
+
 
 class ParsedNBTValue(ParsedNBT):
     __slots__ = ParsedNBT.__slots__ + [
@@ -95,6 +98,9 @@ class ParsedNBTValue(ParsedNBT):
     def update(self, name: str, value: Union[int, float, str]):
         self._name = name
         self._value = value
+
+    def build_nbt(self):
+        return self._type(self._value)
 
 
 class ParsedNBTContainer(ParsedNBT):
@@ -135,6 +141,18 @@ class ParsedNBTContainer(ParsedNBT):
 
     def update(self, name: str, _: None):
         self._name = name
+
+    def build_nbt(self):
+        container = self._type()
+
+        if isinstance(container, nbt.TAG_Compound):
+            for child in self._children:
+                container[child.name] = child.build_nbt()
+        else:
+            for child in self._children:
+                container.append(child.build_nbt())
+
+        return container
 
 
 def parse_nbt(
@@ -219,10 +237,14 @@ class NBTEditor(simple.SimplePanel):
 
         self.tree.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self._tree_right_click)
 
-        _parent = ParsedNBTContainer(None, "", nbt.TAG_Compound)
-        parse_nbt(deepcopy(nbt_data), _parent)
+        self._parent = ParsedNBTContainer(None, "", nbt.TAG_Compound)
+        parse_nbt(deepcopy(nbt_data), self._parent)
 
-        self._build_tree(_parent)
+        self._build_tree(self._parent)
+
+    @property
+    def nbt(self):
+        return self._parent.build_nbt()
 
     def _generate_menu(self, include_add_tag: bool = False) -> wx.Menu:
         menu = wx.Menu()
@@ -560,6 +582,7 @@ if __name__ == "__main__":
 
     app = wx.App()
     frame = wx.Frame(None)
-    NBTEditor(frame, level_dat)
+    editor = NBTEditor(frame, level_dat)
     frame.Show()
     app.MainLoop()
+    print(editor.nbt)
