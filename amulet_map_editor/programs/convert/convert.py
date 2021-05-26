@@ -100,7 +100,8 @@ class ConvertExtension(SimplePanel, BaseProgram):
         menu.setdefault(lang.get("menu_bar.help.menu_name"), {}).setdefault(
             "control", {}
         ).setdefault(
-            lang.get("menu_bar.help.controls"), lambda evt: self._help_controls()
+            lang.get("program_convert.menu_bar.help.user_guide"),
+            lambda evt: self._help_controls(),
         )
         return menu
 

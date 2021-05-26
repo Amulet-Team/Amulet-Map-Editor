@@ -78,6 +78,7 @@ program_convert.select_output_world=Select Output World
 program_convert.input_output_must_different=The input and output worlds must be different!
 program_convert.select_before_converting=Select a world before converting!
 program_convert.conversion_completed=World conversion completed
+program_convert.menu_bar.help.user_guide=User Guide
 
 # 3D Editor
 ## The program used to edit a world with a 3D viewer
