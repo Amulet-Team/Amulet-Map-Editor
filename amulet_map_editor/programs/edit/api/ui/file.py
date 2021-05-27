@@ -12,6 +12,8 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_CREATE_UNDO,
     EVT_SAVE,
     EVT_PROJECTION_CHANGED,
+    EVT_DIMENSION_CHANGE,
+    DimensionChangeEvent,
 )
 from amulet_map_editor.api import image
 from amulet_map_editor.api.opengl.camera import Projection
@@ -94,6 +96,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
         self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
         self.canvas.Bind(EVT_PROJECTION_CHANGED, self._on_projection_change)
+        self.canvas.Bind(EVT_DIMENSION_CHANGE, self._change_dimension)
 
     def _on_update_buttons(self, evt):
         self._update_buttons()
@@ -127,7 +130,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
             self.canvas.camera.projection_mode = Projection.PERSPECTIVE
         evt.Skip()
 
-    def _change_dimension(self, evt):
+    def _change_dimension(self, evt: DimensionChangeEvent):
         """Run when the dimension attribute in the canvas is changed.
         This is run when the user changes the attribute and when it is changed manually in code."""
         dimension = evt.dimension
