@@ -72,23 +72,31 @@ class BiomeDefine(BaseDefine):
         ).biome.from_universal(universal_biome)
 
 
+def demo():
+    """
+    Show a demo version of the UI.
+    An app instance must be created first.
+    """
+    translation_manager = PyMCTranslate.new_translation_manager()
+    dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+    sizer = wx.BoxSizer()
+    dialog.SetSizer(sizer)
+    sizer.Add(
+        BiomeDefine(dialog, translation_manager, wx.HORIZONTAL),
+        1,
+        wx.ALL | wx.EXPAND,
+        5,
+    )
+    dialog.Show()
+    dialog.Fit()
+    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+
+
 if __name__ == "__main__":
 
     def main():
         app = wx.App()
-        translation_manager = PyMCTranslate.new_translation_manager()
-        dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
-        sizer = wx.BoxSizer()
-        dialog.SetSizer(sizer)
-        sizer.Add(
-            BiomeDefine(dialog, translation_manager, wx.HORIZONTAL),
-            1,
-            wx.ALL | wx.EXPAND,
-            5,
-        )
-        dialog.Show()
-        dialog.Fit()
-        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+        demo()
         app.MainLoop()
 
     main()

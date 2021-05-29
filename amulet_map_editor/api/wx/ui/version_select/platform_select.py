@@ -95,3 +95,23 @@ class PlatformSelect(wx.Panel):
         if not self._allow_vanilla:
             platforms = [p for p in platforms if p == "universal"]
         self._platform_choice.SetItems(platforms)
+
+
+def demo():
+    """
+    Show a demo version of the UI.
+    An app instance must be created first.
+    """
+    translation_manager = PyMCTranslate.new_translation_manager()
+    dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT)
+    sizer = wx.BoxSizer()
+    dialog.SetSizer(sizer)
+    sizer.Add(
+        PlatformSelect(dialog, translation_manager, "java"),
+        1,
+        wx.ALL | wx.EXPAND,
+        5,
+    )
+    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+    dialog.Show()
+    dialog.Fit()

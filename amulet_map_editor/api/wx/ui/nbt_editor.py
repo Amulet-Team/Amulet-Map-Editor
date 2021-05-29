@@ -13,8 +13,6 @@ from amulet_map_editor.api import image
 
 nbt_resources = image.nbt
 
-NBT_FILE = b"\x0A\x00\x0B\x68\x65\x6C\x6C\x6F\x20\x77\x6F\x72\x6C\x64\x08\x00\x04\x6E\x61\x6D\x65\x00\x09\x42\x61\x6E\x61\x6E\x72\x61\x6D\x61\x00"
-
 
 class NBTRadioButton(simple.SimplePanel):
     def __init__(self, parent, nbt_tag_class, icon):
@@ -381,12 +379,23 @@ class EditTagDialog(wx.Frame):
         self.Close()
 
 
-if __name__ == "__main__":
-    import wx.lib.inspection
-
-    app = wx.App()
-    wx.lib.inspection.InspectionTool().Show()
+def demo():
+    """
+    Show a demo version of the UI.
+    An app instance must be created first.
+    """
     frame = wx.Frame(None)
-    NBTEditor(frame, nbt.load(NBT_FILE), callback=lambda nbt_data: print(nbt_data))
+    NBTEditor(
+        frame,
+        nbt.load(
+            b"\x0A\x00\x0B\x68\x65\x6C\x6C\x6F\x20\x77\x6F\x72\x6C\x64\x08\x00\x04\x6E\x61\x6D\x65\x00\x09\x42\x61\x6E\x61\x6E\x72\x61\x6D\x61\x00"
+        ),
+        callback=lambda nbt_data: print(nbt_data),
+    )
     frame.Show()
+
+
+if __name__ == "__main__":
+    app = wx.App()
+    demo()
     app.MainLoop()

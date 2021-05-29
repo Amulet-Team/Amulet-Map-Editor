@@ -107,5 +107,5 @@ venv.bak/
 /world_temp
 /resource_packs
 /plugins
-/config
-/cache
+*.config
+**/cache

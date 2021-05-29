@@ -188,18 +188,26 @@ class _CollapsibleBlockDefine(wx.Panel):
         return f"{base}[{properties}]" if properties else base
 
 
+def demo():
+    """
+    Show a demo version of the UI.
+    An app instance must be created first.
+    """
+    translation_manager = PyMCTranslate.new_translation_manager()
+    dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+    sizer = wx.BoxSizer()
+    dialog.SetSizer(sizer)
+    sizer.Add(MultiBlockDefine(dialog, translation_manager), 1, wx.EXPAND)
+    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+    dialog.Show()
+    dialog.Fit()
+
+
 if __name__ == "__main__":
 
     def main():
         app = wx.App()
-        translation_manager = PyMCTranslate.new_translation_manager()
-        dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
-        sizer = wx.BoxSizer()
-        dialog.SetSizer(sizer)
-        sizer.Add(MultiBlockDefine(dialog, translation_manager), 1, wx.EXPAND)
-        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
-        dialog.Show()
-        dialog.Fit()
+        demo()
         app.MainLoop()
 
     main()

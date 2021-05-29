@@ -53,23 +53,31 @@ class BlockSelect(BaseSelect):
         self._list_box.SetItems(self._names)
 
 
+def demo():
+    """
+    Show a demo version of the UI.
+    An app instance must be created first.
+    """
+    translation_manager = PyMCTranslate.new_translation_manager()
+    dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT)
+    sizer = wx.BoxSizer()
+    dialog.SetSizer(sizer)
+    sizer.Add(
+        BlockSelect(dialog, translation_manager, "java", (1, 16, 0), False),
+        1,
+        wx.ALL | wx.EXPAND,
+        5,
+    )
+    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+    dialog.Show()
+    dialog.Fit()
+
+
 if __name__ == "__main__":
 
     def main():
         app = wx.App()
-        translation_manager = PyMCTranslate.new_translation_manager()
-        dialog = wx.Dialog(None)
-        sizer = wx.BoxSizer()
-        dialog.SetSizer(sizer)
-        sizer.Add(
-            BlockSelect(dialog, translation_manager, "java", (1, 16, 0), False),
-            1,
-            wx.ALL | wx.EXPAND,
-            5,
-        )
-        dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
-        dialog.Show()
-        dialog.Fit()
+        demo()
         app.MainLoop()
 
     main()

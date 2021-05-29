@@ -348,3 +348,35 @@ class ManualPropertySelect(wx.Panel):
         self._property_index = 0
         for name, value in properties.items():
             self._add_property(name, value)
+
+
+def demo():
+    """
+    Show a demo version of the UI.
+    An app instance must be created first.
+    """
+    translation_manager = PyMCTranslate.new_translation_manager()
+    for block in (("minecraft", "oak_fence"), ("modded", "block")):
+        for cls in (
+            PropertySelect,
+            lambda *args: PropertySelect(*args, wildcard_mode=True),
+        ):
+            dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+            sizer = wx.BoxSizer()
+            dialog.SetSizer(sizer)
+            sizer.Add(
+                cls(dialog, translation_manager, "java", (1, 16, 0), False, *block),
+                1,
+                wx.ALL,
+                5,
+            )
+
+            def get_on_close(dialog_):
+                def on_close(evt):
+                    dialog_.Destroy()
+
+                return on_close
+
+            dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
+            dialog.Show()
+            dialog.Fit()
