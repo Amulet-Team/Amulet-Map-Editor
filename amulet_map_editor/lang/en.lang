@@ -199,3 +199,13 @@ program_3d_edit.goto_ui.z_label=z:
 program_3d_edit.goto_ui.z_label_tooltip=The z coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
 program_3d_edit.goto_ui.copy_button_tooltip=Copy the x, y and z values to the clipboard in the form "0.0 0.0 0.0" (x, y and z respectively)
 program_3d_edit.goto_ui.paste_button_tooltip=Paste a previously copied coordinate into the inputs. Copied value must three numbers separated with spaces or commas.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Platform and data version of the world
+program_3d_edit.file_ui.projection_tooltip=Change view
+program_3d_edit.file_ui.location_tooltip=Move camera
+program_3d_edit.file_ui.dim_tooltip=Select dimension
+program_3d_edit.file_ui.undo_tooltip=Undo
+program_3d_edit.file_ui.redo_tooltip=Redo
+program_3d_edit.file_ui.save_tooltip=Save changes
+program_3d_edit.file_ui.close_tooltip=Close world
