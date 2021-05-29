@@ -1,6 +1,5 @@
 from typing import Tuple, Optional, Any, TYPE_CHECKING
 import wx
-import numpy
 import weakref
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.history.history_manager import ObjectHistoryManager

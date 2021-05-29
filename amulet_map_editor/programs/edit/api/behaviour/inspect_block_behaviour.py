@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 import wx
 from wx.adv import RichToolTip
 from amulet_map_editor import log
+from amulet.api.chunk.biomes import BiomesShape
 
 from .base_behaviour import BaseBehaviour
 from .pointer_behaviour import PointerBehaviour

@@ -24,6 +24,7 @@ from minecraft_model_reader.api.resource_pack import (
     load_resource_pack,
     load_resource_pack_manager,
 )
+from amulet.api.player import LOCAL_PLAYER
 
 from amulet.api.data_types import OperationYieldType, Dimension
 
@@ -64,7 +65,7 @@ class BaseEditCanvas(EventCanvas):
         self.world.history_manager.register(self._selection, False)
 
         self._camera: ControllableCamera = ControllableCamera(self)
-        self._camera.location_rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
+
         self._camera.move_speed = 2.0
         self._camera.rotate_speed = 2.0
 
@@ -189,6 +190,12 @@ class BaseEditCanvas(EventCanvas):
     def _finalise(self):
         """Any logic that needs to be run after everything has been set up."""
         self._init = True
+        try:
+            player = self.world.get_player(LOCAL_PLAYER)
+            self._camera.location_rotation = player.location, player.rotation
+            self.dimension = player.dimension
+        except:
+            self._camera.location_rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
 
     def bind_events(self):
         """Set up all events required to run.

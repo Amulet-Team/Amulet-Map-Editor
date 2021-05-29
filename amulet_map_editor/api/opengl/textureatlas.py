@@ -23,9 +23,8 @@
 """Texture Atlas and Map File Generation Utility Classes"""
 
 from PIL import Image
-import numpy
 import math
-from typing import Dict, Tuple, List, Any, Optional, Generator
+from typing import Dict, Tuple, List, Optional, Generator
 from amulet_map_editor import log
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture

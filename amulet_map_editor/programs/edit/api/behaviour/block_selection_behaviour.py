@@ -95,7 +95,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         self._initial_box: Optional[
             NPArray2x3
         ] = None  # the state of the box when editing started
-        self._pointer_mask: NPArray2x3 = numpy.zeros((2, 3), dtype=numpy.bool)
+        self._pointer_mask: NPArray2x3 = numpy.zeros((2, 3), dtype=bool)
         self._resizing = False  # is a box being resized
         self._pointer_distance2 = 0  # the pointer distance used when resizing
 
@@ -217,7 +217,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 if default_create:
                     self._start_point_1 = self._pointer.bounds
                     self._pointer_mask = numpy.array(
-                        [[False] * 3, [True] * 3], dtype=numpy.bool
+                        [[False] * 3, [True] * 3], dtype=bool
                     )
                     self._active_selection.set_highlight_edges(self._pointer_mask)
                     self._initial_box = None
@@ -443,7 +443,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     )
                     location = numpy.floor(
                         camera + look_vector * (max_distance + 0.01)
-                    ).astype(numpy.int)
+                    ).astype(int)
                     self._pointer.point1, self._pointer.point2 = location, location + 1
                     if box_index == len(self._selection):
                         self._active_selection.set_highlight_edges(faces_hit)
@@ -502,7 +502,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         point1 (x y z), point2 (x y z)"""
         if box_index is None:
             # it doesn't hit any boxes
-            return numpy.zeros((2, 3), dtype=numpy.bool)
+            return numpy.zeros((2, 3), dtype=bool)
         else:
             box: SelectionBox = selection_group[box_index]
             point = max_distance * look_vector + camera

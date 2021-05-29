@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-import numpy
 import math
 import wx
 import time

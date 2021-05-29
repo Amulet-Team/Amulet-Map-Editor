@@ -1,7 +1,7 @@
 import wx
 import math
 
-from amulet.api.data_types import BlockCoordinates, FloatTriplet
+from amulet.api.data_types import FloatTriplet
 from .select_location import SelectLocationUI
 from .events import RotationChangeEvent, ScaleChangeEvent, TransformChangeEvent
 
