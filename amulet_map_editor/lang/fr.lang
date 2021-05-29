@@ -18,10 +18,16 @@
 ## Exemple : "&Fichier" sera traduit en "Fichier" dans le UI, mais permettra à l'utilisateur d'appuyer sur "alt+f" pour ouvrir le menu correspondant
 ## Plus d'informations peuvent être trouvées à : https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
 
+# À propos des fstrings
+## Le pattern "{variable}" est utilisé dans certaines entrées, ce pattern permet à l'application d'introduire des valeurs dans le texte
+## Exemple: "Il y a {n} modifications" sera traduit par "Il y a 2 modifications" dans le UI
+## Ce pattern doit être conservé dans les entrées traduites pour qu'elles puissent fonctionner correctement
+
 
 
 # Application
 app.world_still_used=Un monde est toujours en cours d'utilisation. Veuillez d'abord le fermer.
+app.browser_open_tooltip=Cliquer ouvrira la page dans votre navigateur
 
 world.java_platform=Java
 world.bedrock_platform=Bedrock
@@ -79,6 +85,9 @@ program_convert.input_output_must_different=Les mondes source et de destination 
 program_convert.select_before_converting=Sélectionnez un monde avant de convertir !
 program_convert.conversion_completed=Conversion terminée
 
+## Barre de menu
+program_convert.menu_bar.help.user_guide=Guide utilisateur (en ligne)
+
 # Éditeur 3D
 ## Le programme utilisé pour modifier un monde avec une interface 3D
 program_3d_edit.tab_name=Éditeur 3D
@@ -128,7 +137,7 @@ program_3d_edit.select_tool.scroll_point_z1_tooltip=Définit la coordonnée z du
 program_3d_edit.select_tool.scroll_point_x2_tooltip=Définit la coordonnée x du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
 program_3d_edit.select_tool.scroll_point_y2_tooltip=Définit la coordonnée y du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
 program_3d_edit.select_tool.scroll_point_z2_tooltip=Définit la coordonnée z du coin bleu de la zone de sélection active. Tapez une valeur, utilisez les flèches, ou scrollez en survolant le champ avec la souris.
-program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x}, dy={y}, dz={z}
 program_3d_edit.select_tool.box_size_selector_tooltip=La taille de la zone de sélection active, suivant la notation de Minecraft.
 program_3d_edit.select_tool.box_size_tooltip=La taille de la zone de sélection active, en blocs.
 program_3d_edit.select_tool.button_point1=Déplacer le Point 1
@@ -198,3 +207,13 @@ program_3d_edit.goto_ui.z_label=z :
 program_3d_edit.goto_ui.z_label_tooltip=La coordonnée z de la caméra. Tapez une coordonnée pour vous y déplacer. Ctrl + C pour copier la coordonnée. Ctrl + V pour coller.
 program_3d_edit.goto_ui.copy_button_tooltip=Copier les coordonnées x, y et z dans le presse-papiers sous le format suivant : "0.0 0.0 0.0" (x, y et z respectivement).
 program_3d_edit.goto_ui.paste_button_tooltip=Coller des coordonnées précédemment copiées dans les champs correspondants. Les coordonnées copiées doivent être constituées de trois nombres séparés par des espaces ou des virgules.
+
+## Panneau fichier
+program_3d_edit.file_ui.version_tooltip=Platforme et version de données du monde
+program_3d_edit.file_ui.projection_tooltip=Changer de vue
+program_3d_edit.file_ui.location_tooltip=Déplacer la caméra
+program_3d_edit.file_ui.dim_tooltip=Choisir la dimension
+program_3d_edit.file_ui.undo_tooltip=Annuler
+program_3d_edit.file_ui.redo_tooltip=Rétablir
+program_3d_edit.file_ui.save_tooltip=Sauvegarder les modifications
+program_3d_edit.file_ui.close_tooltip=Fermer le monde
