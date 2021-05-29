@@ -105,7 +105,7 @@ program_3d_edit.menu_bar.edit.goto=Se déplacer
 program_3d_edit.menu_bar.edit.select_all=Tout sélectionner
 program_3d_edit.menu_bar.options.controls=Contrôles...
 program_3d_edit.menu_bar.options.options=Options...
-program_3d_edit.menu_bar.help.controls=Contrôles
+program_3d_edit.menu_bar.help.user_guide=Guide utilisateur (en ligne)
 
 ## Outil de sélection
 program_3d_edit.select_tool.delete_button=Supprimer
