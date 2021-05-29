@@ -18,6 +18,11 @@
 ## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
 ## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
 
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
 
 
 # App
