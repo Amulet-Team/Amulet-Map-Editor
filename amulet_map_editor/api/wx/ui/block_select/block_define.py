@@ -1,6 +1,6 @@
 import wx
 import wx.lib.scrolledpanel
-from typing import Tuple, Optional, Dict
+from typing import Tuple, Optional
 
 import PyMCTranslate
 from amulet.api.block import PropertyType, Block
@@ -11,6 +11,7 @@ from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 
 from amulet_map_editor.api.wx.ui.block_select.properties import (
     PropertySelect,
+    WildcardPropertySelect,
     EVT_PROPERTIES_CHANGE,
 )
 
@@ -52,9 +53,18 @@ class BlockDefine(BaseDefine):
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
-
+        self._wildcard_mode = wildcard_properties
         if wildcard_properties:
-            raise NotImplementedError
+            self._property_picker = PropertySelect(
+                self,
+                translation_manager,
+                self._version_picker.platform,
+                self._version_picker.version_number,
+                self._version_picker.force_blockstate,
+                self._picker.namespace,
+                self._picker.name,
+                properties,
+            )
         else:
             self._property_picker = PropertySelect(
                 self,
@@ -71,6 +81,15 @@ class BlockDefine(BaseDefine):
 
         self.SetSizerAndFit(self._sizer)
         self.Layout()
+
+    @property
+    def wildcard_mode(self) -> bool:
+        """
+        Is the UI in wildcard mode.
+        If True multiple property values can be selected.
+        These can be accessed through :attr:`extra_properties`
+        """
+        return self._wildcard_mode
 
     def _on_picker_change(self, evt):
         self._update_properties()
@@ -112,6 +131,8 @@ class BlockDefine(BaseDefine):
     @properties.setter
     def properties(self, properties: PropertyType):
         self._property_picker.properties = properties
+
+
 
     @property
     def block(self) -> Block:

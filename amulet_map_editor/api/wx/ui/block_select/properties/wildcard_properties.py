@@ -1,18 +1,18 @@
 import wx
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict, List, Iterable
 
 import PyMCTranslate
 import amulet_nbt
 from amulet_nbt import SNBTType
-from amulet.api.block import PropertyDataTypes, PropertyType
+from amulet.api.block import PropertyDataTypes, PropertyType, PropertyValueType
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 from .events import PropertiesChangeEvent
 from .base_property import BasePropertySelect
 
 
-class PropertySelect(BasePropertySelect):
+class WildcardPropertySelect(BasePropertySelect):
     """
-    This is a UI which lets the user pick one value for each property value for a given block.
+    This is a UI which lets the user pick zero or more values for each property.
     If the block is known it will be populated from the specification.
     If it is not known the user can populate it themselves.
     """
@@ -39,9 +39,9 @@ class PropertySelect(BasePropertySelect):
             style=wx.BORDER_SIMPLE)
 
         self._manual_enabled = False
-        self._simple = SimplePropertySelect(self, translation_manager)
+        self._simple = SimpleWildcardPropertySelect(self, translation_manager)
         self._sizer.Add(self._simple, 1, wx.EXPAND)
-        self._manual = ManualPropertySelect(self, translation_manager)
+        self._manual = ManualWildcardPropertySelect(self, translation_manager)
         self._sizer.Add(self._manual, 1, wx.EXPAND)
 
         if properties is None:
@@ -63,6 +63,19 @@ class PropertySelect(BasePropertySelect):
             self._simple.properties = properties
         self.TopLevelParent.Layout()
         self.Thaw()
+
+    @property
+    def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
+        """
+        The values that are checked for each property.
+        This UI can have more than one property value checked (ticked) but only one selected (highlighted blue).
+        :attr:`properties` will return the entry that is highlighted blue.
+        """
+        raise NotImplementedError
+
+    @extra_properties.setter
+    def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
+        raise NotImplementedError
 
     def _rebuild_ui(self):
         self.Freeze()
@@ -87,7 +100,70 @@ class PropertySelect(BasePropertySelect):
         self.Thaw()
 
 
-class BaseSubPropertySelect(wx.Panel):
+class PropertyValueCheckList(wx.Panel):
+    def __init__(self, parent: wx.Window, values: Iterable[str]):
+        super().__init__(parent)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+        self._toggle_checkbox = wx.CheckBox(self, style=wx.CHK_3STATE)
+        sizer.Add(self._toggle_checkbox, 0, wx.ALL, 3)
+        self._check_list_box = wx.CheckListBox(self, choices=values)
+        self._check_list_box.SetCheckedStrings(values)
+        sizer.Add(self._check_list_box, 0)
+
+        self._toggle_checkbox.Bind(wx.EVT_CHECKBOX, self._on_toggle)
+        self._check_list_box.Bind(wx.EVT_CHECKLISTBOX, self._on_check)
+
+    def _on_toggle(self, evt):
+        if self._toggle_checkbox.GetValue():
+            self._check_list_box.SetCheckedItems(list(range(self._check_list_box.GetCount())))
+        else:
+            self._check_list_box.SetCheckedItems([])
+
+    def _on_check(self, evt):
+        items = self._check_list_box.GetCheckedItems()
+        if len(items) == self._check_list_box.GetCount():
+            self._toggle_checkbox.Set3StateValue(wx.CHK_CHECKED)
+        elif len(items) == 0:
+            self._toggle_checkbox.Set3StateValue(wx.CHK_UNCHECKED)
+        else:
+            self._toggle_checkbox.Set3StateValue(wx.CHK_UNDETERMINED)
+
+    @property
+    def value(self) -> str:
+        return self._check_list_box.GetStringSelection()
+
+    @value.setter
+    def value(self, value: str):
+        self._check_list_box.SetStringSelection(value)
+
+    @property
+    def extra_values(self) -> Tuple[str]:
+        return self._check_list_box.GetCheckedStrings()
+
+    @extra_values.setter
+    def extra_values(self, extra_values: Iterable[str]):
+        self._check_list_box.SetCheckedStrings(extra_values)
+
+
+class PropertyValueComboPopup(wx.ComboPopup):
+    def __init__(self, values: Iterable[str]):
+        super().__init__()
+        self.pvcl: PropertyValueCheckList = None
+        self._values = values
+
+    def Create(self, parent):
+        self.pvcl = PropertyValueCheckList(parent, self._values)
+        return True
+
+    def GetControl(self):
+        return self.pvcl
+
+    def GetStringValue(self):
+        return "|".join(self.pvcl.extra_values)
+
+
+class BaseSubWildcardPropertySelect(wx.Panel):
     def __init__(
         self,
         parent: wx.Window,
@@ -107,7 +183,7 @@ class BaseSubPropertySelect(wx.Panel):
         raise NotImplementedError
 
 
-class SimplePropertySelect(BaseSubPropertySelect):
+class SimpleWildcardPropertySelect(BaseSubWildcardPropertySelect):
     def __init__(
         self,
         parent: wx.Window,
@@ -126,7 +202,7 @@ class SimplePropertySelect(BaseSubPropertySelect):
         self._property_sizer = wx.GridSizer(2, 5, 5)
         self._sizer.Add(self._property_sizer, 0, wx.ALL | wx.EXPAND, 5)
 
-        self._properties: Dict[str, wx.Choice] = {}
+        self._properties: Dict[str, PropertyValueComboPopup] = {}
         self._specification: dict = {}
 
     def rebuild_ui(self, specification: dict):
@@ -145,7 +221,11 @@ class SimplePropertySelect(BaseSubPropertySelect):
         for name, choices in spec_properties.items():
             label = wx.StaticText(self, label=name)
             self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
-            choice = wx.Choice(self, choices=choices)
+
+            choice = wx.ComboCtrl(self, style=wx.CB_READONLY)
+            l = PropertyValueComboPopup(choices)
+            choice.SetPopupControl(l)
+
             self._property_sizer.Add(choice, 0, wx.EXPAND)
             choice.Bind(
                 wx.EVT_CHOICE,
@@ -163,8 +243,8 @@ class SimplePropertySelect(BaseSubPropertySelect):
     @property
     def properties(self) -> PropertyType:
         return {
-            name: amulet_nbt.from_snbt(choice.GetString(choice.GetSelection()))
-            for name, choice in self._properties.items()
+            # name: amulet_nbt.from_snbt(choice.GetString(choice.GetSelection()))
+            # for name, choice in self._properties.items()
         }
 
     @properties.setter
@@ -179,13 +259,13 @@ class SimplePropertySelect(BaseSubPropertySelect):
                 else:
                     continue
                 choice = self._properties[name]
-                index = choice.FindString(snbt)
-                if index != wx.NOT_FOUND:
-                    choice.SetSelection(index)
+                # index = choice.FindString(snbt)
+                # if index != wx.NOT_FOUND:
+                #     choice.SetSelection(index)
         self.Thaw()
 
 
-class ManualPropertySelect(BaseSubPropertySelect):
+class ManualWildcardPropertySelect(BaseSubWildcardPropertySelect):
     def __init__(
         self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
     ):
@@ -305,11 +385,11 @@ def demo():
     """
     translation_manager = PyMCTranslate.new_translation_manager()
     for block in (("minecraft", "oak_fence"), ("modded", "block")):
-        dialog = wx.Dialog(None, title=f"PropertySelect with block {block[0]}:{block[1]}", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+        dialog = wx.Dialog(None, title=f"WildcardPropertySelect with block {block[0]}:{block[1]}", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(
-            PropertySelect(dialog, translation_manager, "java", (1, 16, 0), False, *block),
+            WildcardPropertySelect(dialog, translation_manager, "java", (1, 16, 0), False, *block),
             1,
             wx.ALL,
             5,
