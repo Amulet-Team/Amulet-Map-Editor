@@ -11,7 +11,6 @@ from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 
 from amulet_map_editor.api.wx.ui.block_select.properties import (
     PropertySelect,
-    WildcardSNBTType,
     EVT_PROPERTIES_CHANGE,
 )
 
@@ -54,17 +53,19 @@ class BlockDefine(BaseDefine):
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
 
-        self._property_picker = PropertySelect(
-            self,
-            translation_manager,
-            self._version_picker.platform,
-            self._version_picker.version_number,
-            self._version_picker.force_blockstate,
-            self._picker.namespace,
-            self._picker.name,
-            properties,
-            wildcard_properties,
-        )
+        if wildcard_properties:
+            raise NotImplementedError
+        else:
+            self._property_picker = PropertySelect(
+                self,
+                translation_manager,
+                self._version_picker.platform,
+                self._version_picker.version_number,
+                self._version_picker.force_blockstate,
+                self._picker.namespace,
+                self._picker.name,
+                properties,
+            )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._property_picker.Bind(EVT_PROPERTIES_CHANGE, self._on_property_change)
 
@@ -103,14 +104,6 @@ class BlockDefine(BaseDefine):
     @block_name.setter
     def block_name(self, block_name: str):
         self._picker.name = block_name
-
-    @property
-    def str_properties(self) -> Dict[str, "WildcardSNBTType"]:
-        return self._property_picker.str_properties
-
-    @str_properties.setter
-    def str_properties(self, str_properties: Dict[str, "WildcardSNBTType"]):
-        self._property_picker.str_properties = str_properties
 
     @property
     def properties(self) -> PropertyType:

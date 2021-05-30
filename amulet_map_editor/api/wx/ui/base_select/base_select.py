@@ -26,7 +26,7 @@ class BaseSelect(wx.Panel):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
-        version_number: Tuple[int, int, int],
+        version_number: Tuple[int, ...],
         force_blockstate: bool = None,
         namespace: str = None,
         default_name: str = None,
@@ -121,7 +121,7 @@ class BaseSelect(wx.Panel):
         self._populate_namespace()
         self.namespace = None
 
-    def _set_version(self, version: Tuple[str, Tuple[int, int, int], bool]):
+    def _set_version(self, version: Tuple[str, Tuple[int, ...], bool]):
         assert (
             version[0] in self._translation_manager.platforms()
             and version[1] in self._translation_manager.version_numbers(version[0])
