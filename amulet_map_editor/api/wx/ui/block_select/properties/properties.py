@@ -357,11 +357,11 @@ def demo():
     """
     translation_manager = PyMCTranslate.new_translation_manager()
     for block in (("minecraft", "oak_fence"), ("modded", "block")):
-        for cls in (
-            PropertySelect,
-            lambda *args: PropertySelect(*args, wildcard_mode=True),
+        for cls, title in (
+            (PropertySelect, f"PropertySelect with block {block[0]}:{block[1]}"),
+            (lambda *args: PropertySelect(*args, wildcard_mode=True), f"PropertySelect in wildcard mode with block {block[0]}:{block[1]}"),
         ):
-            dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+            dialog = wx.Dialog(None, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
             sizer = wx.BoxSizer()
             dialog.SetSizer(sizer)
             sizer.Add(

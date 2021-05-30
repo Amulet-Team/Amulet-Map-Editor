@@ -163,7 +163,7 @@ def demo():
     An app instance must be created first.
     """
     translation_manager = PyMCTranslate.new_translation_manager()
-    dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+    dialog = wx.Dialog(None, title="BlockDefine", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
     sizer.Add(

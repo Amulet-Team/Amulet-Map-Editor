@@ -5,6 +5,9 @@ from amulet_map_editor.api.wx.ui.block_select.block_select import (
 from amulet_map_editor.api.wx.ui.block_select.block_define import (
     demo as block_define_demo,
 )
+from amulet_map_editor.api.wx.ui.block_select.multi_block_define import (
+    demo as multi_block_define_demo,
+)
 from amulet_map_editor.api.wx.ui.block_select.properties.demo import (
     demo as properties_demo,
 )
@@ -17,6 +20,7 @@ def demo():
     """
     block_select_demo()
     block_define_demo()
+    multi_block_define_demo()
     properties_demo()
 
 
