@@ -38,13 +38,13 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         self._camera_location: CameraLocationType = (0, 150, 0)
         # yaw (-180 to 180), pitch (-90 to 90)
         self._camera_rotation: CameraRotationType = (0, 90)
-        self._dimension: Dimension = "overworld"
+        self._dimension: Dimension = level.dimensions[0]
         self._render_distance = 5
         self._garbage_distance = 10
         self._draw_box = draw_box
         self._draw_floor = draw_floor
         self._selection = GreenRenderSelectionGroup(
-            context_identifier, self.resource_pack, self.level.selection_bounds
+            context_identifier, self.resource_pack, self.level.bounds(self.dimension)
         )
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
 

@@ -126,8 +126,8 @@ class RenderChunk(RenderChunkBuilder):
                 sub_chunk.shape + numpy.array((2, 2, 2)), sub_chunk.dtype
             )
             sub_chunk_box = SelectionBox.create_sub_chunk_box(self.cx, cy, self.cz)
-            if self._level.selection_bounds.intersects(sub_chunk_box):
-                boxes = self._level.selection_bounds.intersection(sub_chunk_box)
+            if self._level.bounds(self.dimension).intersects(sub_chunk_box):
+                boxes = self._level.bounds(self.dimension).intersection(sub_chunk_box)
                 for box in boxes.selection_boxes:
                     larger_blocks[1:-1, 1:-1, 1:-1][
                         box.sub_chunk_slice(self.cx, cy, self.cz)

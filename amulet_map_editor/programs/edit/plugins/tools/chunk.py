@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Tuple
 import wx
 from OpenGL.GL import (
     glClear,
@@ -14,6 +14,7 @@ from amulet_map_editor.api.opengl.camera import Projection, EVT_CAMERA_MOVED
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import ChunkSelectionBehaviour
 from amulet.operations.delete_chunk import delete_chunk
+from amulet.api.data_types import Dimension
 from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_operations.prune_chunks import (
     prune_chunks,
 )
@@ -33,9 +34,6 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 
-        min_range = -30_000_000
-        max_range = 30_000_000
-
         y_sizer = wx.FlexGridSizer(2, 5, 5)
         button_sizer.Add(y_sizer, flag=wx.ALL, border=5)
         min_y_label = wx.StaticText(
@@ -44,11 +42,9 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         y_sizer.Add(min_y_label, flag=wx.ALIGN_CENTER)
         self._min_y = wx.SpinCtrl(
             self._button_panel,
-            min=min_range,
-            max=max_range,
-            initial=min(
-                max_range, max(min_range, self.canvas.world.selection_bounds.min[1])
-            ),
+            min=-30_000_000,
+            max=30_000_000,
+            initial=256,
         )
         self._min_y.SetToolTip(lang.get("program_3d_edit.chunk_tool.min_y_tooltip"))
         y_sizer.Add(self._min_y, flag=wx.ALIGN_CENTER)
@@ -60,15 +56,14 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         y_sizer.Add(max_y_label, flag=wx.ALIGN_CENTER)
         self._max_y = wx.SpinCtrl(
             self._button_panel,
-            min=min_range,
-            max=max_range,
-            initial=min(
-                max_range, max(min_range, self.canvas.world.selection_bounds.max[1])
-            ),
+            min=-30_000_000,
+            max=30_000_000,
+            initial=0,
         )
         self._max_y.SetToolTip(lang.get("program_3d_edit.chunk_tool.max_y_tooltip"))
         y_sizer.Add(self._max_y, flag=wx.ALIGN_CENTER)
         self._max_y.Bind(wx.EVT_SPINCTRL, self._on_update_clipping)
+        self._dimensions: Dict[Dimension, Tuple[int, int]] = {}
 
         delete_button = wx.Button(
             self._button_panel,
@@ -107,6 +102,23 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         self.Layout()
         self.canvas.camera.projection_mode = Projection.TOP_DOWN
         self._selection.enable()
+        self._update_clipping()
+
+        dimension = self.canvas.dimension
+        if dimension not in self._dimensions:
+            self._dimensions[dimension] = (
+                min(
+                    30_000_000,
+                    max(-30_000_000, self.canvas.world.bounds(dimension).min[1]),
+                ),
+                min(
+                    30_000_000,
+                    max(-30_000_000, self.canvas.world.bounds(dimension).max[1]),
+                ),
+            )
+        miny, maxy = self._dimensions[dimension]
+        self._min_y.SetValue(miny)
+        self._max_y.SetValue(maxy)
         self._update_clipping()
 
     def disable(self):

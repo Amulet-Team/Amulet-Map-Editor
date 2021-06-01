@@ -136,8 +136,8 @@ class LevelGroup(
             (
                 -(
                     (
-                        level.selection_bounds.min_array
-                        + level.selection_bounds.max_array
+                        level.bounds(dimension).min_array
+                        + level.bounds(dimension).max_array
                     )
                     // 2
                 ).astype(int)
