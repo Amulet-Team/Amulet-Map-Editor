@@ -126,40 +126,41 @@ class RenderChunk(RenderChunkBuilder):
                 sub_chunk.shape + numpy.array((2, 2, 2)), sub_chunk.dtype
             )
             sub_chunk_box = SelectionBox.create_sub_chunk_box(self.cx, cy, self.cz)
-            if self._level.bounds(self.dimension).intersects(sub_chunk_box):
-                boxes = self._level.bounds(self.dimension).intersection(sub_chunk_box)
-                for box in boxes.selection_boxes:
-                    larger_blocks[1:-1, 1:-1, 1:-1][
-                        box.sub_chunk_slice(self.cx, cy, self.cz)
-                    ] = sub_chunk[box.sub_chunk_slice(self.cx, cy, self.cz)]
-                for chunk_offset, neighbour_blocks in neighbour_chunks.items():
-                    if cy not in neighbour_blocks:
-                        continue
-                    if chunk_offset == (-1, 0):
-                        larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[-1, :, :]
-                    elif chunk_offset == (1, 0):
-                        larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[0, :, :]
-                    elif chunk_offset == (0, -1):
-                        larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[:, :, -1]
-                    elif chunk_offset == (0, 1):
-                        larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[:, :, 0]
-                if cy - 1 in blocks:
-                    larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy - 1)[
-                        :, -1, :
-                    ]
-                if cy + 1 in blocks:
-                    larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy + 1)[
-                        :, 0, :
-                    ]
-                sub_chunks.append((larger_blocks, (0, cy * 16, 0)))
+            # if self._level.bounds(self.dimension).intersects(sub_chunk_box):
+            #     boxes = self._level.bounds(self.dimension).intersection(sub_chunk_box)
+            #     for box in boxes.selection_boxes:
+            #         larger_blocks[1:-1, 1:-1, 1:-1][
+            #             box.sub_chunk_slice(self.cx, cy, self.cz)
+            #         ] = sub_chunk[box.sub_chunk_slice(self.cx, cy, self.cz)]
+            larger_blocks[1:-1, 1:-1, 1:-1] = sub_chunk
+            for chunk_offset, neighbour_blocks in neighbour_chunks.items():
+                if cy not in neighbour_blocks:
+                    continue
+                if chunk_offset == (-1, 0):
+                    larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
+                        cy
+                    )[-1, :, :]
+                elif chunk_offset == (1, 0):
+                    larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
+                        cy
+                    )[0, :, :]
+                elif chunk_offset == (0, -1):
+                    larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(
+                        cy
+                    )[:, :, -1]
+                elif chunk_offset == (0, 1):
+                    larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(
+                        cy
+                    )[:, :, 0]
+            if cy - 1 in blocks:
+                larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy - 1)[
+                    :, -1, :
+                ]
+            if cy + 1 in blocks:
+                larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy + 1)[
+                    :, 0, :
+                ]
+            sub_chunks.append((larger_blocks, (0, cy * 16, 0)))
         return sub_chunks
 
     def create_geometry(self):
