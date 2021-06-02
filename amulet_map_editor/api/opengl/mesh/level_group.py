@@ -123,7 +123,6 @@ class LevelGroup(
             self.context_identifier,
             self._resource_pack,
             level,
-            draw_floor=False,
             draw_box=True,
         )
         render_level.dimension = dimension
