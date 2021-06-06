@@ -8,6 +8,7 @@ import os
 from typing import Optional, Generator
 import weakref
 
+import minecraft_model_reader.api.resource_pack.java.download_resources
 from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
     get_java_vanilla_fix,
@@ -44,6 +45,8 @@ from amulet_map_editor.api.wx.util.mouse_movement import MouseMovement
 from ..renderer import Renderer
 
 from amulet.api.level import BaseLevel
+
+minecraft_model_reader.api.resource_pack.java.download_resources.INCLUDE_SNAPSHOT = True
 
 
 class BaseEditCanvas(EventCanvas):
