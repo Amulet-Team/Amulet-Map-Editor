@@ -31,7 +31,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         level: "BaseLevel",
         draw_box=False,
         draw_floor=False,
-        draw_ceil=False
+        draw_ceil=False,
     ):
         OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
         ContextManager.__init__(self, context_identifier)

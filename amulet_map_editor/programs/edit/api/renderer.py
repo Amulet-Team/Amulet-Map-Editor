@@ -62,7 +62,7 @@ class Renderer(EditCanvasContainer):
             opengl_resource_pack,
             world,
             draw_floor=True,
-            draw_ceil=True
+            draw_ceil=True,
         )
         self._chunk_generator.register(self._render_world)
 
