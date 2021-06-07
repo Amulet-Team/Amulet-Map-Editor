@@ -26,7 +26,8 @@ class RenderChunk(RenderChunkBuilder):
         region_size: int,
         chunk_coords: Tuple[int, int],
         dimension: Dimension,
-        draw_floor: bool = True,
+        draw_floor: bool = False,
+        draw_ceil: bool = False,
     ):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
@@ -36,6 +37,7 @@ class RenderChunk(RenderChunkBuilder):
         self._coords = chunk_coords
         self._dimension = dimension
         self._draw_floor = draw_floor
+        self._draw_ceil = draw_ceil
         self._chunk_state = 0  # 0 = chunk does not exist, 1 = chunk exists but failed to load, 2 = chunk exists
         self._changed_time = 0
         self._needs_rebuild = True
@@ -126,40 +128,37 @@ class RenderChunk(RenderChunkBuilder):
                 sub_chunk.shape + numpy.array((2, 2, 2)), sub_chunk.dtype
             )
             sub_chunk_box = SelectionBox.create_sub_chunk_box(self.cx, cy, self.cz)
-            if self._level.selection_bounds.intersects(sub_chunk_box):
-                boxes = self._level.selection_bounds.intersection(sub_chunk_box)
-                for box in boxes.selection_boxes:
-                    larger_blocks[1:-1, 1:-1, 1:-1][
-                        box.sub_chunk_slice(self.cx, cy, self.cz)
-                    ] = sub_chunk[box.sub_chunk_slice(self.cx, cy, self.cz)]
-                for chunk_offset, neighbour_blocks in neighbour_chunks.items():
-                    if cy not in neighbour_blocks:
-                        continue
-                    if chunk_offset == (-1, 0):
-                        larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[-1, :, :]
-                    elif chunk_offset == (1, 0):
-                        larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[0, :, :]
-                    elif chunk_offset == (0, -1):
-                        larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[:, :, -1]
-                    elif chunk_offset == (0, 1):
-                        larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(
-                            cy
-                        )[:, :, 0]
-                if cy - 1 in blocks:
-                    larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy - 1)[
-                        :, -1, :
+            # if self._level.bounds(self.dimension).intersects(sub_chunk_box):
+            #     boxes = self._level.bounds(self.dimension).intersection(sub_chunk_box)
+            #     for box in boxes.selection_boxes:
+            #         larger_blocks[1:-1, 1:-1, 1:-1][
+            #             box.sub_chunk_slice(self.cx, cy, self.cz)
+            #         ] = sub_chunk[box.sub_chunk_slice(self.cx, cy, self.cz)]
+            larger_blocks[1:-1, 1:-1, 1:-1] = sub_chunk
+            for chunk_offset, neighbour_blocks in neighbour_chunks.items():
+                if cy not in neighbour_blocks:
+                    continue
+                if chunk_offset == (-1, 0):
+                    larger_blocks[0, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[
+                        -1, :, :
                     ]
-                if cy + 1 in blocks:
-                    larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy + 1)[
-                        :, 0, :
+                elif chunk_offset == (1, 0):
+                    larger_blocks[-1, 1:-1, 1:-1] = neighbour_blocks.get_sub_chunk(cy)[
+                        0, :, :
                     ]
-                sub_chunks.append((larger_blocks, (0, cy * 16, 0)))
+                elif chunk_offset == (0, -1):
+                    larger_blocks[1:-1, 1:-1, 0] = neighbour_blocks.get_sub_chunk(cy)[
+                        :, :, -1
+                    ]
+                elif chunk_offset == (0, 1):
+                    larger_blocks[1:-1, 1:-1, -1] = neighbour_blocks.get_sub_chunk(cy)[
+                        :, :, 0
+                    ]
+            if cy - 1 in blocks:
+                larger_blocks[1:-1, 0, 1:-1] = blocks.get_sub_chunk(cy - 1)[:, -1, :]
+            if cy + 1 in blocks:
+                larger_blocks[1:-1, -1, 1:-1] = blocks.get_sub_chunk(cy + 1)[:, 0, :]
+            sub_chunks.append((larger_blocks, (0, cy * 16, 0)))
         return sub_chunks
 
     def create_geometry(self):
@@ -179,44 +178,58 @@ class RenderChunk(RenderChunkBuilder):
                 self._sub_chunks(chunk.blocks)
             )
             self._set_verts(chunk_verts, chunk_verts_translucent)
-            if self._draw_floor:
-                plane: numpy.ndarray = numpy.ones(
-                    (self._vert_len * 12), dtype=numpy.float32
-                ).reshape((-1, self._vert_len))
-                plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(-0.01)
-                plane[:, 5:9] = self.resource_pack.texture_bounds(
-                    self.resource_pack.get_texture_path(
-                        "amulet", "amulet_ui/translucent_white"
-                    )
+            if self._draw_floor or self._draw_ceil:
+                plane = self._create_grid(
+                    "amulet",
+                    "amulet_ui/translucent_white",
+                    (0.55, 0.5, 0.9) if (self.cx + self.cz) % 2 else (0.4, 0.4, 0.85),
                 )
-                if (self.cx + self.cz) % 2:
-                    plane[:, 9:12] = [0.55, 0.5, 0.9]
-                else:
-                    plane[:, 9:12] = [0.4, 0.4, 0.85]
                 self.verts = numpy.concatenate([self.verts, plane.ravel()], 0)
-                self.draw_count += 12
+                self.draw_count += len(plane)
         self._needs_rebuild = True
 
     def _create_empty_geometry(self):
         if self._draw_floor:
-            plane: numpy.ndarray = numpy.ones(
-                (self._vert_len * 12), dtype=numpy.float32
-            ).reshape((-1, self._vert_len))
-            plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
-            plane[:, 5:9] = self.resource_pack.texture_bounds(
-                self.resource_pack.get_texture_path(
-                    "amulet", "amulet_ui/translucent_white"
-                )
+            plane = self._create_grid(
+                "amulet",
+                "amulet_ui/translucent_white",
+                (0.3, 0.3, 0.3) if (self.cx + self.cz) % 2 else (0.2, 0.2, 0.2),
             )
-            if (self.cx + self.cz) % 2:
-                plane[:, 9:12] = [0.3, 0.3, 0.3]
-            else:
-                plane[:, 9:12] = [0.2, 0.2, 0.2]
             self.verts = plane.ravel()
-            self.draw_count = 12
+            self.draw_count = len(plane)
         else:
             self.verts = numpy.ones(0, numpy.float32)
             self.draw_count = 0
+
+    def _create_grid(
+        self,
+        texture_namespace: str,
+        texture_path: str,
+        tint: Tuple[float, float, float],
+    ):
+        plane: numpy.ndarray = numpy.ones(
+            (self._vert_len * 12 * (self._draw_floor + self._draw_ceil)),
+            dtype=numpy.float32,
+        ).reshape((-1, self._vert_len))
+        bounds = self._level.bounds(self.dimension)
+        if self._draw_floor:
+            plane[:12, :3], plane[:12, 3:5] = self._create_chunk_plane(
+                bounds.min_y - 0.01
+            )
+            if self._draw_ceil:
+                plane[12:, :3], plane[12:, 3:5] = self._create_chunk_plane(
+                    bounds.max_y + 0.01
+                )
+        elif self._draw_ceil:
+            plane[:12, :3], plane[:12, 3:5] = self._create_chunk_plane(
+                bounds.max_y + 0.01
+            )
+
+        plane[:, 5:9] = self.resource_pack.texture_bounds(
+            self.resource_pack.get_texture_path(texture_namespace, texture_path)
+        )
+        plane[:, 9:12] = tint
+        return plane
 
     def _create_chunk_plane(
         self, height: Union[int, float]
@@ -253,21 +266,13 @@ class RenderChunk(RenderChunkBuilder):
 
     def _create_error_geometry(self):
         if self._draw_floor:
-            plane: numpy.ndarray = numpy.ones(
-                (self._vert_len * 12), dtype=numpy.float32
-            ).reshape((-1, self._vert_len))
-            plane[:, :3], plane[:, 3:5] = self._create_chunk_plane(0)
-            plane[:, 5:9] = self.resource_pack.texture_bounds(
-                self.resource_pack.get_texture_path(
-                    "amulet", "amulet_ui/translucent_white"
-                )
+            plane = self._create_grid(
+                "amulet",
+                "amulet_ui/translucent_white",
+                (1, 0.2, 0.2) if (self.cx + self.cz) % 2 else (0.75, 0.2, 0.2),
             )
-            if (self.cx + self.cz) % 2:
-                plane[:, 9:12] = [1, 0.2, 0.2]
-            else:
-                plane[:, 9:12] = [0.75, 0.2, 0.2]
             self.verts = plane.ravel()
-            self.draw_count = 12
+            self.draw_count = len(plane)
         else:
             self.verts = numpy.ones(0, numpy.float32)
             self.draw_count = 0

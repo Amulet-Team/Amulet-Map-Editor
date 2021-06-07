@@ -283,12 +283,12 @@ class EditCanvas(BaseEditCanvas):
                 (
                     (
                         min_x * self.world.sub_chunk_size,
-                        self.world.selection_bounds.min[1],
+                        self.world.bounds(self.dimension).min[1],
                         min_z * self.world.sub_chunk_size,
                     ),
                     (
                         (max_x + 1) * self.world.sub_chunk_size,
-                        self.world.selection_bounds.max[1],
+                        self.world.bounds(self.dimension).max[1],
                         (max_z + 1) * self.world.sub_chunk_size,
                     ),
                 )

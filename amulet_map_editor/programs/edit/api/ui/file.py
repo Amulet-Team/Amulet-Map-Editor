@@ -48,10 +48,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
 
         self._dim_options = SimpleChoiceAny(canvas)
         self._dim_options.SetItems(level.level_wrapper.dimensions)
-        if "overworld" in level.level_wrapper.dimensions:
-            self._dim_options.SetValue("overworld")
-        else:
-            self._dim_options.SetValue(level.level_wrapper.dimensions[0])
+        self._dim_options.SetValue(level.level_wrapper.dimensions[0])
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
         self.Add(self._dim_options, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
