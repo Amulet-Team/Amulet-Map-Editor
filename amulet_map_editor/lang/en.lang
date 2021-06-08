@@ -109,7 +109,7 @@ program_3d_edit.menu_bar.edit.redo=Redo
 program_3d_edit.menu_bar.edit.cut=Cut
 program_3d_edit.menu_bar.edit.copy=Copy
 program_3d_edit.menu_bar.edit.paste=Paste
-program_3d_edit.menu_bar.edit.delete=Delete
+program_3d_edit.menu_bar.edit.delete=Delete Blocks
 program_3d_edit.menu_bar.edit.goto=Goto
 program_3d_edit.menu_bar.edit.select_all=Select All
 program_3d_edit.menu_bar.options.controls=Controls...
@@ -117,7 +117,7 @@ program_3d_edit.menu_bar.options.options=Options...
 program_3d_edit.menu_bar.help.user_guide=User Guide (online)
 
 ## Select tool
-program_3d_edit.select_tool.delete_button=Delete
+program_3d_edit.select_tool.delete_button=Delete Blocks
 program_3d_edit.select_tool.delete_button_tooltip=Delete the blocks in the selected area.
 program_3d_edit.select_tool.copy_button=Copy
 program_3d_edit.select_tool.copy_button_tooltip=Copy the selected area to paste later. Can be pasted into any world and dimension.
@@ -194,7 +194,7 @@ program_3d_edit.chunk_tool.max_y=Max Y
 program_3d_edit.chunk_tool.max_y_tooltip=The maximum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
 program_3d_edit.chunk_tool.delete_chunks=Delete Chunks
 program_3d_edit.chunk_tool.delete_chunks_tooltip=Delete the selected chunks. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
-program_3d_edit.chunk_tool.prune_chunks=Prune Chunks
+program_3d_edit.chunk_tool.prune_chunks=Delete Unselected Chunks
 program_3d_edit.chunk_tool.prune_chunks_tooltip=Delete all chunks that are not selected. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
 
 ## Goto/Teleport window
