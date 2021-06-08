@@ -124,6 +124,7 @@ class LevelGroup(
             self._resource_pack,
             level,
             draw_box=True,
+            limit_bounds=True,
         )
         render_level.dimension = dimension
         # the level objects to be drawn

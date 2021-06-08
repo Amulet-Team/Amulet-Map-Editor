@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 
 
 class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextManager):
+    """A RenderLevel holds a reference to a level and manages all the geometry and drawing for that level."""
+
     def __init__(
         self,
         context_identifier: Any,
@@ -32,7 +34,19 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         draw_box=False,
         draw_floor=False,
         draw_ceil=False,
+        limit_bounds=False,
     ):
+        """
+        Create a new RenderLevel instance.
+
+        :param context_identifier: The identifier for the opengl context.
+        :param opengl_resource_pack: The resource pack to use for models and textures.
+        :param level: The level to pull data from.
+        :param draw_box: Should the box around the level be drawn.
+        :param draw_floor: Should the floor below the level be drawn.
+        :param draw_ceil: Should the ceiling above the level be drawn.
+        :param limit_bounds: Should the chunks be limited to the bounds of the level.
+        """
         OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
         ContextManager.__init__(self, context_identifier)
         self._level = level
@@ -45,6 +59,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         self._draw_box = draw_box
         self._draw_floor = draw_floor
         self._draw_ceil = draw_ceil
+        self._limit_bounds = limit_bounds
         self._selection = GreenRenderSelectionGroup(
             context_identifier, self.resource_pack, self.level.bounds(self.dimension)
         )
@@ -144,8 +159,9 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                 self.chunk_manager.region_size,
                 chunk_coords,
                 self.dimension,
-                self.draw_floor,
-                self.draw_ceil,
+                draw_floor=self.draw_floor,
+                draw_ceil=self.draw_ceil,
+                limit_bounds=self._limit_bounds,
             )
 
             try:

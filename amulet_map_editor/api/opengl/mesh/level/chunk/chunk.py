@@ -28,6 +28,7 @@ class RenderChunk(RenderChunkBuilder):
         dimension: Dimension,
         draw_floor: bool = False,
         draw_ceil: bool = False,
+        limit_bounds: bool = False,
     ):
         # the chunk geometry is stored in chunk space (floating point)
         # at shader time it is transformed by the players transform
@@ -38,6 +39,7 @@ class RenderChunk(RenderChunkBuilder):
         self._dimension = dimension
         self._draw_floor = draw_floor
         self._draw_ceil = draw_ceil
+        self._limit_bounds = limit_bounds
         self._chunk_state = 0  # 0 = chunk does not exist, 1 = chunk exists but failed to load, 2 = chunk exists
         self._changed_time = 0
         self._needs_rebuild = True
@@ -128,13 +130,19 @@ class RenderChunk(RenderChunkBuilder):
                 sub_chunk.shape + numpy.array((2, 2, 2)), sub_chunk.dtype
             )
             sub_chunk_box = SelectionBox.create_sub_chunk_box(self.cx, cy, self.cz)
-            # if self._level.bounds(self.dimension).intersects(sub_chunk_box):
-            #     boxes = self._level.bounds(self.dimension).intersection(sub_chunk_box)
-            #     for box in boxes.selection_boxes:
-            #         larger_blocks[1:-1, 1:-1, 1:-1][
-            #             box.sub_chunk_slice(self.cx, cy, self.cz)
-            #         ] = sub_chunk[box.sub_chunk_slice(self.cx, cy, self.cz)]
-            larger_blocks[1:-1, 1:-1, 1:-1] = sub_chunk
+            if self._limit_bounds:
+                if self._level.bounds(self.dimension).intersects(sub_chunk_box):
+                    boxes = self._level.bounds(self.dimension).intersection(
+                        sub_chunk_box
+                    )
+                    for box in boxes.selection_boxes:
+                        larger_blocks[1:-1, 1:-1, 1:-1][
+                            box.sub_chunk_slice(self.cx, cy, self.cz)
+                        ] = sub_chunk[box.sub_chunk_slice(self.cx, cy, self.cz)]
+                else:
+                    continue
+            else:
+                larger_blocks[1:-1, 1:-1, 1:-1] = sub_chunk
             for chunk_offset, neighbour_blocks in neighbour_chunks.items():
                 if cy not in neighbour_blocks:
                     continue
