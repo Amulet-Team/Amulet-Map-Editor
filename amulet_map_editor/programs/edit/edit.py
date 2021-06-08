@@ -192,7 +192,7 @@ class EditExtension(wx.Panel, BaseProgram):
         menu.setdefault(lang.get("menu_bar.help.menu_name"), {}).setdefault(
             "help", {}
         ).setdefault(
-            lang.get("program_3d_edit.menu_bar.help.controls"),
+            lang.get("program_3d_edit.menu_bar.help.user_guide"),
             lambda evt: self._help_controls(),
         )
         return menu

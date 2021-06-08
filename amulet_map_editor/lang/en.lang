@@ -18,10 +18,16 @@
 ## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
 ## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
 
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
 
 
 # App
 app.world_still_used=A world is still being used. Please close it first
+app.browser_open_tooltip=Clicking will open the page in your browser
 
 world.java_platform=Java
 world.bedrock_platform=Bedrock
@@ -78,7 +84,9 @@ program_convert.select_output_world=Select Output World
 program_convert.input_output_must_different=The input and output worlds must be different!
 program_convert.select_before_converting=Select a world before converting!
 program_convert.conversion_completed=World conversion completed
-program_convert.menu_bar.help.user_guide=User Guide
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=User Guide (online)
 
 # 3D Editor
 ## The program used to edit a world with a 3D viewer
@@ -106,7 +114,7 @@ program_3d_edit.menu_bar.edit.goto=Goto
 program_3d_edit.menu_bar.edit.select_all=Select All
 program_3d_edit.menu_bar.options.controls=Controls...
 program_3d_edit.menu_bar.options.options=Options...
-program_3d_edit.menu_bar.help.controls=Controls
+program_3d_edit.menu_bar.help.user_guide=User Guide (online)
 
 ## Select tool
 program_3d_edit.select_tool.delete_button=Delete
@@ -199,3 +207,13 @@ program_3d_edit.goto_ui.z_label=z:
 program_3d_edit.goto_ui.z_label_tooltip=The z coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
 program_3d_edit.goto_ui.copy_button_tooltip=Copy the x, y and z values to the clipboard in the form "0.0 0.0 0.0" (x, y and z respectively)
 program_3d_edit.goto_ui.paste_button_tooltip=Paste a previously copied coordinate into the inputs. Copied value must three numbers separated with spaces or commas.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Platform and data version of the world
+program_3d_edit.file_ui.projection_tooltip=Change view
+program_3d_edit.file_ui.location_tooltip=Move camera
+program_3d_edit.file_ui.dim_tooltip=Select dimension
+program_3d_edit.file_ui.undo_tooltip=Undo
+program_3d_edit.file_ui.redo_tooltip=Redo
+program_3d_edit.file_ui.save_tooltip=Save changes
+program_3d_edit.file_ui.close_tooltip=Close world
