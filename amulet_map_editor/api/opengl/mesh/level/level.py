@@ -24,27 +24,44 @@ if TYPE_CHECKING:
 
 
 class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextManager):
+    """A RenderLevel holds a reference to a level and manages all the geometry and drawing for that level."""
+
     def __init__(
         self,
         context_identifier: Any,
         opengl_resource_pack: OpenGLResourcePack,
         level: "BaseLevel",
-        draw_floor=True,
         draw_box=False,
+        draw_floor=False,
+        draw_ceil=False,
+        limit_bounds=False,
     ):
+        """
+        Create a new RenderLevel instance.
+
+        :param context_identifier: The identifier for the opengl context.
+        :param opengl_resource_pack: The resource pack to use for models and textures.
+        :param level: The level to pull data from.
+        :param draw_box: Should the box around the level be drawn.
+        :param draw_floor: Should the floor below the level be drawn.
+        :param draw_ceil: Should the ceiling above the level be drawn.
+        :param limit_bounds: Should the chunks be limited to the bounds of the level.
+        """
         OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
         ContextManager.__init__(self, context_identifier)
         self._level = level
         self._camera_location: CameraLocationType = (0, 150, 0)
         # yaw (-180 to 180), pitch (-90 to 90)
         self._camera_rotation: CameraRotationType = (0, 90)
-        self._dimension: Dimension = "overworld"
+        self._dimension: Dimension = level.dimensions[0]
         self._render_distance = 5
         self._garbage_distance = 10
         self._draw_box = draw_box
         self._draw_floor = draw_floor
+        self._draw_ceil = draw_ceil
+        self._limit_bounds = limit_bounds
         self._selection = GreenRenderSelectionGroup(
-            context_identifier, self.resource_pack, self.level.selection_bounds
+            context_identifier, self.resource_pack, self.level.bounds(self.dimension)
         )
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
 
@@ -142,7 +159,9 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                 self.chunk_manager.region_size,
                 chunk_coords,
                 self.dimension,
-                self.draw_floor,
+                draw_floor=self.draw_floor,
+                draw_ceil=self.draw_ceil,
+                limit_bounds=self._limit_bounds,
             )
 
             try:
@@ -226,6 +245,11 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def draw_floor(self):
         """Should the floor under the level be drawn."""
         return self._draw_floor
+
+    @property
+    def draw_ceil(self):
+        """Should the ceiling above the level be drawn."""
+        return self._draw_ceil
 
     def chunk_coords(self) -> Generator[ChunkCoordinates, None, None]:
         """Get all of the chunks to draw/load"""
