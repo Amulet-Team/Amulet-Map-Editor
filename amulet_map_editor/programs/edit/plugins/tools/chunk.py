@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Dict, Tuple
+from typing import TYPE_CHECKING, Dict, Tuple, Optional
 import wx
 from OpenGL.GL import (
     glClear,
@@ -136,23 +136,85 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
             y - self._min_y.GetValue() + 1,
         )
 
+    def _ask_delete_chunks(self) -> Optional[bool]:
+        class DeleteChunksDialog(wx.Dialog):
+            def __init__(self, *args, **kwds):
+                kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
+                wx.Dialog.__init__(self, *args, **kwds)
+                self.SetTitle("Do you want to load the orignal chunk state?")
+
+                sizer_1 = wx.BoxSizer(wx.VERTICAL)
+
+                label_1 = wx.StaticText(
+                    self,
+                    wx.ID_ANY,
+                    "Do you want to load the orignal chunk state?\n\n"
+                    'Clicking "Yes" will allow you to undo this operation but the operation will take a while to process.\n\n'
+                    'Clicking "No" will mean this operation cannot be undone.\n\n'
+                    "Changes will not be made to the world until you save so closing before saving will not actually delete the chunks.",
+                    style=wx.ALIGN_CENTER_HORIZONTAL,
+                )
+                label_1.Wrap(500)
+                sizer_1.Add(label_1, 0, wx.ALL, 5)
+
+                sizer_2 = wx.StdDialogButtonSizer()
+                sizer_1.Add(sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
+
+                self.button_YES = wx.Button(self, wx.ID_YES, "")
+                self.button_YES.SetDefault()
+                sizer_2.AddButton(self.button_YES)
+
+                self.button_NO = wx.Button(self, wx.ID_NO, "")
+                self.button_NO.Bind(wx.EVT_BUTTON, self._on_no)
+                sizer_2.AddButton(self.button_NO)
+
+                self.button_CANCEL = wx.Button(self, wx.ID_CANCEL, "")
+                sizer_2.AddButton(self.button_CANCEL)
+
+                sizer_2.Realize()
+
+                self.SetSizer(sizer_1)
+                sizer_1.Fit(self)
+
+                self.SetAffirmativeId(self.button_YES.GetId())
+                self.SetEscapeId(self.button_CANCEL.GetId())
+
+                self.Layout()
+
+            def _on_no(self, evt):
+                self.EndModal(wx.ID_NO)
+
+        d = DeleteChunksDialog(self.canvas)
+        response = d.ShowModal()
+        if response == wx.ID_YES:
+            return True
+        elif response == wx.ID_NO:
+            return False
+        return None
+
     def _delete_chunks(self, evt):
-        self.canvas.run_operation(
-            lambda: delete_chunk(
-                self.canvas.world,
-                self.canvas.dimension,
-                self.canvas.selection.selection_group,
+        load_original = self._ask_delete_chunks()
+        if load_original is not None:
+            self.canvas.run_operation(
+                lambda: delete_chunk(
+                    self.canvas.world,
+                    self.canvas.dimension,
+                    self.canvas.selection.selection_group,
+                    load_original,
+                )
             )
-        )
 
     def _prune_chunks(self, evt):
-        self.canvas.run_operation(
-            lambda: prune_chunks(
-                self.canvas.world,
-                self.canvas.dimension,
-                self.canvas.selection.selection_group,
+        load_original = self._ask_delete_chunks()
+        if load_original is not None:
+            self.canvas.run_operation(
+                lambda: prune_chunks(
+                    self.canvas.world,
+                    self.canvas.dimension,
+                    self.canvas.selection.selection_group,
+                    load_original,
+                )
             )
-        )
 
     def _on_draw(self, evt):
         self.canvas.renderer.start_draw()
