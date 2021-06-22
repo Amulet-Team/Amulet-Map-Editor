@@ -74,10 +74,15 @@ class BaseEditCanvas(EventCanvas):
         self._mouse.set_middle()
 
         # load the resource packs
-        os.makedirs("resource_packs", exist_ok=True)
-        if not os.path.isfile("resource_packs/readme.txt"):
-            with open("resource_packs/readme.txt", "w") as f:
-                f.write("Put the Java resource pack you want loaded in here.")
+        try:
+            os.makedirs("resource_packs", exist_ok=True)
+            if not os.path.isfile("resource_packs/readme.txt"):
+                with open("resource_packs/readme.txt", "w") as f:
+                    f.write("Put the Java resource pack you want loaded in here.")
+        except PermissionError:
+            raise PermissionError(
+                "Amulet is not able to write to the install directory. Try moving Amulet to somewhere else on your computer."
+            )
 
         self._renderer: Optional[Renderer] = None
 
