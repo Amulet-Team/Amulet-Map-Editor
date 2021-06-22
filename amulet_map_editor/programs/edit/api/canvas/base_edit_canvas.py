@@ -79,10 +79,10 @@ class BaseEditCanvas(EventCanvas):
             if not os.path.isfile("resource_packs/readme.txt"):
                 with open("resource_packs/readme.txt", "w") as f:
                     f.write("Put the Java resource pack you want loaded in here.")
-        except PermissionError:
+        except PermissionError as e:
             raise PermissionError(
                 "Amulet is not able to write to the install directory. Try moving Amulet to somewhere else on your computer."
-            )
+            ) from e
 
         self._renderer: Optional[Renderer] = None
 
