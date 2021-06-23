@@ -156,7 +156,9 @@ class BaseEditCanvas(EventCanvas):
                 packs.append(e.value)
             except Exception as e:
                 if sys.platform == "darwin" and "CERTIFICATE_VERIFY_FAILED" in str(e):
-                    msg = lang.get("program_3d_edit.canvas.java_rp_failed_mac_certificates")
+                    msg = lang.get(
+                        "program_3d_edit.canvas.java_rp_failed_mac_certificates"
+                    )
                 else:
                     msg = lang.get("program_3d_edit.canvas.java_rp_failed_default")
                 log.error(
