@@ -14,6 +14,7 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_PROJECTION_CHANGED,
     EVT_DIMENSION_CHANGE,
     DimensionChangeEvent,
+    EditCloseEvent,
 )
 from amulet_map_editor.api import image, lang
 from amulet_map_editor.api.opengl.camera import Projection
@@ -93,7 +94,9 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
             canvas, bitmap=image.icon.tablericons.square_x.bitmap(20, 20)
         )
         close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
-        close_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.close())
+        close_button.Bind(
+            wx.EVT_BUTTON, lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
+        )
         self.Add(close_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         self._update_buttons()

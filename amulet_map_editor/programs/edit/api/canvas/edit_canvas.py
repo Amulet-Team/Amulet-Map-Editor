@@ -37,7 +37,6 @@ from amulet_map_editor.programs.edit.api.events import (
     RedoEvent,
     CreateUndoEvent,
     SaveEvent,
-    EditCloseEvent,
     PasteEvent,
     ToolChangeEvent,
     EVT_EDIT_CLOSE,
@@ -80,10 +79,10 @@ def show_loading_dialog(
             except StopIteration as e:
                 obj = e.value
     except Exception as e:
-        dialog.Destroy()
+        dialog.Update(10_000)
         raise e
     time.sleep(max(0.2 - time.time() + t, 0))
-    dialog.Destroy()
+    dialog.Update(10_000)
     return obj
 
 
@@ -319,6 +318,3 @@ class EditCanvas(BaseEditCanvas):
         show_loading_dialog(save, "Saving world.", "Please wait.", self)
         wx.PostEvent(self, SaveEvent())
         self.renderer.enable_threads()
-
-    def close(self):
-        wx.PostEvent(self, EditCloseEvent())
