@@ -7,6 +7,7 @@ from OpenGL.GL import (
 import os
 from typing import Optional, Generator
 import weakref
+import sys
 
 from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
@@ -159,12 +160,21 @@ class BaseEditCanvas(EventCanvas):
             except StopIteration as e:
                 packs.append(e.value)
             except Exception as e:
+                if sys.platform == "darwin" and "CERTIFICATE_VERIFY_FAILED" in str(e):
+                    msg = lang.get(
+                        "program_3d_edit.canvas.java_rp_failed_mac_certificates"
+                    )
+                else:
+                    msg = lang.get("program_3d_edit.canvas.java_rp_failed_default")
                 log.error(
-                    str(e),
+                    msg,
                     exc_info=True,
                 )
                 wx.MessageBox(
-                    f"{lang.get('program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed')}\n{e}"
+                    f"{lang.get('program_3d_edit.canvas.java_rp_failed')}\n"
+                    f"{msg}\n"
+                    f"{e}\n"
+                    f"{lang.get('shared.check_console')}"
                 )
 
             yield 0.5, lang.get("program_3d_edit.canvas.loading_resource_packs")
