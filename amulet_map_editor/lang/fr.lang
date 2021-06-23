@@ -67,7 +67,7 @@ select_world.open_world_dialogue=Sélectionnez un dossier de monde Minecraft
 select_world.select_directory_failed=Impossible d'ouvrir ce dossier !
 select_world.recent_worlds=Mondes récents
 select_world.no_loader_found=Aucun loader n'a été trouvé pour charger ce monde.
-select_world.loading_world_failed=Erreur lors du chargement du monde. Regardez la console pour plus de détails.
+select_world.loading_world_failed=Erreur lors du chargement du monde.
 
 # À propos
 ## Le programme par défaut lorsqu'on ouvre un monde

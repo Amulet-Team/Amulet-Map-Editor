@@ -13,7 +13,7 @@ select_world.open_world_dialogue=選擇一個Minecraft存檔目錄
 select_world.select_directory_failed=無法打開目錄!
 select_world.recent_worlds=最近打開的世界
 select_world.no_loader_found=無法為該世界找到一個加載器.
-select_world.loading_world_failed=世界加載失敗. 請檢查控制臺輸出以獲取更多信息.
+select_world.loading_world_failed=世界加載失敗.
 
 main_menu.tab_name=主菜單
 main_menu.open_world=打開世界
