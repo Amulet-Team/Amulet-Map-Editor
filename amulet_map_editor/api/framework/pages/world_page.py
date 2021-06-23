@@ -123,7 +123,16 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         Check is_closeable before running this"""
         for ext in self._extensions:
             ext.close()
+        dialog = wx.ProgressDialog(
+            "Closing World",
+            "Please be patient. This may take a little while.",
+            maximum=100,
+            parent=self,
+            style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_AUTO_HIDE,
+        )
+        dialog.Fit()
         self.world.close()
+        dialog.Update(100)
 
     def _page_change(self, _):
         """Method to fire when the page is changed"""
