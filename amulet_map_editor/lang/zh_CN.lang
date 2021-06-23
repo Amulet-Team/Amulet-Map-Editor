@@ -1,3 +1,6 @@
+# Shared strings
+shared.check_console=查看控制台以获取更多信息.
+
 app.world_still_used=有一个世界仍在使用当中. 请先关闭它
 
 world.java_platform=Java版
@@ -137,7 +140,8 @@ program_3d_edit.goto_ui.paste_button_tooltip=将先前复制的坐标粘贴到�
 program_3d_edit.canvas.please_wait=渲染器正在初始化, 请稍作等待
 program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下载基岩版纯净资源包
 program_3d_edit.canvas.downloading_java_vanilla_resource_pack=正在下载Java版纯净资源包
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=无法下载最新版本的Java版纯净资源包.\n请检查你的网络连接或重启Amulet.\n查看控制台以获取更多信息.
+program_3d_edit.canvas.java_rp_failed=无法下载最新版本的Java版纯净资源包.
+program_3d_edit.canvas.java_rp_failed_default=请检查你的网络连接或重启Amulet.
 program_3d_edit.canvas.loading_resource_packs=正在加载资源包
 program_3d_edit.canvas.creating_texture_atlas=正在创建纹理
 program_3d_edit.canvas.setting_up_renderer=正在设置渲染器

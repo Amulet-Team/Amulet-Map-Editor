@@ -23,7 +23,8 @@
 ## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
 ## This pattern must stay in the translated entries for them to work properly
 
-
+# Shared strings
+shared.check_console=Check the console for more details.
 
 # App
 app.world_still_used=A world is still being used. Please close it first
@@ -96,7 +97,9 @@ program_3d_edit.tab_name=3D Editor
 program_3d_edit.canvas.please_wait=Please wait while the renderer loads
 program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Downloading Bedrock vanilla resource pack
 program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Downloading Java vanilla resource pack
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Failed to download the latest Java resource pack.\nCheck your internet connection and restart Amulet.\nCheck the console for more details.
+program_3d_edit.canvas.java_rp_failed=Failed to download the latest Java resource pack.
+program_3d_edit.canvas.java_rp_failed_default=Check your internet connection and restart Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=The certificates to access the internet were not installed.\nRun the "Install Certificates.command" program that can be found in "Applications/Python 3.x".
 program_3d_edit.canvas.loading_resource_packs=Loading resource packs
 program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
 program_3d_edit.canvas.setting_up_renderer=Setting up renderer

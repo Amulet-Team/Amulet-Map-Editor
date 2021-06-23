@@ -23,7 +23,8 @@
 ## Exemple: "Il y a {n} modifications" sera traduit par "Il y a 2 modifications" dans le UI
 ## Ce pattern doit être conservé dans les entrées traduites pour qu'elles puissent fonctionner correctement
 
-
+# Shared strings
+shared.check_console=Regardez la console pour plus de détails.
 
 # Application
 app.world_still_used=Un monde est toujours en cours d'utilisation. Veuillez d'abord le fermer.
@@ -96,7 +97,8 @@ program_3d_edit.tab_name=Éditeur 3D
 program_3d_edit.canvas.please_wait=Veuillez attendre pendant que le moteur de rendu charge
 program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Bedrock
 program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Téléchargement du pack de ressources vanilla Java
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=Impossible de télécharger le dernier pack de ressources Java.\nVérifiez votre connexion internet et relancez Amulet.\nRegardez la console pour plus de détails.
+program_3d_edit.canvas.java_rp_failed=Impossible de télécharger le dernier pack de ressources Java.
+program_3d_edit.canvas.java_rp_failed_default=Vérifiez votre connexion internet et relancez Amulet.
 program_3d_edit.canvas.loading_resource_packs=Chargement des packs de ressources
 program_3d_edit.canvas.creating_texture_atlas=Création de l'atlas de texture
 program_3d_edit.canvas.setting_up_renderer=Préparation du moteur de rendu
