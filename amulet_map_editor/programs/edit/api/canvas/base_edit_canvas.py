@@ -232,9 +232,9 @@ class BaseEditCanvas(EventCanvas):
         return self.renderer.is_closeable()
 
     def close(self):
-        """Close and destroy the canvas and all contained data."""
+        """Destroy all contained data so that the window can be safely destroyed."""
         self.renderer.close()
-        super()._close()
+        super().close()
 
     @property
     def world(self) -> BaseLevel:
