@@ -82,7 +82,7 @@ class WorldPageUI(wx.Notebook, BasePageUI):
             raise e
         self.world_name = self.world.level_wrapper.level_name
         self._extensions: List[BaseProgram] = []
-        self._last_extension: int = -1
+        self._active_extension: int = -1
         self._load_extensions()
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
 
@@ -136,15 +136,40 @@ class WorldPageUI(wx.Notebook, BasePageUI):
 
     def _page_change(self, _):
         """Method to fire when the page is changed"""
-        if self.GetSelection() != self._last_extension:
-            self._extensions[self._last_extension].disable()
+        if self.GetSelection() != self._active_extension:
+            self._enable_active()
+
+    def _disable_active(self):
+        if self._active_extension >= 0:
+            try:
+                self._extensions[self._active_extension].disable()
+            except Exception as e:
+                log.critical(traceback.format_exc())
+            finally:
+                self._active_extension = -1
+
+    def _enable_active(self):
+        self._disable_active()
+        try:
             self._extensions[self.GetSelection()].enable()
             self.GetGrandParent().create_menu()
-            self._last_extension = self.GetSelection()
+        except Exception as e:
+            log.critical(traceback.format_exc())
+            wx.MessageDialog(
+                self,
+                f"Exception loading sub-program: {e}\nSee the console for more details",
+                style=wx.OK,
+            ).ShowModal()
+            self._extensions.pop(self.GetSelection())
+            self._active_extension = -1
+            self.DeletePage(self.GetSelection())
+        else:
+            self._active_extension = self.GetSelection()
 
     def disable(self):
-        self._extensions[self.GetSelection()].disable()
+        """Disable all containers in the world page"""
+        self._disable_active()
 
     def enable(self):
-        self._extensions[self.GetSelection()].enable()
-        self.GetGrandParent().create_menu()
+        """Enable the world page"""
+        self._enable_active()
