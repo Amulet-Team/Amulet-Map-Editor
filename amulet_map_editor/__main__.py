@@ -15,7 +15,7 @@ from amulet_map_editor.api.framework import AmuletApp
 if __name__ == "__main__":
     if sys.platform == "linux" and wx.__version__.VERSION >= (4, 1, 1):
         # bug 247
-        os.environ['PYOPENGL_PLATFORM'] = 'egl'
+        os.environ["PYOPENGL_PLATFORM"] = "egl"
     try:
         app = AmuletApp(0)
         app.MainLoop()
