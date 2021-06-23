@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class ResultDialog(SimpleDialog):
     def __init__(self, parent, block_location_info):
         super(ResultDialog, self).__init__(parent, "Block Locations")
+        self.Freeze()
 
         self.sizer.Add(
             wx.StaticText(
@@ -40,6 +41,7 @@ class ResultDialog(SimpleDialog):
         self.sizer.Add(tree, 1, wx.ALL | wx.EXPAND, 5)
 
         self.Layout()
+        self.Thaw()
 
 
 class FindBlock(SimpleOperationPanel):
@@ -65,7 +67,6 @@ class FindBlock(SimpleOperationPanel):
         self._findSubTypes = wx.CheckBox(self, label="Find All Block Substates")
         self._findSubTypes.SetValue(options.get("find_substates", False))
 
-        # self._block_define.Bind(EVT_PICK, self._on_pick_block)
         self._sizer.Add(self._block_define, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self._sizer.Add(self._findSubTypes, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
@@ -131,13 +132,19 @@ class FindBlock(SimpleOperationPanel):
     def _find_multiple_blockstates(
         self, world: "BaseLevel", dimension: "Dimension", selection: "SelectionGroup"
     ):
-        blocks_to_find = {world.block_palette.get_add_block(self._get_target_block())}
+        blocks_to_find = set()
         block_translator = world.translation_manager.get_version(
             world.level_wrapper.platform, world.level_wrapper.version
         ).block
-        versioned_block_name = block_translator.from_universal(
-            self._get_target_block()
-        )[0].namespaced_name
+        versioned_block = block_translator.from_universal(self._get_target_block())[0]
+        versioned_block_name = versioned_block.namespaced_name
+
+        blocks_to_find.add(
+            (
+                world.block_palette.get_add_block(self._get_target_block()),
+                versioned_block,
+            )
+        )
 
         # TODO: Find a better way to iterate through all permutations of the wanted blockstates
         # Technically, this is the correct way, since if a Block's substate doesn't exist in the
@@ -145,52 +152,47 @@ class FindBlock(SimpleOperationPanel):
         # but to users this may not seem straightforward since it would look like the operation
         # is missing blockstates when the results window is shown
         blocks_to_find = blocks_to_find.union(
-            map(
-                lambda t: t[0],
-                filter(
-                    lambda b: b[1].namespaced_name == versioned_block_name,
-                    map(
-                        lambda b: (b[0], block_translator.from_universal(b[1])[0]),
-                        world.block_palette.items(),
-                    ),
+            filter(
+                lambda b: b[1].namespaced_name == versioned_block_name,
+                map(
+                    lambda b: (b[0], block_translator.from_universal(b[1])[0]),
+                    world.block_palette.items(),
                 ),
-            )
+            ),
         )
 
-        iter_count = len(list(world.get_chunk_slice_box(dimension, selection, False)))
+        chunk_slices = list(world.get_chunk_slice_box(dimension, selection, False))
+
+        iter_count = len(chunk_slices)
         iter_count *= len(blocks_to_find)
         count = 0
 
-        block_locations = {internal_id: [] for internal_id in blocks_to_find}
-        for internal_id in blocks_to_find:
-            for chunk, slices, _ in world.get_chunk_slice_box(
-                dimension, selection, False
-            ):
+        results = {block.full_blockstate: [] for _, block in blocks_to_find}
+
+        for internal_id, block in blocks_to_find:
+            extend_func = results[block.full_blockstate].extend
+            for chunk, slices, _ in chunk_slices:
                 block_selection = chunk.blocks[slices]
                 x_values, y_values, z_values = numpy.where(
                     block_selection == internal_id
                 )
-                for x, y, z in zip(x_values, y_values, z_values):
-                    block_locations[internal_id].append(
-                        (
+
+                extend_func(
+                    map(
+                        lambda x, y, z: (
                             block_selection.start_x + x,
                             block_selection.start_y + y,
                             block_selection.start_z + z,
-                        )
+                        ),
+                        x_values,
+                        y_values,
+                        z_values,
                     )
+                )
                 count += 1
                 yield count / iter_count
 
-        result = {
-            world.translation_manager.get_version(
-                world.level_wrapper.platform, world.level_wrapper.version
-            )
-            .block.from_universal(world.block_palette[_id])[0]
-            .full_blockstate: block_locations[_id]
-            for _id in block_locations.keys()
-        }
-
-        dialog = ResultDialog(self.parent, result)
+        dialog = ResultDialog(self.parent, results)
         dialog.Show()
 
     def _operation(
@@ -200,60 +202,6 @@ class FindBlock(SimpleOperationPanel):
             yield from self._find_multiple_blockstates(world, dimension, selection)
         else:
             yield from self._find_single_blockstate(world, dimension, selection)
-        """
-        blocks_to_find = [
-            world.block_palette.get_add_block(self._get_target_block()),
-        ]
-
-        if self._get_find_all_substates():
-            base_namespaced_name = self._get_target_block().namespaced_name
-            blocks_to_find.extend(
-                map(
-                    lambda t: t[0],
-                    filter(
-                        lambda b: b[1].namespaced_name == base_namespaced_name,
-                        world.block_palette.items(),
-                    ),
-                )
-            )
-
-        iter_count = len(list(world.get_chunk_slice_box(dimension, selection, False)))
-        iter_count *= len(blocks_to_find)
-        count = 0
-
-        block_locations = {internal_id: [] for internal_id in blocks_to_find}
-
-        for internal_id in blocks_to_find:
-            for chunk, slices, _ in world.get_chunk_slice_box(
-                dimension, selection, False
-            ):
-                block_selection = chunk.blocks[slices]
-                x_values, y_values, z_values = numpy.where(
-                    block_selection == internal_id
-                )
-                for x, y, z in zip(x_values, y_values, z_values):
-                    block_locations[internal_id].append(
-                        (
-                            block_selection.start_x + x,
-                            block_selection.start_y + y,
-                            block_selection.start_z + z,
-                        )
-                    )
-                count += 1
-                yield count / iter_count
-
-        result = {
-            world.translation_manager.get_version(
-                world.level_wrapper.platform, world.level_wrapper.version
-            )
-            .block.from_universal(world.block_palette[_id])[0]
-            .full_blockstate: block_locations[_id]
-            for _id in block_locations.keys()
-        }
-
-        dialog = ResultDialog(self.parent, result)
-        dialog.Show()
-        """
 
 
 export = {"name": "Find Block", "operation": FindBlock}
