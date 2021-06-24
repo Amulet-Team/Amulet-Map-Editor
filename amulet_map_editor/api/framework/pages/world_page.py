@@ -13,6 +13,7 @@ from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 
 _extensions: List[Tuple[str, Type[BaseProgram]]] = []
 _fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [
@@ -155,11 +156,11 @@ class WorldPageUI(wx.Notebook, BasePageUI):
             self.GetGrandParent().create_menu()
         except Exception as e:
             log.critical(traceback.format_exc())
-            wx.MessageDialog(
-                self,
-                f"Exception loading sub-program: {e}\nSee the console for more details",
-                style=wx.OK,
-            ).ShowModal()
+            dialog = TracebackDialog(
+                self, "Exception loading sub-program", str(e), traceback.format_exc()
+            )
+            dialog.ShowModal()
+            dialog.Destroy()
             self._extensions.pop(self.GetSelection())
             self._active_extension = -1
             self.DeletePage(self.GetSelection())

@@ -19,6 +19,7 @@ from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
 from amulet_map_editor import CONFIG, log
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.goto import show_goto
 from amulet_map_editor.programs.edit.api.ui.tool_manager import ToolManagerSizer
 from amulet_map_editor.programs.edit.api.operations import (
@@ -192,14 +193,17 @@ class EditCanvas(BaseEditCanvas):
             self.world.restore_last_undo_point()
             err = e
         except Exception as e:
-            self.world.restore_last_undo_point()
             log.error(traceback.format_exc())
-            wx.MessageDialog(
+            dialog = TracebackDialog(
                 self,
-                f"Exception running operation: {e}\nSee the console for more details",
-                style=wx.OK,
-            ).ShowModal()
+                "Exception while running operation",
+                str(e),
+                traceback.format_exc(),
+            )
+            dialog.ShowModal()
+            dialog.Destroy()
             err = e
+            self.world.restore_last_undo_point()
 
         self.renderer.enable_threads()
         self.renderer.render_world.rebuild_changed()

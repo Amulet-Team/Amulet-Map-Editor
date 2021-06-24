@@ -5,6 +5,7 @@ import traceback
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor import __version__, lang, log
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
@@ -171,11 +172,14 @@ class AmuletUI(wx.Frame):
                 wx.MessageBox(f"{lang.get('select_world.no_loader_found')}\n{e}")
             except Exception as e:
                 log.error(lang.get("select_world.loading_world_failed"), exc_info=True)
-                wx.MessageBox(
-                    f"{lang.get('select_world.loading_world_failed')}\n"
-                    f"{e}\n"
-                    f"{lang.get('shared.check_console')}"
+                dialog = TracebackDialog(
+                    self,
+                    lang.get("select_world.loading_world_failed"),
+                    str(e),
+                    traceback.format_exc(),
                 )
+                dialog.ShowModal()
+                dialog.Destroy()
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)

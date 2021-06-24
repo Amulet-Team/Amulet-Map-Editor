@@ -2,11 +2,14 @@ import wx
 from typing import TYPE_CHECKING
 import traceback
 
-from amulet_map_editor import log
-from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
-from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
 import amulet
 from amulet.api.errors import LoaderNoneMatched
+
+from amulet_map_editor import log
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
+from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
+from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
+
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -62,14 +65,18 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
         try:
             level = amulet.load_level(pathname)
         except LoaderNoneMatched:
-            wx.MessageBox(f"Could not find a matching loader for {pathname}.")
-            log.error(f"Could not find a matching loader for {pathname}.")
+            msg = f"Could not find a matching loader for {pathname}."
+            log.error(msg)
+            wx.MessageBox(msg)
         except Exception as e:
-            log.error(
-                f"Could not open {pathname}. Check the console for more details.\n{traceback.format_exc()}"
+            log.error(f"Could not open {pathname}.", exc_info=True)
+            dialog = TracebackDialog(
+                self.canvas,
+                f"Could not open {pathname}.",
+                str(e),
+                traceback.format_exc(),
             )
-            wx.MessageBox(
-                f"Could not open {pathname}. Check the console for more details.\n{e}"
-            )
+            dialog.ShowModal()
+            dialog.Destroy()
         else:
             self.canvas.paste(level, level.dimensions[0])
