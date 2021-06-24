@@ -42,6 +42,7 @@ import amulet_map_editor.programs.edit as amulet_edit
 from amulet_map_editor.api.opengl.camera import ControllableCamera
 from amulet_map_editor.api.wx.util.button_input import ButtonInput
 from amulet_map_editor.api.wx.util.mouse_movement import MouseMovement
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from ..renderer import Renderer
 
 from amulet.api.level import BaseLevel
@@ -170,12 +171,14 @@ class BaseEditCanvas(EventCanvas):
                     msg,
                     exc_info=True,
                 )
-                wx.MessageBox(
-                    f"{lang.get('program_3d_edit.canvas.java_rp_failed')}\n"
-                    f"{msg}\n"
-                    f"{e}\n"
-                    f"{lang.get('shared.check_console')}"
+                dialog = TracebackDialog(
+                    self,
+                    lang.get("program_3d_edit.canvas.java_rp_failed"),
+                    f"{msg}\n{e}",
+                    traceback.format_exc(),
                 )
+                dialog.ShowModal()
+                dialog.Destroy()
 
             yield 0.5, lang.get("program_3d_edit.canvas.loading_resource_packs")
             packs += [pack for pack in user_packs if isinstance(pack, JavaResourcePack)]
