@@ -1,3 +1,6 @@
+# Shared strings
+shared.check_console=查看控制臺以獲取更多信息.
+
 app.world_still_used=有一個世界仍在使用當中. 請先關閉它
 
 world.java_platform=Java版
@@ -10,7 +13,7 @@ select_world.open_world_dialogue=選擇一個Minecraft存檔目錄
 select_world.select_directory_failed=無法打開目錄!
 select_world.recent_worlds=最近打開的世界
 select_world.no_loader_found=無法為該世界找到一個加載器.
-select_world.loading_world_failed=世界加載失敗. 請檢查控制臺輸出以獲取更多信息.
+select_world.loading_world_failed=世界加載失敗.
 
 main_menu.tab_name=主菜單
 main_menu.open_world=打開世界
@@ -137,7 +140,8 @@ program_3d_edit.goto_ui.paste_button_tooltip=將先前復制的坐標粘貼到�
 program_3d_edit.canvas.please_wait=渲染器正在初始化, 請稍作等待
 program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下載基巖版純凈資源包
 program_3d_edit.canvas.downloading_java_vanilla_resource_pack=正在下載Java版純凈資源包
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack_failed=無法下載最新版本的Java版純凈資源包.\n請檢查你的網絡連接或重啟Amulet.\n查看控制臺以獲取更多信息.
+program_3d_edit.canvas.java_rp_failed=無法下載最新版本的Java版純凈資源包.
+program_3d_edit.canvas.java_rp_failed_default=請檢查你的網絡連接或重啟Amulet.
 program_3d_edit.canvas.loading_resource_packs=正在加載資源包
 program_3d_edit.canvas.creating_texture_atlas=正在創建紋理
 program_3d_edit.canvas.setting_up_renderer=正在設置渲染器
@@ -154,4 +158,4 @@ program_3d_edit.menu_bar.edit.goto=前往
 program_3d_edit.menu_bar.edit.select_all=選擇全部
 program_3d_edit.menu_bar.options.controls=操控按鍵...
 program_3d_edit.menu_bar.options.options=其他選項...
-program_3d_edit.menu_bar.help.controls=按鍵說明
+program_3d_edit.menu_bar.help.user_guide=按鍵說明

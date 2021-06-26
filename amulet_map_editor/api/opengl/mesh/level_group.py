@@ -123,8 +123,8 @@ class LevelGroup(
             self.context_identifier,
             self._resource_pack,
             level,
-            draw_floor=False,
             draw_box=True,
+            limit_bounds=True,
         )
         render_level.dimension = dimension
         # the level objects to be drawn
@@ -136,8 +136,8 @@ class LevelGroup(
             (
                 -(
                     (
-                        level.selection_bounds.min_array
-                        + level.selection_bounds.max_array
+                        level.bounds(dimension).min_array
+                        + level.bounds(dimension).max_array
                     )
                     // 2
                 ).astype(int)
