@@ -327,12 +327,23 @@ class WorldSelectAndRecentUI(wx.Panel):
         self._open_world_callback(path)
 
 
-WORLD_SELECT_DIALOG_STYLE = wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL | wx.CLIP_CHILDREN | wx.RESIZE_BORDER
+WORLD_SELECT_DIALOG_STYLE = (
+    wx.DEFAULT_DIALOG_STYLE
+    | wx.MAXIMIZE_BOX
+    | wx.TAB_TRAVERSAL
+    | wx.CLIP_CHILDREN
+    | wx.RESIZE_BORDER
+)
 
 
 @preserve_ui_preferences
 class WorldSelectDialog(wx.Dialog):
-    def __init__(self, parent: Optional[wx.Window], open_world_callback: Callable[[str], None], **kwargs):
+    def __init__(
+        self,
+        parent: Optional[wx.Window],
+        open_world_callback: Callable[[str], None],
+        **kwargs,
+    ):
         if isinstance(parent, wx.Window):
             size = wx.Size(*[int(s * 0.95) for s in parent.GetSize()])
         else:
@@ -343,7 +354,7 @@ class WorldSelectDialog(wx.Dialog):
             pos=wx.Point(50, 50),
             size=size,
             style=kwargs.pop("style", WORLD_SELECT_DIALOG_STYLE),
-            **kwargs
+            **kwargs,
         )
         self.Bind(wx.EVT_CLOSE, self._hide_event)
 
@@ -371,8 +382,10 @@ def demo():
     Show a demo version of the UI.
     An app instance must be created first.
     """
+
     def open_world_callback(path):
         print(f"Open world {path}")
+
     dialog = WorldSelectDialog(
         None,
         open_world_callback,

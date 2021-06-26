@@ -36,7 +36,8 @@ class WildcardPropertySelect(BasePropertySelect):
             force_blockstate,
             namespace,
             block_name,
-            style=wx.BORDER_SIMPLE)
+            style=wx.BORDER_SIMPLE,
+        )
 
         self._manual_enabled = False
         self._simple = SimpleWildcardPropertySelect(self, translation_manager)
@@ -116,7 +117,9 @@ class PropertyValueCheckList(wx.Panel):
 
     def _on_toggle(self, evt):
         if self._toggle_checkbox.GetValue():
-            self._check_list_box.SetCheckedItems(list(range(self._check_list_box.GetCount())))
+            self._check_list_box.SetCheckedItems(
+                list(range(self._check_list_box.GetCount()))
+            )
         else:
             self._check_list_box.SetCheckedItems([])
 
@@ -385,11 +388,17 @@ def demo():
     """
     translation_manager = PyMCTranslate.new_translation_manager()
     for block in (("minecraft", "oak_fence"), ("modded", "block")):
-        dialog = wx.Dialog(None, title=f"WildcardPropertySelect with block {block[0]}:{block[1]}", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+        dialog = wx.Dialog(
+            None,
+            title=f"WildcardPropertySelect with block {block[0]}:{block[1]}",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
+        )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(
-            WildcardPropertySelect(dialog, translation_manager, "java", (1, 16, 0), False, *block),
+            WildcardPropertySelect(
+                dialog, translation_manager, "java", (1, 16, 0), False, *block
+            ),
             1,
             wx.ALL,
             5,

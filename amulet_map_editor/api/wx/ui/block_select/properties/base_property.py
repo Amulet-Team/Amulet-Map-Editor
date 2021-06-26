@@ -93,9 +93,7 @@ class BasePropertySelect(wx.Panel):
     @properties.setter
     def properties(self, properties: PropertyType):
         self._set_properties(properties)
-        wx.PostEvent(
-            self, PropertiesChangeEvent()
-        )
+        wx.PostEvent(self, PropertiesChangeEvent())
 
     def _get_properties(self) -> PropertyType:
         """Get the selected values for each property."""

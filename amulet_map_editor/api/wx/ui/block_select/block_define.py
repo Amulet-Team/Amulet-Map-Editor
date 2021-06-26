@@ -132,8 +132,6 @@ class BlockDefine(BaseDefine):
     def properties(self, properties: PropertyType):
         self._property_picker.properties = properties
 
-
-
     @property
     def block(self) -> Block:
         return Block(self.namespace, self.block_name, self.properties)
@@ -177,7 +175,11 @@ def demo():
     An app instance must be created first.
     """
     translation_manager = PyMCTranslate.new_translation_manager()
-    dialog = wx.Dialog(None, title="BlockDefine", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+    dialog = wx.Dialog(
+        None,
+        title="BlockDefine",
+        style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
+    )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
     sizer.Add(

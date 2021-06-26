@@ -163,10 +163,15 @@ def demo():
     """
     translation_manager = PyMCTranslate.new_translation_manager()
     for cls, title in (
-        (lambda *args: VersionSelect(*args, show_force_blockstate=False), "VersionSelect without format choice"),
+        (
+            lambda *args: VersionSelect(*args, show_force_blockstate=False),
+            "VersionSelect without format choice",
+        ),
         (VersionSelect, "VersionSelect with format choice"),
     ):
-        dialog = wx.Dialog(None, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT)
+        dialog = wx.Dialog(
+            None, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT
+        )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(cls(dialog, translation_manager), 0, wx.ALL, 5)

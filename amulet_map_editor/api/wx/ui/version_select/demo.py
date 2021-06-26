@@ -1,6 +1,10 @@
 import wx
-from amulet_map_editor.api.wx.ui.version_select.platform_select import demo as platform_demo
-from amulet_map_editor.api.wx.ui.version_select.version_select import demo as version_demo
+from amulet_map_editor.api.wx.ui.version_select.platform_select import (
+    demo as platform_demo,
+)
+from amulet_map_editor.api.wx.ui.version_select.version_select import (
+    demo as version_demo,
+)
 
 
 def demo():

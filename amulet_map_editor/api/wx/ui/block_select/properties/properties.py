@@ -36,7 +36,8 @@ class PropertySelect(BasePropertySelect):
             force_blockstate,
             namespace,
             block_name,
-            style=wx.BORDER_SIMPLE)
+            style=wx.BORDER_SIMPLE,
+        )
 
         self._manual_enabled = False
         self._simple = SimplePropertySelect(self, translation_manager)
@@ -305,11 +306,17 @@ def demo():
     """
     translation_manager = PyMCTranslate.new_translation_manager()
     for block in (("minecraft", "oak_fence"), ("modded", "block")):
-        dialog = wx.Dialog(None, title=f"PropertySelect with block {block[0]}:{block[1]}", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT)
+        dialog = wx.Dialog(
+            None,
+            title=f"PropertySelect with block {block[0]}:{block[1]}",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
+        )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(
-            PropertySelect(dialog, translation_manager, "java", (1, 16, 0), False, *block),
+            PropertySelect(
+                dialog, translation_manager, "java", (1, 16, 0), False, *block
+            ),
             1,
             wx.ALL,
             5,
