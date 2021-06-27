@@ -1,8 +1,12 @@
 from __future__ import annotations
+
+from functools import reduce
 from typing import TYPE_CHECKING
 
 import numpy
 import wx
+
+from operator import add
 
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
@@ -17,6 +21,8 @@ if TYPE_CHECKING:
 class ResultDialog(SimpleDialog):
     def __init__(self, parent, block_location_info):
         super(ResultDialog, self).__init__(parent, "Block Locations")
+
+        self._block_location_info = block_location_info
         self.Freeze()
 
         self.sizer.Add(
@@ -27,21 +33,30 @@ class ResultDialog(SimpleDialog):
             wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL,
             5,
         )
-
-        tree = wx.TreeCtrl(self, style=wx.TR_DEFAULT_STYLE | wx.TR_HIDE_ROOT)
-        _root = tree.AddRoot("__root__")
-
-        for block in block_location_info:
-            block_root = tree.AppendItem(
-                _root, f"{block} - {len(block_location_info[block])} locations"
-            )
-            for coordinates in block_location_info[block]:
-                tree.AppendItem(block_root, str(coordinates))
+        self._tree = tree = wx.TreeCtrl(
+            self, style=wx.TR_DEFAULT_STYLE | wx.TR_HIDE_ROOT
+        )
+        self._root = tree.AddRoot("__root__")
 
         self.sizer.Add(tree, 1, wx.ALL | wx.EXPAND, 5)
 
         self.Layout()
         self.Thaw()
+
+    def build_results(self):
+        count = 0
+        iter_count = reduce(add, map(len, self._block_location_info.values()))
+
+        for block in self._block_location_info:
+            block_root = self._tree.AppendItem(
+                self._root,
+                f"{block} - {len(self._block_location_info[block])} locations",
+            )
+
+            for coordinates in self._block_location_info[block]:
+                self._tree.AppendItem(block_root, str(coordinates))
+                count += 1
+                yield count / iter_count, "Building results dialog..."
 
 
 class FindBlock(SimpleOperationPanel):
@@ -116,7 +131,7 @@ class FindBlock(SimpleOperationPanel):
                     )
                 )
             count += 1
-            yield count / iter_count
+            yield count / iter_count, "Searching blocks..."
 
         result = {
             world.translation_manager.get_version(
@@ -127,6 +142,7 @@ class FindBlock(SimpleOperationPanel):
         }
 
         dialog = ResultDialog(self.parent, result)
+        yield from dialog.build_results()
         dialog.Show()
 
     def _find_multiple_blockstates(
@@ -146,7 +162,6 @@ class FindBlock(SimpleOperationPanel):
             )
         )
 
-        # TODO: Find a better way to iterate through all permutations of the wanted blockstates
         # Technically, this is the correct way, since if a Block's substate doesn't exist in the
         # world, then it wouldn't be present in the block_palette and thus would be skipped
         # but to users this may not seem straightforward since it would look like the operation
@@ -190,9 +205,10 @@ class FindBlock(SimpleOperationPanel):
                     )
                 )
                 count += 1
-                yield count / iter_count
+                yield count / iter_count, "Searching blocks..."
 
         dialog = ResultDialog(self.parent, results)
+        yield from dialog.build_results()
         dialog.Show()
 
     def _operation(
