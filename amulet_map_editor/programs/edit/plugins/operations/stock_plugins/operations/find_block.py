@@ -45,7 +45,7 @@ class ResultDialog(SimpleDialog):
 
     def build_results(self):
         count = 0
-        iter_count = reduce(add, map(len, self._block_location_info.values()))
+        iter_count = sum(map(len, self._block_location_info.values()))
 
         for block in self._block_location_info:
             block_root = self._tree.AppendItem(
