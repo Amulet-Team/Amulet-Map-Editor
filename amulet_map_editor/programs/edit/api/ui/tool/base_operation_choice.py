@@ -1,13 +1,13 @@
 import wx
 from typing import TYPE_CHECKING, Optional
+import traceback
 
 from amulet_map_editor import log
 from amulet_map_editor.api.image import REFRESH_ICON
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 
-from amulet_map_editor.programs.edit.api.operations import (
-    OperationUIType,
-)
+from amulet_map_editor.programs.edit.api.operations import OperationUIType
 from amulet_map_editor.programs.edit.api.operations.manager import UIOperationManager
 from .base_tool_ui import BaseToolUI
 
@@ -84,21 +84,37 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
             operation = self._operations[operation_path]
             if self._active_operation is not None:
                 self._active_operation.disable()
-                if isinstance(self._active_operation, wx.Window):
-                    self._active_operation.Destroy()
-                elif isinstance(self._active_operation, wx.Sizer):
-                    self._operation_sizer.GetItem(
-                        self._active_operation
-                    ).DeleteWindows()
-            self._active_operation = operation(
-                self.canvas, self.canvas, self.canvas.world
-            )
-            self._last_active_operation_id = operation.identifier
-            self._operation_sizer.Add(
-                self._active_operation, *self._active_operation.wx_add_options
-            )
-            self._active_operation.enable()
-            self.Layout()
+            self._operation_sizer.Clear(delete_windows=True)
+            try:
+                self._active_operation = operation(
+                    self.canvas, self.canvas, self.canvas.world
+                )
+                self._operation_sizer.Add(
+                    self._active_operation, *self._active_operation.wx_add_options
+                )
+                self._active_operation.enable()
+            except Exception as e:
+                # If something went wrong clear the created UI
+                self._active_operation = None
+                self._operation_sizer.Clear(delete_windows=True)
+                for window in self.canvas.GetChildren():
+                    window: wx.Window
+                    # remove orphaned windows.
+                    # If the Sizer.Add method was not run it will not be in self._operation_sizer
+                    if window.GetContainingSizer() is None:
+                        window.Destroy()
+                log.error("Error loading Operation UI.", exc_info=True)
+                dialog = TracebackDialog(
+                    self.canvas,
+                    "Error loading Operation UI.",
+                    str(e),
+                    traceback.format_exc(),
+                )
+                dialog.ShowModal()
+                dialog.Destroy()
+            finally:
+                self._last_active_operation_id = operation.identifier
+                self.Layout()
 
     def bind_events(self):
         if self._active_operation is not None:
