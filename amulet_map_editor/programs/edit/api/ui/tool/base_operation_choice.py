@@ -84,9 +84,14 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
             operation = self._operations[operation_path]
             if self._active_operation is not None:
                 self._active_operation.disable()
-                if isinstance(self._active_operation, wx.Window):
+                if (
+                    isinstance(self._active_operation, wx.Window)
+                    and self._active_operation
+                ):
                     self._active_operation.Destroy()
-                elif isinstance(self._active_operation, wx.Sizer):
+                elif isinstance(
+                    self._active_operation, wx.Sizer
+                ) and self._operation_sizer.GetItem(self._active_operation):
                     self._operation_sizer.GetItem(
                         self._active_operation
                     ).DeleteWindows()
