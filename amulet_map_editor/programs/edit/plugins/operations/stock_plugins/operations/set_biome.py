@@ -112,7 +112,7 @@ class SetBiome(SimpleOperationPanel):
     ) -> "OperationReturnType":
         mode = self._mode.GetCurrentObject()
 
-        iter_count = len(list(world.get_chunk_slice_box(dimension, selection, False)))
+        iter_count = len(list(world.get_coord_box(dimension, selection, False)))
         for count, (chunk, slices, _) in enumerate(
             world.get_chunk_slice_box(dimension, selection, False)
         ):
