@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from functools import reduce
 from typing import TYPE_CHECKING
 
 import numpy
 import wx
 
-from operator import add
-
+from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.programs.edit.api.operations import SimpleOperationPanel
@@ -20,7 +18,7 @@ if TYPE_CHECKING:
 
 class ResultDialog(SimpleDialog):
     def __init__(self, parent, block_location_info):
-        super(ResultDialog, self).__init__(parent, "Block Locations")
+        super().__init__(parent, "Block Locations")
 
         self._block_location_info = block_location_info
         self.Freeze()
@@ -61,7 +59,7 @@ class ResultDialog(SimpleDialog):
 
 class FindBlock(SimpleOperationPanel):
     def __init__(self, parent, canvas, world, options_path):
-        SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
+        super().__init__(parent, canvas, world, options_path)
         self.Freeze()
 
         self._sizer = wx.BoxSizer(wx.VERTICAL)
@@ -79,6 +77,8 @@ class FindBlock(SimpleOperationPanel):
             ),
             show_pick_block=True,
         )
+        self._block_define.Bind(EVT_PICK, self._on_pick_block_button)
+
         self._findSubTypes = wx.CheckBox(self, label="Find All Block Substates")
         self._findSubTypes.SetValue(options.get("find_substates", False))
 
@@ -88,6 +88,18 @@ class FindBlock(SimpleOperationPanel):
         self._add_run_button()
 
         self.Thaw()
+
+    def _on_pick_block_button(self, evt):
+        self._show_pointer = True
+
+    def _on_block_click(self):
+        if self._show_pointer:
+            self._show_pointer = False
+            x, y, z = self._pointer.pointer_base
+            self._block_define.universal_block = (
+                self.world.get_block(x, y, z, self.canvas.dimension),
+                None,
+            )
 
     def _get_target_block(self):
         return self._block_define.universal_block[0]
@@ -114,22 +126,37 @@ class FindBlock(SimpleOperationPanel):
     def _find_single_blockstate(self, world, dimension, selection):
         target = world.block_palette.get_add_block(self._get_target_block())
 
-        iter_count = len(list(world.get_chunk_slice_box(dimension, selection, False)))
+        iter_count = len(list(world.get_coord_box(dimension, selection, False)))
         count = 0
 
         block_locations = []
+        extend_func = block_locations.extend
 
         for chunk, slices, _ in world.get_chunk_slice_box(dimension, selection, False):
             block_selection = chunk.blocks[slices]
             x_values, y_values, z_values = numpy.where(block_selection == target)
+            extend_func(
+                map(
+                    lambda x, y, z: (
+                        chunk.cx + block_selection.start_x + x,
+                        block_selection.start_y + y,
+                        chunk.cz + block_selection.start_z + z,
+                    ),
+                    x_values,
+                    y_values,
+                    z_values,
+                )
+            )
+            '''
             for x, y, z in zip(x_values, y_values, z_values):
                 block_locations.append(
                     (
-                        block_selection.start_x + x,
+                        chunk.cx + block_selection.start_x + x,
                         block_selection.start_y + y,
-                        block_selection.start_z + z,
+                        chunk.cz + block_selection.start_z + z,
                     )
                 )
+            '''
             count += 1
             yield count / iter_count, "Searching blocks..."
 
@@ -195,9 +222,9 @@ class FindBlock(SimpleOperationPanel):
                 extend_func(
                     map(
                         lambda x, y, z: (
-                            block_selection.start_x + x,
+                            chunk.cx + block_selection.start_x + x,
                             block_selection.start_y + y,
-                            block_selection.start_z + z,
+                            chunk.cz + block_selection.start_z + z,
                         ),
                         x_values,
                         y_values,
