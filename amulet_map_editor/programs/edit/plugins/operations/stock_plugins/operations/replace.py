@@ -143,7 +143,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         original_block_matches = []
         universal_block_count = 0
 
-        iter_count = len(list(world.get_chunk_slice_box(dimension, selection)))
+        iter_count = len(list(world.get_coord_box(dimension, selection)))
         count = 0
 
         for chunk, slices, _ in world.get_chunk_slice_box(dimension, selection):

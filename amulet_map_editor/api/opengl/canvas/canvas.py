@@ -58,5 +58,5 @@ class BaseCanvas(glcanvas.GLCanvas):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-    def _close(self):
+    def close(self):
         glDeleteTextures([self._gl_texture_atlas])
