@@ -8,26 +8,31 @@ The edit program is a 3D world editor with similarities to MCEdit Unified. The u
 
 ## Controls
 
-The controls are currently hard coded but in the future they will be customisable. They are as follows:
-- forward: W
-- backward: S
-- left: A
-- right D
-- down: Shift
-- up: Spacebar
-- toggle camera rotation: middle click or double right click
+The controls are customizable in `Options` -> `Controls...`, but the defaults are as follows:
+- forward: `W`
+- backward: `S`
+- left: `A`
+- right `D`
+- down: `Shift`
+- up: `Spacebar`
+- toggle camera rotation: Middle click or double right click
 - select box corner: Left click
-- change mouse select mode: Right click (options are closest non-air block and fixed distance)
-- change fly speed: Middle mouse scroll
+- change mouse select mode: Right click (Select modes are closest non-air block and fixed distance)
+- deselect: `Ctrl` + `D`
+- deselect all: `Ctrl` + `Shift` + `D`
+- change select distance: `R` and `F`
+- change fly speed: Scroll
+- inspect block: `Alt`
+- change projection: `Tab`
 
 ## Tools
 
 On the left should be a bar of buttons which control different things in the editor.
 
 Dimension: Select which dimension is active
-Undo: Undo the last change. (ctrl+z)
-Redo: Reapply an undone change. (ctrl+y)
-Save: Save all changes to the world. Any changes in the editor are saved in the editor until the user requests them to be saved to the world. (ctrl+s)
+Undo: Undo the last change. (`Ctrl` + `Z`)
+Redo: Reapply an undone change. (`Ctrl` + `Y`)
+Save: Save all changes to the world. Any changes in the editor are saved in the editor until the user requests them to be saved to the world. (`Ctrl` + `S`)
 Close: Close the current world.
 
 ### Operations
@@ -58,10 +63,10 @@ Below that is a button that will run the operation. Some operations may require 
 - Select an area, select the operation and click run operation.
 - The operation screen will change to allow you to pick a destination location.
 - Type in the coordinate where you want it to be placed or use middle mouse wheel while hovering on a number.
-- Click "Confirm" to paste the selection at the new location or "Cancel" to cancel
+- Click `Confirm` to paste the selection at the new location or `Cancel` to cancel
 
 ### Copy and Paste
-- Select an area and press ctrl+c to copy (or Edit -> Copy)
-- Press ctrl+v (or Edit -> Paste) to choose where to paste the selection in the world. See [clone](#clone) for more information
+- Select an area and press `Ctrl` + `C` to copy (or `Edit` -> `Copy`)
+- Press `Ctrl` + `V` (or `Edit` -> `Paste`) to choose where to paste the selection in the world. See [clone](#clone) for more information
 - It is worth noting here that Amulet is able to have multiple worlds open at the same time and the copied area can be pasted into a different world.
 - Our translation system also handles conversion between different world formats so the source and destination worlds do not need to be from the same version or platform.
