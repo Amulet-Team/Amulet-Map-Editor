@@ -14,6 +14,7 @@ class AutomaticSingleProperty(BaseSingleProperty):
 
     The UI is automatically populated from the given specification.
     """
+
     def __init__(
         self,
         parent: wx.Window,

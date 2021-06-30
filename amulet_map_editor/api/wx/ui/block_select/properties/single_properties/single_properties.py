@@ -49,7 +49,6 @@ class SinglePropertySelect(BasePropertySelect):
         self._set_properties(properties)
         self._rebuild_ui()
 
-
     @property
     def properties(self) -> PropertyType:
         """

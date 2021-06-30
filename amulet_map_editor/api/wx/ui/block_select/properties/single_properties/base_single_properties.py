@@ -11,6 +11,7 @@ class BaseSingleProperty(wx.Panel):
     This is base class for both flavours of single property selection UIs.
     Subclasses must implement the logic.
     """
+
     def __init__(
         self,
         parent: wx.Window,

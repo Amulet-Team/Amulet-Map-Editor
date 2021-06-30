@@ -16,6 +16,7 @@ class ManualSingleProperty(BaseSingleProperty):
 
     This is used when the block is not know so the user can define the properties themselves.
     """
+
     def __init__(
         self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
     ):
