@@ -10,9 +10,7 @@ def main():
         "pymctranslate",
         "minecraft-resource-pack",
     }
-    installed = {
-        r.split("==")[0].lower(): r for r in freeze.freeze() if "==" in r
-    }
+    installed = {r.split("==")[0].lower(): r for r in freeze.freeze() if "==" in r}
     for index, r in enumerate(requirements):
         if r[0] != "#" and "~=" in r:
             req = r.split("~=")[0]
@@ -22,5 +20,5 @@ def main():
         f.write("\n".join(requirements))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
