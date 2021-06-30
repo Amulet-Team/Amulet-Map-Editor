@@ -112,7 +112,7 @@ def demo():
     for block in (("minecraft", "oak_fence"), ("modded", "block")):
         dialog = wx.Dialog(
             None,
-            title=f"PropertySelect with block {block[0]}:{block[1]}",
+            title=f"SinglePropertySelect with block {block[0]}:{block[1]}",
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
         )
         sizer = wx.BoxSizer()

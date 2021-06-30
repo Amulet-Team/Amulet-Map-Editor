@@ -10,7 +10,7 @@ from amulet_map_editor.api.wx.ui.base_define import BaseDefine
 from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 
 from amulet_map_editor.api.wx.ui.block_select.properties import (
-    PropertySelect,
+    SinglePropertySelect,
     WildcardPropertySelect,
     EVT_PROPERTIES_CHANGE,
 )
@@ -55,7 +55,7 @@ class BlockDefine(BaseDefine):
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
         self._wildcard_mode = wildcard_properties
         if wildcard_properties:
-            self._property_picker = PropertySelect(
+            self._property_picker = SinglePropertySelect(
                 self,
                 translation_manager,
                 self._version_picker.platform,
@@ -66,7 +66,7 @@ class BlockDefine(BaseDefine):
                 properties,
             )
         else:
-            self._property_picker = PropertySelect(
+            self._property_picker = SinglePropertySelect(
                 self,
                 translation_manager,
                 self._version_picker.platform,

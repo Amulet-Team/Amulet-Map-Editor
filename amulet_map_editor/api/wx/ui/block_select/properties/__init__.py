@@ -1,3 +1,3 @@
 from .events import PropertiesChangeEvent, EVT_PROPERTIES_CHANGE
-from .properties import PropertySelect
+from .single_properties import SinglePropertySelect
 from .wildcard_properties import WildcardPropertySelect
