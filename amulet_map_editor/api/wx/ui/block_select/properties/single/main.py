@@ -4,7 +4,7 @@ from typing import Tuple
 import PyMCTranslate
 from amulet.api.block import PropertyType
 from ..base import BasePropertySelect
-from ..events import PropertiesChangeEvent
+from .events import SinglePropertiesChangeEvent
 from .automatic import AutomaticSingleProperty
 from .manual import ManualSingleProperty
 
@@ -61,7 +61,7 @@ class SinglePropertySelect(BasePropertySelect):
     @properties.setter
     def properties(self, properties: PropertyType):
         self._set_properties(properties)
-        wx.PostEvent(self, PropertiesChangeEvent())
+        wx.PostEvent(self, SinglePropertiesChangeEvent(self.properties))
 
     def _get_properties(self) -> PropertyType:
         """Get the selected values for each property."""

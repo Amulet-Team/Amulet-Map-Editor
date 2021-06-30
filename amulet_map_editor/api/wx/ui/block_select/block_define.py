@@ -12,7 +12,7 @@ from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 from amulet_map_editor.api.wx.ui.block_select.properties import (
     SinglePropertySelect,
     MultiplePropertySelect,
-    EVT_PROPERTIES_CHANGE,
+    EVT_SINGLE_PROPERTIES_CHANGE,
 )
 
 
@@ -77,7 +77,9 @@ class BlockDefine(BaseDefine):
                 properties,
             )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
-        self._property_picker.Bind(EVT_PROPERTIES_CHANGE, self._on_property_change)
+        self._property_picker.Bind(
+            EVT_SINGLE_PROPERTIES_CHANGE, self._on_property_change
+        )
 
         self.SetSizerAndFit(self._sizer)
         self.Layout()

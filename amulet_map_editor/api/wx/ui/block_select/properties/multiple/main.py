@@ -68,14 +68,22 @@ class MultiplePropertySelect(BasePropertySelect):
     def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
         """
         The values that are checked for each property.
-        This UI can have more than one property value checked (ticked) but only one selected (highlighted blue).
-        :attr:`properties` will return the entry that is highlighted blue.
+        This UI can have more than one property value checked (ticked).
         """
-        raise NotImplementedError
+        if self._manual_enabled:
+            return self._manual.extra_properties
+        else:
+            return self._simple.extra_properties
 
     @extra_properties.setter
     def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
-        raise NotImplementedError
+        self.Freeze()
+        if self._manual_enabled:
+            self._manual.extra_properties = properties
+        else:
+            self._simple.extra_properties = properties
+        self.TopLevelParent.Layout()
+        self.Thaw()
 
     def _rebuild_ui(self):
         self.Freeze()

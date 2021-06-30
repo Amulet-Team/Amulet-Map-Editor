@@ -4,7 +4,7 @@ from typing import Dict, List
 import PyMCTranslate
 import amulet_nbt
 from amulet.api.block import PropertyDataTypes, PropertyType
-from ..events import PropertiesChangeEvent
+from .events import SinglePropertiesChangeEvent
 from .base import BaseSingleProperty
 
 
@@ -58,7 +58,7 @@ class AutomaticSingleProperty(BaseSingleProperty):
                 wx.EVT_CHOICE,
                 lambda evt: wx.PostEvent(
                     self,
-                    PropertiesChangeEvent(self.GetId(), properties=self.properties),
+                    SinglePropertiesChangeEvent(self.properties),
                 ),
             )
             self._properties[name] = choice

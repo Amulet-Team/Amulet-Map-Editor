@@ -4,9 +4,9 @@ from typing import Tuple, Dict
 import PyMCTranslate
 import amulet_nbt
 from amulet_nbt import SNBTType
-from amulet.api.block import PropertyDataTypes, PropertyType
+from amulet.api.block import PropertyDataTypes, PropertyType, PropertyValueType
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
-from ..events import PropertiesChangeEvent
+from .events import MultiplePropertiesChangeEvent
 from .base import BaseMultipleProperty
 
 
@@ -40,9 +40,7 @@ class ManualMultipleProperty(BaseMultipleProperty):
         self._properties: Dict[int, Tuple[wx.TextCtrl, wx.TextCtrl]] = {}
 
     def _post_property_change(self):
-        wx.PostEvent(
-            self, PropertiesChangeEvent(self.GetId(), properties=self.properties)
-        )
+        wx.PostEvent(self, MultiplePropertiesChangeEvent(self.extra_properties))
 
     def _add_property(self, name: str = "", value: SNBTType = ""):
         self.Freeze()
@@ -121,3 +119,20 @@ class ManualMultipleProperty(BaseMultipleProperty):
         self._property_index = 0
         for name, value in properties.items():
             self._add_property(name, value.to_snbt())
+
+    # TODO: implement this properly
+    @property
+    def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
+        """
+        The values that are checked for each property.
+        This UI can have more than one property value checked (ticked).
+        """
+        return {prop: (val,) for prop, val in self.properties.items()}
+
+    @extra_properties.setter
+    def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
+        props = {}
+        for prop, val in properties:
+            if val:
+                props[prop] = val[0]
+        self.properties = props

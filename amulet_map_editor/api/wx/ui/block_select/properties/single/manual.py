@@ -6,7 +6,7 @@ import amulet_nbt
 from amulet_nbt import SNBTType
 from amulet.api.block import PropertyDataTypes, PropertyType
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
-from ..events import PropertiesChangeEvent
+from .events import SinglePropertiesChangeEvent
 from .base import BaseSingleProperty
 
 
@@ -46,9 +46,7 @@ class ManualSingleProperty(BaseSingleProperty):
         self._properties: Dict[int, Tuple[wx.TextCtrl, wx.TextCtrl]] = {}
 
     def _post_property_change(self):
-        wx.PostEvent(
-            self, PropertiesChangeEvent(self.GetId(), properties=self.properties)
-        )
+        wx.PostEvent(self, SinglePropertiesChangeEvent(self.properties))
 
     def _add_property(self, name: str = "", value: SNBTType = ""):
         """
