@@ -2,8 +2,6 @@ import wx
 from typing import Tuple
 
 import PyMCTranslate
-from amulet.api.block import PropertyType
-from .events import PropertiesChangeEvent
 
 
 class BasePropertySelect(wx.Panel):
@@ -79,26 +77,4 @@ class BasePropertySelect(wx.Panel):
         Rebuild the UI.
         Run when the version or block is changed.
         """
-        raise NotImplementedError
-
-    @property
-    def properties(self) -> PropertyType:
-        """
-        The selected values for each property.
-
-        :return: A dictionary mapping property name to the nbt value.
-        """
-        return self._get_properties()
-
-    @properties.setter
-    def properties(self, properties: PropertyType):
-        self._set_properties(properties)
-        wx.PostEvent(self, PropertiesChangeEvent())
-
-    def _get_properties(self) -> PropertyType:
-        """Get the selected values for each property."""
-        raise NotImplementedError
-
-    def _set_properties(self, properties: PropertyType):
-        """Set the selected values for each property."""
         raise NotImplementedError
