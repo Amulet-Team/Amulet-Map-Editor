@@ -5,8 +5,8 @@ import PyMCTranslate
 from amulet.api.block import PropertyType
 from ..base_property import BasePropertySelect
 from ..events import PropertiesChangeEvent
-from .automatic_single_properties import AutomaticSingleProperty
-from .manual_single_properties import ManualSingleProperty
+from .automatic import AutomaticSingleProperty
+from .manual import ManualSingleProperty
 
 
 class SinglePropertySelect(BasePropertySelect):

@@ -7,7 +7,7 @@ from amulet_nbt import SNBTType
 from amulet.api.block import PropertyDataTypes, PropertyType
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 from ..events import PropertiesChangeEvent
-from .base_single_properties import BaseSingleProperty
+from .base import BaseSingleProperty
 
 
 class ManualSingleProperty(BaseSingleProperty):
