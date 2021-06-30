@@ -7,10 +7,10 @@ from amulet_nbt import SNBTType
 from amulet.api.block import PropertyDataTypes, PropertyType
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 from ..events import PropertiesChangeEvent
-from .base import BaseSubWildcardPropertySelect
+from .base import BaseMultipleProperty
 
 
-class ManualWildcardPropertySelect(BaseSubWildcardPropertySelect):
+class ManualMultipleProperty(BaseMultipleProperty):
     def __init__(
         self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
     ):

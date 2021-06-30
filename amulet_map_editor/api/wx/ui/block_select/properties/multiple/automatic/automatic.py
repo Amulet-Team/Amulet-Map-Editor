@@ -4,11 +4,11 @@ from typing import Dict, List
 import PyMCTranslate
 from amulet.api.block import PropertyDataTypes, PropertyType
 from ...events import PropertiesChangeEvent
-from ..base import BaseSubWildcardPropertySelect
+from ..base import BaseMultipleProperty
 from .popup import PropertyValueComboPopup
 
 
-class SimpleWildcardPropertySelect(BaseSubWildcardPropertySelect):
+class AutomaticMultipleProperty(BaseMultipleProperty):
     def __init__(
         self,
         parent: wx.Window,

@@ -11,7 +11,7 @@ from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 
 from amulet_map_editor.api.wx.ui.block_select.properties import (
     SinglePropertySelect,
-    WildcardPropertySelect,
+    MultiplePropertySelect,
     EVT_PROPERTIES_CHANGE,
 )
 

@@ -4,7 +4,7 @@ import PyMCTranslate
 from amulet.api.block import PropertyType
 
 
-class BaseSubWildcardPropertySelect(wx.Panel):
+class BaseMultipleProperty(wx.Panel):
     def __init__(
         self,
         parent: wx.Window,

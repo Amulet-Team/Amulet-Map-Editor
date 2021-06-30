@@ -1,1 +1,1 @@
-from .automatic import SimpleWildcardPropertySelect
+from .automatic import AutomaticMultipleProperty

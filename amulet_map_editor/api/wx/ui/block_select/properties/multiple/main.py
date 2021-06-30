@@ -5,11 +5,11 @@ import PyMCTranslate
 from amulet.api.block import PropertyType, PropertyValueType
 from ..base import BasePropertySelect
 
-from .automatic import SimpleWildcardPropertySelect
-from .manual import ManualWildcardPropertySelect
+from .automatic import AutomaticMultipleProperty
+from .manual import ManualMultipleProperty
 
 
-class WildcardPropertySelect(BasePropertySelect):
+class MultiplePropertySelect(BasePropertySelect):
     """
     This is a UI which lets the user pick zero or more values for each property.
     If the block is known it will be populated from the specification.
@@ -39,9 +39,9 @@ class WildcardPropertySelect(BasePropertySelect):
         )
 
         self._manual_enabled = False
-        self._simple = SimpleWildcardPropertySelect(self, translation_manager)
+        self._simple = AutomaticMultipleProperty(self, translation_manager)
         self._sizer.Add(self._simple, 1, wx.EXPAND)
-        self._manual = ManualWildcardPropertySelect(self, translation_manager)
+        self._manual = ManualMultipleProperty(self, translation_manager)
         self._sizer.Add(self._manual, 1, wx.EXPAND)
 
         if properties is None:
@@ -109,13 +109,13 @@ def demo():
     for block in (("minecraft", "oak_fence"), ("modded", "block")):
         dialog = wx.Dialog(
             None,
-            title=f"WildcardPropertySelect with block {block[0]}:{block[1]}",
+            title=f"MultiplePropertySelect with block {block[0]}:{block[1]}",
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(
-            WildcardPropertySelect(
+            MultiplePropertySelect(
                 dialog, translation_manager, "java", (1, 16, 0), False, *block
             ),
             1,

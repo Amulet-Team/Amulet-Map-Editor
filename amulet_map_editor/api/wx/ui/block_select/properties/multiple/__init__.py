@@ -1,1 +1,1 @@
-from .main import WildcardPropertySelect, demo
+from .main import MultiplePropertySelect, demo
