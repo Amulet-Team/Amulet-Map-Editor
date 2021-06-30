@@ -54,6 +54,11 @@ jobs:
       shell: bash
 
     - if: matrix.os == 'windows-latest'
+      name: Pip Freeze
+      run: |
+        python pip_freeze.py
+
+    - if: matrix.os == 'windows-latest'
       name: Publish to PyPi
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
