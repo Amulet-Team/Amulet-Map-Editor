@@ -28,11 +28,6 @@ jobs:
         pip install setuptools wheel twine pyinstaller==4.2
         pip install -r requirements.txt
 
-    - if: matrix.os == 'windows-latest'
-      name: Pip Freeze
-      run: |
-        python pip_freeze.py
-
     # setup
     - name: setup.py
       run: |
