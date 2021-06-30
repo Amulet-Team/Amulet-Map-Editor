@@ -1,8 +1,8 @@
 import wx
-from amulet_map_editor.api.wx.ui.block_select.properties.single_properties import (
+from amulet_map_editor.api.wx.ui.block_select.properties.single import (
     demo as single_properties_demo,
 )
-from amulet_map_editor.api.wx.ui.block_select.properties.wildcard_properties import (
+from amulet_map_editor.api.wx.ui.block_select.properties.multiple import (
     demo as wildcard_properties_demo,
 )
 

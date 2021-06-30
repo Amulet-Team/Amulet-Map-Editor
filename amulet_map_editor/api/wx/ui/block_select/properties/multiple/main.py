@@ -1,17 +1,17 @@
 import wx
-from typing import Tuple
+from typing import Tuple, Dict
 
 import PyMCTranslate
-from amulet.api.block import PropertyType
+from amulet.api.block import PropertyType, PropertyValueType
 from ..base import BasePropertySelect
-from ..events import PropertiesChangeEvent
-from .automatic import AutomaticSingleProperty
-from .manual import ManualSingleProperty
+
+from .automatic import SimpleWildcardPropertySelect
+from .manual import ManualWildcardPropertySelect
 
 
-class SinglePropertySelect(BasePropertySelect):
+class WildcardPropertySelect(BasePropertySelect):
     """
-    This is a UI which lets the user pick one value for each property for a given block.
+    This is a UI which lets the user pick zero or more values for each property.
     If the block is known it will be populated from the specification.
     If it is not known the user can populate it themselves.
     """
@@ -39,9 +39,9 @@ class SinglePropertySelect(BasePropertySelect):
         )
 
         self._manual_enabled = False
-        self._simple = AutomaticSingleProperty(self, translation_manager)
+        self._simple = SimpleWildcardPropertySelect(self, translation_manager)
         self._sizer.Add(self._simple, 1, wx.EXPAND)
-        self._manual = ManualSingleProperty(self, translation_manager)
+        self._manual = ManualWildcardPropertySelect(self, translation_manager)
         self._sizer.Add(self._manual, 1, wx.EXPAND)
 
         if properties is None:
@@ -49,29 +49,13 @@ class SinglePropertySelect(BasePropertySelect):
         self._set_properties(properties)
         self._rebuild_ui()
 
-    @property
-    def properties(self) -> PropertyType:
-        """
-        The selected values for each property.
-
-        :return: A dictionary mapping property name to the nbt value.
-        """
-        return self._get_properties()
-
-    @properties.setter
-    def properties(self, properties: PropertyType):
-        self._set_properties(properties)
-        wx.PostEvent(self, PropertiesChangeEvent())
-
     def _get_properties(self) -> PropertyType:
-        """Get the selected values for each property."""
         if self._manual_enabled:
             return self._manual.properties
         else:
             return self._simple.properties
 
     def _set_properties(self, properties: PropertyType):
-        """Set the selected values for each property."""
         self.Freeze()
         if self._manual_enabled:
             self._manual.properties = properties
@@ -79,6 +63,19 @@ class SinglePropertySelect(BasePropertySelect):
             self._simple.properties = properties
         self.TopLevelParent.Layout()
         self.Thaw()
+
+    @property
+    def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
+        """
+        The values that are checked for each property.
+        This UI can have more than one property value checked (ticked) but only one selected (highlighted blue).
+        :attr:`properties` will return the entry that is highlighted blue.
+        """
+        raise NotImplementedError
+
+    @extra_properties.setter
+    def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
+        raise NotImplementedError
 
     def _rebuild_ui(self):
         self.Freeze()
@@ -112,13 +109,13 @@ def demo():
     for block in (("minecraft", "oak_fence"), ("modded", "block")):
         dialog = wx.Dialog(
             None,
-            title=f"SinglePropertySelect with block {block[0]}:{block[1]}",
+            title=f"WildcardPropertySelect with block {block[0]}:{block[1]}",
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
         sizer.Add(
-            SinglePropertySelect(
+            WildcardPropertySelect(
                 dialog, translation_manager, "java", (1, 16, 0), False, *block
             ),
             1,

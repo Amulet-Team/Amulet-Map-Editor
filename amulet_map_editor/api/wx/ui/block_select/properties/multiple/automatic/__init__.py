@@ -1,0 +1,1 @@
+from .automatic import SimpleWildcardPropertySelect
