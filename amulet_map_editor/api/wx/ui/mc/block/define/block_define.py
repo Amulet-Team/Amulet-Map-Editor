@@ -6,16 +6,14 @@ import PyMCTranslate
 from amulet.api.block import PropertyType, Block
 from amulet.api.block_entity import BlockEntity
 
-from amulet_map_editor.api.wx.ui.mc.base.base_define import BaseDefine
-from amulet_map_editor.api.wx.ui.mc.block import BlockSelect
-
 from amulet_map_editor.api.wx.ui.mc.block.properties import (
     SinglePropertySelect,
     EVT_SINGLE_PROPERTIES_CHANGE,
 )
+from amulet_map_editor.api.wx.ui.mc.block.define.base import BaseBlockDefine
 
 
-class BlockDefine(BaseDefine):
+class BlockDefine(BaseBlockDefine):
     """
     A UI that merges a version select widget with a block select widget and a property select.
     """
@@ -31,99 +29,41 @@ class BlockDefine(BaseDefine):
         namespace: str = None,
         block_name: str = None,
         properties: PropertyType = None,
-        wildcard_properties=False,
         show_pick_block: bool = False,
         **kwargs,
     ):
         super().__init__(
             parent,
             translation_manager,
-            BlockSelect,
             orientation,
             platform,
             version_number,
+            force_blockstate,
             namespace,
-            default_name=block_name,
-            show_pick=show_pick_block,
-            force_blockstate=force_blockstate,
+            block_name,
+            show_pick_block=show_pick_block,
             **kwargs,
         )
 
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
-        self._wildcard_mode = wildcard_properties
-        if wildcard_properties:
-            self._property_picker = SinglePropertySelect(
-                self,
-                translation_manager,
-                self._version_picker.platform,
-                self._version_picker.version_number,
-                self._version_picker.force_blockstate,
-                self._picker.namespace,
-                self._picker.name,
-                properties,
-            )
-        else:
-            self._property_picker = SinglePropertySelect(
-                self,
-                translation_manager,
-                self._version_picker.platform,
-                self._version_picker.version_number,
-                self._version_picker.force_blockstate,
-                self._picker.namespace,
-                self._picker.name,
-                properties,
-            )
-        right_sizer.Add(self._property_picker, 1, wx.EXPAND)
-        self._property_picker.Bind(
-            EVT_SINGLE_PROPERTIES_CHANGE, self._on_property_change
-        )
-
-        self.SetSizerAndFit(self._sizer)
-        self.Layout()
-
-    @property
-    def wildcard_mode(self) -> bool:
-        """
-        Is the UI in wildcard mode.
-        If True multiple property values can be selected.
-        These can be accessed through :attr:`extra_properties`
-        """
-        return self._wildcard_mode
-
-    def _on_picker_change(self, evt):
-        self._update_properties()
-        evt.Skip()
-
-    def _on_property_change(self, evt):
-        self.Layout()
-        evt.Skip()
-
-    def _update_properties(self):
-        self._property_picker.version_block = (
+        self._property_picker = SinglePropertySelect(
+            self,
+            translation_manager,
             self._version_picker.platform,
             self._version_picker.version_number,
             self._version_picker.force_blockstate,
             self._picker.namespace,
             self._picker.name,
+            properties,
+        )
+        right_sizer.Add(self._property_picker, 1, wx.EXPAND)
+        self._property_picker.Bind(
+            EVT_SINGLE_PROPERTIES_CHANGE, self._on_property_change
         )
 
-    @property
-    def force_blockstate(self) -> bool:
-        return self._version_picker.force_blockstate
-
-    @force_blockstate.setter
-    def force_blockstate(self, force_blockstate: bool):
-        self._version_picker.force_blockstate = force_blockstate
-
-    @property
-    def block_name(self) -> str:
-        return self._picker.name
-
-    @block_name.setter
-    def block_name(self, block_name: str):
-        self._picker.name = block_name
+        self.Layout()
 
     @property
     def properties(self) -> PropertyType:

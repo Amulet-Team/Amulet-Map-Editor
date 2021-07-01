@@ -2,7 +2,7 @@ import wx
 from amulet_map_editor.api.wx.ui.mc.block.block_select import (
     demo as block_select_demo,
 )
-from amulet_map_editor.api.wx.ui.mc.block.block_define import (
+from amulet_map_editor.api.wx.ui.mc.block.define import (
     demo as block_define_demo,
 )
 

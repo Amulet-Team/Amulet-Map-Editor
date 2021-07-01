@@ -60,7 +60,7 @@ class BaseDefine(wx.Panel):
         left_sizer.Add(self._picker, 1, wx.EXPAND | wx.TOP, 5)
         self._picker.Bind(EVT_ITEM_CHANGE, self._on_picker_change)
 
-        self.SetSizerAndFit(self._sizer)
+        self.SetSizer(self._sizer)
         self.Layout()
 
     def _on_picker_change(self, evt):

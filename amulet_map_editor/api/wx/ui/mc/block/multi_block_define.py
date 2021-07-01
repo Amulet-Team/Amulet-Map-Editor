@@ -12,7 +12,7 @@ from amulet_map_editor.api.image import (
     MAXIMIZE,
     MINIMIZE,
 )
-from amulet_map_editor.api.wx.ui.mc.block import BlockDefine
+from amulet_map_editor.api.wx.ui.mc.block.define import BlockDefine
 from amulet_map_editor.api.wx.ui.mc.block.properties import EVT_SINGLE_PROPERTIES_CHANGE
 
 

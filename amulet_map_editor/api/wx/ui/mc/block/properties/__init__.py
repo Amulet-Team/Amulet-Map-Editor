@@ -1,3 +1,4 @@
+from .base import BasePropertySelect
 from .single import (
     SinglePropertySelect,
     SinglePropertiesChangeEvent,
