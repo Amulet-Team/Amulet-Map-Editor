@@ -26,6 +26,25 @@ def load_requirements(path: str) -> List[str]:
 
 required_packages = load_requirements("./requirements.txt")
 
+try:
+    # try and freeze the requirements if already installed
+    from pip._internal.operations import freeze
+
+    first_party = {
+        "amulet-core",
+        "amulet-nbt",
+        "pymctranslate",
+        "minecraft-resource-pack",
+    }
+    installed = {r.split("==")[0].lower(): r for r in freeze.freeze() if "==" in r}
+    for index, r in enumerate(required_packages):
+        if r[0] != "#" and "~=" in r:
+            req = r.split("~=")[0]
+            if req in first_party and req in installed:
+                required_packages[index] = installed[req]
+except:
+    pass
+
 package_data = [
     os.path.relpath(path, "amulet_map_editor")
     for path in set(
