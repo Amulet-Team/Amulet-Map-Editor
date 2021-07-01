@@ -1,8 +1,8 @@
 import wx
-from amulet_map_editor.api.wx.ui.mc.version_select.platform_select import (
+from amulet_map_editor.api.wx.ui.mc.version.platform_select import (
     demo as platform_demo,
 )
-from amulet_map_editor.api.wx.ui.mc.version_select.version_select import (
+from amulet_map_editor.api.wx.ui.mc.version.version_select import (
     demo as version_demo,
 )
 

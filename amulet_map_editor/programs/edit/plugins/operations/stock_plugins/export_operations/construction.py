@@ -7,7 +7,7 @@ from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.level.formats.construction import ConstructionFormatWrapper
 
-from amulet_map_editor.api.wx.ui.mc.version_select import VersionSelect
+from amulet_map_editor.api.wx.ui.mc.version import VersionSelect
 from amulet_map_editor.programs.edit.api.operations import (
     SimpleOperationPanel,
     OperationError,

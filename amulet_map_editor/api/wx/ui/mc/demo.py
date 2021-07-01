@@ -1,4 +1,4 @@
-from amulet_map_editor.api.wx.ui.mc.version_select.demo import demo as version_select_demo
+from amulet_map_editor.api.wx.ui.mc.version.demo import demo as version_select_demo
 from amulet_map_editor.api.wx.ui.mc.biome.demo import demo as biome_demo
 from amulet_map_editor.api.wx.ui.mc.block.demo import demo as block_demo
 

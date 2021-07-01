@@ -6,7 +6,7 @@ import PyMCTranslate
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 
 from amulet_map_editor.api.wx.ui.mc.base.base_select import EVT_ITEM_CHANGE, BaseSelect
-from amulet_map_editor.api.wx.ui.mc.version_select import (
+from amulet_map_editor.api.wx.ui.mc.version import (
     VersionSelect,
     EVT_VERSION_CHANGE,
 )
