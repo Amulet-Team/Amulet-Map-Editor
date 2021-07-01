@@ -2,7 +2,7 @@ import wx
 from typing import Dict, List, Tuple
 
 import PyMCTranslate
-from amulet.api.block import PropertyValueType
+from amulet.api.block import PropertyTypeMultiple
 from ..events import MultiplePropertiesChangeEvent
 from ..base import BaseMultipleProperty
 from .popup import PropertyValueComboPopup
@@ -69,13 +69,12 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
                 self._properties[name] = (choice, popup)
 
             create_choice()
-        self.properties = self._specification.get("defaults", {})
         self.Fit()
         self.GetTopLevelParent().Layout()
         self.Thaw()
 
     @property
-    def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
+    def extra_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
@@ -85,7 +84,7 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
         }
 
     @extra_properties.setter
-    def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
+    def extra_properties(self, properties: PropertyTypeMultiple):
         self.Freeze()
         for name, nbt_tuple in properties.items():
             if name in self._properties:

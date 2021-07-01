@@ -1,8 +1,8 @@
 import wx
-from typing import Tuple, Dict
+from typing import Tuple
 
 import PyMCTranslate
-from amulet.api.block import PropertyType, PropertyValueType
+from amulet.api.block import PropertyTypeMultiple
 from ..base import BasePropertySelect
 
 from .automatic import AutomaticMultipleProperty
@@ -25,7 +25,7 @@ class MultiplePropertySelect(BasePropertySelect):
         force_blockstate: bool,
         namespace: str,
         block_name: str,
-        properties: PropertyType = None,
+        properties: PropertyTypeMultiple = None,
     ):
         super().__init__(
             parent,
@@ -49,13 +49,7 @@ class MultiplePropertySelect(BasePropertySelect):
         self._set_properties(properties)
         self._rebuild_ui()
 
-    def _get_properties(self) -> PropertyType:
-        if self._manual_enabled:
-            return self._manual.properties
-        else:
-            return self._simple.properties
-
-    def _set_properties(self, properties: PropertyType):
+    def _set_properties(self, properties: PropertyTypeMultiple):
         self.Freeze()
         if self._manual_enabled:
             self._manual.properties = properties
@@ -65,7 +59,7 @@ class MultiplePropertySelect(BasePropertySelect):
         self.Thaw()
 
     @property
-    def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
+    def extra_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
@@ -76,12 +70,12 @@ class MultiplePropertySelect(BasePropertySelect):
             return self._simple.extra_properties
 
     @extra_properties.setter
-    def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
+    def extra_properties(self, extra_properties: PropertyTypeMultiple):
         self.Freeze()
         if self._manual_enabled:
-            self._manual.extra_properties = properties
+            self._manual.extra_properties = extra_properties
         else:
-            self._simple.extra_properties = properties
+            self._simple.extra_properties = extra_properties
         self.TopLevelParent.Layout()
         self.Thaw()
 

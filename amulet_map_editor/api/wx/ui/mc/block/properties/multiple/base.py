@@ -1,8 +1,7 @@
 import wx
-from typing import Dict, Tuple
 
 import PyMCTranslate
-from amulet.api.block import PropertyValueType
+from amulet.api.block import PropertyTypeMultiple
 
 
 class BaseMultipleProperty(wx.Panel):
@@ -17,7 +16,7 @@ class BaseMultipleProperty(wx.Panel):
         self._translation_manager = translation_manager
 
     @property
-    def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
+    def extra_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
@@ -25,5 +24,5 @@ class BaseMultipleProperty(wx.Panel):
         raise NotImplementedError
 
     @extra_properties.setter
-    def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
+    def extra_properties(self, properties: PropertyTypeMultiple):
         raise NotImplementedError

@@ -4,7 +4,7 @@ from typing import Tuple, Dict
 import PyMCTranslate
 import amulet_nbt
 from amulet_nbt import SNBTType
-from amulet.api.block import PropertyDataTypes, PropertyType, PropertyValueType
+from amulet.api.block import PropertyDataTypes, PropertyType, PropertyTypeMultiple
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 from .events import MultiplePropertiesChangeEvent
 from .base import BaseMultipleProperty
@@ -122,7 +122,7 @@ class ManualMultipleProperty(BaseMultipleProperty):
 
     # TODO: implement this properly
     @property
-    def extra_properties(self) -> Dict[str, Tuple[PropertyValueType, ...]]:
+    def extra_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
@@ -130,7 +130,7 @@ class ManualMultipleProperty(BaseMultipleProperty):
         return {prop: (val,) for prop, val in self.properties.items()}
 
     @extra_properties.setter
-    def extra_properties(self, properties: Dict[str, Tuple[PropertyValueType, ...]]):
+    def extra_properties(self, properties: PropertyTypeMultiple):
         props = {}
         for prop, val in properties:
             if val:
