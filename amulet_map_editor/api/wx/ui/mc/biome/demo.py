@@ -1,8 +1,8 @@
 import wx
-from amulet_map_editor.api.wx.ui.biome_select.biome_select import (
+from amulet_map_editor.api.wx.ui.mc.biome.biome_select import (
     demo as biome_select_demo,
 )
-from amulet_map_editor.api.wx.ui.biome_select.biome_define import (
+from amulet_map_editor.api.wx.ui.mc.biome.biome_define import (
     demo as biome_define_demo,
 )
 

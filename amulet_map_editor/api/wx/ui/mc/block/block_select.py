@@ -3,7 +3,7 @@ from typing import Tuple
 
 import PyMCTranslate
 
-from amulet_map_editor.api.wx.ui.base_select import BaseSelect
+from amulet_map_editor.api.wx.ui.mc.base.base_select import BaseSelect
 
 
 class BlockSelect(BaseSelect):

@@ -4,8 +4,8 @@ import numpy
 
 from amulet.api.block import Block
 
-from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine
+from amulet_map_editor.api.wx.ui.mc.base.base_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.mc.block import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 

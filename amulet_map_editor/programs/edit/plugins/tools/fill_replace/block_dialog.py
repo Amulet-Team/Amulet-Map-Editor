@@ -3,7 +3,7 @@ import wx
 import PyMCTranslate
 from amulet.api.block import Block
 from amulet.api.block_entity import BlockEntity
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine
+from amulet_map_editor.api.wx.ui.mc.block import BlockDefine
 
 
 class BlockSelectDialog(wx.Dialog):

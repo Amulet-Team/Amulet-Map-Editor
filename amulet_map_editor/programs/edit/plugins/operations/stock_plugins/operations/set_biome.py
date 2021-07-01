@@ -5,8 +5,8 @@ import math
 
 from amulet.utils import block_coords_to_chunk_coords
 from amulet.api.chunk.biomes import BiomesShape
-from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
-from amulet_map_editor.api.wx.ui.biome_select import BiomeDefine
+from amulet_map_editor.api.wx.ui.mc.base.base_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.mc.biome import BiomeDefine
 from amulet_map_editor.programs.edit.api.operations import SimpleOperationPanel
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 

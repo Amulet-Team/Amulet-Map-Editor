@@ -12,7 +12,10 @@ from amulet_map_editor.api.image import (
     MAXIMIZE,
     MINIMIZE,
 )
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine, EVT_PROPERTIES_CHANGE
+from amulet_map_editor.api.wx.ui.mc.block import (
+    BlockDefine
+)
+from amulet_map_editor.api.wx.ui.mc.block.properties import EVT_SINGLE_PROPERTIES_CHANGE
 
 
 class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
@@ -150,7 +153,7 @@ class _CollapsibleBlockDefine(wx.Panel):
         self.expand_button.Bind(
             wx.EVT_BUTTON, lambda evt: self._toggle_block_expand(parent)
         )
-        self.block_define.Bind(EVT_PROPERTIES_CHANGE, self._on_properties_change)
+        self.block_define.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._on_properties_change)
 
     @property
     def collapsed(self) -> bool:
@@ -180,10 +183,7 @@ class _CollapsibleBlockDefine(wx.Panel):
     def _gen_block_string(self):
         base = f"{self.block_define.namespace}:{self.block_define.block_name}"
         properties = ",".join(
-            (
-                f"{key}={value}"
-                for key, value in self.block_define.str_properties.items()
-            )
+            (f"{key}={value}" for key, value in self.block_define.properties.items())
         )
         return f"{base}[{properties}]" if properties else base
 

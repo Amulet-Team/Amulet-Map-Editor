@@ -6,12 +6,11 @@ import PyMCTranslate
 from amulet.api.block import PropertyType, Block
 from amulet.api.block_entity import BlockEntity
 
-from amulet_map_editor.api.wx.ui.base_define import BaseDefine
-from amulet_map_editor.api.wx.ui.block_select import BlockSelect
+from amulet_map_editor.api.wx.ui.mc.base.base_define import BaseDefine
+from amulet_map_editor.api.wx.ui.mc.block import BlockSelect
 
-from amulet_map_editor.api.wx.ui.block_select.properties import (
+from amulet_map_editor.api.wx.ui.mc.block.properties import (
     SinglePropertySelect,
-    MultiplePropertySelect,
     EVT_SINGLE_PROPERTIES_CHANGE,
 )
 

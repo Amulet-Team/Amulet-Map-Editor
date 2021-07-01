@@ -3,8 +3,8 @@ from typing import Tuple
 import PyMCTranslate
 import wx
 
-from amulet_map_editor.api.wx.ui.base_define import BaseDefine
-from amulet_map_editor.api.wx.ui.biome_select.biome_select import BiomeSelect
+from amulet_map_editor.api.wx.ui.mc.base.base_define import BaseDefine
+from amulet_map_editor.api.wx.ui.mc.biome.biome_select import BiomeSelect
 
 
 class BiomeDefine(BaseDefine):
