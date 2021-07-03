@@ -7,7 +7,7 @@ if sys.version_info[:2] < (3, 7):
 
 import os
 import traceback
-import wx.__version__
+import wx
 from amulet_map_editor import log
 from amulet_map_editor.api.framework import AmuletApp
 
