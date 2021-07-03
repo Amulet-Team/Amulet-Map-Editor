@@ -1,9 +1,9 @@
 from amulet_map_editor.api.wx.ui.simple import SimpleChoice, SimpleChoiceAny
 import wx
 import PyMCTranslate
-from typing import Tuple, Optional
+from typing import Optional
 
-from amulet.api.data_types import VersionNumberTuple, PlatformType
+from amulet.api.data_types import VersionNumberTuple, PlatformType, VersionGroupType
 from .platform_select import PlatformSelect
 from .events import (
     PlatformChangeEvent,
@@ -119,11 +119,11 @@ class VersionSelect(PlatformSelect):
             self._blockstate_choice.SetSelection(int(force_blockstate))
 
     @property
-    def version(self) -> Tuple[PlatformType, VersionNumberTuple, bool]:
+    def version(self) -> VersionGroupType:
         return self.platform, self.version_number, self.force_blockstate
 
     @version.setter
-    def version(self, version: Tuple[PlatformType, VersionNumberTuple, bool]):
+    def version(self, version: VersionGroupType):
         platform, version_number, force_blockstate = version
         self._set_platform(platform)
         self._set_version_number(version_number)
