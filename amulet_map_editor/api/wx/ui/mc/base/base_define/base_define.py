@@ -10,9 +10,10 @@ from amulet_map_editor.api.wx.ui.mc.version import (
     VersionSelect,
     EVT_VERSION_CHANGE,
 )
+from .api import BaseDefineAPI
 
 
-class BaseDefine(wx.Panel):
+class BaseDefine(wx.Panel, BaseDefineAPI):
     def __init__(
         self,
         parent,
@@ -89,14 +90,6 @@ class BaseDefine(wx.Panel):
     @version_number.setter
     def version_number(self, version_number: VersionNumberTuple):
         self._version_picker.version_number = version_number
-
-    @property
-    def version(self) -> Tuple[PlatformType, VersionNumberTuple, bool]:
-        return self._version_picker.version
-
-    @version.setter
-    def version(self, version: Tuple[PlatformType, VersionNumberTuple, bool]):
-        self._version_picker.version = version
 
     @property
     def namespace(self) -> str:
