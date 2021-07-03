@@ -10,10 +10,11 @@ from amulet_map_editor.api.wx.ui.mc.block.properties import (
     SinglePropertySelect,
     EVT_SINGLE_PROPERTIES_CHANGE,
 )
-from amulet_map_editor.api.wx.ui.mc.block.define.base import BaseBlockDefine
+from amulet_map_editor.api.wx.ui.mc.block.define.widget.base import BaseBlockDefine
+from amulet_map_editor.api.wx.ui.mc.block.define.api import NormalBlockDefineAPI
 
 
-class BlockDefine(BaseBlockDefine):
+class BlockDefine(BaseBlockDefine, NormalBlockDefineAPI):
     """
     A UI that merges a version select widget with a block select widget and a property select.
     """

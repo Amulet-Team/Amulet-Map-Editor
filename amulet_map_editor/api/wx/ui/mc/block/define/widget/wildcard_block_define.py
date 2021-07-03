@@ -9,10 +9,11 @@ from amulet_map_editor.api.wx.ui.mc.block.properties import (
     MultiplePropertySelect,
     EVT_MULTIPLE_PROPERTIES_CHANGE,
 )
-from amulet_map_editor.api.wx.ui.mc.block.define.base import BaseBlockDefine
+from amulet_map_editor.api.wx.ui.mc.block.define.widget.base import BaseBlockDefine
+from amulet_map_editor.api.wx.ui.mc.block.define.api import WildcardBlockDefineAPI
 
 
-class WildcardBlockDefine(BaseBlockDefine):
+class WildcardBlockDefine(BaseBlockDefine, WildcardBlockDefineAPI):
     """
     A UI that merges a version select widget with a block select widget and a multi property select.
     """

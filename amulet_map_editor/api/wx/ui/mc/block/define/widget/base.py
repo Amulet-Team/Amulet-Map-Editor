@@ -9,9 +9,10 @@ from amulet_map_editor.api.wx.ui.mc.block import BlockSelect
 from amulet_map_editor.api.wx.ui.mc.block.properties import (
     BasePropertySelect,
 )
+from amulet_map_editor.api.wx.ui.mc.block.define.api import BaseBlockDefineAPI
 
 
-class BaseBlockDefine(BaseDefine):
+class BaseBlockDefine(BaseDefine, BaseBlockDefineAPI):
     """
     A UI that merges a version select widget with a block select widget and a property select.
     """
