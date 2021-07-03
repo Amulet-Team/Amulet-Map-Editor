@@ -7,13 +7,13 @@ if sys.version_info[:2] < (3, 7):
 
 import os
 import traceback
-import wx.__version__
+import wx
 from amulet_map_editor import log
 from amulet_map_editor.api.framework import AmuletApp
 
 
 if __name__ == "__main__":
-    if sys.platform == "linux" and wx.__version__.VERSION >= (4, 1, 1):
+    if sys.platform == "linux" and wx.VERSION >= (4, 1, 1):
         # bug 247
         os.environ["PYOPENGL_PLATFORM"] = "egl"
     try:
