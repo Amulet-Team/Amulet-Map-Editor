@@ -10,10 +10,10 @@ from amulet_map_editor.api.wx.ui.mc.version import (
     VersionSelect,
     EVT_VERSION_CHANGE,
 )
-from .api import BaseDefineAPI
+from amulet_map_editor.api.wx.ui.mc.base.api import BaseMCVersionAPI
 
 
-class BaseDefine(wx.Panel, BaseDefineAPI):
+class BaseDefine(wx.Panel, BaseMCVersionAPI):
     def __init__(
         self,
         parent,
