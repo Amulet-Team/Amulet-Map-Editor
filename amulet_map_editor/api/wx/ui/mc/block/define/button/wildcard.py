@@ -5,23 +5,36 @@ from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlockAPI
 from amulet_map_editor.api.wx.ui.mc.block.define.widget import WildcardBlockDefine
-from amulet_map_editor.api.wx.ui.mc.block.define.button.base import BaseBlockDefineButton
+from amulet_map_editor.api.wx.ui.mc.block.define.button.base import (
+    BaseBlockDefineButton,
+)
 
 
 class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlockAPI):
-    def __init__(self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager, *args, **kwargs):
+    def __init__(
+        self,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        *args,
+        **kwargs,
+    ):
         super().__init__(parent)
         self._dialog = SimpleDialog(parent, "Pick a Block")
-        self._block_widget = WildcardBlockDefine(self._dialog, translation_manager, wx.HORIZONTAL, *args, **kwargs)
+        self._block_widget = WildcardBlockDefine(
+            self._dialog, translation_manager, wx.HORIZONTAL, *args, **kwargs
+        )
         self._dialog.sizer.Add(self._block_widget)
         self.update_button()
 
     def update_button(self):
         """Update the text on the button from the internal state."""
         if self.selected_properties:
-            properties = [f"{key}:({'|'.join([v.to_snbt() for v in val])})" for key, val in self.selected_properties.items()]
+            properties = [
+                f"{key}:({'|'.join([v.to_snbt() for v in val])})"
+                for key, val in self.selected_properties.items()
+            ]
             self.SetLabel(f"{self.namespace}:{self.block_name}[{','.join(properties)}]")
-            properties_str = ',\n'.join(properties)
+            properties_str = ",\n".join(properties)
             self.SetToolTip(f"{self.namespace}:{self.block_name}[\n{properties_str}\n]")
         else:
             self.SetLabel(f"{self.namespace}:{self.block_name}")

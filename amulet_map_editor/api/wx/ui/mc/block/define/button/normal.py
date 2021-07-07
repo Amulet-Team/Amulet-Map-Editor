@@ -8,14 +8,24 @@ from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.api.wx.ui.mc.base import NormalMCBlockAPI
 from amulet_map_editor.api.wx.ui.mc.block.define.widget import BlockDefine
 
-from amulet_map_editor.api.wx.ui.mc.block.define.button.base import BaseBlockDefineButton
+from amulet_map_editor.api.wx.ui.mc.block.define.button.base import (
+    BaseBlockDefineButton,
+)
 
 
 class BlockDefineButton(BaseBlockDefineButton, NormalMCBlockAPI):
-    def __init__(self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager, *args, **kwargs):
+    def __init__(
+        self,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        *args,
+        **kwargs
+    ):
         super().__init__(parent)
         self._dialog = SimpleDialog(parent, "Pick a Block")
-        self._block_widget = BlockDefine(self._dialog, translation_manager, wx.HORIZONTAL, *args, **kwargs)
+        self._block_widget = BlockDefine(
+            self._dialog, translation_manager, wx.HORIZONTAL, *args, **kwargs
+        )
         self._dialog.sizer.Add(self._block_widget)
         self.update_button()
 
