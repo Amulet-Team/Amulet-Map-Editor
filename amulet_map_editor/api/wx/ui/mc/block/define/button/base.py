@@ -20,6 +20,9 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockAPI):
         self._dialog.Fit()
         if self._dialog.ShowModal() == wx.ID_OK:
             self.update_button()
+        # TODO: There is currently a bug if the user clicks cancel and clicks the button again the UI will not get reset.
+        #  In order to fix this, this class will need to store the state outside of the UI.
+        #  This should probably be done for all the UI elements
 
     def update_button(self):
         """Update the text on the button from the internal state."""
