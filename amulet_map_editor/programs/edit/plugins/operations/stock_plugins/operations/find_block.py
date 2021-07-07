@@ -147,22 +147,12 @@ class FindBlock(SimpleOperationPanel):
                     z_values,
                 )
             )
-            '''
-            for x, y, z in zip(x_values, y_values, z_values):
-                block_locations.append(
-                    (
-                        chunk.cx + block_selection.start_x + x,
-                        block_selection.start_y + y,
-                        chunk.cz + block_selection.start_z + z,
-                    )
-                )
-            '''
             count += 1
             yield count / iter_count, "Searching blocks..."
 
         result = {
             world.translation_manager.get_version(
-                world.level_wrapper.platform, world.level_wrapper.version
+                self._block_define.platform, self._block_define.version_number
             )
             .block.from_universal(world.block_palette[target])[0]
             .full_blockstate: block_locations
@@ -177,7 +167,7 @@ class FindBlock(SimpleOperationPanel):
     ):
         blocks_to_find = set()
         block_translator = world.translation_manager.get_version(
-            world.level_wrapper.platform, world.level_wrapper.version
+            self._block_define.platform, self._block_define.version_number
         ).block
         versioned_block = block_translator.from_universal(self._get_target_block())[0]
         versioned_block_name = versioned_block.namespaced_name
@@ -193,15 +183,19 @@ class FindBlock(SimpleOperationPanel):
         # world, then it wouldn't be present in the block_palette and thus would be skipped
         # but to users this may not seem straightforward since it would look like the operation
         # is missing blockstates when the results window is shown
-        blocks_to_find = blocks_to_find.union(
-            filter(
-                lambda b: b[1].namespaced_name == versioned_block_name,
-                map(
-                    lambda b: (b[0], block_translator.from_universal(b[1])[0]),
-                    world.block_palette.items(),
+        def find_blocks():
+            return blocks_to_find.union(
+                filter(
+                    lambda b: b[1].namespaced_name == versioned_block_name,
+                    map(
+                        lambda b: (b[0], block_translator.from_universal(b[1])[0]),
+                        world.block_palette.items(),
+                    ),
                 ),
-            ),
-        )
+            )
+        blocks_to_find = find_blocks()
+
+        block_palette_length = len(world.block_palette)
 
         chunk_slices = list(world.get_chunk_slice_box(dimension, selection, False))
 
@@ -211,15 +205,17 @@ class FindBlock(SimpleOperationPanel):
 
         results = {block.full_blockstate: [] for _, block in blocks_to_find}
 
-        for internal_id, block in blocks_to_find:
-            extend_func = results[block.full_blockstate].extend
-            for chunk, slices, _ in chunk_slices:
+        for chunk, slices, _ in chunk_slices:
+            if len(world.block_palette) > block_palette_length:
+                blocks_to_find = find_blocks()
+
+            for internal_id, block in blocks_to_find:
                 block_selection = chunk.blocks[slices]
                 x_values, y_values, z_values = numpy.where(
                     block_selection == internal_id
                 )
 
-                extend_func(
+                results[block.full_blockstate].extend(
                     map(
                         lambda x, y, z: (
                             chunk.cx + block_selection.start_x + x,
