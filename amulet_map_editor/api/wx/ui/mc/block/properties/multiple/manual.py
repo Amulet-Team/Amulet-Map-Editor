@@ -40,7 +40,7 @@ class ManualMultipleProperty(BaseMultipleProperty):
         self._properties: Dict[int, Tuple[wx.TextCtrl, wx.TextCtrl]] = {}
 
     def _post_property_change(self):
-        wx.PostEvent(self, MultiplePropertiesChangeEvent(self.extra_properties))
+        wx.PostEvent(self, MultiplePropertiesChangeEvent(self.selected_properties))
 
     def _add_property(self, name: str = "", value: SNBTType = ""):
         self.Freeze()
@@ -122,17 +122,25 @@ class ManualMultipleProperty(BaseMultipleProperty):
 
     # TODO: implement this properly
     @property
-    def extra_properties(self) -> PropertyTypeMultiple:
-        """
-        The values that are checked for each property.
-        This UI can have more than one property value checked (ticked).
-        """
+    def selected_properties(self) -> PropertyTypeMultiple:
         return {prop: (val,) for prop, val in self.properties.items()}
 
-    @extra_properties.setter
-    def extra_properties(self, properties: PropertyTypeMultiple):
+    @selected_properties.setter
+    def selected_properties(self, properties: PropertyTypeMultiple):
         props = {}
         for prop, val in properties:
+            if val:
+                props[prop] = val[0]
+        self.properties = props
+
+    @property
+    def all_properties(self) -> PropertyTypeMultiple:
+        return {prop: (val,) for prop, val in self.properties.items()}
+
+    @all_properties.setter
+    def all_properties(self, all_properties: PropertyTypeMultiple):
+        props = {}
+        for prop, val in all_properties:
             if val:
                 props[prop] = val[0]
         self.properties = props

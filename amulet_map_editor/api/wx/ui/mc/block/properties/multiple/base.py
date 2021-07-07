@@ -16,13 +16,25 @@ class BaseMultipleProperty(wx.Panel):
         self._translation_manager = translation_manager
 
     @property
-    def extra_properties(self) -> PropertyTypeMultiple:
+    def all_properties(self) -> PropertyTypeMultiple:
+        """
+        All the states defined for every property.
+        This contains all values regardless of if they are selected or not.
+        """
+        raise NotImplementedError
+
+    @all_properties.setter
+    def all_properties(self, all_properties: PropertyTypeMultiple):
+        raise NotImplementedError
+
+    @property
+    def selected_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
         """
         raise NotImplementedError
 
-    @extra_properties.setter
-    def extra_properties(self, properties: PropertyTypeMultiple):
+    @selected_properties.setter
+    def selected_properties(self, selected_properties: PropertyTypeMultiple):
         raise NotImplementedError

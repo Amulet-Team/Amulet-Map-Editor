@@ -66,16 +66,25 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlockAPI):
         self.Layout()
 
     @property
-    def extra_properties(self) -> PropertyTypeMultiple:
+    def selected_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
         """
-        return self._property_picker.extra_properties
+        return self._property_picker.selected_properties
 
-    @extra_properties.setter
-    def extra_properties(self, extra_properties: PropertyTypeMultiple):
-        self._property_picker.extra_properties = extra_properties
+    @selected_properties.setter
+    def selected_properties(self, selected_properties: PropertyTypeMultiple):
+        self._property_picker.selected_properties = selected_properties
+
+    @property
+    def all_properties(self) -> PropertyTypeMultiple:
+        """The values that exist for every property."""
+        return self._property_picker.all_properties
+
+    @all_properties.setter
+    def all_properties(self, all_properties: PropertyTypeMultiple):
+        self._property_picker.all_properties = all_properties
 
 
 def demo():

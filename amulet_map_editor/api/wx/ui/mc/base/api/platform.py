@@ -12,5 +12,3 @@ class BaseMCPlatformAPI:
     def platform(self, platform: PlatformType):
         raise NotImplementedError
 
-    def set_platform(self, platform: PlatformType):
-        raise NotImplementedError

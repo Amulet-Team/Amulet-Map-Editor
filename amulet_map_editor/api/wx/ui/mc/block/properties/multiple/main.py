@@ -59,23 +59,44 @@ class MultiplePropertySelect(BasePropertySelect):
         self.Thaw()
 
     @property
-    def extra_properties(self) -> PropertyTypeMultiple:
+    def selected_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
         """
         if self._manual_enabled:
-            return self._manual.extra_properties
+            return self._manual.selected_properties
         else:
-            return self._simple.extra_properties
+            return self._simple.selected_properties
 
-    @extra_properties.setter
-    def extra_properties(self, extra_properties: PropertyTypeMultiple):
+    @selected_properties.setter
+    def selected_properties(self, selected_properties: PropertyTypeMultiple):
         self.Freeze()
         if self._manual_enabled:
-            self._manual.extra_properties = extra_properties
+            self._manual.selected_properties = selected_properties
         else:
-            self._simple.extra_properties = extra_properties
+            self._simple.selected_properties = selected_properties
+        self.TopLevelParent.Layout()
+        self.Thaw()
+
+    @property
+    def all_properties(self) -> PropertyTypeMultiple:
+        """
+        The values that are checked for each property.
+        This UI can have more than one property value checked (ticked).
+        """
+        if self._manual_enabled:
+            return self._manual.all_properties
+        else:
+            return self._simple.all_properties
+
+    @all_properties.setter
+    def all_properties(self, all_properties: PropertyTypeMultiple):
+        self.Freeze()
+        if self._manual_enabled:
+            self._manual.all_properties = all_properties
+        else:
+            self._simple.all_properties = all_properties
         self.TopLevelParent.Layout()
         self.Thaw()
 

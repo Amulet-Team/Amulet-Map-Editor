@@ -59,7 +59,7 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
                     choice.SetValue(popup.GetStringValue())
                     wx.PostEvent(
                         self,
-                        MultiplePropertiesChangeEvent(self.extra_properties),
+                        MultiplePropertiesChangeEvent(self.selected_properties),
                     )
 
                 choice.Bind(
@@ -74,7 +74,7 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
         self.Thaw()
 
     @property
-    def extra_properties(self) -> PropertyTypeMultiple:
+    def selected_properties(self) -> PropertyTypeMultiple:
         """
         The values that are checked for each property.
         This UI can have more than one property value checked (ticked).
@@ -83,8 +83,8 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
             prop: popup.checked_nbt for prop, (_, popup) in self._properties.items()
         }
 
-    @extra_properties.setter
-    def extra_properties(self, properties: PropertyTypeMultiple):
+    @selected_properties.setter
+    def selected_properties(self, properties: PropertyTypeMultiple):
         self.Freeze()
         for name, nbt_tuple in properties.items():
             if name in self._properties:

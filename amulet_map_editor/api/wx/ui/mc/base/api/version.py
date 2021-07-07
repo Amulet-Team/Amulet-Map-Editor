@@ -11,9 +11,6 @@ class BaseMCVersionAPI(BaseMCPlatformAPI):
     def version_number(self, version_number: VersionNumberTuple):
         raise NotImplementedError
 
-    def set_version_number(self, version_number: VersionNumberTuple):
-        raise NotImplementedError
-
     @property
     def force_blockstate(self) -> bool:
         raise NotImplementedError
@@ -22,5 +19,3 @@ class BaseMCVersionAPI(BaseMCPlatformAPI):
     def force_blockstate(self, force_blockstate: bool):
         raise NotImplementedError
 
-    def set_force_blockstate(self, force_blockstate: bool):
-        raise NotImplementedError
