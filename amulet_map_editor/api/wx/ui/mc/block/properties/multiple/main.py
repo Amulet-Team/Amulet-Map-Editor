@@ -46,17 +46,8 @@ class MultiplePropertySelect(BasePropertySelect):
 
         if properties is None:
             properties = {}
-        self._set_properties(properties)
+        self.selected_properties = properties
         self._rebuild_ui()
-
-    def _set_properties(self, properties: PropertyTypeMultiple):
-        self.Freeze()
-        if self._manual_enabled:
-            self._manual.properties = properties
-        else:
-            self._simple.properties = properties
-        self.TopLevelParent.Layout()
-        self.Thaw()
 
     @property
     def selected_properties(self) -> PropertyTypeMultiple:

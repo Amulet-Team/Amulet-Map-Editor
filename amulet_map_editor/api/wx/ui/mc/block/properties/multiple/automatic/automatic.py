@@ -92,3 +92,11 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
                 popup.checked_nbt = nbt_tuple
                 choice.SetValue(popup.GetStringValue())
         self.Thaw()
+
+    @property
+    def all_properties(self) -> PropertyTypeMultiple:
+        return {prop: popup.all_nbt for prop, (_, popup) in self._properties.items()}
+
+    @all_properties.setter
+    def all_properties(self, all_properties: PropertyTypeMultiple):
+        pass

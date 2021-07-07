@@ -42,6 +42,16 @@ class PropertyValueCheckList(wx.Panel):
     def checked_nbt(self, checked_nbt: Iterable[PropertyValueType]):
         self._check_list_box.SetCheckedStrings([v.to_snbt() for v in checked_nbt])
 
+    @property
+    def all_nbt(self) -> Tuple[PropertyValueType, ...]:
+        nbt = []
+        for entry in self._check_list_box.GetStrings():
+            try:
+                nbt.append(amulet_nbt.from_snbt(entry))
+            except:
+                pass
+        return tuple(nbt)
+
     def _on_toggle(self, evt):
         if self._toggle_checkbox.GetValue():
             self._check_list_box.SetCheckedItems(
@@ -74,6 +84,10 @@ class PropertyValueComboPopup(wx.ComboPopup):
         super().__init__()
         self._check_list: Optional[PropertyValueCheckList] = None
         self._values = values
+
+    @property
+    def all_nbt(self) -> Tuple[PropertyValueType, ...]:
+        return self._check_list.all_nbt
 
     @property
     def checked_nbt(self) -> Tuple[PropertyValueType, ...]:
