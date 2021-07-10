@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Tuple
 import urllib.request
 import threading
 import json
 import re
 import webbrowser
+from dataclasses import dataclass
 
 import wx
 
@@ -13,38 +13,72 @@ from amulet_map_editor import lang
 
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
 VERSION_REGEX = re.compile(
-    r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<bugfix>\d+))?(b(?P<beta>\d+))?$"
+    r"^v?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)((b(?P<beta>\d+)(\.dev(?P<devnum>\d{12}))?)|(a(?P<alpha>\d+)))?(.*\.g(?P<commit_hash>[a-z\d]{7}))?"
 )
 
 _EVT_UPDATE_CHECK = wx.NewEventType()
 EVT_UPDATE_CHECK = wx.PyEventBinder(_EVT_UPDATE_CHECK, 1)
 
+FULL_RELEASE = 0
+BETA_RELEASE = -1
+ALPHA_RELEASE = -2
 
-def get_version(version_string: str) -> Tuple[bool, Tuple[int, ...]]:
+
+@dataclass
+class Version:
+    release_stage: int
+    major: int
+    minor: int
+    patch: int
+    alpha_number: int = -1
+    beta_number: int = -1
+    nightly_timestamp: int = -1
+    has_commit_hash: bool = False
+
+    def __gt__(self, other: Version):
+        if self.version_tuple > other.version_tuple:
+            return True
+        if self.release_stage > other.release_stage:
+            return True
+        if self.release_stage == other.release_stage:
+            if self.release_stage == -2:
+                return self.alpha_number > other.alpha_number
+            elif self.release_stage == -1:
+                if self.beta_number > other.beta_number:
+                    return True
+                elif self.beta_number == other.beta_number and self.beta_number != -1:
+                    return self.nightly_timestamp > other.nightly_timestamp
+        return False
+
+    @property
+    def version_tuple(self):
+        return self.major, self.minor, self.patch
+
+
+def get_version(version_string: str) -> Version:
     """Parse the version into a more usable format
 
     :param version_string: The version string. Eg 1.2 or 1.2.3.4 or 1.2.3.4b0
-    :return: (bool(full_version), (major, minor, patch, bugfix, <beta>)) beta will not exist if it is not a beta
+    :return: (<release stage identifier>, (major, minor, patch)) beta will not exist if it is not a beta
     """
     version_match = VERSION_REGEX.match(version_string)
     if version_match:
         v = version_match.groupdict()
-        version = (
-            int(v["major"]),
-            int(v["minor"]),
-            int(
-                v["patch"] or 0,
-            ),
-            int(
-                v["bugfix"] or 0,
-            ),
-        )
-        if v["beta"] is None:
-            # full release
-            return (True, version)
-        else:
-            # beta release
-            return (False, version + (int(v["beta"]),))
+        major, minor, patch = int(v["major"]), int(v["minor"]), int(v["patch"])
+        version = Version(FULL_RELEASE, major, minor, patch)
+
+        if v.get("alpha") is not None:
+            version.release_stage = ALPHA_RELEASE
+            version.alpha_number = int(v["alpha"])
+        elif v.get("beta") is not None:
+            version.release_stage = BETA_RELEASE
+            version.beta_number = int(v["beta"])
+            if v.get("devnum") is not None:
+                version.nightly_timestamp = int(v["devnum"])
+
+        if v.get("commit_hash") is not None:
+            version.has_commit_hash = True
+        return version
 
     raise Exception(f"Invalid version string {version_string}")
 
@@ -76,27 +110,14 @@ class CheckForUpdate(threading.Thread):
             except Exception:
                 return
 
-            for release in data:
-                try:
-                    release_version = get_version(release["tag_name"])
-                except Exception:
-                    continue
-
-                if current_version[0] == release_version[0]:
-                    # if they are both full releases or betas
-                    if release_version[1] > current_version[1]:
-                        self._new_version = release["tag_name"]
-                        break
-                elif not current_version[0]:
-                    # if current is beta
-                    if release_version[0]:
-                        release_version = (
-                            release_version[0],
-                            release_version[1] + (float("inf"),),
-                        )
-                    if release_version[1] > current_version[1]:
-                        self._new_version = release["tag_name"]
-                        break
+            for release_version, release_data in sorted(
+                map(lambda d: (get_version(d["tag_name"]), d), data),
+                key=lambda t: t[0],
+                reverse=True,
+            ):
+                if release_version > current_version:
+                    self._new_version = release_data["tag_name"]
+                    break
 
             if self._new_version:
                 evt = UpdateEvent(_EVT_UPDATE_CHECK, -1, self._new_version)
@@ -153,6 +174,9 @@ class UpdateDialog(wx.Dialog):
 
 
 def show_update_window(parent, current_version: str, evt: UpdateEvent):
+    if get_version(current_version).has_commit_hash:
+        print("Running from source, not showing update dialog")
+        return
     UpdateDialog(parent, current_version, evt.GetVersion()).ShowModal()
 
 
