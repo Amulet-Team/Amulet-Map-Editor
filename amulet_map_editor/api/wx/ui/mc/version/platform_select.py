@@ -1,13 +1,14 @@
 from amulet_map_editor.api.wx.ui.simple import SimpleChoice
 import wx
 import PyMCTranslate
-from typing import Tuple, Type, Any
+from typing import Tuple, Type, Any, Dict
 
 from amulet.api.data_types import PlatformType
 from .events import PlatformChangeEvent
+from amulet_map_editor.api.wx.ui.mc.base.api.platform import BaseMCPlatform
 
 
-class PlatformSelect(wx.Panel):
+class PlatformSelect(wx.Panel, BaseMCPlatform):
     """
     A UI element that allows you to pick between the platforms in the translator.
     """
@@ -20,6 +21,7 @@ class PlatformSelect(wx.Panel):
         allow_universal: bool = True,
         allow_vanilla: bool = True,
         allowed_platforms: Tuple[PlatformType, ...] = None,
+        state: Dict[str, Any] = None,
         **kwargs
     ):
         """
@@ -31,10 +33,20 @@ class PlatformSelect(wx.Panel):
         :param allow_universal: If True the universal format will be included.
         :param allow_vanilla: If True the vanilla formats will be included.
         :param allowed_platforms: A whitelist of platforms.
+        :param state: A dictionary containing kwargs passed to the state manager.
         :param kwargs: Keyword args to be given to the Panel.
         """
+        state = state or {}
+        state.setdefault("translation_manager", translation_manager)
+        state.setdefault("platform", platform)
+        # This is the init call to the class that stores the internal state of the data.
+        # This needs to be at the start to ensure that the internal state is set up before anything else is done.
+        # It is not a direct call to init so that subclasses of this class can substitute in which state subclass is used.
+        self._init_state(state)
+
+        # Init the panel
         kwargs.setdefault("style", wx.BORDER_SIMPLE)
-        super().__init__(parent, **kwargs)
+        wx.Panel.__init__(self, parent, **kwargs)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
         self._sizer = wx.FlexGridSizer(2, 5, 5)
@@ -43,7 +55,6 @@ class PlatformSelect(wx.Panel):
         self._sizer.AddGrowableCol(0)
         self._sizer.AddGrowableCol(1)
 
-        self._translation_manager = translation_manager
         self._allow_universal = allow_universal
         self._allow_vanilla = allow_vanilla
         self._allowed_platforms = allowed_platforms
@@ -51,11 +62,18 @@ class PlatformSelect(wx.Panel):
             "Platform:", SimpleChoice
         )
         self._populate_platform()
-        self._set_platform(platform)
+        self._push_platform()
         self._platform_choice.Bind(
             wx.EVT_CHOICE,
-            lambda evt: wx.PostEvent(self, PlatformChangeEvent(self.platform)),
+            self._on_platform_change,
         )
+
+    def _init_state(self, state: Dict[str, Any]):
+        """
+        Call the init method of the state manager.
+        This is here so that nested classes do not have to init the state managers multiple times.
+        """
+        BaseMCPlatform.__init__(self, **state)
 
     def _add_ui_element(
         self, label: str, obj: Type[wx.Control], shown=True, **kwargs
@@ -69,24 +87,8 @@ class PlatformSelect(wx.Panel):
             wx_obj.Hide()
         return wx_obj
 
-    @property
-    def platform(self) -> PlatformType:
-        return self._platform_choice.GetCurrentString()
-
-    @platform.setter
-    def platform(self, platform: PlatformType):
-        self._set_platform(platform)
-        wx.PostEvent(self, PlatformChangeEvent(self.platform))
-
-    def _set_platform(self, platform: PlatformType):
-        if platform and platform in self._platform_choice.GetItems():
-            self._platform_choice.SetSelection(
-                self._platform_choice.GetItems().index(platform)
-            )
-        else:
-            self._platform_choice.SetSelection(0)
-
     def _populate_platform(self):
+        """Update the UI with the valid platforms."""
         platforms = self._translation_manager.platforms()
         if self._allowed_platforms is not None:
             platforms = [p for p in platforms if p in self._allowed_platforms]
@@ -95,6 +97,26 @@ class PlatformSelect(wx.Panel):
         if not self._allow_vanilla:
             platforms = [p for p in platforms if p == "universal"]
         self._platform_choice.SetItems(platforms)
+
+    def _push_platform(self):
+        """Push the internal platform state to the UI."""
+        self._platform_choice.SetSelection(
+            self._platform_choice.GetItems().index(self.platform)
+        )
+
+    def _on_platform_change(self, evt):
+        """The event run when the platform choice is changed by a user."""
+        old_platform = self.platform
+        new_platform = self._platform_choice.GetCurrentString()
+        # write the changes back to the internal state
+        self.set_platform(new_platform)
+        wx.PostEvent(self, PlatformChangeEvent(new_platform, old_platform))
+
+    def update(self):
+        if self.platform != self._platform_choice.GetCurrentString():
+            self._push_platform()
+            return True
+        return False
 
 
 def demo():
