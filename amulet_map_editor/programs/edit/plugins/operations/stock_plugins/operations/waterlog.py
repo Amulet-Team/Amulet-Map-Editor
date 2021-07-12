@@ -2,7 +2,7 @@ import numpy
 from typing import TYPE_CHECKING, Tuple
 import wx
 
-from amulet_map_editor.api.wx.ui.mc.base.base_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.api.wx.ui.mc.block import BlockDefine
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
