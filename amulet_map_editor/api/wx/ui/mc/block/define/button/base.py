@@ -2,11 +2,11 @@ import wx
 from typing import Optional
 
 from amulet.api.data_types import PlatformType, VersionNumberTuple
-from amulet_map_editor.api.wx.ui.mc.base import BaseMCBlockAPI
+from amulet_map_editor.api.wx.ui.mc.base import MCBlockIdentifierAPI
 from amulet_map_editor.api.wx.ui.mc.block.define import BaseBlockDefine
 
 
-class BaseBlockDefineButton(wx.Button, BaseMCBlockAPI):
+class BaseBlockDefineButton(wx.Button, MCBlockIdentifierAPI):
     def __init__(
         self,
         parent: wx.Window,

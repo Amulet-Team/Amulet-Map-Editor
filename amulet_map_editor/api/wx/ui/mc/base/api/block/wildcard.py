@@ -1,9 +1,9 @@
 from amulet.api.block import PropertyTypeMultiple
 
-from .base import BaseMCBlockAPI
+from .identifier import MCBlockIdentifierAPI
 
 
-class WildcardMCBlockAPI(BaseMCBlockAPI):
+class WildcardMCBlockAPI(MCBlockIdentifierAPI):
     @property
     def all_properties(self) -> PropertyTypeMultiple:
         """The values that exist for every property."""

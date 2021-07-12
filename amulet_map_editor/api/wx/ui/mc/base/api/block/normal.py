@@ -3,10 +3,10 @@ from typing import Optional, Tuple
 from amulet.api.block import PropertyType, Block
 from amulet.api.block_entity import BlockEntity
 
-from .base import BaseMCBlockAPI
+from .identifier import MCBlockIdentifierAPI
 
 
-class NormalMCBlockAPI(BaseMCBlockAPI):
+class NormalMCBlockAPI(MCBlockIdentifierAPI):
     @property
     def properties(self) -> PropertyType:
         raise NotImplementedError
