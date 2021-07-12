@@ -30,7 +30,7 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         allow_numerical: bool = True,
         allow_blockstate: bool = True,
         state: Dict[str, Any] = None,
-        **kwargs,
+        style: Dict[str, Any] = None,
     ):
         """
         Construct a :class:`VersionSelect` UI.
@@ -47,7 +47,7 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         :param allow_numerical: Should the numerical versions be shown to the user.
         :param allow_blockstate: Should the blockstate versions be shown to the user.
         :param state: A dictionary containing kwargs passed to the state manager.
-        :param kwargs: Keyword args to be given to the :class:`PlatformSelect` and Panel.
+        :param style: Dictionary of keyword args to be given to the Panel.
         """
         state = state or {}
         state.setdefault("version_number", version_number)
@@ -60,7 +60,7 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
             allow_vanilla=allow_vanilla,
             allowed_platforms=allowed_platforms,
             state=state,
-            **kwargs,
+            style=style,
         )
         self._allow_numerical = allow_numerical
         self._allow_blockstate = allow_blockstate

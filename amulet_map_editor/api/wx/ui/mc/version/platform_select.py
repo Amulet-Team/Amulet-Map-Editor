@@ -22,7 +22,7 @@ class PlatformSelect(wx.Panel, BaseMCPlatform):
         allow_vanilla: bool = True,
         allowed_platforms: Tuple[PlatformType, ...] = None,
         state: Dict[str, Any] = None,
-        **kwargs
+        style: Dict[str, Any] = None,
     ):
         """
         Construct a :class:`PlatformSelect` UI.
@@ -34,7 +34,7 @@ class PlatformSelect(wx.Panel, BaseMCPlatform):
         :param allow_vanilla: If True the vanilla formats will be included.
         :param allowed_platforms: A whitelist of platforms.
         :param state: A dictionary containing kwargs passed to the state manager.
-        :param kwargs: Keyword args to be given to the Panel.
+        :param style: Dictionary of keyword args to be given to the Panel.
         """
         state = state or {}
         state.setdefault("translation_manager", translation_manager)
@@ -45,8 +45,9 @@ class PlatformSelect(wx.Panel, BaseMCPlatform):
         self._init_state(state)
 
         # Init the panel
-        kwargs.setdefault("style", wx.BORDER_SIMPLE)
-        wx.Panel.__init__(self, parent, **kwargs)
+        style = style or {}
+        style.setdefault("style", wx.BORDER_SIMPLE)
+        wx.Panel.__init__(self, parent, **style)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
         self._sizer = wx.FlexGridSizer(2, 5, 5)
