@@ -22,8 +22,8 @@ class BaseMCBlock(BaseMCResourceID, BaseMCBlockAPI):
                 self.platform, self.version_number
             ).block.base_names(self.namespace, self.force_blockstate)
             if blocks:
-                self._block_name = blocks[0]
+                self._base_name = blocks[0]
             else:
-                self._block_name = ""
+                self._base_name = ""
         else:
-            self._block_name = str(base_name)
+            self._base_name = str(base_name)
