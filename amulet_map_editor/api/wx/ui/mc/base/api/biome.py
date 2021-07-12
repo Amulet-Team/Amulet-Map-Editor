@@ -3,11 +3,11 @@ from typing import Optional
 from .resource_id import BaseMCResourceIDAPI, BaseMCResourceID
 
 
-class MCBiomeIdentifierAPI(BaseMCResourceIDAPI):
+class BaseMCBiomeIdentifierAPI(BaseMCResourceIDAPI):
     pass
 
 
-class MCBiomeIdentifier(BaseMCResourceID, MCBiomeIdentifierAPI):
+class BaseMCBiomeIdentifier(BaseMCResourceID, BaseMCBiomeIdentifierAPI):
     def set_namespace(self, namespace: Optional[str]):
         if namespace is None:
             self._namespace = (

@@ -3,11 +3,11 @@ from typing import Optional
 from ..resource_id import BaseMCResourceIDAPI, BaseMCResourceID
 
 
-class MCBlockIdentifierAPI(BaseMCResourceIDAPI):
+class BaseMCBlockIdentifierAPI(BaseMCResourceIDAPI):
     pass
 
 
-class MCBlockIdentifier(BaseMCResourceID, MCBlockIdentifierAPI):
+class BaseMCBlockIdentifier(BaseMCResourceID, BaseMCBlockIdentifierAPI):
     def set_namespace(self, namespace: Optional[str]):
         if namespace is None:
             self._namespace = self._translation_manager.get_version(

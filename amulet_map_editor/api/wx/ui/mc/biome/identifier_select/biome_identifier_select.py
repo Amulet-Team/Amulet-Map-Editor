@@ -4,14 +4,14 @@ import wx
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
 )
-from amulet_map_editor.api.wx.ui.mc.base.api.biome import MCBiomeIdentifier
+from amulet_map_editor.api.wx.ui.mc.base.api.biome import BaseMCBiomeIdentifier
 from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.events import (
     BiomeIDChangeEvent,
     EVT_BIOME_ID_CHANGE,
 )
 
 
-class BiomeIdentifierSelect(BaseIdentifierSelect, MCBiomeIdentifier):
+class BiomeIdentifierSelect(BaseIdentifierSelect, BaseMCBiomeIdentifier):
     """
     A UI consisting of a namespace choice, biome name search box and list of biome names.
     """
@@ -21,7 +21,7 @@ class BiomeIdentifierSelect(BaseIdentifierSelect, MCBiomeIdentifier):
         return "Biome"
 
     def _init_state(self, state: Dict[str, Any]):
-        MCBiomeIdentifier.__init__(self, **state)
+        BaseMCBiomeIdentifier.__init__(self, **state)
 
     def _populate_namespace(self):
         version = self._translation_manager.get_version(
