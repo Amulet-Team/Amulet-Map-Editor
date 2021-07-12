@@ -119,8 +119,16 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
 
     def _push_base_name(self):
         """Push the internal base name to the UI."""
-        self._search.ChangeValue(self.base_name)
-        self._update_from_search()
+        if self.base_name in self._base_names:
+            location = self._base_name_list_box.FindString(self.base_name)
+            if location == wx.NOT_FOUND:
+                self._search.ChangeValue("")
+                self._update_from_search()
+                location = self._base_name_list_box.FindString(self.base_name)
+            self._base_name_list_box.SetSelection(location)
+        else:
+            self._search.ChangeValue(self.base_name)
+            self._update_from_search()
 
     def _update_from_search(self) -> bool:
         """

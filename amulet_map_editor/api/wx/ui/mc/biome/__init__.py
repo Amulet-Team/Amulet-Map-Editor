@@ -1,2 +1,2 @@
-from .biome_select import BiomeSelect
+from .identifier_select import BiomeIdentifierSelect
 from .biome_define import BiomeDefine

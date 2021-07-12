@@ -4,38 +4,48 @@ import wx
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
 )
-from amulet_map_editor.api.wx.ui.mc.base.api.block import MCBlockIdentifier
-from amulet_map_editor.api.wx.ui.mc.block.identifier_select.events import (
-    BlockIDChangeEvent,
-    EVT_BLOCK_ID_CHANGE,
+from amulet_map_editor.api.wx.ui.mc.base.api.biome import MCBiomeIdentifier
+from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.events import (
+    BiomeIDChangeEvent,
+    EVT_BIOME_ID_CHANGE,
 )
 
 
-class BlockIdentifierSelect(BaseIdentifierSelect, MCBlockIdentifier):
+class BiomeIdentifierSelect(BaseIdentifierSelect, MCBiomeIdentifier):
     """
-    A UI consisting of a namespace choice, block name search box and list of block names.
+    A UI consisting of a namespace choice, biome name search box and list of biome names.
     """
 
     @property
     def type_name(self) -> str:
-        return "Block"
+        return "Biome"
 
     def _init_state(self, state: Dict[str, Any]):
-        MCBlockIdentifier.__init__(self, **state)
+        MCBiomeIdentifier.__init__(self, **state)
 
     def _populate_namespace(self):
         version = self._translation_manager.get_version(
             self.platform, self.version_number
         )
-        self._namespace_combo.Set(version.block.namespaces(self.force_blockstate))
+        namespaces = list(
+            set(
+                [biome_id.split(":", 1)[0] for biome_id in version.biome.biome_ids]
+            )
+        )
+        self._namespace_combo.Set(namespaces)
 
     def _populate_base_name(self):
         version = self._translation_manager.get_version(
             self.platform, self.version_number
         )
-        self._base_names = version.block.base_names(
-            self.namespace, self.force_blockstate
-        )
+        namespace = f"{self.namespace}:"
+        namespace_size = len(namespace)
+
+        self._base_names = [
+            biome_id[namespace_size:]
+            for biome_id in version.biome.biome_ids
+            if biome_id.startswith(namespace)
+        ]
         self._base_name_list_box.SetItems(self._base_names)
 
     def _post_event(
@@ -47,7 +57,7 @@ class BlockIdentifierSelect(BaseIdentifierSelect, MCBlockIdentifier):
     ):
         wx.PostEvent(
             self,
-            BlockIDChangeEvent(
+            BiomeIDChangeEvent(
                 new_namespace,
                 new_base_name,
                 old_namespace,
@@ -66,28 +76,26 @@ def demo():
     translation_manager = PyMCTranslate.new_translation_manager()
     dialog = wx.Dialog(
         None,
-        title="BlockIdentifierSelect",
-        style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT | wx.RESIZE_BORDER,
+        title="BiomeIdentifierSelect",
+        style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
-    widget = BlockIdentifierSelect(
-        dialog, translation_manager, "java", (1, 16, 0), False
-    )
+    widget = BiomeIdentifierSelect(dialog, translation_manager, "java", (1, 16, 0), False)
 
-    def on_change(evt: BlockIDChangeEvent):
+    def on_change(evt: BiomeIDChangeEvent):
         print(evt.old_namespace, evt.old_base_name, evt.namespace, evt.base_name)
 
-    widget.Bind(EVT_BLOCK_ID_CHANGE, on_change)
+    widget.Bind(EVT_BIOME_ID_CHANGE, on_change)
     sizer.Add(
         widget,
         1,
         wx.ALL | wx.EXPAND,
         5,
     )
-    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
     dialog.Show()
     dialog.Fit()
+    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
 
 
 if __name__ == "__main__":

@@ -1,13 +1,13 @@
 import wx
 from ...base.base_identifier_select import BaseIDChangeEvent
 
-_BlockIDChangeEventType = wx.NewEventType()
-EVT_BLOCK_ID_CHANGE = wx.PyEventBinder(_BlockIDChangeEventType)
+_BiomeIDChangeEventType = wx.NewEventType()
+EVT_BIOME_ID_CHANGE = wx.PyEventBinder(_BiomeIDChangeEventType)
 
 
-class BlockIDChangeEvent(BaseIDChangeEvent):
+class BiomeIDChangeEvent(BaseIDChangeEvent):
     """
-    Run when the block resource identifier changes.
+    Run when the biome resource identifier changes.
     """
 
     def __init__(
@@ -18,4 +18,4 @@ class BlockIDChangeEvent(BaseIDChangeEvent):
         old_base_name: str,
     ):
         super().__init__(namespace, base_name, old_namespace, old_base_name)
-        self.SetEventType(_BlockIDChangeEventType)
+        self.SetEventType(_BiomeIDChangeEventType)
