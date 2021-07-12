@@ -10,11 +10,11 @@ class BlockIDChangeEvent(wx.PyEvent):
     """
 
     def __init__(
-            self,
-            namespace: str,
-            base_name: str,
-            old_namespace: str,
-            old_base_name: str,
+        self,
+        namespace: str,
+        base_name: str,
+        old_namespace: str,
+        old_base_name: str,
     ):
         wx.PyEvent.__init__(self, eventType=_BlockIDChangeEventType)
         self._namespace = namespace

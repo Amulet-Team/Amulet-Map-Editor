@@ -165,7 +165,13 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
             self._base_name_list_box.GetSelection()
         )
 
-    def _post_event(self, old_namespace: str, old_base_name: str, new_namespace: str, new_base_name: str):
+    def _post_event(
+        self,
+        old_namespace: str,
+        old_base_name: str,
+        new_namespace: str,
+        new_base_name: str,
+    ):
         raise NotImplementedError
 
     def _on_namespace_change(self, evt):
@@ -190,8 +196,12 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         if old_namespace is None:
             old_namespace = self.namespace
         old_base_name = self.base_name
-        new_base_name = self._base_name_list_box.GetString(self._base_name_list_box.GetSelection())
-        if self._base_name_list_box.GetSelection() == 0 and new_base_name.startswith('"'):
+        new_base_name = self._base_name_list_box.GetString(
+            self._base_name_list_box.GetSelection()
+        )
+        if self._base_name_list_box.GetSelection() == 0 and new_base_name.startswith(
+            '"'
+        ):
             new_base_name = new_base_name[1:-1]
         self.set_base_name(new_base_name)
         self._post_event(old_namespace, old_base_name, self.namespace, new_base_name)

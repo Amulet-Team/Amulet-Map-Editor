@@ -3,9 +3,14 @@ import wx
 
 import PyMCTranslate
 from amulet.api.data_types import VersionNumberTuple
-from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import BaseIdentifierSelect
+from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
+    BaseIdentifierSelect,
+)
 from amulet_map_editor.api.wx.ui.mc.base.api.block import MCBlockIdentifier
-from amulet_map_editor.api.wx.ui.mc.block.identifier_select.events import BlockIDChangeEvent, EVT_BLOCK_ID_CHANGE
+from amulet_map_editor.api.wx.ui.mc.block.identifier_select.events import (
+    BlockIDChangeEvent,
+    EVT_BLOCK_ID_CHANGE,
+)
 
 
 class BlockIdentifierSelect(BaseIdentifierSelect, MCBlockIdentifier):
@@ -52,10 +57,18 @@ class BlockIdentifierSelect(BaseIdentifierSelect, MCBlockIdentifier):
         version = self._translation_manager.get_version(
             self.platform, self.version_number
         )
-        self._base_names = version.block.base_names(self.namespace, self.force_blockstate)
+        self._base_names = version.block.base_names(
+            self.namespace, self.force_blockstate
+        )
         self._base_name_list_box.SetItems(self._base_names)
 
-    def _post_event(self, old_namespace: str, old_base_name: str, new_namespace: str, new_base_name: str):
+    def _post_event(
+        self,
+        old_namespace: str,
+        old_base_name: str,
+        new_namespace: str,
+        new_base_name: str,
+    ):
         wx.PostEvent(
             self,
             BlockIDChangeEvent(
@@ -74,14 +87,19 @@ def demo():
     """
     translation_manager = PyMCTranslate.new_translation_manager()
     dialog = wx.Dialog(
-        None, title="BlockIdentifierSelect", style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT | wx.RESIZE_BORDER
+        None,
+        title="BlockIdentifierSelect",
+        style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT | wx.RESIZE_BORDER,
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
-    widget = BlockIdentifierSelect(dialog, translation_manager, "java", (1, 16, 0), False)
+    widget = BlockIdentifierSelect(
+        dialog, translation_manager, "java", (1, 16, 0), False
+    )
 
     def on_change(evt: BlockIDChangeEvent):
         print(evt.old_namespace, evt.old_base_name, evt.namespace, evt.base_name)
+
     widget.Bind(EVT_BLOCK_ID_CHANGE, on_change)
     sizer.Add(
         widget,
