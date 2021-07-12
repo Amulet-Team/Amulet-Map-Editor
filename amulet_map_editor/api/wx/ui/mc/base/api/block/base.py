@@ -1,22 +1,29 @@
 from typing import Optional
 
-from ..version import BaseMCVersionAPI
+from ..resource_id import BaseMCResourceIDAPI, BaseMCResourceID
 
 
-class BaseMCBlockAPI(BaseMCVersionAPI):
-    @property
-    def namespace(self) -> str:
-        raise NotImplementedError
+class BaseMCBlockAPI(BaseMCResourceIDAPI):
+    pass
 
-    @namespace.setter
-    def namespace(self, namespace: str):
-        raise NotImplementedError
 
-    @property
-    def block_name(self) -> str:
-        raise NotImplementedError
+class BaseMCBlock(BaseMCResourceID, BaseMCBlockAPI):
+    def set_namespace(self, namespace: Optional[str]):
+        if namespace is None:
+            self._namespace = self._translation_manager.get_version(
+                self.platform, self.version_number
+            ).block.namespaces(self.force_blockstate)[0]
+        else:
+            self._namespace = str(namespace)
 
-    @block_name.setter
-    def block_name(self, block_name: str):
-        raise NotImplementedError
-
+    def set_base_name(self, base_name: Optional[str]):
+        if base_name is None:
+            blocks = self._translation_manager.get_version(
+                self.platform, self.version_number
+            ).block.base_names(self.namespace, self.force_blockstate)
+            if blocks:
+                self._block_name = blocks[0]
+            else:
+                self._block_name = ""
+        else:
+            self._block_name = str(base_name)
