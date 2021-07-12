@@ -28,9 +28,7 @@ class BiomeIdentifierSelect(BaseIdentifierSelect, MCBiomeIdentifier):
             self.platform, self.version_number
         )
         namespaces = list(
-            set(
-                [biome_id.split(":", 1)[0] for biome_id in version.biome.biome_ids]
-            )
+            set([biome_id.split(":", 1)[0] for biome_id in version.biome.biome_ids])
         )
         self._namespace_combo.Set(namespaces)
 
@@ -81,7 +79,9 @@ def demo():
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
-    widget = BiomeIdentifierSelect(dialog, translation_manager, "java", (1, 16, 0), False)
+    widget = BiomeIdentifierSelect(
+        dialog, translation_manager, "java", (1, 16, 0), False
+    )
 
     def on_change(evt: BiomeIDChangeEvent):
         print(evt.old_namespace, evt.old_base_name, evt.namespace, evt.base_name)
