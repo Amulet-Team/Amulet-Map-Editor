@@ -4,15 +4,6 @@ from amulet.api.data_types import PlatformType
 
 
 class BaseMCPlatformAPI:
-    def update(self) -> bool:
-        """
-        Update the from the internal state.
-        No events should be created when calling this method.
-
-        :return: True if data was changed
-        """
-        return False
-
     @property
     def platform(self) -> PlatformType:
         """The active platform."""
@@ -69,6 +60,15 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
         super().__init__(translation_manager)
         self._platform = None
         self.set_platform(platform)
+
+    def update(self) -> bool:
+        """
+        Update the from the internal state.
+        No events should be created when calling this method.
+
+        :return: True if data was changed
+        """
+        raise NotImplementedError
 
     @property
     def platform(self) -> PlatformType:
