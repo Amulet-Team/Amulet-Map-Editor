@@ -59,7 +59,7 @@ def get_version(version_string: str) -> Version:
     """Parse the version into a more usable format
 
     :param version_string: The version string. Eg 1.2 or 1.2.3.4 or 1.2.3.4b0
-    :return: (<release stage identifier>, (major, minor, patch)) beta will not exist if it is not a beta
+    :return: A Version object from the parsed version string
     """
     version_match = VERSION_REGEX.match(version_string)
     if version_match:
