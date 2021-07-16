@@ -115,7 +115,10 @@ class CheckForUpdate(threading.Thread):
                 key=lambda t: t[0],
                 reverse=True,
             ):
-                if release_version > current_version:
+                if (
+                    release_version > current_version
+                    and release_version.release_stage >= current_version.release_stage
+                ):
                     self._new_version = release_data["tag_name"]
                     break
 
