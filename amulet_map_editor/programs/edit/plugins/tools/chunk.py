@@ -141,14 +141,14 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
             def __init__(self, *args, **kwds):
                 kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
                 wx.Dialog.__init__(self, *args, **kwds)
-                self.SetTitle("Do you want to load the orignal chunk state?")
+                self.SetTitle("Do you want to load the original chunk state?")
 
                 sizer_1 = wx.BoxSizer(wx.VERTICAL)
 
                 label_1 = wx.StaticText(
                     self,
                     wx.ID_ANY,
-                    "Do you want to load the orignal chunk state?\n\n"
+                    "Do you want to load the original chunk state?\n\n"
                     'Clicking "Yes" will allow you to undo this operation but the operation will take a while to process.\n\n'
                     'Clicking "No" will mean this operation cannot be undone.\n\n'
                     "Changes will not be made to the world until you save so closing before saving will not actually delete the chunks.",
