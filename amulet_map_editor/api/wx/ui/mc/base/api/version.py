@@ -101,9 +101,9 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
                 except KeyError:
                     pass
         if v is None:
-            self._version_number = self._translation_manager.version_numbers(
-                self.platform
-            )[-1]
+            self._version_number = max(
+                self._translation_manager.version_numbers(self.platform)
+            )
 
     @property
     def force_blockstate(self) -> bool:
