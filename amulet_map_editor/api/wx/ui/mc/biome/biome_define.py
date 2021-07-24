@@ -8,7 +8,10 @@ from amulet_map_editor.api.wx.ui.mc.base.api.biome import BaseMCBiomeIdentifier
 from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.biome_identifier_select import (
     BiomeIdentifierSelect,
 )
-from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.events import BiomeIDChangeEvent, EVT_BIOME_ID_CHANGE
+from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.events import (
+    BiomeIDChangeEvent,
+    EVT_BIOME_ID_CHANGE,
+)
 from amulet_map_editor.api.wx.ui.mc.version.events import VersionChangeEvent
 
 
@@ -40,7 +43,7 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
             version_number,
             False,
             state=state,
-            show_force_blockstate=False
+            show_force_blockstate=False,
         )
         self._picker = BiomeIdentifierSelect(
             self,
@@ -66,8 +69,12 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
         self.set_version_number(evt.version_number)
         self.set_force_blockstate(evt.force_blockstate)
 
-        universal_biome = self._translation_manager.get_version(old_platform, old_version).biome.to_universal(f"{self.namespace}:{self.base_name}")
-        new_biome = self._translation_manager.get_version(self.platform, self.version_number).biome.from_universal(universal_biome)
+        universal_biome = self._translation_manager.get_version(
+            old_platform, old_version
+        ).biome.to_universal(f"{self.namespace}:{self.base_name}")
+        new_biome = self._translation_manager.get_version(
+            self.platform, self.version_number
+        ).biome.from_universal(universal_biome)
         namespace, base_name = new_biome.split(":", 1)
 
         self.set_namespace(namespace)
@@ -112,7 +119,10 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
             self._picker.set_platform(self.platform)
             self._picker.set_version_number(self.version_number)
             self._picker.set_force_blockstate(self.force_blockstate)
-        if self.namespace != self._picker.namespace or self.base_name != self._picker.base_name:
+        if (
+            self.namespace != self._picker.namespace
+            or self.base_name != self._picker.base_name
+        ):
             update = True
             self._picker.set_namespace(self.namespace)
             self._picker.set_base_name(self.base_name)
