@@ -3,6 +3,7 @@ from typing import Tuple, Dict, Any
 import PyMCTranslate
 import wx
 
+from amulet.api.data_types import VersionNumberTuple, PlatformType
 from amulet_map_editor.api.wx.ui.mc.base.base_define import BaseDefine
 from amulet_map_editor.api.wx.ui.mc.base.api.biome import BaseMCBiomeIdentifier
 from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.biome_identifier_select import (
@@ -62,6 +63,7 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
         BaseMCBiomeIdentifier.__init__(self, **state)
 
     def _on_version_change(self, evt: VersionChangeEvent):
+        self.Freeze()
         old_platform, old_version = self.platform, self.version_number
         old_namespace, old_base_name = self.namespace, self.base_name
 
@@ -96,6 +98,7 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
                 old_base_name,
             ),
         )
+        self.Thaw()
 
     def _on_biome_id_change(self, evt: BiomeIDChangeEvent):
         self.set_namespace(evt.namespace)
@@ -111,6 +114,7 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
         )
 
     def push(self) -> bool:
+        self.Freeze()
         update = super().push()
         self.set_namespace(self.namespace)
         self.set_base_name(self.base_name)
@@ -128,6 +132,7 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
             self._picker.set_base_name(self.base_name)
         if update:
             self._picker.push()
+        self.Thaw()
         return update
 
 
@@ -144,8 +149,16 @@ def demo():
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
+    obj = BiomeDefine(dialog, translation_manager, wx.HORIZONTAL)
+
+    def on_biome_change(evt: BiomeIDChangeEvent):
+        print(obj.platform, obj.version_number, obj.force_blockstate, obj.namespace, obj.base_name)
+        print(evt.namespace, evt.base_name, evt.old_namespace, evt.old_base_name)
+
+    obj.Bind(EVT_BIOME_ID_CHANGE, on_biome_change)
+
     sizer.Add(
-        BiomeDefine(dialog, translation_manager, wx.HORIZONTAL),
+        obj,
         1,
         wx.ALL | wx.EXPAND,
         5,
@@ -153,6 +166,26 @@ def demo():
     dialog.Show()
     dialog.Fit()
     dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+
+    def set(
+        platform: PlatformType,
+        version: VersionNumberTuple,
+        force_blockstate: bool,
+        namespace: str,
+        base_name: str,
+    ):
+        obj.set_platform(platform)
+        obj.set_version_number(version)
+        obj.set_force_blockstate(force_blockstate)
+        obj.set_namespace(namespace)
+        obj.set_base_name(base_name)
+        obj.push()
+
+    interval = 1_000
+    wx.CallLater(interval * 1, set, "java", (1, 17, 0), False, "minecraft", "end_highlands")
+    wx.CallLater(interval * 2, set, "bedrock", (1, 17, 0), False, "minecraft", "birch_forest_hills_mutated")
+    wx.CallLater(interval * 3, set, "java", (1, 17, 0), False, "minecraft", "random")
+    wx.CallLater(interval * 4, set, "bedrock", (1, 17, 0), False, "minecraft", "random")
 
 
 if __name__ == "__main__":
