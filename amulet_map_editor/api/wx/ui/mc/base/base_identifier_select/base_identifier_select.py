@@ -50,12 +50,14 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
         text = wx.StaticText(self, label="Namespace:", style=wx.ALIGN_CENTER)
         sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
-        self._namespace_combo = wx.ComboBox(self)
+        self._namespace_combo = wx.ComboBox(self, style=wx.TE_PROCESS_ENTER)
         sizer.Add(self._namespace_combo, 2)
         self._populate_namespace()
         self._push_namespace()
 
-        self._namespace_combo.Bind(wx.EVT_TEXT, self._on_namespace_change)
+        self._namespace_combo.Bind(wx.EVT_COMBOBOX, self._on_namespace_change)
+        self._namespace_combo.Bind(wx.EVT_TEXT_ENTER, self._on_namespace_change)
+        self._namespace_combo.Bind(wx.EVT_KILL_FOCUS, self._on_namespace_change)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self._sizer.Add(sizer, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
@@ -186,12 +188,15 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         old_namespace = self.namespace
 
         new_namespace = self._namespace_combo.GetValue()
-        self.set_namespace(new_namespace)
+        if new_namespace != old_namespace:
+            self.set_namespace(new_namespace)
 
-        self._populate_base_name()
-        self._update_from_search()
+            self._populate_base_name()
+            self._update_from_search()
 
-        self._on_change(old_namespace)
+            self._on_change(old_namespace)
+        if isinstance(evt, wx.FocusEvent):
+            evt.Skip()
 
     def _on_search_change(self, evt):
         if self._update_from_search():
