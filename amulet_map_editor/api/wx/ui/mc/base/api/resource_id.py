@@ -84,7 +84,7 @@ class BaseMCResourceID(BaseMCVersion, BaseMCResourceIDAPI):
     @namespace.setter
     def namespace(self, namespace: str):
         self.set_namespace(namespace)
-        self.update()
+        self.push()
 
     def set_namespace(self, namespace: Optional[str]):
         raise NotImplementedError
@@ -96,7 +96,7 @@ class BaseMCResourceID(BaseMCVersion, BaseMCResourceIDAPI):
     @base_name.setter
     def base_name(self, base_name: str):
         self.set_base_name(base_name)
-        self.update()
+        self.push()
 
     def set_base_name(self, base_name: Optional[str]):
         raise NotImplementedError

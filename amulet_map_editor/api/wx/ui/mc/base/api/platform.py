@@ -61,9 +61,9 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
         self._platform = None
         self.set_platform(platform)
 
-    def update(self) -> bool:
+    def push(self) -> bool:
         """
-        Update the from the internal state.
+        Push the internal state to the UI.
         No events should be created when calling this method.
 
         :return: True if data was changed
@@ -77,7 +77,7 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
     @platform.setter
     def platform(self, platform: PlatformType):
         self.set_platform(platform)
-        self.update()
+        self.push()
 
     def set_platform(self, platform: Optional[PlatformType]):
         if platform is not None and platform in self._translation_manager.platforms():

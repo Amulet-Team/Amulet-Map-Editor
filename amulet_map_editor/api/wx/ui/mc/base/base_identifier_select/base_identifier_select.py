@@ -214,7 +214,7 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         self.set_base_name(new_base_name)
         self._post_event(old_namespace, old_base_name, self.namespace, new_base_name)
 
-    def update(self) -> bool:
+    def push(self) -> bool:
         self._populate_namespace()
         self._push_namespace()
         self._populate_base_name()

@@ -84,7 +84,7 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
     @version_number.setter
     def version_number(self, version_number: VersionNumberTuple):
         self.set_version_number(version_number)
-        self.update()
+        self.push()
 
     def set_version_number(self, version_number: Optional[VersionNumberTuple]):
         v = None
@@ -112,7 +112,7 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
     @force_blockstate.setter
     def force_blockstate(self, force_blockstate: bool):
         self.set_force_blockstate(force_blockstate)
-        self.update()
+        self.push()
 
     def set_force_blockstate(self, force_blockstate: Optional[bool]):
         self._force_blockstate = bool(force_blockstate)
