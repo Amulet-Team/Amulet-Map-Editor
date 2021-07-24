@@ -191,6 +191,7 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
             evt.Skip()
 
     def _handle_namespace_change(self):
+        self.Freeze()
         old_namespace = self.namespace
         new_namespace = self._namespace_combo.GetValue()
         if new_namespace != old_namespace:
@@ -200,6 +201,7 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
             self._update_from_search()
 
             self._on_change(old_namespace)
+        self.Thaw()
 
     def _on_namespace_char(self, evt):
         wx.CallAfter(self._handle_namespace_change)
