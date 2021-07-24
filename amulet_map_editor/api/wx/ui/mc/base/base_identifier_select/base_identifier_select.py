@@ -50,14 +50,15 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
         text = wx.StaticText(self, label="Namespace:", style=wx.ALIGN_CENTER)
         sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
-        self._namespace_combo = wx.ComboBox(self, style=wx.TE_PROCESS_ENTER)
+        self._namespace_combo = wx.ComboBox(self)
         sizer.Add(self._namespace_combo, 2)
         self._populate_namespace()
         self._push_namespace()
 
+        # This was previously done with EVT_TEXT but that is also triggered by the Set method.
+        # This is a workaround so that it is only triggered by user input.
+        self._namespace_combo.Bind(wx.EVT_CHAR, self._on_namespace_char)
         self._namespace_combo.Bind(wx.EVT_COMBOBOX, self._on_namespace_change)
-        self._namespace_combo.Bind(wx.EVT_TEXT_ENTER, self._on_namespace_change)
-        self._namespace_combo.Bind(wx.EVT_KILL_FOCUS, self._on_namespace_change)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self._sizer.Add(sizer, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
@@ -185,8 +186,12 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         raise NotImplementedError
 
     def _on_namespace_change(self, evt):
-        old_namespace = self.namespace
+        self._handle_namespace_change()
+        if isinstance(evt, wx.KeyEvent):
+            evt.Skip()
 
+    def _handle_namespace_change(self):
+        old_namespace = self.namespace
         new_namespace = self._namespace_combo.GetValue()
         if new_namespace != old_namespace:
             self.set_namespace(new_namespace)
@@ -195,8 +200,10 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
             self._update_from_search()
 
             self._on_change(old_namespace)
-        if isinstance(evt, wx.FocusEvent):
-            evt.Skip()
+
+    def _on_namespace_char(self, evt):
+        wx.CallAfter(self._handle_namespace_change)
+        evt.Skip()
 
     def _on_search_change(self, evt):
         if self._update_from_search():
@@ -216,8 +223,9 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
             '"'
         ):
             new_base_name = new_base_name[1:-1]
-        self.set_base_name(new_base_name)
-        self._post_event(old_namespace, old_base_name, self.namespace, new_base_name)
+        if old_namespace != self.namespace or old_base_name != new_base_name:
+            self.set_base_name(new_base_name)
+            self._post_event(old_namespace, old_base_name, self.namespace, new_base_name)
 
     def push(self) -> bool:
         self._populate_namespace()
