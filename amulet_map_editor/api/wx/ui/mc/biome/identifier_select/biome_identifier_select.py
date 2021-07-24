@@ -45,6 +45,7 @@ class BiomeIdentifierSelect(BaseIdentifierSelect, BaseMCBiomeIdentifier):
             if biome_id.startswith(namespace)
         ]
         self._base_name_list_box.SetItems(self._base_names)
+        self._update_from_search()
 
     def _post_event(
         self,
