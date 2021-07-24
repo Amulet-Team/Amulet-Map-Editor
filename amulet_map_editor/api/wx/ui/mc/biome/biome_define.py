@@ -1,13 +1,18 @@
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
 import PyMCTranslate
 import wx
 
 from amulet_map_editor.api.wx.ui.mc.base.base_define import BaseDefine
-from amulet_map_editor.api.wx.ui.mc.biome.biome_select import BiomeSelect
+from amulet_map_editor.api.wx.ui.mc.base.api.biome import BaseMCBiomeIdentifier
+from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.biome_identifier_select import (
+    BiomeIdentifierSelect,
+)
+from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.events import BiomeIDChangeEvent, EVT_BIOME_ID_CHANGE
+from amulet_map_editor.api.wx.ui.mc.version.events import VersionChangeEvent
 
 
-class BiomeDefine(BaseDefine):
+class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
     """
     A UI that merges a version select widget with a biome select widget.
     """
@@ -20,56 +25,100 @@ class BiomeDefine(BaseDefine):
         platform: str = None,
         version_number: Tuple[int, int, int] = None,
         namespace: str = None,
-        biome_name: str = None,
+        base_name: str = None,
         show_pick_biome: bool = False,
-        **kwargs,
+        state: Dict[str, Any] = None,
     ):
+        state = state or {}
+        state.setdefault("namespace", namespace)
+        state.setdefault("base_name", base_name)
         super().__init__(
             parent,
             translation_manager,
-            BiomeSelect,
             orientation,
             platform,
             version_number,
+            False,
+            state=state,
+            show_force_blockstate=False
+        )
+        self._picker = BiomeIdentifierSelect(
+            self,
+            translation_manager,
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
             namespace,
-            default_name=biome_name,
-            show_pick=show_pick_biome,
-            show_force_blockstate=False,
-            **kwargs,
+            base_name,
+            show_pick_biome,
+        )
+        self._picker.Bind(EVT_BIOME_ID_CHANGE, self._on_biome_id_change)
+        self._top_sizer.Add(self._picker, 1, wx.EXPAND | wx.TOP, 5)
+
+    def _init_state(self, state: Dict[str, Any]):
+        BaseMCBiomeIdentifier.__init__(self, **state)
+
+    def _on_version_change(self, evt: VersionChangeEvent):
+        old_platform, old_version = self.platform, self.version_number
+        old_namespace, old_base_name = self.namespace, self.base_name
+
+        self.set_platform(evt.platform)
+        self.set_version_number(evt.version_number)
+        self.set_force_blockstate(evt.force_blockstate)
+
+        universal_biome = self._translation_manager.get_version(old_platform, old_version).biome.to_universal(f"{self.namespace}:{self.base_name}")
+        new_biome = self._translation_manager.get_version(self.platform, self.version_number).biome.from_universal(universal_biome)
+        namespace, base_name = new_biome.split(":", 1)
+
+        self.set_namespace(namespace)
+        self.set_base_name(base_name)
+
+        self._picker.set_platform(self.platform)
+        self._picker.set_version_number(self.version_number)
+        self._picker.set_force_blockstate(self.force_blockstate)
+        self._picker.set_namespace(self.namespace)
+        self._picker.set_base_name(self.base_name)
+        self._picker.push()
+
+        wx.PostEvent(
+            self,
+            BiomeIDChangeEvent(
+                self.namespace,
+                self.base_name,
+                old_namespace,
+                old_base_name,
+            ),
         )
 
-    def _on_picker_change(self, evt):
-        evt.Skip()
+    def _on_biome_id_change(self, evt: BiomeIDChangeEvent):
+        self.set_namespace(evt.namespace)
+        self.set_base_name(evt.base_name)
+        wx.PostEvent(
+            self,
+            BiomeIDChangeEvent(
+                evt.namespace,
+                evt.base_name,
+                evt.old_namespace,
+                evt.old_base_name,
+            ),
+        )
 
-    @property
-    def biome_name(self) -> str:
-        return self._picker.name
-
-    @biome_name.setter
-    def biome_name(self, biome_name: str):
-        self._picker.name = biome_name
-
-    @property
-    def biome(self) -> str:
-        return f"{self.namespace}:{self.biome_name}"
-
-    @biome.setter
-    def biome(self, biome: str):
-        namespace, biome_name = biome.split(":")
-        self._picker.set_namespace(namespace)
-        self._picker.set_name(biome_name)
-
-    @property
-    def universal_biome(self) -> str:
-        return self._translation_manager.get_version(
-            self.platform, self.version_number
-        ).biome.to_universal(self.biome)
-
-    @universal_biome.setter
-    def universal_biome(self, universal_biome: str):
-        self.biome = self._translation_manager.get_version(
-            self.platform, self.version_number
-        ).biome.from_universal(universal_biome)
+    def push(self) -> bool:
+        update = super().push()
+        self.set_namespace(self.namespace)
+        self.set_base_name(self.base_name)
+        if update:
+            # The version changed
+            self._picker.set_platform(self.platform)
+            self._picker.set_version_number(self.version_number)
+            self._picker.set_force_blockstate(self.force_blockstate)
+        if self.namespace != self._picker.namespace or self.base_name != self._picker.base_name:
+            update = True
+            self._picker.set_namespace(self.namespace)
+            self._picker.set_base_name(self.base_name)
+        if update:
+            self._picker.push()
+        return update
 
 
 def demo():
