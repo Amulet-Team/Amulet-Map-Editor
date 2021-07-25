@@ -65,19 +65,29 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
 
     def _schedule_push(self):
         """Schedule the pushing of the internal data to the UI."""
+        self._changed = True
+        push = self.push
         if isinstance(self, wx.Window):
-            self._changed = True
-
-            def on_push():
-                if self._changed:
-                    self.Freeze()
-                    self.push()
-                    self.Thaw()
-                    self._changed = False
-
-            wx.CallAfter(on_push)
+            wx.CallAfter(push)
 
     def push(self) -> bool:
+        """
+        Push the internal state to the UI.
+        No events should be created when calling this method.
+
+        :return: True if data was changed
+        """
+        ret = False
+        if self._changed:
+            if isinstance(self, wx.Window):
+                self.Freeze()
+            ret = self._on_push()
+            if isinstance(self, wx.Window):
+                self.Thaw()
+            self._changed = False
+        return ret
+
+    def _on_push(self) -> bool:
         """
         Push the internal state to the UI.
         No events should be created when calling this method.

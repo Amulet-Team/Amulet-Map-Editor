@@ -231,7 +231,7 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
                 old_namespace, old_base_name, self.namespace, new_base_name
             )
 
-    def push(self) -> bool:
+    def _on_push(self) -> bool:
         self._populate_namespace()
         self._push_namespace()
         self._populate_base_name()

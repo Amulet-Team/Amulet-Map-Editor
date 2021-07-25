@@ -74,7 +74,7 @@ class BaseDefine(wx.Panel, BaseMCVersion):
     def _on_version_change(self, evt: mc_version.VersionChangeEvent):
         raise NotImplementedError
 
-    def push(self) -> bool:
+    def _on_push(self) -> bool:
         self._set_platform(self.platform)
         self._set_version_number(self.version_number)
         self._set_force_blockstate(self.force_blockstate)
@@ -88,6 +88,5 @@ class BaseDefine(wx.Panel, BaseMCVersion):
                 self._version_picker.version_number,
                 self._version_picker.force_blockstate,
             ) = (self.platform, self.version_number, self.force_blockstate)
-            self._version_picker.push()
             return True
         return False

@@ -174,8 +174,8 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
     def _on_blockstate_change(self, evt):
         self._on_change(3)
 
-    def push(self) -> bool:
-        update = super().push()
+    def _on_push(self) -> bool:
+        update = super()._on_push()
         # If the user set these out of order they may be messed up.
         # This should fix that.
         self._set_version_number(self.version_number)
@@ -238,7 +238,6 @@ def demo():
                 version,
                 force_blockstate,
             )
-            obj.push()
 
         interval = 1_000
 
@@ -258,7 +257,6 @@ def demo():
                 version,
                 platform,
             )
-            obj.push()
 
         wx.CallLater(interval * 5, set_version2, select, "java", (1, 15, 0), False)
         wx.CallLater(interval * 6, set_version2, select, "java", (1, 17, 0), False)

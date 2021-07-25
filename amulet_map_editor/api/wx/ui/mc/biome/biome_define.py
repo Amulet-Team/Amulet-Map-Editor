@@ -120,9 +120,9 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
             ),
         )
 
-    def push(self) -> bool:
+    def _on_push(self) -> bool:
         self.Freeze()
-        update = super().push()
+        update = super()._on_push()
         self._set_namespace(self.namespace)
         self._set_base_name(self.base_name)
         if update:
@@ -141,8 +141,6 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
                 self.namespace,
                 self.base_name,
             )
-        if update:
-            self._picker.push()
         self.Thaw()
         return update
 
@@ -204,7 +202,6 @@ def demo():
             namespace,
             base_name,
         )
-        obj.push()
 
     interval = 1_000
     wx.CallLater(
