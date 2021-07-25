@@ -56,7 +56,7 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlockAPI):
         self.update_button()
 
     def set_block(self, block: Block):
-        self.set_namespace(block.namespace)
+        self._set_namespace(block.namespace)
         self.set_block_name(block.base_name)
         self.set_properties(block.properties)
 

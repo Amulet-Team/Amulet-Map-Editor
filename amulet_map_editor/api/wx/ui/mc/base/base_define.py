@@ -75,17 +75,19 @@ class BaseDefine(wx.Panel, BaseMCVersion):
         raise NotImplementedError
 
     def push(self) -> bool:
-        self.set_platform(self.platform)
-        self.set_version_number(self.version_number)
-        self.set_force_blockstate(self.force_blockstate)
+        self._set_platform(self.platform)
+        self._set_version_number(self.version_number)
+        self._set_force_blockstate(self.force_blockstate)
         if (
             self.platform != self._version_picker.platform
             or self.version_number != self._version_picker.version_number
             or self.force_blockstate != self._version_picker.force_blockstate
         ):
-            self._version_picker.set_platform(self.platform)
-            self._version_picker.set_version_number(self.version_number)
-            self._version_picker.set_force_blockstate(self.force_blockstate)
+            (
+                self._version_picker.platform,
+                self._version_picker.version_number,
+                self._version_picker.force_blockstate,
+            ) = (self.platform, self.version_number, self.force_blockstate)
             self._version_picker.push()
             return True
         return False

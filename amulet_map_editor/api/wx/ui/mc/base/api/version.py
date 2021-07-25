@@ -21,7 +21,7 @@ class BaseMCVersionAPI(BaseMCPlatformAPI):
         """
         raise NotImplementedError
 
-    def set_version_number(self, version_number: Optional[VersionNumberTuple]):
+    def _set_version_number(self, version_number: Optional[VersionNumberTuple]):
         """
         Set the active version tuple.
         Changes will not propagate.
@@ -50,7 +50,7 @@ class BaseMCVersionAPI(BaseMCPlatformAPI):
         """
         raise NotImplementedError
 
-    def set_force_blockstate(self, force_blockstate: Optional[bool]):
+    def _set_force_blockstate(self, force_blockstate: Optional[bool]):
         """
         Set if blockstate is forced.
         Changes will not propagate.
@@ -73,9 +73,9 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
     ):
         super().__init__(translation_manager, platform)
         self._version_number = None
-        self.set_version_number(version_number)
+        self._set_version_number(version_number)
         self._force_blockstate = None
-        self.set_force_blockstate(force_blockstate)
+        self._set_force_blockstate(force_blockstate)
 
     @property
     def version_number(self) -> VersionNumberTuple:
@@ -83,10 +83,10 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
 
     @version_number.setter
     def version_number(self, version_number: VersionNumberTuple):
-        self.set_version_number(version_number)
-        self.push()
+        self._set_version_number(version_number)
+        self._schedule_push()
 
-    def set_version_number(self, version_number: Optional[VersionNumberTuple]):
+    def _set_version_number(self, version_number: Optional[VersionNumberTuple]):
         v = None
         if version_number is not None:
             if version_number in self._translation_manager.version_numbers(
@@ -111,8 +111,8 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
 
     @force_blockstate.setter
     def force_blockstate(self, force_blockstate: bool):
-        self.set_force_blockstate(force_blockstate)
-        self.push()
+        self._set_force_blockstate(force_blockstate)
+        self._schedule_push()
 
-    def set_force_blockstate(self, force_blockstate: Optional[bool]):
+    def _set_force_blockstate(self, force_blockstate: Optional[bool]):
         self._force_blockstate = bool(force_blockstate)

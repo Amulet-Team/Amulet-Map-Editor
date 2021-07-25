@@ -67,9 +67,9 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
         old_platform, old_version = self.platform, self.version_number
         old_namespace, old_base_name = self.namespace, self.base_name
 
-        self.set_platform(evt.platform)
-        self.set_version_number(evt.version_number)
-        self.set_force_blockstate(evt.force_blockstate)
+        self._set_platform(evt.platform)
+        self._set_version_number(evt.version_number)
+        self._set_force_blockstate(evt.force_blockstate)
 
         universal_biome = self._translation_manager.get_version(
             old_platform, old_version
@@ -79,15 +79,22 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
         ).biome.from_universal(universal_biome)
         namespace, base_name = new_biome.split(":", 1)
 
-        self.set_namespace(namespace)
-        self.set_base_name(base_name)
+        self._set_namespace(namespace)
+        self._set_base_name(base_name)
 
-        self._picker.set_platform(self.platform)
-        self._picker.set_version_number(self.version_number)
-        self._picker.set_force_blockstate(self.force_blockstate)
-        self._picker.set_namespace(self.namespace)
-        self._picker.set_base_name(self.base_name)
-        self._picker.push()
+        (
+            self._picker.platform,
+            self._picker.version_number,
+            self._picker.force_blockstate,
+            self._picker.namespace,
+            self._picker.base_name,
+        ) = (
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
+            self.namespace,
+            self.base_name,
+        )
 
         wx.PostEvent(
             self,
@@ -101,8 +108,8 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
         self.Thaw()
 
     def _on_biome_id_change(self, evt: BiomeIDChangeEvent):
-        self.set_namespace(evt.namespace)
-        self.set_base_name(evt.base_name)
+        self._set_namespace(evt.namespace)
+        self._set_base_name(evt.base_name)
         wx.PostEvent(
             self,
             BiomeIDChangeEvent(
@@ -116,20 +123,24 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
     def push(self) -> bool:
         self.Freeze()
         update = super().push()
-        self.set_namespace(self.namespace)
-        self.set_base_name(self.base_name)
+        self._set_namespace(self.namespace)
+        self._set_base_name(self.base_name)
         if update:
             # The version changed
-            self._picker.set_platform(self.platform)
-            self._picker.set_version_number(self.version_number)
-            self._picker.set_force_blockstate(self.force_blockstate)
+            (
+                self._picker.platform,
+                self._picker.version_number,
+                self._picker.force_blockstate,
+            ) = (self.platform, self.version_number, self.force_blockstate)
         if (
             self.namespace != self._picker.namespace
             or self.base_name != self._picker.base_name
         ):
             update = True
-            self._picker.set_namespace(self.namespace)
-            self._picker.set_base_name(self.base_name)
+            self._picker.namespace, self._picker.base_name = (
+                self.namespace,
+                self.base_name,
+            )
         if update:
             self._picker.push()
         self.Thaw()
@@ -152,7 +163,13 @@ def demo():
     obj = BiomeDefine(dialog, translation_manager, wx.HORIZONTAL)
 
     def on_biome_change(evt: BiomeIDChangeEvent):
-        print(obj.platform, obj.version_number, obj.force_blockstate, obj.namespace, obj.base_name)
+        print(
+            obj.platform,
+            obj.version_number,
+            obj.force_blockstate,
+            obj.namespace,
+            obj.base_name,
+        )
         print(evt.namespace, evt.base_name, evt.old_namespace, evt.old_base_name)
 
     obj.Bind(EVT_BIOME_ID_CHANGE, on_biome_change)
@@ -174,16 +191,34 @@ def demo():
         namespace: str,
         base_name: str,
     ):
-        obj.set_platform(platform)
-        obj.set_version_number(version)
-        obj.set_force_blockstate(force_blockstate)
-        obj.set_namespace(namespace)
-        obj.set_base_name(base_name)
+        (
+            obj.platform,
+            obj.version_number,
+            obj.force_blockstate,
+            obj.namespace,
+            obj.base_name,
+        ) = (
+            platform,
+            version,
+            force_blockstate,
+            namespace,
+            base_name,
+        )
         obj.push()
 
     interval = 1_000
-    wx.CallLater(interval * 1, set, "java", (1, 17, 0), False, "minecraft", "end_highlands")
-    wx.CallLater(interval * 2, set, "bedrock", (1, 17, 0), False, "minecraft", "birch_forest_hills_mutated")
+    wx.CallLater(
+        interval * 1, set, "java", (1, 17, 0), False, "minecraft", "end_highlands"
+    )
+    wx.CallLater(
+        interval * 2,
+        set,
+        "bedrock",
+        (1, 17, 0),
+        False,
+        "minecraft",
+        "birch_forest_hills_mutated",
+    )
     wx.CallLater(interval * 3, set, "java", (1, 17, 0), False, "minecraft", "random")
     wx.CallLater(interval * 4, set, "bedrock", (1, 17, 0), False, "minecraft", "random")
 

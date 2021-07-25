@@ -1,4 +1,5 @@
 from typing import Optional
+import wx
 import PyMCTranslate
 from amulet.api.data_types import PlatformType
 
@@ -20,7 +21,7 @@ class BaseMCPlatformAPI:
         """
         raise NotImplementedError
 
-    def set_platform(self, platform: Optional[PlatformType]):
+    def _set_platform(self, platform: Optional[PlatformType]):
         """
         Set the active platform.
         Changes will not propagate.
@@ -47,6 +48,7 @@ class BaseMC:
         translation_manager: PyMCTranslate.TranslationManager,
     ):
         self._translation_manager = translation_manager
+        self._changed = False
 
 
 class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
@@ -59,7 +61,21 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
     ):
         super().__init__(translation_manager)
         self._platform = None
-        self.set_platform(platform)
+        self._set_platform(platform)
+
+    def _schedule_push(self):
+        """Schedule the pushing of the internal data to the UI."""
+        if isinstance(self, wx.Window):
+            self._changed = True
+
+            def on_push():
+                if self._changed:
+                    self.Freeze()
+                    self.push()
+                    self.Thaw()
+                    self._changed = False
+
+            wx.CallAfter(on_push)
 
     def push(self) -> bool:
         """
@@ -76,10 +92,10 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
 
     @platform.setter
     def platform(self, platform: PlatformType):
-        self.set_platform(platform)
-        self.push()
+        self._set_platform(platform)
+        self._schedule_push()
 
-    def set_platform(self, platform: Optional[PlatformType]):
+    def _set_platform(self, platform: Optional[PlatformType]):
         if platform is not None and platform in self._translation_manager.platforms():
             self._platform = platform
         else:

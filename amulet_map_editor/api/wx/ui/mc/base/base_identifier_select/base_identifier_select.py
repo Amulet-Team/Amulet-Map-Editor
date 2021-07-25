@@ -195,7 +195,7 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         old_namespace = self.namespace
         new_namespace = self._namespace_combo.GetValue()
         if new_namespace != old_namespace:
-            self.set_namespace(new_namespace)
+            self._set_namespace(new_namespace)
 
             self._populate_base_name()
             self._update_from_search()
@@ -226,8 +226,10 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         ):
             new_base_name = new_base_name[1:-1]
         if old_namespace != self.namespace or old_base_name != new_base_name:
-            self.set_base_name(new_base_name)
-            self._post_event(old_namespace, old_base_name, self.namespace, new_base_name)
+            self._set_base_name(new_base_name)
+            self._post_event(
+                old_namespace, old_base_name, self.namespace, new_base_name
+            )
 
     def push(self) -> bool:
         self._populate_namespace()

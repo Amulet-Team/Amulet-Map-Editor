@@ -8,7 +8,7 @@ class BaseMCBiomeIdentifierAPI(BaseMCResourceIDAPI):
 
 
 class BaseMCBiomeIdentifier(BaseMCResourceID, BaseMCBiomeIdentifierAPI):
-    def set_namespace(self, namespace: Optional[str]):
+    def _set_namespace(self, namespace: Optional[str]):
         if namespace is None:
             self._namespace = (
                 self._translation_manager.get_version(
@@ -20,7 +20,7 @@ class BaseMCBiomeIdentifier(BaseMCResourceID, BaseMCBiomeIdentifierAPI):
         else:
             self._namespace = str(namespace)
 
-    def set_base_name(self, base_name: Optional[str]):
+    def _set_base_name(self, base_name: Optional[str]):
         if base_name is None:
             self._base_name = (
                 self._translation_manager.get_version(

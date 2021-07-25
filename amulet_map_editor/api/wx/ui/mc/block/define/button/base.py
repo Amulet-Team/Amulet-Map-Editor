@@ -34,10 +34,10 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifierAPI):
 
     @platform.setter
     def platform(self, platform: PlatformType):
-        self.set_platform(platform)
+        self._set_platform(platform)
         self.update_button()
 
-    def set_platform(self, platform: PlatformType):
+    def _set_platform(self, platform: PlatformType):
         self._block_widget.platform = platform
 
     @property
@@ -46,10 +46,10 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifierAPI):
 
     @version_number.setter
     def version_number(self, version_number: VersionNumberTuple):
-        self.set_version_number(version_number)
+        self._set_version_number(version_number)
         self.update_button()
 
-    def set_version_number(self, version_number: VersionNumberTuple):
+    def _set_version_number(self, version_number: VersionNumberTuple):
         self._block_widget.version_number = version_number
 
     @property
@@ -58,10 +58,10 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifierAPI):
 
     @namespace.setter
     def namespace(self, namespace: str):
-        self.set_namespace(namespace)
+        self._set_namespace(namespace)
         self.update_button()
 
-    def set_namespace(self, namespace: str):
+    def _set_namespace(self, namespace: str):
         self._block_widget.namespace = namespace
 
     @property
@@ -70,10 +70,10 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifierAPI):
 
     @force_blockstate.setter
     def force_blockstate(self, force_blockstate: bool):
-        self.set_force_blockstate(force_blockstate)
+        self._set_force_blockstate(force_blockstate)
         self.update_button()
 
-    def set_force_blockstate(self, force_blockstate: bool):
+    def _set_force_blockstate(self, force_blockstate: bool):
         self._block_widget.force_blockstate = force_blockstate
 
     @property

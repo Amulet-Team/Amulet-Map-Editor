@@ -8,7 +8,7 @@ class BaseMCBlockIdentifierAPI(BaseMCResourceIDAPI):
 
 
 class BaseMCBlockIdentifier(BaseMCResourceID, BaseMCBlockIdentifierAPI):
-    def set_namespace(self, namespace: Optional[str]):
+    def _set_namespace(self, namespace: Optional[str]):
         if namespace is None:
             self._namespace = self._translation_manager.get_version(
                 self.platform, self.version_number
@@ -16,7 +16,7 @@ class BaseMCBlockIdentifier(BaseMCResourceID, BaseMCBlockIdentifierAPI):
         else:
             self._namespace = str(namespace)
 
-    def set_base_name(self, base_name: Optional[str]):
+    def _set_base_name(self, base_name: Optional[str]):
         if base_name is None:
             blocks = self._translation_manager.get_version(
                 self.platform, self.version_number

@@ -22,7 +22,7 @@ class BaseMCResourceIDAPI(BaseMCVersionAPI):
         """
         raise NotImplementedError
 
-    def set_namespace(self, namespace: Optional[str]):
+    def _set_namespace(self, namespace: Optional[str]):
         """
         Set the active namespace.
         Changes will not propagate.
@@ -48,7 +48,7 @@ class BaseMCResourceIDAPI(BaseMCVersionAPI):
         """
         raise NotImplementedError
 
-    def set_base_name(self, base_name: Optional[str]):
+    def _set_base_name(self, base_name: Optional[str]):
         """
         Set the active base name.
         Changes will not propagate.
@@ -73,9 +73,9 @@ class BaseMCResourceID(BaseMCVersion, BaseMCResourceIDAPI):
             translation_manager, platform, version_number, force_blockstate
         )
         self._namespace = None
-        self.set_namespace(namespace)
+        self._set_namespace(namespace)
         self._base_name = None
-        self.set_base_name(base_name)
+        self._set_base_name(base_name)
 
     @property
     def namespace(self) -> str:
@@ -83,10 +83,10 @@ class BaseMCResourceID(BaseMCVersion, BaseMCResourceIDAPI):
 
     @namespace.setter
     def namespace(self, namespace: str):
-        self.set_namespace(namespace)
-        self.push()
+        self._set_namespace(namespace)
+        self._schedule_push()
 
-    def set_namespace(self, namespace: Optional[str]):
+    def _set_namespace(self, namespace: Optional[str]):
         raise NotImplementedError
 
     @property
@@ -95,8 +95,8 @@ class BaseMCResourceID(BaseMCVersion, BaseMCResourceIDAPI):
 
     @base_name.setter
     def base_name(self, base_name: str):
-        self.set_base_name(base_name)
-        self.push()
+        self._set_base_name(base_name)
+        self._schedule_push()
 
-    def set_base_name(self, base_name: Optional[str]):
+    def _set_base_name(self, base_name: Optional[str]):
         raise NotImplementedError

@@ -80,8 +80,10 @@ class BlockDefine(BaseBlockDefine, NormalMCBlockAPI):
 
     @block.setter
     def block(self, block: Block):
-        self._picker.set_namespace(block.namespace)
-        self._picker.set_name(block.base_name)
+        self._picker.namespace, self._picker.base_name = (
+            block.namespace,
+            block.base_name,
+        )
         self._update_properties()
         self.properties = block.properties
 

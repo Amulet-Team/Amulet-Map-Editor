@@ -132,7 +132,7 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         if changed <= 1:
             # write the changes back to the internal state
             new_platform = self._platform_choice.GetCurrentString()
-            self.set_platform(new_platform)
+            self._set_platform(new_platform)
         else:
             new_platform = old_platform
 
@@ -141,7 +141,7 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
                 self._populate_version()
                 self._version_choice.SetSelection(0)
             new_version = self._version_choice.GetCurrentObject()
-            self.set_version_number(new_version)
+            self._set_version_number(new_version)
         else:
             new_version = old_version
 
@@ -151,7 +151,7 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         new_force_blockstate = (
             self._blockstate_choice.GetCurrentString() == "blockstate"
         )
-        self.set_force_blockstate(new_force_blockstate)
+        self._set_force_blockstate(new_force_blockstate)
 
         wx.PostEvent(
             self,
@@ -178,8 +178,8 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         update = super().push()
         # If the user set these out of order they may be messed up.
         # This should fix that.
-        self.set_version_number(self.version_number)
-        self.set_force_blockstate(self.force_blockstate)
+        self._set_version_number(self.version_number)
+        self._set_force_blockstate(self.force_blockstate)
 
         if update:
             self._populate_version()
@@ -233,9 +233,11 @@ def demo():
             version: VersionNumberTuple,
             force_blockstate: bool,
         ):
-            obj.set_platform(platform)
-            obj.set_version_number(version)
-            obj.set_force_blockstate(force_blockstate)
+            obj.platform, obj.version_number, obj.force_blockstate = (
+                platform,
+                version,
+                force_blockstate,
+            )
             obj.push()
 
         interval = 1_000
@@ -251,9 +253,11 @@ def demo():
             version: VersionNumberTuple,
             force_blockstate: bool,
         ):
-            obj.set_force_blockstate(force_blockstate)
-            obj.set_version_number(version)
-            obj.set_platform(platform)
+            obj.force_blockstate, obj.version_number, obj.platform = (
+                force_blockstate,
+                version,
+                platform,
+            )
             obj.push()
 
         wx.CallLater(interval * 5, set_version2, select, "java", (1, 15, 0), False)

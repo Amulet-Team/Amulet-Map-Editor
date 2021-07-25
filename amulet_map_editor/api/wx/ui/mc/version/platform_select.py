@@ -110,7 +110,7 @@ class PlatformSelect(wx.Panel, BaseMCPlatform):
         old_platform = self.platform
         new_platform = self._platform_choice.GetCurrentString()
         # write the changes back to the internal state
-        self.set_platform(new_platform)
+        self._set_platform(new_platform)
         wx.PostEvent(self, PlatformChangeEvent(new_platform, old_platform))
 
     def push(self):
