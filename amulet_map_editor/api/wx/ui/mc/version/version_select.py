@@ -6,9 +6,7 @@ from typing import Optional, Dict, Any, Tuple
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 from .platform_select import PlatformSelect
 from amulet_map_editor.api.wx.ui.mc.base.api.version import BaseMCVersion
-from .events import (
-    VersionChangeEvent,
-)
+from .events import VersionChangeEvent, EVT_VERSION_CHANGE
 
 
 class VersionSelect(PlatformSelect, BaseMCVersion):
@@ -132,6 +130,9 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         if changed <= 1:
             # write the changes back to the internal state
             new_platform = self._platform_choice.GetCurrentString()
+            if new_platform == old_platform:
+                # nothing changed
+                return
             self._set_platform(new_platform)
         else:
             new_platform = old_platform
@@ -141,6 +142,8 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
                 self._populate_version()
                 self._version_choice.SetSelection(0)
             new_version = self._version_choice.GetCurrentObject()
+            if changed == 2 and new_version == old_version:
+                return
             self._set_version_number(new_version)
         else:
             new_version = old_version
@@ -151,6 +154,8 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         new_force_blockstate = (
             self._blockstate_choice.GetCurrentString() == "blockstate"
         )
+        if changed == 3 and new_force_blockstate == old_force_blockstate:
+            return
         self._set_force_blockstate(new_force_blockstate)
 
         wx.PostEvent(
@@ -214,10 +219,22 @@ def demo():
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        select = cls(dialog, translation_manager)
+        select: VersionSelect = cls(dialog, translation_manager)
         sizer.Add(select, 0, wx.ALL, 5)
         dialog.Show()
         dialog.Fit()
+
+        def on_change(evt: VersionChangeEvent):
+            print(
+                evt.platform,
+                evt.version_number,
+                evt.force_blockstate,
+                evt.old_platform,
+                evt.old_version_number,
+                evt.force_blockstate,
+            )
+
+        select.Bind(EVT_VERSION_CHANGE, on_change)
 
         def get_on_close(dialog_):
             def on_close(evt):

@@ -4,7 +4,7 @@ import PyMCTranslate
 from typing import Tuple, Type, Any, Dict
 
 from amulet.api.data_types import PlatformType
-from .events import PlatformChangeEvent
+from .events import PlatformChangeEvent, EVT_PLATFORM_CHANGE
 from amulet_map_editor.api.wx.ui.mc.base.api.platform import BaseMCPlatform
 
 
@@ -109,9 +109,10 @@ class PlatformSelect(wx.Panel, BaseMCPlatform):
         """The event run when the platform choice is changed by a user."""
         old_platform = self.platform
         new_platform = self._platform_choice.GetCurrentString()
-        # write the changes back to the internal state
-        self._set_platform(new_platform)
-        wx.PostEvent(self, PlatformChangeEvent(new_platform, old_platform))
+        if old_platform != new_platform:
+            # write the changes back to the internal state
+            self._set_platform(new_platform)
+            wx.PostEvent(self, PlatformChangeEvent(new_platform, old_platform))
 
     def _on_push(self):
         if self.platform != self._platform_choice.GetCurrentString():
@@ -133,12 +134,18 @@ def demo():
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
+    obj = PlatformSelect(dialog, translation_manager, "java")
     sizer.Add(
-        PlatformSelect(dialog, translation_manager, "java"),
+        obj,
         1,
         wx.ALL | wx.EXPAND,
         5,
     )
+
+    def on_change(evt: PlatformChangeEvent):
+        print(evt.platform, evt.old_platform)
+
+    obj.Bind(EVT_PLATFORM_CHANGE, on_change)
     dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
     dialog.Show()
     dialog.Fit()
