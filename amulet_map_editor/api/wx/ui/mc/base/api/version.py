@@ -21,16 +21,6 @@ class BaseMCVersionAPI(BaseMCPlatformAPI):
         """
         raise NotImplementedError
 
-    def _set_version_number(self, version_number: Optional[VersionNumberTuple]):
-        """
-        Set the active version tuple.
-        Changes will not propagate.
-        :meth:`update` must be called once all desired states are set.
-
-        :param version_number: The version number to set.
-        """
-        raise NotImplementedError
-
     @property
     def force_blockstate(self) -> bool:
         """
@@ -45,16 +35,6 @@ class BaseMCVersionAPI(BaseMCPlatformAPI):
         Set if blockstate is forced.
         Changes will propagate to the end of this UI.
         No events will be created.
-
-        :param force_blockstate: False for the native format, True for the blockstate format.
-        """
-        raise NotImplementedError
-
-    def _set_force_blockstate(self, force_blockstate: Optional[bool]):
-        """
-        Set if blockstate is forced.
-        Changes will not propagate.
-        :meth:`update` must be called once all desired states are set.
 
         :param force_blockstate: False for the native format, True for the blockstate format.
         """
@@ -87,6 +67,13 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
         self._schedule_push()
 
     def _set_version_number(self, version_number: Optional[VersionNumberTuple]):
+        """
+        Set the active version tuple.
+        Changes will not propagate.
+        :meth:`push` must be called once all desired states are set.
+
+        :param version_number: The version number to set.
+        """
         v = None
         if version_number is not None:
             if version_number in self._translation_manager.version_numbers(
@@ -115,4 +102,11 @@ class BaseMCVersion(BaseMCPlatform, BaseMCVersionAPI):
         self._schedule_push()
 
     def _set_force_blockstate(self, force_blockstate: Optional[bool]):
+        """
+        Set if blockstate is forced.
+        Changes will not propagate.
+        :meth:`push` must be called once all desired states are set.
+
+        :param force_blockstate: False for the native format, True for the blockstate format.
+        """
         self._force_blockstate = bool(force_blockstate)

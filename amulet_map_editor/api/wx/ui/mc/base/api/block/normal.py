@@ -13,18 +13,35 @@ from .identifier import BaseMCBlockIdentifierAPI, BaseMCBlockIdentifier
 class NormalMCBlockAPI(BaseMCBlockIdentifierAPI):
     @property
     def properties(self) -> PropertyType:
+        """The active properties."""
         raise NotImplementedError
 
     @properties.setter
     def properties(self, properties: PropertyType):
+        """
+        Set the active properties.
+        Changes will propagate to the end of this UI.
+        No events will be created.
+
+        :param properties: The properties to set.
+        """
         raise NotImplementedError
 
     @property
     def block(self) -> Block:
+        """The active block."""
         raise NotImplementedError
 
     @block.setter
     def block(self, block: Block):
+        """
+        Set the active block.
+        Namespace, base name and properties will be pulled from this.
+        Changes will propagate to the end of this UI.
+        No events will be created.
+
+        :param block: The block to set.
+        """
         raise NotImplementedError
 
 

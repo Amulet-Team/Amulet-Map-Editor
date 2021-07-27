@@ -22,16 +22,6 @@ class BaseMCResourceIDAPI(BaseMCVersionAPI):
         """
         raise NotImplementedError
 
-    def _set_namespace(self, namespace: Optional[str]):
-        """
-        Set the active namespace.
-        Changes will not propagate.
-        :meth:`update` must be called once all desired states are set.
-
-        :param namespace: The namespace to set.
-        """
-        raise NotImplementedError
-
     @property
     def base_name(self) -> str:
         """The active base name."""
@@ -43,16 +33,6 @@ class BaseMCResourceIDAPI(BaseMCVersionAPI):
         Set the active base name.
         Changes will propagate to the end of this UI.
         No events will be created.
-
-        :param base_name: The base name to set.
-        """
-        raise NotImplementedError
-
-    def _set_base_name(self, base_name: Optional[str]):
-        """
-        Set the active base name.
-        Changes will not propagate.
-        :meth:`update` must be called once all desired states are set.
 
         :param base_name: The base name to set.
         """
@@ -87,6 +67,13 @@ class BaseMCResourceID(BaseMCVersion, BaseMCResourceIDAPI):
         self._schedule_push()
 
     def _set_namespace(self, namespace: Optional[str]):
+        """
+        Set the active namespace.
+        Changes will not propagate.
+        :meth:`push` must be called once all desired states are set.
+
+        :param namespace: The namespace to set.
+        """
         raise NotImplementedError
 
     @property
@@ -99,4 +86,11 @@ class BaseMCResourceID(BaseMCVersion, BaseMCResourceIDAPI):
         self._schedule_push()
 
     def _set_base_name(self, base_name: Optional[str]):
+        """
+        Set the active base name.
+        Changes will not propagate.
+        :meth:`push` must be called once all desired states are set.
+
+        :param base_name: The base name to set.
+        """
         raise NotImplementedError

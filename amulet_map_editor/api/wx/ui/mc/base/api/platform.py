@@ -21,16 +21,6 @@ class BaseMCPlatformAPI:
         """
         raise NotImplementedError
 
-    def _set_platform(self, platform: Optional[PlatformType]):
-        """
-        Set the active platform.
-        Changes will not propagate.
-        :meth:`update` must be called once all desired states are set.
-
-        :param platform: The platform string to set.
-        """
-        raise NotImplementedError
-
 
 """
 update method should compare the internal state to the UI state and update as required. This should not create events.
@@ -106,6 +96,13 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
         self._schedule_push()
 
     def _set_platform(self, platform: Optional[PlatformType]):
+        """
+        Set the active platform.
+        Changes will not propagate.
+        :meth:`push` must be called once all desired states are set.
+
+        :param platform: The platform string to set.
+        """
         if platform is not None and platform in self._translation_manager.platforms():
             self._platform = platform
         else:
