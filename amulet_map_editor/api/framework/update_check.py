@@ -6,6 +6,7 @@ import json
 import re
 import webbrowser
 from dataclasses import dataclass
+from enum import IntEnum
 
 import wx
 
@@ -36,9 +37,11 @@ VERSION_REGEX = re.compile(
 _EVT_UPDATE_CHECK = wx.NewEventType()
 EVT_UPDATE_CHECK = wx.PyEventBinder(_EVT_UPDATE_CHECK, 1)
 
-FULL_RELEASE = 0
-BETA_RELEASE = -1
-ALPHA_RELEASE = -2
+
+class Release(IntEnum):
+    FULL = 0
+    BETA = -1
+    ALPHA = -2
 
 
 @dataclass
@@ -58,9 +61,9 @@ class Version:
         if self.release_stage > other.release_stage:
             return True
         if self.release_stage == other.release_stage:
-            if self.release_stage == -2:
+            if self.release_stage == Release.ALPHA:
                 return self.alpha_number > other.alpha_number
-            elif self.release_stage == -1:
+            elif self.release_stage == Release.BETA:
                 if self.beta_number > other.beta_number:
                     return True
                 elif self.beta_number == other.beta_number and self.beta_number != -1:
@@ -89,10 +92,10 @@ def get_version(version_string: str) -> Version:
         version = Version(Release.FULL, major, minor, patch)
 
         if v.get("alpha") is not None:
-            version.release_stage = ALPHA_RELEASE
+            version.release_stage = Release.ALPHA
             version.alpha_number = int(v["alpha"])
         elif v.get("beta") is not None:
-            version.release_stage = BETA_RELEASE
+            version.release_stage = Release.BETA
             version.beta_number = int(v["beta"])
             if v.get("devnum") is not None:
                 version.nightly_timestamp = int(v["devnum"])
