@@ -13,7 +13,24 @@ from amulet_map_editor import lang
 
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
 VERSION_REGEX = re.compile(
-    r"^v?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)((b(?P<beta>\d+)(\.dev(?P<devnum>\d{12}))?)|(a(?P<alpha>\d+)))?(.*\.g(?P<commit_hash>[a-z\d]{7}))?"
+    r"^"  # Match the beginning
+    r"v?" # Match an optional "v" at the start.
+    r"(?P<major>\d+)"  # Major version
+    r"\.(?P<minor>\d+)"  # Minor version
+    r"(\.(?P<patch>\d+))?"  # Optional patch version
+    r"(\.\d+)*"  # More optional version numbers
+    r"("  # Match an optional alpha or beta tag
+    r"(a(?P<alpha>\d+))"
+    r"|"
+    r"(b(?P<beta>\d+))"
+    r")?"
+    r"(\.dev(?P<devnum>\d+))?"  # Match an optional development release
+    r"("  # Match the optional unique extension added by versioneer
+    r"\+(?P<commit_count>\d+)"  # The number of commits since the last release
+    r"\.g(?P<commit_hash>[a-z\d]+)"  # The hash of the commit
+    r"(\.dirty)?"
+    r")?"
+    r"$"  # Match the end
 )
 
 _EVT_UPDATE_CHECK = wx.NewEventType()
@@ -64,8 +81,12 @@ def get_version(version_string: str) -> Version:
     version_match = VERSION_REGEX.match(version_string)
     if version_match:
         v = version_match.groupdict()
-        major, minor, patch = int(v["major"]), int(v["minor"]), int(v["patch"])
-        version = Version(FULL_RELEASE, major, minor, patch)
+        major, minor = int(v["major"]), int(v["minor"])
+        if v["patch"] is None:
+            patch = 0
+        else:
+            patch = int(v["patch"])
+        version = Version(Release.FULL, major, minor, patch)
 
         if v.get("alpha") is not None:
             version.release_stage = ALPHA_RELEASE
