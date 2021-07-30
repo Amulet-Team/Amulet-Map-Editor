@@ -1,3 +1,3 @@
 from .identifier import BaseMCBlockIdentifierAPI, BaseMCBlockIdentifier
-from .normal import NormalMCBlockAPI
-from .wildcard import WildcardMCBlockAPI
+from .normal import NormalMCBlockAPI, NormalMCBlock
+from .wildcard import WildcardMCBlockAPI, WildcardMCBlock
