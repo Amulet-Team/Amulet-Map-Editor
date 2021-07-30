@@ -60,7 +60,7 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
         if isinstance(self, wx.Window):
             wx.CallAfter(push)
 
-    def push(self) -> bool:
+    def push(self, force=False) -> bool:
         """
         Push the internal state to the UI.
         No events should be created when calling this method.
@@ -68,7 +68,7 @@ class BaseMCPlatform(BaseMC, BaseMCPlatformAPI):
         :return: True if data was changed
         """
         ret = False
-        if self._changed:
+        if self._changed or force:
             if isinstance(self, wx.Window):
                 self.Freeze()
             ret = self._on_push()
