@@ -3,6 +3,7 @@ from typing import Tuple, List, Dict, Any
 
 import PyMCTranslate
 
+from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor.api.image import COLOUR_PICKER
 from ..api.resource_id import BaseMCResourceID
 from .events import (
@@ -23,7 +24,7 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
-        version_number: Tuple[int, ...],
+        version_number: VersionNumberTuple,
         force_blockstate: bool = None,
         namespace: str = None,
         base_name: str = None,
