@@ -72,7 +72,7 @@ class ManualSingleProperty(BaseSingleProperty):
         sizer.Add(value_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         snbt_text = wx.StaticText(self, style=wx.ALIGN_CENTER)
         sizer.Add(snbt_text, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
-        self._change_value("", snbt_text)
+        self._change_value(value, snbt_text)
         value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, snbt_text))
 
         self._property_sizer.Add(sizer, 1, wx.TOP | wx.EXPAND, 5)

@@ -83,6 +83,7 @@ class SinglePropertySelect(BasePropertySelect, NormalMCBlock):
                 )
                 for name in properties
             }
+            self._simple.properties = self.properties
         return True
 
     def _on_change(self, evt: SinglePropertiesChangeEvent):
@@ -100,7 +101,17 @@ def demo():
     An app instance must be created first.
     """
     translation_manager = PyMCTranslate.new_translation_manager()
-    for block in (("minecraft", "oak_fence"), ("modded", "block")):
+    for block in (
+        ("minecraft", "oak_fence", {
+            'east': amulet_nbt.TAG_String("false"),
+            'north': amulet_nbt.TAG_String("true"),
+            'south': amulet_nbt.TAG_String("false"),
+            'west': amulet_nbt.TAG_String("false")
+        }),
+        ("modded", "block", {
+            'test': amulet_nbt.TAG_String("hello"),
+        })
+    ):
         dialog = wx.Dialog(
             None,
             title=f"SinglePropertySelect with block {block[0]}:{block[1]}",
