@@ -17,10 +17,8 @@ class ManualSingleProperty(BaseSingleProperty):
     This is used when the block is not know so the user can define the properties themselves.
     """
 
-    def __init__(
-        self, parent: wx.Window, translation_manager: PyMCTranslate.TranslationManager
-    ):
-        super().__init__(parent, translation_manager)
+    def __init__(self, parent: wx.Window):
+        super().__init__(parent)
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
         add_button = wx.BitmapButton(
             self, bitmap=ADD_ICON.bitmap(30, 30), size=(30, 30)

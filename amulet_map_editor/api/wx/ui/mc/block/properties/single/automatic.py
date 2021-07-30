@@ -1,11 +1,12 @@
 import wx
-from typing import Dict, List
+from typing import Dict, Tuple
 
-import PyMCTranslate
-import amulet_nbt
-from amulet.api.block import PropertyDataTypes, PropertyType
+
+from amulet.api.block import PropertyDataTypes, PropertyType, PropertyValueType
 from .events import SinglePropertiesChangeEvent
 from .base import BaseSingleProperty
+
+StatesType = Dict[str, Tuple[Tuple[PropertyValueType, ...], int]]
 
 
 class AutomaticSingleProperty(BaseSingleProperty):
@@ -15,12 +16,13 @@ class AutomaticSingleProperty(BaseSingleProperty):
     The UI is automatically populated from the given specification.
     """
 
+    _states: StatesType
+
     def __init__(
         self,
         parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
     ):
-        super().__init__(parent, translation_manager)
+        super().__init__(parent)
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
@@ -33,26 +35,40 @@ class AutomaticSingleProperty(BaseSingleProperty):
         self._property_sizer = wx.GridSizer(2, 5, 5)
         self._sizer.Add(self._property_sizer, 0, wx.ALL | wx.EXPAND, 5)
 
+        self._states: StatesType = {}
         self._properties: Dict[str, wx.Choice] = {}
-        self._specification: dict = {}
 
-    def rebuild_ui(self, specification: dict):
+    @property
+    def states(self) -> StatesType:
         """
-        Rebuild the UI from the given specification.
-        Run when the version or block is changed.
+        A dictionary mapping the string property names to the valid states and the index of the default state.
         """
-        self._specification = specification
+        return self._states
+
+    @states.setter
+    def states(self, states: StatesType):
+        self._states = {}
+        for key, (choices, default) in states.items():
+            if isinstance(key, str):
+                valid_choices = tuple(
+                    choice
+                    for choice in choices
+                    if isinstance(choice, PropertyDataTypes)
+                )
+                if valid_choices:
+                    self._states[key] = (
+                        valid_choices,
+                        default if default < len(valid_choices) else 0,
+                    )
         self.Freeze()
         self._properties.clear()
         self._property_sizer.Clear(True)
-        spec_properties: Dict[str, List[str]] = self._specification.get(
-            "properties", {}
-        )
 
-        for name, choices in spec_properties.items():
+        props = {}
+        for name, (choices, default) in self._states.items():
             label = wx.StaticText(self, label=name)
             self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
-            choice = wx.Choice(self, choices=choices)
+            choice = wx.Choice(self, choices=[c.to_snbt() for c in choices])
             self._property_sizer.Add(choice, 0, wx.EXPAND)
             choice.Bind(
                 wx.EVT_CHOICE,
@@ -62,7 +78,8 @@ class AutomaticSingleProperty(BaseSingleProperty):
                 ),
             )
             self._properties[name] = choice
-        self.properties = self._specification.get("defaults", {})
+            props[name] = choices[default]
+        self.properties = props
         self.Fit()
         self.GetTopLevelParent().Layout()
         self.Thaw()
@@ -70,23 +87,22 @@ class AutomaticSingleProperty(BaseSingleProperty):
     @property
     def properties(self) -> PropertyType:
         return {
-            name: amulet_nbt.from_snbt(choice.GetString(choice.GetSelection()))
+            name: self._states[name][0][choice.GetSelection()]
             for name, choice in self._properties.items()
         }
 
     @properties.setter
     def properties(self, properties: PropertyType):
-        self.Freeze()
+        is_frozen = self.IsFrozen()
+        if not is_frozen:
+            self.Freeze()
         for name, nbt in properties.items():
             if name in self._properties:
-                if isinstance(nbt, PropertyDataTypes):
-                    snbt = nbt.to_snbt()
-                elif isinstance(nbt, str):
-                    snbt = nbt
+                if isinstance(nbt, PropertyDataTypes) and nbt in self._states[name][0]:
+                    self._properties[name].SetSelection(
+                        self._states[name][0].index(nbt)
+                    )
                 else:
-                    continue
-                choice = self._properties[name]
-                index = choice.FindString(snbt)
-                if index != wx.NOT_FOUND:
-                    choice.SetSelection(index)
-        self.Thaw()
+                    self._properties[name].SetSelection(self._states[name][1])
+        if not is_frozen:
+            self.Thaw()

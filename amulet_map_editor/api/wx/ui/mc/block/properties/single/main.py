@@ -1,15 +1,17 @@
 import wx
-from typing import Tuple
+from typing import Tuple, Dict, Any, List
 
 import PyMCTranslate
+import amulet_nbt
 from amulet.api.block import PropertyType
 from ..base import BasePropertySelect
-from .events import SinglePropertiesChangeEvent
+from .events import SinglePropertiesChangeEvent, EVT_SINGLE_PROPERTIES_CHANGE
 from .automatic import AutomaticSingleProperty
 from .manual import ManualSingleProperty
+from amulet_map_editor.api.wx.ui.mc.base import NormalMCBlock
 
 
-class SinglePropertySelect(BasePropertySelect):
+class SinglePropertySelect(BasePropertySelect, NormalMCBlock):
     """
     This is a UI which lets the user pick one value for each property for a given block.
     If the block is known it will be populated from the specification.
@@ -23,84 +25,73 @@ class SinglePropertySelect(BasePropertySelect):
         platform: str,
         version_number: Tuple[int, int, int],
         force_blockstate: bool,
-        namespace: str,
-        block_name: str,
+        namespace: str = None,
+        base_name: str = None,
         properties: PropertyType = None,
+        state: Dict[str, Any] = None,
     ):
-        super().__init__(
+        state = state or {}
+        state.setdefault("properties", properties)
+        BasePropertySelect.__init__(
+            self,
             parent,
             translation_manager,
             platform,
             version_number,
             force_blockstate,
             namespace,
-            block_name,
-            style=wx.BORDER_SIMPLE,
+            base_name,
+            state,
         )
 
         self._manual_enabled = False
-        self._simple = AutomaticSingleProperty(self, translation_manager)
-        self._sizer.Add(self._simple, 1, wx.EXPAND)
-        self._manual = ManualSingleProperty(self, translation_manager)
-        self._sizer.Add(self._manual, 1, wx.EXPAND)
+        self._simple = AutomaticSingleProperty(self)
+        self._sizer.Add(self._simple, 0, wx.EXPAND)
+        self._manual = ManualSingleProperty(self)
+        self._sizer.Add(self._manual, 0, wx.EXPAND)
+        self._simple.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._on_change)
+        self._manual.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._on_change)
+        self.push(True)
 
-        if properties is None:
-            properties = {}
-        self._set_properties(properties)
-        self._rebuild_ui()
+    def _init_state(self, state: Dict[str, Any]):
+        NormalMCBlock.__init__(self, **state)
 
-    @property
-    def properties(self) -> PropertyType:
-        """
-        The selected values for each property.
-
-        :return: A dictionary mapping property name to the nbt value.
-        """
-        return self._get_properties()
-
-    @properties.setter
-    def properties(self, properties: PropertyType):
-        self._set_properties(properties)
-        wx.PostEvent(self, SinglePropertiesChangeEvent(self.properties))
-
-    def _get_properties(self) -> PropertyType:
-        """Get the selected values for each property."""
-        if self._manual_enabled:
-            return self._manual.properties
-        else:
-            return self._simple.properties
-
-    def _set_properties(self, properties: PropertyType):
-        """Set the selected values for each property."""
-        self.Freeze()
-        if self._manual_enabled:
-            self._manual.properties = properties
-        else:
-            self._simple.properties = properties
-        self.TopLevelParent.Layout()
-        self.Thaw()
-
-    def _rebuild_ui(self):
-        self.Freeze()
+    def _on_push(self) -> bool:
         translator = self._translation_manager.get_version(
             self._platform, self._version_number
         ).block
 
-        self._manual_enabled = self._block_name not in translator.base_names(
-            self._namespace, self._force_blockstate
+        self._manual_enabled = self.base_name not in translator.base_names(
+            self.namespace, self._force_blockstate
         )
         if self._manual_enabled:
             self._simple.Hide()
             self._manual.Show()
+            self._manual.properties = self.properties
         else:
             self._manual.Hide()
             self._simple.Show()
-            self._simple.rebuild_ui(
-                translator.get_specification(
-                    self._namespace, self._block_name, self._force_blockstate
-                )
+            spec = translator.get_specification(
+                self.namespace, self.base_name, self._force_blockstate
             )
-        self.Thaw()
+            properties: Dict[str, List[str]] = spec.get("properties", {})
+            defaults = spec.get("defaults", {})
+            self._simple.states = {
+                name: (
+                    [amulet_nbt.from_snbt(p) for p in properties[name]],
+                    properties[name].index(defaults[name]),
+                )
+                for name in properties
+            }
+        return True
+
+    def _on_change(self, evt: SinglePropertiesChangeEvent):
+        if evt.properties != self.properties:
+            self._set_properties(evt.properties)
+            wx.PostEvent(
+                self,
+                SinglePropertiesChangeEvent(self.properties),
+            )
 
 
 def demo():
@@ -117,14 +108,20 @@ def demo():
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
+        obj = SinglePropertySelect(
+            dialog, translation_manager, "java", (1, 16, 0), False, *block
+        )
         sizer.Add(
-            SinglePropertySelect(
-                dialog, translation_manager, "java", (1, 16, 0), False, *block
-            ),
+            obj,
             1,
             wx.ALL,
             5,
         )
+
+        def on_change(evt: SinglePropertiesChangeEvent):
+            print(evt.properties)
+
+        obj.Bind(EVT_SINGLE_PROPERTIES_CHANGE, on_change)
 
         def get_on_close(dialog_):
             def on_close(evt):
