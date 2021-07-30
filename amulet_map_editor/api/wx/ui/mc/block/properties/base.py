@@ -1,10 +1,11 @@
 import wx
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
 import PyMCTranslate
+from amulet_map_editor.api.wx.ui.mc.base.api.block import BaseMCBlockIdentifier
 
 
-class BasePropertySelect(wx.Panel):
+class BasePropertySelect(wx.Panel, BaseMCBlockIdentifier):
     def __init__(
         self,
         parent: wx.Window,
@@ -12,65 +13,32 @@ class BasePropertySelect(wx.Panel):
         platform: str,
         version_number: Tuple[int, int, int],
         force_blockstate: bool,
-        namespace: str,
-        block_name: str,
-        **kwargs,
+        namespace: str = None,
+        base_name: str = None,
+        state: Dict[str, Any] = None,
     ):
-        super().__init__(parent, **kwargs)
+        state = state or {}
+        state.setdefault("translation_manager", translation_manager)
+        state.setdefault("platform", platform)
+        state.setdefault("version_number", version_number)
+        state.setdefault("force_blockstate", force_blockstate)
+        state.setdefault("namespace", namespace)
+        state.setdefault("base_name", base_name)
+        # This is the init call to the class that stores the internal state of the data.
+        # This needs to be at the start to ensure that the internal state is set up before anything else is done.
+        # It is not a direct call to init so that subclasses of this class can substitute in which state subclass is used.
+        self._init_state(state)
+
+        wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
 
-        self._translation_manager = translation_manager
-
-        self._platform: str = platform
-        self._version_number: Tuple[int, int, int] = version_number
-        self._force_blockstate: bool = force_blockstate
-        self._namespace: str = namespace
-        self._block_name: str = block_name
-
-        self._set_version_block(
-            (platform, version_number, force_blockstate, namespace, block_name)
-        )
-
-    @property
-    def version_block(self) -> Tuple[str, Tuple[int, int, int], bool, str, str]:
-        """The version and block these properties relate to."""
-        return (
-            self._platform,
-            self._version_number,
-            self._force_blockstate,
-            self._namespace,
-            self._block_name,
-        )
-
-    @version_block.setter
-    def version_block(
-        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
-    ):
-        """Set the version and block and update the UI."""
-        self._set_version_block(version_block)
-        self._rebuild_ui()
-
-    def _set_version_block(
-        self, version_block: Tuple[str, Tuple[int, int, int], bool, str, str]
-    ):
+    def _init_state(self, state: Dict[str, Any]):
         """
-        Set the version and block these properties relate to.
-
-        :param version_block: The platform, version number, format, namespace and block name
+        Call the init method of the state manager.
+        This is here so that nested classes do not have to init the state managers multiple times.
         """
-        version = version_block[:3]
-        assert (
-            version[0] in self._translation_manager.platforms()
-            and version[1] in self._translation_manager.version_numbers(version[0])
-            and isinstance(version[2], bool)
-        ), f"{version} is not a valid version"
-        self._platform, self._version_number, self._force_blockstate = version
-        block = version_block[3:5]
-        assert isinstance(block[0], str) and isinstance(
-            block[1], str
-        ), "The block namespace and block name must be strings"
-        self._namespace, self._block_name = block
+        BaseMCBlockIdentifier.__init__(self, **state)
 
     def _rebuild_ui(self):
         """
