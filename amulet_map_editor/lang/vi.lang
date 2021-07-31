@@ -24,7 +24,7 @@
 ## This pattern must stay in the translated entries for them to work properly
 
 # Shared strings
-shared.check_console=Check the console for more details.
+shared.check_console=Kiểm tra cửa sổ lệnh để biết thên chi tiết.
 
 # App
 app.world_still_used=Một thế giới vẫn đang được sử dụng. Xin hãy đóng nó trước đã
@@ -144,9 +144,9 @@ program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
 program_3d_edit.select_tool.box_size_selector_tooltip=Hình dạng của vùng được chọn đang hoạt động sử dụng kí hiệu bộ chọn thể tích của Minecraft.
 program_3d_edit.select_tool.box_size_tooltip=Kích cỡ của hộp được chọn đang hoạt động theo khối.
 program_3d_edit.select_tool.button_point1=Di chuyển điểm 1
-program_3d_edit.select_tool.button_point1_tooltip=Ấn và giữ nút này và dùng các điều khiển chuyển động để di chuyển điểm chọn xanh lục.
+program_3d_edit.select_tool.button_point1_tooltip=Ấn và giữ nút này và dùng các phím điều khiển chuyển động để di chuyển điểm chọn xanh lục.
 program_3d_edit.select_tool.button_point2=Di chuyển điểm 2
-program_3d_edit.select_tool.button_point2_tooltip=Ấn và giữ nút này và dùng các điều khiển chuyển động để di chuyển điểm chọn xanh lam.
+program_3d_edit.select_tool.button_point2_tooltip=Ấn và giữ nút này và dùng các phím điều khiển chuyển động để di chuyển điểm chọn xanh lam.
 program_3d_edit.select_tool.button_selection_box=Di chuyển hộp
 program_3d_edit.select_tool.button_selection_box_tooltip=Ấn và giữ nút này và dùng các điều khiển chuyển động để di chuyển điểm hộp đang hoạt động.
 
