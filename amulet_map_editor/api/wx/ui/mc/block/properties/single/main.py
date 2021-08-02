@@ -102,15 +102,23 @@ def demo():
     """
     translation_manager = PyMCTranslate.new_translation_manager()
     for block in (
-        ("minecraft", "oak_fence", {
-            'east': amulet_nbt.TAG_String("false"),
-            'north': amulet_nbt.TAG_String("true"),
-            'south': amulet_nbt.TAG_String("false"),
-            'west': amulet_nbt.TAG_String("false")
-        }),
-        ("modded", "block", {
-            'test': amulet_nbt.TAG_String("hello"),
-        })
+        (
+            "minecraft",
+            "oak_fence",
+            {
+                "east": amulet_nbt.TAG_String("false"),
+                "north": amulet_nbt.TAG_String("true"),
+                "south": amulet_nbt.TAG_String("false"),
+                "west": amulet_nbt.TAG_String("false"),
+            },
+        ),
+        (
+            "modded",
+            "block",
+            {
+                "test": amulet_nbt.TAG_String("hello"),
+            },
+        ),
     ):
         dialog = wx.Dialog(
             None,
