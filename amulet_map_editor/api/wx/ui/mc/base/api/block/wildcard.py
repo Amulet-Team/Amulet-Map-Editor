@@ -68,7 +68,7 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
         block_manager = self._translation_manager.get_version(
             self.platform, self.version_number
         ).block
-        if self.platform in block_manager.namespaces(
+        if self.namespace in block_manager.namespaces(
             self.force_blockstate
         ) and self.base_name in block_manager.base_names(
             self.namespace, self.force_blockstate
