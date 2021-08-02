@@ -10,10 +10,10 @@ class MultiplePropertiesChangeEvent(wx.PyEvent):
     Run when the properties UI changes.
     """
 
-    def __init__(self, properties: PropertyTypeMultiple):
+    def __init__(self, selected_properties: PropertyTypeMultiple):
         wx.PyEvent.__init__(self, eventType=_MultiplePropertiesChangeEventType)
-        self._properties = properties
+        self._selected_properties = selected_properties
 
     @property
-    def properties(self) -> PropertyTypeMultiple:
-        return self._properties
+    def selected_properties(self) -> PropertyTypeMultiple:
+        return self._selected_properties

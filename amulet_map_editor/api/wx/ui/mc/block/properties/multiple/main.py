@@ -1,15 +1,18 @@
 import wx
-from typing import Tuple
+from typing import Tuple, Dict, Any, List
 
 import PyMCTranslate
+import amulet_nbt
 from amulet.api.block import PropertyTypeMultiple
+from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlock
 from ..base import BasePropertySelect
 
 from .automatic import AutomaticMultipleProperty
 from .manual import ManualMultipleProperty
+from .events import MultiplePropertiesChangeEvent, EVT_MULTIPLE_PROPERTIES_CHANGE
 
 
-class MultiplePropertySelect(BasePropertySelect):
+class MultiplePropertySelect(BasePropertySelect, WildcardMCBlock):
     """
     This is a UI which lets the user pick zero or more values for each property.
     If the block is known it will be populated from the specification.
@@ -24,94 +27,74 @@ class MultiplePropertySelect(BasePropertySelect):
         version_number: Tuple[int, int, int],
         force_blockstate: bool,
         namespace: str,
-        block_name: str,
-        properties: PropertyTypeMultiple = None,
+        base_name: str,
+        selected_properties: PropertyTypeMultiple = None,
+        all_properties: PropertyTypeMultiple = None,
+        state: Dict[str, Any] = None,
     ):
-        super().__init__(
+        state = state or {}
+        state.setdefault("selected_properties", selected_properties or {})
+        state.setdefault("all_properties", all_properties)
+        BasePropertySelect.__init__(
+            self,
             parent,
             translation_manager,
             platform,
             version_number,
             force_blockstate,
             namespace,
-            block_name,
-            style=wx.BORDER_SIMPLE,
+            base_name,
+            state,
         )
 
         self._manual_enabled = False
-        self._simple = AutomaticMultipleProperty(self, translation_manager)
+        self._simple = AutomaticMultipleProperty(self)
         self._sizer.Add(self._simple, 1, wx.EXPAND)
-        self._manual = ManualMultipleProperty(self, translation_manager)
+        self._manual = ManualMultipleProperty(self)
         self._sizer.Add(self._manual, 1, wx.EXPAND)
+        self._simple.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._on_change)
+        self._manual.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._on_change)
+        self.push(True)
 
-        if properties is None:
-            properties = {}
-        self.selected_properties = properties
-        self._rebuild_ui()
+    def _init_state(self, state: Dict[str, Any]):
+        WildcardMCBlock.__init__(self, **state)
 
-    @property
-    def selected_properties(self) -> PropertyTypeMultiple:
-        """
-        The values that are checked for each property.
-        This UI can have more than one property value checked (ticked).
-        """
-        if self._manual_enabled:
-            return self._manual.selected_properties
-        else:
-            return self._simple.selected_properties
-
-    @selected_properties.setter
-    def selected_properties(self, selected_properties: PropertyTypeMultiple):
-        self.Freeze()
-        if self._manual_enabled:
-            self._manual.selected_properties = selected_properties
-        else:
-            self._simple.selected_properties = selected_properties
-        self.TopLevelParent.Layout()
-        self.Thaw()
-
-    @property
-    def all_properties(self) -> PropertyTypeMultiple:
-        """
-        The values that are checked for each property.
-        This UI can have more than one property value checked (ticked).
-        """
-        if self._manual_enabled:
-            return self._manual.all_properties
-        else:
-            return self._simple.all_properties
-
-    @all_properties.setter
-    def all_properties(self, all_properties: PropertyTypeMultiple):
-        self.Freeze()
-        if self._manual_enabled:
-            self._manual.all_properties = all_properties
-        else:
-            self._simple.all_properties = all_properties
-        self.TopLevelParent.Layout()
-        self.Thaw()
-
-    def _rebuild_ui(self):
+    def _on_push(self) -> bool:
         self.Freeze()
         translator = self._translation_manager.get_version(
             self._platform, self._version_number
         ).block
 
-        self._manual_enabled = self._block_name not in translator.base_names(
-            self._namespace, self._force_blockstate
+        self._manual_enabled = self.base_name not in translator.base_names(
+            self.namespace, self.force_blockstate
         )
         if self._manual_enabled:
             self._simple.Hide()
             self._manual.Show()
+            self._manual.all_properties = self.all_properties
+            self._manual.selected_properties = self.selected_properties
         else:
             self._manual.Hide()
             self._simple.Show()
-            self._simple.rebuild_ui(
-                translator.get_specification(
-                    self._namespace, self._block_name, self._force_blockstate
-                )
+            spec = translator.get_specification(
+                self.namespace, self.base_name, self._force_blockstate
             )
+            properties: Dict[str, List[str]] = spec.get("properties", {})
+            self._simple.all_properties = {
+                name: [amulet_nbt.from_snbt(p) for p in properties[name]]
+                for name in properties
+            }
+            self._simple.selected_properties = self.selected_properties
         self.Thaw()
+        return True
+
+    def _on_change(self, evt: MultiplePropertiesChangeEvent):
+        if evt.selected_properties != self.selected_properties:
+            self._set_selected_properties(evt.selected_properties)
+            wx.PostEvent(
+                self,
+                MultiplePropertiesChangeEvent(self.selected_properties),
+            )
 
 
 def demo():
@@ -120,7 +103,34 @@ def demo():
     An app instance must be created first.
     """
     translation_manager = PyMCTranslate.new_translation_manager()
-    for block in (("minecraft", "oak_fence"), ("modded", "block")):
+    for block in (
+        (
+            "minecraft",
+            "oak_fence",
+            {
+                "east": (
+                    amulet_nbt.TAG_String("true"),
+                    amulet_nbt.TAG_String("false"),
+                ),
+                "north": (
+                    amulet_nbt.TAG_String("true"),
+                    amulet_nbt.TAG_String("false"),
+                ),
+                "south": (amulet_nbt.TAG_String("false"),),
+                "west": (amulet_nbt.TAG_String("true"),),
+            },
+        ),
+        (
+            "modded",
+            "block",
+            {
+                "test": (
+                    amulet_nbt.TAG_String("hello"),
+                    amulet_nbt.TAG_String("hello2"),
+                ),
+            },
+        ),
+    ):
         dialog = wx.Dialog(
             None,
             title=f"MultiplePropertySelect with block {block[0]}:{block[1]}",
@@ -128,14 +138,19 @@ def demo():
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
+        obj = MultiplePropertySelect(
+            dialog, translation_manager, "java", (1, 16, 0), False, *block
+        )
+
         sizer.Add(
-            MultiplePropertySelect(
-                dialog, translation_manager, "java", (1, 16, 0), False, *block
-            ),
+            obj,
             1,
             wx.ALL,
             5,
         )
+
+        def on_change(evt: MultiplePropertiesChangeEvent):
+            print(evt.selected_properties)
 
         def get_on_close(dialog_):
             def on_close(evt):
@@ -143,6 +158,7 @@ def demo():
 
             return on_close
 
+        obj.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, on_change)
         dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
         dialog.Show()
         dialog.Fit()

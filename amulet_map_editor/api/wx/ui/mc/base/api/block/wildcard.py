@@ -52,6 +52,20 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
         self._selected_properties = None
         self._set_selected_properties(selected_properties)
 
+    def _block_manager(self):
+        return self._translation_manager.get_version(
+            self.platform, self.version_number
+        ).block
+
+    @property
+    def is_vanilla(self):
+        block_manager = self._block_manager()
+        return self.namespace in block_manager.namespaces(
+            self.force_blockstate
+        ) and self.base_name in block_manager.base_names(
+            self.namespace, self.force_blockstate
+        )
+
     @property
     def all_properties(self) -> PropertyTypeMultiple:
         return self._all_properties
@@ -65,16 +79,9 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
         self, properties: Optional[PropertyTypeMultiple]
     ) -> PropertyTypeMultiple:
         out_properties: PropertyTypeMultiple = {}
-        block_manager = self._translation_manager.get_version(
-            self.platform, self.version_number
-        ).block
-        if self.namespace in block_manager.namespaces(
-            self.force_blockstate
-        ) and self.base_name in block_manager.base_names(
-            self.namespace, self.force_blockstate
-        ):
+        if self.is_vanilla:
             # Vanilla block. Make sure the property is valid
-            block_spec = block_manager.get_specification(
+            block_spec = self._block_manager().get_specification(
                 self.namespace, self.base_name, self.force_blockstate
             )
             props = block_spec.get("properties", {})
@@ -116,8 +123,19 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
     def _set_selected_properties(
         self, selected_properties: Optional[PropertyTypeMultiple]
     ):
-        self._selected_properties = {
-            name: tuple(nbt for nbt in nbts if nbt in self.all_properties[name])
-            for name, nbts in self._clean_properties(selected_properties).items()
-            if name in self.all_properties
-        }
+        if self.is_vanilla:
+            self._selected_properties = {
+                name: tuple(nbt for nbt in nbts if nbt in self.all_properties[name])
+                for name, nbts in self._clean_properties(selected_properties).items()
+                if name in self.all_properties
+            }
+        else:
+            props = self._clean_properties(selected_properties)
+            all_props = self.all_properties
+            for name, nbts in props.items():
+                if name in all_props:
+                    all_props[name] = tuple(set(all_props[name] + nbts))
+                else:
+                    all_props[name] = nbts
+            self.all_properties = all_props
+            self._selected_properties = props

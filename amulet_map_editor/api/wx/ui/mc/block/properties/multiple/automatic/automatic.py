@@ -1,20 +1,15 @@
 import wx
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
-import PyMCTranslate
-from amulet.api.block import PropertyTypeMultiple
+from amulet.api.block import PropertyTypeMultiple, PropertyDataTypes
 from ..events import MultiplePropertiesChangeEvent
 from ..base import BaseMultipleProperty
 from .popup import PropertyValueComboPopup
 
 
 class AutomaticMultipleProperty(BaseMultipleProperty):
-    def __init__(
-        self,
-        parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-    ):
-        super().__init__(parent, translation_manager)
+    def __init__(self, parent: wx.Window):
+        super().__init__(parent)
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
@@ -27,29 +22,37 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
         self._property_sizer = wx.GridSizer(2, 5, 5)
         self._sizer.Add(self._property_sizer, 0, wx.ALL | wx.EXPAND, 5)
 
+        self._states: PropertyTypeMultiple = {}
         self._properties: Dict[str, Tuple[wx.ComboCtrl, PropertyValueComboPopup]] = {}
-        self._specification: dict = {}
 
-    def rebuild_ui(self, specification: dict):
-        """
-        Rebuild the UI.
-        Run when the version or block is changed.
-        """
-        self._specification = specification
+    @property
+    def all_properties(self) -> PropertyTypeMultiple:
+        return self._states
+
+    @all_properties.setter
+    def all_properties(self, all_properties: PropertyTypeMultiple):
+        self._states = {}
+        for key, choices in all_properties.items():
+            if isinstance(key, str):
+                valid_choices = tuple(
+                    choice
+                    for choice in choices
+                    if isinstance(choice, PropertyDataTypes)
+                )
+                if valid_choices:
+                    self._states[key] = valid_choices
         self.Freeze()
         self._properties.clear()
         self._property_sizer.Clear(True)
-        spec_properties: Dict[str, List[str]] = self._specification.get(
-            "properties", {}
-        )
 
-        for name, choices in spec_properties.items():
+        props = {}
+        for name, choices in self._states.items():
             label = wx.StaticText(self, label=name)
             self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
 
             def create_choice():
                 choice = wx.ComboCtrl(self, style=wx.CB_READONLY)
-                popup = PropertyValueComboPopup(choices)
+                popup = PropertyValueComboPopup([c.to_snbt() for c in choices])
                 choice.SetPopupControl(popup)
                 choice.SetValue(popup.GetStringValue())
 
@@ -69,6 +72,8 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
                 self._properties[name] = (choice, popup)
 
             create_choice()
+            props[name] = choices
+        self.selected_properties = props
         self.Fit()
         self.GetTopLevelParent().Layout()
         self.Thaw()
@@ -92,11 +97,3 @@ class AutomaticMultipleProperty(BaseMultipleProperty):
                 popup.checked_nbt = nbt_tuple
                 choice.SetValue(popup.GetStringValue())
         self.Thaw()
-
-    @property
-    def all_properties(self) -> PropertyTypeMultiple:
-        return {prop: popup.all_nbt for prop, (_, popup) in self._properties.items()}
-
-    @all_properties.setter
-    def all_properties(self, all_properties: PropertyTypeMultiple):
-        pass
