@@ -48,8 +48,17 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
             base_name,
         )
         self._all_properties = None
-        self._set_all_properties(all_properties)
         self._selected_properties = None
+        if not self.is_vanilla:
+            selected_properties = self._clean_properties(selected_properties)
+            all_properties = self._clean_properties(all_properties)
+            for name, nbts in selected_properties.items():
+                if name in all_properties:
+                    ap = all_properties[name]
+                    all_properties[name] = ap + tuple(nbt for nbt in nbts if nbt not in ap)
+                else:
+                    all_properties[name] = nbts
+        self._set_all_properties(all_properties)
         self._set_selected_properties(selected_properties)
 
     def _block_manager(self):
@@ -123,19 +132,8 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
     def _set_selected_properties(
         self, selected_properties: Optional[PropertyTypeMultiple]
     ):
-        if self.is_vanilla:
-            self._selected_properties = {
-                name: tuple(nbt for nbt in nbts if nbt in self.all_properties[name])
-                for name, nbts in self._clean_properties(selected_properties).items()
-                if name in self.all_properties
-            }
-        else:
-            props = self._clean_properties(selected_properties)
-            all_props = self.all_properties
-            for name, nbts in props.items():
-                if name in all_props:
-                    all_props[name] = tuple(set(all_props[name] + nbts))
-                else:
-                    all_props[name] = nbts
-            self.all_properties = all_props
-            self._selected_properties = props
+        self._selected_properties = {
+            name: tuple(nbt for nbt in nbts if nbt in self.all_properties[name])
+            for name, nbts in self._clean_properties(selected_properties).items()
+            if name in self.all_properties
+        }
