@@ -24,7 +24,7 @@ class MultiplePropertySelect(BasePropertySelect, WildcardMCBlock):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
-        version_number: Tuple[int, int, int],
+        version_number: Tuple[int, ...],
         force_blockstate: bool,
         namespace: str,
         base_name: str,
@@ -44,7 +44,7 @@ class MultiplePropertySelect(BasePropertySelect, WildcardMCBlock):
             force_blockstate,
             namespace,
             base_name,
-            state,
+            state=state,
         )
 
         self._manual_enabled = False

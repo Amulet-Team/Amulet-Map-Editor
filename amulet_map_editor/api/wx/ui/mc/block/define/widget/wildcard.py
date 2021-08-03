@@ -1,19 +1,22 @@
 import wx
 import wx.lib.scrolledpanel
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
 import PyMCTranslate
-from amulet.api.block import PropertyTypeMultiple
+from amulet.api.block import PropertyTypeMultiple, Block
 
-from amulet_map_editor.api.wx.ui.mc.block.properties import (
+from amulet_map_editor.api.wx.ui.mc.block import (
+    BlockIDChangeEvent,
     MultiplePropertySelect,
     EVT_MULTIPLE_PROPERTIES_CHANGE,
+    MultiplePropertiesChangeEvent,
 )
 from amulet_map_editor.api.wx.ui.mc.block.define.widget.base import BaseBlockDefine
-from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlockAPI
+from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlock
+from amulet_map_editor.api.wx.ui.mc.version import VersionChangeEvent
 
 
-class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlockAPI):
+class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlock):
     """
     A UI that merges a version select widget with a block select widget and a multi property select.
     """
@@ -27,12 +30,17 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlockAPI):
         version_number: Tuple[int, int, int] = None,
         force_blockstate: bool = None,
         namespace: str = None,
-        block_name: str = None,
-        properties: PropertyTypeMultiple = None,
+        base_name: str = None,
+        selected_properties: PropertyTypeMultiple = None,
+        all_properties: PropertyTypeMultiple = None,
         show_pick_block: bool = False,
-        **kwargs,
+        state: Dict[str, Any] = None,
     ):
-        super().__init__(
+        state = state or {}
+        state.setdefault("selected_properties", selected_properties)
+        state.setdefault("all_properties", all_properties)
+        BaseBlockDefine.__init__(
+            self,
             parent,
             translation_manager,
             orientation,
@@ -40,9 +48,9 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlockAPI):
             version_number,
             force_blockstate,
             namespace,
-            block_name,
+            base_name,
             show_pick_block=show_pick_block,
-            **kwargs,
+            state=state,
         )
 
         right_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -51,12 +59,13 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlockAPI):
         self._property_picker = MultiplePropertySelect(
             self,
             translation_manager,
-            self._version_picker.platform,
-            self._version_picker.version_number,
-            self._version_picker.force_blockstate,
-            self._picker.namespace,
-            self._picker.name,
-            properties,
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
+            self.namespace,
+            self.base_name,
+            self.selected_properties,
+            self.all_properties,
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._property_picker.Bind(
@@ -65,26 +74,104 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlockAPI):
 
         self.Layout()
 
-    @property
-    def selected_properties(self) -> PropertyTypeMultiple:
-        """
-        The values that are checked for each property.
-        This UI can have more than one property value checked (ticked).
-        """
-        return self._property_picker.selected_properties
+    def _init_state(self, state: Dict[str, Any]):
+        WildcardMCBlock.__init__(self, **state)
 
-    @selected_properties.setter
-    def selected_properties(self, selected_properties: PropertyTypeMultiple):
-        self._property_picker.selected_properties = selected_properties
+    def _on_version_change(self, evt: VersionChangeEvent):
+        self.Freeze()
+        old_platform, old_version = self.platform, self.version_number
+        old_namespace, old_base_name, old_all_properties = (
+            self.namespace,
+            self.base_name,
+            self.all_properties,
+        )
 
-    @property
-    def all_properties(self) -> PropertyTypeMultiple:
-        """The values that exist for every property."""
-        return self._property_picker.all_properties
+        self._set_platform(evt.platform)
+        self._set_version_number(evt.version_number)
+        self._set_force_blockstate(evt.force_blockstate)
 
-    @all_properties.setter
-    def all_properties(self, all_properties: PropertyTypeMultiple):
-        self._property_picker.all_properties = all_properties
+        old_properties = {
+            name: values[0] for name, values in old_all_properties.items() if values
+        }
+
+        (
+            universal_block,
+            universal_block_entity,
+            _,
+        ) = self._translation_manager.get_version(
+            old_platform, old_version
+        ).block.to_universal(
+            Block(old_namespace, old_base_name, old_properties),
+            force_blockstate=self.force_blockstate,
+        )
+        new_block, _, _ = self._translation_manager.get_version(
+            self.platform, self.version_number
+        ).block.from_universal(
+            universal_block, universal_block_entity, self.force_blockstate
+        )
+
+        if isinstance(new_block, Block):
+            self._set_namespace(new_block.namespace)
+            self._set_base_name(new_block.base_name)
+        else:
+            self._set_namespace(None)
+            self._set_base_name(None)
+        self._set_all_properties(None)
+        self._set_selected_properties(None)
+
+        (
+            self._picker.platform,
+            self._picker.version_number,
+            self._picker.force_blockstate,
+            self._picker.namespace,
+            self._picker.base_name,
+        ) = (
+            self._property_picker.platform,
+            self._property_picker.version_number,
+            self._property_picker.force_blockstate,
+            self._property_picker.namespace,
+            self._property_picker.base_name,
+        ) = (
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
+            self.namespace,
+            self.base_name,
+        )
+        self._property_picker.all_properties = self.all_properties
+        self._property_picker.selected_properties = self.selected_properties
+
+        # wx.PostEvent(
+        #     self,
+        #     BiomeIDChangeEvent(
+        #         self.namespace,
+        #         self.base_name,
+        #         old_namespace,
+        #         old_base_name,
+        #     ),
+        # )
+        self.Thaw()
+
+    def _on_block_change(self, evt: BlockIDChangeEvent):
+        super()._on_block_change(evt)
+        self._set_all_properties(None)
+        self._set_selected_properties(None)
+        self._property_picker.all_properties = self.all_properties
+        self._property_picker.selected_properties = self.selected_properties
+
+    def _on_push(self) -> bool:
+        update = super()._on_push()
+        self._set_all_properties(self.all_properties)
+        self._set_selected_properties(self.selected_properties)
+        if (
+            update
+            or self.all_properties != self._property_picker.all_properties
+            or self.selected_properties != self._property_picker.selected_properties
+        ):
+            update = True
+            self._property_picker.all_properties = self.all_properties
+            self._property_picker.selected_properties = self.selected_properties
+        return update
 
 
 def demo():
@@ -92,23 +179,74 @@ def demo():
     Show a demo version of the UI.
     An app instance must be created first.
     """
+    import amulet_nbt
+
     translation_manager = PyMCTranslate.new_translation_manager()
-    dialog = wx.Dialog(
-        None,
-        title="WildcardBlockDefine",
-        style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
-    )
-    sizer = wx.BoxSizer()
-    dialog.SetSizer(sizer)
-    sizer.Add(
-        WildcardBlockDefine(dialog, translation_manager, wx.HORIZONTAL),
-        1,
-        wx.ALL | wx.EXPAND,
-        5,
-    )
-    dialog.Show()
-    dialog.Fit()
-    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+    for block in (
+        (
+            "minecraft",
+            "oak_fence",
+            {
+                "east": (
+                    amulet_nbt.TAG_String("true"),
+                    amulet_nbt.TAG_String("false"),
+                ),
+                "north": (
+                    amulet_nbt.TAG_String("true"),
+                    amulet_nbt.TAG_String("false"),
+                ),
+                "south": (amulet_nbt.TAG_String("false"),),
+                "west": (amulet_nbt.TAG_String("true"),),
+            },
+        ),
+        (
+            "modded",
+            "block",
+            {
+                "test": (
+                    amulet_nbt.TAG_String("hello"),
+                    amulet_nbt.TAG_String("hello2"),
+                ),
+            },
+        ),
+    ):
+        dialog = wx.Dialog(
+            None,
+            title=f"WildcardBlockDefine with block {block[0]}:{block[1]}",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
+        )
+        sizer = wx.BoxSizer()
+        dialog.SetSizer(sizer)
+        obj = WildcardBlockDefine(
+            dialog,
+            translation_manager,
+            wx.HORIZONTAL,
+            "java",
+            (1, 16, 0),
+            False,
+            *block,
+        )
+
+        sizer.Add(
+            obj,
+            1,
+            wx.ALL,
+            5,
+        )
+
+        def on_change(evt: MultiplePropertiesChangeEvent):
+            print(evt.selected_properties)
+
+        def get_on_close(dialog_):
+            def on_close(evt):
+                dialog_.Destroy()
+
+            return on_close
+
+        obj.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, on_change)
+        dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
+        dialog.Show()
+        dialog.Fit()
 
 
 if __name__ == "__main__":

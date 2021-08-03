@@ -37,6 +37,7 @@ class BlockIdentifierSelect(BaseIdentifierSelect, BaseMCBlockIdentifier):
             self.namespace, self.force_blockstate
         )
         self._base_name_list_box.SetItems(self._base_names)
+        self._update_from_search()
 
     def _post_event(
         self,

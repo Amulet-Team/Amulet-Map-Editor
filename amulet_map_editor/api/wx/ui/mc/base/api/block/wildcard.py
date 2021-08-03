@@ -55,7 +55,9 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
             for name, nbts in selected_properties.items():
                 if name in all_properties:
                     ap = all_properties[name]
-                    all_properties[name] = ap + tuple(nbt for nbt in nbts if nbt not in ap)
+                    all_properties[name] = ap + tuple(
+                        nbt for nbt in nbts if nbt not in ap
+                    )
                 else:
                     all_properties[name] = nbts
         self._set_all_properties(all_properties)

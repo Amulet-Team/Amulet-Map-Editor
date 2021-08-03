@@ -8,7 +8,11 @@ from amulet.api.data_types import VersionNumberTuple, PlatformType
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
 )
-from amulet_map_editor.api.wx.ui.mc import version as mc_version
+from amulet_map_editor.api.wx.ui.mc.version import (
+    VersionSelect,
+    EVT_VERSION_CHANGE,
+    VersionChangeEvent,
+)
 from amulet_map_editor.api.wx.ui.mc.base.api import BaseMCVersion
 
 
@@ -42,11 +46,11 @@ class BaseDefine(wx.Panel, BaseMCVersion):
 
         self._top_sizer = wx.BoxSizer(wx.VERTICAL)
         if orientation == wx.HORIZONTAL:
-            self._sizer.Add(self._top_sizer, 1, wx.EXPAND)
+            self._sizer.Add(self._top_sizer, 0, wx.EXPAND)
         else:
-            self._sizer.Add(self._top_sizer, 2, wx.EXPAND)
+            self._sizer.Add(self._top_sizer, 0, wx.EXPAND)
 
-        self._version_picker = mc_version.VersionSelect(
+        self._version_picker = VersionSelect(
             self,
             translation_manager,
             platform,
@@ -56,9 +60,7 @@ class BaseDefine(wx.Panel, BaseMCVersion):
             **kwargs,
         )
         self._top_sizer.Add(self._version_picker, 0, wx.EXPAND)
-        self._version_picker.Bind(
-            mc_version.EVT_VERSION_CHANGE, self._on_version_change
-        )
+        self._version_picker.Bind(EVT_VERSION_CHANGE, self._on_version_change)
 
         self._picker: Optional[BaseIdentifierSelect] = None
 
@@ -71,7 +73,7 @@ class BaseDefine(wx.Panel, BaseMCVersion):
         """
         BaseMCVersion.__init__(self, **state)
 
-    def _on_version_change(self, evt: mc_version.VersionChangeEvent):
+    def _on_version_change(self, evt: VersionChangeEvent):
         raise NotImplementedError
 
     def _on_push(self) -> bool:

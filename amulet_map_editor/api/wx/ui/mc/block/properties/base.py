@@ -11,7 +11,7 @@ class BasePropertySelect(wx.Panel, BaseMCBlockIdentifier):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
-        version_number: Tuple[int, int, int],
+        version_number: Tuple[int, ...],
         force_blockstate: bool,
         namespace: str = None,
         base_name: str = None,
@@ -39,10 +39,3 @@ class BasePropertySelect(wx.Panel, BaseMCBlockIdentifier):
         This is here so that nested classes do not have to init the state managers multiple times.
         """
         BaseMCBlockIdentifier.__init__(self, **state)
-
-    def _rebuild_ui(self):
-        """
-        Rebuild the UI.
-        Run when the version or block is changed.
-        """
-        raise NotImplementedError
