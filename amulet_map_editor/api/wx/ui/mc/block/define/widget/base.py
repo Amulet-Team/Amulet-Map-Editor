@@ -68,7 +68,6 @@ class BaseBlockDefine(BaseDefine, BaseMCBlockIdentifier):
         raise NotImplementedError
 
     def _on_version_change(self, evt: VersionChangeEvent):
-        # TODO: Translate the block and properties to the new version
         raise NotImplementedError
 
     def _on_block_change(self, evt: BlockIDChangeEvent):
@@ -76,10 +75,6 @@ class BaseBlockDefine(BaseDefine, BaseMCBlockIdentifier):
         self._set_base_name(evt.base_name)
         self._property_picker.namespace = self.namespace
         self._property_picker.base_name = self.base_name
-
-    def _on_property_change(self, evt):
-        self.Layout()
-        evt.Skip()
 
     def _on_push(self) -> bool:
         update = super()._on_push()

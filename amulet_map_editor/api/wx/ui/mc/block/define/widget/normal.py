@@ -12,6 +12,10 @@ from amulet_map_editor.api.wx.ui.mc.block import (
     SinglePropertiesChangeEvent,
 )
 from amulet_map_editor.api.wx.ui.mc.block.define.widget.base import BaseBlockDefine
+from amulet_map_editor.api.wx.ui.mc.block.define.events import (
+    BlockChangeEvent,
+    EVT_BLOCK_CHANGE,
+)
 from amulet_map_editor.api.wx.ui.mc.base import NormalMCBlock
 from amulet_map_editor.api.wx.ui.mc.version import VersionChangeEvent
 
@@ -75,7 +79,11 @@ class BlockDefine(BaseBlockDefine, NormalMCBlock):
 
     def _on_version_change(self, evt: VersionChangeEvent):
         self.Freeze()
-        old_platform, old_version = self.platform, self.version_number
+        old_platform, old_version, old_force_blockstate = (
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
+        )
         old_namespace, old_base_name, old_properties = (
             self.namespace,
             self.base_name,
@@ -132,21 +140,73 @@ class BlockDefine(BaseBlockDefine, NormalMCBlock):
         )
         self._property_picker.properties = self.properties
 
-        # wx.PostEvent(
-        #     self,
-        #     BiomeIDChangeEvent(
-        #         self.namespace,
-        #         self.base_name,
-        #         old_namespace,
-        #         old_base_name,
-        #     ),
-        # )
+        wx.PostEvent(
+            self,
+            BlockChangeEvent(
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                self.properties,
+                old_platform,
+                old_version,
+                old_force_blockstate,
+                old_namespace,
+                old_base_name,
+                old_properties,
+            ),
+        )
         self.Thaw()
 
     def _on_block_change(self, evt: BlockIDChangeEvent):
+        old_namespace, old_base_name, old_properties = (
+            self.namespace,
+            self.base_name,
+            self.properties,
+        )
         super()._on_block_change(evt)
         self._set_properties(None)
         self._property_picker.properties = self.properties
+        wx.PostEvent(
+            self,
+            BlockChangeEvent(
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                self.properties,
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                old_namespace,
+                old_base_name,
+                old_properties,
+            ),
+        )
+
+    def _on_property_change(self, evt: SinglePropertiesChangeEvent):
+        self.Layout()
+        old_properties = self.properties
+        self._set_properties(evt.properties)
+        wx.PostEvent(
+            self,
+            BlockChangeEvent(
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                self.properties,
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                old_properties,
+            ),
+        )
 
     def _on_push(self) -> bool:
         update = super()._on_push()
@@ -208,10 +268,23 @@ def demo():
             5,
         )
 
-        def on_change(evt: SinglePropertiesChangeEvent):
-            print(evt.properties)
+        def on_change(evt: BlockChangeEvent):
+            print(
+                evt.platform,
+                evt.version_number,
+                evt.force_blockstate,
+                evt.namespace,
+                evt.base_name,
+                evt.properties,
+                evt.old_platform,
+                evt.old_version_number,
+                evt.old_force_blockstate,
+                evt.old_namespace,
+                evt.old_base_name,
+                evt.old_properties,
+            )
 
-        obj.Bind(EVT_SINGLE_PROPERTIES_CHANGE, on_change)
+        obj.Bind(EVT_BLOCK_CHANGE, on_change)
 
         def get_on_close(dialog_):
             def on_close(evt):

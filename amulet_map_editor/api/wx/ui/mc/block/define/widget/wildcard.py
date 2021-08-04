@@ -12,6 +12,10 @@ from amulet_map_editor.api.wx.ui.mc.block import (
     MultiplePropertiesChangeEvent,
 )
 from amulet_map_editor.api.wx.ui.mc.block.define.widget.base import BaseBlockDefine
+from amulet_map_editor.api.wx.ui.mc.block.define.events import (
+    WildcardBlockChangeEvent,
+    EVT_WILDCARD_BLOCK_CHANGE,
+)
 from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlock
 from amulet_map_editor.api.wx.ui.mc.version import VersionChangeEvent
 
@@ -79,11 +83,16 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlock):
 
     def _on_version_change(self, evt: VersionChangeEvent):
         self.Freeze()
-        old_platform, old_version = self.platform, self.version_number
-        old_namespace, old_base_name, old_all_properties = (
+        old_platform, old_version, old_force_blockstate = (
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
+        )
+        old_namespace, old_base_name, old_all_properties, old_selected_properties = (
             self.namespace,
             self.base_name,
             self.all_properties,
+            self.selected_properties,
         )
 
         self._set_platform(evt.platform)
@@ -141,23 +150,75 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlock):
         self._property_picker.all_properties = self.all_properties
         self._property_picker.selected_properties = self.selected_properties
 
-        # wx.PostEvent(
-        #     self,
-        #     BiomeIDChangeEvent(
-        #         self.namespace,
-        #         self.base_name,
-        #         old_namespace,
-        #         old_base_name,
-        #     ),
-        # )
+        wx.PostEvent(
+            self,
+            WildcardBlockChangeEvent(
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                self.selected_properties,
+                old_platform,
+                old_version,
+                old_force_blockstate,
+                old_namespace,
+                old_base_name,
+                old_selected_properties,
+            ),
+        )
         self.Thaw()
 
     def _on_block_change(self, evt: BlockIDChangeEvent):
+        old_namespace, old_base_name, old_selected_properties = (
+            self.namespace,
+            self.base_name,
+            self.selected_properties,
+        )
         super()._on_block_change(evt)
         self._set_all_properties(None)
         self._set_selected_properties(None)
         self._property_picker.all_properties = self.all_properties
         self._property_picker.selected_properties = self.selected_properties
+        wx.PostEvent(
+            self,
+            WildcardBlockChangeEvent(
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                self.selected_properties,
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                old_namespace,
+                old_base_name,
+                old_selected_properties,
+            ),
+        )
+
+    def _on_property_change(self, evt: MultiplePropertiesChangeEvent):
+        self.Layout()
+        old_selected_properties = self.selected_properties
+        self._set_selected_properties(evt.selected_properties)
+        wx.PostEvent(
+            self,
+            WildcardBlockChangeEvent(
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                self.selected_properties,
+                self.platform,
+                self.version_number,
+                self.force_blockstate,
+                self.namespace,
+                self.base_name,
+                old_selected_properties,
+            ),
+        )
 
     def _on_push(self) -> bool:
         update = super()._on_push()
@@ -234,8 +295,21 @@ def demo():
             5,
         )
 
-        def on_change(evt: MultiplePropertiesChangeEvent):
-            print(evt.selected_properties)
+        def on_change(evt: WildcardBlockChangeEvent):
+            print(
+                evt.platform,
+                evt.version_number,
+                evt.force_blockstate,
+                evt.namespace,
+                evt.base_name,
+                evt.selected_properties,
+                evt.old_platform,
+                evt.old_version_number,
+                evt.old_force_blockstate,
+                evt.old_namespace,
+                evt.old_base_name,
+                evt.old_selected_properties,
+            )
 
         def get_on_close(dialog_):
             def on_close(evt):
@@ -243,7 +317,7 @@ def demo():
 
             return on_close
 
-        obj.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, on_change)
+        obj.Bind(EVT_WILDCARD_BLOCK_CHANGE, on_change)
         dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
         dialog.Show()
         dialog.Fit()
