@@ -201,6 +201,7 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlock):
     def _on_property_change(self, evt: MultiplePropertiesChangeEvent):
         self.Layout()
         old_selected_properties = self.selected_properties
+        self._set_all_properties(self._property_picker.all_properties)
         self._set_selected_properties(evt.selected_properties)
         wx.PostEvent(
             self,
