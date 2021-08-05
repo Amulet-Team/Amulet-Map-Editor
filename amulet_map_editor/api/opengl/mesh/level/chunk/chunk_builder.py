@@ -3,6 +3,7 @@ from typing import Tuple, Dict, List, Union
 
 import minecraft_model_reader
 from amulet.api.chunk import Chunk
+from amulet.api.registry import BlockManager
 
 from amulet_map_editor.api.opengl.mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import (
@@ -22,35 +23,29 @@ _brightness_multiplier = {
 }
 
 
-def create_lod0_array(
+def py_create_lod0_sub_chunk(
     larger_blocks: numpy.ndarray,
-    unique_blocks: numpy.ndarray,
-    models: Dict[int, minecraft_model_reader.BlockMesh],
+    models: Tuple[minecraft_model_reader.BlockMesh],
     texture_bounds: Dict[str, Tuple[float, float, float, float]],
     vert_len: int,
-    chunk_offset: Union[Tuple[int, int, int], numpy.ndarray],
-    sub_chunk_offset: Tuple[int, int, int] = None,
+    chunk_offset: numpy.ndarray,
+    sub_chunk_y_offset: int,
 ) -> Tuple[List[numpy.ndarray], List[numpy.ndarray]]:
-    """Create chunk geometry for a given sub-chunk.
+    """
+    Create chunk geometry for a given sub-chunk.
     Creates a numpy array for opaque geometry and a numpy array for translucent geometry.
 
     :param larger_blocks: A numpy array for the sub-chunk that extends by one block in each direction.
-    :param unique_blocks: A numpy array of the unique block ids in the sub-chunk.
-    :param models: A dictionary mapping internal block id to the block model.
+    :param models: A tuple of block models. Indices match the larger_blocks array.
     :param texture_bounds: A dictionary mapping texture id to the bounds of the texture in the atlas.
     :param vert_len: The number of float32 values per vertex.
     :param chunk_offset: The offset of the chunk in the world.
-    :param sub_chunk_offset: The offset of the sub-chunk relative to the chunk.
+    :param sub_chunk_y_offset: The offset of the sub-chunk relative to the chunk.
     :return:
     """
-    sub_chunk_offset = sub_chunk_offset or (0, 0, 0)
-
+    sub_chunk_offset = (0, sub_chunk_y_offset, 0)
     blocks = larger_blocks[1:-1, 1:-1, 1:-1]
-
-    transparent_array = numpy.zeros(larger_blocks.shape, dtype=numpy.uint8)
-    for block_temp_id in unique_blocks:
-        model = models[block_temp_id]
-        transparent_array[larger_blocks == block_temp_id] = model.is_transparent
+    transparent_array = numpy.array([model.is_transparent for model in models], dtype=numpy.uint8)[larger_blocks]
 
     def get_transparent_array(offset_transparent_array, transparent_array_):
         return numpy.logical_and(
@@ -170,6 +165,53 @@ def create_lod0_array(
     return chunk_verts, chunk_verts_translucent
 
 
+def py_create_lod0_chunk(
+    resource_pack: OpenGLResourcePack,
+    chunk_offset: numpy.ndarray,
+    blocks: List[Tuple[numpy.ndarray, int]],
+    block_palette: BlockManager,
+    vert_len: int,
+):
+    chunk_verts = []
+    chunk_verts_translucent = []
+
+    for block_array, sub_chunk_y in blocks:
+        # unique blocks per sub-chunk
+        unique_sub_chunk_blocks, inverse_block_array = numpy.unique(block_array, return_inverse=True)
+
+        models: Tuple[minecraft_model_reader.BlockMesh] = tuple(
+            resource_pack.get_block_model(
+                block_palette[block_temp_id]
+            )
+            for block_temp_id in unique_sub_chunk_blocks
+        )
+        texture_bounds: Dict[str, Tuple[float, float, float, float]] = {
+            texture_path: resource_pack.texture_bounds(texture_path)
+            for model in models
+            for texture_path in model.textures
+        }
+        chunk_verts_, chunk_verts_translucent_ = py_create_lod0_sub_chunk(
+            inverse_block_array.reshape(block_array.shape),
+            models,
+            texture_bounds,
+            vert_len,
+            chunk_offset,
+            sub_chunk_y,
+        )
+        chunk_verts += chunk_verts_
+        chunk_verts_translucent += chunk_verts_translucent_
+
+    return chunk_verts, chunk_verts_translucent
+
+
+try:
+    from .chunk_builder_cy import create_lod0_chunk
+    print("Using cython chunk generator")
+except:
+    print("Using python chunk generator")
+    create_lod0_chunk = py_create_lod0_chunk
+
+
 class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
     """A class to define the logic to generate geometry from a block array"""
 
@@ -216,51 +258,17 @@ class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
         self.draw_count = int(self.verts.size // self._vert_len)
 
     def _create_lod0_multi(
-        self, blocks: List[Tuple[numpy.ndarray, Tuple[int, int, int]]]
+        self, blocks: List[Tuple[numpy.ndarray, int]]
     ) -> Tuple[List[numpy.ndarray], List[numpy.ndarray]]:
         """Create LOD0 geometry data for every sub-chunk in a given chunk.
 
         :param blocks: A list of tuples containing block arrays extending one block outside the sub-chunk in each direction.
         :return: Opaque block vertices, translucent block vertices.
         """
-        chunk_verts = []
-        chunk_verts_translucent = []
-
-        if blocks:
-            # unique blocks per sub-chunk
-            unique_sub_chunk_blocks = [numpy.unique(arr) for arr, _ in blocks]
-
-            # unique blocks in the chunk
-            unique_chunk_blocks = numpy.unique(
-                numpy.concatenate(unique_sub_chunk_blocks)
-            )
-
-            block_palette = self.chunk.block_palette
-            models: Dict[int, minecraft_model_reader.BlockMesh] = {
-                block_temp_id: self.resource_pack.get_block_model(
-                    block_palette[block_temp_id]
-                )
-                for block_temp_id in unique_chunk_blocks
-            }
-            texture_bounds: Dict[str, Tuple[float, float, float, float]] = {
-                texture_path: self.resource_pack.texture_bounds(texture_path)
-                for model in models.values()
-                for texture_path in model.textures
-            }
-
-            for (larger_blocks, offset), unique_blocks in zip(
-                blocks, unique_sub_chunk_blocks
-            ):
-                chunk_verts_, chunk_verts_translucent_ = create_lod0_array(
-                    larger_blocks,
-                    unique_blocks,
-                    models,
-                    texture_bounds,
-                    self._vert_len,
-                    self.offset,
-                    offset,
-                )
-                chunk_verts += chunk_verts_
-                chunk_verts_translucent += chunk_verts_translucent_
-
-        return chunk_verts, chunk_verts_translucent
+        return create_lod0_chunk(
+            self.resource_pack,
+            self.offset,
+            blocks,
+            self.chunk.block_palette,
+            self._vert_len,
+        )

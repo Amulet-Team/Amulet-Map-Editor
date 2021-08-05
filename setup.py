@@ -1,9 +1,23 @@
 from typing import List
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
 import os
 import glob
 import shutil
 import versioneer
+
+try:
+    from Cython.Build import cythonize
+except (ImportError, ModuleNotFoundError):
+    print("Could not find cython. The cython version will not be built.")
+    cythonize = None
+
+
+class get_numpy_include:
+    def __str__(self):
+        import numpy
+
+        return numpy.get_include()
+
 
 # there were issues with other builds carrying over their cache
 for d in glob.glob("*.egg-info"):
@@ -55,6 +69,16 @@ package_data = [
     )
 ]
 
+if cythonize:
+    extensions = [
+        Extension(
+            name="amulet_map_editor.api.opengl.mesh.level.chunk.chunk_builder_cy", sources=["amulet_map_editor/api/opengl/mesh/level/chunk/chunk_builder_cy.pyx"]
+        )
+    ]
+    ext_modules = cythonize(extensions, language_level=3, annotate=True)
+else:
+    ext_modules = []
+
 setup(
     name="amulet-map-editor",
     version=versioneer.get_version(),
@@ -64,6 +88,8 @@ setup(
     install_requires=required_packages,
     packages=find_packages(),
     package_data={"amulet_map_editor": package_data},
+    ext_modules=ext_modules,
+    include_dirs=[get_numpy_include()],
     cmdclass=versioneer.get_cmdclass(),
     setup_requires=required_packages,
     dependency_links=[
