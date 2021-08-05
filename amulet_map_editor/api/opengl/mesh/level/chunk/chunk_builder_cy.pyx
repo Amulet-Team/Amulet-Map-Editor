@@ -112,9 +112,9 @@ cdef tuple create_lod0_sub_chunk(
     return chunk_verts, chunk_verts_translucent
 
 
-cpdef create_lod0_chunk(
+def create_lod0_chunk(
     resource_pack,
-    long[:] chunk_offset: numpy.ndarray,
+    chunk_offset: numpy.ndarray,
     blocks,
     block_palette,
     vert_len,  # should be 12
