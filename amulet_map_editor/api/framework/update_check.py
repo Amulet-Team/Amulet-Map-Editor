@@ -13,25 +13,42 @@ import wx
 from amulet_map_editor import lang
 
 URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
+
+"""
+VERSION_REGEX Documentation
+
+    This is not a documentation of regular expression syntax, just documentation on the subsequences that this regular expression looks for
+    For an in-depth guide on regular expressions, see here: https://www.debuggex.com/cheatsheet/regex/python
+    
+    Our version scheme allows for an optional "v" prefix, so that subsequence is tested by "v?"
+    
+    Since we use the Semantic Versioning scheme, our version numbers follow this format: <major>.<minor>.<patch>
+    with the <patch> number being optional (only if it's value would be 0 for that version)
+    That is tested by "(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?"
+    
+    - For the major and minor numbers, "(?P<major>\d+)" will match any non-zero number of digits and group them under the
+        "major" group (in this instance)
+    - "\." will then match the separating "." character
+    - Since the patch number is optional, "(\.(?P<patch>\d+))?" is used instead, the second "." is included in the 
+        optional group, but other wise the capturing group is the same as the major/minor numbers
+        
+    We then use an optional release type flag to denote whether the release is a beta or alpha release and it's number:
+    "((a(?P<alpha>\d+))|(b(?P<beta>\d+)))?"
+    
+    For our nightly builds, we also denote a unique build number with the prefix of ".dev": "(\.dev(?P<devnum>\d{12}))?"
+    
+    Finally, our version scheme also denotes when Amulet is being ran from source, while this information isn't
+    necessarily used for update checking, we use it to determine if the update dialog should be shown. If a commit 
+    hash/count is found in the version string of the current Amulet instance, the dialog is not shown. Our regular 
+    expression uses the following to detect that subsequence: 
+        "(\+(?P<commit_count>\d+)\.g(?P<commit_hash>[a-z\d]+)(\.dirty)?)?"
+        
+    - "commit_count" group signifies the number of commits since the last release
+    - "commit_hash" group is the current commit hash
+    - ".dirty" denotes whether uncommitted changes have been made 
+"""
 VERSION_REGEX = re.compile(
-    r"^"  # Match the beginning
-    r"v?" # Match an optional "v" at the start.
-    r"(?P<major>\d+)"  # Major version
-    r"\.(?P<minor>\d+)"  # Minor version
-    r"(\.(?P<patch>\d+))?"  # Optional patch version
-    r"(\.\d+)*"  # More optional version numbers
-    r"("  # Match an optional alpha or beta tag
-    r"(a(?P<alpha>\d+))"
-    r"|"
-    r"(b(?P<beta>\d+))"
-    r")?"
-    r"(\.dev(?P<devnum>\d+))?"  # Match an optional development release
-    r"("  # Match the optional unique extension added by versioneer
-    r"\+(?P<commit_count>\d+)"  # The number of commits since the last release
-    r"\.g(?P<commit_hash>[a-z\d]+)"  # The hash of the commit
-    r"(\.dirty)?"
-    r")?"
-    r"$"  # Match the end
+    r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?((a(?P<alpha>\d+))|(b(?P<beta>\d+)))?(\.dev(?P<devnum>\d{12}))?(\+(?P<commit_count>\d+)\.g(?P<commit_hash>[a-z\d]+)(\.dirty)?)?$"
 )
 
 _EVT_UPDATE_CHECK = wx.NewEventType()
