@@ -1,5 +1,3 @@
-# distutils: language = c++
-
 import numpy
 cimport numpy
 cimport cython
