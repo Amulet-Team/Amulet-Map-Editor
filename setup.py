@@ -3,7 +3,12 @@ from setuptools import setup, find_packages
 import os
 import glob
 import shutil
-import versioneer
+import sys
+try:
+    import versioneer
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+    import versioneer
 
 # there were issues with other builds carrying over their cache
 for d in glob.glob("*.egg-info"):
@@ -56,25 +61,8 @@ package_data = [
 ]
 
 setup(
-    name="amulet-map-editor",
-    version=versioneer.get_version(),
-    description="A new Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.",
-    author="James Clare, Ben Gothard et al.",
-    author_email="amuleteditor@gmail.com",
     install_requires=required_packages,
     packages=find_packages(),
     package_data={"amulet_map_editor": package_data},
     cmdclass=versioneer.get_cmdclass(),
-    setup_requires=required_packages,
-    dependency_links=[
-        "https://github.com/Amulet-Team/Amulet-Core",
-        "https://github.com/gentlegiantJGC/Minecraft-Model-Reader",
-        "https://github.com/gentlegiantJGC/PyMCTranslate",
-        "https://github.com/Amulet-Team/Amulet-NBT",
-    ],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.6",
 )
