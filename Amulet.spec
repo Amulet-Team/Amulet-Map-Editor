@@ -11,28 +11,17 @@ import glob
 import amulet
 import PyMCTranslate
 import minecraft_model_reader
+import amulet_map_editor
 
 sys.modules["FixTk"] = None
 
 AMULET_PATH = amulet.__path__[0]
-PYMCT_PATH = os.path.abspath(os.path.dirname(PyMCTranslate.__file__))
-REAL_PYMCT_PATH = (
-    PYMCT_PATH if not os.path.islink(PYMCT_PATH) else os.readlink(PYMCT_PATH)
-)  # I have this linked by a symbolic link
-MINECRAFT_MODEL_READER = os.path.abspath(
-    os.path.dirname(minecraft_model_reader.__file__)
-)
-
-AMULET_MAP_EDITOR = os.path.abspath(
-    os.path.join(".", "build", "lib", "amulet_map_editor")
-)
-if not os.path.isfile(os.path.join(AMULET_MAP_EDITOR, "__main__.py")):
-    print(AMULET_MAP_EDITOR)
-    raise Exception(
-        "There is no built version of amulet-map-editor. Run setup.py build first."
-    )
+PYMCT_PATH = PyMCTranslate.__path__[0]
+MINECRAFT_MODEL_READER = minecraft_model_reader.__path__[0]
+AMULET_MAP_EDITOR = amulet_map_editor.__path__[0]
 
 block_cipher = None
+
 
 hidden = []
 hidden.extend(collect_submodules("pkg_resources"))
@@ -136,5 +125,5 @@ app = BUNDLE(
     coll,
     name="amulet.app",
     icon="icon.ico",
-    bundle_identifier="com.amulet-editor.amulet_map_editor",
+    bundle_identifier="com.amuletmc.amulet_map_editor",
 )
