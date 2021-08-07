@@ -120,89 +120,92 @@ def create_lod0_chunk(
     block_palette,
     vert_len,  # should be 12
 ):
+    if not hasattr(resource_pack, "block_model_verts"):
+        # TODO: set up a proper location for these
+        resource_pack.block_model_verts = ()
+    if not hasattr(resource_pack, "block_is_transparent"):
+        resource_pack.block_is_transparent = numpy.zeros(0, dtype=numpy.uint8)
+    model_verts = resource_pack.block_model_verts
+    is_transparent = resource_pack.block_is_transparent
+
+    state_count = len(block_palette)
+    done_count = min(len(model_verts), len(is_transparent))
+
+    if state_count != done_count:
+        # more block states have been added
+
+        model_verts = model_verts[:done_count]
+        is_transparent = is_transparent[:done_count]
+
+        models = tuple(
+            resource_pack.get_block_model(
+                block_palette[block_temp_id]
+            )
+            for block_temp_id in range(done_count, state_count)
+        )
+        resource_pack.block_is_transparent = is_transparent = numpy.concatenate(
+            (
+            is_transparent,
+            numpy.array([model.is_transparent for model in models], dtype=numpy.uint8)
+            ),
+            None,
+            dtype=numpy.uint8
+        )
+        texture_bounds = {
+            texture_path: resource_pack.texture_bounds(texture_path)
+            for model in models
+            for texture_path in model.textures
+        }
+        block_model_verts_new = []
+        for model in models:
+            vert_map = [None]*7
+            for py_cull_dir in model.faces.keys():
+                if py_cull_dir is None:
+                    cull_id = 0
+                elif py_cull_dir in CULL_STR_INDEX:
+                    cull_id = CULL_STR_INDEX[py_cull_dir]
+                else:
+                    continue
+                # the vertices in model space
+                verts = model.verts[py_cull_dir].reshape((-1, 3))
+                tverts = model.texture_coords[py_cull_dir].reshape((-1, 2))
+                faces = model.faces[py_cull_dir]
+
+                py_vert_table = numpy.zeros(
+                    (faces.size, vert_len), dtype=numpy.float32
+                )
+                py_vert_table[:, :3] = verts[faces]
+                py_vert_table[:, 3:5] = tverts[faces]
+
+                vert_index = 0
+                for texture_index in model.texture_index[py_cull_dir]:
+                    py_vert_table[vert_index : vert_index + 3, 5:9] = texture_bounds[model.textures[texture_index]]
+                    vert_index += 3
+
+                py_vert_table[:, 9:12] = (
+                    model.tint_verts[py_cull_dir].reshape((-1, 3))[faces]
+                    * _brightness_multiplier[py_cull_dir]
+                )
+                # py_vert_table[:, 9:12] *= 0.9 + 0.2 * numpy.abs(
+                #     (numpy.remainder(py_vert_table[:, 1:2] / 32, 2) - 1)
+                # )
+                vert_map[cull_id] = py_vert_table
+            block_model_verts_new.append(tuple(vert_map))
+
+        resource_pack.block_model_verts = model_verts = model_verts + tuple(block_model_verts_new)
+
     chunk_verts = []
     chunk_verts_translucent = []
 
-    block_arrays, sub_chunk_offsets = zip(*blocks)
-
-    # the unique block ids and the inverse for each sub-chunk
-    unique_sub_chunk_blocks_arr, inverse_sub_chunk_blocks_arr = zip(
-        *[
-            numpy.unique(block_array, return_inverse=True) for block_array in block_arrays
-        ]
-    )
-    inverse_sub_chunk_blocks_arr = [inv_arr.astype(numpy.uint32).reshape(arr.shape) for inv_arr, arr in zip(inverse_sub_chunk_blocks_arr, block_arrays)]
-    # the unique blocks in the whole chunk
-    unique_chunk_blocks, unique_chunk_blocks_inv = numpy.unique(
-        numpy.concatenate(unique_sub_chunk_blocks_arr), return_inverse=True
-    )
-    # A list of indices which point into unique_chunk_blocks for each sub-chunk
-    inverse_sub_chunk_index_arr = numpy.split(
-        unique_chunk_blocks_inv, numpy.cumsum([len(a) for a in unique_sub_chunk_blocks_arr])[:-1]
-    )
-
-    models = tuple(
-        resource_pack.get_block_model(
-            block_palette[block_temp_id]
-        )
-        for block_temp_id in unique_chunk_blocks
-    )
-    is_transparent = numpy.array([model.is_transparent for model in models], dtype=numpy.uint8)
-    texture_bounds = {
-        texture_path: resource_pack.texture_bounds(texture_path)
-        for model in models
-        for texture_path in model.textures
-    }
-    model_verts = []
-    for model in models:
-        vert_map = [None]*7
-        for py_cull_dir in model.faces.keys():
-            if py_cull_dir is None:
-                cull_id = 0
-            elif py_cull_dir in CULL_STR_INDEX:
-                cull_id = CULL_STR_INDEX[py_cull_dir]
-            else:
-                continue
-            # the vertices in model space
-            verts = model.verts[py_cull_dir].reshape((-1, 3))
-            tverts = model.texture_coords[py_cull_dir].reshape((-1, 2))
-            faces = model.faces[py_cull_dir]
-
-            py_vert_table = numpy.zeros(
-                (faces.size, vert_len), dtype=numpy.float32
-            )
-            py_vert_table[:, :3] = verts[faces]
-            py_vert_table[:, 3:5] = tverts[faces]
-
-            vert_index = 0
-            for texture_index in model.texture_index[py_cull_dir]:
-                py_vert_table[vert_index : vert_index + 3, 5:9] = texture_bounds[model.textures[texture_index]]
-                vert_index += 3
-
-            py_vert_table[:, 9:12] = (
-                model.tint_verts[py_cull_dir].reshape((-1, 3))[faces]
-                * _brightness_multiplier[py_cull_dir]
-            )
-            # py_vert_table[:, 9:12] *= 0.9 + 0.2 * numpy.abs(
-            #     (numpy.remainder(py_vert_table[:, 1:2] / 32, 2) - 1)
-            # )
-            vert_map[cull_id] = py_vert_table
-        model_verts.append(tuple(vert_map))
-
-    for inverse_block_array, sub_chunk_y, block_indices in zip(
-        inverse_sub_chunk_blocks_arr,
-        sub_chunk_offsets,
-        inverse_sub_chunk_index_arr,
-    ):
+    for block_array, sub_chunk_y in blocks:
         sub_chunk_offset = chunk_offset.copy()
         sub_chunk_offset[1] += sub_chunk_y
-        sub_chunk_is_transparent = is_transparent[block_indices]
 
         chunk_verts_, chunk_verts_translucent_ = create_lod0_sub_chunk(
-            inverse_block_array,
-            sub_chunk_is_transparent[inverse_block_array],
-            tuple(model_verts[b] for b in block_indices),
-            sub_chunk_is_transparent,
+            block_array,
+            is_transparent[block_array],
+            model_verts,
+            is_transparent,
             sub_chunk_offset,
         )
         chunk_verts += chunk_verts_
