@@ -84,7 +84,7 @@ cdef tuple create_lod0_sub_chunk(
                         if is_transparent[block_id] == 1:
                             vert_end = trans_vert_id+vert_count
                             if vert_end > ARRAY_SIZE:
-                                chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_id], dtype=numpy.float32).ravel())
+                                chunk_verts_translucent.append(trans_vert_table[:trans_vert_id].copy())
                                 trans_vert_id = 0
                                 vert_end = trans_vert_id+vert_count
                             trans_vert_table[trans_vert_id:vert_end, :] = temp_vert_table
@@ -96,7 +96,7 @@ cdef tuple create_lod0_sub_chunk(
                         else:
                             vert_end = vert_id+vert_count
                             if vert_end > ARRAY_SIZE:
-                                chunk_verts.append(numpy.array(vert_table[:vert_id], dtype=numpy.float32).ravel())
+                                chunk_verts.append(vert_table[:vert_id].copy())
                                 vert_id = 0
                                 vert_end = vert_id+vert_count
                             vert_table[vert_id:vert_end, :] = temp_vert_table
@@ -107,9 +107,9 @@ cdef tuple create_lod0_sub_chunk(
                             vert_id += vert_count
 
     if vert_id:
-        chunk_verts.append(numpy.array(vert_table[:vert_id], dtype=numpy.float32).ravel())
+        chunk_verts.append(vert_table[:vert_id].copy())
     if trans_vert_id:
-        chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_id], dtype=numpy.float32).ravel())
+        chunk_verts_translucent.append(trans_vert_table[:trans_vert_id].copy())
     return chunk_verts, chunk_verts_translucent
 
 

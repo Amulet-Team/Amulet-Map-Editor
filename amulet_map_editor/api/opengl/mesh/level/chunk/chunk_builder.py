@@ -246,14 +246,14 @@ class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
         chunk_verts_translucent: List[numpy.ndarray],
     ):
         if chunk_verts:
-            self.verts = numpy.concatenate(chunk_verts, 0)
+            self.verts = numpy.concatenate(chunk_verts, None)
             self.verts_translucent = self.verts.size
         else:
             self.verts = self.new_empty_verts()
 
         if chunk_verts_translucent:
             chunk_verts_translucent.insert(0, self.verts)
-            self.verts = numpy.concatenate(chunk_verts_translucent, 0)
+            self.verts = numpy.concatenate(chunk_verts_translucent, None)
 
         self.draw_count = int(self.verts.size // self._vert_len)
 
