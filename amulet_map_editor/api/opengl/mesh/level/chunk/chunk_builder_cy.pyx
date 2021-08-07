@@ -42,7 +42,8 @@ cdef tuple create_lod0_sub_chunk(
     char[:] is_transparent,
     long[:] sub_chunk_offset,
 ):
-    cdef int x, y, z, x_, y_, z_, dx, dy, dz, vert_count, vert_end, cull_id, v
+    cdef int x, y, z, x_, y_, z_, dx, dy, dz, vert_count, vert_end, cull_id, vertex, vertex_attr
+    cdef float shade
     cdef unsigned int block_id
     cdef tuple vert_map
 
@@ -88,10 +89,16 @@ cdef tuple create_lod0_sub_chunk(
                                 trans_vert_id = 0
                                 vert_end = trans_vert_id+vert_count
                             trans_vert_table[trans_vert_id:vert_end, :] = temp_vert_table
-                            for v in range(trans_vert_id, trans_vert_id + vert_count):
-                                trans_vert_table[v, 0] += x + sub_chunk_offset[0]
-                                trans_vert_table[v, 1] += y + sub_chunk_offset[1]
-                                trans_vert_table[v, 2] += z + sub_chunk_offset[2]
+                            for vertex in range(trans_vert_id, trans_vert_id + vert_count):
+                                trans_vert_table[vertex, 0] += x + sub_chunk_offset[0]
+                                trans_vert_table[vertex, 1] += y + sub_chunk_offset[1]
+                                trans_vert_table[vertex, 2] += z + sub_chunk_offset[2]
+                                shade = ((trans_vert_table[vertex, 1] / 32) % 2)
+                                if shade > 1:
+                                    shade = - shade + 2
+                                shade = 0.9 + 0.2 * shade
+                                for vertex_attr in range(9, 12):
+                                    trans_vert_table[vertex, vertex_attr] *= shade
                             trans_vert_id += vert_count
                         else:
                             vert_end = vert_id+vert_count
@@ -100,10 +107,16 @@ cdef tuple create_lod0_sub_chunk(
                                 vert_id = 0
                                 vert_end = vert_id+vert_count
                             vert_table[vert_id:vert_end, :] = temp_vert_table
-                            for v in range(vert_id, vert_id + vert_count):
-                                vert_table[v, 0] += x + sub_chunk_offset[0]
-                                vert_table[v, 1] += y + sub_chunk_offset[1]
-                                vert_table[v, 2] += z + sub_chunk_offset[2]
+                            for vertex in range(vert_id, vert_id + vert_count):
+                                vert_table[vertex, 0] += x + sub_chunk_offset[0]
+                                vert_table[vertex, 1] += y + sub_chunk_offset[1]
+                                vert_table[vertex, 2] += z + sub_chunk_offset[2]
+                                shade = ((vert_table[vertex, 1] / 32) % 2)
+                                if shade > 1:
+                                    shade = - shade + 2
+                                shade = 0.9 + 0.2 * shade
+                                for vertex_attr in range(9, 12):
+                                    vert_table[vertex, vertex_attr] *= shade
                             vert_id += vert_count
 
     if vert_id:
@@ -186,9 +199,6 @@ def create_lod0_chunk(
                     model.tint_verts[py_cull_dir].reshape((-1, 3))[faces]
                     * _brightness_multiplier[py_cull_dir]
                 )
-                # py_vert_table[:, 9:12] *= 0.9 + 0.2 * numpy.abs(
-                #     (numpy.remainder(py_vert_table[:, 1:2] / 32, 2) - 1)
-                # )
                 vert_map[cull_id] = py_vert_table
             block_model_verts_new.append(tuple(vert_map))
 
