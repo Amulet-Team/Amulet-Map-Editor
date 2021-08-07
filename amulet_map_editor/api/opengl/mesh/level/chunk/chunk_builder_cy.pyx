@@ -44,7 +44,7 @@ cdef tuple create_lod0_sub_chunk(
 ):
     cdef int x, y, z, x_, y_, z_, dx, dy, dz, vert_count, vert_end, cull_id, v
     cdef unsigned int block_id
-    cdef dict vert_map
+    cdef tuple vert_map
 
     cdef float[:, :] vert_table = numpy.empty((ARRAY_SIZE, 12), dtype=numpy.float32)
     cdef float[:, :] trans_vert_table = numpy.empty((ARRAY_SIZE, 12), dtype=numpy.float32)
@@ -67,43 +67,44 @@ cdef tuple create_lod0_sub_chunk(
                 z_ = z + 1
                 block_id = larger_blocks[x_, y_, z_]
                 vert_map = model_verts[block_id]
-                for cull_id in vert_map:
-                    # iterate through each cull direction
-                    if cull_id:
-                        dx = x_ + CULL_MAP[cull_id][0]
-                        dy = y_ + CULL_MAP[cull_id][1]
-                        dz = z_ + CULL_MAP[cull_id][2]
-                        # If the next block is opaque or both blocks are full transparent blocks, do nothing
-                        if transparent_array[dx, dy, dz] == 0 or transparent_array[dx, dy, dz] == transparent_array[x_, y_, z_] == 1:
-                            continue
+                for cull_id in range(7):
+                    if vert_map[cull_id] is not None:
+                        # iterate through each cull direction
+                        if cull_id:
+                            dx = x_ + CULL_MAP[cull_id][0]
+                            dy = y_ + CULL_MAP[cull_id][1]
+                            dz = z_ + CULL_MAP[cull_id][2]
+                            # If the next block is opaque or both blocks are full transparent blocks, do nothing
+                            if transparent_array[dx, dy, dz] == 0 or transparent_array[dx, dy, dz] == transparent_array[x_, y_, z_] == 1:
+                                continue
 
-                    temp_vert_table = vert_map[cull_id]
-                    vert_count = temp_vert_table.shape[0]
+                        temp_vert_table = vert_map[cull_id]
+                        vert_count = temp_vert_table.shape[0]
 
-                    if is_transparent[block_id] == 1:
-                        vert_end = trans_vert_id+vert_count
-                        if vert_end > ARRAY_SIZE:
-                            chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_id], dtype=numpy.float32).ravel())
-                            trans_vert_id = 0
+                        if is_transparent[block_id] == 1:
                             vert_end = trans_vert_id+vert_count
-                        trans_vert_table[trans_vert_id:vert_end, :] = temp_vert_table
-                        for v in range(trans_vert_id, trans_vert_id + vert_count):
-                            trans_vert_table[v, 0] += x + sub_chunk_offset[0]
-                            trans_vert_table[v, 1] += y + sub_chunk_offset[1]
-                            trans_vert_table[v, 2] += z + sub_chunk_offset[2]
-                        trans_vert_id += vert_count
-                    else:
-                        vert_end = vert_id+vert_count
-                        if vert_end > ARRAY_SIZE:
-                            chunk_verts.append(numpy.array(vert_table[:vert_id], dtype=numpy.float32).ravel())
-                            vert_id = 0
+                            if vert_end > ARRAY_SIZE:
+                                chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_id], dtype=numpy.float32).ravel())
+                                trans_vert_id = 0
+                                vert_end = trans_vert_id+vert_count
+                            trans_vert_table[trans_vert_id:vert_end, :] = temp_vert_table
+                            for v in range(trans_vert_id, trans_vert_id + vert_count):
+                                trans_vert_table[v, 0] += x + sub_chunk_offset[0]
+                                trans_vert_table[v, 1] += y + sub_chunk_offset[1]
+                                trans_vert_table[v, 2] += z + sub_chunk_offset[2]
+                            trans_vert_id += vert_count
+                        else:
                             vert_end = vert_id+vert_count
-                        vert_table[vert_id:vert_end, :] = temp_vert_table
-                        for v in range(vert_id, vert_id + vert_count):
-                            vert_table[v, 0] += x + sub_chunk_offset[0]
-                            vert_table[v, 1] += y + sub_chunk_offset[1]
-                            vert_table[v, 2] += z + sub_chunk_offset[2]
-                        vert_id += vert_count
+                            if vert_end > ARRAY_SIZE:
+                                chunk_verts.append(numpy.array(vert_table[:vert_id], dtype=numpy.float32).ravel())
+                                vert_id = 0
+                                vert_end = vert_id+vert_count
+                            vert_table[vert_id:vert_end, :] = temp_vert_table
+                            for v in range(vert_id, vert_id + vert_count):
+                                vert_table[v, 0] += x + sub_chunk_offset[0]
+                                vert_table[v, 1] += y + sub_chunk_offset[1]
+                                vert_table[v, 2] += z + sub_chunk_offset[2]
+                            vert_id += vert_count
 
     if vert_id:
         chunk_verts.append(numpy.array(vert_table[:vert_id], dtype=numpy.float32).ravel())
@@ -154,7 +155,7 @@ def create_lod0_chunk(
     }
     model_verts = []
     for model in models:
-        vert_map = {}
+        vert_map = [None]*7
         for py_cull_dir in model.faces.keys():
             if py_cull_dir is None:
                 cull_id = 0
@@ -186,7 +187,7 @@ def create_lod0_chunk(
             #     (numpy.remainder(py_vert_table[:, 1:2] / 32, 2) - 1)
             # )
             vert_map[cull_id] = py_vert_table
-        model_verts.append(vert_map)
+        model_verts.append(tuple(vert_map))
 
     for inverse_block_array, sub_chunk_y, block_indices in zip(
         inverse_sub_chunk_blocks_arr,
