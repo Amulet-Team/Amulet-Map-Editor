@@ -20,8 +20,6 @@ PYMCT_PATH = PyMCTranslate.__path__[0]
 MINECRAFT_MODEL_READER = minecraft_model_reader.__path__[0]
 AMULET_MAP_EDITOR = amulet_map_editor.__path__[0]
 
-block_cipher = None
-
 
 hidden = []
 hidden.extend(collect_submodules("pkg_resources"))
@@ -47,7 +45,6 @@ a = Analysis(
     excludes=["FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter"],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
 )
 
@@ -96,7 +93,7 @@ for d in filter(lambda dt: "PyMCTranslate" in dt[0], a.datas):
     print("\t", d)
 sys.stdout.flush()  # fix the log being out of order
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data)
 exe = EXE(
     pyz,
     a.scripts,
