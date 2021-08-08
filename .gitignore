@@ -103,6 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# macOS files
+.DS_Store
+
 /minecraft_model_reader
 /world_temp
 /resource_packs
