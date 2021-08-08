@@ -40,13 +40,14 @@ jobs:
 
     - name: PyInstaller build
       run: |
-        echo "BUILT_PATH=Amulet-v${{ github.event.release.tag_name }}-$RUNNER_OS-${{ matrix.cfg.architecture }}.zip" >> $GITHUB_ENV
+        built_path=Amulet-v${{ github.event.release.tag_name }}-$RUNNER_OS-${{ matrix.cfg.architecture }}.zip
+        echo "BUILT_PATH=$built_path" >> $GITHUB_ENV
         python -m PyInstaller -y Amulet.spec
         cd dist
         if [ "$RUNNER_OS" == "Windows" ]; then
-          7z a ${{ env.BUILT_PATH }} Amulet
+          7z a $built_path Amulet
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          zip -r ${{ env.BUILT_PATH }} Amulet
+          zip -r $built_path Amulet
         else
           echo "$RUNNER_OS not supported"
           exit 1
