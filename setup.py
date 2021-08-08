@@ -1,9 +1,11 @@
 from typing import List
 from setuptools import setup, find_packages
+from Cython.Build import cythonize
 import os
 import glob
 import shutil
 import sys
+import numpy
 
 try:
     import versioneer
@@ -51,19 +53,18 @@ try:
 except:
     pass
 
-package_data = [
-    os.path.relpath(path, "amulet_map_editor")
-    for path in set(
-        glob.glob(os.path.join("amulet_map_editor", "**", "*.*"), recursive=True)
-    )
-    - set(
-        glob.glob(os.path.join("amulet_map_editor", "**", "*.py[cod]"), recursive=True)
-    )
-]
+if next(glob.iglob("amulet_map_editor/**/*.pyx", recursive=True), None):
+    # This throws an error if it does not match any files
+    ext = cythonize("amulet_map_editor/**/*.pyx")
+else:
+    ext = ()
+
 
 setup(
     install_requires=required_packages,
     packages=find_packages(),
-    package_data={"amulet_map_editor": package_data},
+    include_package_data=True,
     cmdclass=versioneer.get_cmdclass(),
+    ext_modules=ext,
+    include_dirs=[numpy.get_include()],
 )
