@@ -8,6 +8,13 @@ from typing import Dict, Tuple, Set
 import sys
 import os
 import glob
+
+# pyinstaller moves the current directory to the front
+# We would prefer to find modules in site packages first
+cwd = os.path.normcase(os.path.realpath(os.getcwd()))
+sys.path = [path for path in sys.path if os.path.normcase(os.path.realpath(path)) != cwd]
+sys.path.append(cwd)
+
 import amulet
 import PyMCTranslate
 import minecraft_model_reader
