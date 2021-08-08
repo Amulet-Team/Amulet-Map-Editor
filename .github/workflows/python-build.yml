@@ -10,10 +10,15 @@ on:
 jobs:
   deploy:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
     strategy:
       matrix:
-        os: [windows-latest]
-        python-version: [3.7]
+        cfg:
+        - {os: windows-latest, python-version: 3.7, architecture: x64}
+        - {os: windows-latest, python-version: 3.7, architecture: x86}
 
     steps:
     - uses: actions/checkout@v2
@@ -21,61 +26,50 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        architecture: ${{ matrix.architecture }}
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install setuptools wheel twine pyinstaller==4.2 build
-        pip install -r requirements.txt
 
-    # setup
-    - name: setup.py
+    - name: Setup
       run: |
         python -m build
         python -m pip install dist/amulet_map_editor-*.whl
-      shell: bash
 
     - name: PyInstaller build
       run: |
+        echo "BUILT_PATH=Amulet-v${{ github.event.release.tag_name }}-$RUNNER_OS-${{ matrix.architecture }}.zip" >> $GITHUB_ENV
         python -m PyInstaller -y Amulet.spec
         cd dist
         if [ "$RUNNER_OS" == "Windows" ]; then
-          7z a Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip Amulet
+          7z a ${{ env.BUILT_PATH }} Amulet
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          zip -r Amulet-v${{ github.event.release.tag_name }}-macos.zip Amulet
+          zip -r ${{ env.BUILT_PATH }} Amulet
         else
           echo "$RUNNER_OS not supported"
           exit 1
         fi
         cd ..
-      shell: bash
 
-    - if: matrix.os == 'windows-latest'
-      name: Publish to PyPi
+    - name: Publish to PyPi
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.AMULET_MAP_EDITOR_PYPI_PASSWORD }}
       run: |
-        twine upload dist/amulet_map_editor*
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          twine upload dist/amulet[_-]map[_-]editor*
+        else
+          twine upload dist/amulet[_-]map[_-]editor*.whl
+        fi
 
-    - if: matrix.os == 'windows-latest'
-      name: Upload Release Asset
+    - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./dist/Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
-        asset_name: Amulet-v${{ github.event.release.tag_name }}-windows-x64.zip
-        asset_content_type: application/zip
-
-    - if: matrix.os == 'macos-latest'
-      name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./dist/Amulet-v${{ github.event.release.tag_name }}-macos.zip
-        asset_name: Amulet-v${{ github.event.release.tag_name }}-macos.zip
+        asset_path: ./dist/${{ env.BUILT_PATH }}
+        asset_name: ${{ env.BUILT_PATH }}
         asset_content_type: application/zip
