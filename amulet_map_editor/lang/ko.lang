@@ -1,0 +1,173 @@
+shared.check_console=자세한 내용은 콘솔을 확인하십시오.
+
+app.world_still_used=월드는 여전히 사용되고 있습니다. 먼저 닫아주세요
+app.browser_open_tooltip=클릭하면 브라우저에서 페이지가 열립니다
+
+world.java_platform=자바
+world.bedrock_platform=베드락
+world.close_world=클로즈 월드
+
+menu_bar.file.menu_name=&파일
+menu_bar.file.open_world=오픈 월드
+menu_bar.file.close_world=클로즈 월드
+menu_bar.file.quit=퀴트
+menu_bar.options.menu_name=&옵션
+menu_bar.help.menu_name=&돕다
+
+main_menu.tab_name=메인 메뉴
+main_menu.open_world=오픈 월드
+main_menu.help=돕다
+main_menu.discord=암울엗 디스코드
+
+update_check.newer_version_released=암울엗의 새 버전이 출시되었습니다!
+update_check.new_version=새로운 버전:
+update_check.current_version=버전:
+update_check.update=다운로드 페이지로 이동
+update_check.ok=네
+
+select_world.title=월드 셀렉트
+select_world.open_world_warning=암울엗에서 열기 전에 게임 및 기타 도구에서 세계를 닫습니다.
+select_world.open_world_button=다른 월드을 열어라
+select_world.open_world_dialogue=마인크래프트 월드 디렉토리 선택
+select_world.select_directory_failed=디렉토리를 열지 못했습니다!
+select_world.recent_worlds=최근에 열린 월드
+select_world.no_loader_found=이 월드에 대한 로더를 찾을 수 없습니다.
+select_world.loading_world_failed=월드를 로드하는 중에 오류가 발생했습니다.
+
+program_about.tab_name=정보
+program_about.currently_opened_world=현재 열린 월드:
+program_about.choose_from_options=왼쪽의 옵션에서 수행할 작업을 선택합니다.\n언제든지 이들 사이를 전환할 수 있습니다.
+
+program_convert.tab_name=컨버트
+program_convert.convert_button=컨버트
+program_convert.input_world=입력 월드:
+program_convert.output_world=출력 월드:
+program_convert.select_output_world=출력 월드 선택
+program_convert.input_output_must_different=입력 월드와 출력 월드가 달라야 합니다!
+program_convert.select_before_converting=변환하기 전에 월드를 선택하십시오!
+program_convert.conversion_completed=월드 변환 완료
+
+program_convert.menu_bar.help.user_guide=사용자 가이드(온라인)
+
+program_3d_edit.tab_name=3D 편집기
+
+program_3d_edit.canvas.please_wait=렌더러가 로드되는 동안 기다려 주십시오.
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=베드락 바닐라 리소스 팩 다운로드
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=자바 바닐라 리소스 팩 다운로드
+program_3d_edit.canvas.java_rp_failed=최신 자바 리소스 팩을 다운로드하지 못했습니다.
+program_3d_edit.canvas.java_rp_failed_default=인터넷 연결을 확인하고 암울엗을 다시 시작하십시오.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=인터넷에 액세스하기 위한 인증서가 설치되지 않았습니다.\n"Applications/Python 3.x"에 있는 "Install Certificates.command" 프로그램을 실행하십시오.
+program_3d_edit.canvas.loading_resource_packs=리소스 팩 로드
+program_3d_edit.canvas.creating_texture_atlas=텍스처 아틀라스 만들기
+program_3d_edit.canvas.setting_up_renderer=렌더러 설정
+
+program_3d_edit.menu_bar.file.save=저장
+program_3d_edit.menu_bar.edit.menu_name=&편집
+program_3d_edit.menu_bar.edit.undo=실행 취소
+program_3d_edit.menu_bar.edit.redo=다시 하다
+program_3d_edit.menu_bar.edit.cut=절단
+program_3d_edit.menu_bar.edit.copy=복사
+program_3d_edit.menu_bar.edit.paste=반죽
+program_3d_edit.menu_bar.edit.delete=블록 삭제
+program_3d_edit.menu_bar.edit.goto=이동
+program_3d_edit.menu_bar.edit.select_all=모두 선택
+program_3d_edit.menu_bar.options.controls=통제 수단...
+program_3d_edit.menu_bar.options.options=옵션...
+program_3d_edit.menu_bar.help.user_guide=사용자 가이드(온라인)
+
+program_3d_edit.select_tool.delete_button=블록 삭제
+program_3d_edit.select_tool.delete_button_tooltip=선택한 영역의 블록을 삭제합니다.
+program_3d_edit.select_tool.copy_button=복사
+program_3d_edit.select_tool.copy_button_tooltip=선택한 영역을 복사하여 나중에 붙여넣습니다. 모든 월드와 차원에 붙여넣을 수 있습니다. 
+program_3d_edit.select_tool.cut_button=절단
+program_3d_edit.select_tool.cut_button_tooltip=선택한 영역을 복사하여 나중에 붙여넣고 삭제합니다. 모든 월드와와 차원에 붙여넣을 수 있습니다.
+program_3d_edit.select_tool.paste_button=붙여
+program_3d_edit.select_tool.paste_button_tooltip=이전에 복사하거나 잘라낸 영역을 월드에 붙여넣습니다.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=활성 상자의 녹색 모서리의 x 좌표를 설정합니다. 마우스를 가져가면서 숫자를 입력하거나 휠을 스크롤합니다.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=활성 상자의 녹색 모서리의 y 좌표를 설정합니다. 마우스를 가져가면서 숫자를 입력하거나 휠을 스크롤합니다.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=활성 상자의 녹색 모서리의 z 좌표를 설정합니다. 마우스를 가져가면서 숫자를 입력하거나 휠을 스크롤합니다.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=활성 상자의 파란색 모서리의 x 좌표를 설정합니다. 마우스를 가져가면서 숫자를 입력하거나 휠을 스크롤합니다.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=활성 상자의 파란색 모서리의 y 좌표를 설정합니다. 마우스를 가져가면서 숫자를 입력하거나 휠을 스크롤합니다.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=활성 상자의 파란색 모서리의 z 좌표를 설정합니다. 마우스를 가져가면서 숫자를 입력하거나 휠을 스크롤합니다.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=마인크래프트 볼륨 선택기 표기법을 사용하는 활성 선택의 모양입니다.
+program_3d_edit.select_tool.box_size_tooltip=활성 선택 상자의 블록 크기입니다.
+program_3d_edit.select_tool.button_point1=이동 포인트 1
+program_3d_edit.select_tool.button_point1_tooltip=이 버튼을 누른 상태에서 이동 컨트롤을 사용하여 녹색 선택 지점을 이동합니다.
+program_3d_edit.select_tool.button_point2=이동 포인트 2
+program_3d_edit.select_tool.button_point2_tooltip=이 버튼을 누른 상태에서 이동 컨트롤을 사용하여 파란색 선택 지점을 이동합니다.
+program_3d_edit.select_tool.button_selection_box=상자 이동
+program_3d_edit.select_tool.button_selection_box_tooltip=이 버튼을 누른 상태에서 이동 컨트롤을 사용하여 활성 상자를 이동합니다.
+
+program_3d_edit.paste_tool.location_label=위치
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=선택 영역의 중심이 배치될 x 위치입니다. 숫자를 입력하거나 휠을 스크롤하거나 화살표를 사용하여 변경합니다.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=선택 영역의 중심이 배치될 y 위치입니다. 숫자를 입력하거나 휠을 스크롤하거나 화살표를 사용하여 변경합니다.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=선택 영역의 중심이 배치될 z 위치입니다. 숫자를 입력하거나 휠을 스크롤하거나 화살표를 사용하여 변경합니다.
+program_3d_edit.paste_tool.move_selection_label=선택 이동
+program_3d_edit.paste_tool.move_selection_tooltip=이 버튼을 누른 상태에서 이동 컨트롤을 사용하여 선택 항목을 이동합니다.
+program_3d_edit.paste_tool.rotation_label=회전
+program_3d_edit.paste_tool.free_rotation_label=자유 회전
+program_3d_edit.paste_tool.free_rotation_tooltip=선택하지 않으면 선택 항목을 90도의 배수로 회전할 수 있습니다. 선택하면 선택 항목을 1도 단위로 회전할 수 있습니다.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=선택 항목이 회전하는 x축의 각도입니다. 이것은 z 및 y 회전에 의해 변환되는 모델의 x축이므로 전역 x축과 일치하지 않을 수 있습니다.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=선택 항목이 회전하는 y축의 각도입니다. 이것은 z 회전에 의해 변환되는 모델의 y축이므로 전역 y축과 일치하지 않을 수 있습니다.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=선택 영역이 회전하는 z축의 각도입니다.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=보기 회전을 기준으로 선택 항목을 시계 반대 방향으로 90도 회전하려면 클릭합니다.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=선택 항목을 보기 회전을 기준으로 시계 방향으로 90도 회전하려면 클릭합니다.
+program_3d_edit.paste_tool.scale_label=스케일
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=x축의 모델 스케일입니다.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=y축의 모델 스케일입니다.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=z축의 모델 스케일입니다.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=카메라가 보고 있는 방향을 기준으로 선택 항목을 수평으로 미러링합니다.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=카메라가 보고 있는 방향을 기준으로 선택 항목을 수직으로 미러링합니다.
+program_3d_edit.paste_tool.copy_air_label=공기 붙여넣기
+program_3d_edit.paste_tool.copy_air_tooltip=활성화하면 붙여넣은 구조의 모든 에어 블록이 기존 블록을 덮어쓰게 됩니다. 비활성화하면 해당 위치의 기존 블록이 유지되고 에어가 복사되지 않습니다.
+program_3d_edit.paste_tool.copy_water_label=물 붙여
+program_3d_edit.paste_tool.copy_water_tooltip=활성화하면 붙여넣은 구조의 모든 워터 블록이 기존 블록을 덮어쓰게 됩니다. 비활성화하면 해당 위치의 기존 블록이 유지되고 물이 복사되지 않습니다.
+program_3d_edit.paste_tool.copy_lava_label=용암을 붙여
+program_3d_edit.paste_tool.copy_lava_tooltip=활성화하면 붙여넣은 구조의 모든 용암 블록이 기존 블록을 덮어쓰게 됩니다. 비활성화하면 해당 위치의 기존 블록이 유지되고 용암이 복사되지 않습니다.
+program_3d_edit.paste_tool.confirm_label=확인
+program_3d_edit.paste_tool.confirm_tooltip=클릭하여 구조를 월드와 지정된 위치, 회전 및 배율에 붙여넣습니다.
+program_3d_edit.paste_tool.zero_scale_message=배율 값 중 하나의 값이 0이므로 아무 것도 복사되지 않았습니다.
+
+program_3d_edit.chunk_tool.min_y=최소 Y
+program_3d_edit.chunk_tool.min_y_tooltip=하향식 보기에서 그릴 최소 y 좌표입니다. 이것은 세계의 일부를 보고 네더 및 동굴과 같은 차원을 보는 데 사용할 수 있습니다.
+program_3d_edit.chunk_tool.max_y=최대 Y
+program_3d_edit.chunk_tool.max_y_tooltip=하향식 보기에서 그릴 최대 y 좌표입니다. 이것은 세계의 일부를 보고 네더 및 동굴과 같은 차원을 보는 데 사용할 수 있습니다.
+program_3d_edit.chunk_tool.delete_chunks=청크 삭제
+program_3d_edit.chunk_tool.delete_chunks_tooltip=선택한 청크를 삭제합니다. 이렇게 하면 실제 청크와 그 안에 포함된 모든 데이터가 삭제됩니다. 다음에 게임에서 영역을 로드하면 청크가 다시 생성됩니다.
+program_3d_edit.chunk_tool.prune_chunks=선택하지 않은 청크 삭제
+program_3d_edit.chunk_tool.prune_chunks_tooltip=선택되지 않은 모든 청크를 삭제합니다. 이렇게 하면 실제 청크와 그 안에 포함된 모든 데이터가 삭제됩니다. 다음에 게임에서 영역을 로드하면 청크가 다시 생성됩니다.
+
+program_3d_edit.goto_ui.title=텔레포트
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=카메라의 x 좌표입니다. 좌표를 입력하여 해당 위치로 이동합니다. Ctrl + C를 눌러 좌표를 복사합니다. Ctrl + V를 눌러 붙여넣습니다.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=카메라의 y 좌표입니다. 좌표를 입력하여 해당 위치로 이동합니다. Ctrl + C를 눌러 좌표를 복사합니다. Ctrl + V를 눌러 붙여넣습니다.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=카메라의 z 좌표입니다. 좌표를 입력하여 해당 위치로 이동합니다. Ctrl + C를 눌러 좌표를 복사합니다. Ctrl + V를 눌러 붙여넣습니다.
+program_3d_edit.goto_ui.copy_button_tooltip=x, y 및 z 값을 "0.0 0.0 0.0"(각각 x, y 및 z) 형식으로 클립보드에 복사합니다.
+program_3d_edit.goto_ui.paste_button_tooltip=이전에 복사한 좌표를 입력에 붙여넣습니다. 복사된 값은 공백이나 쉼표로 구분된 세 개의 숫자여야 합니다.
+
+program_3d_edit.file_ui.version_tooltip=세계의 플랫폼 및 데이터 버전
+program_3d_edit.file_ui.projection_tooltip=보기 변경
+program_3d_edit.file_ui.location_tooltip=카메라 이동
+program_3d_edit.file_ui.dim_tooltip=차원 선택
+program_3d_edit.file_ui.undo_tooltip=실행 취소
+program_3d_edit.file_ui.redo_tooltip=다시 하다
+program_3d_edit.file_ui.save_tooltip=변경 사항을 저장하다
+program_3d_edit.file_ui.close_tooltip=클로즈 월드
