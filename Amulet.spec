@@ -39,14 +39,13 @@ hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 
 a = Analysis(
     [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
-    # pathex=[".", "amulet_map_editor"],
     binaries=[],
     datas=[],
     hiddenimports=hidden,
     hookspath=[
         os.path.join(AMULET_MAP_EDITOR, "__pyinstaller"),
-        os.path.join(amulet.__path__[0], "__pyinstaller"),
-        os.path.join(PyMCTranslate.__path__[0], "__pyinstaller"),
+        os.path.join(AMULET_PATH, "__pyinstaller"),
+        os.path.join(PYMCT_PATH, "__pyinstaller"),
     ],
     runtime_hooks=[],
     excludes=["FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter"],
