@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.cfg.os }}
     defaults:
       run:
         shell: bash
@@ -22,11 +22,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.cfg.python-version }} ${{ matrix.cfg.architecture }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-        architecture: ${{ matrix.architecture }}
+        python-version: ${{ matrix.cfg.python-version }}
+        architecture: ${{ matrix.cfg.architecture }}
 
     - name: Install dependencies
       run: |
@@ -40,7 +40,7 @@ jobs:
 
     - name: PyInstaller build
       run: |
-        echo "BUILT_PATH=Amulet-v${{ github.event.release.tag_name }}-$RUNNER_OS-${{ matrix.architecture }}.zip" >> $GITHUB_ENV
+        echo "BUILT_PATH=Amulet-v${{ github.event.release.tag_name }}-$RUNNER_OS-${{ matrix.cfg.architecture }}.zip" >> $GITHUB_ENV
         python -m PyInstaller -y Amulet.spec
         cd dist
         if [ "$RUNNER_OS" == "Windows" ]; then
