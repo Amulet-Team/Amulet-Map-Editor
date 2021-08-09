@@ -106,9 +106,7 @@ class RenderChunk(RenderChunkBuilder):
                 return True
         return chunk_state != self._chunk_state
 
-    def _sub_chunks(
-        self, blocks: Blocks
-    ) -> List[Tuple[numpy.ndarray, int]]:
+    def _sub_chunks(self, blocks: Blocks) -> List[Tuple[numpy.ndarray, int]]:
         """Create sub-chunk arrays that extend into the neighbour sub-chunks by one block.
 
         :param blocks: The Blocks array for the chunk.

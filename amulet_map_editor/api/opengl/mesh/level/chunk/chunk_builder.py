@@ -45,7 +45,9 @@ def py_create_lod0_sub_chunk(
     """
     sub_chunk_offset = (0, sub_chunk_y_offset, 0)
     blocks = larger_blocks[1:-1, 1:-1, 1:-1]
-    transparent_array = numpy.array([model.is_transparent for model in models], dtype=numpy.uint8)[larger_blocks]
+    transparent_array = numpy.array(
+        [model.is_transparent for model in models], dtype=numpy.uint8
+    )[larger_blocks]
 
     def get_transparent_array(offset_transparent_array, transparent_array_):
         return numpy.logical_and(
@@ -177,12 +179,12 @@ def py_create_lod0_chunk(
 
     for block_array, sub_chunk_y in blocks:
         # unique blocks per sub-chunk
-        unique_sub_chunk_blocks, inverse_block_array = numpy.unique(block_array, return_inverse=True)
+        unique_sub_chunk_blocks, inverse_block_array = numpy.unique(
+            block_array, return_inverse=True
+        )
 
         models: Tuple[minecraft_model_reader.BlockMesh] = tuple(
-            resource_pack.get_block_model(
-                block_palette[block_temp_id]
-            )
+            resource_pack.get_block_model(block_palette[block_temp_id])
             for block_temp_id in unique_sub_chunk_blocks
         )
         texture_bounds: Dict[str, Tuple[float, float, float, float]] = {
@@ -206,6 +208,7 @@ def py_create_lod0_chunk(
 
 try:
     from .chunk_builder_cy import create_lod0_chunk
+
     print("Using cython chunk generator")
 except:
     print("Using python chunk generator")
