@@ -1,0 +1,222 @@
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
+# Shared strings
+shared.check_console=Kiểm tra cửa sổ lệnh để biết thên chi tiết.
+
+# App
+app.world_still_used=Một thế giới vẫn đang được sử dụng. Xin hãy đóng nó trước đã
+app.browser_open_tooltip=Nháy chuột vào sẽ mở trang này trong trình duyệt của bạn
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Đóng thế giới
+
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&Tệp
+menu_bar.file.open_world=Mở thế giới
+menu_bar.file.close_world=Đóng thế giới
+menu_bar.file.quit=Thoát
+menu_bar.options.menu_name=Tuỳ &chọn
+menu_bar.help.menu_name=T&rợ giúp
+
+# Main menu
+## The start screen
+main_menu.tab_name=Bảng chọn chính
+main_menu.open_world=Mở thế giới
+main_menu.help=Trợ giúp
+main_menu.discord=Discord của Amulet
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=Một phiên bản mới của Amulet đã được ra mắt!
+update_check.new_version=Phiên bản mới:
+update_check.current_version=Phiên bản của bạn:
+update_check.update=Đi đến trang tải xuống
+update_check.ok=Ok
+
+# Select world
+## The window when selecting a world to open
+select_world.title=Chọn thế giới
+select_world.open_world_warning=Đóng thế giới trong trò chơi và các công cụ khác trước khi mở trong Amulet.
+select_world.open_world_button=Mở thế giới khác
+select_world.open_world_dialogue=Chọn một thư mục thế giới Minecraft
+select_world.select_directory_failed=Không thể mở thư mục này!
+select_world.recent_worlds=Những thế giới đã được mở gần đây
+select_world.no_loader_found=Không thể tìm một trình nạp cho thế giới này.
+select_world.loading_world_failed=Lỗi khi nạp thế giới.
+
+# About
+## The default program when a world is opened
+program_about.tab_name=Giới thiệu
+program_about.currently_opened_world=Thế giới hiện đang được mở:
+program_about.choose_from_options=Chọn từ các lựa chọn từ bên trái xem bạn muốn làm gì.\nBạn có thể chuyển giữa chúng vào bất kỳ lúc nào.
+
+# Convert
+## The program used to convert a world
+program_convert.tab_name=Chuyển đổi
+program_convert.convert_button=Chuyển đổi
+program_convert.input_world=Thế giới đầu vào:
+program_convert.output_world=Thế giới đầu ra:
+program_convert.select_output_world=Lựa chọn thế giới đầu ra
+program_convert.input_output_must_different=Thế giới đầu vào và đầu ra phải khác nhau!
+program_convert.select_before_converting=Hãy chọn một thế giới trước khi chuyển đổi!
+program_convert.conversion_completed=Đã thành việc chuyển đổi thế giới
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=Hướng dẫn người dùng (trực tuyến)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
+program_3d_edit.tab_name=Trình sửa 3D
+
+## Canvas
+program_3d_edit.canvas.please_wait=Xin vui lòng chờ trong khi trình kết xuất đang tải
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Đang tải xuống gói tài nguyên Bedrock gốc
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Đang tải xuống gói tài nguyên Java gốc
+program_3d_edit.canvas.java_rp_failed=Không thể tải xuống gói tài nguyên Java mới nhất.
+program_3d_edit.canvas.java_rp_failed_default=Hãy kiểm tra kết nối Internet và khởi động lại Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=Chứng chỉ để kết nối Internet đã không được cài đặt.\nHãy chạy chương trình "Install Certificates.command" nằm ở thư mục "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Đang tải gói tài nguyên
+program_3d_edit.canvas.creating_texture_atlas=Đang tạo tập hình kết cấu
+program_3d_edit.canvas.setting_up_renderer=Đang thiết lập trình kết xuất
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Lưu
+program_3d_edit.menu_bar.edit.menu_name=&Chỉnh sửa
+program_3d_edit.menu_bar.edit.undo=Hoàn tác
+program_3d_edit.menu_bar.edit.redo=Làm lại
+program_3d_edit.menu_bar.edit.cut=Cắt
+program_3d_edit.menu_bar.edit.copy=Sao chép
+program_3d_edit.menu_bar.edit.paste=Dán
+program_3d_edit.menu_bar.edit.delete=Xoá các khối
+program_3d_edit.menu_bar.edit.goto=Đi đến
+program_3d_edit.menu_bar.edit.select_all=Chọn tất cả
+program_3d_edit.menu_bar.options.controls=Điều khiển...
+program_3d_edit.menu_bar.options.options=Tuỳ chọn...
+program_3d_edit.menu_bar.help.user_guide=Hướng dẫn người dùng (trực tuyến)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Xoá các khối
+program_3d_edit.select_tool.delete_button_tooltip=Xoá các khối trong khu vực được chọn.
+program_3d_edit.select_tool.copy_button=Sao chép
+program_3d_edit.select_tool.copy_button_tooltip=Sao chép khu vực được chọn để dán về sau. Có thể được dán vào bất cứ thế giới và chiều không gian nào.
+program_3d_edit.select_tool.cut_button=Cắt
+program_3d_edit.select_tool.cut_button_tooltip=Sao chép khu vực được chọn để dán về sau. Có thể được dán vào bất cứ thế giới và chiều không gian nào.
+program_3d_edit.select_tool.paste_button=Dán
+program_3d_edit.select_tool.paste_button_tooltip=Dán một khu vực đã được cắt hoặc sao chép trước đó vào thế giới.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Đặt toạ độ x của góc xanh lục của hộp đang hoạt động. Nhập một số hoặc lăn con lăn trong khi di chuột.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Đặt toạ độ y của góc xanh lục của hộp đang hoạt động. Nhập một số hoặc lăn con lăn trong khi di chuột.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Đặt toạ độ z của góc xanh lục của hộp đang hoạt động. Nhập một số hoặc lăn con lăn trong khi di chuột.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Đặt toạ độ x của góc xanh lam của hộp đang hoạt động. Nhập một số hoặc lăn con lăn trong khi di chuột.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Đặt toạ độ y của góc xanh lam của hộp đang hoạt động. Nhập một số hoặc lăn con lăn trong khi di chuột.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Đặt toạ độ z của góc xanh lam của hộp đang hoạt động. Nhập một số hoặc lăn con lăn trong khi di chuột.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=Hình dạng của vùng được chọn đang hoạt động sử dụng kí hiệu bộ chọn thể tích của Minecraft.
+program_3d_edit.select_tool.box_size_tooltip=Kích cỡ của hộp được chọn đang hoạt động theo khối.
+program_3d_edit.select_tool.button_point1=Di chuyển điểm 1
+program_3d_edit.select_tool.button_point1_tooltip=Ấn và giữ nút này và dùng các phím điều khiển chuyển động để di chuyển điểm chọn xanh lục.
+program_3d_edit.select_tool.button_point2=Di chuyển điểm 2
+program_3d_edit.select_tool.button_point2_tooltip=Ấn và giữ nút này và dùng các phím điều khiển chuyển động để di chuyển điểm chọn xanh lam.
+program_3d_edit.select_tool.button_selection_box=Di chuyển hộp
+program_3d_edit.select_tool.button_selection_box_tooltip=Ấn và giữ nút này và dùng các điều khiển chuyển động để di chuyển điểm hộp đang hoạt động.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=Vị trí
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=Vị trí x của nơi tâm vùng được chọn sẽ được đặt xuống. Nhập một số, lăn con lăn hoặc dùng phím mũi tên để thay đổi.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=Vị trí y của nơi tâm vùng được chọn sẽ được đặt xuống. Nhập một số, lăn con lăn hoặc dùng phím mũi tên để thay đổi.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=Vị trí z của nơi tâm vùng được chọn sẽ được đặt xuống. Nhập một số, lăn con lăn hoặc dùng phím mũi tên để thay đổi.
+program_3d_edit.paste_tool.move_selection_label=Di chuyển vùng được chọn
+program_3d_edit.paste_tool.move_selection_tooltip=Ấn và giữ nút này và dùng các điều khiển chuyển động để di chuyển vùng được chọn.
+program_3d_edit.paste_tool.rotation_label=Xoay
+program_3d_edit.paste_tool.free_rotation_label=Xoay tự do
+program_3d_edit.paste_tool.free_rotation_tooltip=Nếu không được tích thì vùng được chọn có thể được xoay theo bội của 90 độ. Nếu được tích thì vùng được chọn có thể được xoay theo từng độ một.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=Góc theo độ của trục x mà vùng được chọn xoay theo. Lưu ý rằng đây là trục x của mô hình được biến hình theo phép xoay z và y cho nên nó có thể không trung với trục x toàn cục.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=Góc theo độ của trục y mà vùng được chọn xoay theo. Lưu ý rằng đây là trục y của mô hình được biến hình theo phép xoay z cho nên nó có thể không trung với trục y toàn cục.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=Góc theo độ của trục z mà vùng được chọn xoay theo.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Nháy chuột để xoay vùng được chọn 90 độ ngược chiều kim đồng hồ tương đối so với độ xoay nhìn.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Nháy chuột để xoay vùng được chọn 90 độ theo chiều kim đồng hồ tương đối so với độ xoay nhìn.
+program_3d_edit.paste_tool.scale_label=Thu phóng
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=Mức độ thu phóng của mô hình theo trục x.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=Mức độ thu phóng của mô hình theo trục y.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=Mức độ thu phóng của mô hình theo trục z.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Lật vùng được chọn theo chiều ngang tương đối với hướng mà máy quay đang nhìn vào.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Lật vùng được chọn theo chiều dọc tương đối với hướng mà máy quay đang nhìn vào.
+program_3d_edit.paste_tool.copy_air_label=Dán không khí
+program_3d_edit.paste_tool.copy_air_tooltip=Nếu được bật thì tất cả các khối không khí trong cấu trúc được dán sẽ ghi đè lên những khối đã tồn tại. Nếu bị tắt thì các khối tồn tại ở đó sẽ còn nguyên và không khí sẽ không bị sao chép.
+program_3d_edit.paste_tool.copy_water_label=Dán nước
+program_3d_edit.paste_tool.copy_water_tooltip=Nếu được bật thì tất cả các khối nước trong cấu trúc được dán sẽ ghi đè lên những khối đã tồn tại. Nếu bị tắt thì các khối tồn tại ở đó sẽ còn nguyên và không khí sẽ không bị sao chép.
+program_3d_edit.paste_tool.copy_lava_label=Dán dung nham
+program_3d_edit.paste_tool.copy_lava_tooltip=Nếu được bật thì tất cả các khối dung nham trong cấu trúc được dán sẽ ghi đè lên những khối đã tồn tại. Nếu bị tắt thì các khối tồn tại ở đó sẽ còn nguyên và không khí sẽ không bị sao chép.
+program_3d_edit.paste_tool.confirm_label=Xác nhận
+program_3d_edit.paste_tool.confirm_tooltip=Nháy chuột để dán cấu trúc vào thế giới tại vị trí, độ xoay và quy mô cụ thể.
+program_3d_edit.paste_tool.zero_scale_message=Một trong số các giá trị thu phóng có giá trị là không cho nên không có gì được sao chép cả.
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Y nhỏ nhất
+program_3d_edit.chunk_tool.min_y_tooltip=The minimum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.max_y=Y lớn nhất
+program_3d_edit.chunk_tool.max_y_tooltip=The maximum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.delete_chunks=Xoá các đoạn khúc
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Xoá những đoạn khúc được chọn. Cái này sẽ xoá hẳn đoạn khúc và và tất cả thông tin mà nó chứa bên trong. Lần tiếp theo bạn nạp khu vực này trong trò chơi thì nó sẽ tạo lại những đoạn khúc đó.
+program_3d_edit.chunk_tool.prune_chunks=Xoá các đoạn khúc không được chọn
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Xoá những đoạn khúc không được chọn. Cái này sẽ xoá hẳn đoạn khúc và và tất cả thông tin mà nó chứa bên trong. Lần tiếp theo bạn nạp khu vực này trong trò chơi thì nó sẽ tạo lại những đoạn khúc đó.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Dịch chuyển
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Toạ độ x của máy quay. Nhập một toạ độ để đi đến vị trí đó. Ctrl + C để sao chép toạ độ. Ctrl + V để dán.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Toạ độ y của máy quay. Nhập một toạ độ để đi đến vị trí đó. Ctrl + C để sao chép toạ độ. Ctrl + V để dán.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Toạ độ z của máy quay. Nhập một toạ độ để đi đến vị trí đó. Ctrl + C để sao chép toạ độ. Ctrl + V để dán.
+program_3d_edit.goto_ui.copy_button_tooltip=Sao chép giá trị x, y and z vào bảng tạm dưới dạng "0.0 0.0 0.0" (tương ứng với x, y và z)
+program_3d_edit.goto_ui.paste_button_tooltip=Dán một toạ độ đã được chép trước đó vào đầu vào. Giá trị được sao chép phải là ba số được ngăn cách bằng dấu cách hoặc dấu phẩy.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Phiên bản dữ liệu và nền tảng của thế giới
+program_3d_edit.file_ui.projection_tooltip=Thay đổi góc nhìn
+program_3d_edit.file_ui.location_tooltip=Di chuyển máy quay
+program_3d_edit.file_ui.dim_tooltip=Lựa chọn chiều không gian
+program_3d_edit.file_ui.undo_tooltip=Hoàn tác
+program_3d_edit.file_ui.redo_tooltip=Làm lại
+program_3d_edit.file_ui.save_tooltip=Lưu các thay đổi
+program_3d_edit.file_ui.close_tooltip=Đóng thế giới

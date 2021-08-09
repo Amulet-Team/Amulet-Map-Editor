@@ -1,23 +1,17 @@
 from typing import List
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, find_packages
+from Cython.Build import cythonize
 import os
 import glob
 import shutil
-import versioneer
+import sys
+import numpy
 
 try:
-    from Cython.Build import cythonize
-except (ImportError, ModuleNotFoundError):
-    print("Could not find cython. The cython version will not be built.")
-    cythonize = None
-
-
-class get_numpy_include:
-    def __str__(self):
-        import numpy
-
-        return numpy.get_include()
-
+    import versioneer
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+    import versioneer
 
 # there were issues with other builds carrying over their cache
 for d in glob.glob("*.egg-info"):
@@ -59,48 +53,18 @@ try:
 except:
     pass
 
-package_data = [
-    os.path.relpath(path, "amulet_map_editor")
-    for path in set(
-        glob.glob(os.path.join("amulet_map_editor", "**", "*.*"), recursive=True)
-    )
-    - set(
-        glob.glob(os.path.join("amulet_map_editor", "**", "*.py[cod]"), recursive=True)
-    )
-]
-
-if cythonize:
-    extensions = [
-        Extension(
-            name="amulet_map_editor.api.opengl.mesh.level.chunk.chunk_builder_cy", sources=["amulet_map_editor/api/opengl/mesh/level/chunk/chunk_builder_cy.pyx"]
-        )
-    ]
-    ext_modules = cythonize(extensions, language_level=3, annotate=True)
+if next(glob.iglob("amulet_map_editor/**/*.pyx", recursive=True), None):
+    # This throws an error if it does not match any files
+    ext = cythonize("amulet_map_editor/**/*.pyx")
 else:
-    ext_modules = []
+    ext = ()
+
 
 setup(
-    name="amulet-map-editor",
-    version=versioneer.get_version(),
-    description="A new Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.",
-    author="James Clare, Ben Gothard et al.",
-    author_email="amuleteditor@gmail.com",
     install_requires=required_packages,
     packages=find_packages(),
-    package_data={"amulet_map_editor": package_data},
-    ext_modules=ext_modules,
-    include_dirs=[get_numpy_include()],
+    include_package_data=True,
     cmdclass=versioneer.get_cmdclass(),
-    setup_requires=required_packages,
-    dependency_links=[
-        "https://github.com/Amulet-Team/Amulet-Core",
-        "https://github.com/gentlegiantJGC/Minecraft-Model-Reader",
-        "https://github.com/gentlegiantJGC/PyMCTranslate",
-        "https://github.com/Amulet-Team/Amulet-NBT",
-    ],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.6",
+    ext_modules=ext,
+    include_dirs=[numpy.get_include()],
 )
