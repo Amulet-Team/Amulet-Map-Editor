@@ -1,6 +1,7 @@
+# cython: language_level=3, boundscheck=False, wraparound=False
+
 import numpy
 cimport numpy
-cimport cython
 
 cdef float _brightness_step = 0.15
 cdef dict _brightness_multiplier = {
@@ -33,8 +34,6 @@ CULL_MAP[6][:] = (-1, 0, 0)
 
 cdef int ARRAY_SIZE = 10_000
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef tuple create_lod0_sub_chunk(
     unsigned int[:, :, :] larger_blocks,
     char[:, :, :] transparent_array,
