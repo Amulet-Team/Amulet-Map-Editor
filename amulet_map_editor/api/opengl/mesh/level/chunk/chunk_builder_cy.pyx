@@ -3,6 +3,14 @@
 import numpy
 cimport numpy
 
+from libc.stdlib cimport malloc, calloc, free
+
+cdef extern from "stdlib.h":
+    void *memcpy(void *dest, void *src, size_t n) nogil
+
+from cpython cimport array
+import array
+
 cdef float _brightness_step = 0.15
 cdef dict _brightness_multiplier = {
     None: (1,) * 3,
@@ -15,6 +23,7 @@ cdef dict _brightness_multiplier = {
 }
 
 CULL_STR_INDEX = {
+    None: 0,
     "up": 1,
     "down": 2,
     "north": 3,
@@ -32,7 +41,82 @@ CULL_MAP[4][:] = (1, 0, 0)
 CULL_MAP[5][:] = (0, 0, 1)
 CULL_MAP[6][:] = (-1, 0, 0)
 
-cdef int ARRAY_SIZE = 10_000
+DEF ARRAY_SIZE = 10_000
+DEF ATTR_COUNT = 12
+
+
+cdef struct VertArray:
+    float* arr  # pointer to the array
+    int size  # the size of the array in bytes
+
+cdef VertArray* vert_array_init(array.array arr):
+    assert arr.typecode == "f", "arr must be a float array"
+    assert len(arr) and len(arr) % (ATTR_COUNT*3) == 0, "arr must have a multiple of 36 values"
+    vert_array = <VertArray*>calloc(1, sizeof(VertArray))
+    vert_array.size = arr.itemsize * len(arr)
+    vert_array.arr = <float*>malloc(vert_array.size)
+    memcpy(vert_array.arr, &arr.data.as_floats[0], vert_array.size)
+    return vert_array
+
+cdef void vert_array_free(VertArray* vert_array):
+    free(vert_array.arr)
+    free(vert_array)
+
+
+cdef struct BlockModel:
+    VertArray* faces[7]
+
+cdef BlockModel* block_model_init(dict face_data):
+    block_model = <BlockModel*>calloc(1, sizeof(BlockModel))
+    for cull_id, index in CULL_STR_INDEX.items():
+        if cull_id in face_data:
+            arr = face_data[cull_id]
+            if isinstance(arr, array.array) and arr.typecode == "f":
+                block_model.faces[index] = vert_array_init(arr)
+        else:
+            block_model.faces[index] = NULL
+    return block_model
+
+cdef void block_model_free(BlockModel* block_model):
+    cdef int i
+    for i in range(7):
+        if block_model.faces[i]:
+            vert_array_free(block_model.faces[i])
+    free(block_model)
+
+
+cdef class BlockModelManager:
+    cdef BlockModel** blocks  # A pointer to an array of pointers to BlockModel structs
+    cdef unsigned long block_size  # The size of the blocks array
+    cdef unsigned long block_count  # The amount of the blocks array that is used
+
+    def __cinit__(self):
+        self.blocks = NULL
+        self.block_size = 0
+        self.block_count = 0
+
+    def __init__(self):
+        self.blocks = <BlockModel**>calloc(100, sizeof(BlockModel*))
+        self.block_size = 100
+
+    def __dealloc__(self):
+        for i in range(self.block_count):
+            free(self.blocks[i])
+        free(self.blocks)
+
+    cdef _extend(self):
+        if self.block_count == self.block_size:
+            blocks_temp = <BlockModel**>calloc(self.block_size + 100, sizeof(BlockModel*))
+            memcpy(blocks_temp, self.blocks, self.block_size * sizeof(BlockModel*))
+            free(self.blocks)
+            self.blocks = blocks_temp
+
+    cpdef add_block(self, dict face_data):
+        self._extend()
+        self.blocks[self.block_count] = block_model_init(face_data)
+        self.block_count += 1
+
+
 
 cdef tuple create_lod0_sub_chunk(
     unsigned int[:, :, :] larger_blocks,
