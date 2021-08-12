@@ -41,7 +41,7 @@ CULL_MAP[4][:] = (1, 0, 0)
 CULL_MAP[5][:] = (0, 0, 1)
 CULL_MAP[6][:] = (-1, 0, 0)
 
-DEF ARRAY_VERT_COUNT = 10_000  # The number of vertices in the table
+DEF ARRAY_VERT_COUNT = 10_008  # The number of vertices in the table
 DEF ATTR_COUNT = 12  # The number of float attributes per vertex
 DEF ARRAY_SIZE = ARRAY_VERT_COUNT * ATTR_COUNT
 
@@ -50,15 +50,19 @@ cdef struct VertArray:
     float* arr  # pointer to the array
     int size  # the number of floats in the array
 
-cdef VertArray* vert_array_init(float* arr, int size):
-    assert size and size % (ATTR_COUNT*3) == 0, "arr must have a multiple of 36 values"
+cdef VertArray* vert_array_new(unsigned long size) nogil:
+    # assert size and size % (ATTR_COUNT*3) == 0, "arr must have a multiple of 36 values"
     vert_array = <VertArray*>calloc(1, sizeof(VertArray))
-    vert_array.size = size
     vert_array.arr = <float*>malloc(size * sizeof(float))
+    vert_array.size = size
+    return vert_array
+
+cdef VertArray* vert_array_init(float* arr, unsigned long size) nogil:
+    vert_array = vert_array_new(size)
     memcpy(vert_array.arr, arr, size * sizeof(float))
     return vert_array
 
-cdef void vert_array_free(VertArray* vert_array):
+cdef void vert_array_free(VertArray* vert_array) nogil:
     free(vert_array.arr)
     free(vert_array)
 
@@ -85,7 +89,7 @@ cdef BlockModel* block_model_init(dict face_data, char is_transparent):
             block_model.faces[index] = NULL
     return block_model
 
-cdef void block_model_free(BlockModel* block_model):
+cdef void block_model_free(BlockModel* block_model) nogil:
     cdef int i
     for i in range(7):
         if block_model.faces[i]:
@@ -129,16 +133,62 @@ cdef class BlockModelManager:
         return self.block_count
 
 
-cdef tuple create_lod0_sub_chunk(
+cdef struct VertArrayContainer:
+    VertArray** arrays  # A pointer to an array of pointers to VertArrays
+    int size  # The current size of the array
+    int used  # The number of elements of the array that are used
+
+cdef VertArrayContainer* vert_array_container_init() nogil:
+    self = <VertArrayContainer*>calloc(1, sizeof(VertArrayContainer))
+    self.arrays = <VertArray**>calloc(10, sizeof(VertArray*))
+    self.size = 0
+    self.used = 0
+    return self
+
+cdef void vert_array_container_free(VertArrayContainer* self) nogil:
+    cdef int i
+    for i in range(self.used):
+        vert_array_free(self.arrays[i])
+    free(self.arrays)
+    free(self)
+
+cdef void vert_array_container_append(VertArrayContainer* self, VertArray* vert_array) nogil:
+    if self.used == self.size:
+        _vert_array_container_extend(self)
+    self.arrays[self.used] = vert_array
+    self.used += 1
+
+cdef void _vert_array_container_extend(VertArrayContainer* self) nogil:
+    arr = <VertArray**>calloc(self.size + 5, sizeof(VertArray*))
+    memcpy(arr, self.arrays, self.size * sizeof(VertArray*))
+    free(self.arrays)
+    self.arrays = arr
+    self.size += 5
+
+
+cdef struct VertArrayContainerTuple:
+    VertArrayContainer* verts
+    VertArrayContainer* verts_translucent
+
+cdef VertArrayContainerTuple* vert_array_container_tuple_init() nogil:
+    self = <VertArrayContainerTuple*>calloc(1, sizeof(VertArrayContainerTuple))
+    self.verts = vert_array_container_init()
+    self.verts_translucent = vert_array_container_init()
+    return self
+
+cdef void vert_array_container_tuple_free(VertArrayContainerTuple* self) nogil:
+    vert_array_container_free(self.verts)
+    vert_array_container_free(self.verts_translucent)
+    free(self)
+
+cdef VertArrayContainerTuple* create_lod0_sub_chunk(
     unsigned int[:, :, :] larger_blocks,
     BlockModelManager block_model_manager,
     long[:] sub_chunk_offset,
-):
+) nogil:
     cdef int x, y, z, x_, y_, z_, dx, dy, dz  # location variables
 
     # float counters
-    cdef unsigned int vert_start = 0
-    cdef unsigned int trans_vert_start = 0
     cdef unsigned int vert_count, vert_end, vertex, vertex_attr
 
     cdef float shade
@@ -146,15 +196,16 @@ cdef tuple create_lod0_sub_chunk(
     cdef BlockModel* block_model
     cdef VertArray* vert_array
 
-    cdef array.array vert_table = array.clone(array.array('f'), ARRAY_SIZE, False)
-    cdef array.array trans_vert_table = array.clone(array.array('f'), ARRAY_SIZE, False)
+    cdef VertArray* vert_table = vert_array_new(ARRAY_SIZE)
+    vert_table.size = 0
+    cdef VertArray* trans_vert_table = vert_array_new(ARRAY_SIZE)
+    trans_vert_table.size = 0
 
     cdef int size_x = larger_blocks.shape[0] - 2
     cdef int size_y = larger_blocks.shape[1] - 2
     cdef int size_z = larger_blocks.shape[2] - 2
 
-    chunk_verts = []
-    chunk_verts_translucent = []
+    cdef VertArrayContainerTuple* verts = vert_array_container_tuple_init()
 
     for x in range(size_x):
         for y in range(size_y):
@@ -180,71 +231,116 @@ cdef tuple create_lod0_sub_chunk(
                         vert_count = vert_array.size
 
                         if block_model.is_transparent == 1:
-                            vert_end = trans_vert_start+vert_count
+                            vert_end = trans_vert_table.size+vert_count
                             if vert_end > ARRAY_SIZE:
-                                chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_start], dtype=numpy.float32))
-                                trans_vert_start = 0
+                                vert_array_container_append(verts.verts_translucent, trans_vert_table)
+                                trans_vert_table = vert_array_new(ARRAY_SIZE)
+                                trans_vert_table.size = 0
                                 vert_end = vert_count
-                            memcpy(&trans_vert_table.data.as_floats[trans_vert_start], vert_array.arr, vert_count * sizeof(float))
-                            for vertex in range(trans_vert_start, vert_end, ATTR_COUNT):
-                                trans_vert_table.data.as_floats[vertex + 0] += sub_chunk_offset[0] + x
-                                trans_vert_table.data.as_floats[vertex + 1] += sub_chunk_offset[1] + y
-                                trans_vert_table.data.as_floats[vertex + 2] += sub_chunk_offset[2] + z
-                                shade = ((trans_vert_table.data.as_floats[vertex + 1] / 32) % 2)
+                            memcpy(&trans_vert_table.arr[trans_vert_table.size], vert_array.arr, vert_count * sizeof(float))
+                            for vertex in range(trans_vert_table.size, vert_end, ATTR_COUNT):
+                                trans_vert_table.arr[vertex + 0] += sub_chunk_offset[0] + x
+                                trans_vert_table.arr[vertex + 1] += sub_chunk_offset[1] + y
+                                trans_vert_table.arr[vertex + 2] += sub_chunk_offset[2] + z
+                                shade = ((trans_vert_table.arr[vertex + 1] / 32) % 2)
                                 if shade > 1:
                                     shade = - shade + 2
                                 shade = 0.9 + 0.2 * shade
                                 for vertex_attr in range(9, 12):
-                                    trans_vert_table.data.as_floats[vertex + vertex_attr] *= shade
-                            trans_vert_start += vert_count
+                                    trans_vert_table.arr[vertex + vertex_attr] *= shade
+                            trans_vert_table.size += vert_count
                         else:
-                            vert_end = vert_start+vert_count
+                            vert_end = vert_table.size+vert_count
                             if vert_end > ARRAY_SIZE:
-                                chunk_verts.append(numpy.array(vert_table[:vert_start], dtype=numpy.float32))
-                                vert_start = 0
+                                vert_array_container_append(verts.verts, vert_table)
+                                vert_table = vert_array_new(ARRAY_SIZE)
+                                vert_table.size = 0
                                 vert_end = vert_count
-                            memcpy(&vert_table.data.as_floats[vert_start], vert_array.arr, vert_count * sizeof(float))
-                            for vertex in range(vert_start, vert_end, ATTR_COUNT):
-                                vert_table.data.as_floats[vertex + 0] += sub_chunk_offset[0] + x
-                                vert_table.data.as_floats[vertex + 1] += sub_chunk_offset[1] + y
-                                vert_table.data.as_floats[vertex + 2] += sub_chunk_offset[2] + z
-                                shade = ((vert_table.data.as_floats[vertex + 1] / 32) % 2)
+                            memcpy(&vert_table.arr[vert_table.size], vert_array.arr, vert_count * sizeof(float))
+                            for vertex in range(vert_table.size, vert_end, ATTR_COUNT):
+                                vert_table.arr[vertex + 0] += sub_chunk_offset[0] + x
+                                vert_table.arr[vertex + 1] += sub_chunk_offset[1] + y
+                                vert_table.arr[vertex + 2] += sub_chunk_offset[2] + z
+                                shade = ((vert_table.arr[vertex + 1] / 32) % 2)
                                 if shade > 1:
                                     shade = - shade + 2
                                 shade = 0.9 + 0.2 * shade
                                 for vertex_attr in range(9, 12):
-                                    vert_table.data.as_floats[vertex + vertex_attr] *= shade
-                            vert_start += vert_count
+                                    vert_table.arr[vertex + vertex_attr] *= shade
+                            vert_table.size += vert_count
 
-    if vert_start:
-        chunk_verts.append(numpy.array(vert_table[:vert_start], dtype=numpy.float32))
-    if trans_vert_start:
-        chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_start], dtype=numpy.float32))
+    if vert_table.size:
+        vert_array_container_append(verts.verts, vert_table)
+    else:
+        vert_array_free(vert_table)
+    if trans_vert_table.size:
+        vert_array_container_append(verts.verts_translucent, trans_vert_table)
+    else:
+        vert_array_free(trans_vert_table)
 
-    return chunk_verts, chunk_verts_translucent
+    return verts
 
 
-def _create_lod0_chunk(
-    resource_pack,
-    blocks,
-    chunk_offset
+cdef tuple _create_lod0_chunk(
+    BlockModelManager block_model_manager,
+    list blocks,
+    int[:] chunk_offset
 ):
-    chunk_verts = []
-    chunk_verts_translucent = []
-
-    for block_array, sub_chunk_y in blocks:
+    cdef int sub_chunk_count = len(blocks)
+    cdef int i, j
+    sub_chunk_verts = <VertArrayContainerTuple**>calloc(sub_chunk_count, sizeof(VertArrayContainerTuple*))
+    for i in range(sub_chunk_count):
+        block_array, sub_chunk_y = blocks[i]
         sub_chunk_offset = chunk_offset.copy()
         sub_chunk_offset[1] += sub_chunk_y
 
-        chunk_verts_, chunk_verts_translucent_ = create_lod0_sub_chunk(
+        sub_chunk_verts[i] = create_lod0_sub_chunk(
             block_array,
-            resource_pack.block_model_manager,
+            block_model_manager,
             sub_chunk_offset,
         )
-        chunk_verts += chunk_verts_
-        chunk_verts_translucent += chunk_verts_translucent_
 
-    return chunk_verts, chunk_verts_translucent
+    cdef unsigned long vert_size = 0
+    cdef unsigned long vert_size_translucent = 0
+    cdef VertArrayContainerTuple* vert_array_container_tuple
+    cdef VertArrayContainer* vert_array_container
+    cdef VertArray* vert_array
+
+    for i in range(sub_chunk_count):
+        vert_array_container_tuple = sub_chunk_verts[i]
+        vert_array_container = vert_array_container_tuple.verts
+        for j in range(vert_array_container.used):
+            vert_array = vert_array_container.arrays[j]
+            vert_size += vert_array.size
+        vert_array_container = vert_array_container_tuple.verts_translucent
+        for j in range(vert_array_container.used):
+            vert_array = vert_array_container.arrays[j]
+            vert_size_translucent += vert_array.size
+
+    chunk_verts = array.clone(array.array("f"), vert_size, zero=False)
+    chunk_verts_translucent = array.clone(array.array("f"), vert_size_translucent, zero=False)
+
+    vert_size = 0
+    vert_size_translucent = 0
+
+    for i in range(sub_chunk_count):
+        vert_array_container_tuple = sub_chunk_verts[i]
+        vert_array_container = vert_array_container_tuple.verts
+        for j in range(vert_array_container.used):
+            vert_array = vert_array_container.arrays[j]
+            memcpy(&chunk_verts.data.as_floats[vert_size], vert_array.arr, vert_array.size * sizeof(float))
+            vert_size += vert_array.size
+        vert_array_container = vert_array_container_tuple.verts_translucent
+        for j in range(vert_array_container.used):
+            vert_array = vert_array_container.arrays[j]
+            memcpy(&chunk_verts_translucent.data.as_floats[vert_size_translucent], vert_array.arr, vert_array.size * sizeof(float))
+            vert_size_translucent += vert_array.size
+
+    for i in range(sub_chunk_count):
+        vert_array_container_tuple_free(sub_chunk_verts[i])
+    free(sub_chunk_verts)
+
+    return [chunk_verts], [chunk_verts_translucent]
 
 
 def _extend_blocks(resource_pack, block_palette):
@@ -299,7 +395,7 @@ def create_lod0_chunk(
 ):
     _extend_blocks(resource_pack, block_palette)
     return _create_lod0_chunk(
-        resource_pack,
+        resource_pack.block_model_manager,
         blocks,
         chunk_offset
     )
