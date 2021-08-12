@@ -74,7 +74,6 @@ cdef BlockModel* block_model_init(dict face_data, char is_transparent):
     for cull_id, index in CULL_STR_INDEX.items():
         if cull_id in face_data:
             arr = face_data[cull_id]
-            print("arr")
             if isinstance(arr, numpy.ndarray):
                 arr = array.array("f", arr.ravel())
             if isinstance(arr, array.array) and arr.typecode == "f":
@@ -116,6 +115,7 @@ cdef class BlockModelManager:
             memcpy(blocks_temp, self.blocks, self.block_size * sizeof(BlockModel*))
             free(self.blocks)
             self.blocks = blocks_temp
+            self.block_size += 100
 
     cpdef add_block(self, dict face_data, int is_transparent):
         self._extend()
@@ -198,7 +198,8 @@ cdef tuple create_lod0_sub_chunk(
                         else:
                             vert_end = vert_start+vert_count
                             if vert_end > ARRAY_SIZE:
-                                chunk_verts.append(vert_table[:vert_start].copy())
+                                # chunk_verts.append(vert_table[:vert_start].copy())
+                                chunk_verts.append(numpy.array(vert_table[:vert_start], dtype=numpy.float32))
                                 vert_start = 0
                                 vert_end = vert_count
                             memcpy(&vert_table.data.as_floats[vert_start], vert_array.arr, vert_count * sizeof(float))
