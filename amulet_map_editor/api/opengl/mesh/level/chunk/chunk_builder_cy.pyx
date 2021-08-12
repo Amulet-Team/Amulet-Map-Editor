@@ -177,28 +177,26 @@ cdef tuple create_lod0_sub_chunk(
                         vert_count = vert_array.size
 
                         if block_model.is_transparent == 1:
-                            pass
-                            # vert_end = trans_vert_start+vert_count
-                            # if vert_end > ARRAY_SIZE:
-                            #     chunk_verts_translucent.append(trans_vert_table[:trans_vert_start].copy())
-                            #     trans_vert_start = 0
-                            #     vert_end = trans_vert_start+vert_count
-                            # trans_vert_table[trans_vert_start:vert_end, :] = temp_vert_table
-                            # for vertex in range(trans_vert_start, trans_vert_start + vert_count):
-                            #     trans_vert_table[vertex, 0] += x + sub_chunk_offset[0]
-                            #     trans_vert_table[vertex, 1] += y + sub_chunk_offset[1]
-                            #     trans_vert_table[vertex, 2] += z + sub_chunk_offset[2]
-                            #     shade = ((trans_vert_table[vertex, 1] / 32) % 2)
-                            #     if shade > 1:
-                            #         shade = - shade + 2
-                            #     shade = 0.9 + 0.2 * shade
-                            #     for vertex_attr in range(9, 12):
-                            #         trans_vert_table[vertex, vertex_attr] *= shade
-                            # trans_vert_start += vert_count * ATTR_COUNT
+                            vert_end = trans_vert_start+vert_count
+                            if vert_end > ARRAY_SIZE:
+                                chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_start], dtype=numpy.float32))
+                                trans_vert_start = 0
+                                vert_end = vert_count
+                            memcpy(&trans_vert_table.data.as_floats[trans_vert_start], vert_array.arr, vert_count * sizeof(float))
+                            for vertex in range(trans_vert_start, vert_end, ATTR_COUNT):
+                                trans_vert_table.data.as_floats[vertex + 0] += sub_chunk_offset[0] + x
+                                trans_vert_table.data.as_floats[vertex + 1] += sub_chunk_offset[1] + y
+                                trans_vert_table.data.as_floats[vertex + 2] += sub_chunk_offset[2] + z
+                                shade = ((trans_vert_table.data.as_floats[vertex + 1] / 32) % 2)
+                                if shade > 1:
+                                    shade = - shade + 2
+                                shade = 0.9 + 0.2 * shade
+                                for vertex_attr in range(9, 12):
+                                    trans_vert_table.data.as_floats[vertex + vertex_attr] *= shade
+                            trans_vert_start += vert_count
                         else:
                             vert_end = vert_start+vert_count
                             if vert_end > ARRAY_SIZE:
-                                # chunk_verts.append(vert_table[:vert_start].copy())
                                 chunk_verts.append(numpy.array(vert_table[:vert_start], dtype=numpy.float32))
                                 vert_start = 0
                                 vert_end = vert_count
@@ -216,10 +214,8 @@ cdef tuple create_lod0_sub_chunk(
                             vert_start += vert_count
 
     if vert_start:
-        # chunk_verts.append(vert_table[:vert_start].copy())
         chunk_verts.append(numpy.array(vert_table[:vert_start], dtype=numpy.float32))
     if trans_vert_start:
-        # chunk_verts_translucent.append(trans_vert_table[:trans_vert_start].copy())
         chunk_verts_translucent.append(numpy.array(trans_vert_table[:trans_vert_start], dtype=numpy.float32))
 
     return chunk_verts, chunk_verts_translucent
