@@ -50,32 +50,32 @@ cdef struct VertArray:
     float* arr  # pointer to the array
     int size  # the number of floats in the array
 
-cdef VertArray* vert_array_new(unsigned long size) nogil:
+cdef VertArray* VertArray_new(unsigned long size) nogil:
     # assert size and size % (ATTR_COUNT*3) == 0, "arr must have a multiple of 36 values"
     vert_array = <VertArray*>calloc(1, sizeof(VertArray))
     vert_array.arr = <float*>malloc(size * sizeof(float))
     vert_array.size = size
     return vert_array
 
-cdef VertArray* vert_array_init(float* arr, unsigned long size) nogil:
-    vert_array = vert_array_new(size)
+cdef VertArray* VertArray_init(float* arr, unsigned long size) nogil:
+    vert_array = VertArray_new(size)
     memcpy(vert_array.arr, arr, size * sizeof(float))
     return vert_array
 
-cdef void vert_array_free(VertArray* vert_array) nogil:
+cdef void VertArray_free(VertArray* vert_array) nogil:
     free(vert_array.arr)
     free(vert_array)
 
-cdef VertArray* vert_array_from_py(array.array arr):
+cdef VertArray* VertArray_from_py(array.array arr):
     assert arr.typecode == "f", "arr must be a float array"
-    return vert_array_init(&arr.data.as_floats[0], len(arr))
+    return VertArray_init(&arr.data.as_floats[0], len(arr))
 
 
 cdef struct BlockModel:
     VertArray* faces[7]
     char is_transparent
 
-cdef BlockModel* block_model_init(dict face_data, char is_transparent):
+cdef BlockModel* BlockModel_init(dict face_data, char is_transparent):
     block_model = <BlockModel*>calloc(1, sizeof(BlockModel))
     block_model.is_transparent = is_transparent
     for cull_id, index in CULL_STR_INDEX.items():
@@ -84,16 +84,16 @@ cdef BlockModel* block_model_init(dict face_data, char is_transparent):
             if isinstance(arr, numpy.ndarray):
                 arr = array.array("f", arr.ravel())
             if isinstance(arr, array.array) and arr.typecode == "f":
-                block_model.faces[index] = vert_array_from_py(arr)
+                block_model.faces[index] = VertArray_from_py(arr)
         else:
             block_model.faces[index] = NULL
     return block_model
 
-cdef void block_model_free(BlockModel* block_model) nogil:
+cdef void BlockModel_free(BlockModel* block_model) nogil:
     cdef int i
     for i in range(7):
         if block_model.faces[i]:
-            vert_array_free(block_model.faces[i])
+            VertArray_free(block_model.faces[i])
     free(block_model)
 
 
@@ -113,7 +113,7 @@ cdef class BlockModelManager:
 
     def __dealloc__(self):
         for i in range(self.block_count):
-            free(self.blocks[i])
+            BlockModel_free(self.blocks[i])
         free(self.blocks)
 
     cdef _extend(self):
@@ -126,7 +126,7 @@ cdef class BlockModelManager:
 
     cpdef add_block(self, dict face_data, int is_transparent):
         self._extend()
-        self.blocks[self.block_count] = block_model_init(face_data, is_transparent)
+        self.blocks[self.block_count] = BlockModel_init(face_data, is_transparent)
         self.block_count += 1
 
     def __len__(self):
@@ -138,27 +138,27 @@ cdef struct VertArrayContainer:
     int size  # The current size of the array
     int used  # The number of elements of the array that are used
 
-cdef VertArrayContainer* vert_array_container_init() nogil:
+cdef VertArrayContainer* VertArrayContainer_init() nogil:
     self = <VertArrayContainer*>calloc(1, sizeof(VertArrayContainer))
     self.arrays = <VertArray**>calloc(10, sizeof(VertArray*))
     self.size = 0
     self.used = 0
     return self
 
-cdef void vert_array_container_free(VertArrayContainer* self) nogil:
+cdef void VertArrayContainer_free(VertArrayContainer* self) nogil:
     cdef int i
     for i in range(self.used):
-        vert_array_free(self.arrays[i])
+        VertArray_free(self.arrays[i])
     free(self.arrays)
     free(self)
 
-cdef void vert_array_container_append(VertArrayContainer* self, VertArray* vert_array) nogil:
+cdef void VertArrayContainer_append(VertArrayContainer* self, VertArray* vert_array) nogil:
     if self.used == self.size:
-        _vert_array_container_extend(self)
+        _VertArrayContainer_extend(self)
     self.arrays[self.used] = vert_array
     self.used += 1
 
-cdef void _vert_array_container_extend(VertArrayContainer* self) nogil:
+cdef void _VertArrayContainer_extend(VertArrayContainer* self) nogil:
     arr = <VertArray**>calloc(self.size + 5, sizeof(VertArray*))
     memcpy(arr, self.arrays, self.size * sizeof(VertArray*))
     free(self.arrays)
@@ -170,15 +170,15 @@ cdef struct VertArrayContainerTuple:
     VertArrayContainer* verts
     VertArrayContainer* verts_translucent
 
-cdef VertArrayContainerTuple* vert_array_container_tuple_init() nogil:
+cdef VertArrayContainerTuple* VertArrayContainerTuple_init() nogil:
     self = <VertArrayContainerTuple*>calloc(1, sizeof(VertArrayContainerTuple))
-    self.verts = vert_array_container_init()
-    self.verts_translucent = vert_array_container_init()
+    self.verts = VertArrayContainer_init()
+    self.verts_translucent = VertArrayContainer_init()
     return self
 
-cdef void vert_array_container_tuple_free(VertArrayContainerTuple* self) nogil:
-    vert_array_container_free(self.verts)
-    vert_array_container_free(self.verts_translucent)
+cdef void VertArrayContainerTuple_free(VertArrayContainerTuple* self) nogil:
+    VertArrayContainer_free(self.verts)
+    VertArrayContainer_free(self.verts_translucent)
     free(self)
 
 cdef VertArrayContainerTuple* create_lod0_sub_chunk(
@@ -196,16 +196,16 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
     cdef BlockModel* block_model
     cdef VertArray* vert_array
 
-    cdef VertArray* vert_table = vert_array_new(ARRAY_SIZE)
+    cdef VertArray* vert_table = VertArray_new(ARRAY_SIZE)
     vert_table.size = 0
-    cdef VertArray* trans_vert_table = vert_array_new(ARRAY_SIZE)
+    cdef VertArray* trans_vert_table = VertArray_new(ARRAY_SIZE)
     trans_vert_table.size = 0
 
     cdef int size_x = larger_blocks.shape[0] - 2
     cdef int size_y = larger_blocks.shape[1] - 2
     cdef int size_z = larger_blocks.shape[2] - 2
 
-    cdef VertArrayContainerTuple* verts = vert_array_container_tuple_init()
+    cdef VertArrayContainerTuple* verts = VertArrayContainerTuple_init()
 
     for x in range(size_x):
         for y in range(size_y):
@@ -233,8 +233,8 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
                         if block_model.is_transparent == 1:
                             vert_end = trans_vert_table.size+vert_count
                             if vert_end > ARRAY_SIZE:
-                                vert_array_container_append(verts.verts_translucent, trans_vert_table)
-                                trans_vert_table = vert_array_new(ARRAY_SIZE)
+                                VertArrayContainer_append(verts.verts_translucent, trans_vert_table)
+                                trans_vert_table = VertArray_new(ARRAY_SIZE)
                                 trans_vert_table.size = 0
                                 vert_end = vert_count
                             memcpy(&trans_vert_table.arr[trans_vert_table.size], vert_array.arr, vert_count * sizeof(float))
@@ -252,8 +252,8 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
                         else:
                             vert_end = vert_table.size+vert_count
                             if vert_end > ARRAY_SIZE:
-                                vert_array_container_append(verts.verts, vert_table)
-                                vert_table = vert_array_new(ARRAY_SIZE)
+                                VertArrayContainer_append(verts.verts, vert_table)
+                                vert_table = VertArray_new(ARRAY_SIZE)
                                 vert_table.size = 0
                                 vert_end = vert_count
                             memcpy(&vert_table.arr[vert_table.size], vert_array.arr, vert_count * sizeof(float))
@@ -270,13 +270,13 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
                             vert_table.size += vert_count
 
     if vert_table.size:
-        vert_array_container_append(verts.verts, vert_table)
+        VertArrayContainer_append(verts.verts, vert_table)
     else:
-        vert_array_free(vert_table)
+        VertArray_free(vert_table)
     if trans_vert_table.size:
-        vert_array_container_append(verts.verts_translucent, trans_vert_table)
+        VertArrayContainer_append(verts.verts_translucent, trans_vert_table)
     else:
-        vert_array_free(trans_vert_table)
+        VertArray_free(trans_vert_table)
 
     return verts
 
@@ -337,7 +337,7 @@ cdef tuple _create_lod0_chunk(
             vert_size_translucent += vert_array.size
 
     for i in range(sub_chunk_count):
-        vert_array_container_tuple_free(sub_chunk_verts[i])
+        VertArrayContainerTuple_free(sub_chunk_verts[i])
     free(sub_chunk_verts)
 
     return [chunk_verts], [chunk_verts_translucent]
