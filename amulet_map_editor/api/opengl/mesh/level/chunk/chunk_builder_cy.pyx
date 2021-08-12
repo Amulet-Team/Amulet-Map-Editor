@@ -224,13 +224,30 @@ cdef tuple create_lod0_sub_chunk(
     return chunk_verts, chunk_verts_translucent
 
 
-def create_lod0_chunk(
+def _create_lod0_chunk(
     resource_pack,
-    chunk_offset: numpy.ndarray,
     blocks,
-    block_palette,
-    vert_len,  # should be 12
+    chunk_offset
 ):
+    chunk_verts = []
+    chunk_verts_translucent = []
+
+    for block_array, sub_chunk_y in blocks:
+        sub_chunk_offset = chunk_offset.copy()
+        sub_chunk_offset[1] += sub_chunk_y
+
+        chunk_verts_, chunk_verts_translucent_ = create_lod0_sub_chunk(
+            block_array,
+            resource_pack.block_model_manager,
+            sub_chunk_offset,
+        )
+        chunk_verts += chunk_verts_
+        chunk_verts_translucent += chunk_verts_translucent_
+
+    return chunk_verts, chunk_verts_translucent
+
+
+def _extend_blocks(resource_pack, block_palette):
     if not hasattr(resource_pack, "block_model_manager"):
         # TODO: set up a proper location for these
         resource_pack.block_model_manager = BlockModelManager()
@@ -271,19 +288,18 @@ def create_lod0_chunk(
                 )
                 vert_map[py_cull_dir] = py_vert_table
         block_model_manager.add_block(vert_map, model.is_transparent)
-    chunk_verts = []
-    chunk_verts_translucent = []
 
-    for block_array, sub_chunk_y in blocks:
-        sub_chunk_offset = chunk_offset.copy()
-        sub_chunk_offset[1] += sub_chunk_y
 
-        chunk_verts_, chunk_verts_translucent_ = create_lod0_sub_chunk(
-            block_array,
-            block_model_manager,
-            sub_chunk_offset,
-        )
-        chunk_verts += chunk_verts_
-        chunk_verts_translucent += chunk_verts_translucent_
-
-    return chunk_verts, chunk_verts_translucent
+def create_lod0_chunk(
+    resource_pack,
+    chunk_offset: numpy.ndarray,
+    blocks,
+    block_palette,
+    vert_len,  # should be 12
+):
+    _extend_blocks(resource_pack, block_palette)
+    return _create_lod0_chunk(
+        resource_pack,
+        blocks,
+        chunk_offset
+    )
