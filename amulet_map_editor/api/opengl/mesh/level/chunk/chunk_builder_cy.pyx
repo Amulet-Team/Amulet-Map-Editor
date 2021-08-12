@@ -50,18 +50,21 @@ cdef struct VertArray:
     float* arr  # pointer to the array
     int size  # the number of floats in the array
 
-cdef VertArray* vert_array_init(array.array arr):
-    assert arr.typecode == "f", "arr must be a float array"
-    assert len(arr) and len(arr) % (ATTR_COUNT*3) == 0, "arr must have a multiple of 36 values"
+cdef VertArray* vert_array_init(float* arr, int size):
+    assert size and size % (ATTR_COUNT*3) == 0, "arr must have a multiple of 36 values"
     vert_array = <VertArray*>calloc(1, sizeof(VertArray))
-    vert_array.size = len(arr)
-    vert_array.arr = <float*>malloc(vert_array.size * sizeof(float))
-    memcpy(vert_array.arr, &arr.data.as_floats[0], vert_array.size * sizeof(float))
+    vert_array.size = size
+    vert_array.arr = <float*>malloc(size * sizeof(float))
+    memcpy(vert_array.arr, arr, size * sizeof(float))
     return vert_array
 
 cdef void vert_array_free(VertArray* vert_array):
     free(vert_array.arr)
     free(vert_array)
+
+cdef VertArray* vert_array_from_py(array.array arr):
+    assert arr.typecode == "f", "arr must be a float array"
+    return vert_array_init(&arr.data.as_floats[0], len(arr))
 
 
 cdef struct BlockModel:
@@ -77,7 +80,7 @@ cdef BlockModel* block_model_init(dict face_data, char is_transparent):
             if isinstance(arr, numpy.ndarray):
                 arr = array.array("f", arr.ravel())
             if isinstance(arr, array.array) and arr.typecode == "f":
-                block_model.faces[index] = vert_array_init(arr)
+                block_model.faces[index] = vert_array_from_py(arr)
         else:
             block_model.faces[index] = NULL
     return block_model
