@@ -78,6 +78,7 @@ cdef struct BlockModel:
 cdef BlockModel* BlockModel_init(dict face_data, char is_transparent):
     block_model = <BlockModel*>calloc(1, sizeof(BlockModel))
     block_model.is_transparent = is_transparent
+    cdef Py_ssize_t index
     for cull_id, index in CULL_STR_INDEX.items():
         if cull_id in face_data:
             arr = face_data[cull_id]
@@ -90,7 +91,7 @@ cdef BlockModel* BlockModel_init(dict face_data, char is_transparent):
     return block_model
 
 cdef void BlockModel_free(BlockModel* block_model) nogil:
-    cdef int i
+    cdef Py_ssize_t i
     for i in range(7):
         if block_model.faces[i]:
             VertArray_free(block_model.faces[i])
@@ -284,9 +285,12 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
 cdef tuple _create_lod0_chunk(
     BlockModelManager block_model_manager,
     list blocks,
-    int[:] chunk_offset
+    long[:] chunk_offset
 ):
     cdef int sub_chunk_count = len(blocks)
+    cdef long[:] sub_chunk_offset
+    cdef long sub_chunk_y
+    cdef unsigned int[:, :, :] block_array
     cdef int i, j
     sub_chunk_verts = <VertArrayContainerTuple**>calloc(sub_chunk_count, sizeof(VertArrayContainerTuple*))
     for i in range(sub_chunk_count):
