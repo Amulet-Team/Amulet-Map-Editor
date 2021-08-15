@@ -1,5 +1,5 @@
 from typing import List
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
 from Cython.Build import cythonize
 import os
 import glob
@@ -55,7 +55,13 @@ except:
 
 if next(glob.iglob("amulet_map_editor/**/*.pyx", recursive=True), None):
     # This throws an error if it does not match any files
-    ext = cythonize("amulet_map_editor/**/*.pyx")
+    ext = cythonize([
+        Extension(
+            name = 'amulet_map_editor.api.opengl.mesh.draw',
+            sources = ['amulet_map_editor/api/opengl/mesh/draw.pyx'],
+            libraries = ["opengl32"],
+        )
+    ], language_level=3, annotate=True)
 else:
     ext = ()
 

@@ -29,6 +29,7 @@ import numpy
 from amulet_map_editor.api.opengl.shaders import get_shader
 from amulet_map_editor.api.opengl import Drawable, ContextManager
 from amulet_map_editor import log
+from .draw import draw
 
 
 class TriMesh(Drawable, ContextManager):
@@ -172,9 +173,10 @@ class TriMesh(Drawable, ContextManager):
             self._setup()
             glBindVertexArray(self._vao)
         glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self._texture)
+        draw(self, transformation_matrix)
+        # glBindTexture(GL_TEXTURE_2D, self._texture)
 
-        glDrawArrays(self.draw_mode, self.draw_start, self.draw_count)
+        # glDrawArrays(self.draw_mode, self.draw_start, self.draw_count)
 
         glBindVertexArray(0)
         glUseProgram(0)
