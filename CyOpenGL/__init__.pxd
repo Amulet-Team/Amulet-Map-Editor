@@ -49,7 +49,7 @@ cdef extern from "<gl/gl.h>":
     void* wglGetProcAddress(LPCSTR lpszProc)
 
 cpdef void glUseProgram(GLuint program)
-cpdef void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, GLfloat[:] value)
+cpdef void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat[:] value)
 cpdef void glUniform1i(GLint location, GLint v0)
 cpdef void glBindVertexArray(GLuint array)
 cpdef void glActiveTexture(GLenum texture)
