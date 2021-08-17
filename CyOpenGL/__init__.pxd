@@ -1,5 +1,9 @@
 IF UNAME_SYSNAME == "Windows":
     cdef extern from "<windows.h>":
+        ctypedef void *PVOID
+        ctypedef PVOID HANDLE
+        ctypedef HANDLE HINSTANCE
+        ctypedef HINSTANCE HMODULE
         ctypedef char *LPCSTR
 
 cdef extern from "<gl/gl.h>":
