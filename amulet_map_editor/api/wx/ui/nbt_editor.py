@@ -20,6 +20,11 @@ nbt_resources = image.nbt
 class ParsedNBT:
     __slots__ = ["_parent", "_name", "_type"]
 
+    def __init__(self, parent, name, _type):
+        self._parent = parent
+        self._name = name
+        self._type = _type
+
     @classmethod
     def is_container(cls) -> bool:
         return False
@@ -73,10 +78,8 @@ class ParsedNBTValue(ParsedNBT):
         value: Union[int, float, str],
         _type: Type[nbt.AnyNBT],
     ):
-        self._parent: ParsedNBTContainer = parent
-        self._name = name
+        super(ParsedNBTValue, self).__init__(parent, name, _type)
         self._value = value
-        self._type = _type
 
     def __repr__(self):
         return f"{self._type}({self._name}, {self._value})"
@@ -107,11 +110,12 @@ class ParsedNBTContainer(ParsedNBT):
     __slots__ = ParsedNBT.__slots__ + ["_children"]
 
     def __init__(
-        self, parent: Optional[ParsedNBTContainer], name: str, _type: Type[nbt.AnyNBT]
+        self,
+        parent: Optional[ParsedNBTContainer],
+        name: str,
+        _type: Type[Union[nbt.AnyNBT, MutableMapping, MutableSequence]],
     ):
-        self._parent: ParsedNBTContainer = parent
-        self._name = name
-        self._type = _type
+        super(ParsedNBTContainer, self).__init__(parent, name, _type)
         self._children: List[Union[ParsedNBTValue, ParsedNBTContainer]] = []
 
     @classmethod
@@ -220,13 +224,17 @@ class NBTEditor(simple.SimplePanel):
             nbt.TAG_Compound: self.image_list.Add(
                 nbt_resources.nbt_tag_compound.bitmap()
             ),
-            nbt.NBTFile: self.image_list.ImageCount - 1,
+            nbt.NBTFile: self.image_list.Add(nbt_resources.nbt_tag_compound.bitmap()),
             nbt.TAG_List: self.image_list.Add(nbt_resources.nbt_tag_list.bitmap()),
             nbt.TAG_Byte_Array: self.image_list.Add(
                 nbt_resources.nbt_tag_array.bitmap()
             ),
-            nbt.TAG_Int_Array: self.image_list.ImageCount - 1,
-            nbt.TAG_Long_Array: self.image_list.ImageCount - 1,
+            nbt.TAG_Int_Array: self.image_list.Add(
+                nbt_resources.nbt_tag_array.bitmap()
+            ),
+            nbt.TAG_Long_Array: self.image_list.Add(
+                nbt_resources.nbt_tag_array.bitmap()
+            ),
         }
         self.other = self.image_map[nbt.TAG_String]
 
@@ -577,7 +585,7 @@ class EditTagDialog(wx.Frame):
 
 if __name__ == "__main__":
     level_dat = nbt.load(
-        r"C:\Users\gotharbg\Documents\Python Projects\Amulet-Core\tests\worlds_src\Java 1.13\level.dat"
+        r"C:\Users\gotharbg\Documents\Python Projects\Amulet-Core\tests\worlds_src\java_vanilla_1_13\level.dat"
     )
 
     app = wx.App()
