@@ -1,6 +1,8 @@
+# distutils: libraries = opengl32
+
 import numpy
 cimport numpy
-from CyOpenGL cimport (
+from CyOpenGL.GL cimport (
     # GL_FALSE,
     # GL_TEXTURE0,
     # GL_TEXTURE_2D,
@@ -19,7 +21,8 @@ from CyOpenGL cimport (
 )
 
 cpdef draw(self, transformation_matrix: numpy.ndarray):
-    cdef GLfloat[:] transform = transformation_matrix.T.astype(numpy.float32).ravel()
+    cdef float[::1] np_transform = numpy.ascontiguousarray(transformation_matrix.T.ravel(), dtype=numpy.float32)
+    cdef float *transform = &np_transform[0]
     cdef GLenum mode = self.draw_mode
     cdef GLint first = self.draw_start
     cdef GLsizei count = self.draw_count

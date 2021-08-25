@@ -53,26 +53,21 @@ try:
 except:
     pass
 
+ext = []
 if next(glob.iglob("amulet_map_editor/**/*.pyx", recursive=True), None):
     # This throws an error if it does not match any files
-    ext = cythonize(
-        [
-            Extension(
-                name="CyOpenGL",
-                sources=["CyOpenGL/__init__.pyx"],
-                libraries=["opengl32"],
-            ),
-            Extension(
-                name="amulet_map_editor.api.opengl.mesh.draw",
-                sources=["amulet_map_editor/api/opengl/mesh/draw.pyx"],
-                libraries=["opengl32"],
-            ),
-        ],
+    ext += cythonize(
+        "amulet_map_editor/**/*.pyx",
         language_level=3,
         annotate=True,
     )
-else:
-    ext = ()
+if next(glob.iglob("CyOpenGL/**/*.pyx", recursive=True), None):
+    # This throws an error if it does not match any files
+    ext += cythonize(
+        "CyOpenGL/**/*.pyx",
+        language_level=3,
+        annotate=True,
+    )
 
 setup(
     install_requires=required_packages,

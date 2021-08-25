@@ -1,16 +1,20 @@
 # cython: language_level=3, boundscheck=False, wraparound=False
+# distutils: libraries = opengl32
 
 import os
 
 IF UNAME_SYSNAME == "Windows":
+    cdef extern from "<windows.h>":
+        ctypedef void *HMODULE
+        ctypedef char *LPCSTR
     cdef extern from "<libloaderapi.h>":
-        void *LoadLibraryA(char *lpLibFileName)
-        void *GetProcAddress(void *hModule, char *lpProcName)
+        HMODULE LoadLibraryA(LPCSTR lpLibFileName)
+        void* GetProcAddress(HMODULE hModule, LPCSTR lpProcName)
     cdef extern from "<gl/gl.h>":
-        void *wglGetProcAddress(char *lpszProc)
-    cdef void *getFunction(char *functionName):
-        cdef void *p
-        cdef char *module
+        void* wglGetProcAddress(LPCSTR lpszProc)
+    cdef void *getFunction(LPCSTR functionName):
+        cdef void* p
+        cdef HMODULE module
         p = wglGetProcAddress(functionName)
         if -1 <= <unsigned long>p <= 3:
             module = LoadLibraryA("opengl32.dll")
