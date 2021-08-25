@@ -150,6 +150,9 @@ class EnumEntry:
     def write(self, f):
         f.write(f"cdef GLenum {self.name} = {self.value}\n")
 
+    def write_header(self, f):
+        f.write(f"cdef GLenum {self.name}\n")
+
 
 class EnumManager:
     def __init__(self, enums: List[Element]):
@@ -182,8 +185,13 @@ class EnumManager:
 
     def write(self, f, enums: Iterable[str]):
         f.write("\n")
-        for enum in set(enums):
+        for enum in sorted(set(enums)):
             self._enums[enum].write(f)
+
+    def write_header(self, f, enums: Iterable[str]):
+        f.write("\n")
+        for enum in sorted(set(enums)):
+            self._enums[enum].write_header(f)
 
 
 @dataclass
@@ -299,12 +307,12 @@ class CommandManager:
             "write_public_function",
         ):
             f.write("\n")
-            for command in set(commands):
+            for command in sorted(set(commands)):
                 command_entry = self._commands[command]
                 getattr(command_entry, fun)(f)
 
     def write_header(self, f, commands: Iterable[str]):
-        for command in set(commands):
+        for command in sorted(set(commands)):
             self._commands[command].write_header(f)
 
 
@@ -344,6 +352,7 @@ class FeatureEntry:
         hpath = os.path.join(path, self.api.upper(), self.header_name)
         with open(hpath, "w") as h:
             h.write(DTypes)
+            enums.write_header(h, self.enums)
             commands.write_header(h, self.commands)
         with open(os.path.join(path, self.api.upper(), "__init__.pxd"), "a") as f:
             f.write(f"from CyOpenGL.{self.api.upper()}.{self.short_name} cimport *\n")
