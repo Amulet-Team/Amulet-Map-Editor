@@ -303,612 +303,612 @@ cdef PFNGLVERTEXARRAYVERTEXBUFFERSPROC cglVertexArrayVertexBuffers = NULL
 
 cdef void GetglBindTextureUnit(GLuint unit, GLuint texture):
     global cglBindTextureUnit
-    cglBindTextureUnit = <PFNGLBINDTEXTUREUNITPROC>getFunction(b"glBindTextureUnit")
+    cglBindTextureUnit = <PFNGLBINDTEXTUREUNITPROC>getFunction("glBindTextureUnit")
     cglBindTextureUnit(unit, texture)
 
 cdef void GetglBlitNamedFramebuffer(GLuint readFramebuffer, GLuint drawFramebuffer, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter):
     global cglBlitNamedFramebuffer
-    cglBlitNamedFramebuffer = <PFNGLBLITNAMEDFRAMEBUFFERPROC>getFunction(b"glBlitNamedFramebuffer")
+    cglBlitNamedFramebuffer = <PFNGLBLITNAMEDFRAMEBUFFERPROC>getFunction("glBlitNamedFramebuffer")
     cglBlitNamedFramebuffer(readFramebuffer, drawFramebuffer, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter)
 
 cdef GLenum GetglCheckNamedFramebufferStatus(GLuint framebuffer, GLenum target):
     global cglCheckNamedFramebufferStatus
-    cglCheckNamedFramebufferStatus = <PFNGLCHECKNAMEDFRAMEBUFFERSTATUSPROC>getFunction(b"glCheckNamedFramebufferStatus")
+    cglCheckNamedFramebufferStatus = <PFNGLCHECKNAMEDFRAMEBUFFERSTATUSPROC>getFunction("glCheckNamedFramebufferStatus")
     cglCheckNamedFramebufferStatus(framebuffer, target)
 
 cdef void GetglClearNamedBufferData(GLuint buffer, GLenum internalformat, GLenum format, GLenum type, const void *data):
     global cglClearNamedBufferData
-    cglClearNamedBufferData = <PFNGLCLEARNAMEDBUFFERDATAPROC>getFunction(b"glClearNamedBufferData")
+    cglClearNamedBufferData = <PFNGLCLEARNAMEDBUFFERDATAPROC>getFunction("glClearNamedBufferData")
     cglClearNamedBufferData(buffer, internalformat, format, type, data)
 
 cdef void GetglClearNamedBufferSubData(GLuint buffer, GLenum internalformat, GLintptr offset, GLsizeiptr size, GLenum format, GLenum type, const void *data):
     global cglClearNamedBufferSubData
-    cglClearNamedBufferSubData = <PFNGLCLEARNAMEDBUFFERSUBDATAPROC>getFunction(b"glClearNamedBufferSubData")
+    cglClearNamedBufferSubData = <PFNGLCLEARNAMEDBUFFERSUBDATAPROC>getFunction("glClearNamedBufferSubData")
     cglClearNamedBufferSubData(buffer, internalformat, offset, size, format, type, data)
 
 cdef void GetglClearNamedFramebufferfi(GLuint framebuffer, GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil):
     global cglClearNamedFramebufferfi
-    cglClearNamedFramebufferfi = <PFNGLCLEARNAMEDFRAMEBUFFERFIPROC>getFunction(b"glClearNamedFramebufferfi")
+    cglClearNamedFramebufferfi = <PFNGLCLEARNAMEDFRAMEBUFFERFIPROC>getFunction("glClearNamedFramebufferfi")
     cglClearNamedFramebufferfi(framebuffer, buffer, drawbuffer, depth, stencil)
 
 cdef void GetglClearNamedFramebufferfv(GLuint framebuffer, GLenum buffer, GLint drawbuffer, const GLfloat *value):
     global cglClearNamedFramebufferfv
-    cglClearNamedFramebufferfv = <PFNGLCLEARNAMEDFRAMEBUFFERFVPROC>getFunction(b"glClearNamedFramebufferfv")
+    cglClearNamedFramebufferfv = <PFNGLCLEARNAMEDFRAMEBUFFERFVPROC>getFunction("glClearNamedFramebufferfv")
     cglClearNamedFramebufferfv(framebuffer, buffer, drawbuffer, value)
 
 cdef void GetglClearNamedFramebufferiv(GLuint framebuffer, GLenum buffer, GLint drawbuffer, const GLint *value):
     global cglClearNamedFramebufferiv
-    cglClearNamedFramebufferiv = <PFNGLCLEARNAMEDFRAMEBUFFERIVPROC>getFunction(b"glClearNamedFramebufferiv")
+    cglClearNamedFramebufferiv = <PFNGLCLEARNAMEDFRAMEBUFFERIVPROC>getFunction("glClearNamedFramebufferiv")
     cglClearNamedFramebufferiv(framebuffer, buffer, drawbuffer, value)
 
 cdef void GetglClearNamedFramebufferuiv(GLuint framebuffer, GLenum buffer, GLint drawbuffer, const GLuint *value):
     global cglClearNamedFramebufferuiv
-    cglClearNamedFramebufferuiv = <PFNGLCLEARNAMEDFRAMEBUFFERUIVPROC>getFunction(b"glClearNamedFramebufferuiv")
+    cglClearNamedFramebufferuiv = <PFNGLCLEARNAMEDFRAMEBUFFERUIVPROC>getFunction("glClearNamedFramebufferuiv")
     cglClearNamedFramebufferuiv(framebuffer, buffer, drawbuffer, value)
 
 cdef void GetglClipControl(GLenum origin, GLenum depth):
     global cglClipControl
-    cglClipControl = <PFNGLCLIPCONTROLPROC>getFunction(b"glClipControl")
+    cglClipControl = <PFNGLCLIPCONTROLPROC>getFunction("glClipControl")
     cglClipControl(origin, depth)
 
 cdef void GetglCompressedTextureSubImage1D(GLuint texture, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const void *data):
     global cglCompressedTextureSubImage1D
-    cglCompressedTextureSubImage1D = <PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC>getFunction(b"glCompressedTextureSubImage1D")
+    cglCompressedTextureSubImage1D = <PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC>getFunction("glCompressedTextureSubImage1D")
     cglCompressedTextureSubImage1D(texture, level, xoffset, width, format, imageSize, data)
 
 cdef void GetglCompressedTextureSubImage2D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void *data):
     global cglCompressedTextureSubImage2D
-    cglCompressedTextureSubImage2D = <PFNGLCOMPRESSEDTEXTURESUBIMAGE2DPROC>getFunction(b"glCompressedTextureSubImage2D")
+    cglCompressedTextureSubImage2D = <PFNGLCOMPRESSEDTEXTURESUBIMAGE2DPROC>getFunction("glCompressedTextureSubImage2D")
     cglCompressedTextureSubImage2D(texture, level, xoffset, yoffset, width, height, format, imageSize, data)
 
 cdef void GetglCompressedTextureSubImage3D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const void *data):
     global cglCompressedTextureSubImage3D
-    cglCompressedTextureSubImage3D = <PFNGLCOMPRESSEDTEXTURESUBIMAGE3DPROC>getFunction(b"glCompressedTextureSubImage3D")
+    cglCompressedTextureSubImage3D = <PFNGLCOMPRESSEDTEXTURESUBIMAGE3DPROC>getFunction("glCompressedTextureSubImage3D")
     cglCompressedTextureSubImage3D(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data)
 
 cdef void GetglCopyNamedBufferSubData(GLuint readBuffer, GLuint writeBuffer, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size):
     global cglCopyNamedBufferSubData
-    cglCopyNamedBufferSubData = <PFNGLCOPYNAMEDBUFFERSUBDATAPROC>getFunction(b"glCopyNamedBufferSubData")
+    cglCopyNamedBufferSubData = <PFNGLCOPYNAMEDBUFFERSUBDATAPROC>getFunction("glCopyNamedBufferSubData")
     cglCopyNamedBufferSubData(readBuffer, writeBuffer, readOffset, writeOffset, size)
 
 cdef void GetglCopyTextureSubImage1D(GLuint texture, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width):
     global cglCopyTextureSubImage1D
-    cglCopyTextureSubImage1D = <PFNGLCOPYTEXTURESUBIMAGE1DPROC>getFunction(b"glCopyTextureSubImage1D")
+    cglCopyTextureSubImage1D = <PFNGLCOPYTEXTURESUBIMAGE1DPROC>getFunction("glCopyTextureSubImage1D")
     cglCopyTextureSubImage1D(texture, level, xoffset, x, y, width)
 
 cdef void GetglCopyTextureSubImage2D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height):
     global cglCopyTextureSubImage2D
-    cglCopyTextureSubImage2D = <PFNGLCOPYTEXTURESUBIMAGE2DPROC>getFunction(b"glCopyTextureSubImage2D")
+    cglCopyTextureSubImage2D = <PFNGLCOPYTEXTURESUBIMAGE2DPROC>getFunction("glCopyTextureSubImage2D")
     cglCopyTextureSubImage2D(texture, level, xoffset, yoffset, x, y, width, height)
 
 cdef void GetglCopyTextureSubImage3D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height):
     global cglCopyTextureSubImage3D
-    cglCopyTextureSubImage3D = <PFNGLCOPYTEXTURESUBIMAGE3DPROC>getFunction(b"glCopyTextureSubImage3D")
+    cglCopyTextureSubImage3D = <PFNGLCOPYTEXTURESUBIMAGE3DPROC>getFunction("glCopyTextureSubImage3D")
     cglCopyTextureSubImage3D(texture, level, xoffset, yoffset, zoffset, x, y, width, height)
 
 cdef void GetglCreateBuffers(GLsizei n, GLuint *buffers):
     global cglCreateBuffers
-    cglCreateBuffers = <PFNGLCREATEBUFFERSPROC>getFunction(b"glCreateBuffers")
+    cglCreateBuffers = <PFNGLCREATEBUFFERSPROC>getFunction("glCreateBuffers")
     cglCreateBuffers(n, buffers)
 
 cdef void GetglCreateFramebuffers(GLsizei n, GLuint *framebuffers):
     global cglCreateFramebuffers
-    cglCreateFramebuffers = <PFNGLCREATEFRAMEBUFFERSPROC>getFunction(b"glCreateFramebuffers")
+    cglCreateFramebuffers = <PFNGLCREATEFRAMEBUFFERSPROC>getFunction("glCreateFramebuffers")
     cglCreateFramebuffers(n, framebuffers)
 
 cdef void GetglCreateProgramPipelines(GLsizei n, GLuint *pipelines):
     global cglCreateProgramPipelines
-    cglCreateProgramPipelines = <PFNGLCREATEPROGRAMPIPELINESPROC>getFunction(b"glCreateProgramPipelines")
+    cglCreateProgramPipelines = <PFNGLCREATEPROGRAMPIPELINESPROC>getFunction("glCreateProgramPipelines")
     cglCreateProgramPipelines(n, pipelines)
 
 cdef void GetglCreateQueries(GLenum target, GLsizei n, GLuint *ids):
     global cglCreateQueries
-    cglCreateQueries = <PFNGLCREATEQUERIESPROC>getFunction(b"glCreateQueries")
+    cglCreateQueries = <PFNGLCREATEQUERIESPROC>getFunction("glCreateQueries")
     cglCreateQueries(target, n, ids)
 
 cdef void GetglCreateRenderbuffers(GLsizei n, GLuint *renderbuffers):
     global cglCreateRenderbuffers
-    cglCreateRenderbuffers = <PFNGLCREATERENDERBUFFERSPROC>getFunction(b"glCreateRenderbuffers")
+    cglCreateRenderbuffers = <PFNGLCREATERENDERBUFFERSPROC>getFunction("glCreateRenderbuffers")
     cglCreateRenderbuffers(n, renderbuffers)
 
 cdef void GetglCreateSamplers(GLsizei n, GLuint *samplers):
     global cglCreateSamplers
-    cglCreateSamplers = <PFNGLCREATESAMPLERSPROC>getFunction(b"glCreateSamplers")
+    cglCreateSamplers = <PFNGLCREATESAMPLERSPROC>getFunction("glCreateSamplers")
     cglCreateSamplers(n, samplers)
 
 cdef void GetglCreateTextures(GLenum target, GLsizei n, GLuint *textures):
     global cglCreateTextures
-    cglCreateTextures = <PFNGLCREATETEXTURESPROC>getFunction(b"glCreateTextures")
+    cglCreateTextures = <PFNGLCREATETEXTURESPROC>getFunction("glCreateTextures")
     cglCreateTextures(target, n, textures)
 
 cdef void GetglCreateTransformFeedbacks(GLsizei n, GLuint *ids):
     global cglCreateTransformFeedbacks
-    cglCreateTransformFeedbacks = <PFNGLCREATETRANSFORMFEEDBACKSPROC>getFunction(b"glCreateTransformFeedbacks")
+    cglCreateTransformFeedbacks = <PFNGLCREATETRANSFORMFEEDBACKSPROC>getFunction("glCreateTransformFeedbacks")
     cglCreateTransformFeedbacks(n, ids)
 
 cdef void GetglCreateVertexArrays(GLsizei n, GLuint *arrays):
     global cglCreateVertexArrays
-    cglCreateVertexArrays = <PFNGLCREATEVERTEXARRAYSPROC>getFunction(b"glCreateVertexArrays")
+    cglCreateVertexArrays = <PFNGLCREATEVERTEXARRAYSPROC>getFunction("glCreateVertexArrays")
     cglCreateVertexArrays(n, arrays)
 
 cdef void GetglDisableVertexArrayAttrib(GLuint vaobj, GLuint index):
     global cglDisableVertexArrayAttrib
-    cglDisableVertexArrayAttrib = <PFNGLDISABLEVERTEXARRAYATTRIBPROC>getFunction(b"glDisableVertexArrayAttrib")
+    cglDisableVertexArrayAttrib = <PFNGLDISABLEVERTEXARRAYATTRIBPROC>getFunction("glDisableVertexArrayAttrib")
     cglDisableVertexArrayAttrib(vaobj, index)
 
 cdef void GetglEnableVertexArrayAttrib(GLuint vaobj, GLuint index):
     global cglEnableVertexArrayAttrib
-    cglEnableVertexArrayAttrib = <PFNGLENABLEVERTEXARRAYATTRIBPROC>getFunction(b"glEnableVertexArrayAttrib")
+    cglEnableVertexArrayAttrib = <PFNGLENABLEVERTEXARRAYATTRIBPROC>getFunction("glEnableVertexArrayAttrib")
     cglEnableVertexArrayAttrib(vaobj, index)
 
 cdef void GetglFlushMappedNamedBufferRange(GLuint buffer, GLintptr offset, GLsizeiptr length):
     global cglFlushMappedNamedBufferRange
-    cglFlushMappedNamedBufferRange = <PFNGLFLUSHMAPPEDNAMEDBUFFERRANGEPROC>getFunction(b"glFlushMappedNamedBufferRange")
+    cglFlushMappedNamedBufferRange = <PFNGLFLUSHMAPPEDNAMEDBUFFERRANGEPROC>getFunction("glFlushMappedNamedBufferRange")
     cglFlushMappedNamedBufferRange(buffer, offset, length)
 
 cdef void GetglGenerateTextureMipmap(GLuint texture):
     global cglGenerateTextureMipmap
-    cglGenerateTextureMipmap = <PFNGLGENERATETEXTUREMIPMAPPROC>getFunction(b"glGenerateTextureMipmap")
+    cglGenerateTextureMipmap = <PFNGLGENERATETEXTUREMIPMAPPROC>getFunction("glGenerateTextureMipmap")
     cglGenerateTextureMipmap(texture)
 
 cdef void GetglGetCompressedTextureImage(GLuint texture, GLint level, GLsizei bufSize, void *pixels):
     global cglGetCompressedTextureImage
-    cglGetCompressedTextureImage = <PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC>getFunction(b"glGetCompressedTextureImage")
+    cglGetCompressedTextureImage = <PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC>getFunction("glGetCompressedTextureImage")
     cglGetCompressedTextureImage(texture, level, bufSize, pixels)
 
 cdef void GetglGetCompressedTextureSubImage(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLsizei bufSize, void *pixels):
     global cglGetCompressedTextureSubImage
-    cglGetCompressedTextureSubImage = <PFNGLGETCOMPRESSEDTEXTURESUBIMAGEPROC>getFunction(b"glGetCompressedTextureSubImage")
+    cglGetCompressedTextureSubImage = <PFNGLGETCOMPRESSEDTEXTURESUBIMAGEPROC>getFunction("glGetCompressedTextureSubImage")
     cglGetCompressedTextureSubImage(texture, level, xoffset, yoffset, zoffset, width, height, depth, bufSize, pixels)
 
 cdef GLenum GetglGetGraphicsResetStatus():
     global cglGetGraphicsResetStatus
-    cglGetGraphicsResetStatus = <PFNGLGETGRAPHICSRESETSTATUSPROC>getFunction(b"glGetGraphicsResetStatus")
+    cglGetGraphicsResetStatus = <PFNGLGETGRAPHICSRESETSTATUSPROC>getFunction("glGetGraphicsResetStatus")
     cglGetGraphicsResetStatus()
 
 cdef void GetglGetNamedBufferParameteri64v(GLuint buffer, GLenum pname, GLint64 *params):
     global cglGetNamedBufferParameteri64v
-    cglGetNamedBufferParameteri64v = <PFNGLGETNAMEDBUFFERPARAMETERI64VPROC>getFunction(b"glGetNamedBufferParameteri64v")
+    cglGetNamedBufferParameteri64v = <PFNGLGETNAMEDBUFFERPARAMETERI64VPROC>getFunction("glGetNamedBufferParameteri64v")
     cglGetNamedBufferParameteri64v(buffer, pname, params)
 
 cdef void GetglGetNamedBufferParameteriv(GLuint buffer, GLenum pname, GLint *params):
     global cglGetNamedBufferParameteriv
-    cglGetNamedBufferParameteriv = <PFNGLGETNAMEDBUFFERPARAMETERIVPROC>getFunction(b"glGetNamedBufferParameteriv")
+    cglGetNamedBufferParameteriv = <PFNGLGETNAMEDBUFFERPARAMETERIVPROC>getFunction("glGetNamedBufferParameteriv")
     cglGetNamedBufferParameteriv(buffer, pname, params)
 
 cdef void GetglGetNamedBufferPointerv(GLuint buffer, GLenum pname, void **params):
     global cglGetNamedBufferPointerv
-    cglGetNamedBufferPointerv = <PFNGLGETNAMEDBUFFERPOINTERVPROC>getFunction(b"glGetNamedBufferPointerv")
+    cglGetNamedBufferPointerv = <PFNGLGETNAMEDBUFFERPOINTERVPROC>getFunction("glGetNamedBufferPointerv")
     cglGetNamedBufferPointerv(buffer, pname, params)
 
 cdef void GetglGetNamedBufferSubData(GLuint buffer, GLintptr offset, GLsizeiptr size, void *data):
     global cglGetNamedBufferSubData
-    cglGetNamedBufferSubData = <PFNGLGETNAMEDBUFFERSUBDATAPROC>getFunction(b"glGetNamedBufferSubData")
+    cglGetNamedBufferSubData = <PFNGLGETNAMEDBUFFERSUBDATAPROC>getFunction("glGetNamedBufferSubData")
     cglGetNamedBufferSubData(buffer, offset, size, data)
 
 cdef void GetglGetNamedFramebufferAttachmentParameteriv(GLuint framebuffer, GLenum attachment, GLenum pname, GLint *params):
     global cglGetNamedFramebufferAttachmentParameteriv
-    cglGetNamedFramebufferAttachmentParameteriv = <PFNGLGETNAMEDFRAMEBUFFERATTACHMENTPARAMETERIVPROC>getFunction(b"glGetNamedFramebufferAttachmentParameteriv")
+    cglGetNamedFramebufferAttachmentParameteriv = <PFNGLGETNAMEDFRAMEBUFFERATTACHMENTPARAMETERIVPROC>getFunction("glGetNamedFramebufferAttachmentParameteriv")
     cglGetNamedFramebufferAttachmentParameteriv(framebuffer, attachment, pname, params)
 
 cdef void GetglGetNamedFramebufferParameteriv(GLuint framebuffer, GLenum pname, GLint *param):
     global cglGetNamedFramebufferParameteriv
-    cglGetNamedFramebufferParameteriv = <PFNGLGETNAMEDFRAMEBUFFERPARAMETERIVPROC>getFunction(b"glGetNamedFramebufferParameteriv")
+    cglGetNamedFramebufferParameteriv = <PFNGLGETNAMEDFRAMEBUFFERPARAMETERIVPROC>getFunction("glGetNamedFramebufferParameteriv")
     cglGetNamedFramebufferParameteriv(framebuffer, pname, param)
 
 cdef void GetglGetNamedRenderbufferParameteriv(GLuint renderbuffer, GLenum pname, GLint *params):
     global cglGetNamedRenderbufferParameteriv
-    cglGetNamedRenderbufferParameteriv = <PFNGLGETNAMEDRENDERBUFFERPARAMETERIVPROC>getFunction(b"glGetNamedRenderbufferParameteriv")
+    cglGetNamedRenderbufferParameteriv = <PFNGLGETNAMEDRENDERBUFFERPARAMETERIVPROC>getFunction("glGetNamedRenderbufferParameteriv")
     cglGetNamedRenderbufferParameteriv(renderbuffer, pname, params)
 
 cdef void GetglGetQueryBufferObjecti64v(GLuint id, GLuint buffer, GLenum pname, GLintptr offset):
     global cglGetQueryBufferObjecti64v
-    cglGetQueryBufferObjecti64v = <PFNGLGETQUERYBUFFEROBJECTI64VPROC>getFunction(b"glGetQueryBufferObjecti64v")
+    cglGetQueryBufferObjecti64v = <PFNGLGETQUERYBUFFEROBJECTI64VPROC>getFunction("glGetQueryBufferObjecti64v")
     cglGetQueryBufferObjecti64v(id, buffer, pname, offset)
 
 cdef void GetglGetQueryBufferObjectiv(GLuint id, GLuint buffer, GLenum pname, GLintptr offset):
     global cglGetQueryBufferObjectiv
-    cglGetQueryBufferObjectiv = <PFNGLGETQUERYBUFFEROBJECTIVPROC>getFunction(b"glGetQueryBufferObjectiv")
+    cglGetQueryBufferObjectiv = <PFNGLGETQUERYBUFFEROBJECTIVPROC>getFunction("glGetQueryBufferObjectiv")
     cglGetQueryBufferObjectiv(id, buffer, pname, offset)
 
 cdef void GetglGetQueryBufferObjectui64v(GLuint id, GLuint buffer, GLenum pname, GLintptr offset):
     global cglGetQueryBufferObjectui64v
-    cglGetQueryBufferObjectui64v = <PFNGLGETQUERYBUFFEROBJECTUI64VPROC>getFunction(b"glGetQueryBufferObjectui64v")
+    cglGetQueryBufferObjectui64v = <PFNGLGETQUERYBUFFEROBJECTUI64VPROC>getFunction("glGetQueryBufferObjectui64v")
     cglGetQueryBufferObjectui64v(id, buffer, pname, offset)
 
 cdef void GetglGetQueryBufferObjectuiv(GLuint id, GLuint buffer, GLenum pname, GLintptr offset):
     global cglGetQueryBufferObjectuiv
-    cglGetQueryBufferObjectuiv = <PFNGLGETQUERYBUFFEROBJECTUIVPROC>getFunction(b"glGetQueryBufferObjectuiv")
+    cglGetQueryBufferObjectuiv = <PFNGLGETQUERYBUFFEROBJECTUIVPROC>getFunction("glGetQueryBufferObjectuiv")
     cglGetQueryBufferObjectuiv(id, buffer, pname, offset)
 
 cdef void GetglGetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels):
     global cglGetTextureImage
-    cglGetTextureImage = <PFNGLGETTEXTUREIMAGEPROC>getFunction(b"glGetTextureImage")
+    cglGetTextureImage = <PFNGLGETTEXTUREIMAGEPROC>getFunction("glGetTextureImage")
     cglGetTextureImage(texture, level, format, type, bufSize, pixels)
 
 cdef void GetglGetTextureLevelParameterfv(GLuint texture, GLint level, GLenum pname, GLfloat *params):
     global cglGetTextureLevelParameterfv
-    cglGetTextureLevelParameterfv = <PFNGLGETTEXTURELEVELPARAMETERFVPROC>getFunction(b"glGetTextureLevelParameterfv")
+    cglGetTextureLevelParameterfv = <PFNGLGETTEXTURELEVELPARAMETERFVPROC>getFunction("glGetTextureLevelParameterfv")
     cglGetTextureLevelParameterfv(texture, level, pname, params)
 
 cdef void GetglGetTextureLevelParameteriv(GLuint texture, GLint level, GLenum pname, GLint *params):
     global cglGetTextureLevelParameteriv
-    cglGetTextureLevelParameteriv = <PFNGLGETTEXTURELEVELPARAMETERIVPROC>getFunction(b"glGetTextureLevelParameteriv")
+    cglGetTextureLevelParameteriv = <PFNGLGETTEXTURELEVELPARAMETERIVPROC>getFunction("glGetTextureLevelParameteriv")
     cglGetTextureLevelParameteriv(texture, level, pname, params)
 
 cdef void GetglGetTextureParameterIiv(GLuint texture, GLenum pname, GLint *params):
     global cglGetTextureParameterIiv
-    cglGetTextureParameterIiv = <PFNGLGETTEXTUREPARAMETERIIVPROC>getFunction(b"glGetTextureParameterIiv")
+    cglGetTextureParameterIiv = <PFNGLGETTEXTUREPARAMETERIIVPROC>getFunction("glGetTextureParameterIiv")
     cglGetTextureParameterIiv(texture, pname, params)
 
 cdef void GetglGetTextureParameterIuiv(GLuint texture, GLenum pname, GLuint *params):
     global cglGetTextureParameterIuiv
-    cglGetTextureParameterIuiv = <PFNGLGETTEXTUREPARAMETERIUIVPROC>getFunction(b"glGetTextureParameterIuiv")
+    cglGetTextureParameterIuiv = <PFNGLGETTEXTUREPARAMETERIUIVPROC>getFunction("glGetTextureParameterIuiv")
     cglGetTextureParameterIuiv(texture, pname, params)
 
 cdef void GetglGetTextureParameterfv(GLuint texture, GLenum pname, GLfloat *params):
     global cglGetTextureParameterfv
-    cglGetTextureParameterfv = <PFNGLGETTEXTUREPARAMETERFVPROC>getFunction(b"glGetTextureParameterfv")
+    cglGetTextureParameterfv = <PFNGLGETTEXTUREPARAMETERFVPROC>getFunction("glGetTextureParameterfv")
     cglGetTextureParameterfv(texture, pname, params)
 
 cdef void GetglGetTextureParameteriv(GLuint texture, GLenum pname, GLint *params):
     global cglGetTextureParameteriv
-    cglGetTextureParameteriv = <PFNGLGETTEXTUREPARAMETERIVPROC>getFunction(b"glGetTextureParameteriv")
+    cglGetTextureParameteriv = <PFNGLGETTEXTUREPARAMETERIVPROC>getFunction("glGetTextureParameteriv")
     cglGetTextureParameteriv(texture, pname, params)
 
 cdef void GetglGetTextureSubImage(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLsizei bufSize, void *pixels):
     global cglGetTextureSubImage
-    cglGetTextureSubImage = <PFNGLGETTEXTURESUBIMAGEPROC>getFunction(b"glGetTextureSubImage")
+    cglGetTextureSubImage = <PFNGLGETTEXTURESUBIMAGEPROC>getFunction("glGetTextureSubImage")
     cglGetTextureSubImage(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, type, bufSize, pixels)
 
 cdef void GetglGetTransformFeedbacki64_v(GLuint xfb, GLenum pname, GLuint index, GLint64 *param):
     global cglGetTransformFeedbacki64_v
-    cglGetTransformFeedbacki64_v = <PFNGLGETTRANSFORMFEEDBACKI64_VPROC>getFunction(b"glGetTransformFeedbacki64_v")
+    cglGetTransformFeedbacki64_v = <PFNGLGETTRANSFORMFEEDBACKI64_VPROC>getFunction("glGetTransformFeedbacki64_v")
     cglGetTransformFeedbacki64_v(xfb, pname, index, param)
 
 cdef void GetglGetTransformFeedbacki_v(GLuint xfb, GLenum pname, GLuint index, GLint *param):
     global cglGetTransformFeedbacki_v
-    cglGetTransformFeedbacki_v = <PFNGLGETTRANSFORMFEEDBACKI_VPROC>getFunction(b"glGetTransformFeedbacki_v")
+    cglGetTransformFeedbacki_v = <PFNGLGETTRANSFORMFEEDBACKI_VPROC>getFunction("glGetTransformFeedbacki_v")
     cglGetTransformFeedbacki_v(xfb, pname, index, param)
 
 cdef void GetglGetTransformFeedbackiv(GLuint xfb, GLenum pname, GLint *param):
     global cglGetTransformFeedbackiv
-    cglGetTransformFeedbackiv = <PFNGLGETTRANSFORMFEEDBACKIVPROC>getFunction(b"glGetTransformFeedbackiv")
+    cglGetTransformFeedbackiv = <PFNGLGETTRANSFORMFEEDBACKIVPROC>getFunction("glGetTransformFeedbackiv")
     cglGetTransformFeedbackiv(xfb, pname, param)
 
 cdef void GetglGetVertexArrayIndexed64iv(GLuint vaobj, GLuint index, GLenum pname, GLint64 *param):
     global cglGetVertexArrayIndexed64iv
-    cglGetVertexArrayIndexed64iv = <PFNGLGETVERTEXARRAYINDEXED64IVPROC>getFunction(b"glGetVertexArrayIndexed64iv")
+    cglGetVertexArrayIndexed64iv = <PFNGLGETVERTEXARRAYINDEXED64IVPROC>getFunction("glGetVertexArrayIndexed64iv")
     cglGetVertexArrayIndexed64iv(vaobj, index, pname, param)
 
 cdef void GetglGetVertexArrayIndexediv(GLuint vaobj, GLuint index, GLenum pname, GLint *param):
     global cglGetVertexArrayIndexediv
-    cglGetVertexArrayIndexediv = <PFNGLGETVERTEXARRAYINDEXEDIVPROC>getFunction(b"glGetVertexArrayIndexediv")
+    cglGetVertexArrayIndexediv = <PFNGLGETVERTEXARRAYINDEXEDIVPROC>getFunction("glGetVertexArrayIndexediv")
     cglGetVertexArrayIndexediv(vaobj, index, pname, param)
 
 cdef void GetglGetVertexArrayiv(GLuint vaobj, GLenum pname, GLint *param):
     global cglGetVertexArrayiv
-    cglGetVertexArrayiv = <PFNGLGETVERTEXARRAYIVPROC>getFunction(b"glGetVertexArrayiv")
+    cglGetVertexArrayiv = <PFNGLGETVERTEXARRAYIVPROC>getFunction("glGetVertexArrayiv")
     cglGetVertexArrayiv(vaobj, pname, param)
 
 cdef void GetglGetnColorTable(GLenum target, GLenum format, GLenum type, GLsizei bufSize, void *table):
     global cglGetnColorTable
-    cglGetnColorTable = <PFNGLGETNCOLORTABLEPROC>getFunction(b"glGetnColorTable")
+    cglGetnColorTable = <PFNGLGETNCOLORTABLEPROC>getFunction("glGetnColorTable")
     cglGetnColorTable(target, format, type, bufSize, table)
 
 cdef void GetglGetnCompressedTexImage(GLenum target, GLint lod, GLsizei bufSize, void *pixels):
     global cglGetnCompressedTexImage
-    cglGetnCompressedTexImage = <PFNGLGETNCOMPRESSEDTEXIMAGEPROC>getFunction(b"glGetnCompressedTexImage")
+    cglGetnCompressedTexImage = <PFNGLGETNCOMPRESSEDTEXIMAGEPROC>getFunction("glGetnCompressedTexImage")
     cglGetnCompressedTexImage(target, lod, bufSize, pixels)
 
 cdef void GetglGetnConvolutionFilter(GLenum target, GLenum format, GLenum type, GLsizei bufSize, void *image):
     global cglGetnConvolutionFilter
-    cglGetnConvolutionFilter = <PFNGLGETNCONVOLUTIONFILTERPROC>getFunction(b"glGetnConvolutionFilter")
+    cglGetnConvolutionFilter = <PFNGLGETNCONVOLUTIONFILTERPROC>getFunction("glGetnConvolutionFilter")
     cglGetnConvolutionFilter(target, format, type, bufSize, image)
 
 cdef void GetglGetnHistogram(GLenum target, GLboolean reset, GLenum format, GLenum type, GLsizei bufSize, void *values):
     global cglGetnHistogram
-    cglGetnHistogram = <PFNGLGETNHISTOGRAMPROC>getFunction(b"glGetnHistogram")
+    cglGetnHistogram = <PFNGLGETNHISTOGRAMPROC>getFunction("glGetnHistogram")
     cglGetnHistogram(target, reset, format, type, bufSize, values)
 
 cdef void GetglGetnMapdv(GLenum target, GLenum query, GLsizei bufSize, GLdouble *v):
     global cglGetnMapdv
-    cglGetnMapdv = <PFNGLGETNMAPDVPROC>getFunction(b"glGetnMapdv")
+    cglGetnMapdv = <PFNGLGETNMAPDVPROC>getFunction("glGetnMapdv")
     cglGetnMapdv(target, query, bufSize, v)
 
 cdef void GetglGetnMapfv(GLenum target, GLenum query, GLsizei bufSize, GLfloat *v):
     global cglGetnMapfv
-    cglGetnMapfv = <PFNGLGETNMAPFVPROC>getFunction(b"glGetnMapfv")
+    cglGetnMapfv = <PFNGLGETNMAPFVPROC>getFunction("glGetnMapfv")
     cglGetnMapfv(target, query, bufSize, v)
 
 cdef void GetglGetnMapiv(GLenum target, GLenum query, GLsizei bufSize, GLint *v):
     global cglGetnMapiv
-    cglGetnMapiv = <PFNGLGETNMAPIVPROC>getFunction(b"glGetnMapiv")
+    cglGetnMapiv = <PFNGLGETNMAPIVPROC>getFunction("glGetnMapiv")
     cglGetnMapiv(target, query, bufSize, v)
 
 cdef void GetglGetnMinmax(GLenum target, GLboolean reset, GLenum format, GLenum type, GLsizei bufSize, void *values):
     global cglGetnMinmax
-    cglGetnMinmax = <PFNGLGETNMINMAXPROC>getFunction(b"glGetnMinmax")
+    cglGetnMinmax = <PFNGLGETNMINMAXPROC>getFunction("glGetnMinmax")
     cglGetnMinmax(target, reset, format, type, bufSize, values)
 
 cdef void GetglGetnPixelMapfv(GLenum map, GLsizei bufSize, GLfloat *values):
     global cglGetnPixelMapfv
-    cglGetnPixelMapfv = <PFNGLGETNPIXELMAPFVPROC>getFunction(b"glGetnPixelMapfv")
+    cglGetnPixelMapfv = <PFNGLGETNPIXELMAPFVPROC>getFunction("glGetnPixelMapfv")
     cglGetnPixelMapfv(map, bufSize, values)
 
 cdef void GetglGetnPixelMapuiv(GLenum map, GLsizei bufSize, GLuint *values):
     global cglGetnPixelMapuiv
-    cglGetnPixelMapuiv = <PFNGLGETNPIXELMAPUIVPROC>getFunction(b"glGetnPixelMapuiv")
+    cglGetnPixelMapuiv = <PFNGLGETNPIXELMAPUIVPROC>getFunction("glGetnPixelMapuiv")
     cglGetnPixelMapuiv(map, bufSize, values)
 
 cdef void GetglGetnPixelMapusv(GLenum map, GLsizei bufSize, GLushort *values):
     global cglGetnPixelMapusv
-    cglGetnPixelMapusv = <PFNGLGETNPIXELMAPUSVPROC>getFunction(b"glGetnPixelMapusv")
+    cglGetnPixelMapusv = <PFNGLGETNPIXELMAPUSVPROC>getFunction("glGetnPixelMapusv")
     cglGetnPixelMapusv(map, bufSize, values)
 
 cdef void GetglGetnPolygonStipple(GLsizei bufSize, GLubyte *pattern):
     global cglGetnPolygonStipple
-    cglGetnPolygonStipple = <PFNGLGETNPOLYGONSTIPPLEPROC>getFunction(b"glGetnPolygonStipple")
+    cglGetnPolygonStipple = <PFNGLGETNPOLYGONSTIPPLEPROC>getFunction("glGetnPolygonStipple")
     cglGetnPolygonStipple(bufSize, pattern)
 
 cdef void GetglGetnSeparableFilter(GLenum target, GLenum format, GLenum type, GLsizei rowBufSize, void *row, GLsizei columnBufSize, void *column, void *span):
     global cglGetnSeparableFilter
-    cglGetnSeparableFilter = <PFNGLGETNSEPARABLEFILTERPROC>getFunction(b"glGetnSeparableFilter")
+    cglGetnSeparableFilter = <PFNGLGETNSEPARABLEFILTERPROC>getFunction("glGetnSeparableFilter")
     cglGetnSeparableFilter(target, format, type, rowBufSize, row, columnBufSize, column, span)
 
 cdef void GetglGetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels):
     global cglGetnTexImage
-    cglGetnTexImage = <PFNGLGETNTEXIMAGEPROC>getFunction(b"glGetnTexImage")
+    cglGetnTexImage = <PFNGLGETNTEXIMAGEPROC>getFunction("glGetnTexImage")
     cglGetnTexImage(target, level, format, type, bufSize, pixels)
 
 cdef void GetglGetnUniformdv(GLuint program, GLint location, GLsizei bufSize, GLdouble *params):
     global cglGetnUniformdv
-    cglGetnUniformdv = <PFNGLGETNUNIFORMDVPROC>getFunction(b"glGetnUniformdv")
+    cglGetnUniformdv = <PFNGLGETNUNIFORMDVPROC>getFunction("glGetnUniformdv")
     cglGetnUniformdv(program, location, bufSize, params)
 
 cdef void GetglGetnUniformfv(GLuint program, GLint location, GLsizei bufSize, GLfloat *params):
     global cglGetnUniformfv
-    cglGetnUniformfv = <PFNGLGETNUNIFORMFVPROC>getFunction(b"glGetnUniformfv")
+    cglGetnUniformfv = <PFNGLGETNUNIFORMFVPROC>getFunction("glGetnUniformfv")
     cglGetnUniformfv(program, location, bufSize, params)
 
 cdef void GetglGetnUniformiv(GLuint program, GLint location, GLsizei bufSize, GLint *params):
     global cglGetnUniformiv
-    cglGetnUniformiv = <PFNGLGETNUNIFORMIVPROC>getFunction(b"glGetnUniformiv")
+    cglGetnUniformiv = <PFNGLGETNUNIFORMIVPROC>getFunction("glGetnUniformiv")
     cglGetnUniformiv(program, location, bufSize, params)
 
 cdef void GetglGetnUniformuiv(GLuint program, GLint location, GLsizei bufSize, GLuint *params):
     global cglGetnUniformuiv
-    cglGetnUniformuiv = <PFNGLGETNUNIFORMUIVPROC>getFunction(b"glGetnUniformuiv")
+    cglGetnUniformuiv = <PFNGLGETNUNIFORMUIVPROC>getFunction("glGetnUniformuiv")
     cglGetnUniformuiv(program, location, bufSize, params)
 
 cdef void GetglInvalidateNamedFramebufferData(GLuint framebuffer, GLsizei numAttachments, const GLenum *attachments):
     global cglInvalidateNamedFramebufferData
-    cglInvalidateNamedFramebufferData = <PFNGLINVALIDATENAMEDFRAMEBUFFERDATAPROC>getFunction(b"glInvalidateNamedFramebufferData")
+    cglInvalidateNamedFramebufferData = <PFNGLINVALIDATENAMEDFRAMEBUFFERDATAPROC>getFunction("glInvalidateNamedFramebufferData")
     cglInvalidateNamedFramebufferData(framebuffer, numAttachments, attachments)
 
 cdef void GetglInvalidateNamedFramebufferSubData(GLuint framebuffer, GLsizei numAttachments, const GLenum *attachments, GLint x, GLint y, GLsizei width, GLsizei height):
     global cglInvalidateNamedFramebufferSubData
-    cglInvalidateNamedFramebufferSubData = <PFNGLINVALIDATENAMEDFRAMEBUFFERSUBDATAPROC>getFunction(b"glInvalidateNamedFramebufferSubData")
+    cglInvalidateNamedFramebufferSubData = <PFNGLINVALIDATENAMEDFRAMEBUFFERSUBDATAPROC>getFunction("glInvalidateNamedFramebufferSubData")
     cglInvalidateNamedFramebufferSubData(framebuffer, numAttachments, attachments, x, y, width, height)
 
 cdef void *GetglMapNamedBuffer(GLuint buffer, GLenum access):
     global cglMapNamedBuffer
-    cglMapNamedBuffer = <PFNGLMAPNAMEDBUFFERPROC>getFunction(b"glMapNamedBuffer")
+    cglMapNamedBuffer = <PFNGLMAPNAMEDBUFFERPROC>getFunction("glMapNamedBuffer")
     cglMapNamedBuffer(buffer, access)
 
 cdef void *GetglMapNamedBufferRange(GLuint buffer, GLintptr offset, GLsizeiptr length, GLbitfield access):
     global cglMapNamedBufferRange
-    cglMapNamedBufferRange = <PFNGLMAPNAMEDBUFFERRANGEPROC>getFunction(b"glMapNamedBufferRange")
+    cglMapNamedBufferRange = <PFNGLMAPNAMEDBUFFERRANGEPROC>getFunction("glMapNamedBufferRange")
     cglMapNamedBufferRange(buffer, offset, length, access)
 
 cdef void GetglMemoryBarrierByRegion(GLbitfield barriers):
     global cglMemoryBarrierByRegion
-    cglMemoryBarrierByRegion = <PFNGLMEMORYBARRIERBYREGIONPROC>getFunction(b"glMemoryBarrierByRegion")
+    cglMemoryBarrierByRegion = <PFNGLMEMORYBARRIERBYREGIONPROC>getFunction("glMemoryBarrierByRegion")
     cglMemoryBarrierByRegion(barriers)
 
 cdef void GetglNamedBufferData(GLuint buffer, GLsizeiptr size, const void *data, GLenum usage):
     global cglNamedBufferData
-    cglNamedBufferData = <PFNGLNAMEDBUFFERDATAPROC>getFunction(b"glNamedBufferData")
+    cglNamedBufferData = <PFNGLNAMEDBUFFERDATAPROC>getFunction("glNamedBufferData")
     cglNamedBufferData(buffer, size, data, usage)
 
 cdef void GetglNamedBufferStorage(GLuint buffer, GLsizeiptr size, const void *data, GLbitfield flags):
     global cglNamedBufferStorage
-    cglNamedBufferStorage = <PFNGLNAMEDBUFFERSTORAGEPROC>getFunction(b"glNamedBufferStorage")
+    cglNamedBufferStorage = <PFNGLNAMEDBUFFERSTORAGEPROC>getFunction("glNamedBufferStorage")
     cglNamedBufferStorage(buffer, size, data, flags)
 
 cdef void GetglNamedBufferSubData(GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data):
     global cglNamedBufferSubData
-    cglNamedBufferSubData = <PFNGLNAMEDBUFFERSUBDATAPROC>getFunction(b"glNamedBufferSubData")
+    cglNamedBufferSubData = <PFNGLNAMEDBUFFERSUBDATAPROC>getFunction("glNamedBufferSubData")
     cglNamedBufferSubData(buffer, offset, size, data)
 
 cdef void GetglNamedFramebufferDrawBuffer(GLuint framebuffer, GLenum buf):
     global cglNamedFramebufferDrawBuffer
-    cglNamedFramebufferDrawBuffer = <PFNGLNAMEDFRAMEBUFFERDRAWBUFFERPROC>getFunction(b"glNamedFramebufferDrawBuffer")
+    cglNamedFramebufferDrawBuffer = <PFNGLNAMEDFRAMEBUFFERDRAWBUFFERPROC>getFunction("glNamedFramebufferDrawBuffer")
     cglNamedFramebufferDrawBuffer(framebuffer, buf)
 
 cdef void GetglNamedFramebufferDrawBuffers(GLuint framebuffer, GLsizei n, const GLenum *bufs):
     global cglNamedFramebufferDrawBuffers
-    cglNamedFramebufferDrawBuffers = <PFNGLNAMEDFRAMEBUFFERDRAWBUFFERSPROC>getFunction(b"glNamedFramebufferDrawBuffers")
+    cglNamedFramebufferDrawBuffers = <PFNGLNAMEDFRAMEBUFFERDRAWBUFFERSPROC>getFunction("glNamedFramebufferDrawBuffers")
     cglNamedFramebufferDrawBuffers(framebuffer, n, bufs)
 
 cdef void GetglNamedFramebufferParameteri(GLuint framebuffer, GLenum pname, GLint param):
     global cglNamedFramebufferParameteri
-    cglNamedFramebufferParameteri = <PFNGLNAMEDFRAMEBUFFERPARAMETERIPROC>getFunction(b"glNamedFramebufferParameteri")
+    cglNamedFramebufferParameteri = <PFNGLNAMEDFRAMEBUFFERPARAMETERIPROC>getFunction("glNamedFramebufferParameteri")
     cglNamedFramebufferParameteri(framebuffer, pname, param)
 
 cdef void GetglNamedFramebufferReadBuffer(GLuint framebuffer, GLenum src):
     global cglNamedFramebufferReadBuffer
-    cglNamedFramebufferReadBuffer = <PFNGLNAMEDFRAMEBUFFERREADBUFFERPROC>getFunction(b"glNamedFramebufferReadBuffer")
+    cglNamedFramebufferReadBuffer = <PFNGLNAMEDFRAMEBUFFERREADBUFFERPROC>getFunction("glNamedFramebufferReadBuffer")
     cglNamedFramebufferReadBuffer(framebuffer, src)
 
 cdef void GetglNamedFramebufferRenderbuffer(GLuint framebuffer, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer):
     global cglNamedFramebufferRenderbuffer
-    cglNamedFramebufferRenderbuffer = <PFNGLNAMEDFRAMEBUFFERRENDERBUFFERPROC>getFunction(b"glNamedFramebufferRenderbuffer")
+    cglNamedFramebufferRenderbuffer = <PFNGLNAMEDFRAMEBUFFERRENDERBUFFERPROC>getFunction("glNamedFramebufferRenderbuffer")
     cglNamedFramebufferRenderbuffer(framebuffer, attachment, renderbuffertarget, renderbuffer)
 
 cdef void GetglNamedFramebufferTexture(GLuint framebuffer, GLenum attachment, GLuint texture, GLint level):
     global cglNamedFramebufferTexture
-    cglNamedFramebufferTexture = <PFNGLNAMEDFRAMEBUFFERTEXTUREPROC>getFunction(b"glNamedFramebufferTexture")
+    cglNamedFramebufferTexture = <PFNGLNAMEDFRAMEBUFFERTEXTUREPROC>getFunction("glNamedFramebufferTexture")
     cglNamedFramebufferTexture(framebuffer, attachment, texture, level)
 
 cdef void GetglNamedFramebufferTextureLayer(GLuint framebuffer, GLenum attachment, GLuint texture, GLint level, GLint layer):
     global cglNamedFramebufferTextureLayer
-    cglNamedFramebufferTextureLayer = <PFNGLNAMEDFRAMEBUFFERTEXTURELAYERPROC>getFunction(b"glNamedFramebufferTextureLayer")
+    cglNamedFramebufferTextureLayer = <PFNGLNAMEDFRAMEBUFFERTEXTURELAYERPROC>getFunction("glNamedFramebufferTextureLayer")
     cglNamedFramebufferTextureLayer(framebuffer, attachment, texture, level, layer)
 
 cdef void GetglNamedRenderbufferStorage(GLuint renderbuffer, GLenum internalformat, GLsizei width, GLsizei height):
     global cglNamedRenderbufferStorage
-    cglNamedRenderbufferStorage = <PFNGLNAMEDRENDERBUFFERSTORAGEPROC>getFunction(b"glNamedRenderbufferStorage")
+    cglNamedRenderbufferStorage = <PFNGLNAMEDRENDERBUFFERSTORAGEPROC>getFunction("glNamedRenderbufferStorage")
     cglNamedRenderbufferStorage(renderbuffer, internalformat, width, height)
 
 cdef void GetglNamedRenderbufferStorageMultisample(GLuint renderbuffer, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height):
     global cglNamedRenderbufferStorageMultisample
-    cglNamedRenderbufferStorageMultisample = <PFNGLNAMEDRENDERBUFFERSTORAGEMULTISAMPLEPROC>getFunction(b"glNamedRenderbufferStorageMultisample")
+    cglNamedRenderbufferStorageMultisample = <PFNGLNAMEDRENDERBUFFERSTORAGEMULTISAMPLEPROC>getFunction("glNamedRenderbufferStorageMultisample")
     cglNamedRenderbufferStorageMultisample(renderbuffer, samples, internalformat, width, height)
 
 cdef void GetglReadnPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLsizei bufSize, void *data):
     global cglReadnPixels
-    cglReadnPixels = <PFNGLREADNPIXELSPROC>getFunction(b"glReadnPixels")
+    cglReadnPixels = <PFNGLREADNPIXELSPROC>getFunction("glReadnPixels")
     cglReadnPixels(x, y, width, height, format, type, bufSize, data)
 
 cdef void GetglTextureBarrier():
     global cglTextureBarrier
-    cglTextureBarrier = <PFNGLTEXTUREBARRIERPROC>getFunction(b"glTextureBarrier")
+    cglTextureBarrier = <PFNGLTEXTUREBARRIERPROC>getFunction("glTextureBarrier")
     cglTextureBarrier()
 
 cdef void GetglTextureBuffer(GLuint texture, GLenum internalformat, GLuint buffer):
     global cglTextureBuffer
-    cglTextureBuffer = <PFNGLTEXTUREBUFFERPROC>getFunction(b"glTextureBuffer")
+    cglTextureBuffer = <PFNGLTEXTUREBUFFERPROC>getFunction("glTextureBuffer")
     cglTextureBuffer(texture, internalformat, buffer)
 
 cdef void GetglTextureBufferRange(GLuint texture, GLenum internalformat, GLuint buffer, GLintptr offset, GLsizeiptr size):
     global cglTextureBufferRange
-    cglTextureBufferRange = <PFNGLTEXTUREBUFFERRANGEPROC>getFunction(b"glTextureBufferRange")
+    cglTextureBufferRange = <PFNGLTEXTUREBUFFERRANGEPROC>getFunction("glTextureBufferRange")
     cglTextureBufferRange(texture, internalformat, buffer, offset, size)
 
 cdef void GetglTextureParameterIiv(GLuint texture, GLenum pname, const GLint *params):
     global cglTextureParameterIiv
-    cglTextureParameterIiv = <PFNGLTEXTUREPARAMETERIIVPROC>getFunction(b"glTextureParameterIiv")
+    cglTextureParameterIiv = <PFNGLTEXTUREPARAMETERIIVPROC>getFunction("glTextureParameterIiv")
     cglTextureParameterIiv(texture, pname, params)
 
 cdef void GetglTextureParameterIuiv(GLuint texture, GLenum pname, const GLuint *params):
     global cglTextureParameterIuiv
-    cglTextureParameterIuiv = <PFNGLTEXTUREPARAMETERIUIVPROC>getFunction(b"glTextureParameterIuiv")
+    cglTextureParameterIuiv = <PFNGLTEXTUREPARAMETERIUIVPROC>getFunction("glTextureParameterIuiv")
     cglTextureParameterIuiv(texture, pname, params)
 
 cdef void GetglTextureParameterf(GLuint texture, GLenum pname, GLfloat param):
     global cglTextureParameterf
-    cglTextureParameterf = <PFNGLTEXTUREPARAMETERFPROC>getFunction(b"glTextureParameterf")
+    cglTextureParameterf = <PFNGLTEXTUREPARAMETERFPROC>getFunction("glTextureParameterf")
     cglTextureParameterf(texture, pname, param)
 
 cdef void GetglTextureParameterfv(GLuint texture, GLenum pname, const GLfloat *param):
     global cglTextureParameterfv
-    cglTextureParameterfv = <PFNGLTEXTUREPARAMETERFVPROC>getFunction(b"glTextureParameterfv")
+    cglTextureParameterfv = <PFNGLTEXTUREPARAMETERFVPROC>getFunction("glTextureParameterfv")
     cglTextureParameterfv(texture, pname, param)
 
 cdef void GetglTextureParameteri(GLuint texture, GLenum pname, GLint param):
     global cglTextureParameteri
-    cglTextureParameteri = <PFNGLTEXTUREPARAMETERIPROC>getFunction(b"glTextureParameteri")
+    cglTextureParameteri = <PFNGLTEXTUREPARAMETERIPROC>getFunction("glTextureParameteri")
     cglTextureParameteri(texture, pname, param)
 
 cdef void GetglTextureParameteriv(GLuint texture, GLenum pname, const GLint *param):
     global cglTextureParameteriv
-    cglTextureParameteriv = <PFNGLTEXTUREPARAMETERIVPROC>getFunction(b"glTextureParameteriv")
+    cglTextureParameteriv = <PFNGLTEXTUREPARAMETERIVPROC>getFunction("glTextureParameteriv")
     cglTextureParameteriv(texture, pname, param)
 
 cdef void GetglTextureStorage1D(GLuint texture, GLsizei levels, GLenum internalformat, GLsizei width):
     global cglTextureStorage1D
-    cglTextureStorage1D = <PFNGLTEXTURESTORAGE1DPROC>getFunction(b"glTextureStorage1D")
+    cglTextureStorage1D = <PFNGLTEXTURESTORAGE1DPROC>getFunction("glTextureStorage1D")
     cglTextureStorage1D(texture, levels, internalformat, width)
 
 cdef void GetglTextureStorage2D(GLuint texture, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height):
     global cglTextureStorage2D
-    cglTextureStorage2D = <PFNGLTEXTURESTORAGE2DPROC>getFunction(b"glTextureStorage2D")
+    cglTextureStorage2D = <PFNGLTEXTURESTORAGE2DPROC>getFunction("glTextureStorage2D")
     cglTextureStorage2D(texture, levels, internalformat, width, height)
 
 cdef void GetglTextureStorage2DMultisample(GLuint texture, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations):
     global cglTextureStorage2DMultisample
-    cglTextureStorage2DMultisample = <PFNGLTEXTURESTORAGE2DMULTISAMPLEPROC>getFunction(b"glTextureStorage2DMultisample")
+    cglTextureStorage2DMultisample = <PFNGLTEXTURESTORAGE2DMULTISAMPLEPROC>getFunction("glTextureStorage2DMultisample")
     cglTextureStorage2DMultisample(texture, samples, internalformat, width, height, fixedsamplelocations)
 
 cdef void GetglTextureStorage3D(GLuint texture, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth):
     global cglTextureStorage3D
-    cglTextureStorage3D = <PFNGLTEXTURESTORAGE3DPROC>getFunction(b"glTextureStorage3D")
+    cglTextureStorage3D = <PFNGLTEXTURESTORAGE3DPROC>getFunction("glTextureStorage3D")
     cglTextureStorage3D(texture, levels, internalformat, width, height, depth)
 
 cdef void GetglTextureStorage3DMultisample(GLuint texture, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations):
     global cglTextureStorage3DMultisample
-    cglTextureStorage3DMultisample = <PFNGLTEXTURESTORAGE3DMULTISAMPLEPROC>getFunction(b"glTextureStorage3DMultisample")
+    cglTextureStorage3DMultisample = <PFNGLTEXTURESTORAGE3DMULTISAMPLEPROC>getFunction("glTextureStorage3DMultisample")
     cglTextureStorage3DMultisample(texture, samples, internalformat, width, height, depth, fixedsamplelocations)
 
 cdef void GetglTextureSubImage1D(GLuint texture, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const void *pixels):
     global cglTextureSubImage1D
-    cglTextureSubImage1D = <PFNGLTEXTURESUBIMAGE1DPROC>getFunction(b"glTextureSubImage1D")
+    cglTextureSubImage1D = <PFNGLTEXTURESUBIMAGE1DPROC>getFunction("glTextureSubImage1D")
     cglTextureSubImage1D(texture, level, xoffset, width, format, type, pixels)
 
 cdef void GetglTextureSubImage2D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels):
     global cglTextureSubImage2D
-    cglTextureSubImage2D = <PFNGLTEXTURESUBIMAGE2DPROC>getFunction(b"glTextureSubImage2D")
+    cglTextureSubImage2D = <PFNGLTEXTURESUBIMAGE2DPROC>getFunction("glTextureSubImage2D")
     cglTextureSubImage2D(texture, level, xoffset, yoffset, width, height, format, type, pixels)
 
 cdef void GetglTextureSubImage3D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const void *pixels):
     global cglTextureSubImage3D
-    cglTextureSubImage3D = <PFNGLTEXTURESUBIMAGE3DPROC>getFunction(b"glTextureSubImage3D")
+    cglTextureSubImage3D = <PFNGLTEXTURESUBIMAGE3DPROC>getFunction("glTextureSubImage3D")
     cglTextureSubImage3D(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels)
 
 cdef void GetglTransformFeedbackBufferBase(GLuint xfb, GLuint index, GLuint buffer):
     global cglTransformFeedbackBufferBase
-    cglTransformFeedbackBufferBase = <PFNGLTRANSFORMFEEDBACKBUFFERBASEPROC>getFunction(b"glTransformFeedbackBufferBase")
+    cglTransformFeedbackBufferBase = <PFNGLTRANSFORMFEEDBACKBUFFERBASEPROC>getFunction("glTransformFeedbackBufferBase")
     cglTransformFeedbackBufferBase(xfb, index, buffer)
 
 cdef void GetglTransformFeedbackBufferRange(GLuint xfb, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size):
     global cglTransformFeedbackBufferRange
-    cglTransformFeedbackBufferRange = <PFNGLTRANSFORMFEEDBACKBUFFERRANGEPROC>getFunction(b"glTransformFeedbackBufferRange")
+    cglTransformFeedbackBufferRange = <PFNGLTRANSFORMFEEDBACKBUFFERRANGEPROC>getFunction("glTransformFeedbackBufferRange")
     cglTransformFeedbackBufferRange(xfb, index, buffer, offset, size)
 
 cdef GLboolean GetglUnmapNamedBuffer(GLuint buffer):
     global cglUnmapNamedBuffer
-    cglUnmapNamedBuffer = <PFNGLUNMAPNAMEDBUFFERPROC>getFunction(b"glUnmapNamedBuffer")
+    cglUnmapNamedBuffer = <PFNGLUNMAPNAMEDBUFFERPROC>getFunction("glUnmapNamedBuffer")
     cglUnmapNamedBuffer(buffer)
 
 cdef void GetglVertexArrayAttribBinding(GLuint vaobj, GLuint attribindex, GLuint bindingindex):
     global cglVertexArrayAttribBinding
-    cglVertexArrayAttribBinding = <PFNGLVERTEXARRAYATTRIBBINDINGPROC>getFunction(b"glVertexArrayAttribBinding")
+    cglVertexArrayAttribBinding = <PFNGLVERTEXARRAYATTRIBBINDINGPROC>getFunction("glVertexArrayAttribBinding")
     cglVertexArrayAttribBinding(vaobj, attribindex, bindingindex)
 
 cdef void GetglVertexArrayAttribFormat(GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset):
     global cglVertexArrayAttribFormat
-    cglVertexArrayAttribFormat = <PFNGLVERTEXARRAYATTRIBFORMATPROC>getFunction(b"glVertexArrayAttribFormat")
+    cglVertexArrayAttribFormat = <PFNGLVERTEXARRAYATTRIBFORMATPROC>getFunction("glVertexArrayAttribFormat")
     cglVertexArrayAttribFormat(vaobj, attribindex, size, type, normalized, relativeoffset)
 
 cdef void GetglVertexArrayAttribIFormat(GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset):
     global cglVertexArrayAttribIFormat
-    cglVertexArrayAttribIFormat = <PFNGLVERTEXARRAYATTRIBIFORMATPROC>getFunction(b"glVertexArrayAttribIFormat")
+    cglVertexArrayAttribIFormat = <PFNGLVERTEXARRAYATTRIBIFORMATPROC>getFunction("glVertexArrayAttribIFormat")
     cglVertexArrayAttribIFormat(vaobj, attribindex, size, type, relativeoffset)
 
 cdef void GetglVertexArrayAttribLFormat(GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset):
     global cglVertexArrayAttribLFormat
-    cglVertexArrayAttribLFormat = <PFNGLVERTEXARRAYATTRIBLFORMATPROC>getFunction(b"glVertexArrayAttribLFormat")
+    cglVertexArrayAttribLFormat = <PFNGLVERTEXARRAYATTRIBLFORMATPROC>getFunction("glVertexArrayAttribLFormat")
     cglVertexArrayAttribLFormat(vaobj, attribindex, size, type, relativeoffset)
 
 cdef void GetglVertexArrayBindingDivisor(GLuint vaobj, GLuint bindingindex, GLuint divisor):
     global cglVertexArrayBindingDivisor
-    cglVertexArrayBindingDivisor = <PFNGLVERTEXARRAYBINDINGDIVISORPROC>getFunction(b"glVertexArrayBindingDivisor")
+    cglVertexArrayBindingDivisor = <PFNGLVERTEXARRAYBINDINGDIVISORPROC>getFunction("glVertexArrayBindingDivisor")
     cglVertexArrayBindingDivisor(vaobj, bindingindex, divisor)
 
 cdef void GetglVertexArrayElementBuffer(GLuint vaobj, GLuint buffer):
     global cglVertexArrayElementBuffer
-    cglVertexArrayElementBuffer = <PFNGLVERTEXARRAYELEMENTBUFFERPROC>getFunction(b"glVertexArrayElementBuffer")
+    cglVertexArrayElementBuffer = <PFNGLVERTEXARRAYELEMENTBUFFERPROC>getFunction("glVertexArrayElementBuffer")
     cglVertexArrayElementBuffer(vaobj, buffer)
 
 cdef void GetglVertexArrayVertexBuffer(GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride):
     global cglVertexArrayVertexBuffer
-    cglVertexArrayVertexBuffer = <PFNGLVERTEXARRAYVERTEXBUFFERPROC>getFunction(b"glVertexArrayVertexBuffer")
+    cglVertexArrayVertexBuffer = <PFNGLVERTEXARRAYVERTEXBUFFERPROC>getFunction("glVertexArrayVertexBuffer")
     cglVertexArrayVertexBuffer(vaobj, bindingindex, buffer, offset, stride)
 
 cdef void GetglVertexArrayVertexBuffers(GLuint vaobj, GLuint first, GLsizei count, const GLuint *buffers, const GLintptr *offsets, const GLsizei *strides):
     global cglVertexArrayVertexBuffers
-    cglVertexArrayVertexBuffers = <PFNGLVERTEXARRAYVERTEXBUFFERSPROC>getFunction(b"glVertexArrayVertexBuffers")
+    cglVertexArrayVertexBuffers = <PFNGLVERTEXARRAYVERTEXBUFFERSPROC>getFunction("glVertexArrayVertexBuffers")
     cglVertexArrayVertexBuffers(vaobj, first, count, buffers, offsets, strides)
 
 cglBindTextureUnit = GetglBindTextureUnit

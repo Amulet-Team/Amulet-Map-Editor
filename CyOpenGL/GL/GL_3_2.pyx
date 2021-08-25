@@ -111,97 +111,97 @@ cdef PFNGLWAITSYNCPROC cglWaitSync = NULL
 
 cdef GLenum GetglClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout):
     global cglClientWaitSync
-    cglClientWaitSync = <PFNGLCLIENTWAITSYNCPROC>getFunction(b"glClientWaitSync")
+    cglClientWaitSync = <PFNGLCLIENTWAITSYNCPROC>getFunction("glClientWaitSync")
     cglClientWaitSync(sync, flags, timeout)
 
 cdef void GetglDeleteSync(GLsync sync):
     global cglDeleteSync
-    cglDeleteSync = <PFNGLDELETESYNCPROC>getFunction(b"glDeleteSync")
+    cglDeleteSync = <PFNGLDELETESYNCPROC>getFunction("glDeleteSync")
     cglDeleteSync(sync)
 
 cdef void GetglDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum type, const void *indices, GLint basevertex):
     global cglDrawElementsBaseVertex
-    cglDrawElementsBaseVertex = <PFNGLDRAWELEMENTSBASEVERTEXPROC>getFunction(b"glDrawElementsBaseVertex")
+    cglDrawElementsBaseVertex = <PFNGLDRAWELEMENTSBASEVERTEXPROC>getFunction("glDrawElementsBaseVertex")
     cglDrawElementsBaseVertex(mode, count, type, indices, basevertex)
 
 cdef void GetglDrawElementsInstancedBaseVertex(GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount, GLint basevertex):
     global cglDrawElementsInstancedBaseVertex
-    cglDrawElementsInstancedBaseVertex = <PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC>getFunction(b"glDrawElementsInstancedBaseVertex")
+    cglDrawElementsInstancedBaseVertex = <PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC>getFunction("glDrawElementsInstancedBaseVertex")
     cglDrawElementsInstancedBaseVertex(mode, count, type, indices, instancecount, basevertex)
 
 cdef void GetglDrawRangeElementsBaseVertex(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices, GLint basevertex):
     global cglDrawRangeElementsBaseVertex
-    cglDrawRangeElementsBaseVertex = <PFNGLDRAWRANGEELEMENTSBASEVERTEXPROC>getFunction(b"glDrawRangeElementsBaseVertex")
+    cglDrawRangeElementsBaseVertex = <PFNGLDRAWRANGEELEMENTSBASEVERTEXPROC>getFunction("glDrawRangeElementsBaseVertex")
     cglDrawRangeElementsBaseVertex(mode, start, end, count, type, indices, basevertex)
 
 cdef GLsync GetglFenceSync(GLenum condition, GLbitfield flags):
     global cglFenceSync
-    cglFenceSync = <PFNGLFENCESYNCPROC>getFunction(b"glFenceSync")
+    cglFenceSync = <PFNGLFENCESYNCPROC>getFunction("glFenceSync")
     cglFenceSync(condition, flags)
 
 cdef void GetglFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level):
     global cglFramebufferTexture
-    cglFramebufferTexture = <PFNGLFRAMEBUFFERTEXTUREPROC>getFunction(b"glFramebufferTexture")
+    cglFramebufferTexture = <PFNGLFRAMEBUFFERTEXTUREPROC>getFunction("glFramebufferTexture")
     cglFramebufferTexture(target, attachment, texture, level)
 
 cdef void GetglGetBufferParameteri64v(GLenum target, GLenum pname, GLint64 *params):
     global cglGetBufferParameteri64v
-    cglGetBufferParameteri64v = <PFNGLGETBUFFERPARAMETERI64VPROC>getFunction(b"glGetBufferParameteri64v")
+    cglGetBufferParameteri64v = <PFNGLGETBUFFERPARAMETERI64VPROC>getFunction("glGetBufferParameteri64v")
     cglGetBufferParameteri64v(target, pname, params)
 
 cdef void GetglGetInteger64i_v(GLenum target, GLuint index, GLint64 *data):
     global cglGetInteger64i_v
-    cglGetInteger64i_v = <PFNGLGETINTEGER64I_VPROC>getFunction(b"glGetInteger64i_v")
+    cglGetInteger64i_v = <PFNGLGETINTEGER64I_VPROC>getFunction("glGetInteger64i_v")
     cglGetInteger64i_v(target, index, data)
 
 cdef void GetglGetInteger64v(GLenum pname, GLint64 *data):
     global cglGetInteger64v
-    cglGetInteger64v = <PFNGLGETINTEGER64VPROC>getFunction(b"glGetInteger64v")
+    cglGetInteger64v = <PFNGLGETINTEGER64VPROC>getFunction("glGetInteger64v")
     cglGetInteger64v(pname, data)
 
 cdef void GetglGetMultisamplefv(GLenum pname, GLuint index, GLfloat *val):
     global cglGetMultisamplefv
-    cglGetMultisamplefv = <PFNGLGETMULTISAMPLEFVPROC>getFunction(b"glGetMultisamplefv")
+    cglGetMultisamplefv = <PFNGLGETMULTISAMPLEFVPROC>getFunction("glGetMultisamplefv")
     cglGetMultisamplefv(pname, index, val)
 
 cdef void GetglGetSynciv(GLsync sync, GLenum pname, GLsizei count, GLsizei *length, GLint *values):
     global cglGetSynciv
-    cglGetSynciv = <PFNGLGETSYNCIVPROC>getFunction(b"glGetSynciv")
+    cglGetSynciv = <PFNGLGETSYNCIVPROC>getFunction("glGetSynciv")
     cglGetSynciv(sync, pname, count, length, values)
 
 cdef GLboolean GetglIsSync(GLsync sync):
     global cglIsSync
-    cglIsSync = <PFNGLISSYNCPROC>getFunction(b"glIsSync")
+    cglIsSync = <PFNGLISSYNCPROC>getFunction("glIsSync")
     cglIsSync(sync)
 
 cdef void GetglMultiDrawElementsBaseVertex(GLenum mode, const GLsizei *count, GLenum type, const void **indices, GLsizei drawcount, const GLint *basevertex):
     global cglMultiDrawElementsBaseVertex
-    cglMultiDrawElementsBaseVertex = <PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC>getFunction(b"glMultiDrawElementsBaseVertex")
+    cglMultiDrawElementsBaseVertex = <PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC>getFunction("glMultiDrawElementsBaseVertex")
     cglMultiDrawElementsBaseVertex(mode, count, type, indices, drawcount, basevertex)
 
 cdef void GetglProvokingVertex(GLenum mode):
     global cglProvokingVertex
-    cglProvokingVertex = <PFNGLPROVOKINGVERTEXPROC>getFunction(b"glProvokingVertex")
+    cglProvokingVertex = <PFNGLPROVOKINGVERTEXPROC>getFunction("glProvokingVertex")
     cglProvokingVertex(mode)
 
 cdef void GetglSampleMaski(GLuint maskNumber, GLbitfield mask):
     global cglSampleMaski
-    cglSampleMaski = <PFNGLSAMPLEMASKIPROC>getFunction(b"glSampleMaski")
+    cglSampleMaski = <PFNGLSAMPLEMASKIPROC>getFunction("glSampleMaski")
     cglSampleMaski(maskNumber, mask)
 
 cdef void GetglTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations):
     global cglTexImage2DMultisample
-    cglTexImage2DMultisample = <PFNGLTEXIMAGE2DMULTISAMPLEPROC>getFunction(b"glTexImage2DMultisample")
+    cglTexImage2DMultisample = <PFNGLTEXIMAGE2DMULTISAMPLEPROC>getFunction("glTexImage2DMultisample")
     cglTexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations)
 
 cdef void GetglTexImage3DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations):
     global cglTexImage3DMultisample
-    cglTexImage3DMultisample = <PFNGLTEXIMAGE3DMULTISAMPLEPROC>getFunction(b"glTexImage3DMultisample")
+    cglTexImage3DMultisample = <PFNGLTEXIMAGE3DMULTISAMPLEPROC>getFunction("glTexImage3DMultisample")
     cglTexImage3DMultisample(target, samples, internalformat, width, height, depth, fixedsamplelocations)
 
 cdef void GetglWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout):
     global cglWaitSync
-    cglWaitSync = <PFNGLWAITSYNCPROC>getFunction(b"glWaitSync")
+    cglWaitSync = <PFNGLWAITSYNCPROC>getFunction("glWaitSync")
     cglWaitSync(sync, flags, timeout)
 
 cglClientWaitSync = GetglClientWaitSync

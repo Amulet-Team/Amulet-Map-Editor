@@ -197,232 +197,232 @@ cdef PFNGLSAMPLECOVERAGEPROC cglSampleCoverage = NULL
 
 cdef void GetglActiveTexture(GLenum texture):
     global cglActiveTexture
-    cglActiveTexture = <PFNGLACTIVETEXTUREPROC>getFunction(b"glActiveTexture")
+    cglActiveTexture = <PFNGLACTIVETEXTUREPROC>getFunction("glActiveTexture")
     cglActiveTexture(texture)
 
 cdef void GetglClientActiveTexture(GLenum texture):
     global cglClientActiveTexture
-    cglClientActiveTexture = <PFNGLCLIENTACTIVETEXTUREPROC>getFunction(b"glClientActiveTexture")
+    cglClientActiveTexture = <PFNGLCLIENTACTIVETEXTUREPROC>getFunction("glClientActiveTexture")
     cglClientActiveTexture(texture)
 
 cdef void GetglCompressedTexImage1D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const void *data):
     global cglCompressedTexImage1D
-    cglCompressedTexImage1D = <PFNGLCOMPRESSEDTEXIMAGE1DPROC>getFunction(b"glCompressedTexImage1D")
+    cglCompressedTexImage1D = <PFNGLCOMPRESSEDTEXIMAGE1DPROC>getFunction("glCompressedTexImage1D")
     cglCompressedTexImage1D(target, level, internalformat, width, border, imageSize, data)
 
 cdef void GetglCompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const void *data):
     global cglCompressedTexImage2D
-    cglCompressedTexImage2D = <PFNGLCOMPRESSEDTEXIMAGE2DPROC>getFunction(b"glCompressedTexImage2D")
+    cglCompressedTexImage2D = <PFNGLCOMPRESSEDTEXIMAGE2DPROC>getFunction("glCompressedTexImage2D")
     cglCompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data)
 
 cdef void GetglCompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const void *data):
     global cglCompressedTexImage3D
-    cglCompressedTexImage3D = <PFNGLCOMPRESSEDTEXIMAGE3DPROC>getFunction(b"glCompressedTexImage3D")
+    cglCompressedTexImage3D = <PFNGLCOMPRESSEDTEXIMAGE3DPROC>getFunction("glCompressedTexImage3D")
     cglCompressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data)
 
 cdef void GetglCompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const void *data):
     global cglCompressedTexSubImage1D
-    cglCompressedTexSubImage1D = <PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC>getFunction(b"glCompressedTexSubImage1D")
+    cglCompressedTexSubImage1D = <PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC>getFunction("glCompressedTexSubImage1D")
     cglCompressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data)
 
 cdef void GetglCompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void *data):
     global cglCompressedTexSubImage2D
-    cglCompressedTexSubImage2D = <PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC>getFunction(b"glCompressedTexSubImage2D")
+    cglCompressedTexSubImage2D = <PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC>getFunction("glCompressedTexSubImage2D")
     cglCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data)
 
 cdef void GetglCompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const void *data):
     global cglCompressedTexSubImage3D
-    cglCompressedTexSubImage3D = <PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC>getFunction(b"glCompressedTexSubImage3D")
+    cglCompressedTexSubImage3D = <PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC>getFunction("glCompressedTexSubImage3D")
     cglCompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data)
 
 cdef void GetglGetCompressedTexImage(GLenum target, GLint level, void *img):
     global cglGetCompressedTexImage
-    cglGetCompressedTexImage = <PFNGLGETCOMPRESSEDTEXIMAGEPROC>getFunction(b"glGetCompressedTexImage")
+    cglGetCompressedTexImage = <PFNGLGETCOMPRESSEDTEXIMAGEPROC>getFunction("glGetCompressedTexImage")
     cglGetCompressedTexImage(target, level, img)
 
 cdef void GetglLoadTransposeMatrixd(const GLdouble *m):
     global cglLoadTransposeMatrixd
-    cglLoadTransposeMatrixd = <PFNGLLOADTRANSPOSEMATRIXDPROC>getFunction(b"glLoadTransposeMatrixd")
+    cglLoadTransposeMatrixd = <PFNGLLOADTRANSPOSEMATRIXDPROC>getFunction("glLoadTransposeMatrixd")
     cglLoadTransposeMatrixd(m)
 
 cdef void GetglLoadTransposeMatrixf(const GLfloat *m):
     global cglLoadTransposeMatrixf
-    cglLoadTransposeMatrixf = <PFNGLLOADTRANSPOSEMATRIXFPROC>getFunction(b"glLoadTransposeMatrixf")
+    cglLoadTransposeMatrixf = <PFNGLLOADTRANSPOSEMATRIXFPROC>getFunction("glLoadTransposeMatrixf")
     cglLoadTransposeMatrixf(m)
 
 cdef void GetglMultTransposeMatrixd(const GLdouble *m):
     global cglMultTransposeMatrixd
-    cglMultTransposeMatrixd = <PFNGLMULTTRANSPOSEMATRIXDPROC>getFunction(b"glMultTransposeMatrixd")
+    cglMultTransposeMatrixd = <PFNGLMULTTRANSPOSEMATRIXDPROC>getFunction("glMultTransposeMatrixd")
     cglMultTransposeMatrixd(m)
 
 cdef void GetglMultTransposeMatrixf(const GLfloat *m):
     global cglMultTransposeMatrixf
-    cglMultTransposeMatrixf = <PFNGLMULTTRANSPOSEMATRIXFPROC>getFunction(b"glMultTransposeMatrixf")
+    cglMultTransposeMatrixf = <PFNGLMULTTRANSPOSEMATRIXFPROC>getFunction("glMultTransposeMatrixf")
     cglMultTransposeMatrixf(m)
 
 cdef void GetglMultiTexCoord1d(GLenum target, GLdouble s):
     global cglMultiTexCoord1d
-    cglMultiTexCoord1d = <PFNGLMULTITEXCOORD1DPROC>getFunction(b"glMultiTexCoord1d")
+    cglMultiTexCoord1d = <PFNGLMULTITEXCOORD1DPROC>getFunction("glMultiTexCoord1d")
     cglMultiTexCoord1d(target, s)
 
 cdef void GetglMultiTexCoord1dv(GLenum target, const GLdouble *v):
     global cglMultiTexCoord1dv
-    cglMultiTexCoord1dv = <PFNGLMULTITEXCOORD1DVPROC>getFunction(b"glMultiTexCoord1dv")
+    cglMultiTexCoord1dv = <PFNGLMULTITEXCOORD1DVPROC>getFunction("glMultiTexCoord1dv")
     cglMultiTexCoord1dv(target, v)
 
 cdef void GetglMultiTexCoord1f(GLenum target, GLfloat s):
     global cglMultiTexCoord1f
-    cglMultiTexCoord1f = <PFNGLMULTITEXCOORD1FPROC>getFunction(b"glMultiTexCoord1f")
+    cglMultiTexCoord1f = <PFNGLMULTITEXCOORD1FPROC>getFunction("glMultiTexCoord1f")
     cglMultiTexCoord1f(target, s)
 
 cdef void GetglMultiTexCoord1fv(GLenum target, const GLfloat *v):
     global cglMultiTexCoord1fv
-    cglMultiTexCoord1fv = <PFNGLMULTITEXCOORD1FVPROC>getFunction(b"glMultiTexCoord1fv")
+    cglMultiTexCoord1fv = <PFNGLMULTITEXCOORD1FVPROC>getFunction("glMultiTexCoord1fv")
     cglMultiTexCoord1fv(target, v)
 
 cdef void GetglMultiTexCoord1i(GLenum target, GLint s):
     global cglMultiTexCoord1i
-    cglMultiTexCoord1i = <PFNGLMULTITEXCOORD1IPROC>getFunction(b"glMultiTexCoord1i")
+    cglMultiTexCoord1i = <PFNGLMULTITEXCOORD1IPROC>getFunction("glMultiTexCoord1i")
     cglMultiTexCoord1i(target, s)
 
 cdef void GetglMultiTexCoord1iv(GLenum target, const GLint *v):
     global cglMultiTexCoord1iv
-    cglMultiTexCoord1iv = <PFNGLMULTITEXCOORD1IVPROC>getFunction(b"glMultiTexCoord1iv")
+    cglMultiTexCoord1iv = <PFNGLMULTITEXCOORD1IVPROC>getFunction("glMultiTexCoord1iv")
     cglMultiTexCoord1iv(target, v)
 
 cdef void GetglMultiTexCoord1s(GLenum target, GLshort s):
     global cglMultiTexCoord1s
-    cglMultiTexCoord1s = <PFNGLMULTITEXCOORD1SPROC>getFunction(b"glMultiTexCoord1s")
+    cglMultiTexCoord1s = <PFNGLMULTITEXCOORD1SPROC>getFunction("glMultiTexCoord1s")
     cglMultiTexCoord1s(target, s)
 
 cdef void GetglMultiTexCoord1sv(GLenum target, const GLshort *v):
     global cglMultiTexCoord1sv
-    cglMultiTexCoord1sv = <PFNGLMULTITEXCOORD1SVPROC>getFunction(b"glMultiTexCoord1sv")
+    cglMultiTexCoord1sv = <PFNGLMULTITEXCOORD1SVPROC>getFunction("glMultiTexCoord1sv")
     cglMultiTexCoord1sv(target, v)
 
 cdef void GetglMultiTexCoord2d(GLenum target, GLdouble s, GLdouble t):
     global cglMultiTexCoord2d
-    cglMultiTexCoord2d = <PFNGLMULTITEXCOORD2DPROC>getFunction(b"glMultiTexCoord2d")
+    cglMultiTexCoord2d = <PFNGLMULTITEXCOORD2DPROC>getFunction("glMultiTexCoord2d")
     cglMultiTexCoord2d(target, s, t)
 
 cdef void GetglMultiTexCoord2dv(GLenum target, const GLdouble *v):
     global cglMultiTexCoord2dv
-    cglMultiTexCoord2dv = <PFNGLMULTITEXCOORD2DVPROC>getFunction(b"glMultiTexCoord2dv")
+    cglMultiTexCoord2dv = <PFNGLMULTITEXCOORD2DVPROC>getFunction("glMultiTexCoord2dv")
     cglMultiTexCoord2dv(target, v)
 
 cdef void GetglMultiTexCoord2f(GLenum target, GLfloat s, GLfloat t):
     global cglMultiTexCoord2f
-    cglMultiTexCoord2f = <PFNGLMULTITEXCOORD2FPROC>getFunction(b"glMultiTexCoord2f")
+    cglMultiTexCoord2f = <PFNGLMULTITEXCOORD2FPROC>getFunction("glMultiTexCoord2f")
     cglMultiTexCoord2f(target, s, t)
 
 cdef void GetglMultiTexCoord2fv(GLenum target, const GLfloat *v):
     global cglMultiTexCoord2fv
-    cglMultiTexCoord2fv = <PFNGLMULTITEXCOORD2FVPROC>getFunction(b"glMultiTexCoord2fv")
+    cglMultiTexCoord2fv = <PFNGLMULTITEXCOORD2FVPROC>getFunction("glMultiTexCoord2fv")
     cglMultiTexCoord2fv(target, v)
 
 cdef void GetglMultiTexCoord2i(GLenum target, GLint s, GLint t):
     global cglMultiTexCoord2i
-    cglMultiTexCoord2i = <PFNGLMULTITEXCOORD2IPROC>getFunction(b"glMultiTexCoord2i")
+    cglMultiTexCoord2i = <PFNGLMULTITEXCOORD2IPROC>getFunction("glMultiTexCoord2i")
     cglMultiTexCoord2i(target, s, t)
 
 cdef void GetglMultiTexCoord2iv(GLenum target, const GLint *v):
     global cglMultiTexCoord2iv
-    cglMultiTexCoord2iv = <PFNGLMULTITEXCOORD2IVPROC>getFunction(b"glMultiTexCoord2iv")
+    cglMultiTexCoord2iv = <PFNGLMULTITEXCOORD2IVPROC>getFunction("glMultiTexCoord2iv")
     cglMultiTexCoord2iv(target, v)
 
 cdef void GetglMultiTexCoord2s(GLenum target, GLshort s, GLshort t):
     global cglMultiTexCoord2s
-    cglMultiTexCoord2s = <PFNGLMULTITEXCOORD2SPROC>getFunction(b"glMultiTexCoord2s")
+    cglMultiTexCoord2s = <PFNGLMULTITEXCOORD2SPROC>getFunction("glMultiTexCoord2s")
     cglMultiTexCoord2s(target, s, t)
 
 cdef void GetglMultiTexCoord2sv(GLenum target, const GLshort *v):
     global cglMultiTexCoord2sv
-    cglMultiTexCoord2sv = <PFNGLMULTITEXCOORD2SVPROC>getFunction(b"glMultiTexCoord2sv")
+    cglMultiTexCoord2sv = <PFNGLMULTITEXCOORD2SVPROC>getFunction("glMultiTexCoord2sv")
     cglMultiTexCoord2sv(target, v)
 
 cdef void GetglMultiTexCoord3d(GLenum target, GLdouble s, GLdouble t, GLdouble r):
     global cglMultiTexCoord3d
-    cglMultiTexCoord3d = <PFNGLMULTITEXCOORD3DPROC>getFunction(b"glMultiTexCoord3d")
+    cglMultiTexCoord3d = <PFNGLMULTITEXCOORD3DPROC>getFunction("glMultiTexCoord3d")
     cglMultiTexCoord3d(target, s, t, r)
 
 cdef void GetglMultiTexCoord3dv(GLenum target, const GLdouble *v):
     global cglMultiTexCoord3dv
-    cglMultiTexCoord3dv = <PFNGLMULTITEXCOORD3DVPROC>getFunction(b"glMultiTexCoord3dv")
+    cglMultiTexCoord3dv = <PFNGLMULTITEXCOORD3DVPROC>getFunction("glMultiTexCoord3dv")
     cglMultiTexCoord3dv(target, v)
 
 cdef void GetglMultiTexCoord3f(GLenum target, GLfloat s, GLfloat t, GLfloat r):
     global cglMultiTexCoord3f
-    cglMultiTexCoord3f = <PFNGLMULTITEXCOORD3FPROC>getFunction(b"glMultiTexCoord3f")
+    cglMultiTexCoord3f = <PFNGLMULTITEXCOORD3FPROC>getFunction("glMultiTexCoord3f")
     cglMultiTexCoord3f(target, s, t, r)
 
 cdef void GetglMultiTexCoord3fv(GLenum target, const GLfloat *v):
     global cglMultiTexCoord3fv
-    cglMultiTexCoord3fv = <PFNGLMULTITEXCOORD3FVPROC>getFunction(b"glMultiTexCoord3fv")
+    cglMultiTexCoord3fv = <PFNGLMULTITEXCOORD3FVPROC>getFunction("glMultiTexCoord3fv")
     cglMultiTexCoord3fv(target, v)
 
 cdef void GetglMultiTexCoord3i(GLenum target, GLint s, GLint t, GLint r):
     global cglMultiTexCoord3i
-    cglMultiTexCoord3i = <PFNGLMULTITEXCOORD3IPROC>getFunction(b"glMultiTexCoord3i")
+    cglMultiTexCoord3i = <PFNGLMULTITEXCOORD3IPROC>getFunction("glMultiTexCoord3i")
     cglMultiTexCoord3i(target, s, t, r)
 
 cdef void GetglMultiTexCoord3iv(GLenum target, const GLint *v):
     global cglMultiTexCoord3iv
-    cglMultiTexCoord3iv = <PFNGLMULTITEXCOORD3IVPROC>getFunction(b"glMultiTexCoord3iv")
+    cglMultiTexCoord3iv = <PFNGLMULTITEXCOORD3IVPROC>getFunction("glMultiTexCoord3iv")
     cglMultiTexCoord3iv(target, v)
 
 cdef void GetglMultiTexCoord3s(GLenum target, GLshort s, GLshort t, GLshort r):
     global cglMultiTexCoord3s
-    cglMultiTexCoord3s = <PFNGLMULTITEXCOORD3SPROC>getFunction(b"glMultiTexCoord3s")
+    cglMultiTexCoord3s = <PFNGLMULTITEXCOORD3SPROC>getFunction("glMultiTexCoord3s")
     cglMultiTexCoord3s(target, s, t, r)
 
 cdef void GetglMultiTexCoord3sv(GLenum target, const GLshort *v):
     global cglMultiTexCoord3sv
-    cglMultiTexCoord3sv = <PFNGLMULTITEXCOORD3SVPROC>getFunction(b"glMultiTexCoord3sv")
+    cglMultiTexCoord3sv = <PFNGLMULTITEXCOORD3SVPROC>getFunction("glMultiTexCoord3sv")
     cglMultiTexCoord3sv(target, v)
 
 cdef void GetglMultiTexCoord4d(GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q):
     global cglMultiTexCoord4d
-    cglMultiTexCoord4d = <PFNGLMULTITEXCOORD4DPROC>getFunction(b"glMultiTexCoord4d")
+    cglMultiTexCoord4d = <PFNGLMULTITEXCOORD4DPROC>getFunction("glMultiTexCoord4d")
     cglMultiTexCoord4d(target, s, t, r, q)
 
 cdef void GetglMultiTexCoord4dv(GLenum target, const GLdouble *v):
     global cglMultiTexCoord4dv
-    cglMultiTexCoord4dv = <PFNGLMULTITEXCOORD4DVPROC>getFunction(b"glMultiTexCoord4dv")
+    cglMultiTexCoord4dv = <PFNGLMULTITEXCOORD4DVPROC>getFunction("glMultiTexCoord4dv")
     cglMultiTexCoord4dv(target, v)
 
 cdef void GetglMultiTexCoord4f(GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q):
     global cglMultiTexCoord4f
-    cglMultiTexCoord4f = <PFNGLMULTITEXCOORD4FPROC>getFunction(b"glMultiTexCoord4f")
+    cglMultiTexCoord4f = <PFNGLMULTITEXCOORD4FPROC>getFunction("glMultiTexCoord4f")
     cglMultiTexCoord4f(target, s, t, r, q)
 
 cdef void GetglMultiTexCoord4fv(GLenum target, const GLfloat *v):
     global cglMultiTexCoord4fv
-    cglMultiTexCoord4fv = <PFNGLMULTITEXCOORD4FVPROC>getFunction(b"glMultiTexCoord4fv")
+    cglMultiTexCoord4fv = <PFNGLMULTITEXCOORD4FVPROC>getFunction("glMultiTexCoord4fv")
     cglMultiTexCoord4fv(target, v)
 
 cdef void GetglMultiTexCoord4i(GLenum target, GLint s, GLint t, GLint r, GLint q):
     global cglMultiTexCoord4i
-    cglMultiTexCoord4i = <PFNGLMULTITEXCOORD4IPROC>getFunction(b"glMultiTexCoord4i")
+    cglMultiTexCoord4i = <PFNGLMULTITEXCOORD4IPROC>getFunction("glMultiTexCoord4i")
     cglMultiTexCoord4i(target, s, t, r, q)
 
 cdef void GetglMultiTexCoord4iv(GLenum target, const GLint *v):
     global cglMultiTexCoord4iv
-    cglMultiTexCoord4iv = <PFNGLMULTITEXCOORD4IVPROC>getFunction(b"glMultiTexCoord4iv")
+    cglMultiTexCoord4iv = <PFNGLMULTITEXCOORD4IVPROC>getFunction("glMultiTexCoord4iv")
     cglMultiTexCoord4iv(target, v)
 
 cdef void GetglMultiTexCoord4s(GLenum target, GLshort s, GLshort t, GLshort r, GLshort q):
     global cglMultiTexCoord4s
-    cglMultiTexCoord4s = <PFNGLMULTITEXCOORD4SPROC>getFunction(b"glMultiTexCoord4s")
+    cglMultiTexCoord4s = <PFNGLMULTITEXCOORD4SPROC>getFunction("glMultiTexCoord4s")
     cglMultiTexCoord4s(target, s, t, r, q)
 
 cdef void GetglMultiTexCoord4sv(GLenum target, const GLshort *v):
     global cglMultiTexCoord4sv
-    cglMultiTexCoord4sv = <PFNGLMULTITEXCOORD4SVPROC>getFunction(b"glMultiTexCoord4sv")
+    cglMultiTexCoord4sv = <PFNGLMULTITEXCOORD4SVPROC>getFunction("glMultiTexCoord4sv")
     cglMultiTexCoord4sv(target, v)
 
 cdef void GetglSampleCoverage(GLfloat value, GLboolean invert):
     global cglSampleCoverage
-    cglSampleCoverage = <PFNGLSAMPLECOVERAGEPROC>getFunction(b"glSampleCoverage")
+    cglSampleCoverage = <PFNGLSAMPLECOVERAGEPROC>getFunction("glSampleCoverage")
     cglSampleCoverage(value, invert)
 
 cglActiveTexture = GetglActiveTexture

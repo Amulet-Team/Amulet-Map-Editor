@@ -359,222 +359,222 @@ cdef PFNGLVERTEXBINDINGDIVISORPROC cglVertexBindingDivisor = NULL
 
 cdef void GetglBindVertexBuffer(GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride):
     global cglBindVertexBuffer
-    cglBindVertexBuffer = <PFNGLBINDVERTEXBUFFERPROC>getFunction(b"glBindVertexBuffer")
+    cglBindVertexBuffer = <PFNGLBINDVERTEXBUFFERPROC>getFunction("glBindVertexBuffer")
     cglBindVertexBuffer(bindingindex, buffer, offset, stride)
 
 cdef void GetglClearBufferData(GLenum target, GLenum internalformat, GLenum format, GLenum type, const void *data):
     global cglClearBufferData
-    cglClearBufferData = <PFNGLCLEARBUFFERDATAPROC>getFunction(b"glClearBufferData")
+    cglClearBufferData = <PFNGLCLEARBUFFERDATAPROC>getFunction("glClearBufferData")
     cglClearBufferData(target, internalformat, format, type, data)
 
 cdef void GetglClearBufferSubData(GLenum target, GLenum internalformat, GLintptr offset, GLsizeiptr size, GLenum format, GLenum type, const void *data):
     global cglClearBufferSubData
-    cglClearBufferSubData = <PFNGLCLEARBUFFERSUBDATAPROC>getFunction(b"glClearBufferSubData")
+    cglClearBufferSubData = <PFNGLCLEARBUFFERSUBDATAPROC>getFunction("glClearBufferSubData")
     cglClearBufferSubData(target, internalformat, offset, size, format, type, data)
 
 cdef void GetglCopyImageSubData(GLuint srcName, GLenum srcTarget, GLint srcLevel, GLint srcX, GLint srcY, GLint srcZ, GLuint dstName, GLenum dstTarget, GLint dstLevel, GLint dstX, GLint dstY, GLint dstZ, GLsizei srcWidth, GLsizei srcHeight, GLsizei srcDepth):
     global cglCopyImageSubData
-    cglCopyImageSubData = <PFNGLCOPYIMAGESUBDATAPROC>getFunction(b"glCopyImageSubData")
+    cglCopyImageSubData = <PFNGLCOPYIMAGESUBDATAPROC>getFunction("glCopyImageSubData")
     cglCopyImageSubData(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName, dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight, srcDepth)
 
 cdef void GetglDebugMessageCallback(GLDEBUGPROC callback, const void *userParam):
     global cglDebugMessageCallback
-    cglDebugMessageCallback = <PFNGLDEBUGMESSAGECALLBACKPROC>getFunction(b"glDebugMessageCallback")
+    cglDebugMessageCallback = <PFNGLDEBUGMESSAGECALLBACKPROC>getFunction("glDebugMessageCallback")
     cglDebugMessageCallback(callback, userParam)
 
 cdef void GetglDebugMessageControl(GLenum source, GLenum type, GLenum severity, GLsizei count, const GLuint *ids, GLboolean enabled):
     global cglDebugMessageControl
-    cglDebugMessageControl = <PFNGLDEBUGMESSAGECONTROLPROC>getFunction(b"glDebugMessageControl")
+    cglDebugMessageControl = <PFNGLDEBUGMESSAGECONTROLPROC>getFunction("glDebugMessageControl")
     cglDebugMessageControl(source, type, severity, count, ids, enabled)
 
 cdef void GetglDebugMessageInsert(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *buf):
     global cglDebugMessageInsert
-    cglDebugMessageInsert = <PFNGLDEBUGMESSAGEINSERTPROC>getFunction(b"glDebugMessageInsert")
+    cglDebugMessageInsert = <PFNGLDEBUGMESSAGEINSERTPROC>getFunction("glDebugMessageInsert")
     cglDebugMessageInsert(source, type, id, severity, length, buf)
 
 cdef void GetglDispatchCompute(GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z):
     global cglDispatchCompute
-    cglDispatchCompute = <PFNGLDISPATCHCOMPUTEPROC>getFunction(b"glDispatchCompute")
+    cglDispatchCompute = <PFNGLDISPATCHCOMPUTEPROC>getFunction("glDispatchCompute")
     cglDispatchCompute(num_groups_x, num_groups_y, num_groups_z)
 
 cdef void GetglDispatchComputeIndirect(GLintptr indirect):
     global cglDispatchComputeIndirect
-    cglDispatchComputeIndirect = <PFNGLDISPATCHCOMPUTEINDIRECTPROC>getFunction(b"glDispatchComputeIndirect")
+    cglDispatchComputeIndirect = <PFNGLDISPATCHCOMPUTEINDIRECTPROC>getFunction("glDispatchComputeIndirect")
     cglDispatchComputeIndirect(indirect)
 
 cdef void GetglFramebufferParameteri(GLenum target, GLenum pname, GLint param):
     global cglFramebufferParameteri
-    cglFramebufferParameteri = <PFNGLFRAMEBUFFERPARAMETERIPROC>getFunction(b"glFramebufferParameteri")
+    cglFramebufferParameteri = <PFNGLFRAMEBUFFERPARAMETERIPROC>getFunction("glFramebufferParameteri")
     cglFramebufferParameteri(target, pname, param)
 
 cdef GLuint GetglGetDebugMessageLog(GLuint count, GLsizei bufSize, GLenum *sources, GLenum *types, GLuint *ids, GLenum *severities, GLsizei *lengths, GLchar *messageLog):
     global cglGetDebugMessageLog
-    cglGetDebugMessageLog = <PFNGLGETDEBUGMESSAGELOGPROC>getFunction(b"glGetDebugMessageLog")
+    cglGetDebugMessageLog = <PFNGLGETDEBUGMESSAGELOGPROC>getFunction("glGetDebugMessageLog")
     cglGetDebugMessageLog(count, bufSize, sources, types, ids, severities, lengths, messageLog)
 
 cdef void GetglGetFramebufferParameteriv(GLenum target, GLenum pname, GLint *params):
     global cglGetFramebufferParameteriv
-    cglGetFramebufferParameteriv = <PFNGLGETFRAMEBUFFERPARAMETERIVPROC>getFunction(b"glGetFramebufferParameteriv")
+    cglGetFramebufferParameteriv = <PFNGLGETFRAMEBUFFERPARAMETERIVPROC>getFunction("glGetFramebufferParameteriv")
     cglGetFramebufferParameteriv(target, pname, params)
 
 cdef void GetglGetInternalformati64v(GLenum target, GLenum internalformat, GLenum pname, GLsizei count, GLint64 *params):
     global cglGetInternalformati64v
-    cglGetInternalformati64v = <PFNGLGETINTERNALFORMATI64VPROC>getFunction(b"glGetInternalformati64v")
+    cglGetInternalformati64v = <PFNGLGETINTERNALFORMATI64VPROC>getFunction("glGetInternalformati64v")
     cglGetInternalformati64v(target, internalformat, pname, count, params)
 
 cdef void GetglGetObjectLabel(GLenum identifier, GLuint name, GLsizei bufSize, GLsizei *length, GLchar *label):
     global cglGetObjectLabel
-    cglGetObjectLabel = <PFNGLGETOBJECTLABELPROC>getFunction(b"glGetObjectLabel")
+    cglGetObjectLabel = <PFNGLGETOBJECTLABELPROC>getFunction("glGetObjectLabel")
     cglGetObjectLabel(identifier, name, bufSize, length, label)
 
 cdef void GetglGetObjectPtrLabel(const void *ptr, GLsizei bufSize, GLsizei *length, GLchar *label):
     global cglGetObjectPtrLabel
-    cglGetObjectPtrLabel = <PFNGLGETOBJECTPTRLABELPROC>getFunction(b"glGetObjectPtrLabel")
+    cglGetObjectPtrLabel = <PFNGLGETOBJECTPTRLABELPROC>getFunction("glGetObjectPtrLabel")
     cglGetObjectPtrLabel(ptr, bufSize, length, label)
 
 cdef void GetglGetPointerv(GLenum pname, void **params):
     global cglGetPointerv
-    cglGetPointerv = <PFNGLGETPOINTERVPROC>getFunction(b"glGetPointerv")
+    cglGetPointerv = <PFNGLGETPOINTERVPROC>getFunction("glGetPointerv")
     cglGetPointerv(pname, params)
 
 cdef void GetglGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params):
     global cglGetProgramInterfaceiv
-    cglGetProgramInterfaceiv = <PFNGLGETPROGRAMINTERFACEIVPROC>getFunction(b"glGetProgramInterfaceiv")
+    cglGetProgramInterfaceiv = <PFNGLGETPROGRAMINTERFACEIVPROC>getFunction("glGetProgramInterfaceiv")
     cglGetProgramInterfaceiv(program, programInterface, pname, params)
 
 cdef GLuint GetglGetProgramResourceIndex(GLuint program, GLenum programInterface, const GLchar *name):
     global cglGetProgramResourceIndex
-    cglGetProgramResourceIndex = <PFNGLGETPROGRAMRESOURCEINDEXPROC>getFunction(b"glGetProgramResourceIndex")
+    cglGetProgramResourceIndex = <PFNGLGETPROGRAMRESOURCEINDEXPROC>getFunction("glGetProgramResourceIndex")
     cglGetProgramResourceIndex(program, programInterface, name)
 
 cdef GLint GetglGetProgramResourceLocation(GLuint program, GLenum programInterface, const GLchar *name):
     global cglGetProgramResourceLocation
-    cglGetProgramResourceLocation = <PFNGLGETPROGRAMRESOURCELOCATIONPROC>getFunction(b"glGetProgramResourceLocation")
+    cglGetProgramResourceLocation = <PFNGLGETPROGRAMRESOURCELOCATIONPROC>getFunction("glGetProgramResourceLocation")
     cglGetProgramResourceLocation(program, programInterface, name)
 
 cdef GLint GetglGetProgramResourceLocationIndex(GLuint program, GLenum programInterface, const GLchar *name):
     global cglGetProgramResourceLocationIndex
-    cglGetProgramResourceLocationIndex = <PFNGLGETPROGRAMRESOURCELOCATIONINDEXPROC>getFunction(b"glGetProgramResourceLocationIndex")
+    cglGetProgramResourceLocationIndex = <PFNGLGETPROGRAMRESOURCELOCATIONINDEXPROC>getFunction("glGetProgramResourceLocationIndex")
     cglGetProgramResourceLocationIndex(program, programInterface, name)
 
 cdef void GetglGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name):
     global cglGetProgramResourceName
-    cglGetProgramResourceName = <PFNGLGETPROGRAMRESOURCENAMEPROC>getFunction(b"glGetProgramResourceName")
+    cglGetProgramResourceName = <PFNGLGETPROGRAMRESOURCENAMEPROC>getFunction("glGetProgramResourceName")
     cglGetProgramResourceName(program, programInterface, index, bufSize, length, name)
 
 cdef void GetglGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei count, GLsizei *length, GLint *params):
     global cglGetProgramResourceiv
-    cglGetProgramResourceiv = <PFNGLGETPROGRAMRESOURCEIVPROC>getFunction(b"glGetProgramResourceiv")
+    cglGetProgramResourceiv = <PFNGLGETPROGRAMRESOURCEIVPROC>getFunction("glGetProgramResourceiv")
     cglGetProgramResourceiv(program, programInterface, index, propCount, props, count, length, params)
 
 cdef void GetglInvalidateBufferData(GLuint buffer):
     global cglInvalidateBufferData
-    cglInvalidateBufferData = <PFNGLINVALIDATEBUFFERDATAPROC>getFunction(b"glInvalidateBufferData")
+    cglInvalidateBufferData = <PFNGLINVALIDATEBUFFERDATAPROC>getFunction("glInvalidateBufferData")
     cglInvalidateBufferData(buffer)
 
 cdef void GetglInvalidateBufferSubData(GLuint buffer, GLintptr offset, GLsizeiptr length):
     global cglInvalidateBufferSubData
-    cglInvalidateBufferSubData = <PFNGLINVALIDATEBUFFERSUBDATAPROC>getFunction(b"glInvalidateBufferSubData")
+    cglInvalidateBufferSubData = <PFNGLINVALIDATEBUFFERSUBDATAPROC>getFunction("glInvalidateBufferSubData")
     cglInvalidateBufferSubData(buffer, offset, length)
 
 cdef void GetglInvalidateFramebuffer(GLenum target, GLsizei numAttachments, const GLenum *attachments):
     global cglInvalidateFramebuffer
-    cglInvalidateFramebuffer = <PFNGLINVALIDATEFRAMEBUFFERPROC>getFunction(b"glInvalidateFramebuffer")
+    cglInvalidateFramebuffer = <PFNGLINVALIDATEFRAMEBUFFERPROC>getFunction("glInvalidateFramebuffer")
     cglInvalidateFramebuffer(target, numAttachments, attachments)
 
 cdef void GetglInvalidateSubFramebuffer(GLenum target, GLsizei numAttachments, const GLenum *attachments, GLint x, GLint y, GLsizei width, GLsizei height):
     global cglInvalidateSubFramebuffer
-    cglInvalidateSubFramebuffer = <PFNGLINVALIDATESUBFRAMEBUFFERPROC>getFunction(b"glInvalidateSubFramebuffer")
+    cglInvalidateSubFramebuffer = <PFNGLINVALIDATESUBFRAMEBUFFERPROC>getFunction("glInvalidateSubFramebuffer")
     cglInvalidateSubFramebuffer(target, numAttachments, attachments, x, y, width, height)
 
 cdef void GetglInvalidateTexImage(GLuint texture, GLint level):
     global cglInvalidateTexImage
-    cglInvalidateTexImage = <PFNGLINVALIDATETEXIMAGEPROC>getFunction(b"glInvalidateTexImage")
+    cglInvalidateTexImage = <PFNGLINVALIDATETEXIMAGEPROC>getFunction("glInvalidateTexImage")
     cglInvalidateTexImage(texture, level)
 
 cdef void GetglInvalidateTexSubImage(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth):
     global cglInvalidateTexSubImage
-    cglInvalidateTexSubImage = <PFNGLINVALIDATETEXSUBIMAGEPROC>getFunction(b"glInvalidateTexSubImage")
+    cglInvalidateTexSubImage = <PFNGLINVALIDATETEXSUBIMAGEPROC>getFunction("glInvalidateTexSubImage")
     cglInvalidateTexSubImage(texture, level, xoffset, yoffset, zoffset, width, height, depth)
 
 cdef void GetglMultiDrawArraysIndirect(GLenum mode, const void *indirect, GLsizei drawcount, GLsizei stride):
     global cglMultiDrawArraysIndirect
-    cglMultiDrawArraysIndirect = <PFNGLMULTIDRAWARRAYSINDIRECTPROC>getFunction(b"glMultiDrawArraysIndirect")
+    cglMultiDrawArraysIndirect = <PFNGLMULTIDRAWARRAYSINDIRECTPROC>getFunction("glMultiDrawArraysIndirect")
     cglMultiDrawArraysIndirect(mode, indirect, drawcount, stride)
 
 cdef void GetglMultiDrawElementsIndirect(GLenum mode, GLenum type, const void *indirect, GLsizei drawcount, GLsizei stride):
     global cglMultiDrawElementsIndirect
-    cglMultiDrawElementsIndirect = <PFNGLMULTIDRAWELEMENTSINDIRECTPROC>getFunction(b"glMultiDrawElementsIndirect")
+    cglMultiDrawElementsIndirect = <PFNGLMULTIDRAWELEMENTSINDIRECTPROC>getFunction("glMultiDrawElementsIndirect")
     cglMultiDrawElementsIndirect(mode, type, indirect, drawcount, stride)
 
 cdef void GetglObjectLabel(GLenum identifier, GLuint name, GLsizei length, const GLchar *label):
     global cglObjectLabel
-    cglObjectLabel = <PFNGLOBJECTLABELPROC>getFunction(b"glObjectLabel")
+    cglObjectLabel = <PFNGLOBJECTLABELPROC>getFunction("glObjectLabel")
     cglObjectLabel(identifier, name, length, label)
 
 cdef void GetglObjectPtrLabel(const void *ptr, GLsizei length, const GLchar *label):
     global cglObjectPtrLabel
-    cglObjectPtrLabel = <PFNGLOBJECTPTRLABELPROC>getFunction(b"glObjectPtrLabel")
+    cglObjectPtrLabel = <PFNGLOBJECTPTRLABELPROC>getFunction("glObjectPtrLabel")
     cglObjectPtrLabel(ptr, length, label)
 
 cdef void GetglPopDebugGroup():
     global cglPopDebugGroup
-    cglPopDebugGroup = <PFNGLPOPDEBUGGROUPPROC>getFunction(b"glPopDebugGroup")
+    cglPopDebugGroup = <PFNGLPOPDEBUGGROUPPROC>getFunction("glPopDebugGroup")
     cglPopDebugGroup()
 
 cdef void GetglPushDebugGroup(GLenum source, GLuint id, GLsizei length, const GLchar *message):
     global cglPushDebugGroup
-    cglPushDebugGroup = <PFNGLPUSHDEBUGGROUPPROC>getFunction(b"glPushDebugGroup")
+    cglPushDebugGroup = <PFNGLPUSHDEBUGGROUPPROC>getFunction("glPushDebugGroup")
     cglPushDebugGroup(source, id, length, message)
 
 cdef void GetglShaderStorageBlockBinding(GLuint program, GLuint storageBlockIndex, GLuint storageBlockBinding):
     global cglShaderStorageBlockBinding
-    cglShaderStorageBlockBinding = <PFNGLSHADERSTORAGEBLOCKBINDINGPROC>getFunction(b"glShaderStorageBlockBinding")
+    cglShaderStorageBlockBinding = <PFNGLSHADERSTORAGEBLOCKBINDINGPROC>getFunction("glShaderStorageBlockBinding")
     cglShaderStorageBlockBinding(program, storageBlockIndex, storageBlockBinding)
 
 cdef void GetglTexBufferRange(GLenum target, GLenum internalformat, GLuint buffer, GLintptr offset, GLsizeiptr size):
     global cglTexBufferRange
-    cglTexBufferRange = <PFNGLTEXBUFFERRANGEPROC>getFunction(b"glTexBufferRange")
+    cglTexBufferRange = <PFNGLTEXBUFFERRANGEPROC>getFunction("glTexBufferRange")
     cglTexBufferRange(target, internalformat, buffer, offset, size)
 
 cdef void GetglTexStorage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations):
     global cglTexStorage2DMultisample
-    cglTexStorage2DMultisample = <PFNGLTEXSTORAGE2DMULTISAMPLEPROC>getFunction(b"glTexStorage2DMultisample")
+    cglTexStorage2DMultisample = <PFNGLTEXSTORAGE2DMULTISAMPLEPROC>getFunction("glTexStorage2DMultisample")
     cglTexStorage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations)
 
 cdef void GetglTexStorage3DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations):
     global cglTexStorage3DMultisample
-    cglTexStorage3DMultisample = <PFNGLTEXSTORAGE3DMULTISAMPLEPROC>getFunction(b"glTexStorage3DMultisample")
+    cglTexStorage3DMultisample = <PFNGLTEXSTORAGE3DMULTISAMPLEPROC>getFunction("glTexStorage3DMultisample")
     cglTexStorage3DMultisample(target, samples, internalformat, width, height, depth, fixedsamplelocations)
 
 cdef void GetglTextureView(GLuint texture, GLenum target, GLuint origtexture, GLenum internalformat, GLuint minlevel, GLuint numlevels, GLuint minlayer, GLuint numlayers):
     global cglTextureView
-    cglTextureView = <PFNGLTEXTUREVIEWPROC>getFunction(b"glTextureView")
+    cglTextureView = <PFNGLTEXTUREVIEWPROC>getFunction("glTextureView")
     cglTextureView(texture, target, origtexture, internalformat, minlevel, numlevels, minlayer, numlayers)
 
 cdef void GetglVertexAttribBinding(GLuint attribindex, GLuint bindingindex):
     global cglVertexAttribBinding
-    cglVertexAttribBinding = <PFNGLVERTEXATTRIBBINDINGPROC>getFunction(b"glVertexAttribBinding")
+    cglVertexAttribBinding = <PFNGLVERTEXATTRIBBINDINGPROC>getFunction("glVertexAttribBinding")
     cglVertexAttribBinding(attribindex, bindingindex)
 
 cdef void GetglVertexAttribFormat(GLuint attribindex, GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset):
     global cglVertexAttribFormat
-    cglVertexAttribFormat = <PFNGLVERTEXATTRIBFORMATPROC>getFunction(b"glVertexAttribFormat")
+    cglVertexAttribFormat = <PFNGLVERTEXATTRIBFORMATPROC>getFunction("glVertexAttribFormat")
     cglVertexAttribFormat(attribindex, size, type, normalized, relativeoffset)
 
 cdef void GetglVertexAttribIFormat(GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset):
     global cglVertexAttribIFormat
-    cglVertexAttribIFormat = <PFNGLVERTEXATTRIBIFORMATPROC>getFunction(b"glVertexAttribIFormat")
+    cglVertexAttribIFormat = <PFNGLVERTEXATTRIBIFORMATPROC>getFunction("glVertexAttribIFormat")
     cglVertexAttribIFormat(attribindex, size, type, relativeoffset)
 
 cdef void GetglVertexAttribLFormat(GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset):
     global cglVertexAttribLFormat
-    cglVertexAttribLFormat = <PFNGLVERTEXATTRIBLFORMATPROC>getFunction(b"glVertexAttribLFormat")
+    cglVertexAttribLFormat = <PFNGLVERTEXATTRIBLFORMATPROC>getFunction("glVertexAttribLFormat")
     cglVertexAttribLFormat(attribindex, size, type, relativeoffset)
 
 cdef void GetglVertexBindingDivisor(GLuint bindingindex, GLuint divisor):
     global cglVertexBindingDivisor
-    cglVertexBindingDivisor = <PFNGLVERTEXBINDINGDIVISORPROC>getFunction(b"glVertexBindingDivisor")
+    cglVertexBindingDivisor = <PFNGLVERTEXBINDINGDIVISORPROC>getFunction("glVertexBindingDivisor")
     cglVertexBindingDivisor(bindingindex, divisor)
 
 cglBindVertexBuffer = GetglBindVertexBuffer

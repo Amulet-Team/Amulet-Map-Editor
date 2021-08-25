@@ -153,237 +153,237 @@ cdef PFNGLWINDOWPOS3SVPROC cglWindowPos3sv = NULL
 
 cdef void GetglBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha):
     global cglBlendColor
-    cglBlendColor = <PFNGLBLENDCOLORPROC>getFunction(b"glBlendColor")
+    cglBlendColor = <PFNGLBLENDCOLORPROC>getFunction("glBlendColor")
     cglBlendColor(red, green, blue, alpha)
 
 cdef void GetglBlendEquation(GLenum mode):
     global cglBlendEquation
-    cglBlendEquation = <PFNGLBLENDEQUATIONPROC>getFunction(b"glBlendEquation")
+    cglBlendEquation = <PFNGLBLENDEQUATIONPROC>getFunction("glBlendEquation")
     cglBlendEquation(mode)
 
 cdef void GetglBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha):
     global cglBlendFuncSeparate
-    cglBlendFuncSeparate = <PFNGLBLENDFUNCSEPARATEPROC>getFunction(b"glBlendFuncSeparate")
+    cglBlendFuncSeparate = <PFNGLBLENDFUNCSEPARATEPROC>getFunction("glBlendFuncSeparate")
     cglBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha)
 
 cdef void GetglFogCoordPointer(GLenum type, GLsizei stride, const void *pointer):
     global cglFogCoordPointer
-    cglFogCoordPointer = <PFNGLFOGCOORDPOINTERPROC>getFunction(b"glFogCoordPointer")
+    cglFogCoordPointer = <PFNGLFOGCOORDPOINTERPROC>getFunction("glFogCoordPointer")
     cglFogCoordPointer(type, stride, pointer)
 
 cdef void GetglFogCoordd(GLdouble coord):
     global cglFogCoordd
-    cglFogCoordd = <PFNGLFOGCOORDDPROC>getFunction(b"glFogCoordd")
+    cglFogCoordd = <PFNGLFOGCOORDDPROC>getFunction("glFogCoordd")
     cglFogCoordd(coord)
 
 cdef void GetglFogCoorddv(const GLdouble *coord):
     global cglFogCoorddv
-    cglFogCoorddv = <PFNGLFOGCOORDDVPROC>getFunction(b"glFogCoorddv")
+    cglFogCoorddv = <PFNGLFOGCOORDDVPROC>getFunction("glFogCoorddv")
     cglFogCoorddv(coord)
 
 cdef void GetglFogCoordf(GLfloat coord):
     global cglFogCoordf
-    cglFogCoordf = <PFNGLFOGCOORDFPROC>getFunction(b"glFogCoordf")
+    cglFogCoordf = <PFNGLFOGCOORDFPROC>getFunction("glFogCoordf")
     cglFogCoordf(coord)
 
 cdef void GetglFogCoordfv(const GLfloat *coord):
     global cglFogCoordfv
-    cglFogCoordfv = <PFNGLFOGCOORDFVPROC>getFunction(b"glFogCoordfv")
+    cglFogCoordfv = <PFNGLFOGCOORDFVPROC>getFunction("glFogCoordfv")
     cglFogCoordfv(coord)
 
 cdef void GetglMultiDrawArrays(GLenum mode, const GLint *first, const GLsizei *count, GLsizei drawcount):
     global cglMultiDrawArrays
-    cglMultiDrawArrays = <PFNGLMULTIDRAWARRAYSPROC>getFunction(b"glMultiDrawArrays")
+    cglMultiDrawArrays = <PFNGLMULTIDRAWARRAYSPROC>getFunction("glMultiDrawArrays")
     cglMultiDrawArrays(mode, first, count, drawcount)
 
 cdef void GetglMultiDrawElements(GLenum mode, const GLsizei *count, GLenum type, const void **indices, GLsizei drawcount):
     global cglMultiDrawElements
-    cglMultiDrawElements = <PFNGLMULTIDRAWELEMENTSPROC>getFunction(b"glMultiDrawElements")
+    cglMultiDrawElements = <PFNGLMULTIDRAWELEMENTSPROC>getFunction("glMultiDrawElements")
     cglMultiDrawElements(mode, count, type, indices, drawcount)
 
 cdef void GetglPointParameterf(GLenum pname, GLfloat param):
     global cglPointParameterf
-    cglPointParameterf = <PFNGLPOINTPARAMETERFPROC>getFunction(b"glPointParameterf")
+    cglPointParameterf = <PFNGLPOINTPARAMETERFPROC>getFunction("glPointParameterf")
     cglPointParameterf(pname, param)
 
 cdef void GetglPointParameterfv(GLenum pname, const GLfloat *params):
     global cglPointParameterfv
-    cglPointParameterfv = <PFNGLPOINTPARAMETERFVPROC>getFunction(b"glPointParameterfv")
+    cglPointParameterfv = <PFNGLPOINTPARAMETERFVPROC>getFunction("glPointParameterfv")
     cglPointParameterfv(pname, params)
 
 cdef void GetglPointParameteri(GLenum pname, GLint param):
     global cglPointParameteri
-    cglPointParameteri = <PFNGLPOINTPARAMETERIPROC>getFunction(b"glPointParameteri")
+    cglPointParameteri = <PFNGLPOINTPARAMETERIPROC>getFunction("glPointParameteri")
     cglPointParameteri(pname, param)
 
 cdef void GetglPointParameteriv(GLenum pname, const GLint *params):
     global cglPointParameteriv
-    cglPointParameteriv = <PFNGLPOINTPARAMETERIVPROC>getFunction(b"glPointParameteriv")
+    cglPointParameteriv = <PFNGLPOINTPARAMETERIVPROC>getFunction("glPointParameteriv")
     cglPointParameteriv(pname, params)
 
 cdef void GetglSecondaryColor3b(GLbyte red, GLbyte green, GLbyte blue):
     global cglSecondaryColor3b
-    cglSecondaryColor3b = <PFNGLSECONDARYCOLOR3BPROC>getFunction(b"glSecondaryColor3b")
+    cglSecondaryColor3b = <PFNGLSECONDARYCOLOR3BPROC>getFunction("glSecondaryColor3b")
     cglSecondaryColor3b(red, green, blue)
 
 cdef void GetglSecondaryColor3bv(const GLbyte *v):
     global cglSecondaryColor3bv
-    cglSecondaryColor3bv = <PFNGLSECONDARYCOLOR3BVPROC>getFunction(b"glSecondaryColor3bv")
+    cglSecondaryColor3bv = <PFNGLSECONDARYCOLOR3BVPROC>getFunction("glSecondaryColor3bv")
     cglSecondaryColor3bv(v)
 
 cdef void GetglSecondaryColor3d(GLdouble red, GLdouble green, GLdouble blue):
     global cglSecondaryColor3d
-    cglSecondaryColor3d = <PFNGLSECONDARYCOLOR3DPROC>getFunction(b"glSecondaryColor3d")
+    cglSecondaryColor3d = <PFNGLSECONDARYCOLOR3DPROC>getFunction("glSecondaryColor3d")
     cglSecondaryColor3d(red, green, blue)
 
 cdef void GetglSecondaryColor3dv(const GLdouble *v):
     global cglSecondaryColor3dv
-    cglSecondaryColor3dv = <PFNGLSECONDARYCOLOR3DVPROC>getFunction(b"glSecondaryColor3dv")
+    cglSecondaryColor3dv = <PFNGLSECONDARYCOLOR3DVPROC>getFunction("glSecondaryColor3dv")
     cglSecondaryColor3dv(v)
 
 cdef void GetglSecondaryColor3f(GLfloat red, GLfloat green, GLfloat blue):
     global cglSecondaryColor3f
-    cglSecondaryColor3f = <PFNGLSECONDARYCOLOR3FPROC>getFunction(b"glSecondaryColor3f")
+    cglSecondaryColor3f = <PFNGLSECONDARYCOLOR3FPROC>getFunction("glSecondaryColor3f")
     cglSecondaryColor3f(red, green, blue)
 
 cdef void GetglSecondaryColor3fv(const GLfloat *v):
     global cglSecondaryColor3fv
-    cglSecondaryColor3fv = <PFNGLSECONDARYCOLOR3FVPROC>getFunction(b"glSecondaryColor3fv")
+    cglSecondaryColor3fv = <PFNGLSECONDARYCOLOR3FVPROC>getFunction("glSecondaryColor3fv")
     cglSecondaryColor3fv(v)
 
 cdef void GetglSecondaryColor3i(GLint red, GLint green, GLint blue):
     global cglSecondaryColor3i
-    cglSecondaryColor3i = <PFNGLSECONDARYCOLOR3IPROC>getFunction(b"glSecondaryColor3i")
+    cglSecondaryColor3i = <PFNGLSECONDARYCOLOR3IPROC>getFunction("glSecondaryColor3i")
     cglSecondaryColor3i(red, green, blue)
 
 cdef void GetglSecondaryColor3iv(const GLint *v):
     global cglSecondaryColor3iv
-    cglSecondaryColor3iv = <PFNGLSECONDARYCOLOR3IVPROC>getFunction(b"glSecondaryColor3iv")
+    cglSecondaryColor3iv = <PFNGLSECONDARYCOLOR3IVPROC>getFunction("glSecondaryColor3iv")
     cglSecondaryColor3iv(v)
 
 cdef void GetglSecondaryColor3s(GLshort red, GLshort green, GLshort blue):
     global cglSecondaryColor3s
-    cglSecondaryColor3s = <PFNGLSECONDARYCOLOR3SPROC>getFunction(b"glSecondaryColor3s")
+    cglSecondaryColor3s = <PFNGLSECONDARYCOLOR3SPROC>getFunction("glSecondaryColor3s")
     cglSecondaryColor3s(red, green, blue)
 
 cdef void GetglSecondaryColor3sv(const GLshort *v):
     global cglSecondaryColor3sv
-    cglSecondaryColor3sv = <PFNGLSECONDARYCOLOR3SVPROC>getFunction(b"glSecondaryColor3sv")
+    cglSecondaryColor3sv = <PFNGLSECONDARYCOLOR3SVPROC>getFunction("glSecondaryColor3sv")
     cglSecondaryColor3sv(v)
 
 cdef void GetglSecondaryColor3ub(GLubyte red, GLubyte green, GLubyte blue):
     global cglSecondaryColor3ub
-    cglSecondaryColor3ub = <PFNGLSECONDARYCOLOR3UBPROC>getFunction(b"glSecondaryColor3ub")
+    cglSecondaryColor3ub = <PFNGLSECONDARYCOLOR3UBPROC>getFunction("glSecondaryColor3ub")
     cglSecondaryColor3ub(red, green, blue)
 
 cdef void GetglSecondaryColor3ubv(const GLubyte *v):
     global cglSecondaryColor3ubv
-    cglSecondaryColor3ubv = <PFNGLSECONDARYCOLOR3UBVPROC>getFunction(b"glSecondaryColor3ubv")
+    cglSecondaryColor3ubv = <PFNGLSECONDARYCOLOR3UBVPROC>getFunction("glSecondaryColor3ubv")
     cglSecondaryColor3ubv(v)
 
 cdef void GetglSecondaryColor3ui(GLuint red, GLuint green, GLuint blue):
     global cglSecondaryColor3ui
-    cglSecondaryColor3ui = <PFNGLSECONDARYCOLOR3UIPROC>getFunction(b"glSecondaryColor3ui")
+    cglSecondaryColor3ui = <PFNGLSECONDARYCOLOR3UIPROC>getFunction("glSecondaryColor3ui")
     cglSecondaryColor3ui(red, green, blue)
 
 cdef void GetglSecondaryColor3uiv(const GLuint *v):
     global cglSecondaryColor3uiv
-    cglSecondaryColor3uiv = <PFNGLSECONDARYCOLOR3UIVPROC>getFunction(b"glSecondaryColor3uiv")
+    cglSecondaryColor3uiv = <PFNGLSECONDARYCOLOR3UIVPROC>getFunction("glSecondaryColor3uiv")
     cglSecondaryColor3uiv(v)
 
 cdef void GetglSecondaryColor3us(GLushort red, GLushort green, GLushort blue):
     global cglSecondaryColor3us
-    cglSecondaryColor3us = <PFNGLSECONDARYCOLOR3USPROC>getFunction(b"glSecondaryColor3us")
+    cglSecondaryColor3us = <PFNGLSECONDARYCOLOR3USPROC>getFunction("glSecondaryColor3us")
     cglSecondaryColor3us(red, green, blue)
 
 cdef void GetglSecondaryColor3usv(const GLushort *v):
     global cglSecondaryColor3usv
-    cglSecondaryColor3usv = <PFNGLSECONDARYCOLOR3USVPROC>getFunction(b"glSecondaryColor3usv")
+    cglSecondaryColor3usv = <PFNGLSECONDARYCOLOR3USVPROC>getFunction("glSecondaryColor3usv")
     cglSecondaryColor3usv(v)
 
 cdef void GetglSecondaryColorPointer(GLint size, GLenum type, GLsizei stride, const void *pointer):
     global cglSecondaryColorPointer
-    cglSecondaryColorPointer = <PFNGLSECONDARYCOLORPOINTERPROC>getFunction(b"glSecondaryColorPointer")
+    cglSecondaryColorPointer = <PFNGLSECONDARYCOLORPOINTERPROC>getFunction("glSecondaryColorPointer")
     cglSecondaryColorPointer(size, type, stride, pointer)
 
 cdef void GetglWindowPos2d(GLdouble x, GLdouble y):
     global cglWindowPos2d
-    cglWindowPos2d = <PFNGLWINDOWPOS2DPROC>getFunction(b"glWindowPos2d")
+    cglWindowPos2d = <PFNGLWINDOWPOS2DPROC>getFunction("glWindowPos2d")
     cglWindowPos2d(x, y)
 
 cdef void GetglWindowPos2dv(const GLdouble *v):
     global cglWindowPos2dv
-    cglWindowPos2dv = <PFNGLWINDOWPOS2DVPROC>getFunction(b"glWindowPos2dv")
+    cglWindowPos2dv = <PFNGLWINDOWPOS2DVPROC>getFunction("glWindowPos2dv")
     cglWindowPos2dv(v)
 
 cdef void GetglWindowPos2f(GLfloat x, GLfloat y):
     global cglWindowPos2f
-    cglWindowPos2f = <PFNGLWINDOWPOS2FPROC>getFunction(b"glWindowPos2f")
+    cglWindowPos2f = <PFNGLWINDOWPOS2FPROC>getFunction("glWindowPos2f")
     cglWindowPos2f(x, y)
 
 cdef void GetglWindowPos2fv(const GLfloat *v):
     global cglWindowPos2fv
-    cglWindowPos2fv = <PFNGLWINDOWPOS2FVPROC>getFunction(b"glWindowPos2fv")
+    cglWindowPos2fv = <PFNGLWINDOWPOS2FVPROC>getFunction("glWindowPos2fv")
     cglWindowPos2fv(v)
 
 cdef void GetglWindowPos2i(GLint x, GLint y):
     global cglWindowPos2i
-    cglWindowPos2i = <PFNGLWINDOWPOS2IPROC>getFunction(b"glWindowPos2i")
+    cglWindowPos2i = <PFNGLWINDOWPOS2IPROC>getFunction("glWindowPos2i")
     cglWindowPos2i(x, y)
 
 cdef void GetglWindowPos2iv(const GLint *v):
     global cglWindowPos2iv
-    cglWindowPos2iv = <PFNGLWINDOWPOS2IVPROC>getFunction(b"glWindowPos2iv")
+    cglWindowPos2iv = <PFNGLWINDOWPOS2IVPROC>getFunction("glWindowPos2iv")
     cglWindowPos2iv(v)
 
 cdef void GetglWindowPos2s(GLshort x, GLshort y):
     global cglWindowPos2s
-    cglWindowPos2s = <PFNGLWINDOWPOS2SPROC>getFunction(b"glWindowPos2s")
+    cglWindowPos2s = <PFNGLWINDOWPOS2SPROC>getFunction("glWindowPos2s")
     cglWindowPos2s(x, y)
 
 cdef void GetglWindowPos2sv(const GLshort *v):
     global cglWindowPos2sv
-    cglWindowPos2sv = <PFNGLWINDOWPOS2SVPROC>getFunction(b"glWindowPos2sv")
+    cglWindowPos2sv = <PFNGLWINDOWPOS2SVPROC>getFunction("glWindowPos2sv")
     cglWindowPos2sv(v)
 
 cdef void GetglWindowPos3d(GLdouble x, GLdouble y, GLdouble z):
     global cglWindowPos3d
-    cglWindowPos3d = <PFNGLWINDOWPOS3DPROC>getFunction(b"glWindowPos3d")
+    cglWindowPos3d = <PFNGLWINDOWPOS3DPROC>getFunction("glWindowPos3d")
     cglWindowPos3d(x, y, z)
 
 cdef void GetglWindowPos3dv(const GLdouble *v):
     global cglWindowPos3dv
-    cglWindowPos3dv = <PFNGLWINDOWPOS3DVPROC>getFunction(b"glWindowPos3dv")
+    cglWindowPos3dv = <PFNGLWINDOWPOS3DVPROC>getFunction("glWindowPos3dv")
     cglWindowPos3dv(v)
 
 cdef void GetglWindowPos3f(GLfloat x, GLfloat y, GLfloat z):
     global cglWindowPos3f
-    cglWindowPos3f = <PFNGLWINDOWPOS3FPROC>getFunction(b"glWindowPos3f")
+    cglWindowPos3f = <PFNGLWINDOWPOS3FPROC>getFunction("glWindowPos3f")
     cglWindowPos3f(x, y, z)
 
 cdef void GetglWindowPos3fv(const GLfloat *v):
     global cglWindowPos3fv
-    cglWindowPos3fv = <PFNGLWINDOWPOS3FVPROC>getFunction(b"glWindowPos3fv")
+    cglWindowPos3fv = <PFNGLWINDOWPOS3FVPROC>getFunction("glWindowPos3fv")
     cglWindowPos3fv(v)
 
 cdef void GetglWindowPos3i(GLint x, GLint y, GLint z):
     global cglWindowPos3i
-    cglWindowPos3i = <PFNGLWINDOWPOS3IPROC>getFunction(b"glWindowPos3i")
+    cglWindowPos3i = <PFNGLWINDOWPOS3IPROC>getFunction("glWindowPos3i")
     cglWindowPos3i(x, y, z)
 
 cdef void GetglWindowPos3iv(const GLint *v):
     global cglWindowPos3iv
-    cglWindowPos3iv = <PFNGLWINDOWPOS3IVPROC>getFunction(b"glWindowPos3iv")
+    cglWindowPos3iv = <PFNGLWINDOWPOS3IVPROC>getFunction("glWindowPos3iv")
     cglWindowPos3iv(v)
 
 cdef void GetglWindowPos3s(GLshort x, GLshort y, GLshort z):
     global cglWindowPos3s
-    cglWindowPos3s = <PFNGLWINDOWPOS3SPROC>getFunction(b"glWindowPos3s")
+    cglWindowPos3s = <PFNGLWINDOWPOS3SPROC>getFunction("glWindowPos3s")
     cglWindowPos3s(x, y, z)
 
 cdef void GetglWindowPos3sv(const GLshort *v):
     global cglWindowPos3sv
-    cglWindowPos3sv = <PFNGLWINDOWPOS3SVPROC>getFunction(b"glWindowPos3sv")
+    cglWindowPos3sv = <PFNGLWINDOWPOS3SVPROC>getFunction("glWindowPos3sv")
     cglWindowPos3sv(v)
 
 cglBlendColor = GetglBlendColor

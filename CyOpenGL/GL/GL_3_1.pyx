@@ -100,77 +100,77 @@ cdef PFNGLUNIFORMBLOCKBINDINGPROC cglUniformBlockBinding = NULL
 
 cdef void GetglBindBufferBase(GLenum target, GLuint index, GLuint buffer):
     global cglBindBufferBase
-    cglBindBufferBase = <PFNGLBINDBUFFERBASEPROC>getFunction(b"glBindBufferBase")
+    cglBindBufferBase = <PFNGLBINDBUFFERBASEPROC>getFunction("glBindBufferBase")
     cglBindBufferBase(target, index, buffer)
 
 cdef void GetglBindBufferRange(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size):
     global cglBindBufferRange
-    cglBindBufferRange = <PFNGLBINDBUFFERRANGEPROC>getFunction(b"glBindBufferRange")
+    cglBindBufferRange = <PFNGLBINDBUFFERRANGEPROC>getFunction("glBindBufferRange")
     cglBindBufferRange(target, index, buffer, offset, size)
 
 cdef void GetglCopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size):
     global cglCopyBufferSubData
-    cglCopyBufferSubData = <PFNGLCOPYBUFFERSUBDATAPROC>getFunction(b"glCopyBufferSubData")
+    cglCopyBufferSubData = <PFNGLCOPYBUFFERSUBDATAPROC>getFunction("glCopyBufferSubData")
     cglCopyBufferSubData(readTarget, writeTarget, readOffset, writeOffset, size)
 
 cdef void GetglDrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instancecount):
     global cglDrawArraysInstanced
-    cglDrawArraysInstanced = <PFNGLDRAWARRAYSINSTANCEDPROC>getFunction(b"glDrawArraysInstanced")
+    cglDrawArraysInstanced = <PFNGLDRAWARRAYSINSTANCEDPROC>getFunction("glDrawArraysInstanced")
     cglDrawArraysInstanced(mode, first, count, instancecount)
 
 cdef void GetglDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount):
     global cglDrawElementsInstanced
-    cglDrawElementsInstanced = <PFNGLDRAWELEMENTSINSTANCEDPROC>getFunction(b"glDrawElementsInstanced")
+    cglDrawElementsInstanced = <PFNGLDRAWELEMENTSINSTANCEDPROC>getFunction("glDrawElementsInstanced")
     cglDrawElementsInstanced(mode, count, type, indices, instancecount)
 
 cdef void GetglGetActiveUniformBlockName(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformBlockName):
     global cglGetActiveUniformBlockName
-    cglGetActiveUniformBlockName = <PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC>getFunction(b"glGetActiveUniformBlockName")
+    cglGetActiveUniformBlockName = <PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC>getFunction("glGetActiveUniformBlockName")
     cglGetActiveUniformBlockName(program, uniformBlockIndex, bufSize, length, uniformBlockName)
 
 cdef void GetglGetActiveUniformBlockiv(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params):
     global cglGetActiveUniformBlockiv
-    cglGetActiveUniformBlockiv = <PFNGLGETACTIVEUNIFORMBLOCKIVPROC>getFunction(b"glGetActiveUniformBlockiv")
+    cglGetActiveUniformBlockiv = <PFNGLGETACTIVEUNIFORMBLOCKIVPROC>getFunction("glGetActiveUniformBlockiv")
     cglGetActiveUniformBlockiv(program, uniformBlockIndex, pname, params)
 
 cdef void GetglGetActiveUniformName(GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformName):
     global cglGetActiveUniformName
-    cglGetActiveUniformName = <PFNGLGETACTIVEUNIFORMNAMEPROC>getFunction(b"glGetActiveUniformName")
+    cglGetActiveUniformName = <PFNGLGETACTIVEUNIFORMNAMEPROC>getFunction("glGetActiveUniformName")
     cglGetActiveUniformName(program, uniformIndex, bufSize, length, uniformName)
 
 cdef void GetglGetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint *uniformIndices, GLenum pname, GLint *params):
     global cglGetActiveUniformsiv
-    cglGetActiveUniformsiv = <PFNGLGETACTIVEUNIFORMSIVPROC>getFunction(b"glGetActiveUniformsiv")
+    cglGetActiveUniformsiv = <PFNGLGETACTIVEUNIFORMSIVPROC>getFunction("glGetActiveUniformsiv")
     cglGetActiveUniformsiv(program, uniformCount, uniformIndices, pname, params)
 
 cdef void GetglGetIntegeri_v(GLenum target, GLuint index, GLint *data):
     global cglGetIntegeri_v
-    cglGetIntegeri_v = <PFNGLGETINTEGERI_VPROC>getFunction(b"glGetIntegeri_v")
+    cglGetIntegeri_v = <PFNGLGETINTEGERI_VPROC>getFunction("glGetIntegeri_v")
     cglGetIntegeri_v(target, index, data)
 
 cdef GLuint GetglGetUniformBlockIndex(GLuint program, const GLchar *uniformBlockName):
     global cglGetUniformBlockIndex
-    cglGetUniformBlockIndex = <PFNGLGETUNIFORMBLOCKINDEXPROC>getFunction(b"glGetUniformBlockIndex")
+    cglGetUniformBlockIndex = <PFNGLGETUNIFORMBLOCKINDEXPROC>getFunction("glGetUniformBlockIndex")
     cglGetUniformBlockIndex(program, uniformBlockName)
 
 cdef void GetglGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar **uniformNames, GLuint *uniformIndices):
     global cglGetUniformIndices
-    cglGetUniformIndices = <PFNGLGETUNIFORMINDICESPROC>getFunction(b"glGetUniformIndices")
+    cglGetUniformIndices = <PFNGLGETUNIFORMINDICESPROC>getFunction("glGetUniformIndices")
     cglGetUniformIndices(program, uniformCount, uniformNames, uniformIndices)
 
 cdef void GetglPrimitiveRestartIndex(GLuint index):
     global cglPrimitiveRestartIndex
-    cglPrimitiveRestartIndex = <PFNGLPRIMITIVERESTARTINDEXPROC>getFunction(b"glPrimitiveRestartIndex")
+    cglPrimitiveRestartIndex = <PFNGLPRIMITIVERESTARTINDEXPROC>getFunction("glPrimitiveRestartIndex")
     cglPrimitiveRestartIndex(index)
 
 cdef void GetglTexBuffer(GLenum target, GLenum internalformat, GLuint buffer):
     global cglTexBuffer
-    cglTexBuffer = <PFNGLTEXBUFFERPROC>getFunction(b"glTexBuffer")
+    cglTexBuffer = <PFNGLTEXBUFFERPROC>getFunction("glTexBuffer")
     cglTexBuffer(target, internalformat, buffer)
 
 cdef void GetglUniformBlockBinding(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding):
     global cglUniformBlockBinding
-    cglUniformBlockBinding = <PFNGLUNIFORMBLOCKBINDINGPROC>getFunction(b"glUniformBlockBinding")
+    cglUniformBlockBinding = <PFNGLUNIFORMBLOCKBINDINGPROC>getFunction("glUniformBlockBinding")
     cglUniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding)
 
 cglBindBufferBase = GetglBindBufferBase

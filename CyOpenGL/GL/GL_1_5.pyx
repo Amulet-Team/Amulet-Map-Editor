@@ -97,97 +97,97 @@ cdef PFNGLUNMAPBUFFERPROC cglUnmapBuffer = NULL
 
 cdef void GetglBeginQuery(GLenum target, GLuint id):
     global cglBeginQuery
-    cglBeginQuery = <PFNGLBEGINQUERYPROC>getFunction(b"glBeginQuery")
+    cglBeginQuery = <PFNGLBEGINQUERYPROC>getFunction("glBeginQuery")
     cglBeginQuery(target, id)
 
 cdef void GetglBindBuffer(GLenum target, GLuint buffer):
     global cglBindBuffer
-    cglBindBuffer = <PFNGLBINDBUFFERPROC>getFunction(b"glBindBuffer")
+    cglBindBuffer = <PFNGLBINDBUFFERPROC>getFunction("glBindBuffer")
     cglBindBuffer(target, buffer)
 
 cdef void GetglBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage):
     global cglBufferData
-    cglBufferData = <PFNGLBUFFERDATAPROC>getFunction(b"glBufferData")
+    cglBufferData = <PFNGLBUFFERDATAPROC>getFunction("glBufferData")
     cglBufferData(target, size, data, usage)
 
 cdef void GetglBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void *data):
     global cglBufferSubData
-    cglBufferSubData = <PFNGLBUFFERSUBDATAPROC>getFunction(b"glBufferSubData")
+    cglBufferSubData = <PFNGLBUFFERSUBDATAPROC>getFunction("glBufferSubData")
     cglBufferSubData(target, offset, size, data)
 
 cdef void GetglDeleteBuffers(GLsizei n, const GLuint *buffers):
     global cglDeleteBuffers
-    cglDeleteBuffers = <PFNGLDELETEBUFFERSPROC>getFunction(b"glDeleteBuffers")
+    cglDeleteBuffers = <PFNGLDELETEBUFFERSPROC>getFunction("glDeleteBuffers")
     cglDeleteBuffers(n, buffers)
 
 cdef void GetglDeleteQueries(GLsizei n, const GLuint *ids):
     global cglDeleteQueries
-    cglDeleteQueries = <PFNGLDELETEQUERIESPROC>getFunction(b"glDeleteQueries")
+    cglDeleteQueries = <PFNGLDELETEQUERIESPROC>getFunction("glDeleteQueries")
     cglDeleteQueries(n, ids)
 
 cdef void GetglEndQuery(GLenum target):
     global cglEndQuery
-    cglEndQuery = <PFNGLENDQUERYPROC>getFunction(b"glEndQuery")
+    cglEndQuery = <PFNGLENDQUERYPROC>getFunction("glEndQuery")
     cglEndQuery(target)
 
 cdef void GetglGenBuffers(GLsizei n, GLuint *buffers):
     global cglGenBuffers
-    cglGenBuffers = <PFNGLGENBUFFERSPROC>getFunction(b"glGenBuffers")
+    cglGenBuffers = <PFNGLGENBUFFERSPROC>getFunction("glGenBuffers")
     cglGenBuffers(n, buffers)
 
 cdef void GetglGenQueries(GLsizei n, GLuint *ids):
     global cglGenQueries
-    cglGenQueries = <PFNGLGENQUERIESPROC>getFunction(b"glGenQueries")
+    cglGenQueries = <PFNGLGENQUERIESPROC>getFunction("glGenQueries")
     cglGenQueries(n, ids)
 
 cdef void GetglGetBufferParameteriv(GLenum target, GLenum pname, GLint *params):
     global cglGetBufferParameteriv
-    cglGetBufferParameteriv = <PFNGLGETBUFFERPARAMETERIVPROC>getFunction(b"glGetBufferParameteriv")
+    cglGetBufferParameteriv = <PFNGLGETBUFFERPARAMETERIVPROC>getFunction("glGetBufferParameteriv")
     cglGetBufferParameteriv(target, pname, params)
 
 cdef void GetglGetBufferPointerv(GLenum target, GLenum pname, void **params):
     global cglGetBufferPointerv
-    cglGetBufferPointerv = <PFNGLGETBUFFERPOINTERVPROC>getFunction(b"glGetBufferPointerv")
+    cglGetBufferPointerv = <PFNGLGETBUFFERPOINTERVPROC>getFunction("glGetBufferPointerv")
     cglGetBufferPointerv(target, pname, params)
 
 cdef void GetglGetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, void *data):
     global cglGetBufferSubData
-    cglGetBufferSubData = <PFNGLGETBUFFERSUBDATAPROC>getFunction(b"glGetBufferSubData")
+    cglGetBufferSubData = <PFNGLGETBUFFERSUBDATAPROC>getFunction("glGetBufferSubData")
     cglGetBufferSubData(target, offset, size, data)
 
 cdef void GetglGetQueryObjectiv(GLuint id, GLenum pname, GLint *params):
     global cglGetQueryObjectiv
-    cglGetQueryObjectiv = <PFNGLGETQUERYOBJECTIVPROC>getFunction(b"glGetQueryObjectiv")
+    cglGetQueryObjectiv = <PFNGLGETQUERYOBJECTIVPROC>getFunction("glGetQueryObjectiv")
     cglGetQueryObjectiv(id, pname, params)
 
 cdef void GetglGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params):
     global cglGetQueryObjectuiv
-    cglGetQueryObjectuiv = <PFNGLGETQUERYOBJECTUIVPROC>getFunction(b"glGetQueryObjectuiv")
+    cglGetQueryObjectuiv = <PFNGLGETQUERYOBJECTUIVPROC>getFunction("glGetQueryObjectuiv")
     cglGetQueryObjectuiv(id, pname, params)
 
 cdef void GetglGetQueryiv(GLenum target, GLenum pname, GLint *params):
     global cglGetQueryiv
-    cglGetQueryiv = <PFNGLGETQUERYIVPROC>getFunction(b"glGetQueryiv")
+    cglGetQueryiv = <PFNGLGETQUERYIVPROC>getFunction("glGetQueryiv")
     cglGetQueryiv(target, pname, params)
 
 cdef GLboolean GetglIsBuffer(GLuint buffer):
     global cglIsBuffer
-    cglIsBuffer = <PFNGLISBUFFERPROC>getFunction(b"glIsBuffer")
+    cglIsBuffer = <PFNGLISBUFFERPROC>getFunction("glIsBuffer")
     cglIsBuffer(buffer)
 
 cdef GLboolean GetglIsQuery(GLuint id):
     global cglIsQuery
-    cglIsQuery = <PFNGLISQUERYPROC>getFunction(b"glIsQuery")
+    cglIsQuery = <PFNGLISQUERYPROC>getFunction("glIsQuery")
     cglIsQuery(id)
 
 cdef void *GetglMapBuffer(GLenum target, GLenum access):
     global cglMapBuffer
-    cglMapBuffer = <PFNGLMAPBUFFERPROC>getFunction(b"glMapBuffer")
+    cglMapBuffer = <PFNGLMAPBUFFERPROC>getFunction("glMapBuffer")
     cglMapBuffer(target, access)
 
 cdef GLboolean GetglUnmapBuffer(GLenum target):
     global cglUnmapBuffer
-    cglUnmapBuffer = <PFNGLUNMAPBUFFERPROC>getFunction(b"glUnmapBuffer")
+    cglUnmapBuffer = <PFNGLUNMAPBUFFERPROC>getFunction("glUnmapBuffer")
     cglUnmapBuffer(target)
 
 cglBeginQuery = GetglBeginQuery

@@ -279,467 +279,467 @@ cdef PFNGLVERTEXATTRIBPOINTERPROC cglVertexAttribPointer = NULL
 
 cdef void GetglAttachShader(GLuint program, GLuint shader):
     global cglAttachShader
-    cglAttachShader = <PFNGLATTACHSHADERPROC>getFunction(b"glAttachShader")
+    cglAttachShader = <PFNGLATTACHSHADERPROC>getFunction("glAttachShader")
     cglAttachShader(program, shader)
 
 cdef void GetglBindAttribLocation(GLuint program, GLuint index, const GLchar *name):
     global cglBindAttribLocation
-    cglBindAttribLocation = <PFNGLBINDATTRIBLOCATIONPROC>getFunction(b"glBindAttribLocation")
+    cglBindAttribLocation = <PFNGLBINDATTRIBLOCATIONPROC>getFunction("glBindAttribLocation")
     cglBindAttribLocation(program, index, name)
 
 cdef void GetglBlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha):
     global cglBlendEquationSeparate
-    cglBlendEquationSeparate = <PFNGLBLENDEQUATIONSEPARATEPROC>getFunction(b"glBlendEquationSeparate")
+    cglBlendEquationSeparate = <PFNGLBLENDEQUATIONSEPARATEPROC>getFunction("glBlendEquationSeparate")
     cglBlendEquationSeparate(modeRGB, modeAlpha)
 
 cdef void GetglCompileShader(GLuint shader):
     global cglCompileShader
-    cglCompileShader = <PFNGLCOMPILESHADERPROC>getFunction(b"glCompileShader")
+    cglCompileShader = <PFNGLCOMPILESHADERPROC>getFunction("glCompileShader")
     cglCompileShader(shader)
 
 cdef GLuint GetglCreateProgram():
     global cglCreateProgram
-    cglCreateProgram = <PFNGLCREATEPROGRAMPROC>getFunction(b"glCreateProgram")
+    cglCreateProgram = <PFNGLCREATEPROGRAMPROC>getFunction("glCreateProgram")
     cglCreateProgram()
 
 cdef GLuint GetglCreateShader(GLenum type):
     global cglCreateShader
-    cglCreateShader = <PFNGLCREATESHADERPROC>getFunction(b"glCreateShader")
+    cglCreateShader = <PFNGLCREATESHADERPROC>getFunction("glCreateShader")
     cglCreateShader(type)
 
 cdef void GetglDeleteProgram(GLuint program):
     global cglDeleteProgram
-    cglDeleteProgram = <PFNGLDELETEPROGRAMPROC>getFunction(b"glDeleteProgram")
+    cglDeleteProgram = <PFNGLDELETEPROGRAMPROC>getFunction("glDeleteProgram")
     cglDeleteProgram(program)
 
 cdef void GetglDeleteShader(GLuint shader):
     global cglDeleteShader
-    cglDeleteShader = <PFNGLDELETESHADERPROC>getFunction(b"glDeleteShader")
+    cglDeleteShader = <PFNGLDELETESHADERPROC>getFunction("glDeleteShader")
     cglDeleteShader(shader)
 
 cdef void GetglDetachShader(GLuint program, GLuint shader):
     global cglDetachShader
-    cglDetachShader = <PFNGLDETACHSHADERPROC>getFunction(b"glDetachShader")
+    cglDetachShader = <PFNGLDETACHSHADERPROC>getFunction("glDetachShader")
     cglDetachShader(program, shader)
 
 cdef void GetglDisableVertexAttribArray(GLuint index):
     global cglDisableVertexAttribArray
-    cglDisableVertexAttribArray = <PFNGLDISABLEVERTEXATTRIBARRAYPROC>getFunction(b"glDisableVertexAttribArray")
+    cglDisableVertexAttribArray = <PFNGLDISABLEVERTEXATTRIBARRAYPROC>getFunction("glDisableVertexAttribArray")
     cglDisableVertexAttribArray(index)
 
 cdef void GetglDrawBuffers(GLsizei n, const GLenum *bufs):
     global cglDrawBuffers
-    cglDrawBuffers = <PFNGLDRAWBUFFERSPROC>getFunction(b"glDrawBuffers")
+    cglDrawBuffers = <PFNGLDRAWBUFFERSPROC>getFunction("glDrawBuffers")
     cglDrawBuffers(n, bufs)
 
 cdef void GetglEnableVertexAttribArray(GLuint index):
     global cglEnableVertexAttribArray
-    cglEnableVertexAttribArray = <PFNGLENABLEVERTEXATTRIBARRAYPROC>getFunction(b"glEnableVertexAttribArray")
+    cglEnableVertexAttribArray = <PFNGLENABLEVERTEXATTRIBARRAYPROC>getFunction("glEnableVertexAttribArray")
     cglEnableVertexAttribArray(index)
 
 cdef void GetglGetActiveAttrib(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name):
     global cglGetActiveAttrib
-    cglGetActiveAttrib = <PFNGLGETACTIVEATTRIBPROC>getFunction(b"glGetActiveAttrib")
+    cglGetActiveAttrib = <PFNGLGETACTIVEATTRIBPROC>getFunction("glGetActiveAttrib")
     cglGetActiveAttrib(program, index, bufSize, length, size, type, name)
 
 cdef void GetglGetActiveUniform(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name):
     global cglGetActiveUniform
-    cglGetActiveUniform = <PFNGLGETACTIVEUNIFORMPROC>getFunction(b"glGetActiveUniform")
+    cglGetActiveUniform = <PFNGLGETACTIVEUNIFORMPROC>getFunction("glGetActiveUniform")
     cglGetActiveUniform(program, index, bufSize, length, size, type, name)
 
 cdef void GetglGetAttachedShaders(GLuint program, GLsizei maxCount, GLsizei *count, GLuint *shaders):
     global cglGetAttachedShaders
-    cglGetAttachedShaders = <PFNGLGETATTACHEDSHADERSPROC>getFunction(b"glGetAttachedShaders")
+    cglGetAttachedShaders = <PFNGLGETATTACHEDSHADERSPROC>getFunction("glGetAttachedShaders")
     cglGetAttachedShaders(program, maxCount, count, shaders)
 
 cdef GLint GetglGetAttribLocation(GLuint program, const GLchar *name):
     global cglGetAttribLocation
-    cglGetAttribLocation = <PFNGLGETATTRIBLOCATIONPROC>getFunction(b"glGetAttribLocation")
+    cglGetAttribLocation = <PFNGLGETATTRIBLOCATIONPROC>getFunction("glGetAttribLocation")
     cglGetAttribLocation(program, name)
 
 cdef void GetglGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog):
     global cglGetProgramInfoLog
-    cglGetProgramInfoLog = <PFNGLGETPROGRAMINFOLOGPROC>getFunction(b"glGetProgramInfoLog")
+    cglGetProgramInfoLog = <PFNGLGETPROGRAMINFOLOGPROC>getFunction("glGetProgramInfoLog")
     cglGetProgramInfoLog(program, bufSize, length, infoLog)
 
 cdef void GetglGetProgramiv(GLuint program, GLenum pname, GLint *params):
     global cglGetProgramiv
-    cglGetProgramiv = <PFNGLGETPROGRAMIVPROC>getFunction(b"glGetProgramiv")
+    cglGetProgramiv = <PFNGLGETPROGRAMIVPROC>getFunction("glGetProgramiv")
     cglGetProgramiv(program, pname, params)
 
 cdef void GetglGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog):
     global cglGetShaderInfoLog
-    cglGetShaderInfoLog = <PFNGLGETSHADERINFOLOGPROC>getFunction(b"glGetShaderInfoLog")
+    cglGetShaderInfoLog = <PFNGLGETSHADERINFOLOGPROC>getFunction("glGetShaderInfoLog")
     cglGetShaderInfoLog(shader, bufSize, length, infoLog)
 
 cdef void GetglGetShaderSource(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source):
     global cglGetShaderSource
-    cglGetShaderSource = <PFNGLGETSHADERSOURCEPROC>getFunction(b"glGetShaderSource")
+    cglGetShaderSource = <PFNGLGETSHADERSOURCEPROC>getFunction("glGetShaderSource")
     cglGetShaderSource(shader, bufSize, length, source)
 
 cdef void GetglGetShaderiv(GLuint shader, GLenum pname, GLint *params):
     global cglGetShaderiv
-    cglGetShaderiv = <PFNGLGETSHADERIVPROC>getFunction(b"glGetShaderiv")
+    cglGetShaderiv = <PFNGLGETSHADERIVPROC>getFunction("glGetShaderiv")
     cglGetShaderiv(shader, pname, params)
 
 cdef GLint GetglGetUniformLocation(GLuint program, const GLchar *name):
     global cglGetUniformLocation
-    cglGetUniformLocation = <PFNGLGETUNIFORMLOCATIONPROC>getFunction(b"glGetUniformLocation")
+    cglGetUniformLocation = <PFNGLGETUNIFORMLOCATIONPROC>getFunction("glGetUniformLocation")
     cglGetUniformLocation(program, name)
 
 cdef void GetglGetUniformfv(GLuint program, GLint location, GLfloat *params):
     global cglGetUniformfv
-    cglGetUniformfv = <PFNGLGETUNIFORMFVPROC>getFunction(b"glGetUniformfv")
+    cglGetUniformfv = <PFNGLGETUNIFORMFVPROC>getFunction("glGetUniformfv")
     cglGetUniformfv(program, location, params)
 
 cdef void GetglGetUniformiv(GLuint program, GLint location, GLint *params):
     global cglGetUniformiv
-    cglGetUniformiv = <PFNGLGETUNIFORMIVPROC>getFunction(b"glGetUniformiv")
+    cglGetUniformiv = <PFNGLGETUNIFORMIVPROC>getFunction("glGetUniformiv")
     cglGetUniformiv(program, location, params)
 
 cdef void GetglGetVertexAttribPointerv(GLuint index, GLenum pname, void **pointer):
     global cglGetVertexAttribPointerv
-    cglGetVertexAttribPointerv = <PFNGLGETVERTEXATTRIBPOINTERVPROC>getFunction(b"glGetVertexAttribPointerv")
+    cglGetVertexAttribPointerv = <PFNGLGETVERTEXATTRIBPOINTERVPROC>getFunction("glGetVertexAttribPointerv")
     cglGetVertexAttribPointerv(index, pname, pointer)
 
 cdef void GetglGetVertexAttribdv(GLuint index, GLenum pname, GLdouble *params):
     global cglGetVertexAttribdv
-    cglGetVertexAttribdv = <PFNGLGETVERTEXATTRIBDVPROC>getFunction(b"glGetVertexAttribdv")
+    cglGetVertexAttribdv = <PFNGLGETVERTEXATTRIBDVPROC>getFunction("glGetVertexAttribdv")
     cglGetVertexAttribdv(index, pname, params)
 
 cdef void GetglGetVertexAttribfv(GLuint index, GLenum pname, GLfloat *params):
     global cglGetVertexAttribfv
-    cglGetVertexAttribfv = <PFNGLGETVERTEXATTRIBFVPROC>getFunction(b"glGetVertexAttribfv")
+    cglGetVertexAttribfv = <PFNGLGETVERTEXATTRIBFVPROC>getFunction("glGetVertexAttribfv")
     cglGetVertexAttribfv(index, pname, params)
 
 cdef void GetglGetVertexAttribiv(GLuint index, GLenum pname, GLint *params):
     global cglGetVertexAttribiv
-    cglGetVertexAttribiv = <PFNGLGETVERTEXATTRIBIVPROC>getFunction(b"glGetVertexAttribiv")
+    cglGetVertexAttribiv = <PFNGLGETVERTEXATTRIBIVPROC>getFunction("glGetVertexAttribiv")
     cglGetVertexAttribiv(index, pname, params)
 
 cdef GLboolean GetglIsProgram(GLuint program):
     global cglIsProgram
-    cglIsProgram = <PFNGLISPROGRAMPROC>getFunction(b"glIsProgram")
+    cglIsProgram = <PFNGLISPROGRAMPROC>getFunction("glIsProgram")
     cglIsProgram(program)
 
 cdef GLboolean GetglIsShader(GLuint shader):
     global cglIsShader
-    cglIsShader = <PFNGLISSHADERPROC>getFunction(b"glIsShader")
+    cglIsShader = <PFNGLISSHADERPROC>getFunction("glIsShader")
     cglIsShader(shader)
 
 cdef void GetglLinkProgram(GLuint program):
     global cglLinkProgram
-    cglLinkProgram = <PFNGLLINKPROGRAMPROC>getFunction(b"glLinkProgram")
+    cglLinkProgram = <PFNGLLINKPROGRAMPROC>getFunction("glLinkProgram")
     cglLinkProgram(program)
 
 cdef void GetglShaderSource(GLuint shader, GLsizei count, const GLchar **string, const GLint *length):
     global cglShaderSource
-    cglShaderSource = <PFNGLSHADERSOURCEPROC>getFunction(b"glShaderSource")
+    cglShaderSource = <PFNGLSHADERSOURCEPROC>getFunction("glShaderSource")
     cglShaderSource(shader, count, string, length)
 
 cdef void GetglStencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask):
     global cglStencilFuncSeparate
-    cglStencilFuncSeparate = <PFNGLSTENCILFUNCSEPARATEPROC>getFunction(b"glStencilFuncSeparate")
+    cglStencilFuncSeparate = <PFNGLSTENCILFUNCSEPARATEPROC>getFunction("glStencilFuncSeparate")
     cglStencilFuncSeparate(face, func, ref, mask)
 
 cdef void GetglStencilMaskSeparate(GLenum face, GLuint mask):
     global cglStencilMaskSeparate
-    cglStencilMaskSeparate = <PFNGLSTENCILMASKSEPARATEPROC>getFunction(b"glStencilMaskSeparate")
+    cglStencilMaskSeparate = <PFNGLSTENCILMASKSEPARATEPROC>getFunction("glStencilMaskSeparate")
     cglStencilMaskSeparate(face, mask)
 
 cdef void GetglStencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass):
     global cglStencilOpSeparate
-    cglStencilOpSeparate = <PFNGLSTENCILOPSEPARATEPROC>getFunction(b"glStencilOpSeparate")
+    cglStencilOpSeparate = <PFNGLSTENCILOPSEPARATEPROC>getFunction("glStencilOpSeparate")
     cglStencilOpSeparate(face, sfail, dpfail, dppass)
 
 cdef void GetglUniform1f(GLint location, GLfloat v0):
     global cglUniform1f
-    cglUniform1f = <PFNGLUNIFORM1FPROC>getFunction(b"glUniform1f")
+    cglUniform1f = <PFNGLUNIFORM1FPROC>getFunction("glUniform1f")
     cglUniform1f(location, v0)
 
 cdef void GetglUniform1fv(GLint location, GLsizei count, const GLfloat *value):
     global cglUniform1fv
-    cglUniform1fv = <PFNGLUNIFORM1FVPROC>getFunction(b"glUniform1fv")
+    cglUniform1fv = <PFNGLUNIFORM1FVPROC>getFunction("glUniform1fv")
     cglUniform1fv(location, count, value)
 
 cdef void GetglUniform1i(GLint location, GLint v0):
     global cglUniform1i
-    cglUniform1i = <PFNGLUNIFORM1IPROC>getFunction(b"glUniform1i")
+    cglUniform1i = <PFNGLUNIFORM1IPROC>getFunction("glUniform1i")
     cglUniform1i(location, v0)
 
 cdef void GetglUniform1iv(GLint location, GLsizei count, const GLint *value):
     global cglUniform1iv
-    cglUniform1iv = <PFNGLUNIFORM1IVPROC>getFunction(b"glUniform1iv")
+    cglUniform1iv = <PFNGLUNIFORM1IVPROC>getFunction("glUniform1iv")
     cglUniform1iv(location, count, value)
 
 cdef void GetglUniform2f(GLint location, GLfloat v0, GLfloat v1):
     global cglUniform2f
-    cglUniform2f = <PFNGLUNIFORM2FPROC>getFunction(b"glUniform2f")
+    cglUniform2f = <PFNGLUNIFORM2FPROC>getFunction("glUniform2f")
     cglUniform2f(location, v0, v1)
 
 cdef void GetglUniform2fv(GLint location, GLsizei count, const GLfloat *value):
     global cglUniform2fv
-    cglUniform2fv = <PFNGLUNIFORM2FVPROC>getFunction(b"glUniform2fv")
+    cglUniform2fv = <PFNGLUNIFORM2FVPROC>getFunction("glUniform2fv")
     cglUniform2fv(location, count, value)
 
 cdef void GetglUniform2i(GLint location, GLint v0, GLint v1):
     global cglUniform2i
-    cglUniform2i = <PFNGLUNIFORM2IPROC>getFunction(b"glUniform2i")
+    cglUniform2i = <PFNGLUNIFORM2IPROC>getFunction("glUniform2i")
     cglUniform2i(location, v0, v1)
 
 cdef void GetglUniform2iv(GLint location, GLsizei count, const GLint *value):
     global cglUniform2iv
-    cglUniform2iv = <PFNGLUNIFORM2IVPROC>getFunction(b"glUniform2iv")
+    cglUniform2iv = <PFNGLUNIFORM2IVPROC>getFunction("glUniform2iv")
     cglUniform2iv(location, count, value)
 
 cdef void GetglUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2):
     global cglUniform3f
-    cglUniform3f = <PFNGLUNIFORM3FPROC>getFunction(b"glUniform3f")
+    cglUniform3f = <PFNGLUNIFORM3FPROC>getFunction("glUniform3f")
     cglUniform3f(location, v0, v1, v2)
 
 cdef void GetglUniform3fv(GLint location, GLsizei count, const GLfloat *value):
     global cglUniform3fv
-    cglUniform3fv = <PFNGLUNIFORM3FVPROC>getFunction(b"glUniform3fv")
+    cglUniform3fv = <PFNGLUNIFORM3FVPROC>getFunction("glUniform3fv")
     cglUniform3fv(location, count, value)
 
 cdef void GetglUniform3i(GLint location, GLint v0, GLint v1, GLint v2):
     global cglUniform3i
-    cglUniform3i = <PFNGLUNIFORM3IPROC>getFunction(b"glUniform3i")
+    cglUniform3i = <PFNGLUNIFORM3IPROC>getFunction("glUniform3i")
     cglUniform3i(location, v0, v1, v2)
 
 cdef void GetglUniform3iv(GLint location, GLsizei count, const GLint *value):
     global cglUniform3iv
-    cglUniform3iv = <PFNGLUNIFORM3IVPROC>getFunction(b"glUniform3iv")
+    cglUniform3iv = <PFNGLUNIFORM3IVPROC>getFunction("glUniform3iv")
     cglUniform3iv(location, count, value)
 
 cdef void GetglUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3):
     global cglUniform4f
-    cglUniform4f = <PFNGLUNIFORM4FPROC>getFunction(b"glUniform4f")
+    cglUniform4f = <PFNGLUNIFORM4FPROC>getFunction("glUniform4f")
     cglUniform4f(location, v0, v1, v2, v3)
 
 cdef void GetglUniform4fv(GLint location, GLsizei count, const GLfloat *value):
     global cglUniform4fv
-    cglUniform4fv = <PFNGLUNIFORM4FVPROC>getFunction(b"glUniform4fv")
+    cglUniform4fv = <PFNGLUNIFORM4FVPROC>getFunction("glUniform4fv")
     cglUniform4fv(location, count, value)
 
 cdef void GetglUniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3):
     global cglUniform4i
-    cglUniform4i = <PFNGLUNIFORM4IPROC>getFunction(b"glUniform4i")
+    cglUniform4i = <PFNGLUNIFORM4IPROC>getFunction("glUniform4i")
     cglUniform4i(location, v0, v1, v2, v3)
 
 cdef void GetglUniform4iv(GLint location, GLsizei count, const GLint *value):
     global cglUniform4iv
-    cglUniform4iv = <PFNGLUNIFORM4IVPROC>getFunction(b"glUniform4iv")
+    cglUniform4iv = <PFNGLUNIFORM4IVPROC>getFunction("glUniform4iv")
     cglUniform4iv(location, count, value)
 
 cdef void GetglUniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix2fv
-    cglUniformMatrix2fv = <PFNGLUNIFORMMATRIX2FVPROC>getFunction(b"glUniformMatrix2fv")
+    cglUniformMatrix2fv = <PFNGLUNIFORMMATRIX2FVPROC>getFunction("glUniformMatrix2fv")
     cglUniformMatrix2fv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix3fv
-    cglUniformMatrix3fv = <PFNGLUNIFORMMATRIX3FVPROC>getFunction(b"glUniformMatrix3fv")
+    cglUniformMatrix3fv = <PFNGLUNIFORMMATRIX3FVPROC>getFunction("glUniformMatrix3fv")
     cglUniformMatrix3fv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix4fv
-    cglUniformMatrix4fv = <PFNGLUNIFORMMATRIX4FVPROC>getFunction(b"glUniformMatrix4fv")
+    cglUniformMatrix4fv = <PFNGLUNIFORMMATRIX4FVPROC>getFunction("glUniformMatrix4fv")
     cglUniformMatrix4fv(location, count, transpose, value)
 
 cdef void GetglUseProgram(GLuint program):
     global cglUseProgram
-    cglUseProgram = <PFNGLUSEPROGRAMPROC>getFunction(b"glUseProgram")
+    cglUseProgram = <PFNGLUSEPROGRAMPROC>getFunction("glUseProgram")
     cglUseProgram(program)
 
 cdef void GetglValidateProgram(GLuint program):
     global cglValidateProgram
-    cglValidateProgram = <PFNGLVALIDATEPROGRAMPROC>getFunction(b"glValidateProgram")
+    cglValidateProgram = <PFNGLVALIDATEPROGRAMPROC>getFunction("glValidateProgram")
     cglValidateProgram(program)
 
 cdef void GetglVertexAttrib1d(GLuint index, GLdouble x):
     global cglVertexAttrib1d
-    cglVertexAttrib1d = <PFNGLVERTEXATTRIB1DPROC>getFunction(b"glVertexAttrib1d")
+    cglVertexAttrib1d = <PFNGLVERTEXATTRIB1DPROC>getFunction("glVertexAttrib1d")
     cglVertexAttrib1d(index, x)
 
 cdef void GetglVertexAttrib1dv(GLuint index, const GLdouble *v):
     global cglVertexAttrib1dv
-    cglVertexAttrib1dv = <PFNGLVERTEXATTRIB1DVPROC>getFunction(b"glVertexAttrib1dv")
+    cglVertexAttrib1dv = <PFNGLVERTEXATTRIB1DVPROC>getFunction("glVertexAttrib1dv")
     cglVertexAttrib1dv(index, v)
 
 cdef void GetglVertexAttrib1f(GLuint index, GLfloat x):
     global cglVertexAttrib1f
-    cglVertexAttrib1f = <PFNGLVERTEXATTRIB1FPROC>getFunction(b"glVertexAttrib1f")
+    cglVertexAttrib1f = <PFNGLVERTEXATTRIB1FPROC>getFunction("glVertexAttrib1f")
     cglVertexAttrib1f(index, x)
 
 cdef void GetglVertexAttrib1fv(GLuint index, const GLfloat *v):
     global cglVertexAttrib1fv
-    cglVertexAttrib1fv = <PFNGLVERTEXATTRIB1FVPROC>getFunction(b"glVertexAttrib1fv")
+    cglVertexAttrib1fv = <PFNGLVERTEXATTRIB1FVPROC>getFunction("glVertexAttrib1fv")
     cglVertexAttrib1fv(index, v)
 
 cdef void GetglVertexAttrib1s(GLuint index, GLshort x):
     global cglVertexAttrib1s
-    cglVertexAttrib1s = <PFNGLVERTEXATTRIB1SPROC>getFunction(b"glVertexAttrib1s")
+    cglVertexAttrib1s = <PFNGLVERTEXATTRIB1SPROC>getFunction("glVertexAttrib1s")
     cglVertexAttrib1s(index, x)
 
 cdef void GetglVertexAttrib1sv(GLuint index, const GLshort *v):
     global cglVertexAttrib1sv
-    cglVertexAttrib1sv = <PFNGLVERTEXATTRIB1SVPROC>getFunction(b"glVertexAttrib1sv")
+    cglVertexAttrib1sv = <PFNGLVERTEXATTRIB1SVPROC>getFunction("glVertexAttrib1sv")
     cglVertexAttrib1sv(index, v)
 
 cdef void GetglVertexAttrib2d(GLuint index, GLdouble x, GLdouble y):
     global cglVertexAttrib2d
-    cglVertexAttrib2d = <PFNGLVERTEXATTRIB2DPROC>getFunction(b"glVertexAttrib2d")
+    cglVertexAttrib2d = <PFNGLVERTEXATTRIB2DPROC>getFunction("glVertexAttrib2d")
     cglVertexAttrib2d(index, x, y)
 
 cdef void GetglVertexAttrib2dv(GLuint index, const GLdouble *v):
     global cglVertexAttrib2dv
-    cglVertexAttrib2dv = <PFNGLVERTEXATTRIB2DVPROC>getFunction(b"glVertexAttrib2dv")
+    cglVertexAttrib2dv = <PFNGLVERTEXATTRIB2DVPROC>getFunction("glVertexAttrib2dv")
     cglVertexAttrib2dv(index, v)
 
 cdef void GetglVertexAttrib2f(GLuint index, GLfloat x, GLfloat y):
     global cglVertexAttrib2f
-    cglVertexAttrib2f = <PFNGLVERTEXATTRIB2FPROC>getFunction(b"glVertexAttrib2f")
+    cglVertexAttrib2f = <PFNGLVERTEXATTRIB2FPROC>getFunction("glVertexAttrib2f")
     cglVertexAttrib2f(index, x, y)
 
 cdef void GetglVertexAttrib2fv(GLuint index, const GLfloat *v):
     global cglVertexAttrib2fv
-    cglVertexAttrib2fv = <PFNGLVERTEXATTRIB2FVPROC>getFunction(b"glVertexAttrib2fv")
+    cglVertexAttrib2fv = <PFNGLVERTEXATTRIB2FVPROC>getFunction("glVertexAttrib2fv")
     cglVertexAttrib2fv(index, v)
 
 cdef void GetglVertexAttrib2s(GLuint index, GLshort x, GLshort y):
     global cglVertexAttrib2s
-    cglVertexAttrib2s = <PFNGLVERTEXATTRIB2SPROC>getFunction(b"glVertexAttrib2s")
+    cglVertexAttrib2s = <PFNGLVERTEXATTRIB2SPROC>getFunction("glVertexAttrib2s")
     cglVertexAttrib2s(index, x, y)
 
 cdef void GetglVertexAttrib2sv(GLuint index, const GLshort *v):
     global cglVertexAttrib2sv
-    cglVertexAttrib2sv = <PFNGLVERTEXATTRIB2SVPROC>getFunction(b"glVertexAttrib2sv")
+    cglVertexAttrib2sv = <PFNGLVERTEXATTRIB2SVPROC>getFunction("glVertexAttrib2sv")
     cglVertexAttrib2sv(index, v)
 
 cdef void GetglVertexAttrib3d(GLuint index, GLdouble x, GLdouble y, GLdouble z):
     global cglVertexAttrib3d
-    cglVertexAttrib3d = <PFNGLVERTEXATTRIB3DPROC>getFunction(b"glVertexAttrib3d")
+    cglVertexAttrib3d = <PFNGLVERTEXATTRIB3DPROC>getFunction("glVertexAttrib3d")
     cglVertexAttrib3d(index, x, y, z)
 
 cdef void GetglVertexAttrib3dv(GLuint index, const GLdouble *v):
     global cglVertexAttrib3dv
-    cglVertexAttrib3dv = <PFNGLVERTEXATTRIB3DVPROC>getFunction(b"glVertexAttrib3dv")
+    cglVertexAttrib3dv = <PFNGLVERTEXATTRIB3DVPROC>getFunction("glVertexAttrib3dv")
     cglVertexAttrib3dv(index, v)
 
 cdef void GetglVertexAttrib3f(GLuint index, GLfloat x, GLfloat y, GLfloat z):
     global cglVertexAttrib3f
-    cglVertexAttrib3f = <PFNGLVERTEXATTRIB3FPROC>getFunction(b"glVertexAttrib3f")
+    cglVertexAttrib3f = <PFNGLVERTEXATTRIB3FPROC>getFunction("glVertexAttrib3f")
     cglVertexAttrib3f(index, x, y, z)
 
 cdef void GetglVertexAttrib3fv(GLuint index, const GLfloat *v):
     global cglVertexAttrib3fv
-    cglVertexAttrib3fv = <PFNGLVERTEXATTRIB3FVPROC>getFunction(b"glVertexAttrib3fv")
+    cglVertexAttrib3fv = <PFNGLVERTEXATTRIB3FVPROC>getFunction("glVertexAttrib3fv")
     cglVertexAttrib3fv(index, v)
 
 cdef void GetglVertexAttrib3s(GLuint index, GLshort x, GLshort y, GLshort z):
     global cglVertexAttrib3s
-    cglVertexAttrib3s = <PFNGLVERTEXATTRIB3SPROC>getFunction(b"glVertexAttrib3s")
+    cglVertexAttrib3s = <PFNGLVERTEXATTRIB3SPROC>getFunction("glVertexAttrib3s")
     cglVertexAttrib3s(index, x, y, z)
 
 cdef void GetglVertexAttrib3sv(GLuint index, const GLshort *v):
     global cglVertexAttrib3sv
-    cglVertexAttrib3sv = <PFNGLVERTEXATTRIB3SVPROC>getFunction(b"glVertexAttrib3sv")
+    cglVertexAttrib3sv = <PFNGLVERTEXATTRIB3SVPROC>getFunction("glVertexAttrib3sv")
     cglVertexAttrib3sv(index, v)
 
 cdef void GetglVertexAttrib4Nbv(GLuint index, const GLbyte *v):
     global cglVertexAttrib4Nbv
-    cglVertexAttrib4Nbv = <PFNGLVERTEXATTRIB4NBVPROC>getFunction(b"glVertexAttrib4Nbv")
+    cglVertexAttrib4Nbv = <PFNGLVERTEXATTRIB4NBVPROC>getFunction("glVertexAttrib4Nbv")
     cglVertexAttrib4Nbv(index, v)
 
 cdef void GetglVertexAttrib4Niv(GLuint index, const GLint *v):
     global cglVertexAttrib4Niv
-    cglVertexAttrib4Niv = <PFNGLVERTEXATTRIB4NIVPROC>getFunction(b"glVertexAttrib4Niv")
+    cglVertexAttrib4Niv = <PFNGLVERTEXATTRIB4NIVPROC>getFunction("glVertexAttrib4Niv")
     cglVertexAttrib4Niv(index, v)
 
 cdef void GetglVertexAttrib4Nsv(GLuint index, const GLshort *v):
     global cglVertexAttrib4Nsv
-    cglVertexAttrib4Nsv = <PFNGLVERTEXATTRIB4NSVPROC>getFunction(b"glVertexAttrib4Nsv")
+    cglVertexAttrib4Nsv = <PFNGLVERTEXATTRIB4NSVPROC>getFunction("glVertexAttrib4Nsv")
     cglVertexAttrib4Nsv(index, v)
 
 cdef void GetglVertexAttrib4Nub(GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w):
     global cglVertexAttrib4Nub
-    cglVertexAttrib4Nub = <PFNGLVERTEXATTRIB4NUBPROC>getFunction(b"glVertexAttrib4Nub")
+    cglVertexAttrib4Nub = <PFNGLVERTEXATTRIB4NUBPROC>getFunction("glVertexAttrib4Nub")
     cglVertexAttrib4Nub(index, x, y, z, w)
 
 cdef void GetglVertexAttrib4Nubv(GLuint index, const GLubyte *v):
     global cglVertexAttrib4Nubv
-    cglVertexAttrib4Nubv = <PFNGLVERTEXATTRIB4NUBVPROC>getFunction(b"glVertexAttrib4Nubv")
+    cglVertexAttrib4Nubv = <PFNGLVERTEXATTRIB4NUBVPROC>getFunction("glVertexAttrib4Nubv")
     cglVertexAttrib4Nubv(index, v)
 
 cdef void GetglVertexAttrib4Nuiv(GLuint index, const GLuint *v):
     global cglVertexAttrib4Nuiv
-    cglVertexAttrib4Nuiv = <PFNGLVERTEXATTRIB4NUIVPROC>getFunction(b"glVertexAttrib4Nuiv")
+    cglVertexAttrib4Nuiv = <PFNGLVERTEXATTRIB4NUIVPROC>getFunction("glVertexAttrib4Nuiv")
     cglVertexAttrib4Nuiv(index, v)
 
 cdef void GetglVertexAttrib4Nusv(GLuint index, const GLushort *v):
     global cglVertexAttrib4Nusv
-    cglVertexAttrib4Nusv = <PFNGLVERTEXATTRIB4NUSVPROC>getFunction(b"glVertexAttrib4Nusv")
+    cglVertexAttrib4Nusv = <PFNGLVERTEXATTRIB4NUSVPROC>getFunction("glVertexAttrib4Nusv")
     cglVertexAttrib4Nusv(index, v)
 
 cdef void GetglVertexAttrib4bv(GLuint index, const GLbyte *v):
     global cglVertexAttrib4bv
-    cglVertexAttrib4bv = <PFNGLVERTEXATTRIB4BVPROC>getFunction(b"glVertexAttrib4bv")
+    cglVertexAttrib4bv = <PFNGLVERTEXATTRIB4BVPROC>getFunction("glVertexAttrib4bv")
     cglVertexAttrib4bv(index, v)
 
 cdef void GetglVertexAttrib4d(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w):
     global cglVertexAttrib4d
-    cglVertexAttrib4d = <PFNGLVERTEXATTRIB4DPROC>getFunction(b"glVertexAttrib4d")
+    cglVertexAttrib4d = <PFNGLVERTEXATTRIB4DPROC>getFunction("glVertexAttrib4d")
     cglVertexAttrib4d(index, x, y, z, w)
 
 cdef void GetglVertexAttrib4dv(GLuint index, const GLdouble *v):
     global cglVertexAttrib4dv
-    cglVertexAttrib4dv = <PFNGLVERTEXATTRIB4DVPROC>getFunction(b"glVertexAttrib4dv")
+    cglVertexAttrib4dv = <PFNGLVERTEXATTRIB4DVPROC>getFunction("glVertexAttrib4dv")
     cglVertexAttrib4dv(index, v)
 
 cdef void GetglVertexAttrib4f(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w):
     global cglVertexAttrib4f
-    cglVertexAttrib4f = <PFNGLVERTEXATTRIB4FPROC>getFunction(b"glVertexAttrib4f")
+    cglVertexAttrib4f = <PFNGLVERTEXATTRIB4FPROC>getFunction("glVertexAttrib4f")
     cglVertexAttrib4f(index, x, y, z, w)
 
 cdef void GetglVertexAttrib4fv(GLuint index, const GLfloat *v):
     global cglVertexAttrib4fv
-    cglVertexAttrib4fv = <PFNGLVERTEXATTRIB4FVPROC>getFunction(b"glVertexAttrib4fv")
+    cglVertexAttrib4fv = <PFNGLVERTEXATTRIB4FVPROC>getFunction("glVertexAttrib4fv")
     cglVertexAttrib4fv(index, v)
 
 cdef void GetglVertexAttrib4iv(GLuint index, const GLint *v):
     global cglVertexAttrib4iv
-    cglVertexAttrib4iv = <PFNGLVERTEXATTRIB4IVPROC>getFunction(b"glVertexAttrib4iv")
+    cglVertexAttrib4iv = <PFNGLVERTEXATTRIB4IVPROC>getFunction("glVertexAttrib4iv")
     cglVertexAttrib4iv(index, v)
 
 cdef void GetglVertexAttrib4s(GLuint index, GLshort x, GLshort y, GLshort z, GLshort w):
     global cglVertexAttrib4s
-    cglVertexAttrib4s = <PFNGLVERTEXATTRIB4SPROC>getFunction(b"glVertexAttrib4s")
+    cglVertexAttrib4s = <PFNGLVERTEXATTRIB4SPROC>getFunction("glVertexAttrib4s")
     cglVertexAttrib4s(index, x, y, z, w)
 
 cdef void GetglVertexAttrib4sv(GLuint index, const GLshort *v):
     global cglVertexAttrib4sv
-    cglVertexAttrib4sv = <PFNGLVERTEXATTRIB4SVPROC>getFunction(b"glVertexAttrib4sv")
+    cglVertexAttrib4sv = <PFNGLVERTEXATTRIB4SVPROC>getFunction("glVertexAttrib4sv")
     cglVertexAttrib4sv(index, v)
 
 cdef void GetglVertexAttrib4ubv(GLuint index, const GLubyte *v):
     global cglVertexAttrib4ubv
-    cglVertexAttrib4ubv = <PFNGLVERTEXATTRIB4UBVPROC>getFunction(b"glVertexAttrib4ubv")
+    cglVertexAttrib4ubv = <PFNGLVERTEXATTRIB4UBVPROC>getFunction("glVertexAttrib4ubv")
     cglVertexAttrib4ubv(index, v)
 
 cdef void GetglVertexAttrib4uiv(GLuint index, const GLuint *v):
     global cglVertexAttrib4uiv
-    cglVertexAttrib4uiv = <PFNGLVERTEXATTRIB4UIVPROC>getFunction(b"glVertexAttrib4uiv")
+    cglVertexAttrib4uiv = <PFNGLVERTEXATTRIB4UIVPROC>getFunction("glVertexAttrib4uiv")
     cglVertexAttrib4uiv(index, v)
 
 cdef void GetglVertexAttrib4usv(GLuint index, const GLushort *v):
     global cglVertexAttrib4usv
-    cglVertexAttrib4usv = <PFNGLVERTEXATTRIB4USVPROC>getFunction(b"glVertexAttrib4usv")
+    cglVertexAttrib4usv = <PFNGLVERTEXATTRIB4USVPROC>getFunction("glVertexAttrib4usv")
     cglVertexAttrib4usv(index, v)
 
 cdef void GetglVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer):
     global cglVertexAttribPointer
-    cglVertexAttribPointer = <PFNGLVERTEXATTRIBPOINTERPROC>getFunction(b"glVertexAttribPointer")
+    cglVertexAttribPointer = <PFNGLVERTEXATTRIBPOINTERPROC>getFunction("glVertexAttribPointer")
     cglVertexAttribPointer(index, size, type, normalized, stride, pointer)
 
 cglAttachShader = GetglAttachShader

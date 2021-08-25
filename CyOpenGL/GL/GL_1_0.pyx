@@ -1045,1532 +1045,1532 @@ cdef PFNGLVIEWPORTPROC cglViewport = NULL
 
 cdef void GetglAccum(GLenum op, GLfloat value):
     global cglAccum
-    cglAccum = <PFNGLACCUMPROC>getFunction(b"glAccum")
+    cglAccum = <PFNGLACCUMPROC>getFunction("glAccum")
     cglAccum(op, value)
 
 cdef void GetglAlphaFunc(GLenum func, GLfloat ref):
     global cglAlphaFunc
-    cglAlphaFunc = <PFNGLALPHAFUNCPROC>getFunction(b"glAlphaFunc")
+    cglAlphaFunc = <PFNGLALPHAFUNCPROC>getFunction("glAlphaFunc")
     cglAlphaFunc(func, ref)
 
 cdef void GetglBegin(GLenum mode):
     global cglBegin
-    cglBegin = <PFNGLBEGINPROC>getFunction(b"glBegin")
+    cglBegin = <PFNGLBEGINPROC>getFunction("glBegin")
     cglBegin(mode)
 
 cdef void GetglBitmap(GLsizei width, GLsizei height, GLfloat xorig, GLfloat yorig, GLfloat xmove, GLfloat ymove, const GLubyte *bitmap):
     global cglBitmap
-    cglBitmap = <PFNGLBITMAPPROC>getFunction(b"glBitmap")
+    cglBitmap = <PFNGLBITMAPPROC>getFunction("glBitmap")
     cglBitmap(width, height, xorig, yorig, xmove, ymove, bitmap)
 
 cdef void GetglBlendFunc(GLenum sfactor, GLenum dfactor):
     global cglBlendFunc
-    cglBlendFunc = <PFNGLBLENDFUNCPROC>getFunction(b"glBlendFunc")
+    cglBlendFunc = <PFNGLBLENDFUNCPROC>getFunction("glBlendFunc")
     cglBlendFunc(sfactor, dfactor)
 
 cdef void GetglCallList(GLuint list):
     global cglCallList
-    cglCallList = <PFNGLCALLLISTPROC>getFunction(b"glCallList")
+    cglCallList = <PFNGLCALLLISTPROC>getFunction("glCallList")
     cglCallList(list)
 
 cdef void GetglCallLists(GLsizei n, GLenum type, const void *lists):
     global cglCallLists
-    cglCallLists = <PFNGLCALLLISTSPROC>getFunction(b"glCallLists")
+    cglCallLists = <PFNGLCALLLISTSPROC>getFunction("glCallLists")
     cglCallLists(n, type, lists)
 
 cdef void GetglClear(GLbitfield mask):
     global cglClear
-    cglClear = <PFNGLCLEARPROC>getFunction(b"glClear")
+    cglClear = <PFNGLCLEARPROC>getFunction("glClear")
     cglClear(mask)
 
 cdef void GetglClearAccum(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha):
     global cglClearAccum
-    cglClearAccum = <PFNGLCLEARACCUMPROC>getFunction(b"glClearAccum")
+    cglClearAccum = <PFNGLCLEARACCUMPROC>getFunction("glClearAccum")
     cglClearAccum(red, green, blue, alpha)
 
 cdef void GetglClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha):
     global cglClearColor
-    cglClearColor = <PFNGLCLEARCOLORPROC>getFunction(b"glClearColor")
+    cglClearColor = <PFNGLCLEARCOLORPROC>getFunction("glClearColor")
     cglClearColor(red, green, blue, alpha)
 
 cdef void GetglClearDepth(GLdouble depth):
     global cglClearDepth
-    cglClearDepth = <PFNGLCLEARDEPTHPROC>getFunction(b"glClearDepth")
+    cglClearDepth = <PFNGLCLEARDEPTHPROC>getFunction("glClearDepth")
     cglClearDepth(depth)
 
 cdef void GetglClearIndex(GLfloat c):
     global cglClearIndex
-    cglClearIndex = <PFNGLCLEARINDEXPROC>getFunction(b"glClearIndex")
+    cglClearIndex = <PFNGLCLEARINDEXPROC>getFunction("glClearIndex")
     cglClearIndex(c)
 
 cdef void GetglClearStencil(GLint s):
     global cglClearStencil
-    cglClearStencil = <PFNGLCLEARSTENCILPROC>getFunction(b"glClearStencil")
+    cglClearStencil = <PFNGLCLEARSTENCILPROC>getFunction("glClearStencil")
     cglClearStencil(s)
 
 cdef void GetglClipPlane(GLenum plane, const GLdouble *equation):
     global cglClipPlane
-    cglClipPlane = <PFNGLCLIPPLANEPROC>getFunction(b"glClipPlane")
+    cglClipPlane = <PFNGLCLIPPLANEPROC>getFunction("glClipPlane")
     cglClipPlane(plane, equation)
 
 cdef void GetglColor3b(GLbyte red, GLbyte green, GLbyte blue):
     global cglColor3b
-    cglColor3b = <PFNGLCOLOR3BPROC>getFunction(b"glColor3b")
+    cglColor3b = <PFNGLCOLOR3BPROC>getFunction("glColor3b")
     cglColor3b(red, green, blue)
 
 cdef void GetglColor3bv(const GLbyte *v):
     global cglColor3bv
-    cglColor3bv = <PFNGLCOLOR3BVPROC>getFunction(b"glColor3bv")
+    cglColor3bv = <PFNGLCOLOR3BVPROC>getFunction("glColor3bv")
     cglColor3bv(v)
 
 cdef void GetglColor3d(GLdouble red, GLdouble green, GLdouble blue):
     global cglColor3d
-    cglColor3d = <PFNGLCOLOR3DPROC>getFunction(b"glColor3d")
+    cglColor3d = <PFNGLCOLOR3DPROC>getFunction("glColor3d")
     cglColor3d(red, green, blue)
 
 cdef void GetglColor3dv(const GLdouble *v):
     global cglColor3dv
-    cglColor3dv = <PFNGLCOLOR3DVPROC>getFunction(b"glColor3dv")
+    cglColor3dv = <PFNGLCOLOR3DVPROC>getFunction("glColor3dv")
     cglColor3dv(v)
 
 cdef void GetglColor3f(GLfloat red, GLfloat green, GLfloat blue):
     global cglColor3f
-    cglColor3f = <PFNGLCOLOR3FPROC>getFunction(b"glColor3f")
+    cglColor3f = <PFNGLCOLOR3FPROC>getFunction("glColor3f")
     cglColor3f(red, green, blue)
 
 cdef void GetglColor3fv(const GLfloat *v):
     global cglColor3fv
-    cglColor3fv = <PFNGLCOLOR3FVPROC>getFunction(b"glColor3fv")
+    cglColor3fv = <PFNGLCOLOR3FVPROC>getFunction("glColor3fv")
     cglColor3fv(v)
 
 cdef void GetglColor3i(GLint red, GLint green, GLint blue):
     global cglColor3i
-    cglColor3i = <PFNGLCOLOR3IPROC>getFunction(b"glColor3i")
+    cglColor3i = <PFNGLCOLOR3IPROC>getFunction("glColor3i")
     cglColor3i(red, green, blue)
 
 cdef void GetglColor3iv(const GLint *v):
     global cglColor3iv
-    cglColor3iv = <PFNGLCOLOR3IVPROC>getFunction(b"glColor3iv")
+    cglColor3iv = <PFNGLCOLOR3IVPROC>getFunction("glColor3iv")
     cglColor3iv(v)
 
 cdef void GetglColor3s(GLshort red, GLshort green, GLshort blue):
     global cglColor3s
-    cglColor3s = <PFNGLCOLOR3SPROC>getFunction(b"glColor3s")
+    cglColor3s = <PFNGLCOLOR3SPROC>getFunction("glColor3s")
     cglColor3s(red, green, blue)
 
 cdef void GetglColor3sv(const GLshort *v):
     global cglColor3sv
-    cglColor3sv = <PFNGLCOLOR3SVPROC>getFunction(b"glColor3sv")
+    cglColor3sv = <PFNGLCOLOR3SVPROC>getFunction("glColor3sv")
     cglColor3sv(v)
 
 cdef void GetglColor3ub(GLubyte red, GLubyte green, GLubyte blue):
     global cglColor3ub
-    cglColor3ub = <PFNGLCOLOR3UBPROC>getFunction(b"glColor3ub")
+    cglColor3ub = <PFNGLCOLOR3UBPROC>getFunction("glColor3ub")
     cglColor3ub(red, green, blue)
 
 cdef void GetglColor3ubv(const GLubyte *v):
     global cglColor3ubv
-    cglColor3ubv = <PFNGLCOLOR3UBVPROC>getFunction(b"glColor3ubv")
+    cglColor3ubv = <PFNGLCOLOR3UBVPROC>getFunction("glColor3ubv")
     cglColor3ubv(v)
 
 cdef void GetglColor3ui(GLuint red, GLuint green, GLuint blue):
     global cglColor3ui
-    cglColor3ui = <PFNGLCOLOR3UIPROC>getFunction(b"glColor3ui")
+    cglColor3ui = <PFNGLCOLOR3UIPROC>getFunction("glColor3ui")
     cglColor3ui(red, green, blue)
 
 cdef void GetglColor3uiv(const GLuint *v):
     global cglColor3uiv
-    cglColor3uiv = <PFNGLCOLOR3UIVPROC>getFunction(b"glColor3uiv")
+    cglColor3uiv = <PFNGLCOLOR3UIVPROC>getFunction("glColor3uiv")
     cglColor3uiv(v)
 
 cdef void GetglColor3us(GLushort red, GLushort green, GLushort blue):
     global cglColor3us
-    cglColor3us = <PFNGLCOLOR3USPROC>getFunction(b"glColor3us")
+    cglColor3us = <PFNGLCOLOR3USPROC>getFunction("glColor3us")
     cglColor3us(red, green, blue)
 
 cdef void GetglColor3usv(const GLushort *v):
     global cglColor3usv
-    cglColor3usv = <PFNGLCOLOR3USVPROC>getFunction(b"glColor3usv")
+    cglColor3usv = <PFNGLCOLOR3USVPROC>getFunction("glColor3usv")
     cglColor3usv(v)
 
 cdef void GetglColor4b(GLbyte red, GLbyte green, GLbyte blue, GLbyte alpha):
     global cglColor4b
-    cglColor4b = <PFNGLCOLOR4BPROC>getFunction(b"glColor4b")
+    cglColor4b = <PFNGLCOLOR4BPROC>getFunction("glColor4b")
     cglColor4b(red, green, blue, alpha)
 
 cdef void GetglColor4bv(const GLbyte *v):
     global cglColor4bv
-    cglColor4bv = <PFNGLCOLOR4BVPROC>getFunction(b"glColor4bv")
+    cglColor4bv = <PFNGLCOLOR4BVPROC>getFunction("glColor4bv")
     cglColor4bv(v)
 
 cdef void GetglColor4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha):
     global cglColor4d
-    cglColor4d = <PFNGLCOLOR4DPROC>getFunction(b"glColor4d")
+    cglColor4d = <PFNGLCOLOR4DPROC>getFunction("glColor4d")
     cglColor4d(red, green, blue, alpha)
 
 cdef void GetglColor4dv(const GLdouble *v):
     global cglColor4dv
-    cglColor4dv = <PFNGLCOLOR4DVPROC>getFunction(b"glColor4dv")
+    cglColor4dv = <PFNGLCOLOR4DVPROC>getFunction("glColor4dv")
     cglColor4dv(v)
 
 cdef void GetglColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha):
     global cglColor4f
-    cglColor4f = <PFNGLCOLOR4FPROC>getFunction(b"glColor4f")
+    cglColor4f = <PFNGLCOLOR4FPROC>getFunction("glColor4f")
     cglColor4f(red, green, blue, alpha)
 
 cdef void GetglColor4fv(const GLfloat *v):
     global cglColor4fv
-    cglColor4fv = <PFNGLCOLOR4FVPROC>getFunction(b"glColor4fv")
+    cglColor4fv = <PFNGLCOLOR4FVPROC>getFunction("glColor4fv")
     cglColor4fv(v)
 
 cdef void GetglColor4i(GLint red, GLint green, GLint blue, GLint alpha):
     global cglColor4i
-    cglColor4i = <PFNGLCOLOR4IPROC>getFunction(b"glColor4i")
+    cglColor4i = <PFNGLCOLOR4IPROC>getFunction("glColor4i")
     cglColor4i(red, green, blue, alpha)
 
 cdef void GetglColor4iv(const GLint *v):
     global cglColor4iv
-    cglColor4iv = <PFNGLCOLOR4IVPROC>getFunction(b"glColor4iv")
+    cglColor4iv = <PFNGLCOLOR4IVPROC>getFunction("glColor4iv")
     cglColor4iv(v)
 
 cdef void GetglColor4s(GLshort red, GLshort green, GLshort blue, GLshort alpha):
     global cglColor4s
-    cglColor4s = <PFNGLCOLOR4SPROC>getFunction(b"glColor4s")
+    cglColor4s = <PFNGLCOLOR4SPROC>getFunction("glColor4s")
     cglColor4s(red, green, blue, alpha)
 
 cdef void GetglColor4sv(const GLshort *v):
     global cglColor4sv
-    cglColor4sv = <PFNGLCOLOR4SVPROC>getFunction(b"glColor4sv")
+    cglColor4sv = <PFNGLCOLOR4SVPROC>getFunction("glColor4sv")
     cglColor4sv(v)
 
 cdef void GetglColor4ub(GLubyte red, GLubyte green, GLubyte blue, GLubyte alpha):
     global cglColor4ub
-    cglColor4ub = <PFNGLCOLOR4UBPROC>getFunction(b"glColor4ub")
+    cglColor4ub = <PFNGLCOLOR4UBPROC>getFunction("glColor4ub")
     cglColor4ub(red, green, blue, alpha)
 
 cdef void GetglColor4ubv(const GLubyte *v):
     global cglColor4ubv
-    cglColor4ubv = <PFNGLCOLOR4UBVPROC>getFunction(b"glColor4ubv")
+    cglColor4ubv = <PFNGLCOLOR4UBVPROC>getFunction("glColor4ubv")
     cglColor4ubv(v)
 
 cdef void GetglColor4ui(GLuint red, GLuint green, GLuint blue, GLuint alpha):
     global cglColor4ui
-    cglColor4ui = <PFNGLCOLOR4UIPROC>getFunction(b"glColor4ui")
+    cglColor4ui = <PFNGLCOLOR4UIPROC>getFunction("glColor4ui")
     cglColor4ui(red, green, blue, alpha)
 
 cdef void GetglColor4uiv(const GLuint *v):
     global cglColor4uiv
-    cglColor4uiv = <PFNGLCOLOR4UIVPROC>getFunction(b"glColor4uiv")
+    cglColor4uiv = <PFNGLCOLOR4UIVPROC>getFunction("glColor4uiv")
     cglColor4uiv(v)
 
 cdef void GetglColor4us(GLushort red, GLushort green, GLushort blue, GLushort alpha):
     global cglColor4us
-    cglColor4us = <PFNGLCOLOR4USPROC>getFunction(b"glColor4us")
+    cglColor4us = <PFNGLCOLOR4USPROC>getFunction("glColor4us")
     cglColor4us(red, green, blue, alpha)
 
 cdef void GetglColor4usv(const GLushort *v):
     global cglColor4usv
-    cglColor4usv = <PFNGLCOLOR4USVPROC>getFunction(b"glColor4usv")
+    cglColor4usv = <PFNGLCOLOR4USVPROC>getFunction("glColor4usv")
     cglColor4usv(v)
 
 cdef void GetglColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha):
     global cglColorMask
-    cglColorMask = <PFNGLCOLORMASKPROC>getFunction(b"glColorMask")
+    cglColorMask = <PFNGLCOLORMASKPROC>getFunction("glColorMask")
     cglColorMask(red, green, blue, alpha)
 
 cdef void GetglColorMaterial(GLenum face, GLenum mode):
     global cglColorMaterial
-    cglColorMaterial = <PFNGLCOLORMATERIALPROC>getFunction(b"glColorMaterial")
+    cglColorMaterial = <PFNGLCOLORMATERIALPROC>getFunction("glColorMaterial")
     cglColorMaterial(face, mode)
 
 cdef void GetglCopyPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum type):
     global cglCopyPixels
-    cglCopyPixels = <PFNGLCOPYPIXELSPROC>getFunction(b"glCopyPixels")
+    cglCopyPixels = <PFNGLCOPYPIXELSPROC>getFunction("glCopyPixels")
     cglCopyPixels(x, y, width, height, type)
 
 cdef void GetglCullFace(GLenum mode):
     global cglCullFace
-    cglCullFace = <PFNGLCULLFACEPROC>getFunction(b"glCullFace")
+    cglCullFace = <PFNGLCULLFACEPROC>getFunction("glCullFace")
     cglCullFace(mode)
 
 cdef void GetglDeleteLists(GLuint list, GLsizei range):
     global cglDeleteLists
-    cglDeleteLists = <PFNGLDELETELISTSPROC>getFunction(b"glDeleteLists")
+    cglDeleteLists = <PFNGLDELETELISTSPROC>getFunction("glDeleteLists")
     cglDeleteLists(list, range)
 
 cdef void GetglDepthFunc(GLenum func):
     global cglDepthFunc
-    cglDepthFunc = <PFNGLDEPTHFUNCPROC>getFunction(b"glDepthFunc")
+    cglDepthFunc = <PFNGLDEPTHFUNCPROC>getFunction("glDepthFunc")
     cglDepthFunc(func)
 
 cdef void GetglDepthMask(GLboolean flag):
     global cglDepthMask
-    cglDepthMask = <PFNGLDEPTHMASKPROC>getFunction(b"glDepthMask")
+    cglDepthMask = <PFNGLDEPTHMASKPROC>getFunction("glDepthMask")
     cglDepthMask(flag)
 
 cdef void GetglDepthRange(GLdouble n, GLdouble f):
     global cglDepthRange
-    cglDepthRange = <PFNGLDEPTHRANGEPROC>getFunction(b"glDepthRange")
+    cglDepthRange = <PFNGLDEPTHRANGEPROC>getFunction("glDepthRange")
     cglDepthRange(n, f)
 
 cdef void GetglDisable(GLenum cap):
     global cglDisable
-    cglDisable = <PFNGLDISABLEPROC>getFunction(b"glDisable")
+    cglDisable = <PFNGLDISABLEPROC>getFunction("glDisable")
     cglDisable(cap)
 
 cdef void GetglDrawBuffer(GLenum buf):
     global cglDrawBuffer
-    cglDrawBuffer = <PFNGLDRAWBUFFERPROC>getFunction(b"glDrawBuffer")
+    cglDrawBuffer = <PFNGLDRAWBUFFERPROC>getFunction("glDrawBuffer")
     cglDrawBuffer(buf)
 
 cdef void GetglDrawPixels(GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels):
     global cglDrawPixels
-    cglDrawPixels = <PFNGLDRAWPIXELSPROC>getFunction(b"glDrawPixels")
+    cglDrawPixels = <PFNGLDRAWPIXELSPROC>getFunction("glDrawPixels")
     cglDrawPixels(width, height, format, type, pixels)
 
 cdef void GetglEdgeFlag(GLboolean flag):
     global cglEdgeFlag
-    cglEdgeFlag = <PFNGLEDGEFLAGPROC>getFunction(b"glEdgeFlag")
+    cglEdgeFlag = <PFNGLEDGEFLAGPROC>getFunction("glEdgeFlag")
     cglEdgeFlag(flag)
 
 cdef void GetglEdgeFlagv(const GLboolean *flag):
     global cglEdgeFlagv
-    cglEdgeFlagv = <PFNGLEDGEFLAGVPROC>getFunction(b"glEdgeFlagv")
+    cglEdgeFlagv = <PFNGLEDGEFLAGVPROC>getFunction("glEdgeFlagv")
     cglEdgeFlagv(flag)
 
 cdef void GetglEnable(GLenum cap):
     global cglEnable
-    cglEnable = <PFNGLENABLEPROC>getFunction(b"glEnable")
+    cglEnable = <PFNGLENABLEPROC>getFunction("glEnable")
     cglEnable(cap)
 
 cdef void GetglEnd():
     global cglEnd
-    cglEnd = <PFNGLENDPROC>getFunction(b"glEnd")
+    cglEnd = <PFNGLENDPROC>getFunction("glEnd")
     cglEnd()
 
 cdef void GetglEndList():
     global cglEndList
-    cglEndList = <PFNGLENDLISTPROC>getFunction(b"glEndList")
+    cglEndList = <PFNGLENDLISTPROC>getFunction("glEndList")
     cglEndList()
 
 cdef void GetglEvalCoord1d(GLdouble u):
     global cglEvalCoord1d
-    cglEvalCoord1d = <PFNGLEVALCOORD1DPROC>getFunction(b"glEvalCoord1d")
+    cglEvalCoord1d = <PFNGLEVALCOORD1DPROC>getFunction("glEvalCoord1d")
     cglEvalCoord1d(u)
 
 cdef void GetglEvalCoord1dv(const GLdouble *u):
     global cglEvalCoord1dv
-    cglEvalCoord1dv = <PFNGLEVALCOORD1DVPROC>getFunction(b"glEvalCoord1dv")
+    cglEvalCoord1dv = <PFNGLEVALCOORD1DVPROC>getFunction("glEvalCoord1dv")
     cglEvalCoord1dv(u)
 
 cdef void GetglEvalCoord1f(GLfloat u):
     global cglEvalCoord1f
-    cglEvalCoord1f = <PFNGLEVALCOORD1FPROC>getFunction(b"glEvalCoord1f")
+    cglEvalCoord1f = <PFNGLEVALCOORD1FPROC>getFunction("glEvalCoord1f")
     cglEvalCoord1f(u)
 
 cdef void GetglEvalCoord1fv(const GLfloat *u):
     global cglEvalCoord1fv
-    cglEvalCoord1fv = <PFNGLEVALCOORD1FVPROC>getFunction(b"glEvalCoord1fv")
+    cglEvalCoord1fv = <PFNGLEVALCOORD1FVPROC>getFunction("glEvalCoord1fv")
     cglEvalCoord1fv(u)
 
 cdef void GetglEvalCoord2d(GLdouble u, GLdouble v):
     global cglEvalCoord2d
-    cglEvalCoord2d = <PFNGLEVALCOORD2DPROC>getFunction(b"glEvalCoord2d")
+    cglEvalCoord2d = <PFNGLEVALCOORD2DPROC>getFunction("glEvalCoord2d")
     cglEvalCoord2d(u, v)
 
 cdef void GetglEvalCoord2dv(const GLdouble *u):
     global cglEvalCoord2dv
-    cglEvalCoord2dv = <PFNGLEVALCOORD2DVPROC>getFunction(b"glEvalCoord2dv")
+    cglEvalCoord2dv = <PFNGLEVALCOORD2DVPROC>getFunction("glEvalCoord2dv")
     cglEvalCoord2dv(u)
 
 cdef void GetglEvalCoord2f(GLfloat u, GLfloat v):
     global cglEvalCoord2f
-    cglEvalCoord2f = <PFNGLEVALCOORD2FPROC>getFunction(b"glEvalCoord2f")
+    cglEvalCoord2f = <PFNGLEVALCOORD2FPROC>getFunction("glEvalCoord2f")
     cglEvalCoord2f(u, v)
 
 cdef void GetglEvalCoord2fv(const GLfloat *u):
     global cglEvalCoord2fv
-    cglEvalCoord2fv = <PFNGLEVALCOORD2FVPROC>getFunction(b"glEvalCoord2fv")
+    cglEvalCoord2fv = <PFNGLEVALCOORD2FVPROC>getFunction("glEvalCoord2fv")
     cglEvalCoord2fv(u)
 
 cdef void GetglEvalMesh1(GLenum mode, GLint i1, GLint i2):
     global cglEvalMesh1
-    cglEvalMesh1 = <PFNGLEVALMESH1PROC>getFunction(b"glEvalMesh1")
+    cglEvalMesh1 = <PFNGLEVALMESH1PROC>getFunction("glEvalMesh1")
     cglEvalMesh1(mode, i1, i2)
 
 cdef void GetglEvalMesh2(GLenum mode, GLint i1, GLint i2, GLint j1, GLint j2):
     global cglEvalMesh2
-    cglEvalMesh2 = <PFNGLEVALMESH2PROC>getFunction(b"glEvalMesh2")
+    cglEvalMesh2 = <PFNGLEVALMESH2PROC>getFunction("glEvalMesh2")
     cglEvalMesh2(mode, i1, i2, j1, j2)
 
 cdef void GetglEvalPoint1(GLint i):
     global cglEvalPoint1
-    cglEvalPoint1 = <PFNGLEVALPOINT1PROC>getFunction(b"glEvalPoint1")
+    cglEvalPoint1 = <PFNGLEVALPOINT1PROC>getFunction("glEvalPoint1")
     cglEvalPoint1(i)
 
 cdef void GetglEvalPoint2(GLint i, GLint j):
     global cglEvalPoint2
-    cglEvalPoint2 = <PFNGLEVALPOINT2PROC>getFunction(b"glEvalPoint2")
+    cglEvalPoint2 = <PFNGLEVALPOINT2PROC>getFunction("glEvalPoint2")
     cglEvalPoint2(i, j)
 
 cdef void GetglFeedbackBuffer(GLsizei size, GLenum type, GLfloat *buffer):
     global cglFeedbackBuffer
-    cglFeedbackBuffer = <PFNGLFEEDBACKBUFFERPROC>getFunction(b"glFeedbackBuffer")
+    cglFeedbackBuffer = <PFNGLFEEDBACKBUFFERPROC>getFunction("glFeedbackBuffer")
     cglFeedbackBuffer(size, type, buffer)
 
 cdef void GetglFinish():
     global cglFinish
-    cglFinish = <PFNGLFINISHPROC>getFunction(b"glFinish")
+    cglFinish = <PFNGLFINISHPROC>getFunction("glFinish")
     cglFinish()
 
 cdef void GetglFlush():
     global cglFlush
-    cglFlush = <PFNGLFLUSHPROC>getFunction(b"glFlush")
+    cglFlush = <PFNGLFLUSHPROC>getFunction("glFlush")
     cglFlush()
 
 cdef void GetglFogf(GLenum pname, GLfloat param):
     global cglFogf
-    cglFogf = <PFNGLFOGFPROC>getFunction(b"glFogf")
+    cglFogf = <PFNGLFOGFPROC>getFunction("glFogf")
     cglFogf(pname, param)
 
 cdef void GetglFogfv(GLenum pname, const GLfloat *params):
     global cglFogfv
-    cglFogfv = <PFNGLFOGFVPROC>getFunction(b"glFogfv")
+    cglFogfv = <PFNGLFOGFVPROC>getFunction("glFogfv")
     cglFogfv(pname, params)
 
 cdef void GetglFogi(GLenum pname, GLint param):
     global cglFogi
-    cglFogi = <PFNGLFOGIPROC>getFunction(b"glFogi")
+    cglFogi = <PFNGLFOGIPROC>getFunction("glFogi")
     cglFogi(pname, param)
 
 cdef void GetglFogiv(GLenum pname, const GLint *params):
     global cglFogiv
-    cglFogiv = <PFNGLFOGIVPROC>getFunction(b"glFogiv")
+    cglFogiv = <PFNGLFOGIVPROC>getFunction("glFogiv")
     cglFogiv(pname, params)
 
 cdef void GetglFrontFace(GLenum mode):
     global cglFrontFace
-    cglFrontFace = <PFNGLFRONTFACEPROC>getFunction(b"glFrontFace")
+    cglFrontFace = <PFNGLFRONTFACEPROC>getFunction("glFrontFace")
     cglFrontFace(mode)
 
 cdef void GetglFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar):
     global cglFrustum
-    cglFrustum = <PFNGLFRUSTUMPROC>getFunction(b"glFrustum")
+    cglFrustum = <PFNGLFRUSTUMPROC>getFunction("glFrustum")
     cglFrustum(left, right, bottom, top, zNear, zFar)
 
 cdef GLuint GetglGenLists(GLsizei range):
     global cglGenLists
-    cglGenLists = <PFNGLGENLISTSPROC>getFunction(b"glGenLists")
+    cglGenLists = <PFNGLGENLISTSPROC>getFunction("glGenLists")
     cglGenLists(range)
 
 cdef void GetglGetBooleanv(GLenum pname, GLboolean *data):
     global cglGetBooleanv
-    cglGetBooleanv = <PFNGLGETBOOLEANVPROC>getFunction(b"glGetBooleanv")
+    cglGetBooleanv = <PFNGLGETBOOLEANVPROC>getFunction("glGetBooleanv")
     cglGetBooleanv(pname, data)
 
 cdef void GetglGetClipPlane(GLenum plane, GLdouble *equation):
     global cglGetClipPlane
-    cglGetClipPlane = <PFNGLGETCLIPPLANEPROC>getFunction(b"glGetClipPlane")
+    cglGetClipPlane = <PFNGLGETCLIPPLANEPROC>getFunction("glGetClipPlane")
     cglGetClipPlane(plane, equation)
 
 cdef void GetglGetDoublev(GLenum pname, GLdouble *data):
     global cglGetDoublev
-    cglGetDoublev = <PFNGLGETDOUBLEVPROC>getFunction(b"glGetDoublev")
+    cglGetDoublev = <PFNGLGETDOUBLEVPROC>getFunction("glGetDoublev")
     cglGetDoublev(pname, data)
 
 cdef GLenum GetglGetError():
     global cglGetError
-    cglGetError = <PFNGLGETERRORPROC>getFunction(b"glGetError")
+    cglGetError = <PFNGLGETERRORPROC>getFunction("glGetError")
     cglGetError()
 
 cdef void GetglGetFloatv(GLenum pname, GLfloat *data):
     global cglGetFloatv
-    cglGetFloatv = <PFNGLGETFLOATVPROC>getFunction(b"glGetFloatv")
+    cglGetFloatv = <PFNGLGETFLOATVPROC>getFunction("glGetFloatv")
     cglGetFloatv(pname, data)
 
 cdef void GetglGetIntegerv(GLenum pname, GLint *data):
     global cglGetIntegerv
-    cglGetIntegerv = <PFNGLGETINTEGERVPROC>getFunction(b"glGetIntegerv")
+    cglGetIntegerv = <PFNGLGETINTEGERVPROC>getFunction("glGetIntegerv")
     cglGetIntegerv(pname, data)
 
 cdef void GetglGetLightfv(GLenum light, GLenum pname, GLfloat *params):
     global cglGetLightfv
-    cglGetLightfv = <PFNGLGETLIGHTFVPROC>getFunction(b"glGetLightfv")
+    cglGetLightfv = <PFNGLGETLIGHTFVPROC>getFunction("glGetLightfv")
     cglGetLightfv(light, pname, params)
 
 cdef void GetglGetLightiv(GLenum light, GLenum pname, GLint *params):
     global cglGetLightiv
-    cglGetLightiv = <PFNGLGETLIGHTIVPROC>getFunction(b"glGetLightiv")
+    cglGetLightiv = <PFNGLGETLIGHTIVPROC>getFunction("glGetLightiv")
     cglGetLightiv(light, pname, params)
 
 cdef void GetglGetMapdv(GLenum target, GLenum query, GLdouble *v):
     global cglGetMapdv
-    cglGetMapdv = <PFNGLGETMAPDVPROC>getFunction(b"glGetMapdv")
+    cglGetMapdv = <PFNGLGETMAPDVPROC>getFunction("glGetMapdv")
     cglGetMapdv(target, query, v)
 
 cdef void GetglGetMapfv(GLenum target, GLenum query, GLfloat *v):
     global cglGetMapfv
-    cglGetMapfv = <PFNGLGETMAPFVPROC>getFunction(b"glGetMapfv")
+    cglGetMapfv = <PFNGLGETMAPFVPROC>getFunction("glGetMapfv")
     cglGetMapfv(target, query, v)
 
 cdef void GetglGetMapiv(GLenum target, GLenum query, GLint *v):
     global cglGetMapiv
-    cglGetMapiv = <PFNGLGETMAPIVPROC>getFunction(b"glGetMapiv")
+    cglGetMapiv = <PFNGLGETMAPIVPROC>getFunction("glGetMapiv")
     cglGetMapiv(target, query, v)
 
 cdef void GetglGetMaterialfv(GLenum face, GLenum pname, GLfloat *params):
     global cglGetMaterialfv
-    cglGetMaterialfv = <PFNGLGETMATERIALFVPROC>getFunction(b"glGetMaterialfv")
+    cglGetMaterialfv = <PFNGLGETMATERIALFVPROC>getFunction("glGetMaterialfv")
     cglGetMaterialfv(face, pname, params)
 
 cdef void GetglGetMaterialiv(GLenum face, GLenum pname, GLint *params):
     global cglGetMaterialiv
-    cglGetMaterialiv = <PFNGLGETMATERIALIVPROC>getFunction(b"glGetMaterialiv")
+    cglGetMaterialiv = <PFNGLGETMATERIALIVPROC>getFunction("glGetMaterialiv")
     cglGetMaterialiv(face, pname, params)
 
 cdef void GetglGetPixelMapfv(GLenum map, GLfloat *values):
     global cglGetPixelMapfv
-    cglGetPixelMapfv = <PFNGLGETPIXELMAPFVPROC>getFunction(b"glGetPixelMapfv")
+    cglGetPixelMapfv = <PFNGLGETPIXELMAPFVPROC>getFunction("glGetPixelMapfv")
     cglGetPixelMapfv(map, values)
 
 cdef void GetglGetPixelMapuiv(GLenum map, GLuint *values):
     global cglGetPixelMapuiv
-    cglGetPixelMapuiv = <PFNGLGETPIXELMAPUIVPROC>getFunction(b"glGetPixelMapuiv")
+    cglGetPixelMapuiv = <PFNGLGETPIXELMAPUIVPROC>getFunction("glGetPixelMapuiv")
     cglGetPixelMapuiv(map, values)
 
 cdef void GetglGetPixelMapusv(GLenum map, GLushort *values):
     global cglGetPixelMapusv
-    cglGetPixelMapusv = <PFNGLGETPIXELMAPUSVPROC>getFunction(b"glGetPixelMapusv")
+    cglGetPixelMapusv = <PFNGLGETPIXELMAPUSVPROC>getFunction("glGetPixelMapusv")
     cglGetPixelMapusv(map, values)
 
 cdef void GetglGetPolygonStipple(GLubyte *mask):
     global cglGetPolygonStipple
-    cglGetPolygonStipple = <PFNGLGETPOLYGONSTIPPLEPROC>getFunction(b"glGetPolygonStipple")
+    cglGetPolygonStipple = <PFNGLGETPOLYGONSTIPPLEPROC>getFunction("glGetPolygonStipple")
     cglGetPolygonStipple(mask)
 
 cdef const GLubyte *GetglGetString(GLenum name):
     global cglGetString
-    cglGetString = <PFNGLGETSTRINGPROC>getFunction(b"glGetString")
+    cglGetString = <PFNGLGETSTRINGPROC>getFunction("glGetString")
     cglGetString(name)
 
 cdef void GetglGetTexEnvfv(GLenum target, GLenum pname, GLfloat *params):
     global cglGetTexEnvfv
-    cglGetTexEnvfv = <PFNGLGETTEXENVFVPROC>getFunction(b"glGetTexEnvfv")
+    cglGetTexEnvfv = <PFNGLGETTEXENVFVPROC>getFunction("glGetTexEnvfv")
     cglGetTexEnvfv(target, pname, params)
 
 cdef void GetglGetTexEnviv(GLenum target, GLenum pname, GLint *params):
     global cglGetTexEnviv
-    cglGetTexEnviv = <PFNGLGETTEXENVIVPROC>getFunction(b"glGetTexEnviv")
+    cglGetTexEnviv = <PFNGLGETTEXENVIVPROC>getFunction("glGetTexEnviv")
     cglGetTexEnviv(target, pname, params)
 
 cdef void GetglGetTexGendv(GLenum coord, GLenum pname, GLdouble *params):
     global cglGetTexGendv
-    cglGetTexGendv = <PFNGLGETTEXGENDVPROC>getFunction(b"glGetTexGendv")
+    cglGetTexGendv = <PFNGLGETTEXGENDVPROC>getFunction("glGetTexGendv")
     cglGetTexGendv(coord, pname, params)
 
 cdef void GetglGetTexGenfv(GLenum coord, GLenum pname, GLfloat *params):
     global cglGetTexGenfv
-    cglGetTexGenfv = <PFNGLGETTEXGENFVPROC>getFunction(b"glGetTexGenfv")
+    cglGetTexGenfv = <PFNGLGETTEXGENFVPROC>getFunction("glGetTexGenfv")
     cglGetTexGenfv(coord, pname, params)
 
 cdef void GetglGetTexGeniv(GLenum coord, GLenum pname, GLint *params):
     global cglGetTexGeniv
-    cglGetTexGeniv = <PFNGLGETTEXGENIVPROC>getFunction(b"glGetTexGeniv")
+    cglGetTexGeniv = <PFNGLGETTEXGENIVPROC>getFunction("glGetTexGeniv")
     cglGetTexGeniv(coord, pname, params)
 
 cdef void GetglGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels):
     global cglGetTexImage
-    cglGetTexImage = <PFNGLGETTEXIMAGEPROC>getFunction(b"glGetTexImage")
+    cglGetTexImage = <PFNGLGETTEXIMAGEPROC>getFunction("glGetTexImage")
     cglGetTexImage(target, level, format, type, pixels)
 
 cdef void GetglGetTexLevelParameterfv(GLenum target, GLint level, GLenum pname, GLfloat *params):
     global cglGetTexLevelParameterfv
-    cglGetTexLevelParameterfv = <PFNGLGETTEXLEVELPARAMETERFVPROC>getFunction(b"glGetTexLevelParameterfv")
+    cglGetTexLevelParameterfv = <PFNGLGETTEXLEVELPARAMETERFVPROC>getFunction("glGetTexLevelParameterfv")
     cglGetTexLevelParameterfv(target, level, pname, params)
 
 cdef void GetglGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *params):
     global cglGetTexLevelParameteriv
-    cglGetTexLevelParameteriv = <PFNGLGETTEXLEVELPARAMETERIVPROC>getFunction(b"glGetTexLevelParameteriv")
+    cglGetTexLevelParameteriv = <PFNGLGETTEXLEVELPARAMETERIVPROC>getFunction("glGetTexLevelParameteriv")
     cglGetTexLevelParameteriv(target, level, pname, params)
 
 cdef void GetglGetTexParameterfv(GLenum target, GLenum pname, GLfloat *params):
     global cglGetTexParameterfv
-    cglGetTexParameterfv = <PFNGLGETTEXPARAMETERFVPROC>getFunction(b"glGetTexParameterfv")
+    cglGetTexParameterfv = <PFNGLGETTEXPARAMETERFVPROC>getFunction("glGetTexParameterfv")
     cglGetTexParameterfv(target, pname, params)
 
 cdef void GetglGetTexParameteriv(GLenum target, GLenum pname, GLint *params):
     global cglGetTexParameteriv
-    cglGetTexParameteriv = <PFNGLGETTEXPARAMETERIVPROC>getFunction(b"glGetTexParameteriv")
+    cglGetTexParameteriv = <PFNGLGETTEXPARAMETERIVPROC>getFunction("glGetTexParameteriv")
     cglGetTexParameteriv(target, pname, params)
 
 cdef void GetglHint(GLenum target, GLenum mode):
     global cglHint
-    cglHint = <PFNGLHINTPROC>getFunction(b"glHint")
+    cglHint = <PFNGLHINTPROC>getFunction("glHint")
     cglHint(target, mode)
 
 cdef void GetglIndexMask(GLuint mask):
     global cglIndexMask
-    cglIndexMask = <PFNGLINDEXMASKPROC>getFunction(b"glIndexMask")
+    cglIndexMask = <PFNGLINDEXMASKPROC>getFunction("glIndexMask")
     cglIndexMask(mask)
 
 cdef void GetglIndexd(GLdouble c):
     global cglIndexd
-    cglIndexd = <PFNGLINDEXDPROC>getFunction(b"glIndexd")
+    cglIndexd = <PFNGLINDEXDPROC>getFunction("glIndexd")
     cglIndexd(c)
 
 cdef void GetglIndexdv(const GLdouble *c):
     global cglIndexdv
-    cglIndexdv = <PFNGLINDEXDVPROC>getFunction(b"glIndexdv")
+    cglIndexdv = <PFNGLINDEXDVPROC>getFunction("glIndexdv")
     cglIndexdv(c)
 
 cdef void GetglIndexf(GLfloat c):
     global cglIndexf
-    cglIndexf = <PFNGLINDEXFPROC>getFunction(b"glIndexf")
+    cglIndexf = <PFNGLINDEXFPROC>getFunction("glIndexf")
     cglIndexf(c)
 
 cdef void GetglIndexfv(const GLfloat *c):
     global cglIndexfv
-    cglIndexfv = <PFNGLINDEXFVPROC>getFunction(b"glIndexfv")
+    cglIndexfv = <PFNGLINDEXFVPROC>getFunction("glIndexfv")
     cglIndexfv(c)
 
 cdef void GetglIndexi(GLint c):
     global cglIndexi
-    cglIndexi = <PFNGLINDEXIPROC>getFunction(b"glIndexi")
+    cglIndexi = <PFNGLINDEXIPROC>getFunction("glIndexi")
     cglIndexi(c)
 
 cdef void GetglIndexiv(const GLint *c):
     global cglIndexiv
-    cglIndexiv = <PFNGLINDEXIVPROC>getFunction(b"glIndexiv")
+    cglIndexiv = <PFNGLINDEXIVPROC>getFunction("glIndexiv")
     cglIndexiv(c)
 
 cdef void GetglIndexs(GLshort c):
     global cglIndexs
-    cglIndexs = <PFNGLINDEXSPROC>getFunction(b"glIndexs")
+    cglIndexs = <PFNGLINDEXSPROC>getFunction("glIndexs")
     cglIndexs(c)
 
 cdef void GetglIndexsv(const GLshort *c):
     global cglIndexsv
-    cglIndexsv = <PFNGLINDEXSVPROC>getFunction(b"glIndexsv")
+    cglIndexsv = <PFNGLINDEXSVPROC>getFunction("glIndexsv")
     cglIndexsv(c)
 
 cdef void GetglInitNames():
     global cglInitNames
-    cglInitNames = <PFNGLINITNAMESPROC>getFunction(b"glInitNames")
+    cglInitNames = <PFNGLINITNAMESPROC>getFunction("glInitNames")
     cglInitNames()
 
 cdef GLboolean GetglIsEnabled(GLenum cap):
     global cglIsEnabled
-    cglIsEnabled = <PFNGLISENABLEDPROC>getFunction(b"glIsEnabled")
+    cglIsEnabled = <PFNGLISENABLEDPROC>getFunction("glIsEnabled")
     cglIsEnabled(cap)
 
 cdef GLboolean GetglIsList(GLuint list):
     global cglIsList
-    cglIsList = <PFNGLISLISTPROC>getFunction(b"glIsList")
+    cglIsList = <PFNGLISLISTPROC>getFunction("glIsList")
     cglIsList(list)
 
 cdef void GetglLightModelf(GLenum pname, GLfloat param):
     global cglLightModelf
-    cglLightModelf = <PFNGLLIGHTMODELFPROC>getFunction(b"glLightModelf")
+    cglLightModelf = <PFNGLLIGHTMODELFPROC>getFunction("glLightModelf")
     cglLightModelf(pname, param)
 
 cdef void GetglLightModelfv(GLenum pname, const GLfloat *params):
     global cglLightModelfv
-    cglLightModelfv = <PFNGLLIGHTMODELFVPROC>getFunction(b"glLightModelfv")
+    cglLightModelfv = <PFNGLLIGHTMODELFVPROC>getFunction("glLightModelfv")
     cglLightModelfv(pname, params)
 
 cdef void GetglLightModeli(GLenum pname, GLint param):
     global cglLightModeli
-    cglLightModeli = <PFNGLLIGHTMODELIPROC>getFunction(b"glLightModeli")
+    cglLightModeli = <PFNGLLIGHTMODELIPROC>getFunction("glLightModeli")
     cglLightModeli(pname, param)
 
 cdef void GetglLightModeliv(GLenum pname, const GLint *params):
     global cglLightModeliv
-    cglLightModeliv = <PFNGLLIGHTMODELIVPROC>getFunction(b"glLightModeliv")
+    cglLightModeliv = <PFNGLLIGHTMODELIVPROC>getFunction("glLightModeliv")
     cglLightModeliv(pname, params)
 
 cdef void GetglLightf(GLenum light, GLenum pname, GLfloat param):
     global cglLightf
-    cglLightf = <PFNGLLIGHTFPROC>getFunction(b"glLightf")
+    cglLightf = <PFNGLLIGHTFPROC>getFunction("glLightf")
     cglLightf(light, pname, param)
 
 cdef void GetglLightfv(GLenum light, GLenum pname, const GLfloat *params):
     global cglLightfv
-    cglLightfv = <PFNGLLIGHTFVPROC>getFunction(b"glLightfv")
+    cglLightfv = <PFNGLLIGHTFVPROC>getFunction("glLightfv")
     cglLightfv(light, pname, params)
 
 cdef void GetglLighti(GLenum light, GLenum pname, GLint param):
     global cglLighti
-    cglLighti = <PFNGLLIGHTIPROC>getFunction(b"glLighti")
+    cglLighti = <PFNGLLIGHTIPROC>getFunction("glLighti")
     cglLighti(light, pname, param)
 
 cdef void GetglLightiv(GLenum light, GLenum pname, const GLint *params):
     global cglLightiv
-    cglLightiv = <PFNGLLIGHTIVPROC>getFunction(b"glLightiv")
+    cglLightiv = <PFNGLLIGHTIVPROC>getFunction("glLightiv")
     cglLightiv(light, pname, params)
 
 cdef void GetglLineStipple(GLint factor, GLushort pattern):
     global cglLineStipple
-    cglLineStipple = <PFNGLLINESTIPPLEPROC>getFunction(b"glLineStipple")
+    cglLineStipple = <PFNGLLINESTIPPLEPROC>getFunction("glLineStipple")
     cglLineStipple(factor, pattern)
 
 cdef void GetglLineWidth(GLfloat width):
     global cglLineWidth
-    cglLineWidth = <PFNGLLINEWIDTHPROC>getFunction(b"glLineWidth")
+    cglLineWidth = <PFNGLLINEWIDTHPROC>getFunction("glLineWidth")
     cglLineWidth(width)
 
 cdef void GetglListBase(GLuint base):
     global cglListBase
-    cglListBase = <PFNGLLISTBASEPROC>getFunction(b"glListBase")
+    cglListBase = <PFNGLLISTBASEPROC>getFunction("glListBase")
     cglListBase(base)
 
 cdef void GetglLoadIdentity():
     global cglLoadIdentity
-    cglLoadIdentity = <PFNGLLOADIDENTITYPROC>getFunction(b"glLoadIdentity")
+    cglLoadIdentity = <PFNGLLOADIDENTITYPROC>getFunction("glLoadIdentity")
     cglLoadIdentity()
 
 cdef void GetglLoadMatrixd(const GLdouble *m):
     global cglLoadMatrixd
-    cglLoadMatrixd = <PFNGLLOADMATRIXDPROC>getFunction(b"glLoadMatrixd")
+    cglLoadMatrixd = <PFNGLLOADMATRIXDPROC>getFunction("glLoadMatrixd")
     cglLoadMatrixd(m)
 
 cdef void GetglLoadMatrixf(const GLfloat *m):
     global cglLoadMatrixf
-    cglLoadMatrixf = <PFNGLLOADMATRIXFPROC>getFunction(b"glLoadMatrixf")
+    cglLoadMatrixf = <PFNGLLOADMATRIXFPROC>getFunction("glLoadMatrixf")
     cglLoadMatrixf(m)
 
 cdef void GetglLoadName(GLuint name):
     global cglLoadName
-    cglLoadName = <PFNGLLOADNAMEPROC>getFunction(b"glLoadName")
+    cglLoadName = <PFNGLLOADNAMEPROC>getFunction("glLoadName")
     cglLoadName(name)
 
 cdef void GetglLogicOp(GLenum opcode):
     global cglLogicOp
-    cglLogicOp = <PFNGLLOGICOPPROC>getFunction(b"glLogicOp")
+    cglLogicOp = <PFNGLLOGICOPPROC>getFunction("glLogicOp")
     cglLogicOp(opcode)
 
 cdef void GetglMap1d(GLenum target, GLdouble u1, GLdouble u2, GLint stride, GLint order, const GLdouble *points):
     global cglMap1d
-    cglMap1d = <PFNGLMAP1DPROC>getFunction(b"glMap1d")
+    cglMap1d = <PFNGLMAP1DPROC>getFunction("glMap1d")
     cglMap1d(target, u1, u2, stride, order, points)
 
 cdef void GetglMap1f(GLenum target, GLfloat u1, GLfloat u2, GLint stride, GLint order, const GLfloat *points):
     global cglMap1f
-    cglMap1f = <PFNGLMAP1FPROC>getFunction(b"glMap1f")
+    cglMap1f = <PFNGLMAP1FPROC>getFunction("glMap1f")
     cglMap1f(target, u1, u2, stride, order, points)
 
 cdef void GetglMap2d(GLenum target, GLdouble u1, GLdouble u2, GLint ustride, GLint uorder, GLdouble v1, GLdouble v2, GLint vstride, GLint vorder, const GLdouble *points):
     global cglMap2d
-    cglMap2d = <PFNGLMAP2DPROC>getFunction(b"glMap2d")
+    cglMap2d = <PFNGLMAP2DPROC>getFunction("glMap2d")
     cglMap2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
 
 cdef void GetglMap2f(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder, GLfloat v1, GLfloat v2, GLint vstride, GLint vorder, const GLfloat *points):
     global cglMap2f
-    cglMap2f = <PFNGLMAP2FPROC>getFunction(b"glMap2f")
+    cglMap2f = <PFNGLMAP2FPROC>getFunction("glMap2f")
     cglMap2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
 
 cdef void GetglMapGrid1d(GLint un, GLdouble u1, GLdouble u2):
     global cglMapGrid1d
-    cglMapGrid1d = <PFNGLMAPGRID1DPROC>getFunction(b"glMapGrid1d")
+    cglMapGrid1d = <PFNGLMAPGRID1DPROC>getFunction("glMapGrid1d")
     cglMapGrid1d(un, u1, u2)
 
 cdef void GetglMapGrid1f(GLint un, GLfloat u1, GLfloat u2):
     global cglMapGrid1f
-    cglMapGrid1f = <PFNGLMAPGRID1FPROC>getFunction(b"glMapGrid1f")
+    cglMapGrid1f = <PFNGLMAPGRID1FPROC>getFunction("glMapGrid1f")
     cglMapGrid1f(un, u1, u2)
 
 cdef void GetglMapGrid2d(GLint un, GLdouble u1, GLdouble u2, GLint vn, GLdouble v1, GLdouble v2):
     global cglMapGrid2d
-    cglMapGrid2d = <PFNGLMAPGRID2DPROC>getFunction(b"glMapGrid2d")
+    cglMapGrid2d = <PFNGLMAPGRID2DPROC>getFunction("glMapGrid2d")
     cglMapGrid2d(un, u1, u2, vn, v1, v2)
 
 cdef void GetglMapGrid2f(GLint un, GLfloat u1, GLfloat u2, GLint vn, GLfloat v1, GLfloat v2):
     global cglMapGrid2f
-    cglMapGrid2f = <PFNGLMAPGRID2FPROC>getFunction(b"glMapGrid2f")
+    cglMapGrid2f = <PFNGLMAPGRID2FPROC>getFunction("glMapGrid2f")
     cglMapGrid2f(un, u1, u2, vn, v1, v2)
 
 cdef void GetglMaterialf(GLenum face, GLenum pname, GLfloat param):
     global cglMaterialf
-    cglMaterialf = <PFNGLMATERIALFPROC>getFunction(b"glMaterialf")
+    cglMaterialf = <PFNGLMATERIALFPROC>getFunction("glMaterialf")
     cglMaterialf(face, pname, param)
 
 cdef void GetglMaterialfv(GLenum face, GLenum pname, const GLfloat *params):
     global cglMaterialfv
-    cglMaterialfv = <PFNGLMATERIALFVPROC>getFunction(b"glMaterialfv")
+    cglMaterialfv = <PFNGLMATERIALFVPROC>getFunction("glMaterialfv")
     cglMaterialfv(face, pname, params)
 
 cdef void GetglMateriali(GLenum face, GLenum pname, GLint param):
     global cglMateriali
-    cglMateriali = <PFNGLMATERIALIPROC>getFunction(b"glMateriali")
+    cglMateriali = <PFNGLMATERIALIPROC>getFunction("glMateriali")
     cglMateriali(face, pname, param)
 
 cdef void GetglMaterialiv(GLenum face, GLenum pname, const GLint *params):
     global cglMaterialiv
-    cglMaterialiv = <PFNGLMATERIALIVPROC>getFunction(b"glMaterialiv")
+    cglMaterialiv = <PFNGLMATERIALIVPROC>getFunction("glMaterialiv")
     cglMaterialiv(face, pname, params)
 
 cdef void GetglMatrixMode(GLenum mode):
     global cglMatrixMode
-    cglMatrixMode = <PFNGLMATRIXMODEPROC>getFunction(b"glMatrixMode")
+    cglMatrixMode = <PFNGLMATRIXMODEPROC>getFunction("glMatrixMode")
     cglMatrixMode(mode)
 
 cdef void GetglMultMatrixd(const GLdouble *m):
     global cglMultMatrixd
-    cglMultMatrixd = <PFNGLMULTMATRIXDPROC>getFunction(b"glMultMatrixd")
+    cglMultMatrixd = <PFNGLMULTMATRIXDPROC>getFunction("glMultMatrixd")
     cglMultMatrixd(m)
 
 cdef void GetglMultMatrixf(const GLfloat *m):
     global cglMultMatrixf
-    cglMultMatrixf = <PFNGLMULTMATRIXFPROC>getFunction(b"glMultMatrixf")
+    cglMultMatrixf = <PFNGLMULTMATRIXFPROC>getFunction("glMultMatrixf")
     cglMultMatrixf(m)
 
 cdef void GetglNewList(GLuint list, GLenum mode):
     global cglNewList
-    cglNewList = <PFNGLNEWLISTPROC>getFunction(b"glNewList")
+    cglNewList = <PFNGLNEWLISTPROC>getFunction("glNewList")
     cglNewList(list, mode)
 
 cdef void GetglNormal3b(GLbyte nx, GLbyte ny, GLbyte nz):
     global cglNormal3b
-    cglNormal3b = <PFNGLNORMAL3BPROC>getFunction(b"glNormal3b")
+    cglNormal3b = <PFNGLNORMAL3BPROC>getFunction("glNormal3b")
     cglNormal3b(nx, ny, nz)
 
 cdef void GetglNormal3bv(const GLbyte *v):
     global cglNormal3bv
-    cglNormal3bv = <PFNGLNORMAL3BVPROC>getFunction(b"glNormal3bv")
+    cglNormal3bv = <PFNGLNORMAL3BVPROC>getFunction("glNormal3bv")
     cglNormal3bv(v)
 
 cdef void GetglNormal3d(GLdouble nx, GLdouble ny, GLdouble nz):
     global cglNormal3d
-    cglNormal3d = <PFNGLNORMAL3DPROC>getFunction(b"glNormal3d")
+    cglNormal3d = <PFNGLNORMAL3DPROC>getFunction("glNormal3d")
     cglNormal3d(nx, ny, nz)
 
 cdef void GetglNormal3dv(const GLdouble *v):
     global cglNormal3dv
-    cglNormal3dv = <PFNGLNORMAL3DVPROC>getFunction(b"glNormal3dv")
+    cglNormal3dv = <PFNGLNORMAL3DVPROC>getFunction("glNormal3dv")
     cglNormal3dv(v)
 
 cdef void GetglNormal3f(GLfloat nx, GLfloat ny, GLfloat nz):
     global cglNormal3f
-    cglNormal3f = <PFNGLNORMAL3FPROC>getFunction(b"glNormal3f")
+    cglNormal3f = <PFNGLNORMAL3FPROC>getFunction("glNormal3f")
     cglNormal3f(nx, ny, nz)
 
 cdef void GetglNormal3fv(const GLfloat *v):
     global cglNormal3fv
-    cglNormal3fv = <PFNGLNORMAL3FVPROC>getFunction(b"glNormal3fv")
+    cglNormal3fv = <PFNGLNORMAL3FVPROC>getFunction("glNormal3fv")
     cglNormal3fv(v)
 
 cdef void GetglNormal3i(GLint nx, GLint ny, GLint nz):
     global cglNormal3i
-    cglNormal3i = <PFNGLNORMAL3IPROC>getFunction(b"glNormal3i")
+    cglNormal3i = <PFNGLNORMAL3IPROC>getFunction("glNormal3i")
     cglNormal3i(nx, ny, nz)
 
 cdef void GetglNormal3iv(const GLint *v):
     global cglNormal3iv
-    cglNormal3iv = <PFNGLNORMAL3IVPROC>getFunction(b"glNormal3iv")
+    cglNormal3iv = <PFNGLNORMAL3IVPROC>getFunction("glNormal3iv")
     cglNormal3iv(v)
 
 cdef void GetglNormal3s(GLshort nx, GLshort ny, GLshort nz):
     global cglNormal3s
-    cglNormal3s = <PFNGLNORMAL3SPROC>getFunction(b"glNormal3s")
+    cglNormal3s = <PFNGLNORMAL3SPROC>getFunction("glNormal3s")
     cglNormal3s(nx, ny, nz)
 
 cdef void GetglNormal3sv(const GLshort *v):
     global cglNormal3sv
-    cglNormal3sv = <PFNGLNORMAL3SVPROC>getFunction(b"glNormal3sv")
+    cglNormal3sv = <PFNGLNORMAL3SVPROC>getFunction("glNormal3sv")
     cglNormal3sv(v)
 
 cdef void GetglOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar):
     global cglOrtho
-    cglOrtho = <PFNGLORTHOPROC>getFunction(b"glOrtho")
+    cglOrtho = <PFNGLORTHOPROC>getFunction("glOrtho")
     cglOrtho(left, right, bottom, top, zNear, zFar)
 
 cdef void GetglPassThrough(GLfloat token):
     global cglPassThrough
-    cglPassThrough = <PFNGLPASSTHROUGHPROC>getFunction(b"glPassThrough")
+    cglPassThrough = <PFNGLPASSTHROUGHPROC>getFunction("glPassThrough")
     cglPassThrough(token)
 
 cdef void GetglPixelMapfv(GLenum map, GLsizei mapsize, const GLfloat *values):
     global cglPixelMapfv
-    cglPixelMapfv = <PFNGLPIXELMAPFVPROC>getFunction(b"glPixelMapfv")
+    cglPixelMapfv = <PFNGLPIXELMAPFVPROC>getFunction("glPixelMapfv")
     cglPixelMapfv(map, mapsize, values)
 
 cdef void GetglPixelMapuiv(GLenum map, GLsizei mapsize, const GLuint *values):
     global cglPixelMapuiv
-    cglPixelMapuiv = <PFNGLPIXELMAPUIVPROC>getFunction(b"glPixelMapuiv")
+    cglPixelMapuiv = <PFNGLPIXELMAPUIVPROC>getFunction("glPixelMapuiv")
     cglPixelMapuiv(map, mapsize, values)
 
 cdef void GetglPixelMapusv(GLenum map, GLsizei mapsize, const GLushort *values):
     global cglPixelMapusv
-    cglPixelMapusv = <PFNGLPIXELMAPUSVPROC>getFunction(b"glPixelMapusv")
+    cglPixelMapusv = <PFNGLPIXELMAPUSVPROC>getFunction("glPixelMapusv")
     cglPixelMapusv(map, mapsize, values)
 
 cdef void GetglPixelStoref(GLenum pname, GLfloat param):
     global cglPixelStoref
-    cglPixelStoref = <PFNGLPIXELSTOREFPROC>getFunction(b"glPixelStoref")
+    cglPixelStoref = <PFNGLPIXELSTOREFPROC>getFunction("glPixelStoref")
     cglPixelStoref(pname, param)
 
 cdef void GetglPixelStorei(GLenum pname, GLint param):
     global cglPixelStorei
-    cglPixelStorei = <PFNGLPIXELSTOREIPROC>getFunction(b"glPixelStorei")
+    cglPixelStorei = <PFNGLPIXELSTOREIPROC>getFunction("glPixelStorei")
     cglPixelStorei(pname, param)
 
 cdef void GetglPixelTransferf(GLenum pname, GLfloat param):
     global cglPixelTransferf
-    cglPixelTransferf = <PFNGLPIXELTRANSFERFPROC>getFunction(b"glPixelTransferf")
+    cglPixelTransferf = <PFNGLPIXELTRANSFERFPROC>getFunction("glPixelTransferf")
     cglPixelTransferf(pname, param)
 
 cdef void GetglPixelTransferi(GLenum pname, GLint param):
     global cglPixelTransferi
-    cglPixelTransferi = <PFNGLPIXELTRANSFERIPROC>getFunction(b"glPixelTransferi")
+    cglPixelTransferi = <PFNGLPIXELTRANSFERIPROC>getFunction("glPixelTransferi")
     cglPixelTransferi(pname, param)
 
 cdef void GetglPixelZoom(GLfloat xfactor, GLfloat yfactor):
     global cglPixelZoom
-    cglPixelZoom = <PFNGLPIXELZOOMPROC>getFunction(b"glPixelZoom")
+    cglPixelZoom = <PFNGLPIXELZOOMPROC>getFunction("glPixelZoom")
     cglPixelZoom(xfactor, yfactor)
 
 cdef void GetglPointSize(GLfloat size):
     global cglPointSize
-    cglPointSize = <PFNGLPOINTSIZEPROC>getFunction(b"glPointSize")
+    cglPointSize = <PFNGLPOINTSIZEPROC>getFunction("glPointSize")
     cglPointSize(size)
 
 cdef void GetglPolygonMode(GLenum face, GLenum mode):
     global cglPolygonMode
-    cglPolygonMode = <PFNGLPOLYGONMODEPROC>getFunction(b"glPolygonMode")
+    cglPolygonMode = <PFNGLPOLYGONMODEPROC>getFunction("glPolygonMode")
     cglPolygonMode(face, mode)
 
 cdef void GetglPolygonStipple(const GLubyte *mask):
     global cglPolygonStipple
-    cglPolygonStipple = <PFNGLPOLYGONSTIPPLEPROC>getFunction(b"glPolygonStipple")
+    cglPolygonStipple = <PFNGLPOLYGONSTIPPLEPROC>getFunction("glPolygonStipple")
     cglPolygonStipple(mask)
 
 cdef void GetglPopAttrib():
     global cglPopAttrib
-    cglPopAttrib = <PFNGLPOPATTRIBPROC>getFunction(b"glPopAttrib")
+    cglPopAttrib = <PFNGLPOPATTRIBPROC>getFunction("glPopAttrib")
     cglPopAttrib()
 
 cdef void GetglPopMatrix():
     global cglPopMatrix
-    cglPopMatrix = <PFNGLPOPMATRIXPROC>getFunction(b"glPopMatrix")
+    cglPopMatrix = <PFNGLPOPMATRIXPROC>getFunction("glPopMatrix")
     cglPopMatrix()
 
 cdef void GetglPopName():
     global cglPopName
-    cglPopName = <PFNGLPOPNAMEPROC>getFunction(b"glPopName")
+    cglPopName = <PFNGLPOPNAMEPROC>getFunction("glPopName")
     cglPopName()
 
 cdef void GetglPushAttrib(GLbitfield mask):
     global cglPushAttrib
-    cglPushAttrib = <PFNGLPUSHATTRIBPROC>getFunction(b"glPushAttrib")
+    cglPushAttrib = <PFNGLPUSHATTRIBPROC>getFunction("glPushAttrib")
     cglPushAttrib(mask)
 
 cdef void GetglPushMatrix():
     global cglPushMatrix
-    cglPushMatrix = <PFNGLPUSHMATRIXPROC>getFunction(b"glPushMatrix")
+    cglPushMatrix = <PFNGLPUSHMATRIXPROC>getFunction("glPushMatrix")
     cglPushMatrix()
 
 cdef void GetglPushName(GLuint name):
     global cglPushName
-    cglPushName = <PFNGLPUSHNAMEPROC>getFunction(b"glPushName")
+    cglPushName = <PFNGLPUSHNAMEPROC>getFunction("glPushName")
     cglPushName(name)
 
 cdef void GetglRasterPos2d(GLdouble x, GLdouble y):
     global cglRasterPos2d
-    cglRasterPos2d = <PFNGLRASTERPOS2DPROC>getFunction(b"glRasterPos2d")
+    cglRasterPos2d = <PFNGLRASTERPOS2DPROC>getFunction("glRasterPos2d")
     cglRasterPos2d(x, y)
 
 cdef void GetglRasterPos2dv(const GLdouble *v):
     global cglRasterPos2dv
-    cglRasterPos2dv = <PFNGLRASTERPOS2DVPROC>getFunction(b"glRasterPos2dv")
+    cglRasterPos2dv = <PFNGLRASTERPOS2DVPROC>getFunction("glRasterPos2dv")
     cglRasterPos2dv(v)
 
 cdef void GetglRasterPos2f(GLfloat x, GLfloat y):
     global cglRasterPos2f
-    cglRasterPos2f = <PFNGLRASTERPOS2FPROC>getFunction(b"glRasterPos2f")
+    cglRasterPos2f = <PFNGLRASTERPOS2FPROC>getFunction("glRasterPos2f")
     cglRasterPos2f(x, y)
 
 cdef void GetglRasterPos2fv(const GLfloat *v):
     global cglRasterPos2fv
-    cglRasterPos2fv = <PFNGLRASTERPOS2FVPROC>getFunction(b"glRasterPos2fv")
+    cglRasterPos2fv = <PFNGLRASTERPOS2FVPROC>getFunction("glRasterPos2fv")
     cglRasterPos2fv(v)
 
 cdef void GetglRasterPos2i(GLint x, GLint y):
     global cglRasterPos2i
-    cglRasterPos2i = <PFNGLRASTERPOS2IPROC>getFunction(b"glRasterPos2i")
+    cglRasterPos2i = <PFNGLRASTERPOS2IPROC>getFunction("glRasterPos2i")
     cglRasterPos2i(x, y)
 
 cdef void GetglRasterPos2iv(const GLint *v):
     global cglRasterPos2iv
-    cglRasterPos2iv = <PFNGLRASTERPOS2IVPROC>getFunction(b"glRasterPos2iv")
+    cglRasterPos2iv = <PFNGLRASTERPOS2IVPROC>getFunction("glRasterPos2iv")
     cglRasterPos2iv(v)
 
 cdef void GetglRasterPos2s(GLshort x, GLshort y):
     global cglRasterPos2s
-    cglRasterPos2s = <PFNGLRASTERPOS2SPROC>getFunction(b"glRasterPos2s")
+    cglRasterPos2s = <PFNGLRASTERPOS2SPROC>getFunction("glRasterPos2s")
     cglRasterPos2s(x, y)
 
 cdef void GetglRasterPos2sv(const GLshort *v):
     global cglRasterPos2sv
-    cglRasterPos2sv = <PFNGLRASTERPOS2SVPROC>getFunction(b"glRasterPos2sv")
+    cglRasterPos2sv = <PFNGLRASTERPOS2SVPROC>getFunction("glRasterPos2sv")
     cglRasterPos2sv(v)
 
 cdef void GetglRasterPos3d(GLdouble x, GLdouble y, GLdouble z):
     global cglRasterPos3d
-    cglRasterPos3d = <PFNGLRASTERPOS3DPROC>getFunction(b"glRasterPos3d")
+    cglRasterPos3d = <PFNGLRASTERPOS3DPROC>getFunction("glRasterPos3d")
     cglRasterPos3d(x, y, z)
 
 cdef void GetglRasterPos3dv(const GLdouble *v):
     global cglRasterPos3dv
-    cglRasterPos3dv = <PFNGLRASTERPOS3DVPROC>getFunction(b"glRasterPos3dv")
+    cglRasterPos3dv = <PFNGLRASTERPOS3DVPROC>getFunction("glRasterPos3dv")
     cglRasterPos3dv(v)
 
 cdef void GetglRasterPos3f(GLfloat x, GLfloat y, GLfloat z):
     global cglRasterPos3f
-    cglRasterPos3f = <PFNGLRASTERPOS3FPROC>getFunction(b"glRasterPos3f")
+    cglRasterPos3f = <PFNGLRASTERPOS3FPROC>getFunction("glRasterPos3f")
     cglRasterPos3f(x, y, z)
 
 cdef void GetglRasterPos3fv(const GLfloat *v):
     global cglRasterPos3fv
-    cglRasterPos3fv = <PFNGLRASTERPOS3FVPROC>getFunction(b"glRasterPos3fv")
+    cglRasterPos3fv = <PFNGLRASTERPOS3FVPROC>getFunction("glRasterPos3fv")
     cglRasterPos3fv(v)
 
 cdef void GetglRasterPos3i(GLint x, GLint y, GLint z):
     global cglRasterPos3i
-    cglRasterPos3i = <PFNGLRASTERPOS3IPROC>getFunction(b"glRasterPos3i")
+    cglRasterPos3i = <PFNGLRASTERPOS3IPROC>getFunction("glRasterPos3i")
     cglRasterPos3i(x, y, z)
 
 cdef void GetglRasterPos3iv(const GLint *v):
     global cglRasterPos3iv
-    cglRasterPos3iv = <PFNGLRASTERPOS3IVPROC>getFunction(b"glRasterPos3iv")
+    cglRasterPos3iv = <PFNGLRASTERPOS3IVPROC>getFunction("glRasterPos3iv")
     cglRasterPos3iv(v)
 
 cdef void GetglRasterPos3s(GLshort x, GLshort y, GLshort z):
     global cglRasterPos3s
-    cglRasterPos3s = <PFNGLRASTERPOS3SPROC>getFunction(b"glRasterPos3s")
+    cglRasterPos3s = <PFNGLRASTERPOS3SPROC>getFunction("glRasterPos3s")
     cglRasterPos3s(x, y, z)
 
 cdef void GetglRasterPos3sv(const GLshort *v):
     global cglRasterPos3sv
-    cglRasterPos3sv = <PFNGLRASTERPOS3SVPROC>getFunction(b"glRasterPos3sv")
+    cglRasterPos3sv = <PFNGLRASTERPOS3SVPROC>getFunction("glRasterPos3sv")
     cglRasterPos3sv(v)
 
 cdef void GetglRasterPos4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w):
     global cglRasterPos4d
-    cglRasterPos4d = <PFNGLRASTERPOS4DPROC>getFunction(b"glRasterPos4d")
+    cglRasterPos4d = <PFNGLRASTERPOS4DPROC>getFunction("glRasterPos4d")
     cglRasterPos4d(x, y, z, w)
 
 cdef void GetglRasterPos4dv(const GLdouble *v):
     global cglRasterPos4dv
-    cglRasterPos4dv = <PFNGLRASTERPOS4DVPROC>getFunction(b"glRasterPos4dv")
+    cglRasterPos4dv = <PFNGLRASTERPOS4DVPROC>getFunction("glRasterPos4dv")
     cglRasterPos4dv(v)
 
 cdef void GetglRasterPos4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w):
     global cglRasterPos4f
-    cglRasterPos4f = <PFNGLRASTERPOS4FPROC>getFunction(b"glRasterPos4f")
+    cglRasterPos4f = <PFNGLRASTERPOS4FPROC>getFunction("glRasterPos4f")
     cglRasterPos4f(x, y, z, w)
 
 cdef void GetglRasterPos4fv(const GLfloat *v):
     global cglRasterPos4fv
-    cglRasterPos4fv = <PFNGLRASTERPOS4FVPROC>getFunction(b"glRasterPos4fv")
+    cglRasterPos4fv = <PFNGLRASTERPOS4FVPROC>getFunction("glRasterPos4fv")
     cglRasterPos4fv(v)
 
 cdef void GetglRasterPos4i(GLint x, GLint y, GLint z, GLint w):
     global cglRasterPos4i
-    cglRasterPos4i = <PFNGLRASTERPOS4IPROC>getFunction(b"glRasterPos4i")
+    cglRasterPos4i = <PFNGLRASTERPOS4IPROC>getFunction("glRasterPos4i")
     cglRasterPos4i(x, y, z, w)
 
 cdef void GetglRasterPos4iv(const GLint *v):
     global cglRasterPos4iv
-    cglRasterPos4iv = <PFNGLRASTERPOS4IVPROC>getFunction(b"glRasterPos4iv")
+    cglRasterPos4iv = <PFNGLRASTERPOS4IVPROC>getFunction("glRasterPos4iv")
     cglRasterPos4iv(v)
 
 cdef void GetglRasterPos4s(GLshort x, GLshort y, GLshort z, GLshort w):
     global cglRasterPos4s
-    cglRasterPos4s = <PFNGLRASTERPOS4SPROC>getFunction(b"glRasterPos4s")
+    cglRasterPos4s = <PFNGLRASTERPOS4SPROC>getFunction("glRasterPos4s")
     cglRasterPos4s(x, y, z, w)
 
 cdef void GetglRasterPos4sv(const GLshort *v):
     global cglRasterPos4sv
-    cglRasterPos4sv = <PFNGLRASTERPOS4SVPROC>getFunction(b"glRasterPos4sv")
+    cglRasterPos4sv = <PFNGLRASTERPOS4SVPROC>getFunction("glRasterPos4sv")
     cglRasterPos4sv(v)
 
 cdef void GetglReadBuffer(GLenum src):
     global cglReadBuffer
-    cglReadBuffer = <PFNGLREADBUFFERPROC>getFunction(b"glReadBuffer")
+    cglReadBuffer = <PFNGLREADBUFFERPROC>getFunction("glReadBuffer")
     cglReadBuffer(src)
 
 cdef void GetglReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void *pixels):
     global cglReadPixels
-    cglReadPixels = <PFNGLREADPIXELSPROC>getFunction(b"glReadPixels")
+    cglReadPixels = <PFNGLREADPIXELSPROC>getFunction("glReadPixels")
     cglReadPixels(x, y, width, height, format, type, pixels)
 
 cdef void GetglRectd(GLdouble x1, GLdouble y1, GLdouble x2, GLdouble y2):
     global cglRectd
-    cglRectd = <PFNGLRECTDPROC>getFunction(b"glRectd")
+    cglRectd = <PFNGLRECTDPROC>getFunction("glRectd")
     cglRectd(x1, y1, x2, y2)
 
 cdef void GetglRectdv(const GLdouble *v1, const GLdouble *v2):
     global cglRectdv
-    cglRectdv = <PFNGLRECTDVPROC>getFunction(b"glRectdv")
+    cglRectdv = <PFNGLRECTDVPROC>getFunction("glRectdv")
     cglRectdv(v1, v2)
 
 cdef void GetglRectf(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2):
     global cglRectf
-    cglRectf = <PFNGLRECTFPROC>getFunction(b"glRectf")
+    cglRectf = <PFNGLRECTFPROC>getFunction("glRectf")
     cglRectf(x1, y1, x2, y2)
 
 cdef void GetglRectfv(const GLfloat *v1, const GLfloat *v2):
     global cglRectfv
-    cglRectfv = <PFNGLRECTFVPROC>getFunction(b"glRectfv")
+    cglRectfv = <PFNGLRECTFVPROC>getFunction("glRectfv")
     cglRectfv(v1, v2)
 
 cdef void GetglRecti(GLint x1, GLint y1, GLint x2, GLint y2):
     global cglRecti
-    cglRecti = <PFNGLRECTIPROC>getFunction(b"glRecti")
+    cglRecti = <PFNGLRECTIPROC>getFunction("glRecti")
     cglRecti(x1, y1, x2, y2)
 
 cdef void GetglRectiv(const GLint *v1, const GLint *v2):
     global cglRectiv
-    cglRectiv = <PFNGLRECTIVPROC>getFunction(b"glRectiv")
+    cglRectiv = <PFNGLRECTIVPROC>getFunction("glRectiv")
     cglRectiv(v1, v2)
 
 cdef void GetglRects(GLshort x1, GLshort y1, GLshort x2, GLshort y2):
     global cglRects
-    cglRects = <PFNGLRECTSPROC>getFunction(b"glRects")
+    cglRects = <PFNGLRECTSPROC>getFunction("glRects")
     cglRects(x1, y1, x2, y2)
 
 cdef void GetglRectsv(const GLshort *v1, const GLshort *v2):
     global cglRectsv
-    cglRectsv = <PFNGLRECTSVPROC>getFunction(b"glRectsv")
+    cglRectsv = <PFNGLRECTSVPROC>getFunction("glRectsv")
     cglRectsv(v1, v2)
 
 cdef GLint GetglRenderMode(GLenum mode):
     global cglRenderMode
-    cglRenderMode = <PFNGLRENDERMODEPROC>getFunction(b"glRenderMode")
+    cglRenderMode = <PFNGLRENDERMODEPROC>getFunction("glRenderMode")
     cglRenderMode(mode)
 
 cdef void GetglRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z):
     global cglRotated
-    cglRotated = <PFNGLROTATEDPROC>getFunction(b"glRotated")
+    cglRotated = <PFNGLROTATEDPROC>getFunction("glRotated")
     cglRotated(angle, x, y, z)
 
 cdef void GetglRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z):
     global cglRotatef
-    cglRotatef = <PFNGLROTATEFPROC>getFunction(b"glRotatef")
+    cglRotatef = <PFNGLROTATEFPROC>getFunction("glRotatef")
     cglRotatef(angle, x, y, z)
 
 cdef void GetglScaled(GLdouble x, GLdouble y, GLdouble z):
     global cglScaled
-    cglScaled = <PFNGLSCALEDPROC>getFunction(b"glScaled")
+    cglScaled = <PFNGLSCALEDPROC>getFunction("glScaled")
     cglScaled(x, y, z)
 
 cdef void GetglScalef(GLfloat x, GLfloat y, GLfloat z):
     global cglScalef
-    cglScalef = <PFNGLSCALEFPROC>getFunction(b"glScalef")
+    cglScalef = <PFNGLSCALEFPROC>getFunction("glScalef")
     cglScalef(x, y, z)
 
 cdef void GetglScissor(GLint x, GLint y, GLsizei width, GLsizei height):
     global cglScissor
-    cglScissor = <PFNGLSCISSORPROC>getFunction(b"glScissor")
+    cglScissor = <PFNGLSCISSORPROC>getFunction("glScissor")
     cglScissor(x, y, width, height)
 
 cdef void GetglSelectBuffer(GLsizei size, GLuint *buffer):
     global cglSelectBuffer
-    cglSelectBuffer = <PFNGLSELECTBUFFERPROC>getFunction(b"glSelectBuffer")
+    cglSelectBuffer = <PFNGLSELECTBUFFERPROC>getFunction("glSelectBuffer")
     cglSelectBuffer(size, buffer)
 
 cdef void GetglShadeModel(GLenum mode):
     global cglShadeModel
-    cglShadeModel = <PFNGLSHADEMODELPROC>getFunction(b"glShadeModel")
+    cglShadeModel = <PFNGLSHADEMODELPROC>getFunction("glShadeModel")
     cglShadeModel(mode)
 
 cdef void GetglStencilFunc(GLenum func, GLint ref, GLuint mask):
     global cglStencilFunc
-    cglStencilFunc = <PFNGLSTENCILFUNCPROC>getFunction(b"glStencilFunc")
+    cglStencilFunc = <PFNGLSTENCILFUNCPROC>getFunction("glStencilFunc")
     cglStencilFunc(func, ref, mask)
 
 cdef void GetglStencilMask(GLuint mask):
     global cglStencilMask
-    cglStencilMask = <PFNGLSTENCILMASKPROC>getFunction(b"glStencilMask")
+    cglStencilMask = <PFNGLSTENCILMASKPROC>getFunction("glStencilMask")
     cglStencilMask(mask)
 
 cdef void GetglStencilOp(GLenum fail, GLenum zfail, GLenum zpass):
     global cglStencilOp
-    cglStencilOp = <PFNGLSTENCILOPPROC>getFunction(b"glStencilOp")
+    cglStencilOp = <PFNGLSTENCILOPPROC>getFunction("glStencilOp")
     cglStencilOp(fail, zfail, zpass)
 
 cdef void GetglTexCoord1d(GLdouble s):
     global cglTexCoord1d
-    cglTexCoord1d = <PFNGLTEXCOORD1DPROC>getFunction(b"glTexCoord1d")
+    cglTexCoord1d = <PFNGLTEXCOORD1DPROC>getFunction("glTexCoord1d")
     cglTexCoord1d(s)
 
 cdef void GetglTexCoord1dv(const GLdouble *v):
     global cglTexCoord1dv
-    cglTexCoord1dv = <PFNGLTEXCOORD1DVPROC>getFunction(b"glTexCoord1dv")
+    cglTexCoord1dv = <PFNGLTEXCOORD1DVPROC>getFunction("glTexCoord1dv")
     cglTexCoord1dv(v)
 
 cdef void GetglTexCoord1f(GLfloat s):
     global cglTexCoord1f
-    cglTexCoord1f = <PFNGLTEXCOORD1FPROC>getFunction(b"glTexCoord1f")
+    cglTexCoord1f = <PFNGLTEXCOORD1FPROC>getFunction("glTexCoord1f")
     cglTexCoord1f(s)
 
 cdef void GetglTexCoord1fv(const GLfloat *v):
     global cglTexCoord1fv
-    cglTexCoord1fv = <PFNGLTEXCOORD1FVPROC>getFunction(b"glTexCoord1fv")
+    cglTexCoord1fv = <PFNGLTEXCOORD1FVPROC>getFunction("glTexCoord1fv")
     cglTexCoord1fv(v)
 
 cdef void GetglTexCoord1i(GLint s):
     global cglTexCoord1i
-    cglTexCoord1i = <PFNGLTEXCOORD1IPROC>getFunction(b"glTexCoord1i")
+    cglTexCoord1i = <PFNGLTEXCOORD1IPROC>getFunction("glTexCoord1i")
     cglTexCoord1i(s)
 
 cdef void GetglTexCoord1iv(const GLint *v):
     global cglTexCoord1iv
-    cglTexCoord1iv = <PFNGLTEXCOORD1IVPROC>getFunction(b"glTexCoord1iv")
+    cglTexCoord1iv = <PFNGLTEXCOORD1IVPROC>getFunction("glTexCoord1iv")
     cglTexCoord1iv(v)
 
 cdef void GetglTexCoord1s(GLshort s):
     global cglTexCoord1s
-    cglTexCoord1s = <PFNGLTEXCOORD1SPROC>getFunction(b"glTexCoord1s")
+    cglTexCoord1s = <PFNGLTEXCOORD1SPROC>getFunction("glTexCoord1s")
     cglTexCoord1s(s)
 
 cdef void GetglTexCoord1sv(const GLshort *v):
     global cglTexCoord1sv
-    cglTexCoord1sv = <PFNGLTEXCOORD1SVPROC>getFunction(b"glTexCoord1sv")
+    cglTexCoord1sv = <PFNGLTEXCOORD1SVPROC>getFunction("glTexCoord1sv")
     cglTexCoord1sv(v)
 
 cdef void GetglTexCoord2d(GLdouble s, GLdouble t):
     global cglTexCoord2d
-    cglTexCoord2d = <PFNGLTEXCOORD2DPROC>getFunction(b"glTexCoord2d")
+    cglTexCoord2d = <PFNGLTEXCOORD2DPROC>getFunction("glTexCoord2d")
     cglTexCoord2d(s, t)
 
 cdef void GetglTexCoord2dv(const GLdouble *v):
     global cglTexCoord2dv
-    cglTexCoord2dv = <PFNGLTEXCOORD2DVPROC>getFunction(b"glTexCoord2dv")
+    cglTexCoord2dv = <PFNGLTEXCOORD2DVPROC>getFunction("glTexCoord2dv")
     cglTexCoord2dv(v)
 
 cdef void GetglTexCoord2f(GLfloat s, GLfloat t):
     global cglTexCoord2f
-    cglTexCoord2f = <PFNGLTEXCOORD2FPROC>getFunction(b"glTexCoord2f")
+    cglTexCoord2f = <PFNGLTEXCOORD2FPROC>getFunction("glTexCoord2f")
     cglTexCoord2f(s, t)
 
 cdef void GetglTexCoord2fv(const GLfloat *v):
     global cglTexCoord2fv
-    cglTexCoord2fv = <PFNGLTEXCOORD2FVPROC>getFunction(b"glTexCoord2fv")
+    cglTexCoord2fv = <PFNGLTEXCOORD2FVPROC>getFunction("glTexCoord2fv")
     cglTexCoord2fv(v)
 
 cdef void GetglTexCoord2i(GLint s, GLint t):
     global cglTexCoord2i
-    cglTexCoord2i = <PFNGLTEXCOORD2IPROC>getFunction(b"glTexCoord2i")
+    cglTexCoord2i = <PFNGLTEXCOORD2IPROC>getFunction("glTexCoord2i")
     cglTexCoord2i(s, t)
 
 cdef void GetglTexCoord2iv(const GLint *v):
     global cglTexCoord2iv
-    cglTexCoord2iv = <PFNGLTEXCOORD2IVPROC>getFunction(b"glTexCoord2iv")
+    cglTexCoord2iv = <PFNGLTEXCOORD2IVPROC>getFunction("glTexCoord2iv")
     cglTexCoord2iv(v)
 
 cdef void GetglTexCoord2s(GLshort s, GLshort t):
     global cglTexCoord2s
-    cglTexCoord2s = <PFNGLTEXCOORD2SPROC>getFunction(b"glTexCoord2s")
+    cglTexCoord2s = <PFNGLTEXCOORD2SPROC>getFunction("glTexCoord2s")
     cglTexCoord2s(s, t)
 
 cdef void GetglTexCoord2sv(const GLshort *v):
     global cglTexCoord2sv
-    cglTexCoord2sv = <PFNGLTEXCOORD2SVPROC>getFunction(b"glTexCoord2sv")
+    cglTexCoord2sv = <PFNGLTEXCOORD2SVPROC>getFunction("glTexCoord2sv")
     cglTexCoord2sv(v)
 
 cdef void GetglTexCoord3d(GLdouble s, GLdouble t, GLdouble r):
     global cglTexCoord3d
-    cglTexCoord3d = <PFNGLTEXCOORD3DPROC>getFunction(b"glTexCoord3d")
+    cglTexCoord3d = <PFNGLTEXCOORD3DPROC>getFunction("glTexCoord3d")
     cglTexCoord3d(s, t, r)
 
 cdef void GetglTexCoord3dv(const GLdouble *v):
     global cglTexCoord3dv
-    cglTexCoord3dv = <PFNGLTEXCOORD3DVPROC>getFunction(b"glTexCoord3dv")
+    cglTexCoord3dv = <PFNGLTEXCOORD3DVPROC>getFunction("glTexCoord3dv")
     cglTexCoord3dv(v)
 
 cdef void GetglTexCoord3f(GLfloat s, GLfloat t, GLfloat r):
     global cglTexCoord3f
-    cglTexCoord3f = <PFNGLTEXCOORD3FPROC>getFunction(b"glTexCoord3f")
+    cglTexCoord3f = <PFNGLTEXCOORD3FPROC>getFunction("glTexCoord3f")
     cglTexCoord3f(s, t, r)
 
 cdef void GetglTexCoord3fv(const GLfloat *v):
     global cglTexCoord3fv
-    cglTexCoord3fv = <PFNGLTEXCOORD3FVPROC>getFunction(b"glTexCoord3fv")
+    cglTexCoord3fv = <PFNGLTEXCOORD3FVPROC>getFunction("glTexCoord3fv")
     cglTexCoord3fv(v)
 
 cdef void GetglTexCoord3i(GLint s, GLint t, GLint r):
     global cglTexCoord3i
-    cglTexCoord3i = <PFNGLTEXCOORD3IPROC>getFunction(b"glTexCoord3i")
+    cglTexCoord3i = <PFNGLTEXCOORD3IPROC>getFunction("glTexCoord3i")
     cglTexCoord3i(s, t, r)
 
 cdef void GetglTexCoord3iv(const GLint *v):
     global cglTexCoord3iv
-    cglTexCoord3iv = <PFNGLTEXCOORD3IVPROC>getFunction(b"glTexCoord3iv")
+    cglTexCoord3iv = <PFNGLTEXCOORD3IVPROC>getFunction("glTexCoord3iv")
     cglTexCoord3iv(v)
 
 cdef void GetglTexCoord3s(GLshort s, GLshort t, GLshort r):
     global cglTexCoord3s
-    cglTexCoord3s = <PFNGLTEXCOORD3SPROC>getFunction(b"glTexCoord3s")
+    cglTexCoord3s = <PFNGLTEXCOORD3SPROC>getFunction("glTexCoord3s")
     cglTexCoord3s(s, t, r)
 
 cdef void GetglTexCoord3sv(const GLshort *v):
     global cglTexCoord3sv
-    cglTexCoord3sv = <PFNGLTEXCOORD3SVPROC>getFunction(b"glTexCoord3sv")
+    cglTexCoord3sv = <PFNGLTEXCOORD3SVPROC>getFunction("glTexCoord3sv")
     cglTexCoord3sv(v)
 
 cdef void GetglTexCoord4d(GLdouble s, GLdouble t, GLdouble r, GLdouble q):
     global cglTexCoord4d
-    cglTexCoord4d = <PFNGLTEXCOORD4DPROC>getFunction(b"glTexCoord4d")
+    cglTexCoord4d = <PFNGLTEXCOORD4DPROC>getFunction("glTexCoord4d")
     cglTexCoord4d(s, t, r, q)
 
 cdef void GetglTexCoord4dv(const GLdouble *v):
     global cglTexCoord4dv
-    cglTexCoord4dv = <PFNGLTEXCOORD4DVPROC>getFunction(b"glTexCoord4dv")
+    cglTexCoord4dv = <PFNGLTEXCOORD4DVPROC>getFunction("glTexCoord4dv")
     cglTexCoord4dv(v)
 
 cdef void GetglTexCoord4f(GLfloat s, GLfloat t, GLfloat r, GLfloat q):
     global cglTexCoord4f
-    cglTexCoord4f = <PFNGLTEXCOORD4FPROC>getFunction(b"glTexCoord4f")
+    cglTexCoord4f = <PFNGLTEXCOORD4FPROC>getFunction("glTexCoord4f")
     cglTexCoord4f(s, t, r, q)
 
 cdef void GetglTexCoord4fv(const GLfloat *v):
     global cglTexCoord4fv
-    cglTexCoord4fv = <PFNGLTEXCOORD4FVPROC>getFunction(b"glTexCoord4fv")
+    cglTexCoord4fv = <PFNGLTEXCOORD4FVPROC>getFunction("glTexCoord4fv")
     cglTexCoord4fv(v)
 
 cdef void GetglTexCoord4i(GLint s, GLint t, GLint r, GLint q):
     global cglTexCoord4i
-    cglTexCoord4i = <PFNGLTEXCOORD4IPROC>getFunction(b"glTexCoord4i")
+    cglTexCoord4i = <PFNGLTEXCOORD4IPROC>getFunction("glTexCoord4i")
     cglTexCoord4i(s, t, r, q)
 
 cdef void GetglTexCoord4iv(const GLint *v):
     global cglTexCoord4iv
-    cglTexCoord4iv = <PFNGLTEXCOORD4IVPROC>getFunction(b"glTexCoord4iv")
+    cglTexCoord4iv = <PFNGLTEXCOORD4IVPROC>getFunction("glTexCoord4iv")
     cglTexCoord4iv(v)
 
 cdef void GetglTexCoord4s(GLshort s, GLshort t, GLshort r, GLshort q):
     global cglTexCoord4s
-    cglTexCoord4s = <PFNGLTEXCOORD4SPROC>getFunction(b"glTexCoord4s")
+    cglTexCoord4s = <PFNGLTEXCOORD4SPROC>getFunction("glTexCoord4s")
     cglTexCoord4s(s, t, r, q)
 
 cdef void GetglTexCoord4sv(const GLshort *v):
     global cglTexCoord4sv
-    cglTexCoord4sv = <PFNGLTEXCOORD4SVPROC>getFunction(b"glTexCoord4sv")
+    cglTexCoord4sv = <PFNGLTEXCOORD4SVPROC>getFunction("glTexCoord4sv")
     cglTexCoord4sv(v)
 
 cdef void GetglTexEnvf(GLenum target, GLenum pname, GLfloat param):
     global cglTexEnvf
-    cglTexEnvf = <PFNGLTEXENVFPROC>getFunction(b"glTexEnvf")
+    cglTexEnvf = <PFNGLTEXENVFPROC>getFunction("glTexEnvf")
     cglTexEnvf(target, pname, param)
 
 cdef void GetglTexEnvfv(GLenum target, GLenum pname, const GLfloat *params):
     global cglTexEnvfv
-    cglTexEnvfv = <PFNGLTEXENVFVPROC>getFunction(b"glTexEnvfv")
+    cglTexEnvfv = <PFNGLTEXENVFVPROC>getFunction("glTexEnvfv")
     cglTexEnvfv(target, pname, params)
 
 cdef void GetglTexEnvi(GLenum target, GLenum pname, GLint param):
     global cglTexEnvi
-    cglTexEnvi = <PFNGLTEXENVIPROC>getFunction(b"glTexEnvi")
+    cglTexEnvi = <PFNGLTEXENVIPROC>getFunction("glTexEnvi")
     cglTexEnvi(target, pname, param)
 
 cdef void GetglTexEnviv(GLenum target, GLenum pname, const GLint *params):
     global cglTexEnviv
-    cglTexEnviv = <PFNGLTEXENVIVPROC>getFunction(b"glTexEnviv")
+    cglTexEnviv = <PFNGLTEXENVIVPROC>getFunction("glTexEnviv")
     cglTexEnviv(target, pname, params)
 
 cdef void GetglTexGend(GLenum coord, GLenum pname, GLdouble param):
     global cglTexGend
-    cglTexGend = <PFNGLTEXGENDPROC>getFunction(b"glTexGend")
+    cglTexGend = <PFNGLTEXGENDPROC>getFunction("glTexGend")
     cglTexGend(coord, pname, param)
 
 cdef void GetglTexGendv(GLenum coord, GLenum pname, const GLdouble *params):
     global cglTexGendv
-    cglTexGendv = <PFNGLTEXGENDVPROC>getFunction(b"glTexGendv")
+    cglTexGendv = <PFNGLTEXGENDVPROC>getFunction("glTexGendv")
     cglTexGendv(coord, pname, params)
 
 cdef void GetglTexGenf(GLenum coord, GLenum pname, GLfloat param):
     global cglTexGenf
-    cglTexGenf = <PFNGLTEXGENFPROC>getFunction(b"glTexGenf")
+    cglTexGenf = <PFNGLTEXGENFPROC>getFunction("glTexGenf")
     cglTexGenf(coord, pname, param)
 
 cdef void GetglTexGenfv(GLenum coord, GLenum pname, const GLfloat *params):
     global cglTexGenfv
-    cglTexGenfv = <PFNGLTEXGENFVPROC>getFunction(b"glTexGenfv")
+    cglTexGenfv = <PFNGLTEXGENFVPROC>getFunction("glTexGenfv")
     cglTexGenfv(coord, pname, params)
 
 cdef void GetglTexGeni(GLenum coord, GLenum pname, GLint param):
     global cglTexGeni
-    cglTexGeni = <PFNGLTEXGENIPROC>getFunction(b"glTexGeni")
+    cglTexGeni = <PFNGLTEXGENIPROC>getFunction("glTexGeni")
     cglTexGeni(coord, pname, param)
 
 cdef void GetglTexGeniv(GLenum coord, GLenum pname, const GLint *params):
     global cglTexGeniv
-    cglTexGeniv = <PFNGLTEXGENIVPROC>getFunction(b"glTexGeniv")
+    cglTexGeniv = <PFNGLTEXGENIVPROC>getFunction("glTexGeniv")
     cglTexGeniv(coord, pname, params)
 
 cdef void GetglTexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const void *pixels):
     global cglTexImage1D
-    cglTexImage1D = <PFNGLTEXIMAGE1DPROC>getFunction(b"glTexImage1D")
+    cglTexImage1D = <PFNGLTEXIMAGE1DPROC>getFunction("glTexImage1D")
     cglTexImage1D(target, level, internalformat, width, border, format, type, pixels)
 
 cdef void GetglTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels):
     global cglTexImage2D
-    cglTexImage2D = <PFNGLTEXIMAGE2DPROC>getFunction(b"glTexImage2D")
+    cglTexImage2D = <PFNGLTEXIMAGE2DPROC>getFunction("glTexImage2D")
     cglTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
 
 cdef void GetglTexParameterf(GLenum target, GLenum pname, GLfloat param):
     global cglTexParameterf
-    cglTexParameterf = <PFNGLTEXPARAMETERFPROC>getFunction(b"glTexParameterf")
+    cglTexParameterf = <PFNGLTEXPARAMETERFPROC>getFunction("glTexParameterf")
     cglTexParameterf(target, pname, param)
 
 cdef void GetglTexParameterfv(GLenum target, GLenum pname, const GLfloat *params):
     global cglTexParameterfv
-    cglTexParameterfv = <PFNGLTEXPARAMETERFVPROC>getFunction(b"glTexParameterfv")
+    cglTexParameterfv = <PFNGLTEXPARAMETERFVPROC>getFunction("glTexParameterfv")
     cglTexParameterfv(target, pname, params)
 
 cdef void GetglTexParameteri(GLenum target, GLenum pname, GLint param):
     global cglTexParameteri
-    cglTexParameteri = <PFNGLTEXPARAMETERIPROC>getFunction(b"glTexParameteri")
+    cglTexParameteri = <PFNGLTEXPARAMETERIPROC>getFunction("glTexParameteri")
     cglTexParameteri(target, pname, param)
 
 cdef void GetglTexParameteriv(GLenum target, GLenum pname, const GLint *params):
     global cglTexParameteriv
-    cglTexParameteriv = <PFNGLTEXPARAMETERIVPROC>getFunction(b"glTexParameteriv")
+    cglTexParameteriv = <PFNGLTEXPARAMETERIVPROC>getFunction("glTexParameteriv")
     cglTexParameteriv(target, pname, params)
 
 cdef void GetglTranslated(GLdouble x, GLdouble y, GLdouble z):
     global cglTranslated
-    cglTranslated = <PFNGLTRANSLATEDPROC>getFunction(b"glTranslated")
+    cglTranslated = <PFNGLTRANSLATEDPROC>getFunction("glTranslated")
     cglTranslated(x, y, z)
 
 cdef void GetglTranslatef(GLfloat x, GLfloat y, GLfloat z):
     global cglTranslatef
-    cglTranslatef = <PFNGLTRANSLATEFPROC>getFunction(b"glTranslatef")
+    cglTranslatef = <PFNGLTRANSLATEFPROC>getFunction("glTranslatef")
     cglTranslatef(x, y, z)
 
 cdef void GetglVertex2d(GLdouble x, GLdouble y):
     global cglVertex2d
-    cglVertex2d = <PFNGLVERTEX2DPROC>getFunction(b"glVertex2d")
+    cglVertex2d = <PFNGLVERTEX2DPROC>getFunction("glVertex2d")
     cglVertex2d(x, y)
 
 cdef void GetglVertex2dv(const GLdouble *v):
     global cglVertex2dv
-    cglVertex2dv = <PFNGLVERTEX2DVPROC>getFunction(b"glVertex2dv")
+    cglVertex2dv = <PFNGLVERTEX2DVPROC>getFunction("glVertex2dv")
     cglVertex2dv(v)
 
 cdef void GetglVertex2f(GLfloat x, GLfloat y):
     global cglVertex2f
-    cglVertex2f = <PFNGLVERTEX2FPROC>getFunction(b"glVertex2f")
+    cglVertex2f = <PFNGLVERTEX2FPROC>getFunction("glVertex2f")
     cglVertex2f(x, y)
 
 cdef void GetglVertex2fv(const GLfloat *v):
     global cglVertex2fv
-    cglVertex2fv = <PFNGLVERTEX2FVPROC>getFunction(b"glVertex2fv")
+    cglVertex2fv = <PFNGLVERTEX2FVPROC>getFunction("glVertex2fv")
     cglVertex2fv(v)
 
 cdef void GetglVertex2i(GLint x, GLint y):
     global cglVertex2i
-    cglVertex2i = <PFNGLVERTEX2IPROC>getFunction(b"glVertex2i")
+    cglVertex2i = <PFNGLVERTEX2IPROC>getFunction("glVertex2i")
     cglVertex2i(x, y)
 
 cdef void GetglVertex2iv(const GLint *v):
     global cglVertex2iv
-    cglVertex2iv = <PFNGLVERTEX2IVPROC>getFunction(b"glVertex2iv")
+    cglVertex2iv = <PFNGLVERTEX2IVPROC>getFunction("glVertex2iv")
     cglVertex2iv(v)
 
 cdef void GetglVertex2s(GLshort x, GLshort y):
     global cglVertex2s
-    cglVertex2s = <PFNGLVERTEX2SPROC>getFunction(b"glVertex2s")
+    cglVertex2s = <PFNGLVERTEX2SPROC>getFunction("glVertex2s")
     cglVertex2s(x, y)
 
 cdef void GetglVertex2sv(const GLshort *v):
     global cglVertex2sv
-    cglVertex2sv = <PFNGLVERTEX2SVPROC>getFunction(b"glVertex2sv")
+    cglVertex2sv = <PFNGLVERTEX2SVPROC>getFunction("glVertex2sv")
     cglVertex2sv(v)
 
 cdef void GetglVertex3d(GLdouble x, GLdouble y, GLdouble z):
     global cglVertex3d
-    cglVertex3d = <PFNGLVERTEX3DPROC>getFunction(b"glVertex3d")
+    cglVertex3d = <PFNGLVERTEX3DPROC>getFunction("glVertex3d")
     cglVertex3d(x, y, z)
 
 cdef void GetglVertex3dv(const GLdouble *v):
     global cglVertex3dv
-    cglVertex3dv = <PFNGLVERTEX3DVPROC>getFunction(b"glVertex3dv")
+    cglVertex3dv = <PFNGLVERTEX3DVPROC>getFunction("glVertex3dv")
     cglVertex3dv(v)
 
 cdef void GetglVertex3f(GLfloat x, GLfloat y, GLfloat z):
     global cglVertex3f
-    cglVertex3f = <PFNGLVERTEX3FPROC>getFunction(b"glVertex3f")
+    cglVertex3f = <PFNGLVERTEX3FPROC>getFunction("glVertex3f")
     cglVertex3f(x, y, z)
 
 cdef void GetglVertex3fv(const GLfloat *v):
     global cglVertex3fv
-    cglVertex3fv = <PFNGLVERTEX3FVPROC>getFunction(b"glVertex3fv")
+    cglVertex3fv = <PFNGLVERTEX3FVPROC>getFunction("glVertex3fv")
     cglVertex3fv(v)
 
 cdef void GetglVertex3i(GLint x, GLint y, GLint z):
     global cglVertex3i
-    cglVertex3i = <PFNGLVERTEX3IPROC>getFunction(b"glVertex3i")
+    cglVertex3i = <PFNGLVERTEX3IPROC>getFunction("glVertex3i")
     cglVertex3i(x, y, z)
 
 cdef void GetglVertex3iv(const GLint *v):
     global cglVertex3iv
-    cglVertex3iv = <PFNGLVERTEX3IVPROC>getFunction(b"glVertex3iv")
+    cglVertex3iv = <PFNGLVERTEX3IVPROC>getFunction("glVertex3iv")
     cglVertex3iv(v)
 
 cdef void GetglVertex3s(GLshort x, GLshort y, GLshort z):
     global cglVertex3s
-    cglVertex3s = <PFNGLVERTEX3SPROC>getFunction(b"glVertex3s")
+    cglVertex3s = <PFNGLVERTEX3SPROC>getFunction("glVertex3s")
     cglVertex3s(x, y, z)
 
 cdef void GetglVertex3sv(const GLshort *v):
     global cglVertex3sv
-    cglVertex3sv = <PFNGLVERTEX3SVPROC>getFunction(b"glVertex3sv")
+    cglVertex3sv = <PFNGLVERTEX3SVPROC>getFunction("glVertex3sv")
     cglVertex3sv(v)
 
 cdef void GetglVertex4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w):
     global cglVertex4d
-    cglVertex4d = <PFNGLVERTEX4DPROC>getFunction(b"glVertex4d")
+    cglVertex4d = <PFNGLVERTEX4DPROC>getFunction("glVertex4d")
     cglVertex4d(x, y, z, w)
 
 cdef void GetglVertex4dv(const GLdouble *v):
     global cglVertex4dv
-    cglVertex4dv = <PFNGLVERTEX4DVPROC>getFunction(b"glVertex4dv")
+    cglVertex4dv = <PFNGLVERTEX4DVPROC>getFunction("glVertex4dv")
     cglVertex4dv(v)
 
 cdef void GetglVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w):
     global cglVertex4f
-    cglVertex4f = <PFNGLVERTEX4FPROC>getFunction(b"glVertex4f")
+    cglVertex4f = <PFNGLVERTEX4FPROC>getFunction("glVertex4f")
     cglVertex4f(x, y, z, w)
 
 cdef void GetglVertex4fv(const GLfloat *v):
     global cglVertex4fv
-    cglVertex4fv = <PFNGLVERTEX4FVPROC>getFunction(b"glVertex4fv")
+    cglVertex4fv = <PFNGLVERTEX4FVPROC>getFunction("glVertex4fv")
     cglVertex4fv(v)
 
 cdef void GetglVertex4i(GLint x, GLint y, GLint z, GLint w):
     global cglVertex4i
-    cglVertex4i = <PFNGLVERTEX4IPROC>getFunction(b"glVertex4i")
+    cglVertex4i = <PFNGLVERTEX4IPROC>getFunction("glVertex4i")
     cglVertex4i(x, y, z, w)
 
 cdef void GetglVertex4iv(const GLint *v):
     global cglVertex4iv
-    cglVertex4iv = <PFNGLVERTEX4IVPROC>getFunction(b"glVertex4iv")
+    cglVertex4iv = <PFNGLVERTEX4IVPROC>getFunction("glVertex4iv")
     cglVertex4iv(v)
 
 cdef void GetglVertex4s(GLshort x, GLshort y, GLshort z, GLshort w):
     global cglVertex4s
-    cglVertex4s = <PFNGLVERTEX4SPROC>getFunction(b"glVertex4s")
+    cglVertex4s = <PFNGLVERTEX4SPROC>getFunction("glVertex4s")
     cglVertex4s(x, y, z, w)
 
 cdef void GetglVertex4sv(const GLshort *v):
     global cglVertex4sv
-    cglVertex4sv = <PFNGLVERTEX4SVPROC>getFunction(b"glVertex4sv")
+    cglVertex4sv = <PFNGLVERTEX4SVPROC>getFunction("glVertex4sv")
     cglVertex4sv(v)
 
 cdef void GetglViewport(GLint x, GLint y, GLsizei width, GLsizei height):
     global cglViewport
-    cglViewport = <PFNGLVIEWPORTPROC>getFunction(b"glViewport")
+    cglViewport = <PFNGLVIEWPORTPROC>getFunction("glViewport")
     cglViewport(x, y, width, height)
 
 cglAccum = GetglAccum

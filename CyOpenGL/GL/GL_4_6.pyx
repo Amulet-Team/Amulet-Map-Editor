@@ -43,22 +43,22 @@ cdef PFNGLSPECIALIZESHADERPROC cglSpecializeShader = NULL
 
 cdef void GetglMultiDrawArraysIndirectCount(GLenum mode, const void *indirect, GLintptr drawcount, GLsizei maxdrawcount, GLsizei stride):
     global cglMultiDrawArraysIndirectCount
-    cglMultiDrawArraysIndirectCount = <PFNGLMULTIDRAWARRAYSINDIRECTCOUNTPROC>getFunction(b"glMultiDrawArraysIndirectCount")
+    cglMultiDrawArraysIndirectCount = <PFNGLMULTIDRAWARRAYSINDIRECTCOUNTPROC>getFunction("glMultiDrawArraysIndirectCount")
     cglMultiDrawArraysIndirectCount(mode, indirect, drawcount, maxdrawcount, stride)
 
 cdef void GetglMultiDrawElementsIndirectCount(GLenum mode, GLenum type, const void *indirect, GLintptr drawcount, GLsizei maxdrawcount, GLsizei stride):
     global cglMultiDrawElementsIndirectCount
-    cglMultiDrawElementsIndirectCount = <PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTPROC>getFunction(b"glMultiDrawElementsIndirectCount")
+    cglMultiDrawElementsIndirectCount = <PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTPROC>getFunction("glMultiDrawElementsIndirectCount")
     cglMultiDrawElementsIndirectCount(mode, type, indirect, drawcount, maxdrawcount, stride)
 
 cdef void GetglPolygonOffsetClamp(GLfloat factor, GLfloat units, GLfloat clamp):
     global cglPolygonOffsetClamp
-    cglPolygonOffsetClamp = <PFNGLPOLYGONOFFSETCLAMPPROC>getFunction(b"glPolygonOffsetClamp")
+    cglPolygonOffsetClamp = <PFNGLPOLYGONOFFSETCLAMPPROC>getFunction("glPolygonOffsetClamp")
     cglPolygonOffsetClamp(factor, units, clamp)
 
 cdef void GetglSpecializeShader(GLuint shader, const GLchar *pEntryPoint, GLuint numSpecializationConstants, const GLuint *pConstantIndex, const GLuint *pConstantValue):
     global cglSpecializeShader
-    cglSpecializeShader = <PFNGLSPECIALIZESHADERPROC>getFunction(b"glSpecializeShader")
+    cglSpecializeShader = <PFNGLSPECIALIZESHADERPROC>getFunction("glSpecializeShader")
     cglSpecializeShader(shader, pEntryPoint, numSpecializationConstants, pConstantIndex, pConstantValue)
 
 cglMultiDrawArraysIndirectCount = GetglMultiDrawArraysIndirectCount

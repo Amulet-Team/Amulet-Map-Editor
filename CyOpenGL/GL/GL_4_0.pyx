@@ -179,232 +179,232 @@ cdef PFNGLUNIFORMSUBROUTINESUIVPROC cglUniformSubroutinesuiv = NULL
 
 cdef void GetglBeginQueryIndexed(GLenum target, GLuint index, GLuint id):
     global cglBeginQueryIndexed
-    cglBeginQueryIndexed = <PFNGLBEGINQUERYINDEXEDPROC>getFunction(b"glBeginQueryIndexed")
+    cglBeginQueryIndexed = <PFNGLBEGINQUERYINDEXEDPROC>getFunction("glBeginQueryIndexed")
     cglBeginQueryIndexed(target, index, id)
 
 cdef void GetglBindTransformFeedback(GLenum target, GLuint id):
     global cglBindTransformFeedback
-    cglBindTransformFeedback = <PFNGLBINDTRANSFORMFEEDBACKPROC>getFunction(b"glBindTransformFeedback")
+    cglBindTransformFeedback = <PFNGLBINDTRANSFORMFEEDBACKPROC>getFunction("glBindTransformFeedback")
     cglBindTransformFeedback(target, id)
 
 cdef void GetglBlendEquationSeparatei(GLuint buf, GLenum modeRGB, GLenum modeAlpha):
     global cglBlendEquationSeparatei
-    cglBlendEquationSeparatei = <PFNGLBLENDEQUATIONSEPARATEIPROC>getFunction(b"glBlendEquationSeparatei")
+    cglBlendEquationSeparatei = <PFNGLBLENDEQUATIONSEPARATEIPROC>getFunction("glBlendEquationSeparatei")
     cglBlendEquationSeparatei(buf, modeRGB, modeAlpha)
 
 cdef void GetglBlendEquationi(GLuint buf, GLenum mode):
     global cglBlendEquationi
-    cglBlendEquationi = <PFNGLBLENDEQUATIONIPROC>getFunction(b"glBlendEquationi")
+    cglBlendEquationi = <PFNGLBLENDEQUATIONIPROC>getFunction("glBlendEquationi")
     cglBlendEquationi(buf, mode)
 
 cdef void GetglBlendFuncSeparatei(GLuint buf, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha):
     global cglBlendFuncSeparatei
-    cglBlendFuncSeparatei = <PFNGLBLENDFUNCSEPARATEIPROC>getFunction(b"glBlendFuncSeparatei")
+    cglBlendFuncSeparatei = <PFNGLBLENDFUNCSEPARATEIPROC>getFunction("glBlendFuncSeparatei")
     cglBlendFuncSeparatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha)
 
 cdef void GetglBlendFunci(GLuint buf, GLenum src, GLenum dst):
     global cglBlendFunci
-    cglBlendFunci = <PFNGLBLENDFUNCIPROC>getFunction(b"glBlendFunci")
+    cglBlendFunci = <PFNGLBLENDFUNCIPROC>getFunction("glBlendFunci")
     cglBlendFunci(buf, src, dst)
 
 cdef void GetglDeleteTransformFeedbacks(GLsizei n, const GLuint *ids):
     global cglDeleteTransformFeedbacks
-    cglDeleteTransformFeedbacks = <PFNGLDELETETRANSFORMFEEDBACKSPROC>getFunction(b"glDeleteTransformFeedbacks")
+    cglDeleteTransformFeedbacks = <PFNGLDELETETRANSFORMFEEDBACKSPROC>getFunction("glDeleteTransformFeedbacks")
     cglDeleteTransformFeedbacks(n, ids)
 
 cdef void GetglDrawArraysIndirect(GLenum mode, const void *indirect):
     global cglDrawArraysIndirect
-    cglDrawArraysIndirect = <PFNGLDRAWARRAYSINDIRECTPROC>getFunction(b"glDrawArraysIndirect")
+    cglDrawArraysIndirect = <PFNGLDRAWARRAYSINDIRECTPROC>getFunction("glDrawArraysIndirect")
     cglDrawArraysIndirect(mode, indirect)
 
 cdef void GetglDrawElementsIndirect(GLenum mode, GLenum type, const void *indirect):
     global cglDrawElementsIndirect
-    cglDrawElementsIndirect = <PFNGLDRAWELEMENTSINDIRECTPROC>getFunction(b"glDrawElementsIndirect")
+    cglDrawElementsIndirect = <PFNGLDRAWELEMENTSINDIRECTPROC>getFunction("glDrawElementsIndirect")
     cglDrawElementsIndirect(mode, type, indirect)
 
 cdef void GetglDrawTransformFeedback(GLenum mode, GLuint id):
     global cglDrawTransformFeedback
-    cglDrawTransformFeedback = <PFNGLDRAWTRANSFORMFEEDBACKPROC>getFunction(b"glDrawTransformFeedback")
+    cglDrawTransformFeedback = <PFNGLDRAWTRANSFORMFEEDBACKPROC>getFunction("glDrawTransformFeedback")
     cglDrawTransformFeedback(mode, id)
 
 cdef void GetglDrawTransformFeedbackStream(GLenum mode, GLuint id, GLuint stream):
     global cglDrawTransformFeedbackStream
-    cglDrawTransformFeedbackStream = <PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC>getFunction(b"glDrawTransformFeedbackStream")
+    cglDrawTransformFeedbackStream = <PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC>getFunction("glDrawTransformFeedbackStream")
     cglDrawTransformFeedbackStream(mode, id, stream)
 
 cdef void GetglEndQueryIndexed(GLenum target, GLuint index):
     global cglEndQueryIndexed
-    cglEndQueryIndexed = <PFNGLENDQUERYINDEXEDPROC>getFunction(b"glEndQueryIndexed")
+    cglEndQueryIndexed = <PFNGLENDQUERYINDEXEDPROC>getFunction("glEndQueryIndexed")
     cglEndQueryIndexed(target, index)
 
 cdef void GetglGenTransformFeedbacks(GLsizei n, GLuint *ids):
     global cglGenTransformFeedbacks
-    cglGenTransformFeedbacks = <PFNGLGENTRANSFORMFEEDBACKSPROC>getFunction(b"glGenTransformFeedbacks")
+    cglGenTransformFeedbacks = <PFNGLGENTRANSFORMFEEDBACKSPROC>getFunction("glGenTransformFeedbacks")
     cglGenTransformFeedbacks(n, ids)
 
 cdef void GetglGetActiveSubroutineName(GLuint program, GLenum shadertype, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name):
     global cglGetActiveSubroutineName
-    cglGetActiveSubroutineName = <PFNGLGETACTIVESUBROUTINENAMEPROC>getFunction(b"glGetActiveSubroutineName")
+    cglGetActiveSubroutineName = <PFNGLGETACTIVESUBROUTINENAMEPROC>getFunction("glGetActiveSubroutineName")
     cglGetActiveSubroutineName(program, shadertype, index, bufSize, length, name)
 
 cdef void GetglGetActiveSubroutineUniformName(GLuint program, GLenum shadertype, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name):
     global cglGetActiveSubroutineUniformName
-    cglGetActiveSubroutineUniformName = <PFNGLGETACTIVESUBROUTINEUNIFORMNAMEPROC>getFunction(b"glGetActiveSubroutineUniformName")
+    cglGetActiveSubroutineUniformName = <PFNGLGETACTIVESUBROUTINEUNIFORMNAMEPROC>getFunction("glGetActiveSubroutineUniformName")
     cglGetActiveSubroutineUniformName(program, shadertype, index, bufSize, length, name)
 
 cdef void GetglGetActiveSubroutineUniformiv(GLuint program, GLenum shadertype, GLuint index, GLenum pname, GLint *values):
     global cglGetActiveSubroutineUniformiv
-    cglGetActiveSubroutineUniformiv = <PFNGLGETACTIVESUBROUTINEUNIFORMIVPROC>getFunction(b"glGetActiveSubroutineUniformiv")
+    cglGetActiveSubroutineUniformiv = <PFNGLGETACTIVESUBROUTINEUNIFORMIVPROC>getFunction("glGetActiveSubroutineUniformiv")
     cglGetActiveSubroutineUniformiv(program, shadertype, index, pname, values)
 
 cdef void GetglGetProgramStageiv(GLuint program, GLenum shadertype, GLenum pname, GLint *values):
     global cglGetProgramStageiv
-    cglGetProgramStageiv = <PFNGLGETPROGRAMSTAGEIVPROC>getFunction(b"glGetProgramStageiv")
+    cglGetProgramStageiv = <PFNGLGETPROGRAMSTAGEIVPROC>getFunction("glGetProgramStageiv")
     cglGetProgramStageiv(program, shadertype, pname, values)
 
 cdef void GetglGetQueryIndexediv(GLenum target, GLuint index, GLenum pname, GLint *params):
     global cglGetQueryIndexediv
-    cglGetQueryIndexediv = <PFNGLGETQUERYINDEXEDIVPROC>getFunction(b"glGetQueryIndexediv")
+    cglGetQueryIndexediv = <PFNGLGETQUERYINDEXEDIVPROC>getFunction("glGetQueryIndexediv")
     cglGetQueryIndexediv(target, index, pname, params)
 
 cdef GLuint GetglGetSubroutineIndex(GLuint program, GLenum shadertype, const GLchar *name):
     global cglGetSubroutineIndex
-    cglGetSubroutineIndex = <PFNGLGETSUBROUTINEINDEXPROC>getFunction(b"glGetSubroutineIndex")
+    cglGetSubroutineIndex = <PFNGLGETSUBROUTINEINDEXPROC>getFunction("glGetSubroutineIndex")
     cglGetSubroutineIndex(program, shadertype, name)
 
 cdef GLint GetglGetSubroutineUniformLocation(GLuint program, GLenum shadertype, const GLchar *name):
     global cglGetSubroutineUniformLocation
-    cglGetSubroutineUniformLocation = <PFNGLGETSUBROUTINEUNIFORMLOCATIONPROC>getFunction(b"glGetSubroutineUniformLocation")
+    cglGetSubroutineUniformLocation = <PFNGLGETSUBROUTINEUNIFORMLOCATIONPROC>getFunction("glGetSubroutineUniformLocation")
     cglGetSubroutineUniformLocation(program, shadertype, name)
 
 cdef void GetglGetUniformSubroutineuiv(GLenum shadertype, GLint location, GLuint *params):
     global cglGetUniformSubroutineuiv
-    cglGetUniformSubroutineuiv = <PFNGLGETUNIFORMSUBROUTINEUIVPROC>getFunction(b"glGetUniformSubroutineuiv")
+    cglGetUniformSubroutineuiv = <PFNGLGETUNIFORMSUBROUTINEUIVPROC>getFunction("glGetUniformSubroutineuiv")
     cglGetUniformSubroutineuiv(shadertype, location, params)
 
 cdef void GetglGetUniformdv(GLuint program, GLint location, GLdouble *params):
     global cglGetUniformdv
-    cglGetUniformdv = <PFNGLGETUNIFORMDVPROC>getFunction(b"glGetUniformdv")
+    cglGetUniformdv = <PFNGLGETUNIFORMDVPROC>getFunction("glGetUniformdv")
     cglGetUniformdv(program, location, params)
 
 cdef GLboolean GetglIsTransformFeedback(GLuint id):
     global cglIsTransformFeedback
-    cglIsTransformFeedback = <PFNGLISTRANSFORMFEEDBACKPROC>getFunction(b"glIsTransformFeedback")
+    cglIsTransformFeedback = <PFNGLISTRANSFORMFEEDBACKPROC>getFunction("glIsTransformFeedback")
     cglIsTransformFeedback(id)
 
 cdef void GetglMinSampleShading(GLfloat value):
     global cglMinSampleShading
-    cglMinSampleShading = <PFNGLMINSAMPLESHADINGPROC>getFunction(b"glMinSampleShading")
+    cglMinSampleShading = <PFNGLMINSAMPLESHADINGPROC>getFunction("glMinSampleShading")
     cglMinSampleShading(value)
 
 cdef void GetglPatchParameterfv(GLenum pname, const GLfloat *values):
     global cglPatchParameterfv
-    cglPatchParameterfv = <PFNGLPATCHPARAMETERFVPROC>getFunction(b"glPatchParameterfv")
+    cglPatchParameterfv = <PFNGLPATCHPARAMETERFVPROC>getFunction("glPatchParameterfv")
     cglPatchParameterfv(pname, values)
 
 cdef void GetglPatchParameteri(GLenum pname, GLint value):
     global cglPatchParameteri
-    cglPatchParameteri = <PFNGLPATCHPARAMETERIPROC>getFunction(b"glPatchParameteri")
+    cglPatchParameteri = <PFNGLPATCHPARAMETERIPROC>getFunction("glPatchParameteri")
     cglPatchParameteri(pname, value)
 
 cdef void GetglPauseTransformFeedback():
     global cglPauseTransformFeedback
-    cglPauseTransformFeedback = <PFNGLPAUSETRANSFORMFEEDBACKPROC>getFunction(b"glPauseTransformFeedback")
+    cglPauseTransformFeedback = <PFNGLPAUSETRANSFORMFEEDBACKPROC>getFunction("glPauseTransformFeedback")
     cglPauseTransformFeedback()
 
 cdef void GetglResumeTransformFeedback():
     global cglResumeTransformFeedback
-    cglResumeTransformFeedback = <PFNGLRESUMETRANSFORMFEEDBACKPROC>getFunction(b"glResumeTransformFeedback")
+    cglResumeTransformFeedback = <PFNGLRESUMETRANSFORMFEEDBACKPROC>getFunction("glResumeTransformFeedback")
     cglResumeTransformFeedback()
 
 cdef void GetglUniform1d(GLint location, GLdouble x):
     global cglUniform1d
-    cglUniform1d = <PFNGLUNIFORM1DPROC>getFunction(b"glUniform1d")
+    cglUniform1d = <PFNGLUNIFORM1DPROC>getFunction("glUniform1d")
     cglUniform1d(location, x)
 
 cdef void GetglUniform1dv(GLint location, GLsizei count, const GLdouble *value):
     global cglUniform1dv
-    cglUniform1dv = <PFNGLUNIFORM1DVPROC>getFunction(b"glUniform1dv")
+    cglUniform1dv = <PFNGLUNIFORM1DVPROC>getFunction("glUniform1dv")
     cglUniform1dv(location, count, value)
 
 cdef void GetglUniform2d(GLint location, GLdouble x, GLdouble y):
     global cglUniform2d
-    cglUniform2d = <PFNGLUNIFORM2DPROC>getFunction(b"glUniform2d")
+    cglUniform2d = <PFNGLUNIFORM2DPROC>getFunction("glUniform2d")
     cglUniform2d(location, x, y)
 
 cdef void GetglUniform2dv(GLint location, GLsizei count, const GLdouble *value):
     global cglUniform2dv
-    cglUniform2dv = <PFNGLUNIFORM2DVPROC>getFunction(b"glUniform2dv")
+    cglUniform2dv = <PFNGLUNIFORM2DVPROC>getFunction("glUniform2dv")
     cglUniform2dv(location, count, value)
 
 cdef void GetglUniform3d(GLint location, GLdouble x, GLdouble y, GLdouble z):
     global cglUniform3d
-    cglUniform3d = <PFNGLUNIFORM3DPROC>getFunction(b"glUniform3d")
+    cglUniform3d = <PFNGLUNIFORM3DPROC>getFunction("glUniform3d")
     cglUniform3d(location, x, y, z)
 
 cdef void GetglUniform3dv(GLint location, GLsizei count, const GLdouble *value):
     global cglUniform3dv
-    cglUniform3dv = <PFNGLUNIFORM3DVPROC>getFunction(b"glUniform3dv")
+    cglUniform3dv = <PFNGLUNIFORM3DVPROC>getFunction("glUniform3dv")
     cglUniform3dv(location, count, value)
 
 cdef void GetglUniform4d(GLint location, GLdouble x, GLdouble y, GLdouble z, GLdouble w):
     global cglUniform4d
-    cglUniform4d = <PFNGLUNIFORM4DPROC>getFunction(b"glUniform4d")
+    cglUniform4d = <PFNGLUNIFORM4DPROC>getFunction("glUniform4d")
     cglUniform4d(location, x, y, z, w)
 
 cdef void GetglUniform4dv(GLint location, GLsizei count, const GLdouble *value):
     global cglUniform4dv
-    cglUniform4dv = <PFNGLUNIFORM4DVPROC>getFunction(b"glUniform4dv")
+    cglUniform4dv = <PFNGLUNIFORM4DVPROC>getFunction("glUniform4dv")
     cglUniform4dv(location, count, value)
 
 cdef void GetglUniformMatrix2dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix2dv
-    cglUniformMatrix2dv = <PFNGLUNIFORMMATRIX2DVPROC>getFunction(b"glUniformMatrix2dv")
+    cglUniformMatrix2dv = <PFNGLUNIFORMMATRIX2DVPROC>getFunction("glUniformMatrix2dv")
     cglUniformMatrix2dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix2x3dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix2x3dv
-    cglUniformMatrix2x3dv = <PFNGLUNIFORMMATRIX2X3DVPROC>getFunction(b"glUniformMatrix2x3dv")
+    cglUniformMatrix2x3dv = <PFNGLUNIFORMMATRIX2X3DVPROC>getFunction("glUniformMatrix2x3dv")
     cglUniformMatrix2x3dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix2x4dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix2x4dv
-    cglUniformMatrix2x4dv = <PFNGLUNIFORMMATRIX2X4DVPROC>getFunction(b"glUniformMatrix2x4dv")
+    cglUniformMatrix2x4dv = <PFNGLUNIFORMMATRIX2X4DVPROC>getFunction("glUniformMatrix2x4dv")
     cglUniformMatrix2x4dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix3dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix3dv
-    cglUniformMatrix3dv = <PFNGLUNIFORMMATRIX3DVPROC>getFunction(b"glUniformMatrix3dv")
+    cglUniformMatrix3dv = <PFNGLUNIFORMMATRIX3DVPROC>getFunction("glUniformMatrix3dv")
     cglUniformMatrix3dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix3x2dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix3x2dv
-    cglUniformMatrix3x2dv = <PFNGLUNIFORMMATRIX3X2DVPROC>getFunction(b"glUniformMatrix3x2dv")
+    cglUniformMatrix3x2dv = <PFNGLUNIFORMMATRIX3X2DVPROC>getFunction("glUniformMatrix3x2dv")
     cglUniformMatrix3x2dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix3x4dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix3x4dv
-    cglUniformMatrix3x4dv = <PFNGLUNIFORMMATRIX3X4DVPROC>getFunction(b"glUniformMatrix3x4dv")
+    cglUniformMatrix3x4dv = <PFNGLUNIFORMMATRIX3X4DVPROC>getFunction("glUniformMatrix3x4dv")
     cglUniformMatrix3x4dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix4dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix4dv
-    cglUniformMatrix4dv = <PFNGLUNIFORMMATRIX4DVPROC>getFunction(b"glUniformMatrix4dv")
+    cglUniformMatrix4dv = <PFNGLUNIFORMMATRIX4DVPROC>getFunction("glUniformMatrix4dv")
     cglUniformMatrix4dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix4x2dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix4x2dv
-    cglUniformMatrix4x2dv = <PFNGLUNIFORMMATRIX4X2DVPROC>getFunction(b"glUniformMatrix4x2dv")
+    cglUniformMatrix4x2dv = <PFNGLUNIFORMMATRIX4X2DVPROC>getFunction("glUniformMatrix4x2dv")
     cglUniformMatrix4x2dv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix4x3dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglUniformMatrix4x3dv
-    cglUniformMatrix4x3dv = <PFNGLUNIFORMMATRIX4X3DVPROC>getFunction(b"glUniformMatrix4x3dv")
+    cglUniformMatrix4x3dv = <PFNGLUNIFORMMATRIX4X3DVPROC>getFunction("glUniformMatrix4x3dv")
     cglUniformMatrix4x3dv(location, count, transpose, value)
 
 cdef void GetglUniformSubroutinesuiv(GLenum shadertype, GLsizei count, const GLuint *indices):
     global cglUniformSubroutinesuiv
-    cglUniformSubroutinesuiv = <PFNGLUNIFORMSUBROUTINESUIVPROC>getFunction(b"glUniformSubroutinesuiv")
+    cglUniformSubroutinesuiv = <PFNGLUNIFORMSUBROUTINESUIVPROC>getFunction("glUniformSubroutinesuiv")
     cglUniformSubroutinesuiv(shadertype, count, indices)
 
 cglBeginQueryIndexed = GetglBeginQueryIndexed

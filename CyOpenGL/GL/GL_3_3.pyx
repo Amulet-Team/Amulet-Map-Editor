@@ -141,292 +141,292 @@ cdef PFNGLVERTEXP4UIVPROC cglVertexP4uiv = NULL
 
 cdef void GetglBindFragDataLocationIndexed(GLuint program, GLuint colorNumber, GLuint index, const GLchar *name):
     global cglBindFragDataLocationIndexed
-    cglBindFragDataLocationIndexed = <PFNGLBINDFRAGDATALOCATIONINDEXEDPROC>getFunction(b"glBindFragDataLocationIndexed")
+    cglBindFragDataLocationIndexed = <PFNGLBINDFRAGDATALOCATIONINDEXEDPROC>getFunction("glBindFragDataLocationIndexed")
     cglBindFragDataLocationIndexed(program, colorNumber, index, name)
 
 cdef void GetglBindSampler(GLuint unit, GLuint sampler):
     global cglBindSampler
-    cglBindSampler = <PFNGLBINDSAMPLERPROC>getFunction(b"glBindSampler")
+    cglBindSampler = <PFNGLBINDSAMPLERPROC>getFunction("glBindSampler")
     cglBindSampler(unit, sampler)
 
 cdef void GetglColorP3ui(GLenum type, GLuint color):
     global cglColorP3ui
-    cglColorP3ui = <PFNGLCOLORP3UIPROC>getFunction(b"glColorP3ui")
+    cglColorP3ui = <PFNGLCOLORP3UIPROC>getFunction("glColorP3ui")
     cglColorP3ui(type, color)
 
 cdef void GetglColorP3uiv(GLenum type, const GLuint *color):
     global cglColorP3uiv
-    cglColorP3uiv = <PFNGLCOLORP3UIVPROC>getFunction(b"glColorP3uiv")
+    cglColorP3uiv = <PFNGLCOLORP3UIVPROC>getFunction("glColorP3uiv")
     cglColorP3uiv(type, color)
 
 cdef void GetglColorP4ui(GLenum type, GLuint color):
     global cglColorP4ui
-    cglColorP4ui = <PFNGLCOLORP4UIPROC>getFunction(b"glColorP4ui")
+    cglColorP4ui = <PFNGLCOLORP4UIPROC>getFunction("glColorP4ui")
     cglColorP4ui(type, color)
 
 cdef void GetglColorP4uiv(GLenum type, const GLuint *color):
     global cglColorP4uiv
-    cglColorP4uiv = <PFNGLCOLORP4UIVPROC>getFunction(b"glColorP4uiv")
+    cglColorP4uiv = <PFNGLCOLORP4UIVPROC>getFunction("glColorP4uiv")
     cglColorP4uiv(type, color)
 
 cdef void GetglDeleteSamplers(GLsizei count, const GLuint *samplers):
     global cglDeleteSamplers
-    cglDeleteSamplers = <PFNGLDELETESAMPLERSPROC>getFunction(b"glDeleteSamplers")
+    cglDeleteSamplers = <PFNGLDELETESAMPLERSPROC>getFunction("glDeleteSamplers")
     cglDeleteSamplers(count, samplers)
 
 cdef void GetglGenSamplers(GLsizei count, GLuint *samplers):
     global cglGenSamplers
-    cglGenSamplers = <PFNGLGENSAMPLERSPROC>getFunction(b"glGenSamplers")
+    cglGenSamplers = <PFNGLGENSAMPLERSPROC>getFunction("glGenSamplers")
     cglGenSamplers(count, samplers)
 
 cdef GLint GetglGetFragDataIndex(GLuint program, const GLchar *name):
     global cglGetFragDataIndex
-    cglGetFragDataIndex = <PFNGLGETFRAGDATAINDEXPROC>getFunction(b"glGetFragDataIndex")
+    cglGetFragDataIndex = <PFNGLGETFRAGDATAINDEXPROC>getFunction("glGetFragDataIndex")
     cglGetFragDataIndex(program, name)
 
 cdef void GetglGetQueryObjecti64v(GLuint id, GLenum pname, GLint64 *params):
     global cglGetQueryObjecti64v
-    cglGetQueryObjecti64v = <PFNGLGETQUERYOBJECTI64VPROC>getFunction(b"glGetQueryObjecti64v")
+    cglGetQueryObjecti64v = <PFNGLGETQUERYOBJECTI64VPROC>getFunction("glGetQueryObjecti64v")
     cglGetQueryObjecti64v(id, pname, params)
 
 cdef void GetglGetQueryObjectui64v(GLuint id, GLenum pname, GLuint64 *params):
     global cglGetQueryObjectui64v
-    cglGetQueryObjectui64v = <PFNGLGETQUERYOBJECTUI64VPROC>getFunction(b"glGetQueryObjectui64v")
+    cglGetQueryObjectui64v = <PFNGLGETQUERYOBJECTUI64VPROC>getFunction("glGetQueryObjectui64v")
     cglGetQueryObjectui64v(id, pname, params)
 
 cdef void GetglGetSamplerParameterIiv(GLuint sampler, GLenum pname, GLint *params):
     global cglGetSamplerParameterIiv
-    cglGetSamplerParameterIiv = <PFNGLGETSAMPLERPARAMETERIIVPROC>getFunction(b"glGetSamplerParameterIiv")
+    cglGetSamplerParameterIiv = <PFNGLGETSAMPLERPARAMETERIIVPROC>getFunction("glGetSamplerParameterIiv")
     cglGetSamplerParameterIiv(sampler, pname, params)
 
 cdef void GetglGetSamplerParameterIuiv(GLuint sampler, GLenum pname, GLuint *params):
     global cglGetSamplerParameterIuiv
-    cglGetSamplerParameterIuiv = <PFNGLGETSAMPLERPARAMETERIUIVPROC>getFunction(b"glGetSamplerParameterIuiv")
+    cglGetSamplerParameterIuiv = <PFNGLGETSAMPLERPARAMETERIUIVPROC>getFunction("glGetSamplerParameterIuiv")
     cglGetSamplerParameterIuiv(sampler, pname, params)
 
 cdef void GetglGetSamplerParameterfv(GLuint sampler, GLenum pname, GLfloat *params):
     global cglGetSamplerParameterfv
-    cglGetSamplerParameterfv = <PFNGLGETSAMPLERPARAMETERFVPROC>getFunction(b"glGetSamplerParameterfv")
+    cglGetSamplerParameterfv = <PFNGLGETSAMPLERPARAMETERFVPROC>getFunction("glGetSamplerParameterfv")
     cglGetSamplerParameterfv(sampler, pname, params)
 
 cdef void GetglGetSamplerParameteriv(GLuint sampler, GLenum pname, GLint *params):
     global cglGetSamplerParameteriv
-    cglGetSamplerParameteriv = <PFNGLGETSAMPLERPARAMETERIVPROC>getFunction(b"glGetSamplerParameteriv")
+    cglGetSamplerParameteriv = <PFNGLGETSAMPLERPARAMETERIVPROC>getFunction("glGetSamplerParameteriv")
     cglGetSamplerParameteriv(sampler, pname, params)
 
 cdef GLboolean GetglIsSampler(GLuint sampler):
     global cglIsSampler
-    cglIsSampler = <PFNGLISSAMPLERPROC>getFunction(b"glIsSampler")
+    cglIsSampler = <PFNGLISSAMPLERPROC>getFunction("glIsSampler")
     cglIsSampler(sampler)
 
 cdef void GetglMultiTexCoordP1ui(GLenum texture, GLenum type, GLuint coords):
     global cglMultiTexCoordP1ui
-    cglMultiTexCoordP1ui = <PFNGLMULTITEXCOORDP1UIPROC>getFunction(b"glMultiTexCoordP1ui")
+    cglMultiTexCoordP1ui = <PFNGLMULTITEXCOORDP1UIPROC>getFunction("glMultiTexCoordP1ui")
     cglMultiTexCoordP1ui(texture, type, coords)
 
 cdef void GetglMultiTexCoordP1uiv(GLenum texture, GLenum type, const GLuint *coords):
     global cglMultiTexCoordP1uiv
-    cglMultiTexCoordP1uiv = <PFNGLMULTITEXCOORDP1UIVPROC>getFunction(b"glMultiTexCoordP1uiv")
+    cglMultiTexCoordP1uiv = <PFNGLMULTITEXCOORDP1UIVPROC>getFunction("glMultiTexCoordP1uiv")
     cglMultiTexCoordP1uiv(texture, type, coords)
 
 cdef void GetglMultiTexCoordP2ui(GLenum texture, GLenum type, GLuint coords):
     global cglMultiTexCoordP2ui
-    cglMultiTexCoordP2ui = <PFNGLMULTITEXCOORDP2UIPROC>getFunction(b"glMultiTexCoordP2ui")
+    cglMultiTexCoordP2ui = <PFNGLMULTITEXCOORDP2UIPROC>getFunction("glMultiTexCoordP2ui")
     cglMultiTexCoordP2ui(texture, type, coords)
 
 cdef void GetglMultiTexCoordP2uiv(GLenum texture, GLenum type, const GLuint *coords):
     global cglMultiTexCoordP2uiv
-    cglMultiTexCoordP2uiv = <PFNGLMULTITEXCOORDP2UIVPROC>getFunction(b"glMultiTexCoordP2uiv")
+    cglMultiTexCoordP2uiv = <PFNGLMULTITEXCOORDP2UIVPROC>getFunction("glMultiTexCoordP2uiv")
     cglMultiTexCoordP2uiv(texture, type, coords)
 
 cdef void GetglMultiTexCoordP3ui(GLenum texture, GLenum type, GLuint coords):
     global cglMultiTexCoordP3ui
-    cglMultiTexCoordP3ui = <PFNGLMULTITEXCOORDP3UIPROC>getFunction(b"glMultiTexCoordP3ui")
+    cglMultiTexCoordP3ui = <PFNGLMULTITEXCOORDP3UIPROC>getFunction("glMultiTexCoordP3ui")
     cglMultiTexCoordP3ui(texture, type, coords)
 
 cdef void GetglMultiTexCoordP3uiv(GLenum texture, GLenum type, const GLuint *coords):
     global cglMultiTexCoordP3uiv
-    cglMultiTexCoordP3uiv = <PFNGLMULTITEXCOORDP3UIVPROC>getFunction(b"glMultiTexCoordP3uiv")
+    cglMultiTexCoordP3uiv = <PFNGLMULTITEXCOORDP3UIVPROC>getFunction("glMultiTexCoordP3uiv")
     cglMultiTexCoordP3uiv(texture, type, coords)
 
 cdef void GetglMultiTexCoordP4ui(GLenum texture, GLenum type, GLuint coords):
     global cglMultiTexCoordP4ui
-    cglMultiTexCoordP4ui = <PFNGLMULTITEXCOORDP4UIPROC>getFunction(b"glMultiTexCoordP4ui")
+    cglMultiTexCoordP4ui = <PFNGLMULTITEXCOORDP4UIPROC>getFunction("glMultiTexCoordP4ui")
     cglMultiTexCoordP4ui(texture, type, coords)
 
 cdef void GetglMultiTexCoordP4uiv(GLenum texture, GLenum type, const GLuint *coords):
     global cglMultiTexCoordP4uiv
-    cglMultiTexCoordP4uiv = <PFNGLMULTITEXCOORDP4UIVPROC>getFunction(b"glMultiTexCoordP4uiv")
+    cglMultiTexCoordP4uiv = <PFNGLMULTITEXCOORDP4UIVPROC>getFunction("glMultiTexCoordP4uiv")
     cglMultiTexCoordP4uiv(texture, type, coords)
 
 cdef void GetglNormalP3ui(GLenum type, GLuint coords):
     global cglNormalP3ui
-    cglNormalP3ui = <PFNGLNORMALP3UIPROC>getFunction(b"glNormalP3ui")
+    cglNormalP3ui = <PFNGLNORMALP3UIPROC>getFunction("glNormalP3ui")
     cglNormalP3ui(type, coords)
 
 cdef void GetglNormalP3uiv(GLenum type, const GLuint *coords):
     global cglNormalP3uiv
-    cglNormalP3uiv = <PFNGLNORMALP3UIVPROC>getFunction(b"glNormalP3uiv")
+    cglNormalP3uiv = <PFNGLNORMALP3UIVPROC>getFunction("glNormalP3uiv")
     cglNormalP3uiv(type, coords)
 
 cdef void GetglQueryCounter(GLuint id, GLenum target):
     global cglQueryCounter
-    cglQueryCounter = <PFNGLQUERYCOUNTERPROC>getFunction(b"glQueryCounter")
+    cglQueryCounter = <PFNGLQUERYCOUNTERPROC>getFunction("glQueryCounter")
     cglQueryCounter(id, target)
 
 cdef void GetglSamplerParameterIiv(GLuint sampler, GLenum pname, const GLint *param):
     global cglSamplerParameterIiv
-    cglSamplerParameterIiv = <PFNGLSAMPLERPARAMETERIIVPROC>getFunction(b"glSamplerParameterIiv")
+    cglSamplerParameterIiv = <PFNGLSAMPLERPARAMETERIIVPROC>getFunction("glSamplerParameterIiv")
     cglSamplerParameterIiv(sampler, pname, param)
 
 cdef void GetglSamplerParameterIuiv(GLuint sampler, GLenum pname, const GLuint *param):
     global cglSamplerParameterIuiv
-    cglSamplerParameterIuiv = <PFNGLSAMPLERPARAMETERIUIVPROC>getFunction(b"glSamplerParameterIuiv")
+    cglSamplerParameterIuiv = <PFNGLSAMPLERPARAMETERIUIVPROC>getFunction("glSamplerParameterIuiv")
     cglSamplerParameterIuiv(sampler, pname, param)
 
 cdef void GetglSamplerParameterf(GLuint sampler, GLenum pname, GLfloat param):
     global cglSamplerParameterf
-    cglSamplerParameterf = <PFNGLSAMPLERPARAMETERFPROC>getFunction(b"glSamplerParameterf")
+    cglSamplerParameterf = <PFNGLSAMPLERPARAMETERFPROC>getFunction("glSamplerParameterf")
     cglSamplerParameterf(sampler, pname, param)
 
 cdef void GetglSamplerParameterfv(GLuint sampler, GLenum pname, const GLfloat *param):
     global cglSamplerParameterfv
-    cglSamplerParameterfv = <PFNGLSAMPLERPARAMETERFVPROC>getFunction(b"glSamplerParameterfv")
+    cglSamplerParameterfv = <PFNGLSAMPLERPARAMETERFVPROC>getFunction("glSamplerParameterfv")
     cglSamplerParameterfv(sampler, pname, param)
 
 cdef void GetglSamplerParameteri(GLuint sampler, GLenum pname, GLint param):
     global cglSamplerParameteri
-    cglSamplerParameteri = <PFNGLSAMPLERPARAMETERIPROC>getFunction(b"glSamplerParameteri")
+    cglSamplerParameteri = <PFNGLSAMPLERPARAMETERIPROC>getFunction("glSamplerParameteri")
     cglSamplerParameteri(sampler, pname, param)
 
 cdef void GetglSamplerParameteriv(GLuint sampler, GLenum pname, const GLint *param):
     global cglSamplerParameteriv
-    cglSamplerParameteriv = <PFNGLSAMPLERPARAMETERIVPROC>getFunction(b"glSamplerParameteriv")
+    cglSamplerParameteriv = <PFNGLSAMPLERPARAMETERIVPROC>getFunction("glSamplerParameteriv")
     cglSamplerParameteriv(sampler, pname, param)
 
 cdef void GetglSecondaryColorP3ui(GLenum type, GLuint color):
     global cglSecondaryColorP3ui
-    cglSecondaryColorP3ui = <PFNGLSECONDARYCOLORP3UIPROC>getFunction(b"glSecondaryColorP3ui")
+    cglSecondaryColorP3ui = <PFNGLSECONDARYCOLORP3UIPROC>getFunction("glSecondaryColorP3ui")
     cglSecondaryColorP3ui(type, color)
 
 cdef void GetglSecondaryColorP3uiv(GLenum type, const GLuint *color):
     global cglSecondaryColorP3uiv
-    cglSecondaryColorP3uiv = <PFNGLSECONDARYCOLORP3UIVPROC>getFunction(b"glSecondaryColorP3uiv")
+    cglSecondaryColorP3uiv = <PFNGLSECONDARYCOLORP3UIVPROC>getFunction("glSecondaryColorP3uiv")
     cglSecondaryColorP3uiv(type, color)
 
 cdef void GetglTexCoordP1ui(GLenum type, GLuint coords):
     global cglTexCoordP1ui
-    cglTexCoordP1ui = <PFNGLTEXCOORDP1UIPROC>getFunction(b"glTexCoordP1ui")
+    cglTexCoordP1ui = <PFNGLTEXCOORDP1UIPROC>getFunction("glTexCoordP1ui")
     cglTexCoordP1ui(type, coords)
 
 cdef void GetglTexCoordP1uiv(GLenum type, const GLuint *coords):
     global cglTexCoordP1uiv
-    cglTexCoordP1uiv = <PFNGLTEXCOORDP1UIVPROC>getFunction(b"glTexCoordP1uiv")
+    cglTexCoordP1uiv = <PFNGLTEXCOORDP1UIVPROC>getFunction("glTexCoordP1uiv")
     cglTexCoordP1uiv(type, coords)
 
 cdef void GetglTexCoordP2ui(GLenum type, GLuint coords):
     global cglTexCoordP2ui
-    cglTexCoordP2ui = <PFNGLTEXCOORDP2UIPROC>getFunction(b"glTexCoordP2ui")
+    cglTexCoordP2ui = <PFNGLTEXCOORDP2UIPROC>getFunction("glTexCoordP2ui")
     cglTexCoordP2ui(type, coords)
 
 cdef void GetglTexCoordP2uiv(GLenum type, const GLuint *coords):
     global cglTexCoordP2uiv
-    cglTexCoordP2uiv = <PFNGLTEXCOORDP2UIVPROC>getFunction(b"glTexCoordP2uiv")
+    cglTexCoordP2uiv = <PFNGLTEXCOORDP2UIVPROC>getFunction("glTexCoordP2uiv")
     cglTexCoordP2uiv(type, coords)
 
 cdef void GetglTexCoordP3ui(GLenum type, GLuint coords):
     global cglTexCoordP3ui
-    cglTexCoordP3ui = <PFNGLTEXCOORDP3UIPROC>getFunction(b"glTexCoordP3ui")
+    cglTexCoordP3ui = <PFNGLTEXCOORDP3UIPROC>getFunction("glTexCoordP3ui")
     cglTexCoordP3ui(type, coords)
 
 cdef void GetglTexCoordP3uiv(GLenum type, const GLuint *coords):
     global cglTexCoordP3uiv
-    cglTexCoordP3uiv = <PFNGLTEXCOORDP3UIVPROC>getFunction(b"glTexCoordP3uiv")
+    cglTexCoordP3uiv = <PFNGLTEXCOORDP3UIVPROC>getFunction("glTexCoordP3uiv")
     cglTexCoordP3uiv(type, coords)
 
 cdef void GetglTexCoordP4ui(GLenum type, GLuint coords):
     global cglTexCoordP4ui
-    cglTexCoordP4ui = <PFNGLTEXCOORDP4UIPROC>getFunction(b"glTexCoordP4ui")
+    cglTexCoordP4ui = <PFNGLTEXCOORDP4UIPROC>getFunction("glTexCoordP4ui")
     cglTexCoordP4ui(type, coords)
 
 cdef void GetglTexCoordP4uiv(GLenum type, const GLuint *coords):
     global cglTexCoordP4uiv
-    cglTexCoordP4uiv = <PFNGLTEXCOORDP4UIVPROC>getFunction(b"glTexCoordP4uiv")
+    cglTexCoordP4uiv = <PFNGLTEXCOORDP4UIVPROC>getFunction("glTexCoordP4uiv")
     cglTexCoordP4uiv(type, coords)
 
 cdef void GetglVertexAttribDivisor(GLuint index, GLuint divisor):
     global cglVertexAttribDivisor
-    cglVertexAttribDivisor = <PFNGLVERTEXATTRIBDIVISORPROC>getFunction(b"glVertexAttribDivisor")
+    cglVertexAttribDivisor = <PFNGLVERTEXATTRIBDIVISORPROC>getFunction("glVertexAttribDivisor")
     cglVertexAttribDivisor(index, divisor)
 
 cdef void GetglVertexAttribP1ui(GLuint index, GLenum type, GLboolean normalized, GLuint value):
     global cglVertexAttribP1ui
-    cglVertexAttribP1ui = <PFNGLVERTEXATTRIBP1UIPROC>getFunction(b"glVertexAttribP1ui")
+    cglVertexAttribP1ui = <PFNGLVERTEXATTRIBP1UIPROC>getFunction("glVertexAttribP1ui")
     cglVertexAttribP1ui(index, type, normalized, value)
 
 cdef void GetglVertexAttribP1uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint *value):
     global cglVertexAttribP1uiv
-    cglVertexAttribP1uiv = <PFNGLVERTEXATTRIBP1UIVPROC>getFunction(b"glVertexAttribP1uiv")
+    cglVertexAttribP1uiv = <PFNGLVERTEXATTRIBP1UIVPROC>getFunction("glVertexAttribP1uiv")
     cglVertexAttribP1uiv(index, type, normalized, value)
 
 cdef void GetglVertexAttribP2ui(GLuint index, GLenum type, GLboolean normalized, GLuint value):
     global cglVertexAttribP2ui
-    cglVertexAttribP2ui = <PFNGLVERTEXATTRIBP2UIPROC>getFunction(b"glVertexAttribP2ui")
+    cglVertexAttribP2ui = <PFNGLVERTEXATTRIBP2UIPROC>getFunction("glVertexAttribP2ui")
     cglVertexAttribP2ui(index, type, normalized, value)
 
 cdef void GetglVertexAttribP2uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint *value):
     global cglVertexAttribP2uiv
-    cglVertexAttribP2uiv = <PFNGLVERTEXATTRIBP2UIVPROC>getFunction(b"glVertexAttribP2uiv")
+    cglVertexAttribP2uiv = <PFNGLVERTEXATTRIBP2UIVPROC>getFunction("glVertexAttribP2uiv")
     cglVertexAttribP2uiv(index, type, normalized, value)
 
 cdef void GetglVertexAttribP3ui(GLuint index, GLenum type, GLboolean normalized, GLuint value):
     global cglVertexAttribP3ui
-    cglVertexAttribP3ui = <PFNGLVERTEXATTRIBP3UIPROC>getFunction(b"glVertexAttribP3ui")
+    cglVertexAttribP3ui = <PFNGLVERTEXATTRIBP3UIPROC>getFunction("glVertexAttribP3ui")
     cglVertexAttribP3ui(index, type, normalized, value)
 
 cdef void GetglVertexAttribP3uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint *value):
     global cglVertexAttribP3uiv
-    cglVertexAttribP3uiv = <PFNGLVERTEXATTRIBP3UIVPROC>getFunction(b"glVertexAttribP3uiv")
+    cglVertexAttribP3uiv = <PFNGLVERTEXATTRIBP3UIVPROC>getFunction("glVertexAttribP3uiv")
     cglVertexAttribP3uiv(index, type, normalized, value)
 
 cdef void GetglVertexAttribP4ui(GLuint index, GLenum type, GLboolean normalized, GLuint value):
     global cglVertexAttribP4ui
-    cglVertexAttribP4ui = <PFNGLVERTEXATTRIBP4UIPROC>getFunction(b"glVertexAttribP4ui")
+    cglVertexAttribP4ui = <PFNGLVERTEXATTRIBP4UIPROC>getFunction("glVertexAttribP4ui")
     cglVertexAttribP4ui(index, type, normalized, value)
 
 cdef void GetglVertexAttribP4uiv(GLuint index, GLenum type, GLboolean normalized, const GLuint *value):
     global cglVertexAttribP4uiv
-    cglVertexAttribP4uiv = <PFNGLVERTEXATTRIBP4UIVPROC>getFunction(b"glVertexAttribP4uiv")
+    cglVertexAttribP4uiv = <PFNGLVERTEXATTRIBP4UIVPROC>getFunction("glVertexAttribP4uiv")
     cglVertexAttribP4uiv(index, type, normalized, value)
 
 cdef void GetglVertexP2ui(GLenum type, GLuint value):
     global cglVertexP2ui
-    cglVertexP2ui = <PFNGLVERTEXP2UIPROC>getFunction(b"glVertexP2ui")
+    cglVertexP2ui = <PFNGLVERTEXP2UIPROC>getFunction("glVertexP2ui")
     cglVertexP2ui(type, value)
 
 cdef void GetglVertexP2uiv(GLenum type, const GLuint *value):
     global cglVertexP2uiv
-    cglVertexP2uiv = <PFNGLVERTEXP2UIVPROC>getFunction(b"glVertexP2uiv")
+    cglVertexP2uiv = <PFNGLVERTEXP2UIVPROC>getFunction("glVertexP2uiv")
     cglVertexP2uiv(type, value)
 
 cdef void GetglVertexP3ui(GLenum type, GLuint value):
     global cglVertexP3ui
-    cglVertexP3ui = <PFNGLVERTEXP3UIPROC>getFunction(b"glVertexP3ui")
+    cglVertexP3ui = <PFNGLVERTEXP3UIPROC>getFunction("glVertexP3ui")
     cglVertexP3ui(type, value)
 
 cdef void GetglVertexP3uiv(GLenum type, const GLuint *value):
     global cglVertexP3uiv
-    cglVertexP3uiv = <PFNGLVERTEXP3UIVPROC>getFunction(b"glVertexP3uiv")
+    cglVertexP3uiv = <PFNGLVERTEXP3UIVPROC>getFunction("glVertexP3uiv")
     cglVertexP3uiv(type, value)
 
 cdef void GetglVertexP4ui(GLenum type, GLuint value):
     global cglVertexP4ui
-    cglVertexP4ui = <PFNGLVERTEXP4UIPROC>getFunction(b"glVertexP4ui")
+    cglVertexP4ui = <PFNGLVERTEXP4UIPROC>getFunction("glVertexP4ui")
     cglVertexP4ui(type, value)
 
 cdef void GetglVertexP4uiv(GLenum type, const GLuint *value):
     global cglVertexP4uiv
-    cglVertexP4uiv = <PFNGLVERTEXP4UIVPROC>getFunction(b"glVertexP4uiv")
+    cglVertexP4uiv = <PFNGLVERTEXP4UIVPROC>getFunction("glVertexP4uiv")
     cglVertexP4uiv(type, value)
 
 cglBindFragDataLocationIndexed = GetglBindFragDataLocationIndexed

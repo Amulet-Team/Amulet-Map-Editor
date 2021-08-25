@@ -220,442 +220,442 @@ cdef PFNGLVIEWPORTINDEXEDFVPROC cglViewportIndexedfv = NULL
 
 cdef void GetglActiveShaderProgram(GLuint pipeline, GLuint program):
     global cglActiveShaderProgram
-    cglActiveShaderProgram = <PFNGLACTIVESHADERPROGRAMPROC>getFunction(b"glActiveShaderProgram")
+    cglActiveShaderProgram = <PFNGLACTIVESHADERPROGRAMPROC>getFunction("glActiveShaderProgram")
     cglActiveShaderProgram(pipeline, program)
 
 cdef void GetglBindProgramPipeline(GLuint pipeline):
     global cglBindProgramPipeline
-    cglBindProgramPipeline = <PFNGLBINDPROGRAMPIPELINEPROC>getFunction(b"glBindProgramPipeline")
+    cglBindProgramPipeline = <PFNGLBINDPROGRAMPIPELINEPROC>getFunction("glBindProgramPipeline")
     cglBindProgramPipeline(pipeline)
 
 cdef void GetglClearDepthf(GLfloat d):
     global cglClearDepthf
-    cglClearDepthf = <PFNGLCLEARDEPTHFPROC>getFunction(b"glClearDepthf")
+    cglClearDepthf = <PFNGLCLEARDEPTHFPROC>getFunction("glClearDepthf")
     cglClearDepthf(d)
 
 cdef GLuint GetglCreateShaderProgramv(GLenum type, GLsizei count, const GLchar **strings):
     global cglCreateShaderProgramv
-    cglCreateShaderProgramv = <PFNGLCREATESHADERPROGRAMVPROC>getFunction(b"glCreateShaderProgramv")
+    cglCreateShaderProgramv = <PFNGLCREATESHADERPROGRAMVPROC>getFunction("glCreateShaderProgramv")
     cglCreateShaderProgramv(type, count, strings)
 
 cdef void GetglDeleteProgramPipelines(GLsizei n, const GLuint *pipelines):
     global cglDeleteProgramPipelines
-    cglDeleteProgramPipelines = <PFNGLDELETEPROGRAMPIPELINESPROC>getFunction(b"glDeleteProgramPipelines")
+    cglDeleteProgramPipelines = <PFNGLDELETEPROGRAMPIPELINESPROC>getFunction("glDeleteProgramPipelines")
     cglDeleteProgramPipelines(n, pipelines)
 
 cdef void GetglDepthRangeArrayv(GLuint first, GLsizei count, const GLdouble *v):
     global cglDepthRangeArrayv
-    cglDepthRangeArrayv = <PFNGLDEPTHRANGEARRAYVPROC>getFunction(b"glDepthRangeArrayv")
+    cglDepthRangeArrayv = <PFNGLDEPTHRANGEARRAYVPROC>getFunction("glDepthRangeArrayv")
     cglDepthRangeArrayv(first, count, v)
 
 cdef void GetglDepthRangeIndexed(GLuint index, GLdouble n, GLdouble f):
     global cglDepthRangeIndexed
-    cglDepthRangeIndexed = <PFNGLDEPTHRANGEINDEXEDPROC>getFunction(b"glDepthRangeIndexed")
+    cglDepthRangeIndexed = <PFNGLDEPTHRANGEINDEXEDPROC>getFunction("glDepthRangeIndexed")
     cglDepthRangeIndexed(index, n, f)
 
 cdef void GetglDepthRangef(GLfloat n, GLfloat f):
     global cglDepthRangef
-    cglDepthRangef = <PFNGLDEPTHRANGEFPROC>getFunction(b"glDepthRangef")
+    cglDepthRangef = <PFNGLDEPTHRANGEFPROC>getFunction("glDepthRangef")
     cglDepthRangef(n, f)
 
 cdef void GetglGenProgramPipelines(GLsizei n, GLuint *pipelines):
     global cglGenProgramPipelines
-    cglGenProgramPipelines = <PFNGLGENPROGRAMPIPELINESPROC>getFunction(b"glGenProgramPipelines")
+    cglGenProgramPipelines = <PFNGLGENPROGRAMPIPELINESPROC>getFunction("glGenProgramPipelines")
     cglGenProgramPipelines(n, pipelines)
 
 cdef void GetglGetDoublei_v(GLenum target, GLuint index, GLdouble *data):
     global cglGetDoublei_v
-    cglGetDoublei_v = <PFNGLGETDOUBLEI_VPROC>getFunction(b"glGetDoublei_v")
+    cglGetDoublei_v = <PFNGLGETDOUBLEI_VPROC>getFunction("glGetDoublei_v")
     cglGetDoublei_v(target, index, data)
 
 cdef void GetglGetFloati_v(GLenum target, GLuint index, GLfloat *data):
     global cglGetFloati_v
-    cglGetFloati_v = <PFNGLGETFLOATI_VPROC>getFunction(b"glGetFloati_v")
+    cglGetFloati_v = <PFNGLGETFLOATI_VPROC>getFunction("glGetFloati_v")
     cglGetFloati_v(target, index, data)
 
 cdef void GetglGetProgramBinary(GLuint program, GLsizei bufSize, GLsizei *length, GLenum *binaryFormat, void *binary):
     global cglGetProgramBinary
-    cglGetProgramBinary = <PFNGLGETPROGRAMBINARYPROC>getFunction(b"glGetProgramBinary")
+    cglGetProgramBinary = <PFNGLGETPROGRAMBINARYPROC>getFunction("glGetProgramBinary")
     cglGetProgramBinary(program, bufSize, length, binaryFormat, binary)
 
 cdef void GetglGetProgramPipelineInfoLog(GLuint pipeline, GLsizei bufSize, GLsizei *length, GLchar *infoLog):
     global cglGetProgramPipelineInfoLog
-    cglGetProgramPipelineInfoLog = <PFNGLGETPROGRAMPIPELINEINFOLOGPROC>getFunction(b"glGetProgramPipelineInfoLog")
+    cglGetProgramPipelineInfoLog = <PFNGLGETPROGRAMPIPELINEINFOLOGPROC>getFunction("glGetProgramPipelineInfoLog")
     cglGetProgramPipelineInfoLog(pipeline, bufSize, length, infoLog)
 
 cdef void GetglGetProgramPipelineiv(GLuint pipeline, GLenum pname, GLint *params):
     global cglGetProgramPipelineiv
-    cglGetProgramPipelineiv = <PFNGLGETPROGRAMPIPELINEIVPROC>getFunction(b"glGetProgramPipelineiv")
+    cglGetProgramPipelineiv = <PFNGLGETPROGRAMPIPELINEIVPROC>getFunction("glGetProgramPipelineiv")
     cglGetProgramPipelineiv(pipeline, pname, params)
 
 cdef void GetglGetShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype, GLint *range, GLint *precision):
     global cglGetShaderPrecisionFormat
-    cglGetShaderPrecisionFormat = <PFNGLGETSHADERPRECISIONFORMATPROC>getFunction(b"glGetShaderPrecisionFormat")
+    cglGetShaderPrecisionFormat = <PFNGLGETSHADERPRECISIONFORMATPROC>getFunction("glGetShaderPrecisionFormat")
     cglGetShaderPrecisionFormat(shadertype, precisiontype, range, precision)
 
 cdef void GetglGetVertexAttribLdv(GLuint index, GLenum pname, GLdouble *params):
     global cglGetVertexAttribLdv
-    cglGetVertexAttribLdv = <PFNGLGETVERTEXATTRIBLDVPROC>getFunction(b"glGetVertexAttribLdv")
+    cglGetVertexAttribLdv = <PFNGLGETVERTEXATTRIBLDVPROC>getFunction("glGetVertexAttribLdv")
     cglGetVertexAttribLdv(index, pname, params)
 
 cdef GLboolean GetglIsProgramPipeline(GLuint pipeline):
     global cglIsProgramPipeline
-    cglIsProgramPipeline = <PFNGLISPROGRAMPIPELINEPROC>getFunction(b"glIsProgramPipeline")
+    cglIsProgramPipeline = <PFNGLISPROGRAMPIPELINEPROC>getFunction("glIsProgramPipeline")
     cglIsProgramPipeline(pipeline)
 
 cdef void GetglProgramBinary(GLuint program, GLenum binaryFormat, const void *binary, GLsizei length):
     global cglProgramBinary
-    cglProgramBinary = <PFNGLPROGRAMBINARYPROC>getFunction(b"glProgramBinary")
+    cglProgramBinary = <PFNGLPROGRAMBINARYPROC>getFunction("glProgramBinary")
     cglProgramBinary(program, binaryFormat, binary, length)
 
 cdef void GetglProgramParameteri(GLuint program, GLenum pname, GLint value):
     global cglProgramParameteri
-    cglProgramParameteri = <PFNGLPROGRAMPARAMETERIPROC>getFunction(b"glProgramParameteri")
+    cglProgramParameteri = <PFNGLPROGRAMPARAMETERIPROC>getFunction("glProgramParameteri")
     cglProgramParameteri(program, pname, value)
 
 cdef void GetglProgramUniform1d(GLuint program, GLint location, GLdouble v0):
     global cglProgramUniform1d
-    cglProgramUniform1d = <PFNGLPROGRAMUNIFORM1DPROC>getFunction(b"glProgramUniform1d")
+    cglProgramUniform1d = <PFNGLPROGRAMUNIFORM1DPROC>getFunction("glProgramUniform1d")
     cglProgramUniform1d(program, location, v0)
 
 cdef void GetglProgramUniform1dv(GLuint program, GLint location, GLsizei count, const GLdouble *value):
     global cglProgramUniform1dv
-    cglProgramUniform1dv = <PFNGLPROGRAMUNIFORM1DVPROC>getFunction(b"glProgramUniform1dv")
+    cglProgramUniform1dv = <PFNGLPROGRAMUNIFORM1DVPROC>getFunction("glProgramUniform1dv")
     cglProgramUniform1dv(program, location, count, value)
 
 cdef void GetglProgramUniform1f(GLuint program, GLint location, GLfloat v0):
     global cglProgramUniform1f
-    cglProgramUniform1f = <PFNGLPROGRAMUNIFORM1FPROC>getFunction(b"glProgramUniform1f")
+    cglProgramUniform1f = <PFNGLPROGRAMUNIFORM1FPROC>getFunction("glProgramUniform1f")
     cglProgramUniform1f(program, location, v0)
 
 cdef void GetglProgramUniform1fv(GLuint program, GLint location, GLsizei count, const GLfloat *value):
     global cglProgramUniform1fv
-    cglProgramUniform1fv = <PFNGLPROGRAMUNIFORM1FVPROC>getFunction(b"glProgramUniform1fv")
+    cglProgramUniform1fv = <PFNGLPROGRAMUNIFORM1FVPROC>getFunction("glProgramUniform1fv")
     cglProgramUniform1fv(program, location, count, value)
 
 cdef void GetglProgramUniform1i(GLuint program, GLint location, GLint v0):
     global cglProgramUniform1i
-    cglProgramUniform1i = <PFNGLPROGRAMUNIFORM1IPROC>getFunction(b"glProgramUniform1i")
+    cglProgramUniform1i = <PFNGLPROGRAMUNIFORM1IPROC>getFunction("glProgramUniform1i")
     cglProgramUniform1i(program, location, v0)
 
 cdef void GetglProgramUniform1iv(GLuint program, GLint location, GLsizei count, const GLint *value):
     global cglProgramUniform1iv
-    cglProgramUniform1iv = <PFNGLPROGRAMUNIFORM1IVPROC>getFunction(b"glProgramUniform1iv")
+    cglProgramUniform1iv = <PFNGLPROGRAMUNIFORM1IVPROC>getFunction("glProgramUniform1iv")
     cglProgramUniform1iv(program, location, count, value)
 
 cdef void GetglProgramUniform1ui(GLuint program, GLint location, GLuint v0):
     global cglProgramUniform1ui
-    cglProgramUniform1ui = <PFNGLPROGRAMUNIFORM1UIPROC>getFunction(b"glProgramUniform1ui")
+    cglProgramUniform1ui = <PFNGLPROGRAMUNIFORM1UIPROC>getFunction("glProgramUniform1ui")
     cglProgramUniform1ui(program, location, v0)
 
 cdef void GetglProgramUniform1uiv(GLuint program, GLint location, GLsizei count, const GLuint *value):
     global cglProgramUniform1uiv
-    cglProgramUniform1uiv = <PFNGLPROGRAMUNIFORM1UIVPROC>getFunction(b"glProgramUniform1uiv")
+    cglProgramUniform1uiv = <PFNGLPROGRAMUNIFORM1UIVPROC>getFunction("glProgramUniform1uiv")
     cglProgramUniform1uiv(program, location, count, value)
 
 cdef void GetglProgramUniform2d(GLuint program, GLint location, GLdouble v0, GLdouble v1):
     global cglProgramUniform2d
-    cglProgramUniform2d = <PFNGLPROGRAMUNIFORM2DPROC>getFunction(b"glProgramUniform2d")
+    cglProgramUniform2d = <PFNGLPROGRAMUNIFORM2DPROC>getFunction("glProgramUniform2d")
     cglProgramUniform2d(program, location, v0, v1)
 
 cdef void GetglProgramUniform2dv(GLuint program, GLint location, GLsizei count, const GLdouble *value):
     global cglProgramUniform2dv
-    cglProgramUniform2dv = <PFNGLPROGRAMUNIFORM2DVPROC>getFunction(b"glProgramUniform2dv")
+    cglProgramUniform2dv = <PFNGLPROGRAMUNIFORM2DVPROC>getFunction("glProgramUniform2dv")
     cglProgramUniform2dv(program, location, count, value)
 
 cdef void GetglProgramUniform2f(GLuint program, GLint location, GLfloat v0, GLfloat v1):
     global cglProgramUniform2f
-    cglProgramUniform2f = <PFNGLPROGRAMUNIFORM2FPROC>getFunction(b"glProgramUniform2f")
+    cglProgramUniform2f = <PFNGLPROGRAMUNIFORM2FPROC>getFunction("glProgramUniform2f")
     cglProgramUniform2f(program, location, v0, v1)
 
 cdef void GetglProgramUniform2fv(GLuint program, GLint location, GLsizei count, const GLfloat *value):
     global cglProgramUniform2fv
-    cglProgramUniform2fv = <PFNGLPROGRAMUNIFORM2FVPROC>getFunction(b"glProgramUniform2fv")
+    cglProgramUniform2fv = <PFNGLPROGRAMUNIFORM2FVPROC>getFunction("glProgramUniform2fv")
     cglProgramUniform2fv(program, location, count, value)
 
 cdef void GetglProgramUniform2i(GLuint program, GLint location, GLint v0, GLint v1):
     global cglProgramUniform2i
-    cglProgramUniform2i = <PFNGLPROGRAMUNIFORM2IPROC>getFunction(b"glProgramUniform2i")
+    cglProgramUniform2i = <PFNGLPROGRAMUNIFORM2IPROC>getFunction("glProgramUniform2i")
     cglProgramUniform2i(program, location, v0, v1)
 
 cdef void GetglProgramUniform2iv(GLuint program, GLint location, GLsizei count, const GLint *value):
     global cglProgramUniform2iv
-    cglProgramUniform2iv = <PFNGLPROGRAMUNIFORM2IVPROC>getFunction(b"glProgramUniform2iv")
+    cglProgramUniform2iv = <PFNGLPROGRAMUNIFORM2IVPROC>getFunction("glProgramUniform2iv")
     cglProgramUniform2iv(program, location, count, value)
 
 cdef void GetglProgramUniform2ui(GLuint program, GLint location, GLuint v0, GLuint v1):
     global cglProgramUniform2ui
-    cglProgramUniform2ui = <PFNGLPROGRAMUNIFORM2UIPROC>getFunction(b"glProgramUniform2ui")
+    cglProgramUniform2ui = <PFNGLPROGRAMUNIFORM2UIPROC>getFunction("glProgramUniform2ui")
     cglProgramUniform2ui(program, location, v0, v1)
 
 cdef void GetglProgramUniform2uiv(GLuint program, GLint location, GLsizei count, const GLuint *value):
     global cglProgramUniform2uiv
-    cglProgramUniform2uiv = <PFNGLPROGRAMUNIFORM2UIVPROC>getFunction(b"glProgramUniform2uiv")
+    cglProgramUniform2uiv = <PFNGLPROGRAMUNIFORM2UIVPROC>getFunction("glProgramUniform2uiv")
     cglProgramUniform2uiv(program, location, count, value)
 
 cdef void GetglProgramUniform3d(GLuint program, GLint location, GLdouble v0, GLdouble v1, GLdouble v2):
     global cglProgramUniform3d
-    cglProgramUniform3d = <PFNGLPROGRAMUNIFORM3DPROC>getFunction(b"glProgramUniform3d")
+    cglProgramUniform3d = <PFNGLPROGRAMUNIFORM3DPROC>getFunction("glProgramUniform3d")
     cglProgramUniform3d(program, location, v0, v1, v2)
 
 cdef void GetglProgramUniform3dv(GLuint program, GLint location, GLsizei count, const GLdouble *value):
     global cglProgramUniform3dv
-    cglProgramUniform3dv = <PFNGLPROGRAMUNIFORM3DVPROC>getFunction(b"glProgramUniform3dv")
+    cglProgramUniform3dv = <PFNGLPROGRAMUNIFORM3DVPROC>getFunction("glProgramUniform3dv")
     cglProgramUniform3dv(program, location, count, value)
 
 cdef void GetglProgramUniform3f(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2):
     global cglProgramUniform3f
-    cglProgramUniform3f = <PFNGLPROGRAMUNIFORM3FPROC>getFunction(b"glProgramUniform3f")
+    cglProgramUniform3f = <PFNGLPROGRAMUNIFORM3FPROC>getFunction("glProgramUniform3f")
     cglProgramUniform3f(program, location, v0, v1, v2)
 
 cdef void GetglProgramUniform3fv(GLuint program, GLint location, GLsizei count, const GLfloat *value):
     global cglProgramUniform3fv
-    cglProgramUniform3fv = <PFNGLPROGRAMUNIFORM3FVPROC>getFunction(b"glProgramUniform3fv")
+    cglProgramUniform3fv = <PFNGLPROGRAMUNIFORM3FVPROC>getFunction("glProgramUniform3fv")
     cglProgramUniform3fv(program, location, count, value)
 
 cdef void GetglProgramUniform3i(GLuint program, GLint location, GLint v0, GLint v1, GLint v2):
     global cglProgramUniform3i
-    cglProgramUniform3i = <PFNGLPROGRAMUNIFORM3IPROC>getFunction(b"glProgramUniform3i")
+    cglProgramUniform3i = <PFNGLPROGRAMUNIFORM3IPROC>getFunction("glProgramUniform3i")
     cglProgramUniform3i(program, location, v0, v1, v2)
 
 cdef void GetglProgramUniform3iv(GLuint program, GLint location, GLsizei count, const GLint *value):
     global cglProgramUniform3iv
-    cglProgramUniform3iv = <PFNGLPROGRAMUNIFORM3IVPROC>getFunction(b"glProgramUniform3iv")
+    cglProgramUniform3iv = <PFNGLPROGRAMUNIFORM3IVPROC>getFunction("glProgramUniform3iv")
     cglProgramUniform3iv(program, location, count, value)
 
 cdef void GetglProgramUniform3ui(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2):
     global cglProgramUniform3ui
-    cglProgramUniform3ui = <PFNGLPROGRAMUNIFORM3UIPROC>getFunction(b"glProgramUniform3ui")
+    cglProgramUniform3ui = <PFNGLPROGRAMUNIFORM3UIPROC>getFunction("glProgramUniform3ui")
     cglProgramUniform3ui(program, location, v0, v1, v2)
 
 cdef void GetglProgramUniform3uiv(GLuint program, GLint location, GLsizei count, const GLuint *value):
     global cglProgramUniform3uiv
-    cglProgramUniform3uiv = <PFNGLPROGRAMUNIFORM3UIVPROC>getFunction(b"glProgramUniform3uiv")
+    cglProgramUniform3uiv = <PFNGLPROGRAMUNIFORM3UIVPROC>getFunction("glProgramUniform3uiv")
     cglProgramUniform3uiv(program, location, count, value)
 
 cdef void GetglProgramUniform4d(GLuint program, GLint location, GLdouble v0, GLdouble v1, GLdouble v2, GLdouble v3):
     global cglProgramUniform4d
-    cglProgramUniform4d = <PFNGLPROGRAMUNIFORM4DPROC>getFunction(b"glProgramUniform4d")
+    cglProgramUniform4d = <PFNGLPROGRAMUNIFORM4DPROC>getFunction("glProgramUniform4d")
     cglProgramUniform4d(program, location, v0, v1, v2, v3)
 
 cdef void GetglProgramUniform4dv(GLuint program, GLint location, GLsizei count, const GLdouble *value):
     global cglProgramUniform4dv
-    cglProgramUniform4dv = <PFNGLPROGRAMUNIFORM4DVPROC>getFunction(b"glProgramUniform4dv")
+    cglProgramUniform4dv = <PFNGLPROGRAMUNIFORM4DVPROC>getFunction("glProgramUniform4dv")
     cglProgramUniform4dv(program, location, count, value)
 
 cdef void GetglProgramUniform4f(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3):
     global cglProgramUniform4f
-    cglProgramUniform4f = <PFNGLPROGRAMUNIFORM4FPROC>getFunction(b"glProgramUniform4f")
+    cglProgramUniform4f = <PFNGLPROGRAMUNIFORM4FPROC>getFunction("glProgramUniform4f")
     cglProgramUniform4f(program, location, v0, v1, v2, v3)
 
 cdef void GetglProgramUniform4fv(GLuint program, GLint location, GLsizei count, const GLfloat *value):
     global cglProgramUniform4fv
-    cglProgramUniform4fv = <PFNGLPROGRAMUNIFORM4FVPROC>getFunction(b"glProgramUniform4fv")
+    cglProgramUniform4fv = <PFNGLPROGRAMUNIFORM4FVPROC>getFunction("glProgramUniform4fv")
     cglProgramUniform4fv(program, location, count, value)
 
 cdef void GetglProgramUniform4i(GLuint program, GLint location, GLint v0, GLint v1, GLint v2, GLint v3):
     global cglProgramUniform4i
-    cglProgramUniform4i = <PFNGLPROGRAMUNIFORM4IPROC>getFunction(b"glProgramUniform4i")
+    cglProgramUniform4i = <PFNGLPROGRAMUNIFORM4IPROC>getFunction("glProgramUniform4i")
     cglProgramUniform4i(program, location, v0, v1, v2, v3)
 
 cdef void GetglProgramUniform4iv(GLuint program, GLint location, GLsizei count, const GLint *value):
     global cglProgramUniform4iv
-    cglProgramUniform4iv = <PFNGLPROGRAMUNIFORM4IVPROC>getFunction(b"glProgramUniform4iv")
+    cglProgramUniform4iv = <PFNGLPROGRAMUNIFORM4IVPROC>getFunction("glProgramUniform4iv")
     cglProgramUniform4iv(program, location, count, value)
 
 cdef void GetglProgramUniform4ui(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3):
     global cglProgramUniform4ui
-    cglProgramUniform4ui = <PFNGLPROGRAMUNIFORM4UIPROC>getFunction(b"glProgramUniform4ui")
+    cglProgramUniform4ui = <PFNGLPROGRAMUNIFORM4UIPROC>getFunction("glProgramUniform4ui")
     cglProgramUniform4ui(program, location, v0, v1, v2, v3)
 
 cdef void GetglProgramUniform4uiv(GLuint program, GLint location, GLsizei count, const GLuint *value):
     global cglProgramUniform4uiv
-    cglProgramUniform4uiv = <PFNGLPROGRAMUNIFORM4UIVPROC>getFunction(b"glProgramUniform4uiv")
+    cglProgramUniform4uiv = <PFNGLPROGRAMUNIFORM4UIVPROC>getFunction("glProgramUniform4uiv")
     cglProgramUniform4uiv(program, location, count, value)
 
 cdef void GetglProgramUniformMatrix2dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix2dv
-    cglProgramUniformMatrix2dv = <PFNGLPROGRAMUNIFORMMATRIX2DVPROC>getFunction(b"glProgramUniformMatrix2dv")
+    cglProgramUniformMatrix2dv = <PFNGLPROGRAMUNIFORMMATRIX2DVPROC>getFunction("glProgramUniformMatrix2dv")
     cglProgramUniformMatrix2dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix2fv
-    cglProgramUniformMatrix2fv = <PFNGLPROGRAMUNIFORMMATRIX2FVPROC>getFunction(b"glProgramUniformMatrix2fv")
+    cglProgramUniformMatrix2fv = <PFNGLPROGRAMUNIFORMMATRIX2FVPROC>getFunction("glProgramUniformMatrix2fv")
     cglProgramUniformMatrix2fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix2x3dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix2x3dv
-    cglProgramUniformMatrix2x3dv = <PFNGLPROGRAMUNIFORMMATRIX2X3DVPROC>getFunction(b"glProgramUniformMatrix2x3dv")
+    cglProgramUniformMatrix2x3dv = <PFNGLPROGRAMUNIFORMMATRIX2X3DVPROC>getFunction("glProgramUniformMatrix2x3dv")
     cglProgramUniformMatrix2x3dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix2x3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix2x3fv
-    cglProgramUniformMatrix2x3fv = <PFNGLPROGRAMUNIFORMMATRIX2X3FVPROC>getFunction(b"glProgramUniformMatrix2x3fv")
+    cglProgramUniformMatrix2x3fv = <PFNGLPROGRAMUNIFORMMATRIX2X3FVPROC>getFunction("glProgramUniformMatrix2x3fv")
     cglProgramUniformMatrix2x3fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix2x4dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix2x4dv
-    cglProgramUniformMatrix2x4dv = <PFNGLPROGRAMUNIFORMMATRIX2X4DVPROC>getFunction(b"glProgramUniformMatrix2x4dv")
+    cglProgramUniformMatrix2x4dv = <PFNGLPROGRAMUNIFORMMATRIX2X4DVPROC>getFunction("glProgramUniformMatrix2x4dv")
     cglProgramUniformMatrix2x4dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix2x4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix2x4fv
-    cglProgramUniformMatrix2x4fv = <PFNGLPROGRAMUNIFORMMATRIX2X4FVPROC>getFunction(b"glProgramUniformMatrix2x4fv")
+    cglProgramUniformMatrix2x4fv = <PFNGLPROGRAMUNIFORMMATRIX2X4FVPROC>getFunction("glProgramUniformMatrix2x4fv")
     cglProgramUniformMatrix2x4fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix3dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix3dv
-    cglProgramUniformMatrix3dv = <PFNGLPROGRAMUNIFORMMATRIX3DVPROC>getFunction(b"glProgramUniformMatrix3dv")
+    cglProgramUniformMatrix3dv = <PFNGLPROGRAMUNIFORMMATRIX3DVPROC>getFunction("glProgramUniformMatrix3dv")
     cglProgramUniformMatrix3dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix3fv
-    cglProgramUniformMatrix3fv = <PFNGLPROGRAMUNIFORMMATRIX3FVPROC>getFunction(b"glProgramUniformMatrix3fv")
+    cglProgramUniformMatrix3fv = <PFNGLPROGRAMUNIFORMMATRIX3FVPROC>getFunction("glProgramUniformMatrix3fv")
     cglProgramUniformMatrix3fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix3x2dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix3x2dv
-    cglProgramUniformMatrix3x2dv = <PFNGLPROGRAMUNIFORMMATRIX3X2DVPROC>getFunction(b"glProgramUniformMatrix3x2dv")
+    cglProgramUniformMatrix3x2dv = <PFNGLPROGRAMUNIFORMMATRIX3X2DVPROC>getFunction("glProgramUniformMatrix3x2dv")
     cglProgramUniformMatrix3x2dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix3x2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix3x2fv
-    cglProgramUniformMatrix3x2fv = <PFNGLPROGRAMUNIFORMMATRIX3X2FVPROC>getFunction(b"glProgramUniformMatrix3x2fv")
+    cglProgramUniformMatrix3x2fv = <PFNGLPROGRAMUNIFORMMATRIX3X2FVPROC>getFunction("glProgramUniformMatrix3x2fv")
     cglProgramUniformMatrix3x2fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix3x4dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix3x4dv
-    cglProgramUniformMatrix3x4dv = <PFNGLPROGRAMUNIFORMMATRIX3X4DVPROC>getFunction(b"glProgramUniformMatrix3x4dv")
+    cglProgramUniformMatrix3x4dv = <PFNGLPROGRAMUNIFORMMATRIX3X4DVPROC>getFunction("glProgramUniformMatrix3x4dv")
     cglProgramUniformMatrix3x4dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix3x4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix3x4fv
-    cglProgramUniformMatrix3x4fv = <PFNGLPROGRAMUNIFORMMATRIX3X4FVPROC>getFunction(b"glProgramUniformMatrix3x4fv")
+    cglProgramUniformMatrix3x4fv = <PFNGLPROGRAMUNIFORMMATRIX3X4FVPROC>getFunction("glProgramUniformMatrix3x4fv")
     cglProgramUniformMatrix3x4fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix4dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix4dv
-    cglProgramUniformMatrix4dv = <PFNGLPROGRAMUNIFORMMATRIX4DVPROC>getFunction(b"glProgramUniformMatrix4dv")
+    cglProgramUniformMatrix4dv = <PFNGLPROGRAMUNIFORMMATRIX4DVPROC>getFunction("glProgramUniformMatrix4dv")
     cglProgramUniformMatrix4dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix4fv
-    cglProgramUniformMatrix4fv = <PFNGLPROGRAMUNIFORMMATRIX4FVPROC>getFunction(b"glProgramUniformMatrix4fv")
+    cglProgramUniformMatrix4fv = <PFNGLPROGRAMUNIFORMMATRIX4FVPROC>getFunction("glProgramUniformMatrix4fv")
     cglProgramUniformMatrix4fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix4x2dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix4x2dv
-    cglProgramUniformMatrix4x2dv = <PFNGLPROGRAMUNIFORMMATRIX4X2DVPROC>getFunction(b"glProgramUniformMatrix4x2dv")
+    cglProgramUniformMatrix4x2dv = <PFNGLPROGRAMUNIFORMMATRIX4X2DVPROC>getFunction("glProgramUniformMatrix4x2dv")
     cglProgramUniformMatrix4x2dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix4x2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix4x2fv
-    cglProgramUniformMatrix4x2fv = <PFNGLPROGRAMUNIFORMMATRIX4X2FVPROC>getFunction(b"glProgramUniformMatrix4x2fv")
+    cglProgramUniformMatrix4x2fv = <PFNGLPROGRAMUNIFORMMATRIX4X2FVPROC>getFunction("glProgramUniformMatrix4x2fv")
     cglProgramUniformMatrix4x2fv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix4x3dv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value):
     global cglProgramUniformMatrix4x3dv
-    cglProgramUniformMatrix4x3dv = <PFNGLPROGRAMUNIFORMMATRIX4X3DVPROC>getFunction(b"glProgramUniformMatrix4x3dv")
+    cglProgramUniformMatrix4x3dv = <PFNGLPROGRAMUNIFORMMATRIX4X3DVPROC>getFunction("glProgramUniformMatrix4x3dv")
     cglProgramUniformMatrix4x3dv(program, location, count, transpose, value)
 
 cdef void GetglProgramUniformMatrix4x3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglProgramUniformMatrix4x3fv
-    cglProgramUniformMatrix4x3fv = <PFNGLPROGRAMUNIFORMMATRIX4X3FVPROC>getFunction(b"glProgramUniformMatrix4x3fv")
+    cglProgramUniformMatrix4x3fv = <PFNGLPROGRAMUNIFORMMATRIX4X3FVPROC>getFunction("glProgramUniformMatrix4x3fv")
     cglProgramUniformMatrix4x3fv(program, location, count, transpose, value)
 
 cdef void GetglReleaseShaderCompiler():
     global cglReleaseShaderCompiler
-    cglReleaseShaderCompiler = <PFNGLRELEASESHADERCOMPILERPROC>getFunction(b"glReleaseShaderCompiler")
+    cglReleaseShaderCompiler = <PFNGLRELEASESHADERCOMPILERPROC>getFunction("glReleaseShaderCompiler")
     cglReleaseShaderCompiler()
 
 cdef void GetglScissorArrayv(GLuint first, GLsizei count, const GLint *v):
     global cglScissorArrayv
-    cglScissorArrayv = <PFNGLSCISSORARRAYVPROC>getFunction(b"glScissorArrayv")
+    cglScissorArrayv = <PFNGLSCISSORARRAYVPROC>getFunction("glScissorArrayv")
     cglScissorArrayv(first, count, v)
 
 cdef void GetglScissorIndexed(GLuint index, GLint left, GLint bottom, GLsizei width, GLsizei height):
     global cglScissorIndexed
-    cglScissorIndexed = <PFNGLSCISSORINDEXEDPROC>getFunction(b"glScissorIndexed")
+    cglScissorIndexed = <PFNGLSCISSORINDEXEDPROC>getFunction("glScissorIndexed")
     cglScissorIndexed(index, left, bottom, width, height)
 
 cdef void GetglScissorIndexedv(GLuint index, const GLint *v):
     global cglScissorIndexedv
-    cglScissorIndexedv = <PFNGLSCISSORINDEXEDVPROC>getFunction(b"glScissorIndexedv")
+    cglScissorIndexedv = <PFNGLSCISSORINDEXEDVPROC>getFunction("glScissorIndexedv")
     cglScissorIndexedv(index, v)
 
 cdef void GetglShaderBinary(GLsizei count, const GLuint *shaders, GLenum binaryFormat, const void *binary, GLsizei length):
     global cglShaderBinary
-    cglShaderBinary = <PFNGLSHADERBINARYPROC>getFunction(b"glShaderBinary")
+    cglShaderBinary = <PFNGLSHADERBINARYPROC>getFunction("glShaderBinary")
     cglShaderBinary(count, shaders, binaryFormat, binary, length)
 
 cdef void GetglUseProgramStages(GLuint pipeline, GLbitfield stages, GLuint program):
     global cglUseProgramStages
-    cglUseProgramStages = <PFNGLUSEPROGRAMSTAGESPROC>getFunction(b"glUseProgramStages")
+    cglUseProgramStages = <PFNGLUSEPROGRAMSTAGESPROC>getFunction("glUseProgramStages")
     cglUseProgramStages(pipeline, stages, program)
 
 cdef void GetglValidateProgramPipeline(GLuint pipeline):
     global cglValidateProgramPipeline
-    cglValidateProgramPipeline = <PFNGLVALIDATEPROGRAMPIPELINEPROC>getFunction(b"glValidateProgramPipeline")
+    cglValidateProgramPipeline = <PFNGLVALIDATEPROGRAMPIPELINEPROC>getFunction("glValidateProgramPipeline")
     cglValidateProgramPipeline(pipeline)
 
 cdef void GetglVertexAttribL1d(GLuint index, GLdouble x):
     global cglVertexAttribL1d
-    cglVertexAttribL1d = <PFNGLVERTEXATTRIBL1DPROC>getFunction(b"glVertexAttribL1d")
+    cglVertexAttribL1d = <PFNGLVERTEXATTRIBL1DPROC>getFunction("glVertexAttribL1d")
     cglVertexAttribL1d(index, x)
 
 cdef void GetglVertexAttribL1dv(GLuint index, const GLdouble *v):
     global cglVertexAttribL1dv
-    cglVertexAttribL1dv = <PFNGLVERTEXATTRIBL1DVPROC>getFunction(b"glVertexAttribL1dv")
+    cglVertexAttribL1dv = <PFNGLVERTEXATTRIBL1DVPROC>getFunction("glVertexAttribL1dv")
     cglVertexAttribL1dv(index, v)
 
 cdef void GetglVertexAttribL2d(GLuint index, GLdouble x, GLdouble y):
     global cglVertexAttribL2d
-    cglVertexAttribL2d = <PFNGLVERTEXATTRIBL2DPROC>getFunction(b"glVertexAttribL2d")
+    cglVertexAttribL2d = <PFNGLVERTEXATTRIBL2DPROC>getFunction("glVertexAttribL2d")
     cglVertexAttribL2d(index, x, y)
 
 cdef void GetglVertexAttribL2dv(GLuint index, const GLdouble *v):
     global cglVertexAttribL2dv
-    cglVertexAttribL2dv = <PFNGLVERTEXATTRIBL2DVPROC>getFunction(b"glVertexAttribL2dv")
+    cglVertexAttribL2dv = <PFNGLVERTEXATTRIBL2DVPROC>getFunction("glVertexAttribL2dv")
     cglVertexAttribL2dv(index, v)
 
 cdef void GetglVertexAttribL3d(GLuint index, GLdouble x, GLdouble y, GLdouble z):
     global cglVertexAttribL3d
-    cglVertexAttribL3d = <PFNGLVERTEXATTRIBL3DPROC>getFunction(b"glVertexAttribL3d")
+    cglVertexAttribL3d = <PFNGLVERTEXATTRIBL3DPROC>getFunction("glVertexAttribL3d")
     cglVertexAttribL3d(index, x, y, z)
 
 cdef void GetglVertexAttribL3dv(GLuint index, const GLdouble *v):
     global cglVertexAttribL3dv
-    cglVertexAttribL3dv = <PFNGLVERTEXATTRIBL3DVPROC>getFunction(b"glVertexAttribL3dv")
+    cglVertexAttribL3dv = <PFNGLVERTEXATTRIBL3DVPROC>getFunction("glVertexAttribL3dv")
     cglVertexAttribL3dv(index, v)
 
 cdef void GetglVertexAttribL4d(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w):
     global cglVertexAttribL4d
-    cglVertexAttribL4d = <PFNGLVERTEXATTRIBL4DPROC>getFunction(b"glVertexAttribL4d")
+    cglVertexAttribL4d = <PFNGLVERTEXATTRIBL4DPROC>getFunction("glVertexAttribL4d")
     cglVertexAttribL4d(index, x, y, z, w)
 
 cdef void GetglVertexAttribL4dv(GLuint index, const GLdouble *v):
     global cglVertexAttribL4dv
-    cglVertexAttribL4dv = <PFNGLVERTEXATTRIBL4DVPROC>getFunction(b"glVertexAttribL4dv")
+    cglVertexAttribL4dv = <PFNGLVERTEXATTRIBL4DVPROC>getFunction("glVertexAttribL4dv")
     cglVertexAttribL4dv(index, v)
 
 cdef void GetglVertexAttribLPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const void *pointer):
     global cglVertexAttribLPointer
-    cglVertexAttribLPointer = <PFNGLVERTEXATTRIBLPOINTERPROC>getFunction(b"glVertexAttribLPointer")
+    cglVertexAttribLPointer = <PFNGLVERTEXATTRIBLPOINTERPROC>getFunction("glVertexAttribLPointer")
     cglVertexAttribLPointer(index, size, type, stride, pointer)
 
 cdef void GetglViewportArrayv(GLuint first, GLsizei count, const GLfloat *v):
     global cglViewportArrayv
-    cglViewportArrayv = <PFNGLVIEWPORTARRAYVPROC>getFunction(b"glViewportArrayv")
+    cglViewportArrayv = <PFNGLVIEWPORTARRAYVPROC>getFunction("glViewportArrayv")
     cglViewportArrayv(first, count, v)
 
 cdef void GetglViewportIndexedf(GLuint index, GLfloat x, GLfloat y, GLfloat w, GLfloat h):
     global cglViewportIndexedf
-    cglViewportIndexedf = <PFNGLVIEWPORTINDEXEDFPROC>getFunction(b"glViewportIndexedf")
+    cglViewportIndexedf = <PFNGLVIEWPORTINDEXEDFPROC>getFunction("glViewportIndexedf")
     cglViewportIndexedf(index, x, y, w, h)
 
 cdef void GetglViewportIndexedfv(GLuint index, const GLfloat *v):
     global cglViewportIndexedfv
-    cglViewportIndexedfv = <PFNGLVIEWPORTINDEXEDFVPROC>getFunction(b"glViewportIndexedfv")
+    cglViewportIndexedfv = <PFNGLVIEWPORTINDEXEDFVPROC>getFunction("glViewportIndexedfv")
     cglViewportIndexedfv(index, v)
 
 cglActiveShaderProgram = GetglActiveShaderProgram

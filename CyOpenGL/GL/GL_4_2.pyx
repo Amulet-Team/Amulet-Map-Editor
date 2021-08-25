@@ -145,62 +145,62 @@ cdef PFNGLTEXSTORAGE3DPROC cglTexStorage3D = NULL
 
 cdef void GetglBindImageTexture(GLuint unit, GLuint texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format):
     global cglBindImageTexture
-    cglBindImageTexture = <PFNGLBINDIMAGETEXTUREPROC>getFunction(b"glBindImageTexture")
+    cglBindImageTexture = <PFNGLBINDIMAGETEXTUREPROC>getFunction("glBindImageTexture")
     cglBindImageTexture(unit, texture, level, layered, layer, access, format)
 
 cdef void GetglDrawArraysInstancedBaseInstance(GLenum mode, GLint first, GLsizei count, GLsizei instancecount, GLuint baseinstance):
     global cglDrawArraysInstancedBaseInstance
-    cglDrawArraysInstancedBaseInstance = <PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC>getFunction(b"glDrawArraysInstancedBaseInstance")
+    cglDrawArraysInstancedBaseInstance = <PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC>getFunction("glDrawArraysInstancedBaseInstance")
     cglDrawArraysInstancedBaseInstance(mode, first, count, instancecount, baseinstance)
 
 cdef void GetglDrawElementsInstancedBaseInstance(GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount, GLuint baseinstance):
     global cglDrawElementsInstancedBaseInstance
-    cglDrawElementsInstancedBaseInstance = <PFNGLDRAWELEMENTSINSTANCEDBASEINSTANCEPROC>getFunction(b"glDrawElementsInstancedBaseInstance")
+    cglDrawElementsInstancedBaseInstance = <PFNGLDRAWELEMENTSINSTANCEDBASEINSTANCEPROC>getFunction("glDrawElementsInstancedBaseInstance")
     cglDrawElementsInstancedBaseInstance(mode, count, type, indices, instancecount, baseinstance)
 
 cdef void GetglDrawElementsInstancedBaseVertexBaseInstance(GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount, GLint basevertex, GLuint baseinstance):
     global cglDrawElementsInstancedBaseVertexBaseInstance
-    cglDrawElementsInstancedBaseVertexBaseInstance = <PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC>getFunction(b"glDrawElementsInstancedBaseVertexBaseInstance")
+    cglDrawElementsInstancedBaseVertexBaseInstance = <PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC>getFunction("glDrawElementsInstancedBaseVertexBaseInstance")
     cglDrawElementsInstancedBaseVertexBaseInstance(mode, count, type, indices, instancecount, basevertex, baseinstance)
 
 cdef void GetglDrawTransformFeedbackInstanced(GLenum mode, GLuint id, GLsizei instancecount):
     global cglDrawTransformFeedbackInstanced
-    cglDrawTransformFeedbackInstanced = <PFNGLDRAWTRANSFORMFEEDBACKINSTANCEDPROC>getFunction(b"glDrawTransformFeedbackInstanced")
+    cglDrawTransformFeedbackInstanced = <PFNGLDRAWTRANSFORMFEEDBACKINSTANCEDPROC>getFunction("glDrawTransformFeedbackInstanced")
     cglDrawTransformFeedbackInstanced(mode, id, instancecount)
 
 cdef void GetglDrawTransformFeedbackStreamInstanced(GLenum mode, GLuint id, GLuint stream, GLsizei instancecount):
     global cglDrawTransformFeedbackStreamInstanced
-    cglDrawTransformFeedbackStreamInstanced = <PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC>getFunction(b"glDrawTransformFeedbackStreamInstanced")
+    cglDrawTransformFeedbackStreamInstanced = <PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC>getFunction("glDrawTransformFeedbackStreamInstanced")
     cglDrawTransformFeedbackStreamInstanced(mode, id, stream, instancecount)
 
 cdef void GetglGetActiveAtomicCounterBufferiv(GLuint program, GLuint bufferIndex, GLenum pname, GLint *params):
     global cglGetActiveAtomicCounterBufferiv
-    cglGetActiveAtomicCounterBufferiv = <PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC>getFunction(b"glGetActiveAtomicCounterBufferiv")
+    cglGetActiveAtomicCounterBufferiv = <PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC>getFunction("glGetActiveAtomicCounterBufferiv")
     cglGetActiveAtomicCounterBufferiv(program, bufferIndex, pname, params)
 
 cdef void GetglGetInternalformativ(GLenum target, GLenum internalformat, GLenum pname, GLsizei count, GLint *params):
     global cglGetInternalformativ
-    cglGetInternalformativ = <PFNGLGETINTERNALFORMATIVPROC>getFunction(b"glGetInternalformativ")
+    cglGetInternalformativ = <PFNGLGETINTERNALFORMATIVPROC>getFunction("glGetInternalformativ")
     cglGetInternalformativ(target, internalformat, pname, count, params)
 
 cdef void GetglMemoryBarrier(GLbitfield barriers):
     global cglMemoryBarrier
-    cglMemoryBarrier = <PFNGLMEMORYBARRIERPROC>getFunction(b"glMemoryBarrier")
+    cglMemoryBarrier = <PFNGLMEMORYBARRIERPROC>getFunction("glMemoryBarrier")
     cglMemoryBarrier(barriers)
 
 cdef void GetglTexStorage1D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width):
     global cglTexStorage1D
-    cglTexStorage1D = <PFNGLTEXSTORAGE1DPROC>getFunction(b"glTexStorage1D")
+    cglTexStorage1D = <PFNGLTEXSTORAGE1DPROC>getFunction("glTexStorage1D")
     cglTexStorage1D(target, levels, internalformat, width)
 
 cdef void GetglTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height):
     global cglTexStorage2D
-    cglTexStorage2D = <PFNGLTEXSTORAGE2DPROC>getFunction(b"glTexStorage2D")
+    cglTexStorage2D = <PFNGLTEXSTORAGE2DPROC>getFunction("glTexStorage2D")
     cglTexStorage2D(target, levels, internalformat, width, height)
 
 cdef void GetglTexStorage3D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth):
     global cglTexStorage3D
-    cglTexStorage3D = <PFNGLTEXSTORAGE3DPROC>getFunction(b"glTexStorage3D")
+    cglTexStorage3D = <PFNGLTEXSTORAGE3DPROC>getFunction("glTexStorage3D")
     cglTexStorage3D(target, levels, internalformat, width, height, depth)
 
 cglBindImageTexture = GetglBindImageTexture

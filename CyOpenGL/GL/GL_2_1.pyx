@@ -44,32 +44,32 @@ cdef PFNGLUNIFORMMATRIX4X3FVPROC cglUniformMatrix4x3fv = NULL
 
 cdef void GetglUniformMatrix2x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix2x3fv
-    cglUniformMatrix2x3fv = <PFNGLUNIFORMMATRIX2X3FVPROC>getFunction(b"glUniformMatrix2x3fv")
+    cglUniformMatrix2x3fv = <PFNGLUNIFORMMATRIX2X3FVPROC>getFunction("glUniformMatrix2x3fv")
     cglUniformMatrix2x3fv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix2x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix2x4fv
-    cglUniformMatrix2x4fv = <PFNGLUNIFORMMATRIX2X4FVPROC>getFunction(b"glUniformMatrix2x4fv")
+    cglUniformMatrix2x4fv = <PFNGLUNIFORMMATRIX2X4FVPROC>getFunction("glUniformMatrix2x4fv")
     cglUniformMatrix2x4fv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix3x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix3x2fv
-    cglUniformMatrix3x2fv = <PFNGLUNIFORMMATRIX3X2FVPROC>getFunction(b"glUniformMatrix3x2fv")
+    cglUniformMatrix3x2fv = <PFNGLUNIFORMMATRIX3X2FVPROC>getFunction("glUniformMatrix3x2fv")
     cglUniformMatrix3x2fv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix3x4fv
-    cglUniformMatrix3x4fv = <PFNGLUNIFORMMATRIX3X4FVPROC>getFunction(b"glUniformMatrix3x4fv")
+    cglUniformMatrix3x4fv = <PFNGLUNIFORMMATRIX3X4FVPROC>getFunction("glUniformMatrix3x4fv")
     cglUniformMatrix3x4fv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix4x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix4x2fv
-    cglUniformMatrix4x2fv = <PFNGLUNIFORMMATRIX4X2FVPROC>getFunction(b"glUniformMatrix4x2fv")
+    cglUniformMatrix4x2fv = <PFNGLUNIFORMMATRIX4X2FVPROC>getFunction("glUniformMatrix4x2fv")
     cglUniformMatrix4x2fv(location, count, transpose, value)
 
 cdef void GetglUniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value):
     global cglUniformMatrix4x3fv
-    cglUniformMatrix4x3fv = <PFNGLUNIFORMMATRIX4X3FVPROC>getFunction(b"glUniformMatrix4x3fv")
+    cglUniformMatrix4x3fv = <PFNGLUNIFORMMATRIX4X3FVPROC>getFunction("glUniformMatrix4x3fv")
     cglUniformMatrix4x3fv(location, count, transpose, value)
 
 cglUniformMatrix2x3fv = GetglUniformMatrix2x3fv

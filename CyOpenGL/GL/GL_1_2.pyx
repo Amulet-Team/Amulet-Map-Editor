@@ -58,22 +58,22 @@ cdef PFNGLTEXSUBIMAGE3DPROC cglTexSubImage3D = NULL
 
 cdef void GetglCopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height):
     global cglCopyTexSubImage3D
-    cglCopyTexSubImage3D = <PFNGLCOPYTEXSUBIMAGE3DPROC>getFunction(b"glCopyTexSubImage3D")
+    cglCopyTexSubImage3D = <PFNGLCOPYTEXSUBIMAGE3DPROC>getFunction("glCopyTexSubImage3D")
     cglCopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height)
 
 cdef void GetglDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices):
     global cglDrawRangeElements
-    cglDrawRangeElements = <PFNGLDRAWRANGEELEMENTSPROC>getFunction(b"glDrawRangeElements")
+    cglDrawRangeElements = <PFNGLDRAWRANGEELEMENTSPROC>getFunction("glDrawRangeElements")
     cglDrawRangeElements(mode, start, end, count, type, indices)
 
 cdef void GetglTexImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const void *pixels):
     global cglTexImage3D
-    cglTexImage3D = <PFNGLTEXIMAGE3DPROC>getFunction(b"glTexImage3D")
+    cglTexImage3D = <PFNGLTEXIMAGE3DPROC>getFunction("glTexImage3D")
     cglTexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels)
 
 cdef void GetglTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const void *pixels):
     global cglTexSubImage3D
-    cglTexSubImage3D = <PFNGLTEXSUBIMAGE3DPROC>getFunction(b"glTexSubImage3D")
+    cglTexSubImage3D = <PFNGLTEXSUBIMAGE3DPROC>getFunction("glTexSubImage3D")
     cglTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels)
 
 cglCopyTexSubImage3D = GetglCopyTexSubImage3D

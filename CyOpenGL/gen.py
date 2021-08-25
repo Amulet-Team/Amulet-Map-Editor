@@ -239,7 +239,7 @@ class CommandEntry:
             f"\n"
             f"cdef {self.rtype}{self.loader_name}({self.type_args}):\n"
             f"    global {self.cname}\n"
-            f'    {self.cname} = <{self.typedef_name}>getFunction(b"{self.name}")\n'
+            f'    {self.cname} = <{self.typedef_name}>getFunction("{self.name}")\n'
             f"    {self.cname}({self.arg_names})\n"
         )
 

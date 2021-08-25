@@ -52,47 +52,47 @@ cdef PFNGLCLEARTEXSUBIMAGEPROC cglClearTexSubImage = NULL
 
 cdef void GetglBindBuffersBase(GLenum target, GLuint first, GLsizei count, const GLuint *buffers):
     global cglBindBuffersBase
-    cglBindBuffersBase = <PFNGLBINDBUFFERSBASEPROC>getFunction(b"glBindBuffersBase")
+    cglBindBuffersBase = <PFNGLBINDBUFFERSBASEPROC>getFunction("glBindBuffersBase")
     cglBindBuffersBase(target, first, count, buffers)
 
 cdef void GetglBindBuffersRange(GLenum target, GLuint first, GLsizei count, const GLuint *buffers, const GLintptr *offsets, const GLsizeiptr *sizes):
     global cglBindBuffersRange
-    cglBindBuffersRange = <PFNGLBINDBUFFERSRANGEPROC>getFunction(b"glBindBuffersRange")
+    cglBindBuffersRange = <PFNGLBINDBUFFERSRANGEPROC>getFunction("glBindBuffersRange")
     cglBindBuffersRange(target, first, count, buffers, offsets, sizes)
 
 cdef void GetglBindImageTextures(GLuint first, GLsizei count, const GLuint *textures):
     global cglBindImageTextures
-    cglBindImageTextures = <PFNGLBINDIMAGETEXTURESPROC>getFunction(b"glBindImageTextures")
+    cglBindImageTextures = <PFNGLBINDIMAGETEXTURESPROC>getFunction("glBindImageTextures")
     cglBindImageTextures(first, count, textures)
 
 cdef void GetglBindSamplers(GLuint first, GLsizei count, const GLuint *samplers):
     global cglBindSamplers
-    cglBindSamplers = <PFNGLBINDSAMPLERSPROC>getFunction(b"glBindSamplers")
+    cglBindSamplers = <PFNGLBINDSAMPLERSPROC>getFunction("glBindSamplers")
     cglBindSamplers(first, count, samplers)
 
 cdef void GetglBindTextures(GLuint first, GLsizei count, const GLuint *textures):
     global cglBindTextures
-    cglBindTextures = <PFNGLBINDTEXTURESPROC>getFunction(b"glBindTextures")
+    cglBindTextures = <PFNGLBINDTEXTURESPROC>getFunction("glBindTextures")
     cglBindTextures(first, count, textures)
 
 cdef void GetglBindVertexBuffers(GLuint first, GLsizei count, const GLuint *buffers, const GLintptr *offsets, const GLsizei *strides):
     global cglBindVertexBuffers
-    cglBindVertexBuffers = <PFNGLBINDVERTEXBUFFERSPROC>getFunction(b"glBindVertexBuffers")
+    cglBindVertexBuffers = <PFNGLBINDVERTEXBUFFERSPROC>getFunction("glBindVertexBuffers")
     cglBindVertexBuffers(first, count, buffers, offsets, strides)
 
 cdef void GetglBufferStorage(GLenum target, GLsizeiptr size, const void *data, GLbitfield flags):
     global cglBufferStorage
-    cglBufferStorage = <PFNGLBUFFERSTORAGEPROC>getFunction(b"glBufferStorage")
+    cglBufferStorage = <PFNGLBUFFERSTORAGEPROC>getFunction("glBufferStorage")
     cglBufferStorage(target, size, data, flags)
 
 cdef void GetglClearTexImage(GLuint texture, GLint level, GLenum format, GLenum type, const void *data):
     global cglClearTexImage
-    cglClearTexImage = <PFNGLCLEARTEXIMAGEPROC>getFunction(b"glClearTexImage")
+    cglClearTexImage = <PFNGLCLEARTEXIMAGEPROC>getFunction("glClearTexImage")
     cglClearTexImage(texture, level, format, type, data)
 
 cdef void GetglClearTexSubImage(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const void *data):
     global cglClearTexSubImage
-    cglClearTexSubImage = <PFNGLCLEARTEXSUBIMAGEPROC>getFunction(b"glClearTexSubImage")
+    cglClearTexSubImage = <PFNGLCLEARTEXSUBIMAGEPROC>getFunction("glClearTexSubImage")
     cglClearTexSubImage(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data)
 
 cglBindBuffersBase = GetglBindBuffersBase

@@ -173,152 +173,152 @@ cdef PFNGLVERTEXPOINTERPROC cglVertexPointer = NULL
 
 cdef GLboolean GetglAreTexturesResident(GLsizei n, const GLuint *textures, GLboolean *residences):
     global cglAreTexturesResident
-    cglAreTexturesResident = <PFNGLARETEXTURESRESIDENTPROC>getFunction(b"glAreTexturesResident")
+    cglAreTexturesResident = <PFNGLARETEXTURESRESIDENTPROC>getFunction("glAreTexturesResident")
     cglAreTexturesResident(n, textures, residences)
 
 cdef void GetglArrayElement(GLint i):
     global cglArrayElement
-    cglArrayElement = <PFNGLARRAYELEMENTPROC>getFunction(b"glArrayElement")
+    cglArrayElement = <PFNGLARRAYELEMENTPROC>getFunction("glArrayElement")
     cglArrayElement(i)
 
 cdef void GetglBindTexture(GLenum target, GLuint texture):
     global cglBindTexture
-    cglBindTexture = <PFNGLBINDTEXTUREPROC>getFunction(b"glBindTexture")
+    cglBindTexture = <PFNGLBINDTEXTUREPROC>getFunction("glBindTexture")
     cglBindTexture(target, texture)
 
 cdef void GetglColorPointer(GLint size, GLenum type, GLsizei stride, const void *pointer):
     global cglColorPointer
-    cglColorPointer = <PFNGLCOLORPOINTERPROC>getFunction(b"glColorPointer")
+    cglColorPointer = <PFNGLCOLORPOINTERPROC>getFunction("glColorPointer")
     cglColorPointer(size, type, stride, pointer)
 
 cdef void GetglCopyTexImage1D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLint border):
     global cglCopyTexImage1D
-    cglCopyTexImage1D = <PFNGLCOPYTEXIMAGE1DPROC>getFunction(b"glCopyTexImage1D")
+    cglCopyTexImage1D = <PFNGLCOPYTEXIMAGE1DPROC>getFunction("glCopyTexImage1D")
     cglCopyTexImage1D(target, level, internalformat, x, y, width, border)
 
 cdef void GetglCopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border):
     global cglCopyTexImage2D
-    cglCopyTexImage2D = <PFNGLCOPYTEXIMAGE2DPROC>getFunction(b"glCopyTexImage2D")
+    cglCopyTexImage2D = <PFNGLCOPYTEXIMAGE2DPROC>getFunction("glCopyTexImage2D")
     cglCopyTexImage2D(target, level, internalformat, x, y, width, height, border)
 
 cdef void GetglCopyTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width):
     global cglCopyTexSubImage1D
-    cglCopyTexSubImage1D = <PFNGLCOPYTEXSUBIMAGE1DPROC>getFunction(b"glCopyTexSubImage1D")
+    cglCopyTexSubImage1D = <PFNGLCOPYTEXSUBIMAGE1DPROC>getFunction("glCopyTexSubImage1D")
     cglCopyTexSubImage1D(target, level, xoffset, x, y, width)
 
 cdef void GetglCopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height):
     global cglCopyTexSubImage2D
-    cglCopyTexSubImage2D = <PFNGLCOPYTEXSUBIMAGE2DPROC>getFunction(b"glCopyTexSubImage2D")
+    cglCopyTexSubImage2D = <PFNGLCOPYTEXSUBIMAGE2DPROC>getFunction("glCopyTexSubImage2D")
     cglCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height)
 
 cdef void GetglDeleteTextures(GLsizei n, const GLuint *textures):
     global cglDeleteTextures
-    cglDeleteTextures = <PFNGLDELETETEXTURESPROC>getFunction(b"glDeleteTextures")
+    cglDeleteTextures = <PFNGLDELETETEXTURESPROC>getFunction("glDeleteTextures")
     cglDeleteTextures(n, textures)
 
 cdef void GetglDisableClientState(GLenum array):
     global cglDisableClientState
-    cglDisableClientState = <PFNGLDISABLECLIENTSTATEPROC>getFunction(b"glDisableClientState")
+    cglDisableClientState = <PFNGLDISABLECLIENTSTATEPROC>getFunction("glDisableClientState")
     cglDisableClientState(array)
 
 cdef void GetglDrawArrays(GLenum mode, GLint first, GLsizei count):
     global cglDrawArrays
-    cglDrawArrays = <PFNGLDRAWARRAYSPROC>getFunction(b"glDrawArrays")
+    cglDrawArrays = <PFNGLDRAWARRAYSPROC>getFunction("glDrawArrays")
     cglDrawArrays(mode, first, count)
 
 cdef void GetglDrawElements(GLenum mode, GLsizei count, GLenum type, const void *indices):
     global cglDrawElements
-    cglDrawElements = <PFNGLDRAWELEMENTSPROC>getFunction(b"glDrawElements")
+    cglDrawElements = <PFNGLDRAWELEMENTSPROC>getFunction("glDrawElements")
     cglDrawElements(mode, count, type, indices)
 
 cdef void GetglEdgeFlagPointer(GLsizei stride, const void *pointer):
     global cglEdgeFlagPointer
-    cglEdgeFlagPointer = <PFNGLEDGEFLAGPOINTERPROC>getFunction(b"glEdgeFlagPointer")
+    cglEdgeFlagPointer = <PFNGLEDGEFLAGPOINTERPROC>getFunction("glEdgeFlagPointer")
     cglEdgeFlagPointer(stride, pointer)
 
 cdef void GetglEnableClientState(GLenum array):
     global cglEnableClientState
-    cglEnableClientState = <PFNGLENABLECLIENTSTATEPROC>getFunction(b"glEnableClientState")
+    cglEnableClientState = <PFNGLENABLECLIENTSTATEPROC>getFunction("glEnableClientState")
     cglEnableClientState(array)
 
 cdef void GetglGenTextures(GLsizei n, GLuint *textures):
     global cglGenTextures
-    cglGenTextures = <PFNGLGENTEXTURESPROC>getFunction(b"glGenTextures")
+    cglGenTextures = <PFNGLGENTEXTURESPROC>getFunction("glGenTextures")
     cglGenTextures(n, textures)
 
 cdef void GetglGetPointerv(GLenum pname, void **params):
     global cglGetPointerv
-    cglGetPointerv = <PFNGLGETPOINTERVPROC>getFunction(b"glGetPointerv")
+    cglGetPointerv = <PFNGLGETPOINTERVPROC>getFunction("glGetPointerv")
     cglGetPointerv(pname, params)
 
 cdef void GetglIndexPointer(GLenum type, GLsizei stride, const void *pointer):
     global cglIndexPointer
-    cglIndexPointer = <PFNGLINDEXPOINTERPROC>getFunction(b"glIndexPointer")
+    cglIndexPointer = <PFNGLINDEXPOINTERPROC>getFunction("glIndexPointer")
     cglIndexPointer(type, stride, pointer)
 
 cdef void GetglIndexub(GLubyte c):
     global cglIndexub
-    cglIndexub = <PFNGLINDEXUBPROC>getFunction(b"glIndexub")
+    cglIndexub = <PFNGLINDEXUBPROC>getFunction("glIndexub")
     cglIndexub(c)
 
 cdef void GetglIndexubv(const GLubyte *c):
     global cglIndexubv
-    cglIndexubv = <PFNGLINDEXUBVPROC>getFunction(b"glIndexubv")
+    cglIndexubv = <PFNGLINDEXUBVPROC>getFunction("glIndexubv")
     cglIndexubv(c)
 
 cdef void GetglInterleavedArrays(GLenum format, GLsizei stride, const void *pointer):
     global cglInterleavedArrays
-    cglInterleavedArrays = <PFNGLINTERLEAVEDARRAYSPROC>getFunction(b"glInterleavedArrays")
+    cglInterleavedArrays = <PFNGLINTERLEAVEDARRAYSPROC>getFunction("glInterleavedArrays")
     cglInterleavedArrays(format, stride, pointer)
 
 cdef GLboolean GetglIsTexture(GLuint texture):
     global cglIsTexture
-    cglIsTexture = <PFNGLISTEXTUREPROC>getFunction(b"glIsTexture")
+    cglIsTexture = <PFNGLISTEXTUREPROC>getFunction("glIsTexture")
     cglIsTexture(texture)
 
 cdef void GetglNormalPointer(GLenum type, GLsizei stride, const void *pointer):
     global cglNormalPointer
-    cglNormalPointer = <PFNGLNORMALPOINTERPROC>getFunction(b"glNormalPointer")
+    cglNormalPointer = <PFNGLNORMALPOINTERPROC>getFunction("glNormalPointer")
     cglNormalPointer(type, stride, pointer)
 
 cdef void GetglPolygonOffset(GLfloat factor, GLfloat units):
     global cglPolygonOffset
-    cglPolygonOffset = <PFNGLPOLYGONOFFSETPROC>getFunction(b"glPolygonOffset")
+    cglPolygonOffset = <PFNGLPOLYGONOFFSETPROC>getFunction("glPolygonOffset")
     cglPolygonOffset(factor, units)
 
 cdef void GetglPopClientAttrib():
     global cglPopClientAttrib
-    cglPopClientAttrib = <PFNGLPOPCLIENTATTRIBPROC>getFunction(b"glPopClientAttrib")
+    cglPopClientAttrib = <PFNGLPOPCLIENTATTRIBPROC>getFunction("glPopClientAttrib")
     cglPopClientAttrib()
 
 cdef void GetglPrioritizeTextures(GLsizei n, const GLuint *textures, const GLfloat *priorities):
     global cglPrioritizeTextures
-    cglPrioritizeTextures = <PFNGLPRIORITIZETEXTURESPROC>getFunction(b"glPrioritizeTextures")
+    cglPrioritizeTextures = <PFNGLPRIORITIZETEXTURESPROC>getFunction("glPrioritizeTextures")
     cglPrioritizeTextures(n, textures, priorities)
 
 cdef void GetglPushClientAttrib(GLbitfield mask):
     global cglPushClientAttrib
-    cglPushClientAttrib = <PFNGLPUSHCLIENTATTRIBPROC>getFunction(b"glPushClientAttrib")
+    cglPushClientAttrib = <PFNGLPUSHCLIENTATTRIBPROC>getFunction("glPushClientAttrib")
     cglPushClientAttrib(mask)
 
 cdef void GetglTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void *pointer):
     global cglTexCoordPointer
-    cglTexCoordPointer = <PFNGLTEXCOORDPOINTERPROC>getFunction(b"glTexCoordPointer")
+    cglTexCoordPointer = <PFNGLTEXCOORDPOINTERPROC>getFunction("glTexCoordPointer")
     cglTexCoordPointer(size, type, stride, pointer)
 
 cdef void GetglTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const void *pixels):
     global cglTexSubImage1D
-    cglTexSubImage1D = <PFNGLTEXSUBIMAGE1DPROC>getFunction(b"glTexSubImage1D")
+    cglTexSubImage1D = <PFNGLTEXSUBIMAGE1DPROC>getFunction("glTexSubImage1D")
     cglTexSubImage1D(target, level, xoffset, width, format, type, pixels)
 
 cdef void GetglTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels):
     global cglTexSubImage2D
-    cglTexSubImage2D = <PFNGLTEXSUBIMAGE2DPROC>getFunction(b"glTexSubImage2D")
+    cglTexSubImage2D = <PFNGLTEXSUBIMAGE2DPROC>getFunction("glTexSubImage2D")
     cglTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels)
 
 cdef void GetglVertexPointer(GLint size, GLenum type, GLsizei stride, const void *pointer):
     global cglVertexPointer
-    cglVertexPointer = <PFNGLVERTEXPOINTERPROC>getFunction(b"glVertexPointer")
+    cglVertexPointer = <PFNGLVERTEXPOINTERPROC>getFunction("glVertexPointer")
     cglVertexPointer(size, type, stride, pointer)
 
 cglAreTexturesResident = GetglAreTexturesResident
