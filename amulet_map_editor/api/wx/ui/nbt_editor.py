@@ -585,7 +585,7 @@ class EditTagDialog(wx.Frame):
 
 if __name__ == "__main__":
     level_dat = nbt.load(
-        r"C:\Users\gotharbg\Documents\Python Projects\Amulet-Core\tests\worlds_src\java_vanilla_1_13\level.dat"
+        b"\x0A\x00\x0B\x68\x65\x6C\x6C\x6F\x20\x77\x6F\x72\x6C\x64\x08\x00\x04\x6E\x61\x6D\x65\x00\x09\x42\x61\x6E\x61\x6E\x72\x61\x6D\x61\x00"
     )
 
     app = wx.App()
