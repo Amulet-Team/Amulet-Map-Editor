@@ -4,7 +4,7 @@ import webbrowser
 
 EDIT_CONFIG_ID = "amulet_edit"
 
-from amulet_map_editor import log
+from amulet_map_editor import log, lang
 from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
@@ -35,7 +35,7 @@ class EditExtension(wx.Panel, BaseProgram):
 
         self._sizer.AddStretchSpacer(1)
         self._temp_msg = wx.StaticText(
-            self, label="Please wait while the renderer loads"
+            self, label=lang.get("program_3d_edit.canvas.please_wait")
         )
         self._temp_msg.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp_msg, 0, flag=wx.ALIGN_CENTER_HORIZONTAL)
@@ -101,7 +101,7 @@ class EditExtension(wx.Panel, BaseProgram):
             if self._canvas.is_closeable():
                 return self._check_close_world()
             log.info(
-                f"The canvas in edit for world {self._world.level_wrapper.world_name} was not closeable for some reason."
+                f"The canvas in edit for world {self._world.level_wrapper.level_name} was not closeable for some reason."
             )
             return False
         return not bool(self._world.history_manager.unsaved_changes)
@@ -120,7 +120,7 @@ class EditExtension(wx.Panel, BaseProgram):
                 } {unsaved_changes} unsaved change{
                 's' if unsaved_changes >= 2 else ''
                 } in {
-                self._world.level_wrapper.world_name
+                self._world.level_wrapper.level_name
                 }. Would you like to save?""",
                 style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT,
             )
@@ -133,49 +133,67 @@ class EditExtension(wx.Panel, BaseProgram):
             elif response == wx.ID_CANCEL:
                 log.info(
                     f"""Aborting closing world {
-                    self._world.level_wrapper.world_name
+                    self._world.level_wrapper.level_name
                     } because the user pressed cancel."""
                 )
                 return False
         return True
 
     def menu(self, menu: MenuData) -> MenuData:
-        menu.setdefault("&File", {}).setdefault("system", {}).setdefault(
-            "Save\tCtrl+s", lambda evt: self._canvas.save()
+        menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
+            "system", {}
+        ).setdefault(
+            f"{lang.get('program_3d_edit.menu_bar.file.save')}\tCtrl+s",
+            lambda evt: self._canvas.save(),
         )
-        # menu.setdefault('&File', {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
+        # menu.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
 
-        menu.setdefault("&Edit", {}).setdefault("history", {}).update(
+        menu.setdefault(
+            lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
+        ).setdefault("history", {}).update(
             {
-                "Undo\tCtrl+z": lambda evt: self._canvas.undo(),
-                "Redo\tCtrl+y": lambda evt: self._canvas.redo(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.undo')}\tCtrl+z": lambda evt: self._canvas.undo(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.redo')}\tCtrl+y": lambda evt: self._canvas.redo(),
             }
         )
 
-        menu.setdefault("&Edit", {}).setdefault("operation", {}).update(
+        menu.setdefault(
+            lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
+        ).setdefault("operation", {}).update(
             {
-                "Cut\tCtrl+x": lambda evt: self._canvas.cut(),
-                "Copy\tCtrl+c": lambda evt: self._canvas.copy(),
-                "Paste\tCtrl+v": lambda evt: self._canvas.paste_from_cache(),
-                "Delete\tDelete": lambda evt: self._canvas.delete(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.cut')}\tCtrl+x": lambda evt: self._canvas.cut(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.copy')}\tCtrl+c": lambda evt: self._canvas.copy(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.paste')}\tCtrl+v": lambda evt: self._canvas.paste_from_cache(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.delete')}\tDelete": lambda evt: self._canvas.delete(),
             }
         )
 
-        menu.setdefault("&Edit", {}).setdefault("shortcut", {}).update(
+        menu.setdefault(
+            lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
+        ).setdefault("shortcut", {}).update(
             {
-                "Goto\tCtrl+g": lambda evt: self._canvas.goto(),
-                "Select All\tCtrl+A": lambda evt: self._canvas.select_all(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.goto')}\tCtrl+g": lambda evt: self._canvas.goto(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.select_all')}\tCtrl+A": lambda evt: self._canvas.select_all(),
             }
         )
 
-        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
-            "Controls...", lambda evt: self._edit_controls()
+        menu.setdefault(lang.get("menu_bar.options.menu_name"), {}).setdefault(
+            "options", {}
+        ).setdefault(
+            lang.get("program_3d_edit.menu_bar.options.controls"),
+            lambda evt: self._edit_controls(),
         )
-        menu.setdefault("&Options", {}).setdefault("options", {}).setdefault(
-            "Options...", lambda evt: self._edit_options()
+        menu.setdefault(lang.get("menu_bar.options.menu_name"), {}).setdefault(
+            "options", {}
+        ).setdefault(
+            lang.get("program_3d_edit.menu_bar.options.options"),
+            lambda evt: self._edit_options(),
         )
-        menu.setdefault("&Help", {}).setdefault("help", {}).setdefault(
-            "Controls", lambda evt: self._help_controls()
+        menu.setdefault(lang.get("menu_bar.help.menu_name"), {}).setdefault(
+            "help", {}
+        ).setdefault(
+            lang.get("program_3d_edit.menu_bar.help.user_guide"),
+            lambda evt: self._help_controls(),
         )
         return menu
 

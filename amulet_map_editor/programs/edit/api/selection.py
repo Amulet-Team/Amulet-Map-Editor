@@ -1,6 +1,5 @@
 from typing import Tuple, Optional, Any, TYPE_CHECKING
 import wx
-import numpy
 import weakref
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.history.history_manager import ObjectHistoryManager
@@ -43,6 +42,7 @@ class SelectionManager(Changeable):
     def bind_events(self):
         """Set up all events required to run."""
         self.canvas.Bind(wx.EVT_TIMER, self._create_undo_point, self._timer)
+        self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy, self.canvas)
 
     def _create_undo_point(self, evt):
         self.canvas.create_undo_point(False, True)
@@ -52,6 +52,10 @@ class SelectionManager(Changeable):
         """Start a timer to create an undo point after a period of time.
         If this is called again before the timer runs then the last call will not happen."""
         self._timer.StartOnce(400)
+
+    def _on_destroy(self, evt):
+        self._timer.Stop()
+        evt.Skip()
 
     @property
     def selection_corners(
@@ -93,16 +97,7 @@ class SelectionManager(Changeable):
         """
         selections = []
         for points in selection_corners:
-            if (
-                type(points) in (tuple, list)
-                and len(points) == 2
-                and all(
-                    type(point) in (tuple, list)
-                    and len(point) == 3
-                    and all(isinstance(p, (int, numpy.integer)) for p in point)
-                    for point in points
-                )
-            ):
+            if len(points) == 2 and all(len(point) == 3 for point in points):
                 selections.append(
                     tuple(tuple(int(p) for p in point) for point in points)
                 )

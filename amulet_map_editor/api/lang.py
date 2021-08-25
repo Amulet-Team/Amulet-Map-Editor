@@ -25,6 +25,9 @@ except:
 # if a language is set in the config use that
 _language = CONFIG.get("amulet_meta", {}).get("lang", _language)
 
+if _language is None:
+    _language = _default_language
+
 
 def register_lang_directory(lang_dir: str):
     """Register a new language directory.
@@ -88,11 +91,13 @@ def _load_lang_file(lang_path: str) -> Dict[str, str]:
     if os.path.isfile(lang_path):
         with open(lang_path, encoding="utf-8") as f:
             for line in f.readlines():
-                split_line = line.split("=", 1)
-                if len(split_line) == 2:
-                    unique_identifier = split_line[0].strip()
-                    language_string = split_line[1].replace("\\n", "\n").strip()
-                    lang[unique_identifier] = language_string
+                lstrip_line = line.lstrip()
+                if not lstrip_line.startswith("#"):
+                    split_line = lstrip_line.split("=", 1)
+                    if len(split_line) == 2:
+                        unique_identifier = split_line[0].rstrip()
+                        language_string = split_line[1].replace("\\n", "\n").strip()
+                        lang[unique_identifier] = language_string
     return lang
 
 

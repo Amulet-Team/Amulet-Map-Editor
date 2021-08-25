@@ -42,7 +42,6 @@ class Renderer(EditCanvasContainer):
         "_sky_box",
         "_draw_timer",
         "_gc_timer",
-        "_rebuild_timer",
     )
 
     def __init__(
@@ -62,6 +61,8 @@ class Renderer(EditCanvasContainer):
             context_identifier,
             opengl_resource_pack,
             world,
+            draw_floor=True,
+            draw_ceil=True,
         )
         self._chunk_generator.register(self._render_world)
 
@@ -78,18 +79,17 @@ class Renderer(EditCanvasContainer):
 
         self._draw_timer = wx.Timer(self.canvas)
         self._gc_timer = wx.Timer(self.canvas)
-        self._rebuild_timer = wx.Timer(self.canvas)
 
     def bind_events(self):
         """Set up all events required to run."""
         self.canvas.Bind(wx.EVT_TIMER, self._gc, self._gc_timer)
-        self.canvas.Bind(wx.EVT_TIMER, self._rebuild, self._rebuild_timer)
         self.canvas.Bind(
             wx.EVT_TIMER,
             self._do_draw,
             self._draw_timer,
         )
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_moved)
+        self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy, self.canvas)
 
     def enable(self):
         """Enable and start working."""
@@ -100,6 +100,10 @@ class Renderer(EditCanvasContainer):
         self.disable_threads()
         self.render_world.unload()
         self.fake_levels.unload()
+
+    def _on_destroy(self, evt):
+        self.disable()
+        evt.Skip()
 
     def is_closeable(self):
         """Check that the data is safe to be closed."""
@@ -116,7 +120,6 @@ class Renderer(EditCanvasContainer):
         Makes it safe to modify the world data."""
         self._draw_timer.Stop()
         self._gc_timer.Stop()
-        self._rebuild_timer.Stop()
         self._chunk_generator.stop()
 
     def enable_threads(self):
@@ -126,7 +129,6 @@ class Renderer(EditCanvasContainer):
         self._chunk_generator.start()
         self._draw_timer.Start(15)
         self._gc_timer.Start(10000)
-        self._rebuild_timer.Start(1000)
 
     # TODO: move this logic into a resource pack reload method
     # def _load_resource_pack(self, *resource_packs: JavaResourcePack):
@@ -265,9 +267,3 @@ class Renderer(EditCanvasContainer):
         self.render_world.run_garbage_collector()
         self.fake_levels.run_garbage_collector()
         event.Skip()
-
-    def _rebuild(self, evt):
-        """Rebuild the geometry to reduce draw calls."""
-        self.render_world.chunk_manager.rebuild()
-        self.fake_levels.rebuild()
-        evt.Skip()

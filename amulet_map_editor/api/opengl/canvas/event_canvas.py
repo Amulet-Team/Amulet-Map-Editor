@@ -21,15 +21,14 @@ class EventCanvas(BaseCanvas):
     def tear_down_events(self):
         """Unbind all events.
         We are allowing users to bind custom events so we should have a way to reset what is bound."""
-        handled_events = set()
         for event, handler, source in self._bound_events:
             if source is None:
-                if event not in handled_events:
-                    handled_events.add(event)
-                    super().Unbind(event)
+                while super().Unbind(event):
+                    pass
             else:
                 if not self.Unbind(event, source, handler=handler):
                     log.error(f"Failed to unbind {event}, {handler}, {source}")
+        self._bound_events.clear()
 
     def bind_events(self):
         """Set up all events required to run.

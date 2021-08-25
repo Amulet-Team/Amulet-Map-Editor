@@ -7,6 +7,7 @@ from OpenGL.GL import (
 import os
 from typing import Optional, Generator
 import weakref
+import sys
 
 from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
@@ -24,6 +25,7 @@ from minecraft_model_reader.api.resource_pack import (
     load_resource_pack,
     load_resource_pack_manager,
 )
+from amulet.api.player import LOCAL_PLAYER
 
 from amulet.api.data_types import OperationYieldType, Dimension
 
@@ -34,12 +36,13 @@ from amulet_map_editor.programs.edit.api.selection import (
     SelectionManager,
     SelectionHistoryManager,
 )
-from amulet_map_editor import log
+from amulet_map_editor import log, lang
 import amulet_map_editor.programs.edit as amulet_edit
 
 from amulet_map_editor.api.opengl.camera import ControllableCamera
 from amulet_map_editor.api.wx.util.button_input import ButtonInput
 from amulet_map_editor.api.wx.util.mouse_movement import MouseMovement
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from ..renderer import Renderer
 
 from amulet.api.level import BaseLevel
@@ -64,7 +67,7 @@ class BaseEditCanvas(EventCanvas):
         self.world.history_manager.register(self._selection, False)
 
         self._camera: ControllableCamera = ControllableCamera(self)
-        self._camera.location_rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
+
         self._camera.move_speed = 2.0
         self._camera.rotate_speed = 2.0
 
@@ -73,10 +76,15 @@ class BaseEditCanvas(EventCanvas):
         self._mouse.set_middle()
 
         # load the resource packs
-        os.makedirs("resource_packs", exist_ok=True)
-        if not os.path.isfile("resource_packs/readme.txt"):
-            with open("resource_packs/readme.txt", "w") as f:
-                f.write("Put the Java resource pack you want loaded in here.")
+        try:
+            os.makedirs("resource_packs", exist_ok=True)
+            if not os.path.isfile("resource_packs/readme.txt"):
+                with open("resource_packs/readme.txt", "w") as f:
+                    f.write("Put the Java resource pack you want loaded in here.")
+        except PermissionError as e:
+            raise PermissionError(
+                "Amulet is not able to write to the install directory. Try moving Amulet to somewhere else on your computer."
+            ) from e
 
         self._renderer: Optional[Renderer] = None
 
@@ -114,14 +122,16 @@ class BaseEditCanvas(EventCanvas):
                     )
                 )
             )
-            yield 0.1, "Downloading Bedrock vanilla resource pack"
+            yield 0.1, lang.get(
+                "program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack"
+            )
             gen = get_bedrock_vanilla_latest_iter()
             try:
                 while True:
                     yield next(gen) * 0.4 + 0.1
             except StopIteration as e:
                 packs.append(e.value)
-            yield 0.5, "Loading resource packs"
+            yield 0.5, lang.get("program_3d_edit.canvas.loading_resource_packs")
 
             packs += [
                 pack for pack in user_packs if isinstance(pack, BedrockResourcePack)
@@ -141,7 +151,9 @@ class BaseEditCanvas(EventCanvas):
                     )
                 )
             )
-            yield 0.1, "Downloading Java vanilla resource pack"
+            yield 0.1, lang.get(
+                "program_3d_edit.canvas.downloading_java_vanilla_resource_pack"
+            )
             gen = get_java_vanilla_latest_iter()
             try:
                 while True:
@@ -149,18 +161,26 @@ class BaseEditCanvas(EventCanvas):
             except StopIteration as e:
                 packs.append(e.value)
             except Exception as e:
+                if sys.platform == "darwin" and "CERTIFICATE_VERIFY_FAILED" in str(e):
+                    msg = lang.get(
+                        "program_3d_edit.canvas.java_rp_failed_mac_certificates"
+                    )
+                else:
+                    msg = lang.get("program_3d_edit.canvas.java_rp_failed_default")
                 log.error(
-                    str(e),
+                    msg,
                     exc_info=True,
                 )
-                wx.MessageBox(
-                    "Failed to download the latest Java resource pack.\n"
-                    "Check your internet connection and restart Amulet.\n"
-                    "Check the console for more details.\n"
-                    f"{e}"
+                dialog = TracebackDialog(
+                    self,
+                    lang.get("program_3d_edit.canvas.java_rp_failed"),
+                    f"{msg}\n{e}",
+                    traceback.format_exc(),
                 )
+                dialog.ShowModal()
+                dialog.Destroy()
 
-            yield 0.5, "Loading resource packs"
+            yield 0.5, lang.get("program_3d_edit.canvas.loading_resource_packs")
             packs += [pack for pack in user_packs if isinstance(pack, JavaResourcePack)]
             packs.append(get_java_vanilla_fix())
 
@@ -172,11 +192,11 @@ class BaseEditCanvas(EventCanvas):
 
         opengl_resource_pack = OpenGLResourcePack(resource_pack, translator)
 
-        yield 0.75, "Creating texture atlas"
+        yield 0.75, lang.get("program_3d_edit.canvas.creating_texture_atlas")
         for i in opengl_resource_pack.setup():
             yield i / 4 + 0.75
 
-        yield 1.0, "Setting up renderer"
+        yield 1.0, lang.get("program_3d_edit.canvas.setting_up_renderer")
 
         self._renderer: Optional[Renderer] = Renderer(
             self,
@@ -187,8 +207,13 @@ class BaseEditCanvas(EventCanvas):
 
     def _finalise(self):
         """Any logic that needs to be run after everything has been set up."""
-        self.reset_bound_events()
         self._init = True
+        try:
+            player = self.world.get_player(LOCAL_PLAYER)
+            self._camera.location_rotation = player.location, player.rotation
+            self.dimension = player.dimension
+        except:
+            self._camera.location_rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
 
     def bind_events(self):
         """Set up all events required to run.
@@ -215,9 +240,9 @@ class BaseEditCanvas(EventCanvas):
         return self.renderer.is_closeable()
 
     def close(self):
-        """Close and destroy the canvas and all contained data."""
+        """Destroy all contained data so that the window can be safely destroyed."""
         self.renderer.close()
-        super()._close()
+        super().close()
 
     @property
     def world(self) -> BaseLevel:

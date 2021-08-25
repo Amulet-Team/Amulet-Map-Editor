@@ -1,0 +1,71 @@
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Zavřít Svět
+
+select_world.open_world_button=Otevřít jiný svět
+select_world.open_world_dialogue=Vyberte složku Minecraft světa
+select_world.select_directory_failed=Otevření složky světa selhalo!
+select_world.recent_worlds=Nedávno Otevřené Světy
+
+main_menu.tab_name=Hlavní Nabídka
+main_menu.open_world=Otevřít Svět
+main_menu.help=Pomoc
+
+program_about.tab_name=O Nás
+program_about.currently_opened_world=Nyní Otevřený Svět:
+program_about.choose_from_options=Vyberte si z možností na levo co budete chtít použít.\nMůžete je kdykoliv měnit.
+
+program_convert.tab_name=Konvertovat
+program_convert.convert_button=Konvertovat
+program_convert.input_world=Vstupní Svět:
+program_convert.output_world=Výstupní Svět:
+program_convert.select_output_world=Vyberte Výstupní Svět
+program_convert.input_output_must_different=Vstupní a výstupní světy se musí lišit!
+program_convert.select_before_converting=Vyberte svět před konvertováním!
+program_convert.conversion_completed=Konvertování světa dokončeno
+
+program_3d_edit.tab_name=3D Editor
+
+program_3d_edit.select_tool.delete_button=Odstranit
+program_3d_edit.select_tool.delete_button_tooltip=Odstraní bloky ve vybraném území.
+program_3d_edit.select_tool.copy_button=Kopírovat
+program_3d_edit.select_tool.copy_button_tooltip=Zkopíruje vybrané území k pozdějšímu vložení. Může být vloženo do kteréhokoli světa či dimenze.
+program_3d_edit.select_tool.cut_button=Vyjmout
+program_3d_edit.select_tool.cut_button_tooltip=zkopíruje vybrané území k pozdějšímu odstranění a vložení. Může být vloženo do kteréhokoli světa či dimenze.
+program_3d_edit.select_tool.paste_button=Vložit
+program_3d_edit.select_tool.paste_button_tooltip=Vloží naposledy zkopírované či vyjmuté území do světa.
+
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Určí x souřadnici zeleného rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Určí y souřadnici zeleného rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Určí z souřadnici zeleného rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Určí x souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Určí y souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Určí z souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
+
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
+program_3d_edit.select_tool.box_size_tooltip=Velikost aktivního výběrového boxu v blocích.
+
+program_3d_edit.select_tool.button_point1=Pohybový Bod 1
+program_3d_edit.select_tool.button_point1_tooltip=Stiskněte a podržte toto tlačítko a použijte pohybové ovládání k pohybu zeleného výběrového bodu.
+program_3d_edit.select_tool.button_point2=Pohybový Bod 2
+program_3d_edit.select_tool.button_point2_tooltip=Stiskněte a podržte toto tlačítko a použijte pohybové ovládání k pohybu modrého výběrového bodu.
+program_3d_edit.select_tool.button_selection_box=Pohybový Box
+program_3d_edit.select_tool.button_selection_box_tooltip=Stiskněte a podržte toto tlačítko a použijte pohybové ovládání k pohybu aktivního výběrového boxu.
+
+program_3d_edit.goto_ui.title=Teleportovat
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Souřadnice x pohledu kamery. Napište souřadnici k přesunu na dané místo. Ctrl + C k zakopírování. Ctrl + V ke vložení.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Souřadnice y pohledu kamery. Napište souřadnici k přesunu na dané místo. Ctrl + C k zakopírování. Ctrl + V ke vložení.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Souřadnice z pohledu kamery. Napište souřadnici k přesunu na dané místo. Ctrl + C k zakopírování. Ctrl + V ke vložení.
+program_3d_edit.goto_ui.copy_button_tooltip=Zkopíruje x, y a z hodnoty do schránky tímto způsobem "0.0 0.0 0.0" (x, y a z popořadě)
+program_3d_edit.goto_ui.paste_button_tooltip=vloží předem zkopírované souřadnice do vstupu. Zkopírovaná hodnota musí být 3 čísla oddělená mezerami nebo čárkami.

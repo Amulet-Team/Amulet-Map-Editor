@@ -1,27 +1,161 @@
+# Shared strings
+shared.check_console=查看控制台以获取更多信息.
+
+app.world_still_used=有一个世界仍在使用当中. 请先关闭它
+
 world.java_platform=Java版
 world.bedrock_platform=基岩版
 world.close_world=关闭世界
 
+select_world.title=选择世界
 select_world.open_world_button=打开另外一个世界
 select_world.open_world_dialogue=选择一个Minecraft存档目录
-select_world.select_directory_failed=无法打开目录！
+select_world.select_directory_failed=无法打开目录!
 select_world.recent_worlds=最近打开的世界
+select_world.no_loader_found=无法为该世界找到一个加载器.
+select_world.loading_world_failed=世界加载失败.
 
 main_menu.tab_name=主菜单
 main_menu.open_world=打开世界
 main_menu.help=帮助
+main_menu.discord=Amulet Discord
 
-program_about.tab_name=关于
-program_about.currently_opened_world=当前打开的世界
-program_about.choose_from_options=从左边的选项中选择你想进行的事项。\n你可以随时在这些选项之间进行切换。
+menu_bar.file.menu_name=文件
+menu_bar.file.open_world=打开世界
+menu_bar.file.close_world=关闭世界
+menu_bar.file.quit=离开
+menu_bar.options.menu_name=选项
+menu_bar.help.menu_name=帮助
+
+update_check.newer_version_released=一个新版本的Amulet现已发布!
+update_check.new_version=新版本:
+update_check.current_version=你的版本:
+update_check.update=前往下载页面
+update_check.ok=确认
+
+program_about.tab_name=信息
+program_about.currently_opened_world=当前打开的世界:
+program_about.choose_from_options=从左边的选项中选择你想进行的操作.\n你可以随时在这些选项之间进行切换.
 
 program_convert.tab_name=转换
 program_convert.convert_button=转换
-program_convert.input_world=输入世界
-program_convert.output_world=输出世界
+program_convert.input_world=输入世界:
+program_convert.output_world=输出世界:
 program_convert.select_output_world=选择输出的世界
-program_convert.input_output_must_different=输入和输出的世界不可以是同一个！
-program_convert.select_before_converting=你必须选择一个用于转换的世界！
+program_convert.input_output_must_different=输入和输出的世界不可以是同一个!
+program_convert.select_before_converting=你必须选择一个用于转换的世界!
 program_convert.conversion_completed=世界转换完成
 
 program_3d_edit.tab_name=3D 编辑器
+
+program_3d_edit.select_tool.delete_button=删除
+program_3d_edit.select_tool.delete_button_tooltip=删除选中区域内的方块.
+program_3d_edit.select_tool.copy_button=复制
+program_3d_edit.select_tool.copy_button_tooltip=复制选中区域内的方块以用于之后粘贴. 可以被粘贴到任何世界和维度中.
+program_3d_edit.select_tool.cut_button=剪切
+program_3d_edit.select_tool.cut_button_tooltip=剪切选中区域内的方块以用于之后粘贴. 可以被粘贴到任何世界和维度中.
+program_3d_edit.select_tool.paste_button=粘贴
+program_3d_edit.select_tool.paste_button_tooltip=粘贴一个先前复制或剪切的区域到世界中.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=设置选中区块中绿色边缘的x坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=设置选中区块中绿色边缘的y坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=设置选中区块中绿色边缘的z坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=设置选中区块中蓝色边缘的x坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=设置选中区块中蓝色边缘的y坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=设置选中区块中蓝色边缘的z坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
+
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=当前Minecraft区块选择器选中的形状.
+program_3d_edit.select_tool.box_size_tooltip=当前选择框的尺寸大小, 以块为单位.
+program_3d_edit.select_tool.button_point1=移动坐标1
+program_3d_edit.select_tool.button_point1_tooltip=按住这个按钮并使用移动键(默认为WASD, 空格和shift)移动绿色选中区块的坐标.
+program_3d_edit.select_tool.button_point2=移动坐标2
+program_3d_edit.select_tool.button_point2_tooltip=按住这个按钮并使用移动键(默认为WASD, 空格和shift)移动蓝色选中区块的坐标.
+program_3d_edit.select_tool.button_selection_box=移动选择框
+program_3d_edit.select_tool.button_selection_box_tooltip=按住这个按钮并使用移动键(默认为WASD, 空格和shift)移动选中区块的坐标.
+
+program_3d_edit.paste_tool.location_label=位置
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=选中区域将会被放置的中心位置的x坐标. 输入一个数字, 或使用鼠标滚轮以及右侧箭头来改变数值.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=选中区域将会被放置的中心位置的y坐标. 输入一个数字, 或使用鼠标滚轮以及右侧箭头来改变数值.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=选中区域将会被放置的中心位置的z坐标. 输入一个数字, 或使用鼠标滚轮以及右侧箭头来改变数值.
+program_3d_edit.paste_tool.move_selection_label=移动选中区域
+program_3d_edit.paste_tool.move_selection_tooltip=按住这个按钮并使用移动键(默认为WASD, 空格和shift)移动选中区块.
+program_3d_edit.paste_tool.rotation_label=旋转
+program_3d_edit.paste_tool.free_rotation_label=自由旋转
+program_3d_edit.paste_tool.free_rotation_tooltip=如果不勾选, 选中区块将以90度为单位进行旋转. 如果勾选, 选中区块将以1度为单位进行旋转
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=选中区块在x轴上被旋转的角度. 注意这是模型的x轴, 它受到z轴和y轴旋转的影响, 所以这可能与全局的x轴不一致.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=选中区块在y轴上被旋转的角度. 注意这是模型的y轴, 它受到z轴旋转的影响, 所以这可能与全局的y轴不一致.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=选中区块在Z轴上被旋转的角度.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=点击此处将选中区块逆时针旋转90度.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=点击此处将选中区块顺时针旋转90度.
+program_3d_edit.paste_tool.scale_label=比例
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=模型在x轴上的比例.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=模型在y轴上的比例.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=模型在z轴上的比例.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=参照摄像头的方向, 水平镜面翻转选中的区块.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=参照摄像头的方向, 垂直镜面翻转选中的区块.
+program_3d_edit.paste_tool.copy_air_label=复制空气
+program_3d_edit.paste_tool.copy_air_tooltip=如果启用, 被粘贴的区块中的所有空气方块将被保留并覆盖任何现有的方块. 如果禁用, 这些位置的现有方块将被保留, 空气将不会被复制.
+program_3d_edit.paste_tool.copy_water_label=复制水
+program_3d_edit.paste_tool.copy_water_tooltip=如果启用, 被粘贴的区块中的所有水方块将被保留并覆盖任何现有的方块. 如果禁用, 这些位置的现有方块将被保留, 水将不会被复制.
+program_3d_edit.paste_tool.copy_lava_label=复制岩浆
+program_3d_edit.paste_tool.copy_lava_tooltip==如果启用, 被粘贴的区块中的所有岩浆方块将被保留并覆盖任何现有的方块. 如果禁用, 这些位置的现有方块将被保留, 岩浆将不会被复制.
+program_3d_edit.paste_tool.confirm_label=确认
+program_3d_edit.paste_tool.confirm_tooltip=点击此处将模板旋转, 并按比例粘贴到世界中的指定位置.
+program_3d_edit.paste_tool.zero_scale_message=比例中的一个数值为0, 所有没有任何内容被复制.
+
+program_3d_edit.chunk_tool.min_y=最小 Y
+program_3d_edit.chunk_tool.min_y_tooltip=在自上而下的俯视图中绘制的最低的Y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
+program_3d_edit.chunk_tool.max_y=最大 Y
+program_3d_edit.chunk_tool.max_y_tooltip=在自上而下的俯视图中绘制的最高的Y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
+program_3d_edit.chunk_tool.delete_chunks=删除选中区块
+program_3d_edit.chunk_tool.delete_chunks_tooltip=删除选中的区块. 该操作将会删除实际的区块和其中包含的所有数据. 下次你在游戏中加载该区域时, 游戏将会重新创建这些区块.
+program_3d_edit.chunk_tool.prune_chunks=仅保留选中区块
+program_3d_edit.chunk_tool.prune_chunks_tooltip=删除所有未被选中的区块. 该操作将会删除实际的区块和其中包含的所有数据. 下次你在游戏中加载该区域时, 游戏将会重新创建这些区块.
+
+program_3d_edit.goto_ui.title=传送
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=摄像机的X坐标. 输入一个坐标以前往该位置. 按 Ctrl+C 复制该坐标, Ctrl+V 粘贴.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=摄像机的y坐标. 输入一个坐标以前往该位置. 按 Ctrl+C 复制该坐标, Ctrl+V 粘贴.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=摄像机的z坐标. 输入一个坐标以前往该位置. 按 Ctrl+C 复制该坐标, Ctrl+V 粘贴.
+program_3d_edit.goto_ui.copy_button_tooltip=以 "0.0 0.0 0.0" 的形式将x, y和z的值复制到剪贴板上 (分别为x、y和z).
+program_3d_edit.goto_ui.paste_button_tooltip=将先前复制的坐标粘贴到输入栏中. 复制的值必须是三个数字, 用空格或逗号隔开.
+
+program_3d_edit.canvas.please_wait=渲染器正在初始化, 请稍作等待
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下载基岩版纯净资源包
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=正在下载Java版纯净资源包
+program_3d_edit.canvas.java_rp_failed=无法下载最新版本的Java版纯净资源包.
+program_3d_edit.canvas.java_rp_failed_default=请检查你的网络连接或重启Amulet.
+program_3d_edit.canvas.loading_resource_packs=正在加载资源包
+program_3d_edit.canvas.creating_texture_atlas=正在创建纹理
+program_3d_edit.canvas.setting_up_renderer=正在设置渲染器
+
+program_3d_edit.menu_bar.file.save=保存
+program_3d_edit.menu_bar.edit.menu_name=编辑
+program_3d_edit.menu_bar.edit.undo=撤销
+program_3d_edit.menu_bar.edit.redo=恢复
+program_3d_edit.menu_bar.edit.cut=剪切
+program_3d_edit.menu_bar.edit.copy=复制
+program_3d_edit.menu_bar.edit.paste=粘贴
+program_3d_edit.menu_bar.edit.delete=删除
+program_3d_edit.menu_bar.edit.goto=前往
+program_3d_edit.menu_bar.edit.select_all=选择全部
+program_3d_edit.menu_bar.options.controls=操控按键...
+program_3d_edit.menu_bar.options.options=其他选项...
+program_3d_edit.menu_bar.help.user_guide=按键说明

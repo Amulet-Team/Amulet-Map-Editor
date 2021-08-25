@@ -149,7 +149,7 @@ class Waterlog(wx.Panel, DefaultOperationUI):
         world = self.world
         selection = self.canvas.selection.selection_group
         dimension = self.canvas.dimension
-        iter_count = len(list(world.get_chunk_slice_box(dimension, selection, True)))
+        iter_count = len(list(world.get_coord_box(dimension, selection, True)))
         count = 0
         for chunk, slices, _ in world.get_chunk_slice_box(dimension, selection, True):
             original_blocks = chunk.blocks[slices]

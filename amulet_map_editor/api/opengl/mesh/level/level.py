@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Generator, Optional, Any
 import numpy
+import time
 
 from amulet.api.data_types import Dimension, ChunkCoordinates
 
@@ -23,37 +24,55 @@ if TYPE_CHECKING:
 
 
 class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextManager):
+    """A RenderLevel holds a reference to a level and manages all the geometry and drawing for that level."""
+
     def __init__(
         self,
         context_identifier: Any,
         opengl_resource_pack: OpenGLResourcePack,
         level: "BaseLevel",
-        draw_floor=True,
         draw_box=False,
+        draw_floor=False,
+        draw_ceil=False,
+        limit_bounds=False,
     ):
+        """
+        Create a new RenderLevel instance.
+
+        :param context_identifier: The identifier for the opengl context.
+        :param opengl_resource_pack: The resource pack to use for models and textures.
+        :param level: The level to pull data from.
+        :param draw_box: Should the box around the level be drawn.
+        :param draw_floor: Should the floor below the level be drawn.
+        :param draw_ceil: Should the ceiling above the level be drawn.
+        :param limit_bounds: Should the chunks be limited to the bounds of the level.
+        """
         OpenGLResourcePackManager.__init__(self, opengl_resource_pack)
         ContextManager.__init__(self, context_identifier)
         self._level = level
         self._camera_location: CameraLocationType = (0, 150, 0)
         # yaw (-180 to 180), pitch (-90 to 90)
         self._camera_rotation: CameraRotationType = (0, 90)
-        self._dimension: Dimension = "overworld"
+        self._dimension: Dimension = level.dimensions[0]
         self._render_distance = 5
         self._garbage_distance = 10
         self._draw_box = draw_box
         self._draw_floor = draw_floor
+        self._draw_ceil = draw_ceil
+        self._limit_bounds = limit_bounds
         self._selection = GreenRenderSelectionGroup(
-            context_identifier, self.resource_pack, self.level.selection_bounds
+            context_identifier, self.resource_pack, self.level.bounds(self.dimension)
         )
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
 
         self._last_rebuild_camera_location: Optional[
             numpy.ndarray
         ] = None  # x, z camera location
-        self._rebuild = (
+        self._needs_rebuild = (
             True  # Should we go back to the beginning and re-find chunks to rebuild
         )
         self._chunk_rebuilds = self._rebuild_generator()
+        self._rebuild_time = 0
 
     @property
     def level(self) -> "BaseLevel":
@@ -70,8 +89,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         """A generator of chunk coordinates to rebuild.
         This is an infinite length generator."""
         while True:
-            if self._rebuild:
-                self._rebuild = False
+            if self._needs_rebuild:
+                self._needs_rebuild = False
                 # a set of chunks that are next to chunks that have changed but have not changed themselves
                 chunk_rebuilt = set()
                 chunk_not_loaded = []  # a list of chunks that have not been loaded
@@ -104,17 +123,17 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                                     chunk_coords_
                                 )  # so that it doesn't get picked up again
                         # if the rebuild flag has been set go to the beginning
-                        if self._rebuild:
+                        if self._needs_rebuild:
                             break
                     elif chunk_coords not in self.chunk_manager:
                         # if the chunk is not yet loaded, mark it for loading.
                         chunk_not_loaded.append(chunk_coords)
                 # if the rebuild flag has been set go to the beginning
-                if self._rebuild:
+                if self._needs_rebuild:
                     continue
                 for chunk_coords in chunk_not_loaded:
                     # if the rebuild flag has been set go to the beginning
-                    if self._rebuild:
+                    if self._needs_rebuild:
                         break
                     yield chunk_coords
             else:
@@ -127,7 +146,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
             (self._last_rebuild_camera_location - camera) ** 2
         ) > min(2048, self.render_distance * 16 - 8):
             # if the camera has moved more than 32 blocks set the rebuild flag
-            self._rebuild = True
+            self._needs_rebuild = True
             self._last_rebuild_camera_location = camera
 
         chunk_coords = next(self._chunk_rebuilds)
@@ -140,7 +159,9 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
                 self.chunk_manager.region_size,
                 chunk_coords,
                 self.dimension,
-                self.draw_floor,
+                draw_floor=self.draw_floor,
+                draw_ceil=self.draw_ceil,
+                limit_bounds=self._limit_bounds,
             )
 
             try:
@@ -153,9 +174,14 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
 
             self.chunk_manager.add_render_chunk(chunk)
 
+        t = time.time()
+        if t > self._rebuild_time + 1:
+            self._rebuild_time = t
+            self.chunk_manager.rebuild()
+
     def enable(self):
         """Enable chunk generation in a new thread."""
-        self._rebuild = True
+        self._needs_rebuild = True
 
     def unload(self):
         """Unload all loaded data. Can be resumed by calling enable."""
@@ -196,7 +222,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def dimension(self, dimension: Dimension):
         self._dimension = dimension
         self.run_garbage_collector(True)
-        self._rebuild = True
+        self._needs_rebuild = True
 
     @property
     def render_distance(self) -> int:
@@ -208,7 +234,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         assert isinstance(val, int), "Render distance must be an int"
         self._render_distance = val
         self._garbage_distance = val + 5
-        self._rebuild = True
+        self._needs_rebuild = True
 
     @property
     def draw_box(self):
@@ -219,6 +245,11 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def draw_floor(self):
         """Should the floor under the level be drawn."""
         return self._draw_floor
+
+    @property
+    def draw_ceil(self):
+        """Should the ceiling above the level be drawn."""
+        return self._draw_ceil
 
     def chunk_coords(self) -> Generator[ChunkCoordinates, None, None]:
         """Get all of the chunks to draw/load"""
@@ -264,8 +295,8 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def _rebuild(self):
         """Unload all the chunks so they can be rebuilt."""
         self._chunk_manager.unload()
-        self._rebuild = True
+        self._needs_rebuild = True
 
     def rebuild_changed(self):
         """Rebuild the chunks that have changed."""
-        self._rebuild = True
+        self._needs_rebuild = True

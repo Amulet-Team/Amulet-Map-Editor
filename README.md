@@ -22,7 +22,7 @@ Extract the contained folder to a location on your computer and run the executab
 1) Install [Python 3.7+](https://www.python.org/)
 2) We recommend setting up a [python virtual environment](https://docs.python.org/3/tutorial/venv.html) so you don't run into issues with dependency conflicts.
 3) run `python -m pip install amulet-map-editor` to install the library and all its dependencies.
-4) run `python amulet_map_editor` to run the program
+4) run `python -m amulet_map_editor` to run the program
 
 ### Notes
 

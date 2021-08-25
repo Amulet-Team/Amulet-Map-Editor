@@ -1,10 +1,10 @@
 graft amulet_map_editor
-include README.md
-include requirements*.txt
+include requirements.txt
 include versioneer.py
-include main.py
-include Amulet.spec
 include icon.ico
-include amulet_map_editor/_version.py
 prune */__pycache__/*
 global-exclude *.py[cod]
+global-exclude *.c
+global-exclude *.html
+global-exclude *.log
+global-exclude *.md

@@ -5,6 +5,7 @@ import traceback
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor import __version__, lang, log
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
@@ -51,9 +52,8 @@ class AmuletUI(wx.Frame):
             | wx.CLIP_CHILDREN
             | wx.RESIZE_BORDER,
         )
-        self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
         icon = wx.Icon()
-        icon.CopyFromBitmap(image.logo.icon128.bitmap())
+        icon.CopyFromBitmap(image.logo.amulet_logo.bitmap())
         self.SetIcon(icon)
 
         self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}
@@ -82,17 +82,17 @@ class AmuletUI(wx.Frame):
             )
             update_check.check_for_update(__version__, self)
 
-        self.Show()
-
     def create_menu(self):
         menu_dict = {}
-        menu_dict.setdefault("&File", {}).setdefault("system", {}).setdefault(
-            "Open World", lambda evt: self._show_open_world()
+        menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
+            "system", {}
+        ).setdefault(
+            lang.get("menu_bar.file.open_world"), lambda evt: self._show_open_world()
         )
-        # menu_dict.setdefault('&File', {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
-        menu_dict.setdefault("&File", {}).setdefault("exit", {}).setdefault(
-            "Quit", lambda evt: self.Close()
-        )
+        # menu_dict.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
+        menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
+            "exit", {}
+        ).setdefault(lang.get("menu_bar.file.quit"), lambda evt: self.Close())
         menu_dict = self._last_page.menu(menu_dict)
         menu_bar = wx.MenuBar()
         for menu_name, menu_data in menu_dict.items():
@@ -169,12 +169,17 @@ class AmuletUI(wx.Frame):
                 )
             except LoaderNoneMatched as e:
                 log.error(f"Could not find a loader for this world.\n{e}")
-                wx.MessageBox(f"Could not find a loader for this world.\n{e}")
+                wx.MessageBox(f"{lang.get('select_world.no_loader_found')}\n{e}")
             except Exception as e:
-                log.error(f"Error loading world.\n{e}\n{traceback.format_exc()}")
-                wx.MessageBox(
-                    f"Error loading world. Check the console for more details.\n{e}"
+                log.error(lang.get("select_world.loading_world_failed"), exc_info=True)
+                dialog = TracebackDialog(
+                    self,
+                    lang.get("select_world.loading_world_failed"),
+                    str(e),
+                    traceback.format_exc(),
                 )
+                dialog.ShowModal()
+                dialog.Destroy()
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)
@@ -201,6 +206,6 @@ class AmuletUI(wx.Frame):
         for path, page in list(self._open_worlds.items()):
             self.close_world(path)
         if self.world_tab_holder.GetPageCount() > 1:
-            wx.MessageBox("A world is still being used. Please close it first")
+            wx.MessageBox(lang.get("app.world_still_used"))
         else:
             evt.Skip()

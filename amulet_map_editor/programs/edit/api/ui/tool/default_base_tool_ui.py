@@ -9,8 +9,9 @@ import os
 
 import amulet
 from amulet.api.errors import LoaderNoneMatched
-from amulet_map_editor import log
 
+from amulet_map_editor import log
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.opengl.camera import Projection
 from .base_tool_ui import BaseToolUI
 from amulet_map_editor.programs.edit.api.events import EVT_DRAW
@@ -41,6 +42,7 @@ class DefaultBaseToolUI(BaseToolUI):
         All events on the canvas will be automatically removed after the tool is disabled.
         """
         self.canvas.Bind(EVT_DRAW, self._on_draw)
+        self.canvas.SetDropTarget(None)  # fixes #239
         self.canvas.DragAcceptFiles(True)
         self.canvas.Bind(wx.EVT_DROP_FILES, self._on_drop_files)
         self._camera_behaviour.bind_events()
@@ -64,15 +66,19 @@ class DefaultBaseToolUI(BaseToolUI):
                 try:
                     level = amulet.load_level(pathname)
                 except LoaderNoneMatched:
-                    wx.MessageBox(f"Could not find a matching loader for {pathname}.")
-                    log.error(f"Could not find a matching loader for {pathname}.")
+                    msg = f"Could not find a matching loader for {pathname}."
+                    wx.MessageBox(msg)
+                    log.error(msg)
                 except Exception as e:
-                    log.error(
-                        f"Could not open {pathname}. Check the console for more details.\n{traceback.format_exc()}"
+                    log.error(f"Could not open {pathname}.", exc_info=True)
+                    dialog = TracebackDialog(
+                        self.canvas,
+                        f"Could not open {pathname}.",
+                        str(e),
+                        traceback.format_exc(),
                     )
-                    wx.MessageBox(
-                        f"Could not open {pathname}. Check the console for more details.\n{e}"
-                    )
+                    dialog.ShowModal()
+                    dialog.Destroy()
                 else:
                     self.canvas.paste(level, level.dimensions[0])
         evt.Skip()

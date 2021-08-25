@@ -12,8 +12,11 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_CREATE_UNDO,
     EVT_SAVE,
     EVT_PROJECTION_CHANGED,
+    EVT_DIMENSION_CHANGE,
+    DimensionChangeEvent,
+    EditCloseEvent,
 )
-from amulet_map_editor.api import image
+from amulet_map_editor.api import image, lang
 from amulet_map_editor.api.opengl.camera import Projection
 
 if TYPE_CHECKING:
@@ -30,9 +33,15 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
             canvas,
             label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}",
         )
+        self._version_text.SetToolTip(
+            lang.get("program_3d_edit.file_ui.version_tooltip")
+        )
         self.Add(self._version_text, 0)
         self.AddStretchSpacer(1)
         self._projection_button = wx.Button(canvas, label="3D")
+        self._projection_button.SetToolTip(
+            lang.get("program_3d_edit.file_ui.projection_tooltip")
+        )
         self._projection_button.Bind(wx.EVT_BUTTON, self._on_projection_button)
         self.Add(
             self._projection_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5
@@ -40,16 +49,17 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self._location_button = wx.Button(
             canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location])
         )
+        self._location_button.SetToolTip(
+            lang.get("program_3d_edit.file_ui.location_tooltip")
+        )
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
 
         self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
         self._dim_options = SimpleChoiceAny(canvas)
+        self._dim_options.SetToolTip(lang.get("program_3d_edit.file_ui.dim_tooltip"))
         self._dim_options.SetItems(level.level_wrapper.dimensions)
-        if "overworld" in level.level_wrapper.dimensions:
-            self._dim_options.SetValue("overworld")
-        else:
-            self._dim_options.SetValue(level.level_wrapper.dimensions[0])
+        self._dim_options.SetValue(level.level_wrapper.dimensions[0])
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
         self.Add(self._dim_options, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
@@ -64,6 +74,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
             "0", lambda evt: self.canvas.undo()
         )
         self._undo_button.SetBitmap(image.icon.tablericons.arrow_back_up.bitmap(20, 20))
+        self._undo_button.SetToolTip(lang.get("program_3d_edit.file_ui.undo_tooltip"))
 
         self._redo_button: Optional[wx.Button] = create_button(
             "0", lambda evt: self.canvas.redo()
@@ -71,16 +82,21 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self._redo_button.SetBitmap(
             image.icon.tablericons.arrow_forward_up.bitmap(20, 20)
         )
+        self._redo_button.SetToolTip(lang.get("program_3d_edit.file_ui.redo_tooltip"))
 
         self._save_button: Optional[wx.Button] = create_button(
             "0", lambda evt: self.canvas.save()
         )
         self._save_button.SetBitmap(image.icon.tablericons.device_floppy.bitmap(20, 20))
+        self._save_button.SetToolTip(lang.get("program_3d_edit.file_ui.save_tooltip"))
 
         close_button = wx.BitmapButton(
             canvas, bitmap=image.icon.tablericons.square_x.bitmap(20, 20)
         )
-        close_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.close())
+        close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
+        close_button.Bind(
+            wx.EVT_BUTTON, lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
+        )
         self.Add(close_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         self._update_buttons()
@@ -94,6 +110,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
         self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
         self.canvas.Bind(EVT_PROJECTION_CHANGED, self._on_projection_change)
+        self.canvas.Bind(EVT_DIMENSION_CHANGE, self._change_dimension)
 
     def _on_update_buttons(self, evt):
         self._update_buttons()
@@ -127,7 +144,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
             self.canvas.camera.projection_mode = Projection.PERSPECTIVE
         evt.Skip()
 
-    def _change_dimension(self, evt):
+    def _change_dimension(self, evt: DimensionChangeEvent):
         """Run when the dimension attribute in the canvas is changed.
         This is run when the user changes the attribute and when it is changed manually in code."""
         dimension = evt.dimension

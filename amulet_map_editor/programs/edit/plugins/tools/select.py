@@ -197,21 +197,29 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._y2.SetBackgroundColour((150, 150, 215))
         self._z2.SetBackgroundColour((150, 150, 215))
 
-        self._box_size_fstring = lang.get(
-            "program_3d_edit.select_tool.box_size_fstring"
+        self._box_size_selector_fstring = lang.get(
+            "program_3d_edit.select_tool.box_size_selector_fstring"
         )
         try:
-            box_size_fstring = self._box_size_fstring.format(x=0, y=0, z=0)
+            box_size_fstring = self._box_size_selector_fstring.format(x=0, y=0, z=0)
         except:
-            self._box_size_fstring = "dx={x},dy={y},dz={z}"
-            box_size_fstring = self._box_size_fstring.format(x=0, y=0, z=0)
-        self._box_size_text = wx.StaticText(
+            self._box_size_selector_fstring = "dx={x},dy={y},dz={z}"
+            box_size_fstring = self._box_size_selector_fstring.format(x=0, y=0, z=0)
+        self._box_size_selector_text = wx.StaticText(
             self._button_panel, label=box_size_fstring, style=wx.ALIGN_CENTER_HORIZONTAL
         )
-        self._box_size_text.SetToolTip(
+        self._box_size_selector_text.SetToolTip(
+            lang.get("program_3d_edit.select_tool.box_size_selector_tooltip")
+        )
+        button_sizer.Add(self._box_size_selector_text, 0, wx.ALL | wx.EXPAND, 5)
+
+        self._box_volume_text = wx.StaticText(
+            self._button_panel, label="0x0x0", style=wx.ALIGN_CENTER_HORIZONTAL
+        )
+        button_sizer.Add(self._box_volume_text, 0, wx.ALL | wx.EXPAND, 5)
+        self._box_volume_text.SetToolTip(
             lang.get("program_3d_edit.select_tool.box_size_tooltip")
         )
-        button_sizer.Add(self._box_size_text, 0, wx.ALL | wx.EXPAND, 5)
 
         self._point1_move = Point1MoveButton(
             self._button_panel,
@@ -280,9 +288,9 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._button_panel.GetSizer().Add(sizer, 0, 0)
         name_text = wx.StaticText(self._button_panel, label=label)
-        sizer.Add(name_text, flag=wx.CENTER | wx.ALL | wx.EXPAND, border=5)
+        sizer.Add(name_text, flag=wx.ALIGN_CENTER | wx.ALL, border=5)
         obj = wx_object(self._button_panel, **kwargs)
-        sizer.Add(obj, flag=wx.CENTER | wx.ALL, border=5)
+        sizer.Add(obj, flag=wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, border=5)
         return obj
 
     def _box_input_change(self, _):
@@ -312,12 +320,15 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._x2.SetValue(x2)
         self._y2.SetValue(y2)
         self._z2.SetValue(z2)
-        self._box_size_text.SetLabel(
-            self._box_size_fstring.format(
-                x=int(abs(x2 - x1) + 1),
-                y=int(abs(y2 - y1) + 1),
-                z=int(abs(z2 - z1) + 1),
+        self._box_size_selector_text.SetLabel(
+            self._box_size_selector_fstring.format(
+                x=int(abs(x2 - x1)),
+                y=int(abs(y2 - y1)),
+                z=int(abs(z2 - z1)),
             )
+        )
+        self._box_volume_text.SetLabel(
+            f"{int(abs(x2 - x1)) + 1}x{int(abs(y2 - y1)) + 1}x{int(abs(z2 - z1)) + 1}"
         )
         self.Layout()
 

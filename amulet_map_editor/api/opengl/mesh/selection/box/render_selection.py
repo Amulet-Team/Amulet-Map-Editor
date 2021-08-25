@@ -6,9 +6,12 @@ from OpenGL.GL import (
     GL_FRONT,
     GL_BACK,
     glDisable,
+    glEnable,
     GL_DEPTH_TEST,
     GL_LINE_STRIP,
-    glEnable,
+    glGetBooleanv,
+    glGetIntegerv,
+    GL_CULL_FACE_MODE,
 )
 import itertools
 from typing import Tuple, Optional, Union
@@ -38,7 +41,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         )  # The points set using point1 and point2
         self._bounds: Optional[numpy.ndarray] = None  # The min and max locations
         self.transformation_matrix = numpy.eye(4, dtype=numpy.float64)
-        self._rebuild = True
+        self._needs_rebuild = True
         self._volume = 1
 
         self._init_verts()
@@ -91,7 +94,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     def _mark_recreate(self):
         self._bounds = None
-        self._rebuild = True
+        self._needs_rebuild = True
 
     @property
     def points(self) -> numpy.ndarray:
@@ -99,7 +102,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     @points.setter
     def points(self, points: numpy.ndarray):
-        if not type(points) is numpy.ndarray and points.shape == (2, 3):
+        if not isinstance(points, numpy.ndarray) and points.shape == (2, 3):
             raise TypeError("points must be a numpy array of size 2x3.")
         self.point1, self.point2 = points
 
@@ -136,7 +139,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     @selection_box.setter
     def selection_box(self, selection_box: SelectionBox):
-        if type(selection_box) is not SelectionBox:
+        if not isinstance(selection_box, SelectionBox):
             raise TypeError("selection_box must be a SelectionBox.")
         self.point1 = selection_box.point_1
         self.point2 = selection_box.point_2
@@ -154,9 +157,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         return self.bounds[1]
 
     def _create_box(
-        self,
-        box_min: PointCoordinatesAny,
-        box_max: PointCoordinatesAny,
+        self, box_min: PointCoordinatesAny, box_max: PointCoordinatesAny
     ) -> Tuple[numpy.ndarray, numpy.ndarray]:
         return self._create_box_faces(
             box_min, box_max, True, True, True, True, True, True
@@ -186,86 +187,20 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
                 1,  # down
             ]
             * down
-            + [
-                0,
-                1,
-                3,
-                2,  # west
-            ]
-            * west
-            + [
-                4,
-                0,
-                2,
-                6,  # north
-            ]
-            * north
-            + [
-                5,
-                4,
-                6,
-                7,  # east
-            ]
-            * east
-            + [
-                1,
-                5,
-                7,
-                3,  # south
-            ]
-            * south
-            + [
-                3,
-                7,
-                6,
-                2,  # up
-            ]
-            * up
+            + [0, 1, 3, 2] * west  # west
+            + [4, 0, 2, 6] * north  # north
+            + [5, 4, 6, 7] * east  # east
+            + [1, 5, 7, 3] * south  # south
+            + [3, 7, 6, 2] * up  # up
         )
         box = box.ravel()
         _texture_index = numpy.array(
-            [
-                0,
-                2,
-                3,
-                5,  # down
-            ]
-            * down
-            + [
-                2,
-                1,
-                5,
-                4,  # west
-            ]
-            * west
-            + [
-                3,
-                1,
-                0,
-                4,  # north
-            ]
-            * north
-            + [
-                5,
-                1,
-                2,
-                4,  # east
-            ]
-            * east
-            + [
-                0,
-                1,
-                3,
-                4,  # south
-            ]
-            * south
-            + [
-                0,
-                5,
-                3,
-                2,  # up
-            ]
-            * up,
+            [0, 2, 3, 5] * down  # down
+            + [2, 1, 5, 4] * west  # west
+            + [3, 1, 0, 4] * north  # north
+            + [5, 1, 2, 4] * east  # east
+            + [0, 1, 3, 4] * south  # south
+            + [0, 5, 3, 2] * up,  # up
             numpy.uint32,
         )
         _uv_slice = numpy.array(
@@ -286,8 +221,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
     def _create_geometry_(self):
         self.verts[:36, :3], self.verts[:36, 3:5] = self._create_box(
-            self.min % 16 - 0.005,
-            self.min % 16 + self.max - self.min + 0.005,
+            self.min % 16 - 0.005, self.min % 16 + self.max - self.min + 0.005
         )
         self.verts[:36, 3:5] /= 16
 
@@ -299,7 +233,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
 
         self.change_verts()
         self._volume = numpy.product(self.max - self.min)
-        self._rebuild = False
+        self._needs_rebuild = False
 
     def draw(
         self, camera_matrix: numpy.ndarray, camera_position: PointCoordinatesAny = None
@@ -311,24 +245,31 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
         :return:
         """
         self._setup()
-        if self._rebuild:
+        if self._needs_rebuild:
             self._create_geometry()
         self._draw_mode = GL_TRIANGLES
 
         transformation_matrix = numpy.matmul(camera_matrix, self.transformation_matrix)
 
+        depth_state = glGetBooleanv(GL_DEPTH_TEST)
+        cull_state = glGetIntegerv(GL_CULL_FACE_MODE)
+
         if camera_position is not None and camera_position in self:
-            glCullFace(GL_FRONT)
-        else:
-            glCullFace(GL_BACK)
+            if cull_state == GL_BACK:
+                glCullFace(GL_FRONT)
+            elif cull_state == GL_FRONT:
+                glCullFace(GL_BACK)
 
         self.draw_start = 0
         self.draw_count = 36
         super()._draw(transformation_matrix)
-        glCullFace(GL_BACK)
 
         # draw the lines around the boxes
-        glDisable(GL_DEPTH_TEST)
+        if depth_state:
+            glDisable(GL_DEPTH_TEST)
         self._draw_mode = GL_LINE_STRIP
         super()._draw(transformation_matrix)
-        glEnable(GL_DEPTH_TEST)
+        if depth_state:
+            glEnable(GL_DEPTH_TEST)
+
+        glCullFace(cull_state)
