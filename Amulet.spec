@@ -8,31 +8,25 @@ from typing import Dict, Tuple, Set
 import sys
 import os
 import glob
+
+# pyinstaller moves the current directory to the front
+# We would prefer to find modules in site packages first
+cwd = os.path.normcase(os.path.realpath(os.getcwd()))
+sys.path = [path for path in sys.path if os.path.normcase(os.path.realpath(path)) != cwd]
+sys.path.append(cwd)
+
 import amulet
 import PyMCTranslate
 import minecraft_model_reader
+import amulet_map_editor
 
 sys.modules["FixTk"] = None
 
 AMULET_PATH = amulet.__path__[0]
-PYMCT_PATH = os.path.abspath(os.path.dirname(PyMCTranslate.__file__))
-REAL_PYMCT_PATH = (
-    PYMCT_PATH if not os.path.islink(PYMCT_PATH) else os.readlink(PYMCT_PATH)
-)  # I have this linked by a symbolic link
-MINECRAFT_MODEL_READER = os.path.abspath(
-    os.path.dirname(minecraft_model_reader.__file__)
-)
+PYMCT_PATH = PyMCTranslate.__path__[0]
+MINECRAFT_MODEL_READER = minecraft_model_reader.__path__[0]
+AMULET_MAP_EDITOR = amulet_map_editor.__path__[0]
 
-AMULET_MAP_EDITOR = os.path.abspath(
-    os.path.join(".", "build", "lib", "amulet_map_editor")
-)
-if not os.path.isfile(os.path.join(AMULET_MAP_EDITOR, "__main__.py")):
-    print(AMULET_MAP_EDITOR)
-    raise Exception(
-        "There is no built version of amulet-map-editor. Run setup.py build first."
-    )
-
-block_cipher = None
 
 hidden = []
 hidden.extend(collect_submodules("pkg_resources"))
@@ -45,20 +39,18 @@ hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 
 a = Analysis(
     [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
-    # pathex=[".", "amulet_map_editor"],
     binaries=[],
     datas=[],
     hiddenimports=hidden,
     hookspath=[
         os.path.join(AMULET_MAP_EDITOR, "__pyinstaller"),
-        os.path.join(amulet.__path__[0], "__pyinstaller"),
-        os.path.join(PyMCTranslate.__path__[0], "__pyinstaller"),
+        os.path.join(AMULET_PATH, "__pyinstaller"),
+        os.path.join(PYMCT_PATH, "__pyinstaller"),
     ],
     runtime_hooks=[],
     excludes=["FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter"],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
 )
 
@@ -107,7 +99,7 @@ for d in filter(lambda dt: "PyMCTranslate" in dt[0], a.datas):
     print("\t", d)
 sys.stdout.flush()  # fix the log being out of order
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data)
 exe = EXE(
     pyz,
     a.scripts,
@@ -136,5 +128,5 @@ app = BUNDLE(
     coll,
     name="amulet.app",
     icon="icon.ico",
-    bundle_identifier="com.amulet-editor.amulet_map_editor",
+    bundle_identifier="com.amuletmc.amulet_map_editor",
 )

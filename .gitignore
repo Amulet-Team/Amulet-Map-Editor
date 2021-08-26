@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Cython
+*.c
+*.html
+
 # Distribution / packaging
 .Python
 build/
@@ -102,6 +106,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# macOS files
+.DS_Store
 
 /minecraft_model_reader
 /world_temp
