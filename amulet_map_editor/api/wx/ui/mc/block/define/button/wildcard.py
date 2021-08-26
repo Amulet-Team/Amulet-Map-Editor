@@ -40,7 +40,7 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
             namespace,
             base_name,
             show_pick_block,
-            state=state
+            state=state,
         )
         self.update_button()
 
@@ -50,7 +50,16 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
     def _on_press(self, evt):
         dialog = SimpleDialog(self, "Pick a Block")
         self._block_widget = WildcardBlockDefine(
-            dialog, self._translation_manager, wx.HORIZONTAL, self.platform, self.version_number, self.force_blockstate, self.namespace, self.base_name, self.selected_properties, self.all_properties
+            dialog,
+            self._translation_manager,
+            wx.HORIZONTAL,
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
+            self.namespace,
+            self.base_name,
+            self.selected_properties,
+            self.all_properties,
         )
         dialog.sizer.Add(self._block_widget)
         dialog.Fit()
@@ -87,18 +96,23 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
         self._set_all_properties(self.all_properties)
         self._set_selected_properties(self.selected_properties)
         if self._block_widget is not None and (
-            update or
-            self.namespace != self._block_widget.namespace or
-            self.base_name != self._block_widget.base_name or
-            self.all_properties != self._block_widget.all_properties or
-            self.selected_properties != self._block_widget.selected_properties
+            update
+            or self.namespace != self._block_widget.namespace
+            or self.base_name != self._block_widget.base_name
+            or self.all_properties != self._block_widget.all_properties
+            or self.selected_properties != self._block_widget.selected_properties
         ):
             (
                 self._block_widget.namespace,
                 self._block_widget.base_name,
                 self._block_widget.all_properties,
-                self._block_widget.selected_properties
-            ) = (self.namespace, self.base_name, self.all_properties, self.selected_properties)
+                self._block_widget.selected_properties,
+            ) = (
+                self.namespace,
+                self.base_name,
+                self.all_properties,
+                self.selected_properties,
+            )
             return True
         return False
 

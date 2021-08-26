@@ -38,7 +38,7 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
             namespace,
             base_name,
             show_pick_block,
-            state=state
+            state=state,
         )
         self.update_button()
 
@@ -48,7 +48,15 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
     def _on_press(self, evt):
         dialog = SimpleDialog(self, "Pick a Block")
         self._block_widget = BlockDefine(
-            dialog, self._translation_manager, wx.HORIZONTAL, self.platform, self.version_number, self.force_blockstate, self.namespace, self.base_name, self.properties
+            dialog,
+            self._translation_manager,
+            wx.HORIZONTAL,
+            self.platform,
+            self.version_number,
+            self.force_blockstate,
+            self.namespace,
+            self.base_name,
+            self.properties,
         )
         dialog.sizer.Add(self._block_widget)
         dialog.Fit()
@@ -75,10 +83,10 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
         self._set_base_name(self.base_name)
         self._set_properties(self.properties)
         if self._block_widget is not None and (
-            update or
-            self.namespace != self._block_widget.namespace or
-            self.base_name != self._block_widget.base_name or
-            self.properties != self._block_widget.properties
+            update
+            or self.namespace != self._block_widget.namespace
+            or self.base_name != self._block_widget.base_name
+            or self.properties != self._block_widget.properties
         ):
             (
                 self._block_widget.namespace,
