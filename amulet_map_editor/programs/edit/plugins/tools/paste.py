@@ -8,7 +8,7 @@ import math
 import numpy
 import weakref
 
-from amulet.api.data_types import PointCoordinates
+from amulet.api.data_types import PointCoordinates, BlockCoordinates
 from amulet.operations.paste import paste_iter
 from amulet.utils.matrix import (
     rotation_matrix_xyz,
@@ -101,11 +101,11 @@ class TupleIntInput(TupleInput):
     WindowCls = wx.SpinCtrl
 
     @property
-    def value(self) -> Tuple[int, int, int]:
+    def value(self) -> BlockCoordinates:
         return self.x.GetValue(), self.y.GetValue(), self.z.GetValue()
 
     @value.setter
-    def value(self, value: Tuple[int, int, int]):
+    def value(self, value: BlockCoordinates):
         self.x.SetValue(value[0])
         self.y.SetValue(value[1])
         self.z.SetValue(value[2])
@@ -233,7 +233,7 @@ class MoveButton(NudgeButton):
         super().__init__(parent, camera, keybinds, label, tooltip)
         self._paste_tool = weakref.ref(paste_tool)
 
-    def _move(self, offset: Tuple[int, int, int]):
+    def _move(self, offset: BlockCoordinates):
         ox, oy, oz = offset
         x, y, z = self._paste_tool().location
         self._paste_tool().location = x + ox, y + oy, z + oz

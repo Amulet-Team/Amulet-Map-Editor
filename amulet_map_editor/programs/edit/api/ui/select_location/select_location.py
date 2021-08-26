@@ -62,7 +62,7 @@ class SelectLocationUI(SimplePanel):
         return self._x.GetValue(), self._y.GetValue(), self._z.GetValue()
 
     @location.setter
-    def location(self, location: Tuple[int, int, int]):
+    def location(self, location: BlockCoordinates):
         x, y, z = location
         self._x.SetValue(x)
         self._y.SetValue(y)

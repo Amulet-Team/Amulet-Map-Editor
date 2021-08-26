@@ -3,6 +3,7 @@ from typing import Tuple, Dict, Any, List
 
 import PyMCTranslate
 import amulet_nbt
+from amulet.api.data_types import VersionNumberTuple
 from amulet.api.block import PropertyType
 from ..base import BasePropertySelect
 from .events import SinglePropertiesChangeEvent, EVT_SINGLE_PROPERTIES_CHANGE
@@ -23,7 +24,7 @@ class SinglePropertySelect(BasePropertySelect, NormalMCBlock):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
-        version_number: Tuple[int, ...],
+        version_number: VersionNumberTuple,
         force_blockstate: bool,
         namespace: str = None,
         base_name: str = None,

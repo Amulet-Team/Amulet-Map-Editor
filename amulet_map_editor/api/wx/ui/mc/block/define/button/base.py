@@ -2,6 +2,7 @@ import wx
 from typing import Tuple, Optional, Dict, Any
 
 import PyMCTranslate
+from amulet.api.data_types import VersionNumberTuple
 
 from amulet_map_editor.api.wx.ui.mc.api import BaseMCBlockIdentifier
 from amulet_map_editor.api.wx.ui.mc.block.define import BaseBlockDefine
@@ -13,7 +14,7 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifier):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str = None,
-        version_number: Tuple[int, int, int] = None,
+        version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
         namespace: str = None,
         base_name: str = None,

@@ -1,5 +1,6 @@
 import wx
 from typing import Tuple
+from amulet.api.data_types import VersionNumberTuple
 
 _PlatformEventType = wx.NewEventType()
 EVT_PLATFORM_CHANGE = wx.PyEventBinder(_PlatformEventType)
@@ -39,10 +40,10 @@ class VersionChangeEvent(wx.PyEvent):
     def __init__(
         self,
         platform: str,
-        version_number: Tuple[int, ...],
+        version_number: VersionNumberTuple,
         force_blockstate: bool,
         old_platform: str,
-        old_version_number: Tuple[int, ...],
+        old_version_number: VersionNumberTuple,
         old_force_blockstate: bool,
     ):
         wx.PyEvent.__init__(self, eventType=_VersionChangeEventType)
@@ -59,7 +60,7 @@ class VersionChangeEvent(wx.PyEvent):
         return self._platform
 
     @property
-    def version_number(self) -> Tuple[int, ...]:
+    def version_number(self) -> VersionNumberTuple:
         """The version_number that the selection was changed to."""
         return self._version_number
 
@@ -76,7 +77,7 @@ class VersionChangeEvent(wx.PyEvent):
         return self._old_platform
 
     @property
-    def old_version_number(self) -> Tuple[int, ...]:
+    def old_version_number(self) -> VersionNumberTuple:
         """The version_number that was selected before it was changed."""
         return self._old_version_number
 

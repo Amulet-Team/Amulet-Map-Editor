@@ -3,6 +3,7 @@ import wx.lib.scrolledpanel
 from typing import Tuple, Dict, Any
 
 import PyMCTranslate
+from amulet.api.data_types import VersionNumberTuple
 from amulet.api.block import PropertyTypeMultiple, Block
 
 from amulet_map_editor.api.wx.ui.mc.block import (
@@ -31,7 +32,7 @@ class WildcardBlockDefine(BaseBlockDefine, WildcardMCBlock):
         translation_manager: PyMCTranslate.TranslationManager,
         orientation=wx.VERTICAL,
         platform: str = None,
-        version_number: Tuple[int, int, int] = None,
+        version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
         namespace: str = None,
         base_name: str = None,

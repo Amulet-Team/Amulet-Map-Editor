@@ -46,21 +46,21 @@ class BaseSelectionMoveButton(NudgeButton):
 
 
 class Point1MoveButton(BaseSelectionMoveButton):
-    def _move(self, offset: Tuple[int, int, int]):
+    def _move(self, offset: BlockCoordinates):
         ox, oy, oz = offset
         (x, y, z), point2 = self._selection.active_block_positions
         self._selection.active_block_positions = (x + ox, y + oy, z + oz), point2
 
 
 class Point2MoveButton(BaseSelectionMoveButton):
-    def _move(self, offset: Tuple[int, int, int]):
+    def _move(self, offset: BlockCoordinates):
         ox, oy, oz = offset
         point1, (x, y, z) = self._selection.active_block_positions
         self._selection.active_block_positions = point1, (x + ox, y + oy, z + oz)
 
 
 class SelectionMoveButton(BaseSelectionMoveButton):
-    def _move(self, offset: Tuple[int, int, int]):
+    def _move(self, offset: BlockCoordinates):
         ox, oy, oz = offset
         (x1, y1, z1), (x2, y2, z2) = self._selection.active_block_positions
         self._selection.active_block_positions = (x1 + ox, y1 + oy, z1 + oz), (

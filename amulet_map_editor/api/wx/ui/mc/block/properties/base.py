@@ -2,6 +2,7 @@ import wx
 from typing import Tuple, Dict, Any
 
 import PyMCTranslate
+from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor.api.wx.ui.mc.api.block import BaseMCBlockIdentifier
 
 
@@ -11,7 +12,7 @@ class BasePropertySelect(wx.Panel, BaseMCBlockIdentifier):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
-        version_number: Tuple[int, ...],
+        version_number: VersionNumberTuple,
         force_blockstate: bool,
         namespace: str = None,
         base_name: str = None,

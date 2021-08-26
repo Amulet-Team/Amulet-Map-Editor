@@ -27,7 +27,7 @@ class BiomeDefine(BaseDefine, BaseMCBiomeIdentifier):
         translation_manager: PyMCTranslate.TranslationManager,
         orientation=wx.VERTICAL,
         platform: str = None,
-        version_number: Tuple[int, int, int] = None,
+        version_number: VersionNumberTuple = None,
         namespace: str = None,
         base_name: str = None,
         show_pick_biome: bool = False,

@@ -3,6 +3,7 @@ from typing import Tuple, Dict, Any, List
 
 import PyMCTranslate
 import amulet_nbt
+from amulet.api.data_types import VersionNumberTuple
 from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlock
 from ..base import BasePropertySelect
@@ -24,7 +25,7 @@ class MultiplePropertySelect(BasePropertySelect, WildcardMCBlock):
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         platform: str,
-        version_number: Tuple[int, ...],
+        version_number: VersionNumberTuple,
         force_blockstate: bool,
         namespace: str,
         base_name: str,
