@@ -4,7 +4,7 @@ from typing import Tuple, Dict, Any, List
 import PyMCTranslate
 import amulet_nbt
 from amulet.api.block import PropertyTypeMultiple
-from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlock
+from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlock
 from ..base import BasePropertySelect
 
 from .automatic import AutomaticMultipleProperty

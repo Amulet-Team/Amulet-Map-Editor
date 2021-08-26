@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any, Tuple
 
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 from .platform_select import PlatformSelect
-from amulet_map_editor.api.wx.ui.mc.base.api.version import BaseMCVersion
+from amulet_map_editor.api.wx.ui.mc.api.version import BaseMCVersion
 from .events import VersionChangeEvent, EVT_VERSION_CHANGE
 
 

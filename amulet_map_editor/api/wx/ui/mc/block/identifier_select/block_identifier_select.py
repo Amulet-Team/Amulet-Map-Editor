@@ -4,7 +4,7 @@ import wx
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
 )
-from amulet_map_editor.api.wx.ui.mc.base.api.block import BaseMCBlockIdentifier
+from amulet_map_editor.api.wx.ui.mc.api.block import BaseMCBlockIdentifier
 from amulet_map_editor.api.wx.ui.mc.block.identifier_select.events import (
     BlockIDChangeEvent,
     EVT_BLOCK_ID_CHANGE,

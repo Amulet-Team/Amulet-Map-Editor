@@ -2,7 +2,7 @@ import wx
 from typing import Optional
 
 from amulet.api.data_types import PlatformType, VersionNumberTuple
-from amulet_map_editor.api.wx.ui.mc.base import BaseMCBlockIdentifierAPI
+from amulet_map_editor.api.wx.ui.mc.api import BaseMCBlockIdentifierAPI
 from amulet_map_editor.api.wx.ui.mc.block.define import BaseBlockDefine
 
 

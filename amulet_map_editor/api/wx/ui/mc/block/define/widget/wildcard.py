@@ -16,7 +16,7 @@ from amulet_map_editor.api.wx.ui.mc.block.define.events import (
     WildcardBlockChangeEvent,
     EVT_WILDCARD_BLOCK_CHANGE,
 )
-from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlock
+from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlock
 from amulet_map_editor.api.wx.ui.mc.version import VersionChangeEvent
 
 

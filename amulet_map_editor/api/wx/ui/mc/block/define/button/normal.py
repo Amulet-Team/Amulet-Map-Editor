@@ -5,7 +5,7 @@ import PyMCTranslate
 from amulet.api.block import Block, PropertyType
 from amulet.api.block_entity import BlockEntity
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet_map_editor.api.wx.ui.mc.base import NormalMCBlockAPI
+from amulet_map_editor.api.wx.ui.mc.api import NormalMCBlockAPI
 from amulet_map_editor.api.wx.ui.mc.block.define.widget import BlockDefine
 
 from amulet_map_editor.api.wx.ui.mc.block.define.button.base import (

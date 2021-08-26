@@ -16,7 +16,7 @@ from amulet_map_editor.api.wx.ui.mc.block.define.events import (
     BlockChangeEvent,
     EVT_BLOCK_CHANGE,
 )
-from amulet_map_editor.api.wx.ui.mc.base import NormalMCBlock
+from amulet_map_editor.api.wx.ui.mc.api import NormalMCBlock
 from amulet_map_editor.api.wx.ui.mc.version import VersionChangeEvent
 
 

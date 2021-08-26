@@ -44,6 +44,22 @@ class NormalMCBlockAPI(BaseMCBlockIdentifierAPI):
         """
         raise NotImplementedError
 
+    # @property
+    # def block_entity(self) -> Optional[BlockEntity]:
+    #     raise NotImplementedError
+    #
+    # @block_entity.setter
+    # def block_entity(self, block_entity: Optional[BlockEntity]):
+    #     raise NotImplementedError
+
+    # @property
+    # def universal_block(self) -> Tuple[Block, Optional[BlockEntity]]:
+    #     raise NotImplementedError
+    #
+    # @universal_block.setter
+    # def universal_block(self, universal_block: Tuple[Block, Optional[BlockEntity]]):
+    #     raise NotImplementedError
+
 
 class NormalMCBlock(BaseMCBlockIdentifier, NormalMCBlockAPI):
     def __init__(
@@ -138,3 +154,15 @@ class NormalMCBlock(BaseMCBlockIdentifier, NormalMCBlockAPI):
         self._set_namespace(block.namespace)
         self._set_base_name(block.base_name)
         self._set_properties(block.properties)
+
+    # @property
+    # def block_entity(self) -> Optional[BlockEntity]:
+    #     return self._block_entity
+    #
+    # @block_entity.setter
+    # def block_entity(self, block_entity: Optional[BlockEntity]):
+    #     self._set_block_entity(block_entity)
+    #     self._schedule_push()
+    #
+    # def _set_block_entity(self, block_entity: Optional[BlockEntity]):
+    #     raise NotImplementedError

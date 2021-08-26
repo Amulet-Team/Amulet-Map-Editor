@@ -5,7 +5,7 @@ from typing import Tuple, Type, Any, Dict
 
 from amulet.api.data_types import PlatformType
 from .events import PlatformChangeEvent, EVT_PLATFORM_CHANGE
-from amulet_map_editor.api.wx.ui.mc.base.api.platform import BaseMCPlatform
+from amulet_map_editor.api.wx.ui.mc.api.platform import BaseMCPlatform
 
 
 class PlatformSelect(wx.Panel, BaseMCPlatform):

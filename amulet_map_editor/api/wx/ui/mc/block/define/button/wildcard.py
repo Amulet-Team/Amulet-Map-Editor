@@ -3,7 +3,7 @@ import PyMCTranslate
 
 from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet_map_editor.api.wx.ui.mc.base import WildcardMCBlockAPI
+from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlockAPI
 from amulet_map_editor.api.wx.ui.mc.block.define.widget import WildcardBlockDefine
 from amulet_map_editor.api.wx.ui.mc.block.define.button.base import (
     BaseBlockDefineButton,

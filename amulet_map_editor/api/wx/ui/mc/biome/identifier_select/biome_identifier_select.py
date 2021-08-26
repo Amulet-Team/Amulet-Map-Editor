@@ -4,7 +4,7 @@ import wx
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
 )
-from amulet_map_editor.api.wx.ui.mc.base.api.biome import BaseMCBiomeIdentifier
+from amulet_map_editor.api.wx.ui.mc.api.biome import BaseMCBiomeIdentifier
 from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.events import (
     BiomeIDChangeEvent,
     EVT_BIOME_ID_CHANGE,

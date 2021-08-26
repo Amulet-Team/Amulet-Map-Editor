@@ -11,7 +11,7 @@ from amulet_map_editor.api.wx.ui.mc.block import (
     BlockIDChangeEvent,
     EVT_BLOCK_ID_CHANGE,
 )
-from amulet_map_editor.api.wx.ui.mc.base import BaseMCBlockIdentifier
+from amulet_map_editor.api.wx.ui.mc.api import BaseMCBlockIdentifier
 from amulet_map_editor.api.wx.ui.mc.version import VersionChangeEvent
 
 

@@ -2,7 +2,7 @@ import wx
 from typing import Tuple, Dict, Any
 
 import PyMCTranslate
-from amulet_map_editor.api.wx.ui.mc.base.api.block import BaseMCBlockIdentifier
+from amulet_map_editor.api.wx.ui.mc.api.block import BaseMCBlockIdentifier
 
 
 class BasePropertySelect(wx.Panel, BaseMCBlockIdentifier):

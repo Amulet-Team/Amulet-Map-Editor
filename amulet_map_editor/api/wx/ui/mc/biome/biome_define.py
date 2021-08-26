@@ -5,7 +5,7 @@ import wx
 
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 from amulet_map_editor.api.wx.ui.mc.base.base_define import BaseDefine
-from amulet_map_editor.api.wx.ui.mc.base.api.biome import BaseMCBiomeIdentifier
+from amulet_map_editor.api.wx.ui.mc.api.biome import BaseMCBiomeIdentifier
 from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.biome_identifier_select import (
     BiomeIdentifierSelect,
 )

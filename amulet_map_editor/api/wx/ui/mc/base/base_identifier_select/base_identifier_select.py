@@ -1,11 +1,11 @@
 import wx
-from typing import Tuple, List, Dict, Any
+from typing import List, Dict, Any
 
 import PyMCTranslate
 
 from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor.api.image import COLOUR_PICKER
-from ..api.resource_id import BaseMCResourceID
+from amulet_map_editor.api.wx.ui.mc.api.resource_id import BaseMCResourceID
 from .events import (
     PickEvent,
 )

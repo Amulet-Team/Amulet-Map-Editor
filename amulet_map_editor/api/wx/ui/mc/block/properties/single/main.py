@@ -8,7 +8,7 @@ from ..base import BasePropertySelect
 from .events import SinglePropertiesChangeEvent, EVT_SINGLE_PROPERTIES_CHANGE
 from .automatic import AutomaticSingleProperty
 from .manual import ManualSingleProperty
-from amulet_map_editor.api.wx.ui.mc.base import NormalMCBlock
+from amulet_map_editor.api.wx.ui.mc.api import NormalMCBlock
 
 
 class SinglePropertySelect(BasePropertySelect, NormalMCBlock):

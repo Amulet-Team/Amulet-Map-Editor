@@ -13,7 +13,7 @@ from amulet_map_editor.api.wx.ui.mc.version import (
     EVT_VERSION_CHANGE,
     VersionChangeEvent,
 )
-from amulet_map_editor.api.wx.ui.mc.base.api import BaseMCVersion
+from amulet_map_editor.api.wx.ui.mc.api import BaseMCVersion
 
 
 class BaseDefine(wx.Panel, BaseMCVersion):
