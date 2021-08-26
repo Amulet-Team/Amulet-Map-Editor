@@ -1,30 +1,70 @@
+from typing import Tuple, Dict, Any
 import wx
+
 import PyMCTranslate
 
-from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlockAPI
+from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlock
 from amulet_map_editor.api.wx.ui.mc.block.define.widget import WildcardBlockDefine
 from amulet_map_editor.api.wx.ui.mc.block.define.button.base import (
     BaseBlockDefineButton,
 )
+from amulet.api.block import PropertyTypeMultiple
 
 
-class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlockAPI):
+class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
     def __init__(
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
-        *args,
-        **kwargs,
+        platform: str = None,
+        version_number: Tuple[int, int, int] = None,
+        force_blockstate: bool = None,
+        namespace: str = None,
+        base_name: str = None,
+        selected_properties: PropertyTypeMultiple = None,
+        all_properties: PropertyTypeMultiple = None,
+        show_pick_block: bool = False,
+        state: Dict[str, Any] = None,
     ):
-        super().__init__(parent)
-        self._dialog = SimpleDialog(parent, "Pick a Block")
-        self._block_widget = WildcardBlockDefine(
-            self._dialog, translation_manager, wx.HORIZONTAL, *args, **kwargs
+        state = state or {}
+        state.setdefault("selected_properties", selected_properties)
+        state.setdefault("all_properties", all_properties)
+        BaseBlockDefineButton.__init__(
+            self,
+            parent,
+            translation_manager,
+            platform,
+            version_number,
+            force_blockstate,
+            namespace,
+            base_name,
+            show_pick_block,
+            state=state
         )
-        self._dialog.sizer.Add(self._block_widget)
         self.update_button()
+
+    def _init_state(self, state: Dict[str, Any]):
+        WildcardMCBlock.__init__(self, **state)
+
+    def _on_press(self, evt):
+        dialog = SimpleDialog(self, "Pick a Block")
+        self._block_widget = WildcardBlockDefine(
+            dialog, self._translation_manager, wx.HORIZONTAL, self.platform, self.version_number, self.force_blockstate, self.namespace, self.base_name, self.selected_properties, self.all_properties
+        )
+        dialog.sizer.Add(self._block_widget)
+        dialog.Fit()
+        if dialog.ShowModal() == wx.ID_OK:
+            self._set_platform(self._block_widget.platform)
+            self._set_version_number(self._block_widget.version_number)
+            self._set_force_blockstate(self._block_widget.force_blockstate)
+            self._set_namespace(self._block_widget.namespace)
+            self._set_base_name(self._block_widget.base_name)
+            self._set_all_properties(self._block_widget.all_properties)
+            self._set_selected_properties(self._block_widget.selected_properties)
+            self.update_button()
+        self._block_widget = None
+        dialog.Destroy()
 
     def update_button(self):
         """Update the text on the button from the internal state."""
@@ -33,37 +73,34 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlockAPI):
                 f"{key}:({'|'.join([v.to_snbt() for v in val])})"
                 for key, val in self.selected_properties.items()
             ]
-            self.SetLabel(f"{self.namespace}:{self.block_name}[{','.join(properties)}]")
+            self.SetLabel(f"{self.namespace}:{self.base_name}[{','.join(properties)}]")
             properties_str = ",\n".join(properties)
-            self.SetToolTip(f"{self.namespace}:{self.block_name}[\n{properties_str}\n]")
+            self.SetToolTip(f"{self.namespace}:{self.base_name}[\n{properties_str}\n]")
         else:
-            self.SetLabel(f"{self.namespace}:{self.block_name}")
-            self.SetToolTip(f"{self.namespace}:{self.block_name}")
+            self.SetLabel(f"{self.namespace}:{self.base_name}")
+            self.SetToolTip(f"{self.namespace}:{self.base_name}")
 
-    @property
-    def selected_properties(self) -> PropertyTypeMultiple:
-        return self._block_widget.selected_properties
-
-    @selected_properties.setter
-    def selected_properties(self, selected_properties: PropertyTypeMultiple):
-        self.set_selected_properties(selected_properties)
-        self.update_button()
-
-    def set_selected_properties(self, selected_properties: PropertyTypeMultiple):
-        self._block_widget.selected_properties = selected_properties
-
-    @property
-    def all_properties(self) -> PropertyTypeMultiple:
-        """The values that exist for every property."""
-        return self._block_widget.all_properties
-
-    @all_properties.setter
-    def all_properties(self, all_properties: PropertyTypeMultiple):
-        self.set_all_properties(all_properties)
-        self.update_button()
-
-    def set_all_properties(self, all_properties: PropertyTypeMultiple):
-        self._block_widget.all_properties = all_properties
+    def _on_push(self) -> bool:
+        update = super()._on_push()
+        self._set_namespace(self.namespace)
+        self._set_base_name(self.base_name)
+        self._set_all_properties(self.all_properties)
+        self._set_selected_properties(self.selected_properties)
+        if self._block_widget is not None and (
+            update or
+            self.namespace != self._block_widget.namespace or
+            self.base_name != self._block_widget.base_name or
+            self.all_properties != self._block_widget.all_properties or
+            self.selected_properties != self._block_widget.selected_properties
+        ):
+            (
+                self._block_widget.namespace,
+                self._block_widget.base_name,
+                self._block_widget.all_properties,
+                self._block_widget.selected_properties
+            ) = (self.namespace, self.base_name, self.all_properties, self.selected_properties)
+            return True
+        return False
 
 
 def demo():

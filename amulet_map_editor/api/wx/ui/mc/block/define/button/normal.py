@@ -1,88 +1,90 @@
-from typing import Tuple, Optional
+from typing import Tuple, Dict, Any
 import wx
 
 import PyMCTranslate
-from amulet.api.block import Block, PropertyType
-from amulet.api.block_entity import BlockEntity
-from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet_map_editor.api.wx.ui.mc.api import NormalMCBlockAPI
-from amulet_map_editor.api.wx.ui.mc.block.define.widget import BlockDefine
 
+from amulet_map_editor.api.wx.ui.simple import SimpleDialog
+from amulet_map_editor.api.wx.ui.mc.api import NormalMCBlock
+from amulet_map_editor.api.wx.ui.mc.block.define.widget import BlockDefine
 from amulet_map_editor.api.wx.ui.mc.block.define.button.base import (
     BaseBlockDefineButton,
 )
+from amulet.api.block import PropertyType
 
 
-class BlockDefineButton(BaseBlockDefineButton, NormalMCBlockAPI):
+class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
     def __init__(
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
-        *args,
-        **kwargs
+        platform: str = None,
+        version_number: Tuple[int, int, int] = None,
+        force_blockstate: bool = None,
+        namespace: str = None,
+        base_name: str = None,
+        properties: PropertyType = None,
+        show_pick_block: bool = False,
+        state: Dict[str, Any] = None,
     ):
-        super().__init__(parent)
-        self._dialog = SimpleDialog(parent, "Pick a Block")
-        self._block_widget = BlockDefine(
-            self._dialog, translation_manager, wx.HORIZONTAL, *args, **kwargs
+        state = state or {}
+        state.setdefault("properties", properties)
+        BaseBlockDefineButton.__init__(
+            self,
+            parent,
+            translation_manager,
+            platform,
+            version_number,
+            force_blockstate,
+            namespace,
+            base_name,
+            show_pick_block,
+            state=state
         )
-        self._dialog.sizer.Add(self._block_widget)
         self.update_button()
+
+    def _init_state(self, state: Dict[str, Any]):
+        NormalMCBlock.__init__(self, **state)
+
+    def _on_press(self, evt):
+        dialog = SimpleDialog(self, "Pick a Block")
+        self._block_widget = BlockDefine(
+            dialog, self._translation_manager, wx.HORIZONTAL, self.platform, self.version_number, self.force_blockstate, self.namespace, self.base_name, self.properties
+        )
+        dialog.sizer.Add(self._block_widget)
+        dialog.Fit()
+        if dialog.ShowModal() == wx.ID_OK:
+            self._set_platform(self._block_widget.platform)
+            self._set_version_number(self._block_widget.version_number)
+            self._set_force_blockstate(self._block_widget.force_blockstate)
+            self._set_namespace(self._block_widget.namespace)
+            self._set_base_name(self._block_widget.base_name)
+            self._set_properties(self._block_widget.properties)
+            self.update_button()
+        self._block_widget = None
+        dialog.Destroy()
 
     def update_button(self):
         """Update the text on the button from the internal state."""
         self.SetLabel(self.block.full_blockstate)
 
-    @property
-    def properties(self) -> PropertyType:
-        return self._block_widget.properties
-
-    @properties.setter
-    def properties(self, properties: PropertyType):
-        self.set_properties(properties)
-        self.update_button()
-
-    def set_properties(self, properties: PropertyType):
-        self._block_widget.properties = properties
-
-    @property
-    def block(self) -> Block:
-        """The block object stored in this button."""
-        return Block(self.namespace, self.block_name, self.properties)
-
-    @block.setter
-    def block(self, block: Block):
-        self.set_block(block)
-        self.update_button()
-
-    def set_block(self, block: Block):
-        self._set_namespace(block.namespace)
-        self.set_block_name(block.base_name)
-        self.set_properties(block.properties)
-
-    @property
-    def block_entity(self) -> Optional[BlockEntity]:
-        return self._block_widget.block_entity
-
-    @block_entity.setter
-    def block_entity(self, block_entity: Optional[BlockEntity]):
-        self.set_block_entity(block_entity)
-        self.update_button()
-
-    def set_block_entity(self, block_entity: Optional[BlockEntity]):
-        self._block_widget.block_entity = block_entity
-
-    @property
-    def universal_block(self) -> Tuple[Block, Optional[BlockEntity]]:
-        return self._block_widget.universal_block
-
-    @universal_block.setter
-    def universal_block(self, universal_block: Tuple[Block, Optional[BlockEntity]]):
-        self.set_universal_block(universal_block)
-        self.update_button()
-
-    def set_universal_block(self, universal_block: Tuple[Block, Optional[BlockEntity]]):
-        self._block_widget.universal_block = universal_block
+    def _on_push(self) -> bool:
+        update = super()._on_push()
+        self._set_namespace(self.namespace)
+        self._set_base_name(self.base_name)
+        self._set_properties(self.properties)
+        if self._block_widget is not None and (
+            update or
+            self.namespace != self._block_widget.namespace or
+            self.base_name != self._block_widget.base_name or
+            self.properties != self._block_widget.properties
+        ):
+            (
+                self._block_widget.namespace,
+                self._block_widget.base_name,
+                self._block_widget.properties,
+            ) = (self.namespace, self.base_name, self.properties)
+            return True
+        return False
 
 
 def demo():
@@ -93,7 +95,7 @@ def demo():
     translation_manager = PyMCTranslate.new_translation_manager()
     dialog = wx.Dialog(
         None,
-        title="WildcardBlockDefine",
+        title="BlockDefineButton",
         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.DIALOG_NO_PARENT,
     )
     sizer = wx.BoxSizer()
