@@ -65,7 +65,9 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
 
     def update_button(self):
         """Update the text on the button from the internal state."""
-        self.SetLabel(self.block.full_blockstate)
+        blockstate = self.block.full_blockstate
+        self.SetLabel(f" {blockstate}")
+        self.SetToolTip(blockstate)
 
     def _on_push(self) -> bool:
         update = super()._on_push()

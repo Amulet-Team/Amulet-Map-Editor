@@ -31,7 +31,7 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifier):
         # This needs to be at the start to ensure that the internal state is set up before anything else is done.
         # It is not a direct call to init so that subclasses of this class can substitute in which state subclass is used.
         self._init_state(state)
-        wx.Button.__init__(self, parent)
+        wx.Button.__init__(self, parent, style=wx.BU_LEFT)
         self._block_widget: Optional[BaseBlockDefine] = None
         self.Bind(wx.EVT_BUTTON, self._on_press)
         self._show_pick_block = show_pick_block
