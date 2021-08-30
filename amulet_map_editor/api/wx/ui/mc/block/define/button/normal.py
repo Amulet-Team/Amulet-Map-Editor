@@ -38,7 +38,7 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
             force_blockstate,
             namespace,
             base_name,
-            show_pick_block,
+            show_pick_block=show_pick_block,
             state=state,
         )
         self.update_button()
@@ -83,18 +83,19 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
         self._set_namespace(self.namespace)
         self._set_base_name(self.base_name)
         self._set_properties(self.properties)
-        if self._block_widget is not None and (
+        update = self._block_widget is not None and (
             update
             or self.namespace != self._block_widget.namespace
             or self.base_name != self._block_widget.base_name
             or self.properties != self._block_widget.properties
-        ):
+        )
+        if update:
             (
                 self._block_widget.namespace,
                 self._block_widget.base_name,
                 self._block_widget.properties,
             ) = (self.namespace, self.base_name, self.properties)
-            return True
+        self.update_button()
         return False
 
 

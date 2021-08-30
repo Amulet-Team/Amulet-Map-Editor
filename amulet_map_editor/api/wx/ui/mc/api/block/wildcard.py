@@ -86,13 +86,17 @@ class WildcardMCBlock(BaseMCBlockIdentifier, WildcardMCBlockAPI):
             )
             props = block_spec.get("properties", {})
             if isinstance(properties, dict):
-                for name, ps in props.items():
+                for name, snbts in props.items():
                     if name in properties:
                         out_properties[name] = tuple(
                             nbt
                             for nbt in properties[name]
                             if isinstance(nbt, PropertyDataTypes)
-                            and nbt.to_snbt() in ps
+                            and nbt.to_snbt() in snbts
+                        )
+                    else:
+                        out_properties[name] = tuple(
+                            amulet_nbt.from_snbt(snbt) for snbt in snbts
                         )
             else:
                 for name, snbts in props.items():

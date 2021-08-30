@@ -1,3 +1,3 @@
 from .base import BaseBlockDefineButton
 from .normal import BlockDefineButton
-from .wildcard import WildcardBlockDefine
+from .wildcard import WildcardBlockDefineButton

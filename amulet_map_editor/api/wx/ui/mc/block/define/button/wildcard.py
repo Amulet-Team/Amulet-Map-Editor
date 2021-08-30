@@ -40,7 +40,7 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
             force_blockstate,
             namespace,
             base_name,
-            show_pick_block,
+            show_pick_block=show_pick_block,
             state=state,
         )
         self.update_button()
@@ -96,13 +96,14 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
         self._set_base_name(self.base_name)
         self._set_all_properties(self.all_properties)
         self._set_selected_properties(self.selected_properties)
-        if self._block_widget is not None and (
+        update = self._block_widget is not None and (
             update
             or self.namespace != self._block_widget.namespace
             or self.base_name != self._block_widget.base_name
             or self.all_properties != self._block_widget.all_properties
             or self.selected_properties != self._block_widget.selected_properties
-        ):
+        )
+        if update:
             (
                 self._block_widget.namespace,
                 self._block_widget.base_name,
@@ -114,8 +115,8 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
                 self.all_properties,
                 self.selected_properties,
             )
-            return True
-        return False
+        self.update_button()
+        return update
 
 
 def demo():
