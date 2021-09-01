@@ -35,10 +35,6 @@ class BaseBlockDefine(BaseDefine, BaseMCBlockIdentifier):
         state: Dict[str, Any] = None,
     ):
         state = state or {}
-        state.setdefault("translation_manager", translation_manager)
-        state.setdefault("platform", platform)
-        state.setdefault("version_number", version_number)
-        state.setdefault("force_blockstate", force_blockstate)
         state.setdefault("namespace", namespace)
         state.setdefault("base_name", base_name)
         BaseDefine.__init__(
