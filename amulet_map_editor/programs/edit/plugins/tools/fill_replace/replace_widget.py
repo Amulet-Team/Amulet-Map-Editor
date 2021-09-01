@@ -8,6 +8,7 @@ from .block_container import FillBlockContainer, FindBlockContainer
 
 class ReplaceOperationWidget(wx.Panel):
     """A widget containing a single Fill and optional Find widget."""
+
     def __init__(
         self,
         parent: wx.Window,
@@ -24,7 +25,9 @@ class ReplaceOperationWidget(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
-        self._find = FindBlockContainer(self, translation_manager, platform, version_number, force_blockstate)
+        self._find = FindBlockContainer(
+            self, translation_manager, platform, version_number, force_blockstate
+        )
         self._find.Hide()
         sizer.Add(self._find, 0, wx.EXPAND | wx.ALL, 5)
 
@@ -35,7 +38,9 @@ class ReplaceOperationWidget(wx.Panel):
         self._swap_button.Hide()
         sizer.Add(self._swap_button, 0, wx.EXPAND | wx.ALL, 5)
 
-        self._fill = FillBlockContainer(self, translation_manager, platform, version_number, force_blockstate)
+        self._fill = FillBlockContainer(
+            self, translation_manager, platform, version_number, force_blockstate
+        )
         sizer.Add(self._fill, 0, wx.EXPAND | wx.ALL, 5)
 
         self.Layout()

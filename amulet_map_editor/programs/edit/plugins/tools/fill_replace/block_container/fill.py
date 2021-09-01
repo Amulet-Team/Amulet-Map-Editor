@@ -21,9 +21,7 @@ class FillBlockContainer(BaseBlockContainer):
         self.GetTopLevelParent().Layout()
 
     def _create_block(self) -> FillBlockEntry:
-        return FillBlockEntry(
-            self, self._translation_manager, *self._version
-        )
+        return FillBlockEntry(self, self._translation_manager, *self._version)
 
     def _destroy_block_entry(self, window: FillBlockEntry):
         super()._destroy_block_entry(window)

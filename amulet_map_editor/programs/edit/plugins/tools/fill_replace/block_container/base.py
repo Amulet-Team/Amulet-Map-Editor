@@ -8,6 +8,7 @@ from .block_entry import BaseBlockEntry, EVT_BLOCK_CLOSE
 
 class BaseBlockContainer(wx.Panel):
     """This is a UI element that contains one or more block buttons."""
+
     _blocks: List[BaseBlockEntry]
 
     def __init__(
