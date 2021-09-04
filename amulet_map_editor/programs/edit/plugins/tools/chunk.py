@@ -27,10 +27,17 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         DefaultBaseToolUI.__init__(self, canvas)
+        self._selection: Optional[ChunkSelectionBehaviour] = None
+        self._button_panel: Optional[wx.Panel] = None
+        self._min_y: Optional[wx.SpinCtrl] = None
+        self._max_y: Optional[wx.SpinCtrl] = None
+        self._dimensions: Dict[Dimension, Tuple[int, int]] = {}
 
+    def setup(self):
+        super().setup()
         self._selection = ChunkSelectionBehaviour(self.canvas)
 
-        self._button_panel = wx.Panel(canvas)
+        self._button_panel = wx.Panel(self.canvas)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 
@@ -63,7 +70,6 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         self._max_y.SetToolTip(lang.get("program_3d_edit.chunk_tool.max_y_tooltip"))
         y_sizer.Add(self._max_y, flag=wx.ALIGN_CENTER)
         self._max_y.Bind(wx.EVT_SPINCTRL, self._on_update_clipping)
-        self._dimensions: Dict[Dimension, Tuple[int, int]] = {}
 
         delete_button = wx.Button(
             self._button_panel,

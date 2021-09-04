@@ -110,6 +110,8 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
                 self._active_tool.Show()
             elif isinstance(self._active_tool, wx.Sizer):
                 self._active_tool.ShowItems(show=True)
+            if not self._active_tool.is_setup:
+                self._active_tool.setup()
             self._active_tool.enable()
             self.canvas.reset_bound_events()
             self.canvas.Layout()

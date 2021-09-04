@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Type, Any, Callable, Tuple
+from typing import TYPE_CHECKING, Type, Any, Callable, Optional
 import wx
 from OpenGL.GL import (
     glClear,
@@ -74,11 +74,28 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         DefaultBaseToolUI.__init__(self, canvas)
+        self._selection: Optional[BlockSelectionBehaviour] = None
+        self._inspect_block: Optional[InspectBlockBehaviour] = None
+        self._button_panel: Optional[wx.Panel] = None
+        self._x1: Optional[wx.SpinCtrl] = None
+        self._y1: Optional[wx.SpinCtrl] = None
+        self._z1: Optional[wx.SpinCtrl] = None
+        self._x2: Optional[wx.SpinCtrl] = None
+        self._y2: Optional[wx.SpinCtrl] = None
+        self._z2: Optional[wx.SpinCtrl] = None
+        self._box_size_selector_fstring: Optional[str] = None
+        self._box_size_selector_text: Optional[wx.StaticText] = None
+        self._box_volume_text: Optional[wx.StaticText] = None
+        self._point1_move: Optional[Point1MoveButton] = None
+        self._point2_move: Optional[Point2MoveButton] = None
+        self._selection_move: Optional[SelectionMoveButton] = None
 
+    def setup(self):
+        super().setup()
         self._selection = BlockSelectionBehaviour(self.canvas)
         self._inspect_block = InspectBlockBehaviour(self.canvas, self._selection)
 
-        self._button_panel = wx.Panel(canvas)
+        self._button_panel = wx.Panel(self.canvas)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 

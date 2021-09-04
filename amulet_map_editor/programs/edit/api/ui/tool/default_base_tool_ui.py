@@ -1,5 +1,5 @@
 import wx
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from OpenGL.GL import (
     glClear,
     GL_DEPTH_BUFFER_BIT,
@@ -26,6 +26,10 @@ class DefaultBaseToolUI(BaseToolUI):
 
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
+        self._camera_behaviour: Optional[CameraBehaviour]
+
+    def setup(self):
+        super().setup()
         self._camera_behaviour = CameraBehaviour(self.canvas)
 
     @property

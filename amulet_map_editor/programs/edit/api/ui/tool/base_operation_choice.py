@@ -25,7 +25,13 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
         self._active_operation: Optional[OperationUIType] = None
         self._last_active_operation_id: Optional[str] = None
+        self._operation_choice: Optional[SimpleChoiceAny] = None
+        self._reload_operation: Optional[wx.BitmapButton] = None
+        self._operations: Optional[UIOperationManager] = None
+        self._operation_sizer: Optional[wx.BoxSizer] = None
 
+    def setup(self):
+        super().setup()
         horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self._operation_choice = SimpleChoiceAny(self.canvas)
