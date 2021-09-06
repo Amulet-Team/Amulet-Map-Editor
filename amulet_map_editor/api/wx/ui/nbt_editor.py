@@ -67,7 +67,7 @@ class ParsedNBT:
 
 
 class ParsedNBTValue(ParsedNBT):
-    __slots__ = ParsedNBT.__slots__ + [
+    __slots__ = [
         "_value",
     ]
 
@@ -107,7 +107,7 @@ class ParsedNBTValue(ParsedNBT):
 
 
 class ParsedNBTContainer(ParsedNBT):
-    __slots__ = ParsedNBT.__slots__ + ["_children"]
+    __slots__ = ["_children"]
 
     def __init__(
         self,
@@ -159,32 +159,19 @@ class ParsedNBTContainer(ParsedNBT):
         return container
 
 
-def parse_nbt(
-    _nbt: Union[nbt.NBTFile, nbt.TAG_Compound, MutableMapping],
-    parent: ParsedNBTContainer = None,
-):
-    for key, value in _nbt.items():
-        if isinstance(value, MutableMapping):
-            new_parent = ParsedNBTContainer(parent, key, type(value))
-            parse_nbt(value, new_parent)
-            parent.add_child(new_parent)
-        elif isinstance(value, MutableSequence):
-            new_parent = ParsedNBTContainer(parent, key, type(value))
-            for child in value:
-                if isinstance(child, (MutableMapping, MutableSequence)):
-                    new_new_parent = ParsedNBTContainer(new_parent, "", type(child))
-                    parse_nbt(child, new_new_parent)
-                    new_parent.add_child(new_new_parent)
-                else:
-                    new_parent.add_child(
-                        ParsedNBTValue(new_parent, "", child.value, type(child))
-                    )
-            parent.add_child(new_parent)
-        else:
-            if parent:
-                parent.add_child(ParsedNBTValue(parent, key, value.value, type(value)))
-            else:
-                print(f"Found orphaned NBT: {key}, {value}", file=sys.stderr)
+def parse_nbt(_nbt, parent=None, name="") -> Union[ParsedNBTValue, ParsedNBTContainer]:
+    if isinstance(_nbt, nbt.TAG_List):
+        container = ParsedNBTContainer(parent, name, nbt.TAG_List)
+        for item in _nbt:
+            container.add_child(parse_nbt(item, container))
+        return container
+    elif isinstance(_nbt, (nbt.NBTFile, nbt.TAG_Compound)):
+        container = ParsedNBTContainer(parent, name, nbt.TAG_Compound)
+        for key, value in _nbt.items():
+            container.add_child(parse_nbt(value, container, key))
+        return container
+    else:
+        return ParsedNBTValue(parent, name, _nbt.value, type(_nbt))
 
 
 class NBTRadioButton(simple.SimplePanel):
@@ -245,10 +232,10 @@ class NBTEditor(simple.SimplePanel):
 
         self.tree.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self._tree_right_click)
 
-        self._parent = ParsedNBTContainer(None, "", nbt.TAG_Compound)
-        parse_nbt(deepcopy(nbt_data), self._parent)
+        self._parent = parse_nbt(deepcopy(nbt_data))
 
-        self._build_tree(self._parent)
+        # self._build_tree(self._parent)
+        self._initialize_tree(self._parent)
 
     @property
     def nbt(self):
@@ -304,7 +291,7 @@ class NBTEditor(simple.SimplePanel):
             parent_tag.add_child(new_tag)
 
             self.tree.DeleteChildren(parent_element)
-            self._build_sub_tree(parent_element, parent_tag)
+            self._build_tree(parent_element, parent_tag)
             self.tree.SetItemText(parent_element, parent_tag.display())
 
         add_dialog = NewTagDialog(
@@ -323,16 +310,24 @@ class NBTEditor(simple.SimplePanel):
         parsed_tag = self.tree.GetItemData(selected_element)
 
         def save_callback(edited_tag):
-            parent_element = self.tree.GetItemParent(selected_element)
-            parent_tag = parsed_tag.parent
-
             parsed_tag.update(edited_tag.name, edited_tag.value)
+            build_tag = parsed_tag
 
-            self.tree.DeleteChildren(parent_element)
-            self._build_sub_tree(parent_element, parent_tag)
-            self.tree.SetItemText(parent_element, parent_tag.display())
+            if parsed_tag.parent is not None:
+                parent_tag = parsed_tag.parent
+                while parsed_tag.parent is not None:
+                    parent_tag = parent_tag.parent
+                build_tag = parent_tag
 
-        edit_dialog = EditTagDialog(self, parsed_tag, save_callback)
+            self.tree.DeleteAllItems()
+            self._initialize_tree(build_tag)
+
+        edit_dialog = EditTagDialog(
+            self,
+            parsed_tag,
+            disable_name_field=(parsed_tag.tag_type is nbt.TAG_List),
+            callback=save_callback,
+        )
         edit_dialog.Show()
 
     def _delete_tag(self):
@@ -346,35 +341,32 @@ class NBTEditor(simple.SimplePanel):
 
         self.tree.DeleteChildren(parent_element)
 
-        self._build_sub_tree(parent_element, parent_tag)
+        self._build_tree(parent_element, parent_tag)
         self.tree.SetItemText(parent_element, parent_tag.display())
 
-    def _build_sub_tree(
-        self, tree_parent: wx.TreeItemId, nbt_parent: ParsedNBTContainer
-    ):
-        for nbt_child in sorted(nbt_parent.children, key=lambda t: t.name):
-            if isinstance(nbt_child, ParsedNBTContainer):
-                new_child = self.tree.AppendItem(tree_parent, nbt_child.display())
-                self._build_sub_tree(new_child, nbt_child)
-            else:
-                new_child = self.tree.AppendItem(tree_parent, nbt_child.display())
+    def _build_tree_element(
+        self, tree_parent, parsed_nbt, is_root=False
+    ) -> wx.TreeItemId:
+        if is_root:
+            tree_id = self.tree.AddRoot(parsed_nbt.display())
+        else:
+            tree_id = self.tree.AppendItem(tree_parent, parsed_nbt.display())
+        self.tree.SetItemImage(
+            tree_id, self.image_map.get(parsed_nbt.tag_type, self.other)
+        )
+        self.tree.SetItemData(tree_id, parsed_nbt)
+        return tree_id
 
-            self.tree.SetItemImage(
-                new_child, self.image_map.get(nbt_child.tag_type, self.other)
-            )
-            self.tree.SetItemData(new_child, nbt_child)
+    def _build_tree(self, tree_parent, parsed_nbt, is_root=False):
+        if isinstance(parsed_nbt, ParsedNBTValue):
+            self._build_tree_element(tree_parent, parsed_nbt, is_root)
+        else:
+            parent = self._build_tree_element(tree_parent, parsed_nbt, is_root)
+            for nbt_child in sorted(parsed_nbt.children, key=lambda t: t.name):
+                self._build_tree(parent, nbt_child, False)
 
-    def _build_tree(self, parsed_nbt: ParsedNBTContainer):
-        for root_nbt in parsed_nbt.children:
-            root = self.tree.AddRoot(root_nbt.name)
-            self.tree.SetItemText(root, root_nbt.display())
-            self.tree.SetItemImage(
-                root,
-                self.image_map.get(root_nbt.tag_type, self.image_map[nbt.TAG_Compound]),
-                wx.TreeItemIcon_Normal,
-            )
-            self.tree.SetItemData(root, root_nbt)
-            self._build_sub_tree(root, root_nbt)
+    def _initialize_tree(self, parsed_nbt):
+        self._build_tree(None, parsed_nbt, True)
 
 
 class NewTagDialog(wx.Frame):
@@ -469,8 +461,10 @@ class NewTagDialog(wx.Frame):
 
         if tag_type not in (nbt.TAG_List, nbt.TAG_Compound):
             try:
-                value = tag_type(ast.literal_eval(self.value_field.GetValue())).value
-            except ValueError:
+                value = tag_type(
+                    ast.literal_eval(repr(self.value_field.GetValue()))
+                ).value
+            except ValueError as e:
                 wx.MessageBox(
                     f'Couldn\'t cast value "{self.value_field.GetValue()}" to {tag_type.__name__}',
                     "Cast Error",
@@ -496,7 +490,11 @@ class NewTagDialog(wx.Frame):
 
 class EditTagDialog(wx.Frame):
     def __init__(
-        self, parent, tag: Union[ParsedNBTValue, ParsedNBTContainer], callback=None
+        self,
+        parent,
+        tag: Union[ParsedNBTValue, ParsedNBTContainer],
+        disable_name_field=False,
+        callback=None,
     ):
         super(EditTagDialog, self).__init__(
             parent, title="Edit NBT Tag", size=(500, 280)
@@ -544,7 +542,7 @@ class EditTagDialog(wx.Frame):
         if tag.tag_type in (nbt.TAG_List, nbt.TAG_Compound):
             self.value_field.Disable()
 
-        if tag.parent.tag_type is nbt.TAG_List:
+        if disable_name_field:
             self.name_field.Disable()
 
     def _save(self, _):
@@ -583,14 +581,39 @@ class EditTagDialog(wx.Frame):
         self.Close()
 
 
-if __name__ == "__main__":
-    level_dat = nbt.load(
-        b"\x0A\x00\x0B\x68\x65\x6C\x6C\x6F\x20\x77\x6F\x72\x6C\x64\x08\x00\x04\x6E\x61\x6D\x65\x00\x09\x42\x61\x6E\x61\x6E\x72\x61\x6D\x61\x00"
-    )
+def __run_test(nbt_data):
+    print(f"\t{nbt_data}")
+    # _parent = ParsedNBTContainer(None, "", nbt.TAG_Compound)
+    # parse_nbt(deepcopy(nbt_data), _parent)
+    # print(f"\t{_parent}")
+    new = parse_nbt(nbt_data)
+    print(f"\tNew: {new}")
 
     app = wx.App()
     frame = wx.Frame(None)
-    editor = NBTEditor(frame, level_dat)
+    editor = NBTEditor(frame, nbt_data)
     frame.Show()
     app.MainLoop()
-    print(editor.nbt)
+    print(f"\t{editor.nbt}")
+
+
+if __name__ == "__main__":
+    import traceback
+
+    test_case_1 = nbt.load(
+        b"\x0A\x00\x0B\x68\x65\x6C\x6C\x6F\x20\x77\x6F\x72\x6C\x64\x08\x00\x04\x6E\x61\x6D\x65\x00\x09\x42\x61\x6E\x61\x6E\x72\x61\x6D\x61\x00"
+    )
+    test_case_2 = nbt.TAG_Compound({})
+    test_case_3 = nbt.TAG_String("hello")
+    test_case_4 = nbt.TAG_Compound({"str": nbt.TAG_String("hello")})
+    test_case_5 = nbt.TAG_List([nbt.TAG_Int(i) for i in range(5)])
+
+    test_cases = filter(lambda v: v.startswith("test_case_"), list(locals()))
+    for i, test_case_name in enumerate(test_cases):
+        test_case = locals()[test_case_name]
+        try:
+            print(("=" * 8) + f" Test Case #{i + 1} " + ("=" * 8))
+            __run_test(test_case)
+        except:
+            traceback.print_exc()
+            print(f"!!! Failed test case {i + 1}")
