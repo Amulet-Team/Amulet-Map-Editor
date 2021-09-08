@@ -16,6 +16,7 @@ from amulet_map_editor.programs.edit.plugins.tools import (
     ExportTool,
     OperationTool,
     SelectTool,
+    FillReplaceTool,
     ChunkTool,
     PasteTool,
 )
@@ -45,6 +46,7 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
         self.register_tool(SelectTool)
+        self.register_tool(FillReplaceTool)
         self.register_tool(PasteTool)
         self.register_tool(OperationTool)
         self.register_tool(ImportTool)

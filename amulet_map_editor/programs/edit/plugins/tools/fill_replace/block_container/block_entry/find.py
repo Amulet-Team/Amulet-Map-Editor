@@ -29,6 +29,7 @@ class FindBlockEntry(BaseBlockEntry):
         **kwargs,
     ):
         super().__init__(parent, **kwargs)
+        self._init_close_button()
         self._block_button = WildcardBlockDefineButton(
             self,
             translation_manager,
@@ -39,9 +40,9 @@ class FindBlockEntry(BaseBlockEntry):
             base_name,
             selected_properties,
             all_properties,
+            max_char_length=40
         )
         self._sizer.Add(self._block_button, 1)
-        self._init_close_button()
 
     @property
     def block_button(self) -> WildcardBlockDefineButton:

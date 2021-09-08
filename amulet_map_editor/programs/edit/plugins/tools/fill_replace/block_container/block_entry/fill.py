@@ -25,7 +25,7 @@ class FillBlockEntry(BaseBlockEntry):
         **kwargs,
     ):
         super().__init__(parent, **kwargs)
-
+        self._init_close_button()
         self._block_button = BlockDefineButton(
             self,
             translation_manager,
@@ -35,13 +35,13 @@ class FillBlockEntry(BaseBlockEntry):
             namespace,
             base_name,
             properties,
+            max_char_length=40
         )
         self._sizer.Add(self._block_button, 1)
         self._weight = wx.SpinCtrlDouble(self, initial=1.0, min=0.0, max=1.0, inc=0.1)
         self._weight.SetDigits(2)
         self._sizer.Add(self._weight)
         self.show_weight(False)
-        self._init_close_button()
 
     @property
     def block_button(self) -> BlockDefineButton:
