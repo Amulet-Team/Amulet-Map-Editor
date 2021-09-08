@@ -41,7 +41,9 @@ class FillReplaceTool(wx.BoxSizer, DefaultBaseToolUI):
         panel_sizer.Add(self._operations, 1, wx.LEFT | wx.TOP, 5)
 
         self._button = wx.Button(self._panel, label="Run Operation")
-        panel_sizer.Add(self._button, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.TOP, 5)
+        panel_sizer.Add(
+            self._button, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.BOTTOM | wx.TOP, 5
+        )
         self._button.Bind(wx.EVT_BUTTON, self._operation)
 
         self._selection = BlockSelectionBehaviour(self.canvas)

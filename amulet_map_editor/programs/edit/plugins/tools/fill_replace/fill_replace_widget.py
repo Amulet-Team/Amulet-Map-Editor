@@ -111,7 +111,7 @@ class FillReplaceWidget(wx.Panel):
         platform: str = None,
         version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(parent, **kwargs)
         self._translation_manager = translation_manager
@@ -157,9 +157,7 @@ class FillReplaceWidget(wx.Panel):
                 ReplaceMode.Map: lang.get("program_3d_edit.fill_tool.replace_mode.map"),
             }
         )
-        top_sizer.Add(
-            self._replace_mode, 0, wx.LEFT, 5
-        )
+        top_sizer.Add(self._replace_mode, 0, wx.LEFT, 5)
 
         self._operation_panel = OperationContainer(self)
         sizer.Add(self._operation_panel, 0)
@@ -175,7 +173,7 @@ class FillReplaceWidget(wx.Panel):
             self._translation_manager,
             self._platform,
             self._version_number,
-            self._force_blockstate
+            self._force_blockstate,
         )
         replace_operation.set_expert(self.is_expert)
         replace_operation.set_replace(self.is_replace)

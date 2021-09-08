@@ -37,9 +37,7 @@ class BaseBlockContainer(wx.Panel):
         self._add_button.Show(self._expert)
         top_sizer.Add(self._add_button)
 
-        label = wx.StaticText(
-            self, label=self.name, style=wx.ALIGN_CENTER_HORIZONTAL
-        )
+        label = wx.StaticText(self, label=self.name, style=wx.ALIGN_CENTER_HORIZONTAL)
         top_sizer.Add(label, 1, wx.ALIGN_CENTER_VERTICAL)
 
         self._block_sizer = wx.BoxSizer(wx.VERTICAL)

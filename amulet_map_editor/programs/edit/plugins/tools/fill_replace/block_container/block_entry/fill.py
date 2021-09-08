@@ -35,7 +35,7 @@ class FillBlockEntry(BaseBlockEntry):
             namespace,
             base_name,
             properties,
-            max_char_length=40
+            max_char_length=40,
         )
         self._sizer.Add(self._block_button, 1)
         self._weight = wx.SpinCtrlDouble(self, initial=1.0, min=0.0, max=1.0, inc=0.1)

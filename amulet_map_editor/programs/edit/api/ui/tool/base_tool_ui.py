@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 class BaseToolUI(EditCanvasContainer, CanvasToggleElement):
     """The abstract base class for all tools that are to be loaded into the canvas."""
+
     def __init__(self, canvas: "EditCanvas"):
         super().__init__(canvas)
         self._is_setup = False

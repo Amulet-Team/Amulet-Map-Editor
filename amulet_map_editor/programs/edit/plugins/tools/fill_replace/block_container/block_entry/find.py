@@ -40,7 +40,7 @@ class FindBlockEntry(BaseBlockEntry):
             base_name,
             selected_properties,
             all_properties,
-            max_char_length=40
+            max_char_length=40,
         )
         self._sizer.Add(self._block_button, 1)
 
