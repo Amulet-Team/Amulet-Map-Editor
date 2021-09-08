@@ -178,17 +178,6 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             count += 1
             yield count / iter_count
 
-    def DoGetBestClientSize(self):
-        sizer = self.GetSizer()
-        if sizer is None:
-            return -1, -1
-        else:
-            sx, sy = self.GetSizer().CalcMin()
-            return (
-                sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X),
-                sy + wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y),
-            )
-
 
 export = {
     "name": "Replace",  # the name of the plugin
