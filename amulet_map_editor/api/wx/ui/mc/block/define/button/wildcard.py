@@ -26,6 +26,7 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
         selected_properties: PropertyTypeMultiple = None,
         all_properties: PropertyTypeMultiple = None,
         show_pick_block: bool = False,
+        max_char_length: int = 99999,
         state: Dict[str, Any] = None,
     ):
         state = state or {}
@@ -41,6 +42,7 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
             namespace,
             base_name,
             show_pick_block=show_pick_block,
+            max_char_length=max_char_length,
             state=state,
         )
         self.update_button()

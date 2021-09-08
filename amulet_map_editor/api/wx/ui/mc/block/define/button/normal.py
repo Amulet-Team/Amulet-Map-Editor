@@ -25,6 +25,7 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
         base_name: str = None,
         properties: PropertyType = None,
         show_pick_block: bool = False,
+        max_char_length: int = 99999,
         state: Dict[str, Any] = None,
     ):
         state = state or {}
@@ -39,6 +40,7 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
             namespace,
             base_name,
             show_pick_block=show_pick_block,
+            max_char_length=max_char_length,
             state=state,
         )
         self.update_button()

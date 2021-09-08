@@ -19,6 +19,7 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifier):
         namespace: str = None,
         base_name: str = None,
         show_pick_block: bool = False,
+        max_char_length: int = 99999,
         state: Dict[str, Any] = None,
     ):
         state = state or {}
@@ -36,6 +37,7 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifier):
         self._block_widget: Optional[BaseBlockDefine] = None
         self.Bind(wx.EVT_BUTTON, self._on_press)
         self._show_pick_block = show_pick_block
+        self._max_char_length = max(3, max_char_length)
 
     def _init_state(self, state: Dict[str, Any]):
         """
@@ -43,6 +45,11 @@ class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifier):
         This is here so that nested classes do not have to init the state managers multiple times.
         """
         BaseMCBlockIdentifier.__init__(self, **state)
+
+    def SetLabel(self, label: str):
+        if len(label) > self._max_char_length:
+            label = f"{label[:self._max_char_length]}..."
+        super().SetLabel(label)
 
     def _on_press(self, evt):
         raise NotImplementedError
