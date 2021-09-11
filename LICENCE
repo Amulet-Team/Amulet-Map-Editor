@@ -23,18 +23,23 @@ Can I modify any part of Amulet?
 	You are allowed to modify Amulet however you like.
 	If you want to make improvements we accept code submissions through pull requests.
 	Note that by submitting code you are giving us permission to host, distribute and use the code under the licence in its final form.
-	
-	
+
+
 Usage of Amulet Map Editor as a stand-alone program run either as a compiled build or from source.
 
 Can Amulet Map Editor be used for commercial purposes?
 	Commercial purposes in this context includes, but may not be limited to:
 		1) The manufacture of content (eg. worlds or structures) that is later monetised
 		2) Being paid to use Amulet Map Editor
-		One exception to this is for educational purposes such as making videos explaining how to use Amulet Map Editor.
+
 	Currently we have not been restrictive on the usage of Amulet Map Editor.
 	This may change in the future in order to pay for development costs.
 	We plan for Amulet Map Editor to always be free to use for non-commercial home users.
+	Educational Purposes
+        You are allowed to monetise videos or other materials explaining how to use Amulet.
+        You are allowed to earn an income from teaching how to use Amulet or using Amulet to help teach other subjects.
+            Any content (eg. worlds or structures) created during that time must be used solely for educational purposes and may not be sold or used in any other commercial environment.
+
 Are there any restrictions on operations?
 	Operations are programs that can be run from within Amulet Map Editor in the operations tab of the 3D editor.
 	You are allowed to make, distribute and licence your operations however you wish.
