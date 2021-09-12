@@ -24,16 +24,15 @@ class AutomaticSingleProperty(BaseSingleProperty):
     ):
         super().__init__(parent)
 
-        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        self._property_sizer = wx.FlexGridSizer(2, 5, 5)
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
-        header_sizer.Add(label, 1)
+        self._property_sizer.Add(label, 1, wx.ALIGN_CENTER)
         label = wx.StaticText(
             self, label="Property Value (SNBT)", style=wx.ALIGN_CENTER
         )
-        header_sizer.Add(label, 1, wx.LEFT, 5)
-        self._property_sizer = wx.GridSizer(2, 5, 5)
-        self._sizer.Add(self._property_sizer, 0, wx.ALL | wx.EXPAND, 5)
+        self._property_sizer.Add(label, 1, wx.ALIGN_CENTER)
+
+        self._sizer.Add(self._property_sizer, 1, wx.ALL | wx.EXPAND, 5)
 
         self._states: StatesType = {}
         self._properties: Dict[str, wx.Choice] = {}
@@ -61,28 +60,50 @@ class AutomaticSingleProperty(BaseSingleProperty):
                         default if default < len(valid_choices) else 0,
                     )
         self.Freeze()
-        self._properties.clear()
-        self._property_sizer.Clear(True)
+        self._tear_down_properties()
 
         props = {}
         for name, (choices, default) in self._states.items():
-            label = wx.StaticText(self, label=name)
-            self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
-            choice = wx.Choice(self, choices=[c.to_snbt() for c in choices])
-            self._property_sizer.Add(choice, 0, wx.EXPAND)
-            choice.Bind(
-                wx.EVT_CHOICE,
-                lambda evt: wx.PostEvent(
-                    self,
-                    SinglePropertiesChangeEvent(self.properties),
-                ),
-            )
-            self._properties[name] = choice
+            self._create_property(name, choices)
             props[name] = choices[default]
         self.properties = props
         self.Fit()
         self.GetTopLevelParent().Layout()
         self.Thaw()
+
+    def _tear_down_properties(self):
+        self._properties.clear()
+        child: wx.SizerItem
+        for i, child in enumerate(
+            self._property_sizer.GetChildren()
+        ):
+            if i >= self._property_sizer.GetCols():
+                if child.IsWindow():
+                    child.GetWindow().Destroy()
+                elif child.IsSizer():
+                    child.GetSizer().Clear(True)
+                    self._property_sizer.Remove(self._property_sizer.GetCols())
+                elif child.IsSpacer():
+                    self._property_sizer.Remove(self._property_sizer.GetCols())
+                else:
+                    raise Exception
+
+    def _post_change(self):
+        wx.PostEvent(
+            self,
+            SinglePropertiesChangeEvent(self.properties),
+        )
+
+    def _create_property(self, name: str, choices: Tuple[PropertyValueType]):
+        label = wx.StaticText(self, label=name)
+        self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
+        choice = wx.Choice(self, choices=[c.to_snbt() for c in choices])
+        self._property_sizer.Add(choice, 0, wx.EXPAND)
+        choice.Bind(
+            wx.EVT_CHOICE,
+            lambda evt: self._post_change(),
+        )
+        self._properties[name] = choice
 
     @property
     def properties(self) -> PropertyType:

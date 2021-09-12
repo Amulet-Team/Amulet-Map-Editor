@@ -19,6 +19,9 @@ class SinglePropertySelect(BasePropertySelect, NormalMCBlock):
     If it is not known the user can populate it themselves.
     """
 
+    _simple: AutomaticSingleProperty
+    _manual: ManualSingleProperty
+
     def __init__(
         self,
         parent: wx.Window,
@@ -46,13 +49,19 @@ class SinglePropertySelect(BasePropertySelect, NormalMCBlock):
         )
 
         self._manual_enabled = False
-        self._simple = AutomaticSingleProperty(self)
-        self._sizer.Add(self._simple, 0, wx.EXPAND)
-        self._manual = ManualSingleProperty(self)
-        self._sizer.Add(self._manual, 0, wx.EXPAND)
+        self._simple = self._create_automatic()
+        self._sizer.Add(self._simple, 1, wx.EXPAND)
+        self._manual = self._create_manual()
+        self._sizer.Add(self._manual, 1, wx.EXPAND)
         self._simple.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._on_change)
         self._manual.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._on_change)
         self.push(True)
+
+    def _create_automatic(self) -> AutomaticSingleProperty:
+        return AutomaticSingleProperty(self)
+
+    def _create_manual(self) -> ManualSingleProperty:
+        return ManualSingleProperty(self)
 
     def _init_state(self, state: Dict[str, Any]):
         NormalMCBlock.__init__(self, **state)

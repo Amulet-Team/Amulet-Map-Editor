@@ -26,6 +26,8 @@ class BlockDefine(BaseBlockDefine, NormalMCBlock):
     A UI that merges a version select widget with a block select widget and a property select.
     """
 
+    _property_picker: SinglePropertySelect
+
     def __init__(
         self,
         parent,
@@ -59,9 +61,17 @@ class BlockDefine(BaseBlockDefine, NormalMCBlock):
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
-        self._property_picker = SinglePropertySelect(
+        self._property_picker = self._create_properties()
+        right_sizer.Add(self._property_picker, 1, wx.EXPAND)
+        self._property_picker.Bind(
+            EVT_SINGLE_PROPERTIES_CHANGE, self._on_property_change
+        )
+        self.Layout()
+
+    def _create_properties(self) -> SinglePropertySelect:
+        return SinglePropertySelect(
             self,
-            translation_manager,
+            self._translation_manager,
             self.platform,
             self.version_number,
             self.force_blockstate,
@@ -69,11 +79,6 @@ class BlockDefine(BaseBlockDefine, NormalMCBlock):
             self.base_name,
             self.properties,
         )
-        right_sizer.Add(self._property_picker, 1, wx.EXPAND)
-        self._property_picker.Bind(
-            EVT_SINGLE_PROPERTIES_CHANGE, self._on_property_change
-        )
-        self.Layout()
 
     def _init_state(self, state: Dict[str, Any]):
         NormalMCBlock.__init__(self, **state)

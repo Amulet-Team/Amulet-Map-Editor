@@ -17,6 +17,8 @@ from amulet_map_editor.api.wx.ui.mc.api import BaseMCVersion
 
 
 class BaseDefine(wx.Panel, BaseMCVersion):
+    _version_picker: VersionSelect
+
     def __init__(
         self,
         parent,

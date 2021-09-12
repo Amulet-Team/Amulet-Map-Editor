@@ -48,9 +48,8 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
     def _init_state(self, state: Dict[str, Any]):
         NormalMCBlock.__init__(self, **state)
 
-    def _on_press(self, evt):
-        dialog = SimpleDialog(self, "Pick a Block")
-        self._block_widget = BlockDefine(
+    def _create_block_define(self, dialog: wx.Dialog) -> BlockDefine:
+        return BlockDefine(
             dialog,
             self._translation_manager,
             wx.HORIZONTAL,
@@ -61,15 +60,22 @@ class BlockDefineButton(BaseBlockDefineButton, NormalMCBlock):
             self.base_name,
             self.properties,
         )
-        dialog.sizer.Add(self._block_widget)
+
+    def _update_from_block_define(self, block_define: BlockDefine):
+        self._set_platform(self._block_widget.platform)
+        self._set_version_number(self._block_widget.version_number)
+        self._set_force_blockstate(self._block_widget.force_blockstate)
+        self._set_namespace(self._block_widget.namespace)
+        self._set_base_name(self._block_widget.base_name)
+        self._set_properties(self._block_widget.properties)
+
+    def _on_press(self, evt):
+        dialog = SimpleDialog(self, "Pick a Block")
+        self._block_widget = self._create_block_define(dialog)
+        dialog.sizer.Add(self._block_widget, 1, wx.EXPAND)
         dialog.Fit()
         if dialog.ShowModal() == wx.ID_OK:
-            self._set_platform(self._block_widget.platform)
-            self._set_version_number(self._block_widget.version_number)
-            self._set_force_blockstate(self._block_widget.force_blockstate)
-            self._set_namespace(self._block_widget.namespace)
-            self._set_base_name(self._block_widget.base_name)
-            self._set_properties(self._block_widget.properties)
+            self._update_from_block_define(self._block_widget)
             self.update_button()
         self._block_widget = None
         dialog.Destroy()

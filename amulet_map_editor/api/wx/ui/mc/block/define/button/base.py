@@ -9,6 +9,8 @@ from amulet_map_editor.api.wx.ui.mc.block.define import BaseBlockDefine
 
 
 class BaseBlockDefineButton(wx.Button, BaseMCBlockIdentifier):
+    _block_widget: Optional[BaseBlockDefine]
+
     def __init__(
         self,
         parent: wx.Window,

@@ -21,6 +21,8 @@ class BaseBlockDefine(BaseDefine, BaseMCBlockIdentifier):
     A UI that merges a version select widget with a block select widget and a property select.
     """
 
+    _picker: BlockIdentifierSelect
+
     def __init__(
         self,
         parent,
