@@ -59,7 +59,7 @@ class BaseBlockDefine(BaseDefine, BaseMCBlockIdentifier):
             base_name,
             show_pick_block,
         )
-        self._top_sizer.Add(self._picker, 0, wx.EXPAND | wx.TOP, 5)
+        self._top_sizer.Add(self._picker, 1, wx.EXPAND | wx.TOP, 5)
         self._picker.Bind(EVT_BLOCK_ID_CHANGE, self._on_block_change)
         self._property_picker: Optional[BasePropertySelect] = None
 

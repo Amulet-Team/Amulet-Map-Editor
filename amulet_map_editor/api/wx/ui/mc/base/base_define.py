@@ -48,7 +48,7 @@ class BaseDefine(wx.Panel, BaseMCVersion):
 
         self._top_sizer = wx.BoxSizer(wx.VERTICAL)
         if orientation == wx.HORIZONTAL:
-            self._sizer.Add(self._top_sizer, 0, wx.EXPAND)
+            self._sizer.Add(self._top_sizer, 1, wx.EXPAND)
         else:
             self._sizer.Add(self._top_sizer, 0, wx.EXPAND)
 
