@@ -10,7 +10,6 @@ from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour imp
     BlockSelectionBehaviour,
 )
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
-from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 from .fill_replace_widget import FillReplaceWidget
 
 if TYPE_CHECKING:

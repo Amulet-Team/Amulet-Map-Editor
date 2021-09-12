@@ -28,6 +28,10 @@ class FillBlockContainer(BaseBlockContainer):
             block = self._blocks[-1]
             block.show_weight(False)
 
+    def set_from_source(self, from_source: bool):
+        for block in self._blocks:
+            block.set_from_source(from_source)
+
     @property
     def weights(self) -> Tuple[float, ...]:
         """The weighting values for the blocks contained in this widget. May be unused."""

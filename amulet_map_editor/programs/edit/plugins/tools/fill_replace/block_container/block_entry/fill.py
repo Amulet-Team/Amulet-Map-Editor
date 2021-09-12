@@ -3,8 +3,8 @@ import wx
 import PyMCTranslate
 from amulet.api.data_types import VersionNumberTuple
 from amulet.api.block import PropertyType
-from amulet_map_editor.api.wx.ui.mc.block import BlockDefineButton
 from .base import BaseBlockEntry
+from .custom_fill_button import CustomBlockDefineButton
 
 
 class FillBlockEntry(BaseBlockEntry):
@@ -26,7 +26,7 @@ class FillBlockEntry(BaseBlockEntry):
     ):
         super().__init__(parent, **kwargs)
         self._init_close_button()
-        self._block_button = BlockDefineButton(
+        self._block_button = CustomBlockDefineButton(
             self,
             translation_manager,
             platform,
@@ -44,7 +44,7 @@ class FillBlockEntry(BaseBlockEntry):
         self.show_weight(False)
 
     @property
-    def block_button(self) -> BlockDefineButton:
+    def block_button(self) -> CustomBlockDefineButton:
         return self._block_button
 
     @property
@@ -60,3 +60,6 @@ class FillBlockEntry(BaseBlockEntry):
         """Show or hide the weight entry."""
         self._weight.Show(show)
         self.Layout()
+
+    def set_from_source(self, from_source: bool):
+        self._block_button.set_from_source(from_source)

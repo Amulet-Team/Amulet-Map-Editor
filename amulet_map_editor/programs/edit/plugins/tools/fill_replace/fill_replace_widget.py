@@ -8,7 +8,7 @@ import PyMCTranslate
 from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
-from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE, ChildSizeEvent
+from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
 from .block_container import FillBlockContainer, FindBlockContainer
 
 
@@ -69,6 +69,9 @@ class ReplaceOperationWidget(wx.Panel):
     def set_expert(self, expert: bool):
         self._find.set_expert(expert)
         self._fill.set_expert(expert)
+
+    def set_from_source(self, from_source: bool):
+        self._fill.set_from_source(from_source)
 
     @property
     def operation(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -137,6 +140,7 @@ class FillReplaceWidget(wx.Panel):
 
         self._pull_source = wx.CheckBox(self, wx.ID_ANY, "Pull From Source")
         self._pull_source.Hide()
+        self._pull_source.Bind(wx.EVT_CHECKBOX, self._on_check_change)
         top_sizer.Add(self._pull_source, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
 
         self._multiple = wx.CheckBox(self, wx.ID_ANY, "Multiple")
@@ -188,6 +192,7 @@ class FillReplaceWidget(wx.Panel):
         for operation in self._operation_panel:
             operation.set_replace(self.is_replace)
             operation.set_expert(self.is_expert)
+            operation.set_from_source(self.from_source)
         self._post_change_size()
 
     def _on_check_change(self, evt):
@@ -201,6 +206,10 @@ class FillReplaceWidget(wx.Panel):
     @property
     def is_expert(self) -> bool:
         return self._expert.GetValue()
+
+    @property
+    def from_source(self) -> bool:
+        return self._pull_source.GetValue()
 
     @property
     def replace_mode(self) -> ReplaceMode:
