@@ -1,4 +1,4 @@
-This is not a licence but is guidance on what the final licence will and will not allow.
+This is not a license but is guidance on what the final license will and will not allow.
 
 Definitions
 Amulet-NBT - A low level NBT editing library.
@@ -22,7 +22,7 @@ Can I use any part of Amulet as part of another program?
 Can I modify any part of Amulet?
     You are allowed to modify Amulet however you like.
     If you want to make improvements we accept code submissions through pull requests.
-    Note that by submitting code you are giving us permission to host, distribute and use the code under the licence in its final form.
+    Note that by submitting code you are giving us permission to host, distribute and use the code under the license in its final form.
 
 
 Usage of Amulet Map Editor as a stand-alone program run either as a compiled build or from source.
@@ -45,6 +45,6 @@ Can Amulet Map Editor be used for commercial purposes?
 
 Are there any restrictions on operations?
     Operations are programs that can be run from within Amulet Map Editor in the operations tab of the 3D editor.
-    You are allowed to make, distribute and licence your operations however you wish.
+    You are allowed to make, distribute and license your operations however you wish.
     You are also allowed to make money through the sale or licensing of your operations if you wish.
     As previously stated, your operations can call Amulet code but may not directly include any Amulet code.

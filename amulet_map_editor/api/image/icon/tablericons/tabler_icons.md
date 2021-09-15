@@ -1,5 +1,5 @@
-All files in this directory are from tabler-icons and fall under the MIT Licence.
-This licence does not apply to any other files in this repository.
+All files in this directory are from tabler-icons and fall under the MIT License.
+This license does not apply to any other files in this repository.
 https://github.com/tabler/tabler-icons
 https://tablericons.com/
 

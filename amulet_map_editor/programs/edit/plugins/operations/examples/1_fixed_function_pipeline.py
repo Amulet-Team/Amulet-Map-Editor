@@ -1,7 +1,7 @@
 """
-This licence applies to this file only.
+This license applies to this file only.
 
--- begin licence --
+-- begin license --
 MIT License
 
 Copyright (c) 2021 Amulet-Team
@@ -23,7 +23,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
--- end licence --
+-- end license --
 """
 
 # Fixed function example plugin

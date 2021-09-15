@@ -2,10 +2,10 @@
 
 This is intended for anyone wishing to contribute translations to the project.
 
-### Licence
-All language files contained within amulet_map_editor/lang are licenced under the MIT licence.
-Any contributions you make to these files are made under the MIT licence.
-If you wish to contribute a new language it must include the MIT licence header as found in the other files.
+### License
+All language files contained within amulet_map_editor/lang are licensed under the MIT license.
+Any contributions you make to these files are made under the MIT license.
+If you wish to contribute a new language it must include the MIT license header as found in the other files.
 Upon creating a pull request you will be asked to confirm that you acknowledge this.
 
 ### Language Files
