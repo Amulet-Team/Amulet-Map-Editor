@@ -53,6 +53,7 @@ class BaseState(ABC):
         ), "State is already being set. Release the state before editing again."
         self._edit = True
         self._changed_state = {}
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._edit = False
