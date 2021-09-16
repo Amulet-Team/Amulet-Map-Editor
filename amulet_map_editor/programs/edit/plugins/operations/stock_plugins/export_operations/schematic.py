@@ -51,7 +51,7 @@ class ExportSchematic(SimpleOperationPanel):
         self._platform_define = PlatformSelect(
             self,
             world.translation_manager,
-            options.get("platform", None) or world.level_wrapper.platform,
+            platform=options.get("platform", None) or world.level_wrapper.platform,
             allow_universal=False,
         )
         self._sizer.Add(self._platform_define, 0, wx.CENTRE, 5)

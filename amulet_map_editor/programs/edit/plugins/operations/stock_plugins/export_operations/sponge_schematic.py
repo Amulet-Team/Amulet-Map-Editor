@@ -40,7 +40,7 @@ class ExportSpongeSchematic(SimpleOperationPanel):
         self._version_define = VersionSelect(
             self,
             world.translation_manager,
-            options.get("platform", None) or world.level_wrapper.platform,
+            platform=options.get("platform", None) or world.level_wrapper.platform,
             allowed_platforms=("java",),
             allow_numerical=False,
         )

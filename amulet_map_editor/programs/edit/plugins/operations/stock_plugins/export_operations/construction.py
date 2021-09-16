@@ -40,7 +40,7 @@ class ExportConstruction(SimpleOperationPanel):
         self._version_define = VersionSelect(
             self,
             world.translation_manager,
-            options.get("platform", None) or world.level_wrapper.platform,
+            platform=options.get("platform", None) or world.level_wrapper.platform,
             allow_universal=False,
         )
         self._sizer.Add(self._version_define, 0, wx.CENTRE, 5)

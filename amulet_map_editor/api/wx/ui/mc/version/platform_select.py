@@ -12,6 +12,7 @@ class PlatformSelect(wx.Panel, StateHolder):
     """
     A UI element that allows you to pick between the platforms in the translator.
     """
+
     state: PlatformState
 
     def __init__(

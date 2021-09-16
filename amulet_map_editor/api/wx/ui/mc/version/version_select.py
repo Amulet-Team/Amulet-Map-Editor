@@ -5,7 +5,6 @@ from typing import Optional, Dict, Any, Tuple
 
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 from .platform_select import PlatformSelect
-from amulet_map_editor.api.wx.ui.mc.api.version import BaseMCVersion
 from amulet_map_editor.api.wx.ui.mc.state import VersionState, State
 from .events import VersionChangeEvent, EVT_VERSION_CHANGE
 
@@ -14,6 +13,7 @@ class VersionSelect(PlatformSelect):
     """
     A UI element that allows you to pick between the platforms and versions in the translator.
     """
+
     state: VersionState
 
     def __init__(
@@ -51,7 +51,9 @@ class VersionSelect(PlatformSelect):
         """
         # init the state
         if not isinstance(state, VersionState):
-            state = VersionState(translation_manager, platform, version_number, force_blockstate)
+            state = VersionState(
+                translation_manager, platform, version_number, force_blockstate
+            )
 
         super().__init__(
             parent,
@@ -117,7 +119,7 @@ class VersionSelect(PlatformSelect):
                 self.state.platform,
                 self.state.version_number,
                 self.state.force_blockstate,
-            )
+            ),
         )
 
     def _on_version_number_change(self, evt):
