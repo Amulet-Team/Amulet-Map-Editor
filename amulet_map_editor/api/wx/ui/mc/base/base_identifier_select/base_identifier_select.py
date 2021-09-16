@@ -1,17 +1,16 @@
 import wx
-from typing import List, Dict, Any
 
 import PyMCTranslate
 
 from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor.api.image import COLOUR_PICKER
-from amulet_map_editor.api.wx.ui.mc.api.resource_id import BaseMCResourceID
+from amulet_map_editor.api.wx.ui.mc.state import BaseResourceIDState, StateHolder, State
 from .events import (
     PickEvent,
 )
 
 
-class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
+class BaseIdentifierSelect(wx.Panel, StateHolder):
     """
     BaseIdentifierSelect is a base class for a UI containing
         a namespace choice
@@ -19,30 +18,30 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         a list of base names
     """
 
+    state: BaseResourceIDState
+
     def __init__(
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
-        platform: str,
-        version_number: VersionNumberTuple,
+        state: BaseResourceIDState = None,
+        platform: str = None,
+        version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
         namespace: str = None,
         base_name: str = None,
         show_pick: bool = False,
-        state: Dict[str, Any] = None,
     ):
-        state = state or {}
-        state.setdefault("translation_manager", translation_manager)
-        state.setdefault("platform", platform)
-        state.setdefault("version_number", version_number)
-        state.setdefault("force_blockstate", force_blockstate)
-        state.setdefault("namespace", namespace)
-        state.setdefault("base_name", base_name)
-        # This is the init call to the class that stores the internal state of the data.
-        # This needs to be at the start to ensure that the internal state is set up before anything else is done.
-        # It is not a direct call to init so that subclasses of this class can substitute in which state subclass is used.
-        self._init_state(state)
-
+        if not isinstance(state, BaseResourceIDState):
+            state = self._create_default_state(
+                translation_manager,
+                platform,
+                version_number,
+                force_blockstate,
+                namespace,
+                base_name,
+            )
+        StateHolder.__init__(self, state)
         wx.Panel.__init__(self, parent, style=wx.BORDER_SIMPLE)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
@@ -53,8 +52,7 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
         self._namespace_combo = wx.ComboBox(self)
         sizer.Add(self._namespace_combo, 2)
-        self._populate_namespace()
-        self._push_namespace()
+        self._update_namespace()
 
         # This was previously done with EVT_TEXT but that is also triggered by the Set method.
         # This is a workaround so that it is only triggered by user input.
@@ -88,50 +86,65 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
             )
         self._base_name_list_box = wx.ListBox(self, style=wx.LB_SINGLE)
         sizer.Add(self._base_name_list_box, 1, wx.EXPAND)
-
-        self._base_names: List[str] = []
-        self._populate_base_name()
-        self._push_base_name()
+        self._update_base_name()
         self._base_name_list_box.Bind(wx.EVT_LISTBOX, self._on_base_name_change)
 
-    def _init_state(self, state: Dict[str, Any]):
-        """
-        Call the init method of the state manager.
-        This is here so that nested classes do not have to init the state managers multiple times.
-        """
-        BaseMCResourceID.__init__(self, **state)
+    def _create_default_state(
+        self,
+        translation_manager: PyMCTranslate.TranslationManager,
+        platform: str = None,
+        version_number: VersionNumberTuple = None,
+        force_blockstate: bool = None,
+        namespace: str = None,
+        base_name: str = None,
+    ) -> BaseResourceIDState:
+        raise NotImplementedError
 
     @property
     def type_name(self) -> str:
         raise NotImplementedError
 
-    def _populate_namespace(self):
-        raise NotImplementedError("This method should be overridden in child classes.")
+    def _post_event(
+        self,
+        namespace: str,
+        base_name: str,
+    ):
+        raise NotImplementedError
 
-    def _populate_base_name(self):
-        raise NotImplementedError("This method should be overridden in child classes.")
+    def _on_state_change(self):
+        if self.state.is_changed(State.Namespace) or self.state.is_changed(
+            State.ForceBlockstate
+        ):
+            self._update_namespace()
+        if self.state.is_changed(State.Namespace) or self.state.is_changed(
+            State.BaseName
+        ):
+            self._update_base_name()
 
-    def _push_namespace(self):
-        """Push the internal namespace to the UI."""
-        namespace = self.namespace
-        if namespace in self._namespace_combo.GetItems():
-            self._namespace_combo.SetSelection(
-                self._namespace_combo.GetItems().index(namespace)
-            )
-        else:
-            self._namespace_combo.ChangeValue(namespace)
+    def _update_namespace(self):
+        if self.state.is_changed(State.ForceBlockstate):
+            self._namespace_combo.Set(self.state.valid_namespaces)
+        namespace = self.state.namespace
+        if namespace != self._namespace_combo.GetValue():
+            index = self._namespace_combo.FindString(namespace)
+            if index == wx.NOT_FOUND:
+                self._namespace_combo.ChangeValue(namespace)
+            else:
+                self._namespace_combo.SetSelection(index)
 
-    def _push_base_name(self):
-        """Push the internal base name to the UI."""
-        if self.base_name in self._base_names:
-            location = self._base_name_list_box.FindString(self.base_name)
+    def _update_base_name(self):
+        base_name = self.state.base_name
+        if base_name in self.state.valid_base_names:
+            # The base name is known
+            location = self._base_name_list_box.FindString(base_name)
             if location == wx.NOT_FOUND:
                 self._search.ChangeValue("")
                 self._update_from_search()
-                location = self._base_name_list_box.FindString(self.base_name)
+                location = self._base_name_list_box.FindString(base_name)
             self._base_name_list_box.SetSelection(location)
         else:
-            self._search.ChangeValue(self.base_name)
+            # The base name is not known
+            self._search.ChangeValue(base_name)
             self._update_from_search()
 
     def _update_from_search(self) -> bool:
@@ -141,17 +154,11 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
         :return: True if the text in the field changed
         """
         search_str = self._search.GetValue()
-        base_names = [bn for bn in self._base_names if search_str in bn]
+        base_names = [bn for bn in self.state.valid_base_names if search_str in bn]
         exact = search_str in base_names
 
-        # I originally wrote this in one line but it was rather difficult to read.
-        if exact:
-            # if we have an exact match
-            pass
-        elif not search_str and base_names:
-            # if the search string is blank but there are options
-            pass
-        else:
+        if (search_str and not exact) or (not search_str and not base_names):
+            # We have a search which is not a match or we don't have a search string or options
             base_names.insert(0, f'"{search_str}"')
 
         # find the previously selected string
@@ -177,32 +184,17 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
             self._base_name_list_box.GetSelection()
         )
 
-    def _post_event(
-        self,
-        old_namespace: str,
-        old_base_name: str,
-        new_namespace: str,
-        new_base_name: str,
-    ):
-        raise NotImplementedError
+    def _handle_namespace_change(self):
+        namespace = self._namespace_combo.GetValue()
+        if namespace != self.state.namespace:
+            with self.state as state:
+                state.namespace = namespace
+            self._post_event(self.state.namespace, self.state.base_name)
 
     def _on_namespace_change(self, evt):
         self._handle_namespace_change()
         if isinstance(evt, wx.KeyEvent):
             evt.Skip()
-
-    def _handle_namespace_change(self):
-        self.Freeze()
-        old_namespace = self.namespace
-        new_namespace = self._namespace_combo.GetValue()
-        if new_namespace != old_namespace:
-            self._set_namespace(new_namespace)
-
-            self._populate_base_name()
-            self._update_from_search()
-
-            self._on_change(old_namespace)
-        self.Thaw()
 
     def _on_namespace_char(self, evt):
         wx.CallAfter(self._handle_namespace_change)
@@ -215,26 +207,16 @@ class BaseIdentifierSelect(wx.Panel, BaseMCResourceID):
     def _on_base_name_change(self, evt):
         self._on_change()
 
-    def _on_change(self, old_namespace=None):
-        if old_namespace is None:
-            old_namespace = self.namespace
-        old_base_name = self.base_name
-        new_base_name = self._base_name_list_box.GetString(
+    def _on_change(self):
+        base_name = self._base_name_list_box.GetString(
             self._base_name_list_box.GetSelection()
         )
-        if self._base_name_list_box.GetSelection() == 0 and new_base_name.startswith(
-            '"'
+        if (
+            self._base_name_list_box.GetSelection() == 0
+            and base_name not in self.state.valid_base_names
         ):
-            new_base_name = new_base_name[1:-1]
-        if old_namespace != self.namespace or old_base_name != new_base_name:
-            self._set_base_name(new_base_name)
-            self._post_event(
-                old_namespace, old_base_name, self.namespace, new_base_name
-            )
-
-    def _on_push(self) -> bool:
-        self._populate_namespace()
-        self._push_namespace()
-        self._populate_base_name()
-        self._push_base_name()
-        return True
+            base_name = base_name[1:-1]
+        if base_name != self.state.namespace:
+            with self.state as state:
+                state.base_name = base_name
+            self._post_event(self.state.namespace, self.state.base_name)

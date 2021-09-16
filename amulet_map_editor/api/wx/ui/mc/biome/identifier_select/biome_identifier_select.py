@@ -1,17 +1,18 @@
-from typing import Dict, Any
 import wx
 
+import PyMCTranslate
+from amulet.api.data_types import VersionNumberTuple
+from amulet_map_editor.api.wx.ui.mc.state import BiomeResourceIDState
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
 )
-from amulet_map_editor.api.wx.ui.mc.api.biome import BaseMCBiomeIdentifier
 from amulet_map_editor.api.wx.ui.mc.biome.identifier_select.events import (
     BiomeIDChangeEvent,
     EVT_BIOME_ID_CHANGE,
 )
 
 
-class BiomeIdentifierSelect(BaseIdentifierSelect, BaseMCBiomeIdentifier):
+class BiomeIdentifierSelect(BaseIdentifierSelect):
     """
     A UI consisting of a namespace choice, biome name search box and list of biome names.
     """
@@ -20,47 +21,34 @@ class BiomeIdentifierSelect(BaseIdentifierSelect, BaseMCBiomeIdentifier):
     def type_name(self) -> str:
         return "Biome"
 
-    def _init_state(self, state: Dict[str, Any]):
-        BaseMCBiomeIdentifier.__init__(self, **state)
-
-    def _populate_namespace(self):
-        version = self._translation_manager.get_version(
-            self.platform, self.version_number
+    def _create_default_state(
+        self,
+        translation_manager: PyMCTranslate.TranslationManager,
+        platform: str = None,
+        version_number: VersionNumberTuple = None,
+        force_blockstate: bool = None,
+        namespace: str = None,
+        base_name: str = None,
+    ) -> BiomeResourceIDState:
+        return BiomeResourceIDState(
+            translation_manager,
+            platform,
+            version_number,
+            force_blockstate,
+            namespace,
+            base_name,
         )
-        namespaces = list(
-            set([biome_id.split(":", 1)[0] for biome_id in version.biome.biome_ids])
-        )
-        self._namespace_combo.Set(namespaces)
-
-    def _populate_base_name(self):
-        version = self._translation_manager.get_version(
-            self.platform, self.version_number
-        )
-        namespace = f"{self.namespace}:"
-        namespace_size = len(namespace)
-
-        self._base_names = [
-            biome_id[namespace_size:]
-            for biome_id in version.biome.biome_ids
-            if biome_id.startswith(namespace)
-        ]
-        self._base_name_list_box.SetItems(self._base_names)
-        self._update_from_search()
 
     def _post_event(
         self,
-        old_namespace: str,
-        old_base_name: str,
-        new_namespace: str,
-        new_base_name: str,
+        namespace: str,
+        base_name: str,
     ):
         wx.PostEvent(
             self,
             BiomeIDChangeEvent(
-                new_namespace,
-                new_base_name,
-                old_namespace,
-                old_base_name,
+                namespace,
+                base_name,
             ),
         )
 
@@ -81,11 +69,15 @@ def demo():
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
     widget = BiomeIdentifierSelect(
-        dialog, translation_manager, "java", (1, 16, 0), False
+        dialog,
+        translation_manager,
+        platform="java",
+        version_number=(1, 16, 0),
+        force_blockstate=False,
     )
 
     def on_change(evt: BiomeIDChangeEvent):
-        print(evt.old_namespace, evt.old_base_name, evt.namespace, evt.base_name)
+        print(evt.namespace, evt.base_name)
 
     widget.Bind(EVT_BIOME_ID_CHANGE, on_change)
     sizer.Add(

@@ -16,14 +16,10 @@ class BaseIDChangeEvent(wx.PyEvent):
         self,
         namespace: str,
         base_name: str,
-        old_namespace: str,
-        old_base_name: str,
     ):
         wx.PyEvent.__init__(self)
         self._namespace = namespace
         self._base_name = base_name
-        self._old_namespace = old_namespace
-        self._old_base_name = old_base_name
 
     @property
     def namespace(self) -> str:
@@ -32,11 +28,3 @@ class BaseIDChangeEvent(wx.PyEvent):
     @property
     def base_name(self) -> str:
         return self._base_name
-
-    @property
-    def old_namespace(self) -> str:
-        return self._old_namespace
-
-    @property
-    def old_base_name(self) -> str:
-        return self._old_base_name
