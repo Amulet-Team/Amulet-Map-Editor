@@ -6,18 +6,21 @@ from typing import Optional, Dict, Any, Tuple
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 from .platform_select import PlatformSelect
 from amulet_map_editor.api.wx.ui.mc.api.version import BaseMCVersion
+from amulet_map_editor.api.wx.ui.mc.state import VersionState, State
 from .events import VersionChangeEvent, EVT_VERSION_CHANGE
 
 
-class VersionSelect(PlatformSelect, BaseMCVersion):
+class VersionSelect(PlatformSelect):
     """
     A UI element that allows you to pick between the platforms and versions in the translator.
     """
+    state: VersionState
 
     def __init__(
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
+        state: VersionState = None,
         platform: PlatformType = None,
         version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
@@ -27,7 +30,6 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         show_force_blockstate: bool = True,
         allow_numerical: bool = True,
         allow_blockstate: bool = True,
-        state: Dict[str, Any] = None,
         style: Dict[str, Any] = None,
     ):
         """
@@ -35,29 +37,29 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
 
         :param parent: The parent window.
         :param translation_manager: The translation manager to populate from.
-        :param platform: The default platform (optional)
-        :param version_number: The default version number (optional)
-        :param force_blockstate: If True and the native format is numerical will use the custom blockstate format. Else will use the native format.
+        :param state: optional VersionSelect instance holding the state of the platform and version.
+        :param platform: The default platform (optional). If state is defined this will not be used.
+        :param version_number: The default version number (optional). If state is defined this will not be used.
+        :param force_blockstate: If True and the native format is numerical will use the custom blockstate format. Else will use the native format. If state is defined this will not be used.
         :param allow_universal: If True the universal format will be included.
         :param allow_vanilla: If True the vanilla formats will be included.
         :param allowed_platforms: A whitelist of platforms.
         :param show_force_blockstate: Should the format selection be shown to the user.
         :param allow_numerical: Should the numerical versions be shown to the user.
         :param allow_blockstate: Should the blockstate versions be shown to the user.
-        :param state: A dictionary containing kwargs passed to the state manager.
         :param style: Dictionary of keyword args to be given to the Panel.
         """
-        state = state or {}
-        state.setdefault("version_number", version_number)
-        state.setdefault("force_blockstate", force_blockstate)
+        # init the state
+        if not isinstance(state, VersionState):
+            state = VersionState(translation_manager, platform, version_number, force_blockstate)
+
         super().__init__(
             parent,
             translation_manager,
-            platform,
+            state,
             allow_universal=allow_universal,
             allow_vanilla=allow_vanilla,
             allowed_platforms=allowed_platforms,
-            state=state,
             style=style,
         )
         self._allow_numerical = allow_numerical
@@ -66,8 +68,7 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
         self._version_choice: Optional[SimpleChoiceAny] = self._add_ui_element(
             "Version:", SimpleChoiceAny, reverse=True
         )
-        self._populate_version()
-        self._push_version_number()
+        self._update_version_number()
         self._version_choice.Bind(
             wx.EVT_CHOICE,
             self._on_version_number_change,
@@ -77,128 +78,61 @@ class VersionSelect(PlatformSelect, BaseMCVersion):
             "Format:", SimpleChoice, shown=show_force_blockstate
         )
         self._blockstate_choice.SetItems(["native", "blockstate"])
-        self._blockstate_choice.SetSelection(0)
-        self._populate_blockstate()
-        self._push_force_blockstate()
+        self._update_force_blockstate()
         self._blockstate_choice.Bind(wx.EVT_CHOICE, self._on_blockstate_change)
 
-    def _init_state(self, state: Dict[str, Any]):
-        """
-        Call the init method of the state manager.
-        This is here so that nested classes do not have to init the state managers multiple times.
-        """
-        BaseMCVersion.__init__(self, **state)
+    # def _populate_version(self):
+    #     """Populate the version UI element"""
+        # TODO
+        # versions = self._translation_manager.version_numbers(self.platform)
+        # if not self._allow_blockstate:
+        #     versions = [v for v in versions if v < (1, 13, 0)]
+        # if not self._allow_numerical:
+        #     versions = [v for v in versions if v >= (1, 13, 0)]
+        # self._version_choice.SetItems(versions)
 
-    def _populate_version(self):
-        """Populate the version UI element"""
-        versions = self._translation_manager.version_numbers(self.platform)
-        if not self._allow_blockstate:
-            versions = [v for v in versions if v < (1, 13, 0)]
-        if not self._allow_numerical:
-            versions = [v for v in versions if v >= (1, 13, 0)]
-        self._version_choice.SetItems(versions)
-
-    def _populate_blockstate(self):
-        if self._translation_manager.get_version(
-            self.platform, self.version_number
-        ).has_abstract_format:
-            self._blockstate_choice.Enable()
-        else:
-            self._blockstate_choice.Disable()
-
-    def _push_version_number(self):
+    def _update_version_number(self):
         """Push the internal version number state to the UI."""
+        self._version_choice.SetItems(self.state.valid_version_numbers)
         self._version_choice.SetSelection(
-            self._version_choice.values.index(self.version_number)
+            self._version_choice.values.index(self.state.version_number)
         )
 
-    def _push_force_blockstate(self):
+    def _update_force_blockstate(self):
         """Push the internal block format state to the UI."""
-        self._blockstate_choice.SetSelection(int(self.force_blockstate))
+        self._blockstate_choice.Enable(self.state.has_abstract_format)
+        self._blockstate_choice.SetSelection(int(self.state.force_blockstate))
 
-    def _on_change(self, changed: int):
-        """
-        Handle the UI changes and create an event.
+    def _on_state_change(self):
+        super()._on_state_change()
+        if self.state.is_changed(State.VersionNumber):
+            self._update_version_number()
+        if self.state.is_changed(State.ForceBlockstate):
+            self._update_force_blockstate()
 
-        :param changed: 1=platform, 2=version, 3=blockstate
-        :return:
-        """
-        old_platform = self.platform
-        old_version = self.version_number
-        old_force_blockstate = self.force_blockstate
-
-        if changed <= 1:
-            # write the changes back to the internal state
-            new_platform = self._platform_choice.GetCurrentString()
-            if new_platform == old_platform:
-                # nothing changed
-                return
-            self._set_platform(new_platform)
-        else:
-            new_platform = old_platform
-
-        if changed <= 2:
-            if changed < 2:
-                self._populate_version()
-                self._version_choice.SetSelection(0)
-            new_version = self._version_choice.GetCurrentObject()
-            if changed == 2 and new_version == old_version:
-                return
-            self._set_version_number(new_version)
-        else:
-            new_version = old_version
-
-        if changed < 3:
-            self._populate_blockstate()
-            self._blockstate_choice.SetSelection(0)
-        new_force_blockstate = (
-            self._blockstate_choice.GetCurrentString() == "blockstate"
-        )
-        if changed == 3 and new_force_blockstate == old_force_blockstate:
-            return
-        self._set_force_blockstate(new_force_blockstate)
-
+    def _post_version_change(self):
         wx.PostEvent(
             self,
             VersionChangeEvent(
-                new_platform,
-                new_version,
-                new_force_blockstate,
-                old_platform,
-                old_version,
-                old_force_blockstate,
-            ),
+                self.state.platform,
+                self.state.version_number,
+                self.state.force_blockstate,
+            )
         )
 
-    def _on_platform_change(self, evt):
-        self._on_change(1)
-
     def _on_version_number_change(self, evt):
-        self._on_change(2)
+        version = self._version_choice.GetCurrentObject()
+        if version != self.state.version_number:
+            with self.state as state:
+                state.version_number = version
+            self._post_version_change()
 
     def _on_blockstate_change(self, evt):
-        self._on_change(3)
-
-    def _on_push(self) -> bool:
-        update = super()._on_push()
-        # If the user set these out of order they may be messed up.
-        # This should fix that.
-        self._set_version_number(self.version_number)
-        self._set_force_blockstate(self.force_blockstate)
-
-        if update:
-            self._populate_version()
-        if update or self.version_number != self._version_choice.GetCurrentObject():
-            self._push_version_number()
-            update = True
-        if update:
-            self._populate_blockstate()
-        if update or self.force_blockstate != (
-            self._blockstate_choice.GetCurrentString() == "blockstate"
-        ):
-            self._push_force_blockstate()
-            update = True
-        return update
+        force_blockstate = bool(self._version_choice.GetCurrentSelection())
+        if force_blockstate != self.state.force_blockstate:
+            with self.state as state:
+                state.force_blockstate = force_blockstate
+            self._post_version_change()
 
 
 def demo():
@@ -229,9 +163,6 @@ def demo():
                 evt.platform,
                 evt.version_number,
                 evt.force_blockstate,
-                evt.old_platform,
-                evt.old_version_number,
-                evt.force_blockstate,
             )
 
         select.Bind(EVT_VERSION_CHANGE, on_change)
@@ -250,11 +181,10 @@ def demo():
             version: VersionNumberTuple,
             force_blockstate: bool,
         ):
-            obj.platform, obj.version_number, obj.force_blockstate = (
-                platform,
-                version,
-                force_blockstate,
-            )
+            with obj.state as state:
+                state.platform = platform
+                state.version_number = version
+                state.force_blockstate = force_blockstate
 
         interval = 1_000
 
@@ -269,11 +199,10 @@ def demo():
             version: VersionNumberTuple,
             force_blockstate: bool,
         ):
-            obj.force_blockstate, obj.version_number, obj.platform = (
-                force_blockstate,
-                version,
-                platform,
-            )
+            with obj.state as state:
+                state.force_blockstate = force_blockstate
+                state.version_number = version
+                state.platform = platform
 
         wx.CallLater(interval * 5, set_version2, select, "java", (1, 15, 0), False)
         wx.CallLater(interval * 6, set_version2, select, "java", (1, 17, 0), False)
