@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Callable, List, Dict, Any, Union
+
+import amulet_nbt
 from PyMCTranslate import TranslationManager, Version
 from amulet.api.data_types import PlatformType, VersionNumberTuple, VersionNumberAny
+from amulet.api.block import PropertyType, PropertyTypeMultiple, Block
 from amulet_map_editor import log
 
 
@@ -59,10 +62,6 @@ class BaseState(ABC):
             except:
                 log.warning(f"Error calling {on_change}", exc_info=True)
 
-    def _is_edit(self):
-        if not self._edit:
-            raise Exception("The state has not been opened for editing.")
-
     def is_changed(self, state: Union[State, str]):
         """Check if the state has changed."""
         return state in self._changed_state
@@ -72,6 +71,11 @@ class BaseState(ABC):
             return self._changed_state[state]
         else:
             return self._state[state]
+
+    def _set_state(self, state: State, value: Any):
+        if not self._edit:
+            raise Exception("The state has not been opened for editing.")
+        self._changed_state[state] = value
 
     @abstractmethod
     def _fix_new_state(self):
@@ -119,8 +123,7 @@ class PlatformState(BaseState):
 
     @platform.setter
     def platform(self, platform: PlatformType):
-        self._is_edit()
-        self._changed_state[State.Platform] = platform
+        self._set_state(State.Platform, platform)
 
 
 class VersionState(PlatformState):
@@ -172,8 +175,7 @@ class VersionState(PlatformState):
 
     @version_number.setter
     def version_number(self, version_number: VersionNumberAny):
-        self._is_edit()
-        self._changed_state[State.VersionNumber] = version_number
+        self._set_state(State.VersionNumber, version_number)
 
     def _sanitise_force_blockstate(self, force_blockstate: bool = None) -> bool:
         if self.has_abstract_format:
@@ -191,8 +193,7 @@ class VersionState(PlatformState):
 
     @force_blockstate.setter
     def force_blockstate(self, force_blockstate: bool):
-        self._is_edit()
-        self._changed_state[State.ForceBlockstate] = force_blockstate
+        self._set_state(State.ForceBlockstate, force_blockstate)
 
 
 class BaseNamespaceState(VersionState):
@@ -229,8 +230,7 @@ class BaseNamespaceState(VersionState):
 
     @namespace.setter
     def namespace(self, namespace: str):
-        self._is_edit()
-        self._changed_state[State.Namespace] = namespace
+        self._set_state(State.Namespace, namespace)
 
 
 class BaseResourceIDState(BaseNamespaceState):
@@ -268,8 +268,7 @@ class BaseResourceIDState(BaseNamespaceState):
 
     @base_name.setter
     def base_name(self, base_name: str):
-        self._is_edit()
-        self._changed_state[State.BaseName] = base_name
+        self._set_state(State.BaseName, base_name)
 
 
 class BiomeNamespaceState(BaseNamespaceState):
@@ -300,3 +299,99 @@ class BlockResourceIDState(BlockNamespaceState, BaseResourceIDState):
     @property
     def valid_base_names(self) -> List[str]:
         return self._get_version().block.base_names(self.namespace, self.force_blockstate)
+
+
+class BlockState(BlockResourceIDState):
+    def __init__(
+        self,
+        translation_manager: TranslationManager,
+        platform: str = None,
+        version_number: VersionNumberAny = None,
+        force_blockstate: bool = None,
+        namespace: str = None,
+        base_name: str = None,
+        properties: PropertyType = None,
+        properties_multiple: PropertyTypeMultiple = None,
+    ):
+        super().__init__(translation_manager, platform, version_number, force_blockstate, namespace, base_name)
+        self._state[State.Properties] = self._sanitise_properties(properties)
+        self._state[State.PropertiesMultiple] = self._sanitise_properties_multiple(properties_multiple)
+
+    def _fix_version_change(self):
+        universal_block, _, _ = self._translation_manager.get_version(self._state[State.Platform], self._state[State.VersionNumber]).block.to_universal(
+            Block(self.namespace, self.base_name, self.properties),
+            force_blockstate=self.force_blockstate
+        )
+        version_block, _, _ = self._translation_manager.get_version(self.platform, self.version_number).block.from_universal(universal_block)
+        if isinstance(version_block, Block):
+            version_block: Block
+            if self.is_changed(State.Namespace) or self.is_changed(State.BaseName):
+                if version_block.namespace == self.namespace and version_block.base_name == self.base_name:
+                    if not self.is_changed(State.Properties):
+                        self._changed_state[State.Properties] = self._sanitise_properties(version_block.properties)
+            else:
+                self._changed_state[State.Namespace] = self._sanitise_namespace(version_block.namespace)
+                self._changed_state[State.BaseName] = self._sanitise_base_name(version_block.base_name)
+                if not self.is_changed(State.Properties):
+                    self._changed_state[State.Properties] = self._sanitise_properties(version_block.properties)
+
+    def _fix_new_state(self):
+        super()._fix_new_state()
+        if self.is_changed(State.Properties) or self.is_changed(State.PropertiesMultiple):
+            self._changed_state[State.PropertiesMultiple] = self._sanitise_properties_multiple(self.properties_multiple)
+            self._changed_state[State.Properties] = self._sanitise_properties(self.properties)
+
+    def _get_block_spec(self):
+        return self._get_version().block.get_specification(self.namespace, self.base_name, self.force_blockstate)
+
+    @property
+    def default_properties(self) -> PropertyType:
+        return self._get_block_spec().default_properties
+
+    @property
+    def valid_properties(self) -> PropertyTypeMultiple:
+        return self._get_block_spec().valid_properties
+
+    def _sanitise_properties(self, properties: PropertyType = None) -> PropertyType:
+        valid_properties = self.valid_properties
+        default_properties = self.default_properties
+        if isinstance(properties, dict):
+            return {
+                name: properties[name]
+                if name in properties and isinstance(properties[name], amulet_nbt.BaseValueType) and properties[name] in valid_properties[name]
+                else default_properties[name]
+                for name in valid_properties
+            }
+        else:
+            return default_properties
+
+    @property
+    def properties(self) -> PropertyType:
+        return self._get_state(State.Properties)
+
+    @properties.setter
+    def properties(self, properties: PropertyType):
+        self._set_state(State.Properties, properties)
+
+    def _sanitise_properties_multiple(self, properties: PropertyTypeMultiple = None) -> PropertyTypeMultiple:
+        valid_properties = self.valid_properties
+        if isinstance(properties, dict):
+            return {
+                name: tuple(
+                    val for val in properties[name]
+                    if isinstance(val, amulet_nbt.BaseValueType) and val in valid_properties[name]
+                )
+                if name in properties and isinstance(properties[name], (list, tuple))
+                else valid_properties[name]
+                for name in valid_properties
+            }
+        else:
+            return valid_properties
+
+    @property
+    def properties_multiple(self) -> PropertyTypeMultiple:
+        return self._get_state(State.PropertiesMultiple)
+
+    @properties_multiple.setter
+    def properties_multiple(self, properties_multiple: PropertyTypeMultiple):
+        self._set_state(State.PropertiesMultiple, properties_multiple)
