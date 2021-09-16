@@ -182,7 +182,7 @@ def demo():
     dialog.Fit()
     dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
 
-    def set(
+    def set_data(
         platform: PlatformType,
         version: VersionNumberTuple,
         force_blockstate: bool,
@@ -205,7 +205,7 @@ def demo():
 
     interval = 1_000
     wx.CallLater(
-        interval * 1, set, "java", (1, 17, 0), False, "minecraft", "end_highlands"
+        interval * 1, set_data, "java", (1, 17, 0), False, "minecraft", "end_highlands"
     )
     wx.CallLater(
         interval * 2,
