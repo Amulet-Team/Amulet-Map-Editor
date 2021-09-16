@@ -96,6 +96,28 @@ class BaseState(ABC):
             self._on_change.remove(on_change)
 
 
+class StateHolder:
+    _state: BaseState
+
+    def __init__(self, state: BaseState):
+        self._state = None
+        self.state = state
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, state: BaseState):
+        if self._state is not None:
+            self._state.unbind_on_change(self._on_state_change)
+        self._state = state
+        self._state.bind_on_change(self._on_state_change)
+
+    def _on_state_change(self):
+        pass
+
+
 class PlatformState(BaseState):
     def __init__(
         self,
