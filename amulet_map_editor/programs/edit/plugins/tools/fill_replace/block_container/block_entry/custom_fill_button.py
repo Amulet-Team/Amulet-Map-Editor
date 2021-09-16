@@ -44,8 +44,10 @@ class CustomAutomaticSingleProperty(AutomaticSingleProperty):
 
     def set_from_source(self, from_source: bool):
         self._from_source = from_source
-        for i in range(0, self._property_sizer.GetItemCount(), self._property_sizer.GetCols()):
-            self._property_sizer.Show(i+2, show=from_source)
+        for i in range(
+            0, self._property_sizer.GetItemCount(), self._property_sizer.GetCols()
+        ):
+            self._property_sizer.Show(i + 2, show=from_source)
         self.Layout()
 
 
@@ -75,7 +77,7 @@ class CustomSinglePropertySelect(SinglePropertySelect):
             namespace,
             base_name,
             properties,
-            state=state
+            state=state,
         )
 
     def _create_automatic(self) -> CustomAutomaticSingleProperty:
@@ -103,7 +105,7 @@ class CustomBlockDefine(BlockDefine):
             self.namespace,
             self.base_name,
             self.properties,
-            from_source=self._from_source
+            from_source=self._from_source,
         )
 
     def set_from_source(self, from_source: bool):
@@ -129,7 +131,7 @@ class CustomBlockDefineButton(BlockDefineButton):
             self.namespace,
             self.base_name,
             self.properties,
-            from_source=self._from_source
+            from_source=self._from_source,
         )
 
     def _update_from_block_define(self, block_define: BlockDefine):

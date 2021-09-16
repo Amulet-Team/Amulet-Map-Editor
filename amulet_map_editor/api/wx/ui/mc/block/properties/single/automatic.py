@@ -74,9 +74,7 @@ class AutomaticSingleProperty(BaseSingleProperty):
     def _tear_down_properties(self):
         self._properties.clear()
         child: wx.SizerItem
-        for i, child in enumerate(
-            self._property_sizer.GetChildren()
-        ):
+        for i, child in enumerate(self._property_sizer.GetChildren()):
             if i >= self._property_sizer.GetCols():
                 if child.IsWindow():
                     child.GetWindow().Destroy()
