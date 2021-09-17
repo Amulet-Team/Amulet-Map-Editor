@@ -20,6 +20,7 @@ class VersionSelect(PlatformSelect):
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
+        *,
         state: VersionState = None,
         platform: PlatformType = None,
         version_number: VersionNumberTuple = None,
@@ -52,7 +53,10 @@ class VersionSelect(PlatformSelect):
         # init the state
         if not isinstance(state, VersionState):
             state = VersionState(
-                translation_manager, platform, version_number, force_blockstate
+                translation_manager,
+                platform=platform,
+                version_number=version_number,
+                force_blockstate=force_blockstate,
             )
 
         super().__init__(

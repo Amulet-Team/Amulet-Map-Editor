@@ -24,6 +24,7 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
+        *,
         state: BaseResourceIDState = None,
         platform: str = None,
         version_number: VersionNumberTuple = None,
@@ -35,11 +36,11 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         if not isinstance(state, BaseResourceIDState):
             state = self._create_default_state(
                 translation_manager,
-                platform,
-                version_number,
-                force_blockstate,
-                namespace,
-                base_name,
+                platform=platform,
+                version_number=version_number,
+                force_blockstate=force_blockstate,
+                namespace=namespace,
+                base_name=base_name,
             )
         StateHolder.__init__(self, state)
         wx.Panel.__init__(self, parent, style=wx.BORDER_SIMPLE)
@@ -92,6 +93,7 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
     def _create_default_state(
         self,
         translation_manager: PyMCTranslate.TranslationManager,
+        *,
         platform: str = None,
         version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,

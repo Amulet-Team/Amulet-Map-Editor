@@ -123,6 +123,7 @@ class PlatformState(BaseState):
     def __init__(
         self,
         translation_manager: TranslationManager,
+        *,
         platform: str = None,
     ):
         super().__init__(translation_manager)
@@ -157,6 +158,7 @@ class VersionState(PlatformState):
     def __init__(
         self,
         translation_manager: TranslationManager,
+        *,
         platform: str = None,
         version_number: VersionNumberAny = None,
         force_blockstate: bool = None,
@@ -237,6 +239,7 @@ class BaseNamespaceState(VersionState):
     def __init__(
         self,
         translation_manager: TranslationManager,
+        *,
         platform: str = None,
         version_number: VersionNumberAny = None,
         force_blockstate: bool = None,
@@ -278,6 +281,7 @@ class BaseResourceIDState(BaseNamespaceState):
     def __init__(
         self,
         translation_manager: TranslationManager,
+        *,
         platform: str = None,
         version_number: VersionNumberAny = None,
         force_blockstate: bool = None,
@@ -354,6 +358,7 @@ class BlockState(BlockResourceIDState):
     def __init__(
         self,
         translation_manager: TranslationManager,
+        *,
         platform: str = None,
         version_number: VersionNumberAny = None,
         force_blockstate: bool = None,

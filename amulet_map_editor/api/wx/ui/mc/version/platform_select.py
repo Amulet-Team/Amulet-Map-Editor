@@ -19,6 +19,7 @@ class PlatformSelect(wx.Panel, StateHolder):
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
+        *,
         state: PlatformState = None,
         platform: PlatformType = None,
         allow_universal: bool = True,
@@ -40,7 +41,7 @@ class PlatformSelect(wx.Panel, StateHolder):
         """
         # init the state
         if not isinstance(state, PlatformState):
-            state = PlatformState(translation_manager, platform)
+            state = PlatformState(translation_manager, platform=platform)
         StateHolder.__init__(self, state)
 
         # init the panel

@@ -24,6 +24,7 @@ class BiomeIdentifierSelect(BaseIdentifierSelect):
     def _create_default_state(
         self,
         translation_manager: PyMCTranslate.TranslationManager,
+        *,
         platform: str = None,
         version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
@@ -32,11 +33,11 @@ class BiomeIdentifierSelect(BaseIdentifierSelect):
     ) -> BiomeResourceIDState:
         return BiomeResourceIDState(
             translation_manager,
-            platform,
-            version_number,
-            force_blockstate,
-            namespace,
-            base_name,
+            platform=platform,
+            version_number=version_number,
+            force_blockstate=force_blockstate,
+            namespace=namespace,
+            base_name=base_name,
         )
 
     def _post_event(
