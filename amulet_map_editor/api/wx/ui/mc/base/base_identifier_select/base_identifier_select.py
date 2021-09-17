@@ -169,6 +169,7 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         if selection != wx.NOT_FOUND:
             previous_string = self._base_name_list_box.GetString(selection)
 
+        self.Freeze()
         self._base_name_list_box.SetItems(base_names)
         if exact:
             # if the searched text perfectly matches select that
@@ -181,6 +182,7 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
             self._base_name_list_box.SetSelection(1)
         else:
             self._base_name_list_box.SetSelection(0)
+        self.Thaw()
 
         return previous_string != self._base_name_list_box.GetString(
             self._base_name_list_box.GetSelection()
