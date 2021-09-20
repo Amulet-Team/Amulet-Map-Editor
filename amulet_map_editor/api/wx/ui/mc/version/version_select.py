@@ -62,7 +62,7 @@ class VersionSelect(PlatformSelect):
         super().__init__(
             parent,
             translation_manager,
-            state,
+            state=state,
             allow_universal=allow_universal,
             allow_vanilla=allow_vanilla,
             allowed_platforms=allowed_platforms,

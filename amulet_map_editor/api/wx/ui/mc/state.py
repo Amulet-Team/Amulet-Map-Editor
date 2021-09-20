@@ -163,7 +163,7 @@ class VersionState(PlatformState):
         version_number: VersionNumberAny = None,
         force_blockstate: bool = None,
     ):
-        super().__init__(translation_manager, platform)
+        super().__init__(translation_manager, platform=platform)
         self._state[State.VersionNumber] = self._sanitise_version(version_number)
         self._state[State.ForceBlockstate] = self._sanitise_force_blockstate(
             force_blockstate
@@ -246,7 +246,10 @@ class BaseNamespaceState(VersionState):
         namespace: str = None,
     ):
         super().__init__(
-            translation_manager, platform, version_number, force_blockstate
+            translation_manager,
+            platform=platform,
+            version_number=version_number,
+            force_blockstate=force_blockstate,
         )
         self._state[State.Namespace] = self._sanitise_namespace(namespace)
 
@@ -289,7 +292,11 @@ class BaseResourceIDState(BaseNamespaceState):
         base_name: str = None,
     ):
         super().__init__(
-            translation_manager, platform, version_number, force_blockstate, namespace
+            translation_manager,
+            platform=platform,
+            version_number=version_number,
+            force_blockstate=force_blockstate,
+            namespace=namespace,
         )
         self._state[State.BaseName] = self._sanitise_base_name(base_name)
 
@@ -369,11 +376,11 @@ class BlockState(BlockResourceIDState):
     ):
         super().__init__(
             translation_manager,
-            platform,
-            version_number,
-            force_blockstate,
-            namespace,
-            base_name,
+            platform=platform,
+            version_number=version_number,
+            force_blockstate=force_blockstate,
+            namespace=namespace,
+            base_name=base_name,
         )
         self._state[State.Properties] = self._sanitise_properties(properties)
         self._state[State.PropertiesMultiple] = self._sanitise_properties_multiple(
