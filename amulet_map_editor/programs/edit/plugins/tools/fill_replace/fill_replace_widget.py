@@ -7,7 +7,7 @@ import PyMCTranslate
 
 from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor import lang
-from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import ChoiceRaw
 from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
 from .block_container import FillBlockContainer, FindBlockContainer
 
@@ -148,7 +148,7 @@ class FillReplaceWidget(wx.Panel):
         self._multiple.Bind(wx.EVT_CHECKBOX, self._on_check_change)
         top_sizer.Add(self._multiple, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
 
-        self._replace_mode = SimpleChoiceAny(self, sort=False)
+        self._replace_mode = ChoiceRaw(self, sort=False)
         self._replace_mode.Hide()
         self._replace_mode.SetItems(
             {

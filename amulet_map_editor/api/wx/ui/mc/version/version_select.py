@@ -1,4 +1,4 @@
-from amulet_map_editor.api.wx.ui.simple import SimpleChoice, SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import SimpleChoice, ChoiceRaw
 import wx
 import PyMCTranslate
 from typing import Optional, Dict, Any, Tuple
@@ -71,8 +71,8 @@ class VersionSelect(PlatformSelect):
         self._allow_numerical = allow_numerical
         self._allow_blockstate = allow_blockstate
 
-        self._version_choice: Optional[SimpleChoiceAny] = self._add_ui_element(
-            "Version:", SimpleChoiceAny, reverse=True
+        self._version_choice: Optional[ChoiceRaw] = self._add_ui_element(
+            "Version:", ChoiceRaw, reverse=True
         )
         self._update_version_number()
         self._version_choice.Bind(

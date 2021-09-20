@@ -4,7 +4,7 @@ import traceback
 
 from amulet_map_editor import log
 from amulet_map_editor.api.image import REFRESH_ICON
-from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import ChoiceRaw
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 
 from amulet_map_editor.programs.edit.api.operations import OperationUIType
@@ -25,7 +25,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
         self._active_operation: Optional[OperationUIType] = None
         self._last_active_operation_id: Optional[str] = None
-        self._operation_choice: Optional[SimpleChoiceAny] = None
+        self._operation_choice: Optional[ChoiceRaw] = None
         self._reload_operation: Optional[wx.BitmapButton] = None
         self._operations: Optional[UIOperationManager] = None
         self._operation_sizer: Optional[wx.BoxSizer] = None
@@ -34,7 +34,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         super().setup()
         horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self._operation_choice = SimpleChoiceAny(self.canvas)
+        self._operation_choice = ChoiceRaw(self.canvas)
         self._reload_operation = wx.BitmapButton(
             self.canvas, bitmap=REFRESH_ICON.bitmap(16, 16)
         )

@@ -4,7 +4,7 @@ import wx
 from amulet_map_editor.programs.edit.api.edit_canvas_container import (
     EditCanvasContainer,
 )
-from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import ChoiceRaw
 from amulet_map_editor.programs.edit.api.events import (
     EVT_CAMERA_MOVED,
     EVT_UNDO,
@@ -56,7 +56,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
 
         self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
-        self._dim_options = SimpleChoiceAny(canvas)
+        self._dim_options = ChoiceRaw(canvas)
         self._dim_options.SetToolTip(lang.get("program_3d_edit.file_ui.dim_tooltip"))
         self._dim_options.SetItems(level.level_wrapper.dimensions)
         self._dim_options.SetValue(level.level_wrapper.dimensions[0])

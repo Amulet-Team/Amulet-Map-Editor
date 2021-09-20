@@ -8,7 +8,7 @@ from amulet.api.chunk.biomes import BiomesShape
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.mc.biome import BiomeDefine
 from amulet_map_editor.programs.edit.api.operations import SimpleOperationPanel
-from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
+from amulet_map_editor.api.wx.ui.simple import ChoiceRaw
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
@@ -46,7 +46,7 @@ class SetBiome(SimpleOperationPanel):
         self.Freeze()
         options = self._load_options({})
 
-        self._mode = SimpleChoiceAny(self, sort=False)
+        self._mode = ChoiceRaw(self, sort=False)
         self._mode.SetItems({mode: lang[mode] for mode in MODES.keys()})
         self._sizer.Add(self._mode, 0, Border, 5)
         self._mode.Bind(wx.EVT_CHOICE, self._on_mode_change)
