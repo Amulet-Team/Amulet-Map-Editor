@@ -7,7 +7,7 @@ from ..base import BaseMultipleProperty
 from .popup import PropertyValueComboPopup
 
 
-class AutomaticMultipleProperty(BaseMultipleProperty):
+class VanillaMultipleProperty(BaseMultipleProperty):
     def __init__(self, parent: wx.Window):
         super().__init__(parent)
 

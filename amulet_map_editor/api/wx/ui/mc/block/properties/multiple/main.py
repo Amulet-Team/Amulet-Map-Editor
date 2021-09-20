@@ -1,5 +1,5 @@
 import wx
-from typing import Tuple, Dict, Any, List
+from typing import Dict, Any, List
 
 import PyMCTranslate
 import amulet_nbt
@@ -8,8 +8,8 @@ from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlock
 from ..base import BasePropertySelect
 
-from .automatic import AutomaticMultipleProperty
-from .manual import ManualMultipleProperty
+from .vanilla import VanillaMultipleProperty
+from .modded import ModdedMultipleProperty
 from .events import MultiplePropertiesChangeEvent, EVT_MULTIPLE_PROPERTIES_CHANGE
 
 
@@ -40,21 +40,21 @@ class MultiplePropertySelect(BasePropertySelect, WildcardMCBlock):
             self,
             parent,
             translation_manager,
-            platform,
-            version_number,
-            force_blockstate,
-            namespace,
-            base_name,
+            platform=platform,
+            version_number=version_number,
+            force_blockstate=force_blockstate,
+            namespace=namespace,
+            base_name=base_name,
             state=state,
         )
 
         self._manual_enabled = False
-        self._simple = AutomaticMultipleProperty(self)
-        self._sizer.Add(self._simple, 1, wx.EXPAND)
-        self._manual = ManualMultipleProperty(self)
-        self._sizer.Add(self._manual, 1, wx.EXPAND)
-        self._simple.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._on_change)
-        self._manual.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._on_change)
+        self._vanilla = VanillaMultipleProperty(self)
+        self._sizer.Add(self._vanilla, 1, wx.EXPAND)
+        self._modded = ModdedMultipleProperty(self)
+        self._sizer.Add(self._modded, 1, wx.EXPAND)
+        self._vanilla.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._on_change)
+        self._modded.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._on_change)
         self.push(True)
 
     def _init_state(self, state: Dict[str, Any]):
@@ -70,22 +70,22 @@ class MultiplePropertySelect(BasePropertySelect, WildcardMCBlock):
             self.namespace, self.force_blockstate
         )
         if self._manual_enabled:
-            self._simple.Hide()
-            self._manual.Show()
-            self._manual.all_properties = self.all_properties
-            self._manual.selected_properties = self.selected_properties
+            self._vanilla.Hide()
+            self._modded.Show()
+            self._modded.all_properties = self.all_properties
+            self._modded.selected_properties = self.selected_properties
         else:
-            self._manual.Hide()
-            self._simple.Show()
+            self._modded.Hide()
+            self._vanilla.Show()
             spec = translator.get_specification(
                 self.namespace, self.base_name, self._force_blockstate
             )
             properties: Dict[str, List[str]] = spec.get("properties", {})
-            self._simple.all_properties = {
+            self._vanilla.all_properties = {
                 name: [amulet_nbt.from_snbt(p) for p in properties[name]]
                 for name in properties
             }
-            self._simple.selected_properties = self.selected_properties
+            self._vanilla.selected_properties = self.selected_properties
         self.Thaw()
         return True
 

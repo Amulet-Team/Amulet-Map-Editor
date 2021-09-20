@@ -1,1 +1,0 @@
-from .automatic import AutomaticMultipleProperty

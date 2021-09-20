@@ -1,22 +1,15 @@
 import wx
 from typing import Tuple, Dict
 
-import PyMCTranslate
 import amulet_nbt
 from amulet_nbt import SNBTType
-from amulet.api.block import PropertyDataTypes, PropertyType
+from amulet.api.block import PropertyDataTypes, PropertyType, PropertyTypeMultiple
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
-from .events import SinglePropertiesChangeEvent
-from .base import BaseSingleProperty
+from .events import MultiplePropertiesChangeEvent
+from .base import BaseMultipleProperty
 
 
-class ManualSingleProperty(BaseSingleProperty):
-    """
-    A UI from which a user can choose one value for each property.
-
-    This is used when the block is not know so the user can define the properties themselves.
-    """
-
+class ModdedMultipleProperty(BaseMultipleProperty):
     def __init__(self, parent: wx.Window):
         super().__init__(parent)
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -44,16 +37,9 @@ class ManualSingleProperty(BaseSingleProperty):
         self._properties: Dict[int, Tuple[wx.TextCtrl, wx.TextCtrl]] = {}
 
     def _post_property_change(self):
-        wx.PostEvent(self, SinglePropertiesChangeEvent(self.properties))
+        wx.PostEvent(self, MultiplePropertiesChangeEvent(self.selected_properties))
 
     def _add_property(self, name: str = "", value: SNBTType = ""):
-        """
-        Add a property to the UI with the given data.
-
-        :param name: The name of the property.
-        :param value: The SNBT text of the value for that property.
-        :return:
-        """
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._property_index += 1
@@ -130,3 +116,28 @@ class ManualSingleProperty(BaseSingleProperty):
         self._property_index = 0
         for name, value in properties.items():
             self._add_property(name, value.to_snbt())
+
+    @property
+    def all_properties(self) -> PropertyTypeMultiple:
+        return {prop: (val,) for prop, val in self.properties.items()}
+
+    @all_properties.setter
+    def all_properties(self, all_properties: PropertyTypeMultiple):
+        props = {}
+        for prop, val in all_properties.items():
+            if val:
+                props[prop] = val[0]
+        self.properties = props
+
+    # TODO: implement this properly
+    @property
+    def selected_properties(self) -> PropertyTypeMultiple:
+        return {prop: (val,) for prop, val in self.properties.items()}
+
+    @selected_properties.setter
+    def selected_properties(self, properties: PropertyTypeMultiple):
+        props = {}
+        for prop, val in properties.items():
+            if val:
+                props[prop] = val[0]
+        self.properties = props

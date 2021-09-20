@@ -1,9 +1,8 @@
 import wx
+from amulet_map_editor.api.wx.ui.mc.state import StateHolder, BlockState
 
-from amulet.api.block import PropertyType
 
-
-class BaseSingleProperty(wx.Panel):
+class BaseSingleProperty(wx.Panel, StateHolder):
     """
     A UI from which a user can choose one value for each property.
 
@@ -11,18 +10,10 @@ class BaseSingleProperty(wx.Panel):
     Subclasses must implement the logic.
     """
 
-    def __init__(self, parent: wx.Window):
-        super().__init__(parent)
+    state: BlockState
+
+    def __init__(self, parent: wx.Window, state: BlockState):
+        StateHolder.__init__(self, state)
+        wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
-
-    @property
-    def properties(self) -> PropertyType:
-        """
-        A dictionary mapping string property names to the selected NBT values.
-        """
-        raise NotImplementedError
-
-    @properties.setter
-    def properties(self, properties: PropertyType):
-        raise NotImplementedError
