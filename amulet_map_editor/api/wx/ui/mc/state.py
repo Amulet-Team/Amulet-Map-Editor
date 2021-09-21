@@ -4,8 +4,9 @@ from typing import Callable, List, Dict, Any, Union
 
 import amulet_nbt
 from PyMCTranslate import TranslationManager, Version
+from PyMCTranslate.py3.api.version.translators.block import BlockSpecification
 from amulet.api.data_types import PlatformType, VersionNumberTuple, VersionNumberAny
-from amulet.api.block import PropertyType, PropertyTypeMultiple, Block
+from amulet.api.block import PropertyType, PropertyTypeMultiple, Block, PropertyDataTypes
 from amulet_map_editor import log
 
 
@@ -326,6 +327,10 @@ class BaseResourceIDState(BaseNamespaceState):
     def base_name(self, base_name: str):
         self._set_state(State.BaseName, base_name)
 
+    @property
+    def is_supported(self):
+        return self.base_name in self.valid_base_names
+
 
 class BiomeNamespaceState(BaseNamespaceState):
     @property
@@ -433,9 +438,12 @@ class BlockState(BlockResourceIDState):
             )
 
     def _get_block_spec(self):
-        return self._get_version().block.get_specification(
-            self.namespace, self.base_name, self.force_blockstate
-        )
+        if self.is_supported:
+            return self._get_version().block.get_specification(
+                self.namespace, self.base_name, self.force_blockstate
+            )
+        else:
+            return BlockSpecification({})
 
     @property
     def default_properties(self) -> PropertyType:
@@ -446,19 +454,28 @@ class BlockState(BlockResourceIDState):
         return self._get_block_spec().valid_properties
 
     def _sanitise_properties(self, properties: PropertyType = None) -> PropertyType:
-        valid_properties = self.valid_properties
-        default_properties = self.default_properties
-        if isinstance(properties, dict):
-            return {
-                name: properties[name]
-                if name in properties
-                and isinstance(properties[name], amulet_nbt.BaseValueType)
-                and properties[name] in valid_properties[name]
-                else default_properties[name]
-                for name in valid_properties
-            }
+        if self.is_supported:
+            valid_properties = self.valid_properties
+            default_properties = self.default_properties
+            if isinstance(properties, dict):
+                return {
+                    name: properties[name]
+                    if name in properties
+                    and isinstance(properties[name], PropertyDataTypes)
+                    and properties[name] in valid_properties[name]
+                    else default_properties[name]
+                    for name in valid_properties
+                }
+            else:
+                return default_properties
         else:
-            return default_properties
+            if isinstance(properties, dict):
+                return {
+                    key: val for key, val in properties.items()
+                    if isinstance(val, PropertyDataTypes)
+                }
+            else:
+                return {}
 
     @property
     def properties(self) -> PropertyType:
@@ -471,21 +488,34 @@ class BlockState(BlockResourceIDState):
     def _sanitise_properties_multiple(
         self, properties: PropertyTypeMultiple = None
     ) -> PropertyTypeMultiple:
-        valid_properties = self.valid_properties
-        if isinstance(properties, dict):
-            return {
-                name: tuple(
-                    val
-                    for val in properties[name]
-                    if isinstance(val, amulet_nbt.BaseValueType)
-                    and val in valid_properties[name]
-                )
-                if name in properties and isinstance(properties[name], (list, tuple))
-                else valid_properties[name]
-                for name in valid_properties
-            }
+        if self.is_supported:
+            valid_properties = self.valid_properties
+            if isinstance(properties, dict):
+                return {
+                    name: tuple(
+                        val
+                        for val in properties[name]
+                        if isinstance(val, PropertyDataTypes)
+                        and val in valid_properties[name]
+                    )
+                    if name in properties and isinstance(properties[name], (list, tuple))
+                    else valid_properties[name]
+                    for name in valid_properties
+                }
+            else:
+                return valid_properties
         else:
-            return valid_properties
+            if isinstance(properties, dict):
+                return {
+                    name: tuple(
+                        val
+                        for val in properties[name]
+                        if isinstance(val, PropertyDataTypes)
+                    )
+                    for name in properties
+                }
+            else:
+                return {}
 
     @property
     def properties_multiple(self) -> PropertyTypeMultiple:
