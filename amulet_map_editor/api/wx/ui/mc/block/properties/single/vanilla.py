@@ -34,8 +34,10 @@ class BaseVanillaSingleProperty(BaseSingleProperty):
     def _rebuild_properties(self):
         self.Freeze()
         self._tear_down_properties()
-        for name, choices in self.state.valid_properties.items():
-            self._create_property(name, choices)
+        valid_properties = self.state.valid_properties
+        current_properties = self.state.properties
+        for name in valid_properties:
+            self._create_property(name, valid_properties[name], current_properties[name])
         self.Fit()
         self.Thaw()
 
@@ -54,39 +56,29 @@ class BaseVanillaSingleProperty(BaseSingleProperty):
                 else:
                     raise Exception
 
-    def _update_properties(self):
-        for name, nbt in self.state.properties.items():
-            property_ui = self._properties[name]
-            property_ui.SetSelection(property_ui.SetObject(nbt))
-
-    def _on_state_change(self):
-        if self.state.base_name in self.state.valid_base_names:
-            if self.state.is_changed(State.BaseName):
-                self._rebuild_properties()
-            elif self.state.is_changed(State.Properties):
-                self._update_properties()
-
-    def _on_property_change(self, evt):
-        properties = self._get_ui_properties()
-        if properties != self.state.properties:
-            with self.state as state:
-                state.properties = properties
-
-    def _create_property(self, name: str, choices: Tuple[PropertyValueType]):
+    def _create_property(self, name: str, choices: Tuple[PropertyValueType, ...], default: PropertyValueType = None):
         label = wx.StaticText(self, label=name)
         self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
-        choice = ChoiceRaw(self, choices=[c.to_snbt() for c in choices])
+        choice = ChoiceRaw(self, choices=choices, default=default)
         self._property_sizer.Add(choice, 0, wx.EXPAND)
         choice.Bind(
             wx.EVT_CHOICE,
-            self._on_property_change,
+            lambda evt: self._on_property_change(),
         )
         self._properties[name] = choice
+
+    def _update_properties(self):
+        for name, nbt in self.state.properties.items():
+            property_ui = self._properties[name]
+            property_ui.SetObject(nbt)
 
     def _get_ui_properties(self) -> PropertyType:
         return {
             name: choice.GetCurrentObject() for name, choice in self._properties.items()
         }
+
+    def _if_do_state_change(self) -> bool:
+        return self.state.is_supported
 
 
 class VanillaSingleProperty(BaseVanillaSingleProperty):

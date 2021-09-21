@@ -9,6 +9,7 @@ from .events import SinglePropertiesChangeEvent, EVT_SINGLE_PROPERTIES_CHANGE
 from .vanilla import VanillaSingleProperty
 from .modded import ModdedSingleProperty
 from amulet_map_editor.api.wx.ui.mc.state import State, BlockState
+from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 
 
 class SinglePropertySelect(BasePropertySelect):
@@ -49,9 +50,10 @@ class SinglePropertySelect(BasePropertySelect):
         super().__init__(parent, translation_manager, state=state)
 
         self._vanilla = self._create_automatic()
-        self._sizer.Add(self._vanilla, 1, wx.EXPAND)
+        self._sizer.Add(self._vanilla, 0, wx.EXPAND)
         self._modded = self._create_manual()
-        self._sizer.Add(self._modded, 1, wx.EXPAND)
+        self._sizer.Add(self._modded, 0, wx.EXPAND)
+        self._do_show()
 
     def _create_automatic(self) -> VanillaSingleProperty:
         return VanillaSingleProperty(self, self.state)
@@ -59,11 +61,16 @@ class SinglePropertySelect(BasePropertySelect):
     def _create_manual(self) -> ModdedSingleProperty:
         return ModdedSingleProperty(self, self.state)
 
+    def _do_show(self):
+        vanilla = self.state.is_supported
+        self._vanilla.Show(vanilla)
+        self._modded.Show(not vanilla)
+
     def _on_state_change(self):
         if self.state.is_changed(State.BaseName):
-            vanilla = self.state.base_name in self.state.valid_base_names
-            self._vanilla.Show(vanilla)
-            self._modded.Show(not vanilla)
+            self._do_show()
+        if self.state.is_changed(State.Properties):
+            wx.PostEvent(self, SinglePropertiesChangeEvent(self.state.properties))
 
 
 def demo():
@@ -72,25 +79,8 @@ def demo():
     An app instance must be created first.
     """
     translation_manager = PyMCTranslate.new_translation_manager()
-    for block in (
-        {
-            "namespace": "minecraft",
-            "base_name": "oak_fence",
-            "properties": {
-                "east": amulet_nbt.TAG_String("false"),
-                "north": amulet_nbt.TAG_String("true"),
-                "south": amulet_nbt.TAG_String("false"),
-                "west": amulet_nbt.TAG_String("false"),
-            },
-        },
-        {
-            "namespace": "modded",
-            "base_name": "block",
-            "properties": {
-                "test": amulet_nbt.TAG_String("hello"),
-            },
-        },
-    ):
+
+    def create_dialog(block):
         dialog = wx.Dialog(
             None,
             title=f"SinglePropertySelect with block {block['namespace']}:{block['base_name']}",
@@ -118,12 +108,35 @@ def demo():
 
         obj.Bind(EVT_SINGLE_PROPERTIES_CHANGE, on_change)
 
-        def get_on_close(dialog_):
-            def on_close(evt):
-                dialog_.Destroy()
+        def on_close(evt):
+            dialog.Destroy()
 
-            return on_close
+        def on_child_size(evt):
+            dialog.Layout()
+            evt.Skip()
 
-        dialog.Bind(wx.EVT_CLOSE, get_on_close(dialog))
+        dialog.Bind(wx.EVT_CLOSE, on_close)
+        dialog.Bind(EVT_CHILD_SIZE, on_child_size)
         dialog.Show()
         dialog.Fit()
+
+    for block_ in (
+        {
+            "namespace": "minecraft",
+            "base_name": "oak_fence",
+            "properties": {
+                "east": amulet_nbt.TAG_String("false"),
+                "north": amulet_nbt.TAG_String("true"),
+                "south": amulet_nbt.TAG_String("false"),
+                "west": amulet_nbt.TAG_String("false"),
+            },
+        },
+        {
+            "namespace": "modded",
+            "base_name": "block",
+            "properties": {
+                "test": amulet_nbt.TAG_String("hello"),
+            },
+        },
+    ):
+        create_dialog(block_)

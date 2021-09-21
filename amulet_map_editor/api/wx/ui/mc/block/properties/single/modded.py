@@ -1,21 +1,27 @@
 import wx
-from typing import Tuple, Dict
+from typing import Dict
+from collections import namedtuple
 
 import amulet_nbt
 from amulet_nbt import SNBTType
 from amulet.api.block import PropertyDataTypes, PropertyType
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 from amulet_map_editor.api.wx.ui.mc.state import BlockState
-from .events import SinglePropertiesChangeEvent
+from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
 from .base import BaseSingleProperty
 
+PropertyStorage = namedtuple("PropertyStorage", ("sizer", "key_entry", "value_entry", "snbt_text"))
 
-class ModdedSingleProperty(BaseSingleProperty):
+
+class BaseModdedSingleProperty(BaseSingleProperty):
     """
     A UI from which a user can choose one value for each property.
 
     This is used when the block is not know so the user can define the properties themselves.
     """
+
+    state: BlockState
+    _properties: Dict[int, PropertyStorage]
 
     def __init__(self, parent: wx.Window, state: BlockState):
         super().__init__(parent, state)
@@ -38,15 +44,28 @@ class ModdedSingleProperty(BaseSingleProperty):
             self._property_sizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
         )
 
-        add_button.Bind(wx.EVT_BUTTON, lambda evt: self._add_property())
+        add_button.Bind(wx.EVT_BUTTON, self._on_add_property)
 
-        self._property_index = 0
-        self._properties: Dict[int, Tuple[wx.TextCtrl, wx.TextCtrl]] = {}
+        self._property_id = 0
+        self._properties = {}
 
-    def _post_property_change(self):
-        wx.PostEvent(self, SinglePropertiesChangeEvent(self.properties))
+    def _resize(self):
+        wx.PostEvent(self, ChildSizeEvent(0))
 
-    def _add_property(self, name: str = "", value: SNBTType = ""):
+    def _rebuild_properties(self):
+        self.Freeze()
+        self._tear_down_properties()
+        for name, prop in self.state.properties.items():
+            self._create_property(name, prop.to_snbt())
+        self.Fit()
+        self.Thaw()
+
+    def _tear_down_properties(self):
+        self._property_sizer.Clear(True)
+        self._properties.clear()
+        self._property_id = 0
+
+    def _create_property(self, name: str = "", value: SNBTType = ""):
         """
         Add a property to the UI with the given data.
 
@@ -54,39 +73,60 @@ class ModdedSingleProperty(BaseSingleProperty):
         :param value: The SNBT text of the value for that property.
         :return:
         """
-        self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._property_index += 1
+        self._property_id += 1
         subtract_button = wx.BitmapButton(
             self, bitmap=SUBTRACT_ICON.bitmap(30, 30), size=(30, 30)
         )
         sizer.Add(subtract_button, 0, wx.ALIGN_CENTER_VERTICAL)
-        index = self._property_index
+        property_id = self._property_id
         subtract_button.Bind(
-            wx.EVT_BUTTON, lambda evt: self._on_remove_property(sizer, index)
+            wx.EVT_BUTTON, lambda evt: self._on_remove_property(property_id)
         )
         name_entry = wx.TextCtrl(self, value=name, style=wx.TE_CENTER)
         sizer.Add(name_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
-        name_entry.Bind(wx.EVT_TEXT, lambda evt: self._post_property_change())
+        name_entry.Bind(wx.EVT_TEXT, self._on_key_change)
         value_entry = wx.TextCtrl(self, value=value, style=wx.TE_CENTER)
         sizer.Add(value_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         snbt_text = wx.StaticText(self, style=wx.ALIGN_CENTER)
         sizer.Add(snbt_text, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
-        self._change_value(value, snbt_text)
-        value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, snbt_text))
+        self._change_snbt_text(value, snbt_text)
+        value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, property_id))
 
         self._property_sizer.Add(sizer, 1, wx.TOP | wx.EXPAND, 5)
-        self._properties[self._property_index] = (name_entry, value_entry)
-        self.Fit()
-        self.TopLevelParent.Layout()
-        self.Thaw()
+        self._properties[self._property_id] = PropertyStorage(sizer, name_entry, value_entry, snbt_text)
+        self.Layout()
+        self._resize()
 
-    def _on_value_change(self, evt, snbt_text: wx.StaticText):
-        self._change_value(evt.GetString(), snbt_text)
-        self._post_property_change()
+    def _update_properties(self):
+        if self.state.properties != self._get_ui_properties():
+            self._rebuild_properties()
+
+    def _get_ui_properties(self) -> PropertyType:
+        properties = {}
+        for prop in self._properties.values():
+            try:
+                nbt = amulet_nbt.from_snbt(prop.value_entry.GetValue())
+            except:
+                continue
+            name: str = prop.key_entry.GetValue()
+            if name and isinstance(nbt, PropertyDataTypes):
+                properties[name] = nbt
+        return properties
+
+    def _if_do_state_change(self) -> bool:
+        return not self.state.is_supported
+
+    def _on_key_change(self, evt):
+        wx.CallAfter(self._on_property_change)
         evt.Skip()
 
-    def _change_value(self, snbt: SNBTType, snbt_text: wx.StaticText):
+    def _on_value_change(self, evt, property_id: int):
+        self._change_snbt_text(evt.GetString(), self._properties[property_id].snbt_text)
+        wx.CallAfter(self._on_property_change)
+        evt.Skip()
+
+    def _change_snbt_text(self, snbt: SNBTType, snbt_text: wx.StaticText):
         try:
             nbt = amulet_nbt.from_snbt(snbt)
         except:
@@ -101,32 +141,20 @@ class ModdedSingleProperty(BaseSingleProperty):
                 snbt_text.SetBackgroundColour((255, 200, 200))
         self.Layout()
 
-    def _on_remove_property(self, sizer: wx.Sizer, key: int):
-        self.Freeze()
-        self._property_sizer.Detach(sizer)
-        sizer.Clear(True)
-        del self._properties[key]
-        self.TopLevelParent.Layout()
-        self.Thaw()
-        self._post_property_change()
+    def _on_add_property(self, evt):
+        self._create_property()
+        self._on_property_change()
 
-    @property
-    def properties(self) -> PropertyType:
-        properties = {}
-        for name_ui, value_ui in self._properties.values():
-            try:
-                nbt = amulet_nbt.from_snbt(value_ui.GetValue())
-            except:
-                continue
-            name: str = name_ui.GetValue()
-            if name and isinstance(nbt, PropertyDataTypes):
-                properties[name] = nbt
-        return properties
+    def _on_remove_property(self, property_id: int):
+        property_state = self._properties.pop(property_id)
+        self._property_sizer.Detach(property_state.sizer)
+        property_state.sizer.Clear(True)
+        self.Layout()
+        self._resize()
+        self._on_property_change()
 
-    @properties.setter
-    def properties(self, properties: PropertyType):
-        self._property_sizer.Clear(True)
-        self._properties.clear()
-        self._property_index = 0
-        for name, value in properties.items():
-            self._add_property(name, value.to_snbt())
+
+class ModdedSingleProperty(BaseModdedSingleProperty):
+    def __init__(self, parent: wx.Window, state: BlockState):
+        super().__init__(parent, state)
+        self._rebuild_properties()
