@@ -1,6 +1,7 @@
 import wx
 from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
 from types import GeneratorType
+import inspect
 
 from .base_edit_canvas import BaseEditCanvas
 from ...edit import EDIT_CONFIG_ID
@@ -94,6 +95,7 @@ class EditCanvas(BaseEditCanvas):
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
         self.buttons.register_actions(self.key_binds)
+        self._operation_running = False
 
     def _setup(self) -> Generator[OperationYieldType, None, None]:
         yield from super()._setup()
@@ -157,6 +159,24 @@ class EditCanvas(BaseEditCanvas):
         msg="Running Operation",
         throw_exceptions=False,
     ) -> Any:
+        if self._operation_running:
+            for frame_info in inspect.stack()[1:]:
+                # Compacted from this example
+                # https://stackoverflow.com/questions/54656758/get-function-object-from-stack-frame-object
+                frame = frame_info.frame
+                codename = frame.f_code.co_name
+                if "self" in frame.f_locals:
+                    fobj = getattr(frame.f_locals["self"].__class__, codename)
+                    if fobj == EditCanvas.run_operation:
+                        raise Exception(
+                            "run_operation cannot be called from within itself. "
+                            "This function has already been called by parent code so you do not need to run it again"
+                        )
+            raise Exception(
+                "An operation is already being run. Please wait for it to finish before running another one."
+            )
+        self._operation_running = True
+
         def operation_wrapper():
             yield 0, "Disabling Threads"
             self.renderer.disable_threads()
@@ -207,6 +227,7 @@ class EditCanvas(BaseEditCanvas):
 
         self.renderer.enable_threads()
         self.renderer.render_world.rebuild_changed()
+        self._operation_running = False
         if err is not None and throw_exceptions:
             raise err
         return out
