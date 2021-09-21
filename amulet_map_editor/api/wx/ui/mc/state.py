@@ -6,7 +6,12 @@ import amulet_nbt
 from PyMCTranslate import TranslationManager, Version
 from PyMCTranslate.py3.api.version.translators.block import BlockSpecification
 from amulet.api.data_types import PlatformType, VersionNumberTuple, VersionNumberAny
-from amulet.api.block import PropertyType, PropertyTypeMultiple, Block, PropertyDataTypes
+from amulet.api.block import (
+    PropertyType,
+    PropertyTypeMultiple,
+    Block,
+    PropertyDataTypes,
+)
 from amulet_map_editor import log
 
 
@@ -471,7 +476,8 @@ class BlockState(BlockResourceIDState):
         else:
             if isinstance(properties, dict):
                 return {
-                    key: val for key, val in properties.items()
+                    key: val
+                    for key, val in properties.items()
                     if isinstance(val, PropertyDataTypes)
                 }
             else:
@@ -498,7 +504,8 @@ class BlockState(BlockResourceIDState):
                         if isinstance(val, PropertyDataTypes)
                         and val in valid_properties[name]
                     )
-                    if name in properties and isinstance(properties[name], (list, tuple))
+                    if name in properties
+                    and isinstance(properties[name], (list, tuple))
                     else valid_properties[name]
                     for name in valid_properties
                 }

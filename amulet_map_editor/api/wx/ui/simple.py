@@ -84,7 +84,13 @@ class ChoiceRaw(wx.Choice):
     """
 
     def __init__(
-        self, parent: wx.Window, *, choices: ChoicesType = (), default: Any = None, sort=True, reverse=False
+        self,
+        parent: wx.Window,
+        *,
+        choices: ChoicesType = (),
+        default: Any = None,
+        sort=True,
+        reverse=False
     ):
         super().__init__(parent)
         self._values: List[Any] = []  # the data hidden behind the string

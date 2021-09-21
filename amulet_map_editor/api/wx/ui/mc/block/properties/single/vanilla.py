@@ -37,7 +37,9 @@ class BaseVanillaSingleProperty(BaseSingleProperty):
         valid_properties = self.state.valid_properties
         current_properties = self.state.properties
         for name in valid_properties:
-            self._create_property(name, valid_properties[name], current_properties[name])
+            self._create_property(
+                name, valid_properties[name], current_properties[name]
+            )
         self.Fit()
         self.Thaw()
 
@@ -56,7 +58,12 @@ class BaseVanillaSingleProperty(BaseSingleProperty):
                 else:
                     raise Exception
 
-    def _create_property(self, name: str, choices: Tuple[PropertyValueType, ...], default: PropertyValueType = None):
+    def _create_property(
+        self,
+        name: str,
+        choices: Tuple[PropertyValueType, ...],
+        default: PropertyValueType = None,
+    ):
         label = wx.StaticText(self, label=name)
         self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
         choice = ChoiceRaw(self, choices=choices, default=default)

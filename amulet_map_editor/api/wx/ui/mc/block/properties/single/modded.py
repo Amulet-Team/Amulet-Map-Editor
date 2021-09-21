@@ -10,7 +10,9 @@ from amulet_map_editor.api.wx.ui.mc.state import BlockState
 from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
 from .base import BaseSingleProperty
 
-PropertyStorage = namedtuple("PropertyStorage", ("sizer", "key_entry", "value_entry", "snbt_text"))
+PropertyStorage = namedtuple(
+    "PropertyStorage", ("sizer", "key_entry", "value_entry", "snbt_text")
+)
 
 
 class BaseModdedSingleProperty(BaseSingleProperty):
@@ -91,10 +93,14 @@ class BaseModdedSingleProperty(BaseSingleProperty):
         snbt_text = wx.StaticText(self, style=wx.ALIGN_CENTER)
         sizer.Add(snbt_text, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         self._change_snbt_text(value, snbt_text)
-        value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, property_id))
+        value_entry.Bind(
+            wx.EVT_TEXT, lambda evt: self._on_value_change(evt, property_id)
+        )
 
         self._property_sizer.Add(sizer, 1, wx.TOP | wx.EXPAND, 5)
-        self._properties[self._property_id] = PropertyStorage(sizer, name_entry, value_entry, snbt_text)
+        self._properties[self._property_id] = PropertyStorage(
+            sizer, name_entry, value_entry, snbt_text
+        )
         self.Layout()
         self._resize()
 
