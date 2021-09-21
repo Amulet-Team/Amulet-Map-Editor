@@ -84,7 +84,7 @@ class ChoiceRaw(wx.Choice):
     """
 
     def __init__(
-        self, parent: wx.Window, *, choices: ChoicesType = (), sort=True, reverse=False
+        self, parent: wx.Window, *, choices: ChoicesType = (), default: Any = None, sort=True, reverse=False
     ):
         super().__init__(parent)
         self._values: List[Any] = []  # the data hidden behind the string
@@ -93,6 +93,7 @@ class ChoiceRaw(wx.Choice):
         self._reverse = reverse
         if choices:
             self.SetItems(choices)
+            self.SetObject(default)
 
     @property
     def keys(self) -> Tuple[str, ...]:
@@ -152,17 +153,22 @@ class ChoiceRaw(wx.Choice):
                 else:
                     item = (item, str(item))
                 items_.append(item)
+            items = items_
         self._set_items(items, default)
 
     def SetObject(self, obj: Any):
         """Set the selected item from the data hidden behind the text."""
         if obj in self._values:
             self.SetSelection(self._values.index(obj))
+        elif self.GetCurrentSelection() == wx.NOT_FOUND and self._values:
+            self.SetSelection(0)
 
     def SetValue(self, key: Any):
         """Set the selected item based on the text in the choice."""
         if key in self._keys:
             self.SetSelection(self._keys.index(key))
+        elif self.GetCurrentSelection() == wx.NOT_FOUND and self._values:
+            self.SetSelection(0)
 
     def GetCurrentObject(self) -> Optional[Any]:
         """Return the value currently selected in the form before it was converted to a string"""
