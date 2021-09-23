@@ -84,7 +84,9 @@ class Version:
                 elif self.release_stage == Release.BETA:
                     if self.beta_number > other.beta_number:
                         return True
-                    elif self.beta_number == other.beta_number and self.beta_number != -1:
+                    elif (
+                        self.beta_number == other.beta_number and self.beta_number != -1
+                    ):
                         return self.nightly_timestamp > other.nightly_timestamp
         return False
 
