@@ -75,16 +75,17 @@ class Version:
     def __gt__(self, other: Version):
         if self.version_tuple > other.version_tuple:
             return True
-        if self.release_stage > other.release_stage:
-            return True
-        if self.release_stage == other.release_stage:
-            if self.release_stage == Release.ALPHA:
-                return self.alpha_number > other.alpha_number
-            elif self.release_stage == Release.BETA:
-                if self.beta_number > other.beta_number:
-                    return True
-                elif self.beta_number == other.beta_number and self.beta_number != -1:
-                    return self.nightly_timestamp > other.nightly_timestamp
+        elif self.version_tuple == other.version_tuple:
+            if self.release_stage > other.release_stage:
+                return True
+            elif self.release_stage == other.release_stage:
+                if self.release_stage == Release.ALPHA:
+                    return self.alpha_number > other.alpha_number
+                elif self.release_stage == Release.BETA:
+                    if self.beta_number > other.beta_number:
+                        return True
+                    elif self.beta_number == other.beta_number and self.beta_number != -1:
+                        return self.nightly_timestamp > other.nightly_timestamp
         return False
 
     @property
