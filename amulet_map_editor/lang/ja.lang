@@ -62,7 +62,7 @@ update_check.ok=OK
 ## 開くワールドを選択するときの画面
 select_world.title=ワールドを選択
 select_world.open_world_warning=Amuletでワールドの開く前にゲームなどのツールではワールドを閉じてください
-select_world.open_world_button=フォルダから開く
+select_world.open_world_button=フォルダーを開く
 select_world.open_world_dialogue=ワールドディレクトリを選択
 select_world.select_directory_failed=ディレクトリのオープンに失敗しました。
 select_world.recent_worlds=最近開いたワールド
@@ -91,7 +91,7 @@ program_convert.menu_bar.help.user_guide=オンラインユーザーガイド
 
 # 3Dエディタ
 ## 3Dビューアでワールドを編集するためのプログラムです。
-program_3d_edit.tab_name=3D エディタ
+program_3d_edit.tab_name=3Dエディター
 
 ## キャンバス
 program_3d_edit.canvas.please_wait=レンダラーがロードされるまでお待ちください
@@ -102,7 +102,7 @@ program_3d_edit.canvas.java_rp_failed_default=インターネットの接続状�
 program_3d_edit.canvas.java_rp_failed_mac_certificates=インターネットにアクセスするための証明書がインストールされていません。"Applications/Python 3.x"にある「Install Certificates.command」を実行してください。
 program_3d_edit.canvas.loading_resource_packs=リソースパックの読み込み中...
 program_3d_edit.canvas.creating_texture_atlas=テクスチャアトラスの作成中...
-program_3d_edit.canvas.setting_up_renderer=レンダラの設定中...
+program_3d_edit.canvas.setting_up_renderer=レンダラーの設定中...
 
 ## メニューバー
 program_3d_edit.menu_bar.file.save=保存
