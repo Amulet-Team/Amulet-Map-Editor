@@ -46,7 +46,7 @@ if os.environ.get("BUILD_MODE") == "BAKE":
         import json
         import urllib.request
         import re
-        from amulet_map_editor.api.framework.update_check import Version
+        from amulet_map_editor.api.version import Version
 
         first_party = {
             "amulet-core",
@@ -100,7 +100,7 @@ if os.environ.get("BUILD_MODE") == "BAKE":
 
         fix_requirements()
     except Exception as e:
-        print(e)
+        print("Failed to bake versions:", e)
 
 if next(glob.iglob("amulet_map_editor/**/*.pyx", recursive=True), None):
     # This throws an error if it does not match any files
