@@ -34,8 +34,9 @@ jobs:
         pip install setuptools wheel twine pyinstaller==4.2 build
 
     - name: Setup
+      env:
+        BUILD_MODE: BAKE
       run: |
-        export BUILD_MODE="BAKE"
         python -m build
         python -m pip install dist/amulet_map_editor-*.whl
 
