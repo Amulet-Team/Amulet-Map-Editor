@@ -7,6 +7,7 @@ import re
 import webbrowser
 from dataclasses import dataclass
 from enum import IntEnum
+from typing import Tuple
 
 import wx
 
@@ -48,7 +49,7 @@ VERSION_REGEX Documentation
     - ".dirty" denotes whether uncommitted changes have been made 
 """
 VERSION_REGEX = re.compile(
-    r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?((a(?P<alpha>\d+))|(b(?P<beta>\d+)))?(\.dev(?P<devnum>\d{12}))?(\+(?P<commit_count>\d+)\.g(?P<commit_hash>[a-z\d]+)(\.dirty)?)?$"
+    r"^v?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<bug_fix>\d+))?((a(?P<alpha>\d+))|(b(?P<beta>\d+)))?(\.dev(?P<devnum>\d{12}))?(\+(?P<commit_count>\d+)\.g(?P<commit_hash>[a-z\d]+)(\.dirty)?)?$"
 )
 
 _EVT_UPDATE_CHECK = wx.NewEventType()
@@ -67,6 +68,7 @@ class Version:
     major: int
     minor: int
     patch: int
+    bug_fix: int = -1  # Don't use this.
     alpha_number: int = -1
     beta_number: int = -1
     nightly_timestamp: int = -1
@@ -89,6 +91,8 @@ class Version:
                 patch = int(v["patch"])
             version = cls(Release.FULL, major, minor, patch)
 
+            if v.get("bug_fix") is not None:
+                version.bug_fix = int(v["bug_fix"])
             if v.get("alpha") is not None:
                 version.release_stage = Release.ALPHA
                 version.alpha_number = int(v["alpha"])
@@ -122,9 +126,29 @@ class Version:
                         return self.nightly_timestamp > other.nightly_timestamp
         return False
 
+    def __ge__(self, other: Version):
+        return self > other or self == other
+
     @property
-    def version_tuple(self):
+    def version_triplet(self) -> Tuple[int, int, int]:
         return self.major, self.minor, self.patch
+
+    @property
+    def version_tuple(self) -> Tuple[int, ...]:
+        if self.bug_fix >= 0:
+            return self.major, self.minor, self.patch, self.bug_fix
+        else:
+            return self.major, self.minor, self.patch
+
+    def __str__(self):
+        v = ".".join(str(n) for n in self.version_tuple)
+        if self.release_stage == Release.ALPHA:
+            v += f"a{self.alpha_number}"
+        elif self.release_stage == Release.BETA:
+            v += f"b{self.beta_number}"
+        if self.nightly_timestamp >= 0:
+            v += f".dev{self.nightly_timestamp}"
+        return v
 
 
 class UpdateEvent(wx.PyCommandEvent):
