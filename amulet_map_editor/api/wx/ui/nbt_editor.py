@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import sys
 from collections.abc import MutableMapping, MutableSequence
 from copy import copy, deepcopy
 from functools import partial
@@ -96,7 +95,8 @@ class ParsedNBTValue(ParsedNBT):
         return f"{self._name}: {self._value}" if self._name else f"{self._value}"
 
     def remove(self):
-        self._parent.remove_child(self)
+        if self._parent:
+            self._parent.remove_child(self)
 
     def update(self, name: str, value: Union[int, float, str]):
         self._name = name
@@ -284,14 +284,15 @@ class NBTEditor(simple.SimplePanel):
 
     def _add_tag(self):
         parent_element = self.tree.GetFocusedItem()
-        parent_tag = self.tree.GetItemData(parent_element)
+        parent_tag: ParsedNBTContainer = self.tree.GetItemData(parent_element)
 
         def save_callback(new_tag):
             new_tag.parent = parent_tag
             parent_tag.add_child(new_tag)
 
-            self.tree.DeleteChildren(parent_element)
-            self._build_tree(parent_element, parent_tag)
+            parent_parent = self.tree.GetItemParent(parent_element)
+            self.tree.Delete(parent_element)
+            self._build_tree(parent_parent, parent_tag)
             self.tree.SetItemText(parent_element, parent_tag.display())
 
         add_dialog = NewTagDialog(
@@ -302,6 +303,7 @@ class NBTEditor(simple.SimplePanel):
                 if "TAG_" in tag_type.__name__
             ),
             save_callback,
+            is_in_list=parent_tag.tag_type is nbt.TAG_List,
         )
         add_dialog.Show()
 
@@ -315,7 +317,7 @@ class NBTEditor(simple.SimplePanel):
 
             if parsed_tag.parent is not None:
                 parent_tag = parsed_tag.parent
-                while parsed_tag.parent is not None:
+                while parent_tag.parent is not None:
                     parent_tag = parent_tag.parent
                 build_tag = parent_tag
 
@@ -325,7 +327,7 @@ class NBTEditor(simple.SimplePanel):
         edit_dialog = EditTagDialog(
             self,
             parsed_tag,
-            disable_name_field=(parsed_tag.tag_type is nbt.TAG_List),
+            disable_name_field=(parsed_tag.parent.tag_type is nbt.TAG_List),
             callback=save_callback,
         )
         edit_dialog.Show()
@@ -373,10 +375,11 @@ class NewTagDialog(wx.Frame):
     GRID_ROWS = 3
     GRID_COLUMNS = 4
 
-    def __init__(self, parent, tag_types=None, callback=None):
+    def __init__(self, parent, tag_types=None, callback=None, is_in_list=False):
         super(NewTagDialog, self).__init__(parent, title="Add NBT Tag", size=(500, 280))
 
         self.callback = callback
+        self._is_in_list = is_in_list
 
         main_panel = simple.SimplePanel(self)
 
@@ -387,6 +390,7 @@ class NewTagDialog(wx.Frame):
 
         name_label = wx.StaticText(name_panel, label="Name: ")
         self.name_field = wx.TextCtrl(name_panel)
+        self.name_field.Enable(not self._is_in_list)
 
         name_panel.add_object(name_label, space=0, options=wx.ALL | wx.CENTER)
         name_panel.add_object(self.name_field, space=1, options=wx.ALL | wx.EXPAND)
@@ -455,7 +459,7 @@ class NewTagDialog(wx.Frame):
         tag_type = getattr(nbt, selected_type)
 
         tag_name = self.name_field.GetValue()
-        if not tag_name:
+        if not tag_name and not self._is_in_list:
             wx.MessageBox("A tag name must be specified", "Tag Name Error", wx.OK)
             return
 
@@ -511,6 +515,7 @@ class EditTagDialog(wx.Frame):
 
         name_label = wx.StaticText(name_panel, label="Name: ")
         self.name_field = wx.TextCtrl(name_panel, value=tag.name)
+        self.name_field.Enable(not disable_name_field)
 
         name_panel.add_object(name_label, space=0, options=wx.ALL | wx.CENTER)
         name_panel.add_object(self.name_field, space=1, options=wx.ALL | wx.EXPAND)
@@ -541,9 +546,6 @@ class EditTagDialog(wx.Frame):
 
         if tag.tag_type in (nbt.TAG_List, nbt.TAG_Compound):
             self.value_field.Disable()
-
-        if disable_name_field:
-            self.name_field.Disable()
 
     def _save(self, _):
         tag_type = self.tag.tag_type
