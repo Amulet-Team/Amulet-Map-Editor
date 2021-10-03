@@ -1,12 +1,11 @@
 import wx
-from typing import Tuple, Iterable, Optional
-
-from amulet.api.block import PropertyValueType
-import amulet_nbt
+from typing import Tuple, Iterable, Optional, Sequence
 
 
 class PropertyValueCheckList(wx.Panel):
-    def __init__(self, parent: wx.Window, values: Iterable[str]):
+    def __init__(
+        self, parent: wx.Window, values: Iterable[str], selected: Iterable[bool]
+    ):
         super().__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
@@ -14,43 +13,17 @@ class PropertyValueCheckList(wx.Panel):
         self._toggle_checkbox.Set3StateValue(wx.CHK_CHECKED)
         sizer.Add(self._toggle_checkbox, 0, wx.ALL, 3)
         self._check_list_box = wx.CheckListBox(self, choices=values)
-        self._check_list_box.SetCheckedStrings(values)
+        self._check_list_box.SetCheckedStrings(
+            [value for value, select in zip(values, selected) if select]
+        )
         sizer.Add(self._check_list_box, 0)
 
         self._toggle_checkbox.Bind(wx.EVT_CHECKBOX, self._on_toggle)
         self._check_list_box.Bind(wx.EVT_LEFT_DOWN, self._on_left_down)
 
     @property
-    def checked_snbt(self) -> Tuple[str, ...]:
-        return self._check_list_box.GetCheckedStrings()
-
-    @checked_snbt.setter
-    def checked_snbt(self, checked_snbt: Iterable[str]):
-        self._check_list_box.SetCheckedStrings(checked_snbt)
-
-    @property
-    def checked_nbt(self) -> Tuple[PropertyValueType, ...]:
-        nbt = []
-        for entry in self._check_list_box.GetCheckedStrings():
-            try:
-                nbt.append(amulet_nbt.from_snbt(entry))
-            except:
-                pass
-        return tuple(nbt)
-
-    @checked_nbt.setter
-    def checked_nbt(self, checked_nbt: Iterable[PropertyValueType]):
-        self._check_list_box.SetCheckedStrings([v.to_snbt() for v in checked_nbt])
-
-    @property
-    def all_nbt(self) -> Tuple[PropertyValueType, ...]:
-        nbt = []
-        for entry in self._check_list_box.GetStrings():
-            try:
-                nbt.append(amulet_nbt.from_snbt(entry))
-            except:
-                pass
-        return tuple(nbt)
+    def check_list_box(self) -> wx.CheckListBox:
+        return self._check_list_box
 
     def _on_toggle(self, evt):
         if self._toggle_checkbox.GetValue():
@@ -60,7 +33,7 @@ class PropertyValueCheckList(wx.Panel):
         else:
             self._check_list_box.SetCheckedItems([])
 
-    def _update_check(self):
+    def update_check(self):
         items = self._check_list_box.GetCheckedItems()
         if len(items) == self._check_list_box.GetCount():
             self._toggle_checkbox.Set3StateValue(wx.CHK_CHECKED)
@@ -76,36 +49,41 @@ class PropertyValueCheckList(wx.Panel):
             self._check_list_box.Check(
                 item, check=not self._check_list_box.IsChecked(item)
             )
-            self._update_check()
+            self.update_check()
 
 
 class PropertyValueComboPopup(wx.ComboPopup):
-    def __init__(self, values: Iterable[str]):
+    def __init__(self, values: Iterable[str], selected: Iterable[bool]):
         super().__init__()
         self._check_list: Optional[PropertyValueCheckList] = None
-        self._values = values
+        self._state = values, selected
 
     @property
-    def all_nbt(self) -> Tuple[PropertyValueType, ...]:
-        return self._check_list.all_nbt
+    def _check_list_box(self) -> wx.CheckListBox:
+        return self._check_list.check_list_box
 
-    @property
-    def checked_nbt(self) -> Tuple[PropertyValueType, ...]:
-        return self._check_list.checked_nbt
+    def GetCheckedStrings(self) -> Tuple[str]:
+        return self._check_list_box.GetCheckedStrings()
 
-    @checked_nbt.setter
-    def checked_nbt(self, checked_nbt: Iterable[PropertyValueType]):
-        self._check_list.checked_nbt = checked_nbt
+    def SetCheckedStrings(self, strings: Sequence[str]):
+        self._check_list_box.SetCheckedStrings(strings)
+        self._check_list.update_check()
+
+    def GetItems(self) -> Tuple[str]:
+        return self._check_list_box.GetItems()
+
+    def SetItems(self, strings: Sequence[str]):
+        self._check_list_box.SetItems(strings)
 
     def Create(self, parent):
-        self._check_list = PropertyValueCheckList(parent, self._values)
+        self._check_list = PropertyValueCheckList(parent, *self._state)
         return True
 
     def GetControl(self):
         return self._check_list
 
     def GetStringValue(self):
-        return "|".join(self._check_list.checked_snbt)
+        return "|".join(self.GetCheckedStrings())
 
     def GetAdjustedSize(self, minWidth, prefHeight, maxHeight):
         self.GetControl().Fit()

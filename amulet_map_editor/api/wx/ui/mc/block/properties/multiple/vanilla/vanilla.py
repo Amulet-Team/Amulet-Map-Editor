@@ -1,15 +1,24 @@
 import wx
 from typing import Dict, Tuple
 
-from amulet.api.block import PropertyTypeMultiple, PropertyDataTypes
-from ..events import MultiplePropertiesChangeEvent
+import amulet_nbt
+from amulet.api.block import PropertyTypeMultiple, PropertyValueType
+from amulet_map_editor.api.wx.ui.mc.state import BlockState
 from ..base import BaseMultipleProperty
 from .popup import PropertyValueComboPopup
 
 
-class VanillaMultipleProperty(BaseMultipleProperty):
-    def __init__(self, parent: wx.Window):
-        super().__init__(parent)
+class BaseVanillaMultipleProperty(BaseMultipleProperty):
+    """
+    A UI from which a user can choose zero or more values for each property.
+
+    The UI is automatically populated from the given specification.
+    """
+
+    state: BlockState
+
+    def __init__(self, parent: wx.Window, state: BlockState):
+        super().__init__(parent, state)
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
@@ -25,75 +34,64 @@ class VanillaMultipleProperty(BaseMultipleProperty):
         self._states: PropertyTypeMultiple = {}
         self._properties: Dict[str, Tuple[wx.ComboCtrl, PropertyValueComboPopup]] = {}
 
-    @property
-    def all_properties(self) -> PropertyTypeMultiple:
-        return self._states
-
-    @all_properties.setter
-    def all_properties(self, all_properties: PropertyTypeMultiple):
-        self._states = {}
-        for key, choices in all_properties.items():
-            if isinstance(key, str):
-                valid_choices = tuple(
-                    choice
-                    for choice in choices
-                    if isinstance(choice, PropertyDataTypes)
-                )
-                if valid_choices:
-                    self._states[key] = valid_choices
+    def _rebuild_properties(self):
         self.Freeze()
+        self._tear_down_properties()
+        valid_properties = self.state.valid_properties
+        current_properties = self.state.properties_multiple
+        for name in valid_properties:
+            self._create_property(
+                name, valid_properties[name], current_properties[name]
+            )
+        self.Fit()
+        self.Thaw()
+
+    def _tear_down_properties(self):
         self._properties.clear()
         self._property_sizer.Clear(True)
 
-        props = {}
-        for name, choices in self._states.items():
-            label = wx.StaticText(self, label=name)
-            self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
+    def _create_property(
+        self,
+        name: str,
+        choices: Tuple[PropertyValueType, ...],
+        selected: Tuple[PropertyValueType, ...] = None,
+    ):
+        label = wx.StaticText(self, label=name)
+        self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
 
-            def create_choice():
-                choice = wx.ComboCtrl(self, style=wx.CB_READONLY)
-                popup = PropertyValueComboPopup([c.to_snbt() for c in choices])
-                choice.SetPopupControl(popup)
-                choice.SetValue(popup.GetStringValue())
+        choice = wx.ComboCtrl(self, style=wx.CB_READONLY)
+        if selected is None:
+            selected = [bool] * len(choices)
+        else:
+            selected = [c in choices for c in selected]
+        popup = PropertyValueComboPopup([c.to_snbt() for c in choices], selected)
+        choice.SetPopupControl(popup)
+        choice.SetValue(popup.GetStringValue())
+        self._property_sizer.Add(choice, 0, wx.EXPAND)
 
-                self._property_sizer.Add(choice, 0, wx.EXPAND)
+        def on_closeup(evt):
+            choice.SetValue(popup.GetStringValue())
+            self._on_property_change()
 
-                def on_close(evt):
-                    choice.SetValue(popup.GetStringValue())
-                    wx.PostEvent(
-                        self,
-                        MultiplePropertiesChangeEvent(self.selected_properties),
-                    )
+        choice.Bind(wx.EVT_COMBOBOX_CLOSEUP, on_closeup)
+        self._properties[name] = (choice, popup)
 
-                choice.Bind(
-                    wx.EVT_COMBOBOX_CLOSEUP,
-                    on_close,
-                )
-                self._properties[name] = (choice, popup)
+    def _update_properties(self):
+        for name, choices in self.state.properties_multiple.items():
+            property_ui = self._properties[name][1]
+            property_ui.SetCheckedStrings([c.to_snbt() for c in choices])
 
-            create_choice()
-            props[name] = choices
-        self.selected_properties = props
-        self.Fit()
-        self.GetTopLevelParent().Layout()
-        self.Thaw()
-
-    @property
-    def selected_properties(self) -> PropertyTypeMultiple:
-        """
-        The values that are checked for each property.
-        This UI can have more than one property value checked (ticked).
-        """
+    def _get_ui_properties_multiple(self) -> PropertyTypeMultiple:
         return {
-            prop: popup.checked_nbt for prop, (_, popup) in self._properties.items()
+            prop: tuple(amulet_nbt.from_snbt(v) for v in popup.GetCheckedStrings())
+            for prop, (_, popup) in self._properties.items()
         }
 
-    @selected_properties.setter
-    def selected_properties(self, properties: PropertyTypeMultiple):
-        self.Freeze()
-        for name, nbt_tuple in properties.items():
-            if name in self._properties:
-                choice, popup = self._properties[name]
-                popup.checked_nbt = nbt_tuple
-                choice.SetValue(popup.GetStringValue())
-        self.Thaw()
+    def _if_do_state_change(self) -> bool:
+        return self.state.is_supported
+
+
+class VanillaMultipleProperty(BaseVanillaMultipleProperty):
+    def __init__(self, parent: wx.Window, state: BlockState):
+        super().__init__(parent, state)
+        self._rebuild_properties()

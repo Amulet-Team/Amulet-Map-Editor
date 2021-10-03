@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, List, Dict, Any, Union
+from typing import Callable, List, Dict, Any, Union, Tuple, Optional
 
 import amulet_nbt
 from PyMCTranslate import TranslationManager, Version
@@ -26,6 +26,7 @@ class State(Enum):
     BaseName = "base_name"
     Properties = "properties"
     PropertiesMultiple = "properties_multiple"
+    ValidProperties = "valid_properties"
 
     def __str__(self):
         return self.value
@@ -372,6 +373,11 @@ class BlockResourceIDState(BlockNamespaceState, BaseResourceIDState):
 
 
 class BlockState(BlockResourceIDState):
+    """
+    A class to store the state of a block id and properties.
+    Supports a single value per property and a sequence of values.
+    """
+
     def __init__(
         self,
         translation_manager: TranslationManager,
@@ -383,6 +389,7 @@ class BlockState(BlockResourceIDState):
         base_name: str = None,
         properties: PropertyType = None,
         properties_multiple: PropertyTypeMultiple = None,
+        valid_properties: PropertyTypeMultiple = None,
     ):
         super().__init__(
             translation_manager,
@@ -392,9 +399,14 @@ class BlockState(BlockResourceIDState):
             namespace=namespace,
             base_name=base_name,
         )
-        self._state[State.Properties] = self._sanitise_properties(properties)
-        self._state[State.PropertiesMultiple] = self._sanitise_properties_multiple(
-            properties_multiple
+        (
+            self._state[State.Properties],
+            self._state[State.PropertiesMultiple],
+            self._state[State.ValidProperties],
+        ) = self._sync_properties(
+            self._sanitise_properties(properties),
+            self._sanitise_properties_multiple(properties_multiple),
+            self._sanitise_properties_multiple(valid_properties),
         )
 
     def _fix_version_change(self):
@@ -432,15 +444,24 @@ class BlockState(BlockResourceIDState):
 
     def _fix_new_state(self):
         super()._fix_new_state()
-        if self.is_changed(State.Properties) or self.is_changed(
-            State.PropertiesMultiple
-        ):
-            self._changed_state[
-                State.PropertiesMultiple
-            ] = self._sanitise_properties_multiple(self.properties_multiple)
+        validate = False
+        if self.is_changed(State.Properties):
             self._changed_state[State.Properties] = self._sanitise_properties(
                 self.properties
             )
+            validate = True
+        if self.is_changed(State.PropertiesMultiple):
+            self._changed_state[
+                State.PropertiesMultiple
+            ] = self._sanitise_properties_multiple(self.properties_multiple)
+            validate = True
+        if self.is_changed(State.ValidProperties) and self.is_supported:
+            self._changed_state[
+                State.ValidProperties
+            ] = self._sanitise_properties_multiple(self.valid_properties)
+
+        if validate:
+            self._sync_properties()
 
     def _get_block_spec(self):
         if self.is_supported:
@@ -452,39 +473,101 @@ class BlockState(BlockResourceIDState):
 
     @property
     def default_properties(self) -> PropertyType:
-        return self._get_block_spec().default_properties
+        """The default properties for this block."""
+        if self.is_supported:
+            return self._get_block_spec().default_properties
+        else:
+            return
 
     @property
     def valid_properties(self) -> PropertyTypeMultiple:
-        return self._get_block_spec().valid_properties
+        """The properties that are valid for this block."""
+        if self.is_supported:
+            return self._get_block_spec().valid_properties
+        else:
+            return self._get_state(State.ValidProperties)
+
+    @valid_properties.setter
+    def valid_properties(self, valid_properties: PropertyTypeMultiple):
+        self._set_state(State.ValidProperties, valid_properties)
 
     def _sanitise_properties(self, properties: PropertyType = None) -> PropertyType:
-        if self.is_supported:
-            valid_properties = self.valid_properties
-            default_properties = self.default_properties
-            if isinstance(properties, dict):
-                return {
-                    name: properties[name]
-                    if name in properties
-                    and isinstance(properties[name], PropertyDataTypes)
-                    and properties[name] in valid_properties[name]
-                    else default_properties[name]
-                    for name in valid_properties
-                }
-            else:
-                return default_properties
+        if isinstance(properties, dict):
+            return {
+                key: val
+                for key, val in properties.items()
+                if isinstance(val, PropertyDataTypes)
+            }
         else:
-            if isinstance(properties, dict):
-                return {
-                    key: val
-                    for key, val in properties.items()
-                    if isinstance(val, PropertyDataTypes)
-                }
-            else:
-                return {}
+            return {}
+
+    def _sync_properties(
+        self,
+        properties: PropertyType = None,
+        properties_multiple: PropertyTypeMultiple = None,
+        valid_properties: PropertyTypeMultiple = None,
+    ) -> Tuple[PropertyType, PropertyTypeMultiple, Optional[PropertyTypeMultiple]]:
+        """Make sure that all the properties states are in sync."""
+        if properties is None:
+            properties = self.properties
+        if properties_multiple is None:
+            properties_multiple = self.properties_multiple
+        if valid_properties is None or self.is_supported:
+            valid_properties = self.valid_properties
+        if not self.is_supported:
+            # Nothing is known. Populate/extend valid from the filled out.
+            valid_properties = {
+                prop: tuple(
+                    set(
+                        valid_properties.get(prop, ())
+                        + properties_multiple.get(prop, ())
+                        + ((properties[prop],) if prop in properties else ())
+                    )
+                )
+                for prop in set(
+                    list(valid_properties)
+                    + list(properties)
+                    + list(properties_multiple)
+                )
+            }
+            # Make sure there are valid properties.
+            valid_properties = {
+                key: val for key, val in valid_properties.items() if val
+            }
+            default_properties = {key: val[0] for key, val in valid_properties.items()}
+        else:
+            default_properties = self.default_properties
+
+        # Make sure all the properties are defined and are a subset of valid properties
+        properties = {
+            name: properties[name]
+            if name in properties
+            and isinstance(properties[name], PropertyDataTypes)
+            and properties[name] in valid_properties[name]
+            else default_properties[name]
+            for name in valid_properties
+        }
+
+        # Make sure all the multiple properties are defined and are a subset of valid properties
+        properties_multiple = {
+            name: tuple(
+                val
+                for val in properties_multiple[name]
+                if isinstance(val, PropertyDataTypes) and val in valid_properties[name]
+            )
+            if name in properties_multiple
+            and isinstance(properties_multiple[name], (list, tuple))
+            else valid_properties[name]
+            for name in valid_properties
+        }
+        if self.is_supported:
+            return properties, properties_multiple, None
+        else:
+            return properties, properties_multiple, valid_properties
 
     @property
     def properties(self) -> PropertyType:
+        """The value for each property that is currently active for this block."""
         return self._get_state(State.Properties)
 
     @properties.setter
@@ -494,38 +577,21 @@ class BlockState(BlockResourceIDState):
     def _sanitise_properties_multiple(
         self, properties: PropertyTypeMultiple = None
     ) -> PropertyTypeMultiple:
-        if self.is_supported:
-            valid_properties = self.valid_properties
-            if isinstance(properties, dict):
-                return {
-                    name: tuple(
-                        val
-                        for val in properties[name]
-                        if isinstance(val, PropertyDataTypes)
-                        and val in valid_properties[name]
-                    )
-                    if name in properties
-                    and isinstance(properties[name], (list, tuple))
-                    else valid_properties[name]
-                    for name in valid_properties
-                }
-            else:
-                return valid_properties
+        if isinstance(properties, dict):
+            return {
+                name: tuple(
+                    val
+                    for val in properties[name]
+                    if isinstance(val, PropertyDataTypes)
+                )
+                for name in properties
+            }
         else:
-            if isinstance(properties, dict):
-                return {
-                    name: tuple(
-                        val
-                        for val in properties[name]
-                        if isinstance(val, PropertyDataTypes)
-                    )
-                    for name in properties
-                }
-            else:
-                return {}
+            return {}
 
     @property
     def properties_multiple(self) -> PropertyTypeMultiple:
+        """The values for each property that are currently active for this block."""
         return self._get_state(State.PropertiesMultiple)
 
     @properties_multiple.setter

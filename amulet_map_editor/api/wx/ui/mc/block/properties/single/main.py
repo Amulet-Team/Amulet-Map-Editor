@@ -4,12 +4,13 @@ import PyMCTranslate
 import amulet_nbt
 from amulet.api.data_types import VersionNumberTuple
 from amulet.api.block import PropertyType
-from ..base import BasePropertySelect
-from .events import SinglePropertiesChangeEvent, EVT_SINGLE_PROPERTIES_CHANGE
-from .vanilla import VanillaSingleProperty
-from .modded import ModdedSingleProperty
 from amulet_map_editor.api.wx.ui.mc.state import State, BlockState
 from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
+
+from ..base import BasePropertySelect
+from .vanilla import VanillaSingleProperty
+from .modded import ModdedSingleProperty
+from .events import SinglePropertiesChangeEvent, EVT_SINGLE_PROPERTIES_CHANGE
 
 
 class SinglePropertySelect(BasePropertySelect):
@@ -106,8 +107,6 @@ def demo():
         def on_change(evt: SinglePropertiesChangeEvent):
             print(evt.properties)
 
-        obj.Bind(EVT_SINGLE_PROPERTIES_CHANGE, on_change)
-
         def on_close(evt):
             dialog.Destroy()
 
@@ -115,6 +114,7 @@ def demo():
             dialog.Layout()
             evt.Skip()
 
+        obj.Bind(EVT_SINGLE_PROPERTIES_CHANGE, on_change)
         dialog.Bind(wx.EVT_CLOSE, on_close)
         dialog.Bind(EVT_CHILD_SIZE, on_child_size)
         dialog.Show()
