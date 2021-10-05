@@ -53,7 +53,7 @@ class WildcardBlockDefine(BaseBlockDefine):
                 namespace=namespace,
                 base_name=base_name,
                 properties_multiple=selected_properties,
-                valid_properties=all_properties
+                valid_properties=all_properties,
             )
         BaseBlockDefine.__init__(
             self,
@@ -68,9 +68,7 @@ class WildcardBlockDefine(BaseBlockDefine):
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
         self._property_picker = MultiplePropertySelect(
-            self,
-            translation_manager,
-            state=state
+            self, translation_manager, state=state
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._property_picker.Bind(
@@ -88,7 +86,7 @@ class WildcardBlockDefine(BaseBlockDefine):
                 self.state.force_blockstate,
                 self.state.namespace,
                 self.state.base_name,
-                self.state.properties_multiple
+                self.state.properties_multiple,
             ),
         )
 
@@ -115,7 +113,7 @@ def demo():
             version_number=(1, 16, 0),
             force_blockstate=False,
             **block,
-            orientation=wx.HORIZONTAL
+            orientation=wx.HORIZONTAL,
         )
 
         sizer.Add(

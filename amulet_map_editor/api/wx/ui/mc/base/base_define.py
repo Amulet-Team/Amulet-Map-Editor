@@ -40,9 +40,7 @@ class BaseDefine(wx.Panel, StateHolder):
             self._sizer.Add(self._top_sizer, 0, wx.EXPAND)
 
         self._version_picker = VersionSelect(
-            self,
-            translation_manager,
-            state=self.state
+            self, translation_manager, state=self.state
         )
         self._top_sizer.Add(self._version_picker, 0, wx.EXPAND)
 
