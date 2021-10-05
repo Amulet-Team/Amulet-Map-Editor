@@ -124,8 +124,7 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
             self._update_base_name()
 
     def _update_namespace(self):
-        if self.state.is_changed(State.ForceBlockstate):
-            self._namespace_combo.Set(self.state.valid_namespaces)
+        self._namespace_combo.Set(self.state.valid_namespaces)
         namespace = self.state.namespace
         if namespace != self._namespace_combo.GetValue():
             index = self._namespace_combo.FindString(namespace)

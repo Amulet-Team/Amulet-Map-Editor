@@ -35,7 +35,6 @@ class BaseVanillaMultipleProperty(BaseMultipleProperty):
         self._properties: Dict[str, Tuple[wx.ComboCtrl, PropertyValueComboPopup]] = {}
 
     def _rebuild_properties(self):
-        self.Freeze()
         self._tear_down_properties()
         valid_properties = self.state.valid_properties
         current_properties = self.state.properties_multiple
@@ -44,7 +43,7 @@ class BaseVanillaMultipleProperty(BaseMultipleProperty):
                 name, valid_properties[name], current_properties[name]
             )
         self.Fit()
-        self.Thaw()
+        self.Layout()
 
     def _tear_down_properties(self):
         self._properties.clear()

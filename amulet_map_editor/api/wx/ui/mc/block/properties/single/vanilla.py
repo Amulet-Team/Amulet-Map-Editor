@@ -32,7 +32,6 @@ class BaseVanillaSingleProperty(BaseSingleProperty):
         self._properties: Dict[str, ChoiceRaw] = {}
 
     def _rebuild_properties(self):
-        self.Freeze()
         self._tear_down_properties()
         valid_properties = self.state.valid_properties
         current_properties = self.state.properties
@@ -41,7 +40,7 @@ class BaseVanillaSingleProperty(BaseSingleProperty):
                 name, valid_properties[name], current_properties[name]
             )
         self.Fit()
-        self.Thaw()
+        self.Layout()
 
     def _tear_down_properties(self):
         self._properties.clear()
