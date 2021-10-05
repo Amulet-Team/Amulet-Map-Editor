@@ -70,8 +70,6 @@ class SinglePropertySelect(BasePropertySelect):
     def _on_state_change(self):
         if self.state.is_changed(State.BaseName):
             self._do_show()
-        if self.state.is_changed(State.Properties):
-            wx.PostEvent(self, SinglePropertiesChangeEvent(self.state.properties))
 
 
 def demo():

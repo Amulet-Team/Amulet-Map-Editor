@@ -5,13 +5,13 @@ _MultiplePropertiesChangeEventType = wx.NewEventType()
 EVT_MULTIPLE_PROPERTIES_CHANGE = wx.PyEventBinder(_MultiplePropertiesChangeEventType)
 
 
-class MultiplePropertiesChangeEvent(wx.PyEvent):
+class MultiplePropertiesChangeEvent(wx.PyCommandEvent):
     """
     Run when the properties UI changes.
     """
 
     def __init__(self, selected_properties: PropertyTypeMultiple):
-        wx.PyEvent.__init__(self, eventType=_MultiplePropertiesChangeEventType)
+        wx.PyCommandEvent.__init__(self, eventType=_MultiplePropertiesChangeEventType)
         self._selected_properties = selected_properties
 
     @property

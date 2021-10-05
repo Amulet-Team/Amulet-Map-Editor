@@ -3,6 +3,7 @@ from collections import namedtuple
 
 from amulet_map_editor.api.wx.ui.mc.state import BlockState
 from ..single.modded import BaseModdedSingleProperty
+from .events import MultiplePropertiesChangeEvent
 
 PropertyStorage = namedtuple(
     "PropertyStorage", ("sizer", "key_entry", "value_entry", "snbt_text")
@@ -27,6 +28,9 @@ class BaseModdedMultipleProperty(BaseModdedSingleProperty):
                 state.properties_multiple = {
                     key: (val,) for key, val in properties.items()
                 }
+            wx.PostEvent(
+                self, MultiplePropertiesChangeEvent(self.state.properties_multiple)
+            )
 
 
 class ModdedMultipleProperty(BaseModdedMultipleProperty):

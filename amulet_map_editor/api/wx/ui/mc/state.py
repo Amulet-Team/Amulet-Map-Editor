@@ -209,7 +209,7 @@ class VersionState(PlatformState):
                     ).version_number
                 except KeyError:
                     pass
-        return self.valid_version_numbers[0]
+        return self.valid_version_numbers[-1]
 
     @property
     def valid_version_numbers(self) -> List[VersionNumberTuple]:
@@ -318,7 +318,11 @@ class BaseResourceIDState(BaseNamespaceState):
         if isinstance(base_name, str) and base_name:
             return base_name
         else:
-            return self.valid_base_names[0]
+            valid = self.valid_base_names
+            if valid:
+                return valid[0]
+            else:
+                return ""
 
     @property
     @abstractmethod
@@ -356,6 +360,18 @@ class BiomeResourceIDState(BiomeNamespaceState, BaseResourceIDState):
             if namespace == self.namespace:
                 biomes.append(base_name)
         return biomes
+
+    def _fix_version_change(self):
+        if not self.is_changed(State.Namespace) or self.is_changed(State.BaseName):
+            universal_biome = self._translation_manager.get_version(
+                self._state[State.Platform], self._state[State.VersionNumber]
+            ).biome.to_universal(f"{self.namespace}:{self.base_name}")
+            version_biome = self._translation_manager.get_version(
+                self.platform, self.version_number
+            ).biome.from_universal(universal_biome)
+            namespace, base_name = version_biome.split(":")
+            self._changed_state[State.Namespace] = self._sanitise_namespace(namespace)
+            self._changed_state[State.BaseName] = self._sanitise_base_name(base_name)
 
 
 class BlockNamespaceState(BaseNamespaceState):

@@ -10,7 +10,6 @@ from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 from amulet_map_editor.api.wx.ui.mc.block import (
     MultiplePropertySelect,
     EVT_MULTIPLE_PROPERTIES_CHANGE,
-    MultiplePropertiesChangeEvent,
 )
 from amulet_map_editor.api.wx.ui.mc.block.define.widget.base import BaseBlockDefine
 from amulet_map_editor.api.wx.ui.mc.block.define.events import (
@@ -71,13 +70,11 @@ class WildcardBlockDefine(BaseBlockDefine):
             self, translation_manager, state=state
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
-        self._property_picker.Bind(
-            EVT_MULTIPLE_PROPERTIES_CHANGE, self._post_block_change
-        )
+        self._property_picker.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._post_change)
 
         self.Layout()
 
-    def _post_block_change(self, evt: MultiplePropertiesChangeEvent):
+    def _post_change(self, evt):
         wx.PostEvent(
             self,
             WildcardBlockChangeEvent(

@@ -124,7 +124,8 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
             self._update_base_name()
 
     def _update_namespace(self):
-        self._namespace_combo.Set(self.state.valid_namespaces)
+        if self._namespace_combo.GetItems() != self.state.valid_namespaces:
+            self._namespace_combo.Set(self.state.valid_namespaces)
         namespace = self.state.namespace
         if namespace != self._namespace_combo.GetValue():
             index = self._namespace_combo.FindString(namespace)
@@ -137,6 +138,8 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         base_name = self.state.base_name
         if base_name in self.state.valid_base_names:
             # The base name is known
+            if self.state.is_changed(State.ForceBlockstate):
+                self._update_from_search()
             location = self._base_name_list_box.FindString(base_name)
             if location == wx.NOT_FOUND:
                 self._search.ChangeValue("")
@@ -155,7 +158,9 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         :return: True if the text in the field changed
         """
         search_str = self._search.GetValue()
-        base_names = [bn for bn in self.state.valid_base_names if search_str in bn]
+        base_names = sorted(
+            [bn for bn in self.state.valid_base_names if search_str in bn]
+        )
         exact = search_str in base_names
 
         if (search_str and not exact) or (not search_str and not base_names):

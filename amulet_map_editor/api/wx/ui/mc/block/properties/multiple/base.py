@@ -2,6 +2,7 @@ import wx
 
 from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.mc.state import StateHolder, BlockState, State
+from .events import MultiplePropertiesChangeEvent
 
 
 class BaseMultipleProperty(wx.Panel, StateHolder):
@@ -48,3 +49,6 @@ class BaseMultipleProperty(wx.Panel, StateHolder):
         if properties_multiple != self.state.properties_multiple:
             with self.state as state:
                 state.properties_multiple = properties_multiple
+            wx.PostEvent(
+                self, MultiplePropertiesChangeEvent(self.state.properties_multiple)
+            )

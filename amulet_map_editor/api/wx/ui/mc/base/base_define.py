@@ -8,6 +8,7 @@ from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
 )
 from amulet_map_editor.api.wx.ui.mc.version import (
     VersionSelect,
+    EVT_VERSION_CHANGE,
 )
 from amulet_map_editor.api.wx.ui.mc.state import BaseResourceIDState, StateHolder
 
@@ -42,6 +43,9 @@ class BaseDefine(wx.Panel, StateHolder):
         self._version_picker = VersionSelect(
             self, translation_manager, state=self.state
         )
+        self._version_picker.Bind(EVT_VERSION_CHANGE, self._post_change)
         self._top_sizer.Add(self._version_picker, 0, wx.EXPAND)
-
         self.Layout()
+
+    def _post_change(self, evt):
+        raise NotImplementedError

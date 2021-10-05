@@ -103,13 +103,16 @@ class PlatformSelect(wx.Panel, StateHolder):
         if self.state.is_changed(State.Platform):
             self._update_platform()
 
+    def _post_change(self):
+        wx.PostEvent(self, PlatformChangeEvent(self.state.platform))
+
     def _on_platform_change(self, evt):
         """The event run when the platform choice is changed by a user."""
         platform = self._platform_choice.GetCurrentString()
         if platform != self.state.platform:
             with self.state as state:
                 state.platform = platform
-            wx.PostEvent(self, PlatformChangeEvent(self.state.platform))
+            self._post_change()
 
 
 def demo():

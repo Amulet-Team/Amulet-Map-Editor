@@ -4,9 +4,7 @@ import wx
 from amulet_map_editor.api.wx.ui.mc.base.base_define import BaseDefine
 from amulet_map_editor.api.wx.ui.mc.block import BlockIdentifierSelect
 
-from amulet_map_editor.api.wx.ui.mc.block import (
-    BasePropertySelect,
-)
+from amulet_map_editor.api.wx.ui.mc.block import BasePropertySelect, EVT_BLOCK_ID_CHANGE
 from amulet_map_editor.api.wx.ui.mc.state import BlockState
 
 
@@ -42,4 +40,5 @@ class BaseBlockDefine(BaseDefine):
             state=self.state,
             show_pick=show_pick_block,
         )
+        self._identifier_select.Bind(EVT_BLOCK_ID_CHANGE, self._post_change)
         self._top_sizer.Add(self._identifier_select, 1, wx.EXPAND | wx.TOP, 5)

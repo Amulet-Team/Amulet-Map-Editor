@@ -10,7 +10,6 @@ from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 from amulet_map_editor.api.wx.ui.mc.block import (
     SinglePropertySelect,
     EVT_SINGLE_PROPERTIES_CHANGE,
-    SinglePropertiesChangeEvent,
 )
 from amulet_map_editor.api.wx.ui.mc.block.define.widget.base import BaseBlockDefine
 from amulet_map_editor.api.wx.ui.mc.block.define.events import (
@@ -66,9 +65,7 @@ class BlockDefine(BaseBlockDefine):
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
         self._property_picker = self._create_property_picker(translation_manager)
-        self._property_picker.Bind(
-            EVT_SINGLE_PROPERTIES_CHANGE, self._post_block_change
-        )
+        self._property_picker.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._post_change)
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self.Layout()
 
@@ -77,7 +74,7 @@ class BlockDefine(BaseBlockDefine):
     ) -> SinglePropertySelect:
         return SinglePropertySelect(self, translation_manager, state=self.state)
 
-    def _post_block_change(self, evt: SinglePropertiesChangeEvent):
+    def _post_change(self, evt):
         wx.PostEvent(
             self,
             BlockChangeEvent(

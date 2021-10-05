@@ -77,10 +77,6 @@ class MultiplePropertySelect(BasePropertySelect):
     def _on_state_change(self):
         if self.state.is_changed(State.BaseName):
             self._do_show()
-        if self.state.is_changed(State.PropertiesMultiple):
-            wx.PostEvent(
-                self, MultiplePropertiesChangeEvent(self.state.properties_multiple)
-            )
 
 
 def demo():

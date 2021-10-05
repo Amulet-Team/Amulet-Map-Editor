@@ -119,7 +119,12 @@ class ChoiceRaw(wx.Choice):
     def _set_items(self, items: Iterable[Tuple[Any, str]], default: Any = None):
         if items:
             if self._sorted:
-                items = sorted(items, key=lambda x: x[1], reverse=self._reverse)
+                try:
+                    items = sorted(items, key=lambda x: x[0])
+                except TypeError:
+                    items = sorted(items, key=lambda x: x[1])
+            if self._reverse:
+                items = reversed(items)
             self._values, self._keys = zip(*items)
             super().SetItems(self._keys)
             if default in self._values:

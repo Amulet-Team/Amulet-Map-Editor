@@ -116,7 +116,7 @@ class VersionSelect(PlatformSelect):
         if self.state.is_changed(State.ForceBlockstate):
             self._update_force_blockstate()
 
-    def _post_version_change(self):
+    def _post_change(self):
         wx.PostEvent(
             self,
             VersionChangeEvent(
@@ -131,14 +131,14 @@ class VersionSelect(PlatformSelect):
         if version != self.state.version_number:
             with self.state as state:
                 state.version_number = version
-            self._post_version_change()
+            self._post_change()
 
     def _on_blockstate_change(self, evt):
         force_blockstate = bool(self._version_choice.GetCurrentSelection())
         if force_blockstate != self.state.force_blockstate:
             with self.state as state:
                 state.force_blockstate = force_blockstate
-            self._post_version_change()
+            self._post_change()
 
 
 def demo():

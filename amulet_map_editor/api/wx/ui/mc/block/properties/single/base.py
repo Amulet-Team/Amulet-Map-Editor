@@ -2,6 +2,7 @@ import wx
 
 from amulet.api.block import PropertyType, PropertyValueType
 from amulet_map_editor.api.wx.ui.mc.state import StateHolder, BlockState, State
+from .events import SinglePropertiesChangeEvent
 
 
 class BaseSingleProperty(wx.Panel, StateHolder):
@@ -48,3 +49,4 @@ class BaseSingleProperty(wx.Panel, StateHolder):
         if properties != self.state.properties:
             with self.state as state:
                 state.properties = properties
+            wx.PostEvent(self, SinglePropertiesChangeEvent(self.state.properties))
