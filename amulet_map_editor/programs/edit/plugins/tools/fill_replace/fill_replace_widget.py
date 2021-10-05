@@ -148,7 +148,7 @@ class FillReplaceWidget(wx.Panel):
         self._multiple.Bind(wx.EVT_CHECKBOX, self._on_check_change)
         top_sizer.Add(self._multiple, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
 
-        self._replace_mode = ChoiceRaw(self, sort=False)
+        self._replace_mode = ChoiceRaw(self)
         self._replace_mode.Hide()
         self._replace_mode.SetItems(
             {

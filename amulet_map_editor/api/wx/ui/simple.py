@@ -89,7 +89,7 @@ class ChoiceRaw(wx.Choice):
         *,
         choices: ChoicesType = (),
         default: Any = None,
-        sort=True,
+        sort=False,
         reverse=False
     ):
         super().__init__(parent)

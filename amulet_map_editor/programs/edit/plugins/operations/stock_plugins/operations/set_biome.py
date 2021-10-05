@@ -46,7 +46,7 @@ class SetBiome(SimpleOperationPanel):
         self.Freeze()
         options = self._load_options({})
 
-        self._mode = ChoiceRaw(self, sort=False)
+        self._mode = ChoiceRaw(self)
         self._mode.SetItems({mode: lang[mode] for mode in MODES.keys()})
         self._sizer.Add(self._mode, 0, Border, 5)
         self._mode.Bind(wx.EVT_CHOICE, self._on_mode_change)

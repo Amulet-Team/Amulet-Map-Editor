@@ -72,7 +72,7 @@ class VersionSelect(PlatformSelect):
         self._allow_blockstate = allow_blockstate
 
         self._version_choice: Optional[ChoiceRaw] = self._add_ui_element(
-            "Version:", ChoiceRaw, reverse=True
+            "Version:", ChoiceRaw, reverse=True, sort=True
         )
         self._update_version_number()
         self._version_choice.Bind(
