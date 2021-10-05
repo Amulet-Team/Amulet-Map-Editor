@@ -262,7 +262,7 @@ class BaseNamespaceState(VersionState):
 
     def _fix_new_state(self):
         super()._fix_new_state()
-        if self.is_changed(State.Namespace):
+        if self.is_changed(State.ForceBlockstate) or self.is_changed(State.Namespace):
             self._changed_state[State.Namespace] = self._sanitise_namespace(
                 self.namespace
             )
@@ -309,7 +309,7 @@ class BaseResourceIDState(BaseNamespaceState):
 
     def _fix_new_state(self):
         super()._fix_new_state()
-        if self.is_changed(State.BaseName):
+        if self.is_changed(State.Namespace) or self.is_changed(State.BaseName):
             self._changed_state[State.BaseName] = self._sanitise_base_name(
                 self.base_name
             )
@@ -444,7 +444,7 @@ class BlockState(BlockResourceIDState):
 
     def _fix_new_state(self):
         super()._fix_new_state()
-        validate = False
+        validate = self.is_changed(State.BaseName)
         if self.is_changed(State.Properties):
             self._changed_state[State.Properties] = self._sanitise_properties(
                 self.properties
@@ -461,7 +461,11 @@ class BlockState(BlockResourceIDState):
             ] = self._sanitise_properties_multiple(self.valid_properties)
 
         if validate:
-            self._sync_properties()
+            (
+                self._changed_state[State.Properties],
+                self._changed_state[State.PropertiesMultiple],
+                self._changed_state[State.ValidProperties],
+            ) = self._sync_properties()
 
     def _get_block_spec(self):
         if self.is_supported:
@@ -477,7 +481,7 @@ class BlockState(BlockResourceIDState):
         if self.is_supported:
             return self._get_block_spec().default_properties
         else:
-            return
+            return {}
 
     @property
     def valid_properties(self) -> PropertyTypeMultiple:
@@ -561,7 +565,7 @@ class BlockState(BlockResourceIDState):
             for name in valid_properties
         }
         if self.is_supported:
-            return properties, properties_multiple, None
+            return properties, properties_multiple, {}
         else:
             return properties, properties_multiple, valid_properties
 
