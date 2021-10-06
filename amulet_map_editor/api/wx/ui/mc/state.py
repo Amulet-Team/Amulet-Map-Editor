@@ -103,6 +103,10 @@ class BaseState(ABC):
         while on_change in self._on_change:
             self._on_change.remove(on_change)
 
+    @property
+    def translation_manager(self) -> TranslationManager:
+        return self._translation_manager
+
 
 class StateHolder:
     _state: BaseState
