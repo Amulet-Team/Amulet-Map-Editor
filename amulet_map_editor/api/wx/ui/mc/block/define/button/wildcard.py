@@ -1,23 +1,26 @@
-from typing import Tuple, Dict, Any
 import wx
+import copy
 
 import PyMCTranslate
 from amulet.api.data_types import VersionNumberTuple
 
-from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet_map_editor.api.wx.ui.mc.api import WildcardMCBlock
 from amulet_map_editor.api.wx.ui.mc.block.define.widget import WildcardBlockDefine
 from amulet_map_editor.api.wx.ui.mc.block.define.button.base import (
     BaseBlockDefineButton,
 )
 from amulet.api.block import PropertyTypeMultiple
+from amulet_map_editor.api.wx.ui.mc.state import BlockState
 
 
-class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
+class WildcardBlockDefineButton(BaseBlockDefineButton):
+    state: BlockState
+
     def __init__(
         self,
         parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
+        *,
+        state: BlockState = None,
         platform: str = None,
         version_number: VersionNumberTuple = None,
         force_blockstate: bool = None,
@@ -27,98 +30,48 @@ class WildcardBlockDefineButton(BaseBlockDefineButton, WildcardMCBlock):
         all_properties: PropertyTypeMultiple = None,
         show_pick_block: bool = False,
         max_char_length: int = 99999,
-        state: Dict[str, Any] = None,
     ):
-        state = state or {}
-        state.setdefault("selected_properties", selected_properties)
-        state.setdefault("all_properties", all_properties)
+        if not isinstance(state, BlockState):
+            state = BlockState(
+                translation_manager,
+                platform=platform,
+                version_number=version_number,
+                force_blockstate=force_blockstate,
+                namespace=namespace,
+                base_name=base_name,
+                properties_multiple=selected_properties,
+                valid_properties=all_properties,
+            )
         BaseBlockDefineButton.__init__(
             self,
             parent,
-            translation_manager,
-            platform,
-            version_number,
-            force_blockstate,
-            namespace,
-            base_name,
+            state=state,
             show_pick_block=show_pick_block,
             max_char_length=max_char_length,
-            state=state,
         )
         self.update_button()
 
-    def _init_state(self, state: Dict[str, Any]):
-        WildcardMCBlock.__init__(self, **state)
-
-    def _on_press(self, evt):
-        dialog = SimpleDialog(self, "Pick a Block")
-        self._block_widget = WildcardBlockDefine(
+    def _create_block_define(self, dialog: wx.Dialog) -> WildcardBlockDefine:
+        return WildcardBlockDefine(
             dialog,
-            self._translation_manager,
-            wx.HORIZONTAL,
-            self.platform,
-            self.version_number,
-            self.force_blockstate,
-            self.namespace,
-            self.base_name,
-            self.selected_properties,
-            self.all_properties,
+            self.state.translation_manager,
+            state=copy.deepcopy(self.state),
+            orientation=wx.HORIZONTAL,
         )
-        dialog.sizer.Add(self._block_widget)
-        dialog.Fit()
-        if dialog.ShowModal() == wx.ID_OK:
-            self._set_platform(self._block_widget.platform)
-            self._set_version_number(self._block_widget.version_number)
-            self._set_force_blockstate(self._block_widget.force_blockstate)
-            self._set_namespace(self._block_widget.namespace)
-            self._set_base_name(self._block_widget.base_name)
-            self._set_all_properties(self._block_widget.all_properties)
-            self._set_selected_properties(self._block_widget.selected_properties)
-            self.update_button()
-        self._block_widget = None
-        dialog.Destroy()
 
     def update_button(self):
         """Update the text on the button from the internal state."""
-        if self.selected_properties:
+        if self.state.properties_multiple:
             properties = [
                 f"{key}:({'|'.join([v.to_snbt() for v in val])})"
-                for key, val in self.selected_properties.items()
+                for key, val in self.state.properties_multiple.items()
             ]
-            self.SetLabel(f" {self.namespace}:{self.base_name}[{','.join(properties)}]")
+            self.SetLabel(f" {self.state.namespace}:{self.state.base_name}[{','.join(properties)}]")
             properties_str = ",\n".join(properties)
-            self.SetToolTip(f"{self.namespace}:{self.base_name}[\n{properties_str}\n]")
+            self.SetToolTip(f"{self.state.namespace}:{self.state.base_name}[\n{properties_str}\n]")
         else:
-            self.SetLabel(f" {self.namespace}:{self.base_name}")
-            self.SetToolTip(f"{self.namespace}:{self.base_name}")
-
-    def _on_push(self) -> bool:
-        update = super()._on_push()
-        self._set_namespace(self.namespace)
-        self._set_base_name(self.base_name)
-        self._set_all_properties(self.all_properties)
-        self._set_selected_properties(self.selected_properties)
-        update = self._block_widget is not None and (
-            update
-            or self.namespace != self._block_widget.namespace
-            or self.base_name != self._block_widget.base_name
-            or self.all_properties != self._block_widget.all_properties
-            or self.selected_properties != self._block_widget.selected_properties
-        )
-        if update:
-            (
-                self._block_widget.namespace,
-                self._block_widget.base_name,
-                self._block_widget.all_properties,
-                self._block_widget.selected_properties,
-            ) = (
-                self.namespace,
-                self.base_name,
-                self.all_properties,
-                self.selected_properties,
-            )
-        self.update_button()
-        return update
+            self.SetLabel(f" {self.state.namespace}:{self.state.base_name}")
+            self.SetToolTip(f"{self.state.namespace}:{self.state.base_name}")
 
 
 def demo():
