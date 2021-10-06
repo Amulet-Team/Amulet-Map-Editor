@@ -66,9 +66,13 @@ class WildcardBlockDefineButton(BaseBlockDefineButton):
                 f"{key}:({'|'.join([v.to_snbt() for v in val])})"
                 for key, val in self.state.properties_multiple.items()
             ]
-            self.SetLabel(f" {self.state.namespace}:{self.state.base_name}[{','.join(properties)}]")
+            self.SetLabel(
+                f" {self.state.namespace}:{self.state.base_name}[{','.join(properties)}]"
+            )
             properties_str = ",\n".join(properties)
-            self.SetToolTip(f"{self.state.namespace}:{self.state.base_name}[\n{properties_str}\n]")
+            self.SetToolTip(
+                f"{self.state.namespace}:{self.state.base_name}[\n{properties_str}\n]"
+            )
         else:
             self.SetLabel(f" {self.state.namespace}:{self.state.base_name}")
             self.SetToolTip(f"{self.state.namespace}:{self.state.base_name}")

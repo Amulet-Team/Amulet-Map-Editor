@@ -61,7 +61,9 @@ class BlockDefineButton(BaseBlockDefineButton):
         """Update the text on the button from the internal state."""
         blockstate = f"{self.state.namespace}:{self.state.base_name}"
         if self.state.properties:
-            props = ",".join(f"{key}={val}" for key, val in self.state.properties.items())
+            props = ",".join(
+                f"{key}={val}" for key, val in self.state.properties.items()
+            )
             blockstate = f"{blockstate}[{props}]"
         self.SetLabel(f" {blockstate}")
         self.SetToolTip(blockstate)

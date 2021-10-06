@@ -1,6 +1,6 @@
 import wx
 
-from amulet.api.block import PropertyType, PropertyValueType
+from amulet.api.block import PropertyType
 from amulet_map_editor.api.wx.ui.mc.state import StateHolder, BlockState, State
 from .events import SinglePropertiesChangeEvent
 

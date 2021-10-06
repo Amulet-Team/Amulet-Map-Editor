@@ -2,7 +2,7 @@ import wx
 from typing import Dict, Tuple
 
 from amulet.api.block import PropertyType, PropertyValueType
-from amulet_map_editor.api.wx.ui.mc.state import BlockState, State
+from amulet_map_editor.api.wx.ui.mc.state import BlockState
 from amulet_map_editor.api.wx.ui.simple import ChoiceRaw
 from .base import BaseSingleProperty
 
