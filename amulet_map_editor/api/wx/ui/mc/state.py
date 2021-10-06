@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Callable, List, Dict, Any, Union, Tuple, Optional
+import copy
 
-import amulet_nbt
 from PyMCTranslate import TranslationManager, Version
 from PyMCTranslate.py3.api.version.translators.block import BlockSpecification
 from amulet.api.data_types import PlatformType, VersionNumberTuple, VersionNumberAny
@@ -106,6 +106,12 @@ class BaseState(ABC):
     @property
     def translation_manager(self) -> TranslationManager:
         return self._translation_manager
+
+    def __deepcopy__(self, memodict=None):
+        new_state = self.__class__(self.translation_manager)
+        new_state._state = copy.deepcopy(self._state)
+        new_state._changed_state = copy.deepcopy(self._state)
+        return new_state
 
 
 class StateHolder:
