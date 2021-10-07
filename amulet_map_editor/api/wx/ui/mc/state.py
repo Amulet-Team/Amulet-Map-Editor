@@ -47,7 +47,7 @@ class BaseState(ABC):
     _changed_state: Dict[State, Any]
     _on_change: List[OnChangeType]
 
-    def __init__(self, translation_manager: TranslationManager):
+    def __init__(self, translation_manager: TranslationManager, **kwargs):
         self._translation_manager = translation_manager
         self._edit = False  # Is the instance being edited
         self._state = {}  # The actual state
@@ -142,9 +142,16 @@ class PlatformState(BaseState):
         translation_manager: TranslationManager,
         *,
         platform: str = None,
+        allow_universal: bool = False,
+        allow_vanilla: bool = True,
+        platform_key: Callable[[str], bool] = None,
+        **kwargs,
     ):
-        super().__init__(translation_manager)
+        super().__init__(translation_manager, **kwargs)
         self._state[State.Platform] = self._sanitise_platform(platform)
+        self._allow_universal = allow_universal
+        self._allow_vanilla = allow_vanilla
+        self._platform_key = platform_key
 
     def _fix_new_state(self):
         if self.is_changed(State.Platform):
@@ -160,7 +167,15 @@ class PlatformState(BaseState):
 
     @property
     def valid_platforms(self) -> List[PlatformType]:
-        return self._translation_manager.platforms()
+        return [
+            p
+            for p in self._translation_manager.platforms()
+            if (
+                self._allow_universal
+                if p == "universal"
+                else (self._platform_key is None or self._platform_key(p))
+            )
+        ]
 
     @property
     def platform(self) -> PlatformType:
@@ -176,15 +191,19 @@ class VersionState(PlatformState):
         self,
         translation_manager: TranslationManager,
         *,
-        platform: str = None,
         version_number: VersionNumberAny = None,
+        allow_numerical: bool = True,
+        allow_blockstate: bool = True,
         force_blockstate: bool = None,
+        **kwargs,
     ):
-        super().__init__(translation_manager, platform=platform)
+        super().__init__(translation_manager, **kwargs)
         self._state[State.VersionNumber] = self._sanitise_version(version_number)
         self._state[State.ForceBlockstate] = self._sanitise_force_blockstate(
             force_blockstate
         )
+        self._allow_numerical = allow_numerical
+        self._allow_blockstate = allow_blockstate
 
     def _fix_new_state(self):
         super()._fix_new_state()
@@ -223,7 +242,12 @@ class VersionState(PlatformState):
 
     @property
     def valid_version_numbers(self) -> List[VersionNumberTuple]:
-        return self._translation_manager.version_numbers(self.platform)
+        return [
+            v
+            for v in self._translation_manager.version_numbers(self.platform)
+            if (v >= (1, 13, 0) and self._allow_blockstate)
+            or (v < (1, 13, 0) and self._allow_numerical)
+        ]
 
     @property
     def version_number(self) -> VersionNumberTuple:
@@ -257,17 +281,10 @@ class BaseNamespaceState(VersionState):
         self,
         translation_manager: TranslationManager,
         *,
-        platform: str = None,
-        version_number: VersionNumberAny = None,
-        force_blockstate: bool = None,
         namespace: str = None,
+        **kwargs,
     ):
-        super().__init__(
-            translation_manager,
-            platform=platform,
-            version_number=version_number,
-            force_blockstate=force_blockstate,
-        )
+        super().__init__(translation_manager, **kwargs)
         self._state[State.Namespace] = self._sanitise_namespace(namespace)
 
     def _fix_new_state(self):
@@ -302,19 +319,10 @@ class BaseResourceIDState(BaseNamespaceState):
         self,
         translation_manager: TranslationManager,
         *,
-        platform: str = None,
-        version_number: VersionNumberAny = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
         base_name: str = None,
+        **kwargs,
     ):
-        super().__init__(
-            translation_manager,
-            platform=platform,
-            version_number=version_number,
-            force_blockstate=force_blockstate,
-            namespace=namespace,
-        )
+        super().__init__(translation_manager, **kwargs)
         self._state[State.BaseName] = self._sanitise_base_name(base_name)
 
     def _fix_new_state(self):
@@ -408,23 +416,12 @@ class BlockState(BlockResourceIDState):
         self,
         translation_manager: TranslationManager,
         *,
-        platform: str = None,
-        version_number: VersionNumberAny = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
         properties: PropertyType = None,
         properties_multiple: PropertyTypeMultiple = None,
         valid_properties: PropertyTypeMultiple = None,
+        **kwargs,
     ):
-        super().__init__(
-            translation_manager,
-            platform=platform,
-            version_number=version_number,
-            force_blockstate=force_blockstate,
-            namespace=namespace,
-            base_name=base_name,
-        )
+        super().__init__(translation_manager, **kwargs)
         (
             self._state[State.Properties],
             self._state[State.PropertiesMultiple],
