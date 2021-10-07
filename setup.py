@@ -66,7 +66,9 @@ try:
             if requirement.name in first_party:
                 release_versions = []
                 pypi_json = json.load(
-                    urllib.request.urlopen(f"https://pypi.org/pypi/{requirement.name}/json")
+                    urllib.request.urlopen(
+                        f"https://pypi.org/pypi/{requirement.name}/json"
+                    )
                 )
                 for version, files in pypi_json["releases"].items():
                     # for each release
