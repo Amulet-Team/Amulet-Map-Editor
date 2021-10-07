@@ -45,7 +45,8 @@ try:
     import json
     import urllib.request
     import re
-    from amulet_map_editor.api.version import Version
+    from packaging.requirements import Requirement
+    from packaging.version import Version
 
     first_party = {
         "amulet-core",
@@ -54,41 +55,33 @@ try:
         "minecraft-resource-pack",
     }
 
-    def get_compatible_version(requirement: str) -> Optional[str]:
+    def get_compatible_version(requirement_str: str) -> Optional[str]:
         """
         Converts something like "amulet-core~=1.4.0" to "amulet-core==1.4.7"
-        :param requirement: "amulet-core~=1.4.0"
+        :param requirement_str: "amulet-core~=1.4.0"
         :return: "amulet-core==1.4.7"
         """
-        requirement = requirement.strip()
-        if requirement and requirement[0] != "#" and "~=" in requirement:
-            lib, req = requirement.split("~=", 1)
-            if lib in first_party:
-                # find the latest compatible version. This currently only works on the very simple format.
-                # I tried to find the pip code that does it but it was very complex.
-                target_version = Version.from_string(req)
+        try:
+            requirement = Requirement(requirement_str)
+            if requirement.name in first_party:
                 release_versions = []
                 pypi_json = json.load(
-                    urllib.request.urlopen(f"https://pypi.org/pypi/{lib}/json")
+                    urllib.request.urlopen(f"https://pypi.org/pypi/{requirement.name}/json")
                 )
                 for version, files in pypi_json["releases"].items():
                     # for each release
                     if any(not f["yanked"] for f in files):
                         # If the are files that have not been yanked
                         try:
-                            release_versions.append(Version.from_string(version))
+                            release_versions.append(Version(version))
                         except:
                             continue
                 release_versions.sort(reverse=True)
                 for release_version in release_versions:
-                    if (
-                        release_version.major == target_version.major
-                        and release_version.minor == target_version.minor
-                        and release_version.patch >= target_version.patch
-                        and release_version.release_stage
-                        >= target_version.release_stage
-                    ):
-                        return f"{lib}=={release_version}"
+                    if release_version in requirement.specifier:
+                        return f"{requirement.name}=={release_version}"
+        except:
+            pass
         return None
 
     def fix_requirements():

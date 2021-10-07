@@ -4,6 +4,7 @@ requires = [
     "wheel",
     "cython >= 0.29.13",
     "versioneer-518",
-    "numpy"
+    "numpy",
+    "packaging"
 ]
 build-backend = "setuptools.build_meta"
