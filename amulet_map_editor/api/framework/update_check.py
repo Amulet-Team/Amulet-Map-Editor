@@ -72,38 +72,6 @@ class Version:
     nightly_timestamp: int = -1
     has_commit_hash: bool = False
 
-    @classmethod
-    def from_string(cls, version_string: str) -> Version:
-        """Parse the version into a more usable format
-
-        :param version_string: The version string. Eg 1.2 or 1.2.3.4 or 1.2.3.4b0
-        :return: A Version object from the parsed version string
-        """
-        version_match = VERSION_REGEX.match(version_string)
-        if version_match:
-            v = version_match.groupdict()
-            major, minor = int(v["major"]), int(v["minor"])
-            if v["patch"] is None:
-                patch = 0
-            else:
-                patch = int(v["patch"])
-            version = cls(Release.FULL, major, minor, patch)
-
-            if v.get("alpha") is not None:
-                version.release_stage = Release.ALPHA
-                version.alpha_number = int(v["alpha"])
-            elif v.get("beta") is not None:
-                version.release_stage = Release.BETA
-                version.beta_number = int(v["beta"])
-                if v.get("devnum") is not None:
-                    version.nightly_timestamp = int(v["devnum"])
-
-            if v.get("commit_hash") is not None:
-                version.has_commit_hash = True
-            return version
-
-        raise Exception(f"Invalid version string {version_string}")
-
     def __gt__(self, other: Version):
         if self.version_tuple > other.version_tuple:
             return True
@@ -125,6 +93,38 @@ class Version:
     @property
     def version_tuple(self):
         return self.major, self.minor, self.patch
+
+
+def get_version(version_string: str) -> Version:
+    """Parse the version into a more usable format
+
+    :param version_string: The version string. Eg 1.2 or 1.2.3.4 or 1.2.3.4b0
+    :return: A Version object from the parsed version string
+    """
+    version_match = VERSION_REGEX.match(version_string)
+    if version_match:
+        v = version_match.groupdict()
+        major, minor = int(v["major"]), int(v["minor"])
+        if v["patch"] is None:
+            patch = 0
+        else:
+            patch = int(v["patch"])
+        version = Version(Release.FULL, major, minor, patch)
+
+        if v.get("alpha") is not None:
+            version.release_stage = Release.ALPHA
+            version.alpha_number = int(v["alpha"])
+        elif v.get("beta") is not None:
+            version.release_stage = Release.BETA
+            version.beta_number = int(v["beta"])
+            if v.get("devnum") is not None:
+                version.nightly_timestamp = int(v["devnum"])
+
+        if v.get("commit_hash") is not None:
+            version.has_commit_hash = True
+        return version
+
+    raise Exception(f"Invalid version string {version_string}")
 
 
 class UpdateEvent(wx.PyCommandEvent):
@@ -150,12 +150,12 @@ class CheckForUpdate(threading.Thread):
             data = conn.read()
             data = json.loads(data)
             try:
-                current_version = Version.from_string(self.current_version)
+                current_version = get_version(self.current_version)
             except Exception:
                 return
 
             for release_version, release_data in sorted(
-                map(lambda d: (Version.from_string(d["tag_name"]), d), data),
+                map(lambda d: (get_version(d["tag_name"]), d), data),
                 key=lambda t: t[0],
                 reverse=True,
             ):
@@ -221,7 +221,7 @@ class UpdateDialog(wx.Dialog):
 
 
 def show_update_window(parent, current_version: str, evt: UpdateEvent):
-    if Version.from_string(current_version).has_commit_hash:
+    if get_version(current_version).has_commit_hash:
         print("Running from source, not showing update dialog")
         return
     UpdateDialog(parent, current_version, evt.GetVersion()).ShowModal()
