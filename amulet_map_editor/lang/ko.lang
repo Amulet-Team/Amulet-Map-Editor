@@ -12,7 +12,7 @@ menu_bar.file.open_world=월드 열기
 menu_bar.file.close_world=월드 닫기
 menu_bar.file.quit=나가기
 menu_bar.options.menu_name=&옵션
-menu_bar.help.menu_name=&
+menu_bar.help.menu_name=&도움말
 
 main_menu.tab_name=메인 메뉴
 main_menu.open_world=오픈 월드
