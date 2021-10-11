@@ -1,5 +1,4 @@
 import wx
-from typing import Tuple
 from amulet.api.data_types import VersionNumberTuple
 
 _PlatformEventType = wx.NewEventType()

@@ -2,8 +2,6 @@ import wx
 
 import PyMCTranslate
 import amulet_nbt
-from amulet.api.data_types import VersionNumberTuple
-from amulet.api.block import PropertyType
 from amulet_map_editor.api.wx.ui.mc.state import State, BlockState
 from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 

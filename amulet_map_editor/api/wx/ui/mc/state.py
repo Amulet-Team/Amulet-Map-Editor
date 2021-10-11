@@ -532,7 +532,8 @@ class BlockState(BlockResourceIDState):
     def valid_properties(self, valid_properties: PropertyTypeMultiple):
         self._set_state(State.ValidProperties, valid_properties)
 
-    def _sanitise_properties(self, properties: PropertyType = None) -> PropertyType:
+    @staticmethod
+    def _sanitise_properties(properties: PropertyType = None) -> PropertyType:
         if isinstance(properties, dict):
             return {
                 key: val
@@ -615,8 +616,9 @@ class BlockState(BlockResourceIDState):
     def properties(self, properties: PropertyType):
         self._set_state(State.Properties, properties)
 
+    @staticmethod
     def _sanitise_properties_multiple(
-        self, properties: PropertyTypeMultiple = None
+        properties: PropertyTypeMultiple = None,
     ) -> PropertyTypeMultiple:
         if isinstance(properties, dict):
             return {
