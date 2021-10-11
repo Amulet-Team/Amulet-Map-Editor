@@ -3,8 +3,6 @@ import wx.lib.scrolledpanel
 
 import PyMCTranslate
 import amulet_nbt
-from amulet.api.data_types import VersionNumberTuple
-from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 
 from amulet_map_editor.api.wx.ui.mc.block import (
@@ -30,35 +28,16 @@ class WildcardBlockDefine(BaseBlockDefine):
     def __init__(
         self,
         parent,
-        translation_manager: PyMCTranslate.TranslationManager,
+        state: BlockState,
         *,
-        state: BlockState = None,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
-        selected_properties: PropertyTypeMultiple = None,
-        all_properties: PropertyTypeMultiple = None,
         show_pick_block: bool = False,
         orientation=wx.VERTICAL,
     ):
-        if not isinstance(state, BlockState):
-            state = BlockState(
-                translation_manager,
-                platform=platform,
-                version_number=version_number,
-                force_blockstate=force_blockstate,
-                namespace=namespace,
-                base_name=base_name,
-                properties_multiple=selected_properties,
-                valid_properties=all_properties,
-            )
+        assert isinstance(state, BlockState)
         BaseBlockDefine.__init__(
             self,
             parent,
-            translation_manager,
-            state=state,
+            state,
             orientation=orientation,
             show_pick_block=show_pick_block,
         )
@@ -66,9 +45,7 @@ class WildcardBlockDefine(BaseBlockDefine):
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
-        self._property_picker = MultiplePropertySelect(
-            self, translation_manager, state=state
-        )
+        self._property_picker = MultiplePropertySelect(self, state)
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._property_picker.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._post_change)
 
@@ -103,7 +80,7 @@ def demo():
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        obj = WildcardBlockDefine(
+        obj = WildcardBlockDefine.from_data(
             dialog,
             translation_manager,
             platform="java",
@@ -147,7 +124,7 @@ def demo():
         {
             "namespace": "minecraft",
             "base_name": "oak_fence",
-            "selected_properties": {
+            "properties_multiple": {
                 "east": (
                     amulet_nbt.TAG_String("true"),
                     amulet_nbt.TAG_String("false"),
@@ -163,7 +140,7 @@ def demo():
         {
             "namespace": "modded",
             "base_name": "block",
-            "selected_properties": {
+            "properties_multiple": {
                 "test": (
                     amulet_nbt.TAG_String("hello"),
                     amulet_nbt.TAG_String("hello2"),

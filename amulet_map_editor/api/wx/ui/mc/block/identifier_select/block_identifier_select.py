@@ -1,7 +1,6 @@
 import wx
 
 import PyMCTranslate
-from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
 )
@@ -21,23 +20,19 @@ class BlockIdentifierSelect(BaseIdentifierSelect):
     def type_name(self) -> str:
         return "Block"
 
-    def _create_default_state(
-        self,
+    @classmethod
+    def from_data(
+        cls,
+        parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         *,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
-    ) -> BlockResourceIDState:
-        return BlockResourceIDState(
-            translation_manager,
-            platform=platform,
-            version_number=version_number,
-            force_blockstate=force_blockstate,
-            namespace=namespace,
-            base_name=base_name,
+        show_pick: bool = False,
+        **kwargs
+    ):
+        return cls(
+            parent,
+            BlockResourceIDState(translation_manager, **kwargs),
+            show_pick=show_pick,
         )
 
     def _post_event(
@@ -69,7 +64,7 @@ def demo():
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
-    widget = BlockIdentifierSelect(
+    widget = BlockIdentifierSelect.from_data(
         dialog,
         translation_manager,
         platform="java",

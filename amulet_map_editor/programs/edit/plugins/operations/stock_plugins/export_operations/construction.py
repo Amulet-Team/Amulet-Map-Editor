@@ -37,7 +37,7 @@ class ExportConstruction(SimpleOperationPanel):
             style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
-        self._version_define = VersionSelect(
+        self._version_define = VersionSelect.from_data(
             self,
             world.translation_manager,
             platform=options.get("platform", None) or world.level_wrapper.platform,

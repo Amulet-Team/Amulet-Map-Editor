@@ -48,7 +48,7 @@ class ExportSchematic(SimpleOperationPanel):
             style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE,
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
-        self._platform_define = PlatformSelect(
+        self._platform_define = PlatformSelect.from_data(
             self,
             world.translation_manager,
             platform=options.get("platform", None) or world.level_wrapper.platform,

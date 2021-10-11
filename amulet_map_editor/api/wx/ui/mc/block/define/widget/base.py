@@ -20,9 +20,8 @@ class BaseBlockDefine(BaseDefine):
     def __init__(
         self,
         parent,
-        translation_manager: PyMCTranslate.TranslationManager,
+        state: BlockState,
         *,
-        state: BlockState = None,
         orientation=wx.VERTICAL,
         show_pick_block: bool = False,
     ):
@@ -30,15 +29,33 @@ class BaseBlockDefine(BaseDefine):
         BaseDefine.__init__(
             self,
             parent,
-            translation_manager,
-            state=state,
+            state,
             orientation=orientation,
         )
         self._identifier_select = BlockIdentifierSelect(
             self,
-            translation_manager,
-            state=self.state,
+            state,
             show_pick=show_pick_block,
         )
         self._identifier_select.Bind(EVT_BLOCK_ID_CHANGE, self._post_change)
         self._top_sizer.Add(self._identifier_select, 1, wx.EXPAND | wx.TOP, 5)
+
+    @classmethod
+    def from_data(
+        cls,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        *,
+        orientation=wx.VERTICAL,
+        show_pick_block: bool = False,
+        **kwargs,
+    ):
+        return cls(
+            parent,
+            BlockState(
+                translation_manager,
+                **kwargs,
+            ),
+            orientation=orientation,
+            show_pick_block=show_pick_block,
+        )

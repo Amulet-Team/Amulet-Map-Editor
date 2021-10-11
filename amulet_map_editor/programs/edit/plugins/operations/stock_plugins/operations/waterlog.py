@@ -80,10 +80,10 @@ class Waterlog(wx.Panel, DefaultOperationUI):
         )
         self._mode_description.Fit()
 
-        self._block_define = BlockDefine(
+        self._block_define = BlockDefine.from_data(
             self,
             world.level_wrapper.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(options.get("fill_block_options", []) or [world.level_wrapper.platform]),
             show_pick_block=True
         )

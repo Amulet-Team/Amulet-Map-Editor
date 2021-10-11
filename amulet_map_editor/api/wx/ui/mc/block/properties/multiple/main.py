@@ -2,8 +2,6 @@ import wx
 
 import PyMCTranslate
 import amulet_nbt
-from amulet.api.data_types import VersionNumberTuple
-from amulet.api.block import PropertyTypeMultiple
 from amulet_map_editor.api.wx.ui.mc.state import State, BlockState
 from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 
@@ -28,33 +26,12 @@ class MultiplePropertySelect(BasePropertySelect):
     def __init__(
         self,
         parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        *,
-        state: BlockState = None,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
-        all_properties: PropertyTypeMultiple = None,
-        selected_properties: PropertyTypeMultiple = None,
+        state: BlockState,
     ):
-        if not isinstance(state, BlockState):
-            state = BlockState(
-                translation_manager,
-                platform=platform,
-                version_number=version_number,
-                force_blockstate=force_blockstate,
-                namespace=namespace,
-                base_name=base_name,
-                properties_multiple=selected_properties,
-                valid_properties=all_properties,
-            )
         BasePropertySelect.__init__(
             self,
             parent,
-            translation_manager,
-            state=state,
+            state,
         )
 
         self._vanilla = self._create_automatic()
@@ -94,7 +71,7 @@ def demo():
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        obj = MultiplePropertySelect(
+        obj = MultiplePropertySelect.from_data(
             dialog,
             translation_manager,
             platform="java",
@@ -130,7 +107,7 @@ def demo():
         {
             "namespace": "minecraft",
             "base_name": "oak_fence",
-            "selected_properties": {
+            "properties_multiple": {
                 "east": (
                     amulet_nbt.TAG_String("true"),
                     amulet_nbt.TAG_String("false"),
@@ -146,7 +123,7 @@ def demo():
         {
             "namespace": "modded",
             "base_name": "block",
-            "selected_properties": {
+            "properties_multiple": {
                 "test": (
                     amulet_nbt.TAG_String("hello"),
                     amulet_nbt.TAG_String("hello2"),

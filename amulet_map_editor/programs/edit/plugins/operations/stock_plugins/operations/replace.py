@@ -27,10 +27,10 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         self.Freeze()
         options = self._load_options({})
 
-        self._original_block = BlockDefine(
+        self._original_block = BlockDefine.from_data(
             self,
             world.level_wrapper.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(
                 options.get("original_block_options", [])
                 or [world.level_wrapper.platform]
@@ -40,10 +40,10 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         )
         self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self._original_block.Bind(EVT_PICK, lambda evt: self._on_pick_block_button(1))
-        self._replacement_block = BlockDefine(
+        self._replacement_block = BlockDefine.from_data(
             self,
             world.level_wrapper.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(
                 options.get("replacement_block_options", [])
                 or [world.level_wrapper.platform]

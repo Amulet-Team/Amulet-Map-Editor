@@ -118,8 +118,9 @@ class StateHolder:
     _state: BaseState
 
     def __init__(self, state: BaseState):
-        self._state = None
-        self.state = state
+        assert isinstance(state, BaseState)
+        self._state = state
+        self._state.bind_on_change(self._on_state_change)
 
     @property
     def state(self):
@@ -148,10 +149,10 @@ class PlatformState(BaseState):
         **kwargs,
     ):
         super().__init__(translation_manager, **kwargs)
-        self._state[State.Platform] = self._sanitise_platform(platform)
         self._allow_universal = allow_universal
         self._allow_vanilla = allow_vanilla
         self._platform_key = platform_key
+        self._state[State.Platform] = self._sanitise_platform(platform)
 
     def _fix_new_state(self):
         if self.is_changed(State.Platform):
@@ -185,6 +186,13 @@ class PlatformState(BaseState):
     def platform(self, platform: PlatformType):
         self._set_state(State.Platform, platform)
 
+    def __deepcopy__(self, memodict=None):
+        new_state = super().__deepcopy__(memodict=memodict)
+        new_state._allow_universal = self._allow_universal
+        new_state._allow_vanilla = self._allow_vanilla
+        new_state._platform_key = self._platform_key
+        return new_state
+
 
 class VersionState(PlatformState):
     def __init__(
@@ -198,12 +206,12 @@ class VersionState(PlatformState):
         **kwargs,
     ):
         super().__init__(translation_manager, **kwargs)
+        self._allow_numerical = allow_numerical
+        self._allow_blockstate = allow_blockstate
         self._state[State.VersionNumber] = self._sanitise_version(version_number)
         self._state[State.ForceBlockstate] = self._sanitise_force_blockstate(
             force_blockstate
         )
-        self._allow_numerical = allow_numerical
-        self._allow_blockstate = allow_blockstate
 
     def _fix_new_state(self):
         super()._fix_new_state()
@@ -274,6 +282,12 @@ class VersionState(PlatformState):
     @force_blockstate.setter
     def force_blockstate(self, force_blockstate: bool):
         self._set_state(State.ForceBlockstate, force_blockstate)
+
+    def __deepcopy__(self, memodict=None):
+        new_state = super().__deepcopy__(memodict=memodict)
+        new_state._allow_numerical = self._allow_numerical
+        new_state._allow_blockstate = self._allow_blockstate
+        return new_state
 
 
 class BaseNamespaceState(VersionState):

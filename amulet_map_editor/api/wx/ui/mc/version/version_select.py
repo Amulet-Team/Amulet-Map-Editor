@@ -1,7 +1,7 @@
 from amulet_map_editor.api.wx.ui.simple import SimpleChoice, ChoiceRaw
 import wx
 import PyMCTranslate
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional
 
 from amulet.api.data_types import VersionNumberTuple, PlatformType
 from .platform_select import PlatformSelect
@@ -19,57 +19,18 @@ class VersionSelect(PlatformSelect):
     def __init__(
         self,
         parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
+        state: VersionState,
         *,
-        state: VersionState = None,
-        platform: PlatformType = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        allow_universal: bool = True,
-        allow_vanilla: bool = True,
-        allowed_platforms: Tuple[PlatformType, ...] = None,
         show_force_blockstate: bool = True,
-        allow_numerical: bool = True,
-        allow_blockstate: bool = True,
-        style: Dict[str, Any] = None,
+        **kwargs,
     ):
         """
         Construct a :class:`VersionSelect` UI.
 
         :param parent: The parent window.
-        :param translation_manager: The translation manager to populate from.
         :param state: optional VersionSelect instance holding the state of the platform and version.
-        :param platform: The default platform (optional). If state is defined this will not be used.
-        :param version_number: The default version number (optional). If state is defined this will not be used.
-        :param force_blockstate: If True and the native format is numerical will use the custom blockstate format. Else will use the native format. If state is defined this will not be used.
-        :param allow_universal: If True the universal format will be included.
-        :param allow_vanilla: If True the vanilla formats will be included.
-        :param allowed_platforms: A whitelist of platforms.
-        :param show_force_blockstate: Should the format selection be shown to the user.
-        :param allow_numerical: Should the numerical versions be shown to the user.
-        :param allow_blockstate: Should the blockstate versions be shown to the user.
-        :param style: Dictionary of keyword args to be given to the Panel.
         """
-        # init the state
-        if not isinstance(state, VersionState):
-            state = VersionState(
-                translation_manager,
-                platform=platform,
-                version_number=version_number,
-                force_blockstate=force_blockstate,
-            )
-
-        super().__init__(
-            parent,
-            translation_manager,
-            state=state,
-            allow_universal=allow_universal,
-            allow_vanilla=allow_vanilla,
-            allowed_platforms=allowed_platforms,
-            style=style,
-        )
-        self._allow_numerical = allow_numerical
-        self._allow_blockstate = allow_blockstate
+        super().__init__(parent, state, **kwargs)
 
         self._version_choice: Optional[ChoiceRaw] = self._add_ui_element(
             "Version:", ChoiceRaw, reverse=True, sort=True
@@ -87,15 +48,25 @@ class VersionSelect(PlatformSelect):
         self._update_force_blockstate()
         self._blockstate_choice.Bind(wx.EVT_CHOICE, self._on_blockstate_change)
 
-    # def _populate_version(self):
-    #     """Populate the version UI element"""
-        # TODO
-        # versions = self._translation_manager.version_numbers(self.platform)
-        # if not self._allow_blockstate:
-        #     versions = [v for v in versions if v < (1, 13, 0)]
-        # if not self._allow_numerical:
-        #     versions = [v for v in versions if v >= (1, 13, 0)]
-        # self._version_choice.SetItems(versions)
+    @classmethod
+    def from_data(
+        cls,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        *,
+        show_force_blockstate: bool = True,
+        **kwargs,
+    ):
+        """
+        :param parent: The parent window.
+        :param translation_manager: The translation manager to populate from.
+        :param show_force_blockstate: Should the format selection be shown to the user.
+        """
+        return cls(
+            parent,
+            VersionState(translation_manager, **kwargs),
+            show_force_blockstate=show_force_blockstate,
+        )
 
     def _update_version_number(self):
         """Push the internal version number state to the UI."""
@@ -149,10 +120,10 @@ def demo():
     translation_manager = PyMCTranslate.new_translation_manager()
     for cls, title in (
         (
-            lambda *args: VersionSelect(*args, show_force_blockstate=False),
+            lambda *args: VersionSelect.from_data(*args, show_force_blockstate=False),
             "VersionSelect without format choice",
         ),
-        (VersionSelect, "VersionSelect with format choice"),
+        (VersionSelect.from_data, "VersionSelect with format choice"),
     ):
         dialog = wx.Dialog(
             None, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.DIALOG_NO_PARENT

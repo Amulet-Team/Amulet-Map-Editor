@@ -1,8 +1,6 @@
 import wx
-
 import PyMCTranslate
 
-from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor.api.image import COLOUR_PICKER
 from amulet_map_editor.api.wx.ui.mc.state import BaseResourceIDState, StateHolder, State
 from .events import (
@@ -23,25 +21,11 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
     def __init__(
         self,
         parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
+        state: BaseResourceIDState,
         *,
-        state: BaseResourceIDState = None,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
         show_pick: bool = False,
     ):
-        if not isinstance(state, BaseResourceIDState):
-            state = self._create_default_state(
-                translation_manager,
-                platform=platform,
-                version_number=version_number,
-                force_blockstate=force_blockstate,
-                namespace=namespace,
-                base_name=base_name,
-            )
+        assert isinstance(state, BaseResourceIDState)
         StateHolder.__init__(self, state)
         wx.Panel.__init__(self, parent, style=wx.BORDER_SIMPLE)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
@@ -90,16 +74,15 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         self._update_base_name()
         self._base_name_list_box.Bind(wx.EVT_LISTBOX, self._on_base_name_change)
 
-    def _create_default_state(
-        self,
+    @classmethod
+    def from_data(
+        cls,
+        parent: wx.Window,
         translation_manager: PyMCTranslate.TranslationManager,
         *,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
-    ) -> BaseResourceIDState:
+        show_pick: bool = False,
+        **kwargs,
+    ):
         raise NotImplementedError
 
     @property

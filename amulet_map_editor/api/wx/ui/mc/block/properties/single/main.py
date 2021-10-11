@@ -25,30 +25,8 @@ class SinglePropertySelect(BasePropertySelect):
     _vanilla: VanillaSingleProperty
     _modded: ModdedSingleProperty
 
-    def __init__(
-        self,
-        parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        *,
-        state: BlockState = None,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
-        properties: PropertyType = None,
-    ):
-        if not isinstance(state, BlockState):
-            state = BlockState(
-                translation_manager,
-                platform=platform,
-                version_number=version_number,
-                force_blockstate=force_blockstate,
-                namespace=namespace,
-                base_name=base_name,
-                properties=properties,
-            )
-        super().__init__(parent, translation_manager, state=state)
+    def __init__(self, parent: wx.Window, state: BlockState):
+        super().__init__(parent, state)
 
         self._vanilla = self._create_automatic()
         self._sizer.Add(self._vanilla, 0, wx.EXPAND)
@@ -87,7 +65,7 @@ def demo():
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        obj = SinglePropertySelect(
+        obj = SinglePropertySelect.from_data(
             dialog,
             translation_manager,
             platform="java",

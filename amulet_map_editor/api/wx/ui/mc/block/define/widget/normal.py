@@ -3,8 +3,6 @@ import wx.lib.scrolledpanel
 
 import PyMCTranslate
 import amulet_nbt
-from amulet.api.data_types import VersionNumberTuple
-from amulet.api.block import PropertyType
 from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 
 from amulet_map_editor.api.wx.ui.mc.block import (
@@ -30,33 +28,15 @@ class BlockDefine(BaseBlockDefine):
     def __init__(
         self,
         parent,
-        translation_manager: PyMCTranslate.TranslationManager,
+        state: BlockState,
         *,
-        state: BlockState = None,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        namespace: str = None,
-        base_name: str = None,
-        properties: PropertyType = None,
         show_pick_block: bool = False,
         orientation=wx.VERTICAL,
     ):
-        if not isinstance(state, BlockState):
-            state = BlockState(
-                translation_manager,
-                platform=platform,
-                version_number=version_number,
-                force_blockstate=force_blockstate,
-                namespace=namespace,
-                base_name=base_name,
-                properties=properties,
-            )
-        BaseBlockDefine.__init__(
-            self,
+        assert isinstance(state, BlockState)
+        super().__init__(
             parent,
-            translation_manager,
-            state=state,
+            state,
             orientation=orientation,
             show_pick_block=show_pick_block,
         )
@@ -64,15 +44,13 @@ class BlockDefine(BaseBlockDefine):
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         border = wx.LEFT if orientation == wx.HORIZONTAL else wx.TOP
         self._sizer.Add(right_sizer, 1, wx.EXPAND | border, 5)
-        self._property_picker = self._create_property_picker(translation_manager)
+        self._property_picker = self._create_property_picker()
         self._property_picker.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._post_change)
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self.Layout()
 
-    def _create_property_picker(
-        self, translation_manager: PyMCTranslate.TranslationManager
-    ) -> SinglePropertySelect:
-        return SinglePropertySelect(self, translation_manager, state=self.state)
+    def _create_property_picker(self) -> SinglePropertySelect:
+        return SinglePropertySelect(self, self.state)
 
     def _post_change(self, evt):
         wx.PostEvent(
@@ -103,7 +81,7 @@ def demo():
         )
         sizer = wx.BoxSizer()
         dialog.SetSizer(sizer)
-        obj = BlockDefine(
+        obj = BlockDefine.from_data(
             dialog,
             translation_manager,
             platform="java",

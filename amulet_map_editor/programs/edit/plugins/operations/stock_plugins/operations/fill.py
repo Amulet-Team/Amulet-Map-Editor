@@ -28,10 +28,10 @@ class Fill(wx.Panel, DefaultOperationUI):
 
         options = self._load_options({})
 
-        self._block_define = BlockDefine(
+        self._block_define = BlockDefine.from_data(
             self,
             world.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(options.get("fill_block_options", []) or [world.level_wrapper.platform]),
             show_pick_block=True
         )

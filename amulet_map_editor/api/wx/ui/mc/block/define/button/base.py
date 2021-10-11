@@ -1,6 +1,7 @@
 import wx
 from typing import Optional
 
+import PyMCTranslate
 from amulet_map_editor.api.wx.ui.mc.block.define import BaseBlockDefine
 from amulet_map_editor.api.wx.ui.mc.state import StateHolder, BlockState
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
@@ -12,8 +13,8 @@ class BaseBlockDefineButton(wx.Button, StateHolder):
     def __init__(
         self,
         parent: wx.Window,
+        state: BlockState,
         *,
-        state: BlockState = None,
         show_pick_block: bool = False,
         max_char_length: int = 99999,
     ):
@@ -24,6 +25,24 @@ class BaseBlockDefineButton(wx.Button, StateHolder):
         self.Bind(wx.EVT_BUTTON, self._on_press)
         self._show_pick_block = show_pick_block
         self._max_char_length = max(3, max_char_length)
+        self.update_button()
+
+    @classmethod
+    def from_data(
+        cls,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        *,
+        show_pick_block: bool = False,
+        max_char_length: int = 99999,
+        **kwargs,
+    ):
+        return cls(
+            parent,
+            BlockState(translation_manager, **kwargs),
+            show_pick_block=show_pick_block,
+            max_char_length=max_char_length,
+        )
 
     def SetLabel(self, label: str):
         if len(label) > self._max_char_length:

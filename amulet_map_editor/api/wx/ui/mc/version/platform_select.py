@@ -1,9 +1,8 @@
 from amulet_map_editor.api.wx.ui.simple import SimpleChoice
 import wx
 import PyMCTranslate
-from typing import Tuple, Type, Any, Dict
+from typing import Type, Any
 
-from amulet.api.data_types import PlatformType
 from .events import PlatformChangeEvent, EVT_PLATFORM_CHANGE
 from amulet_map_editor.api.wx.ui.mc.state import PlatformState, StateHolder, State
 
@@ -18,36 +17,20 @@ class PlatformSelect(wx.Panel, StateHolder):
     def __init__(
         self,
         parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        *,
-        state: PlatformState = None,
-        platform: PlatformType = None,
-        allow_universal: bool = True,
-        allow_vanilla: bool = True,
-        allowed_platforms: Tuple[PlatformType, ...] = None,
-        style: Dict[str, Any] = None,
+        state: PlatformState,
+        **kwargs,
     ):
         """
         Construct a :class:`PlatformSelect` UI.
 
         :param parent: The parent window.
-        :param translation_manager: The translation manager to populate from.
         :param state: optional PlatformSelect instance holding the state of the platform.
-        :param platform: The default platform (optional). If state is defined this will not be used.
-        :param allow_universal: If True the universal format will be included.
-        :param allow_vanilla: If True the vanilla formats will be included.
-        :param allowed_platforms: A whitelist of platforms.
-        :param style: Dictionary of keyword args to be given to the Panel.
         """
         # init the state
-        if not isinstance(state, PlatformState):
-            state = PlatformState(translation_manager, platform=platform)
         StateHolder.__init__(self, state)
 
         # init the panel
-        style = style or {}
-        style.setdefault("style", wx.BORDER_SIMPLE)
-        wx.Panel.__init__(self, parent, **style)
+        wx.Panel.__init__(self, parent, style=wx.BORDER_SIMPLE)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
         self._sizer = wx.FlexGridSizer(2, 5, 5)
@@ -56,9 +39,6 @@ class PlatformSelect(wx.Panel, StateHolder):
         self._sizer.AddGrowableCol(0)
         self._sizer.AddGrowableCol(1)
 
-        # self._allow_universal = allow_universal
-        # self._allow_vanilla = allow_vanilla
-        # self._allowed_platforms = allowed_platforms
         self._platform_choice: SimpleChoice = self._add_ui_element(
             "Platform:", SimpleChoice
         )
@@ -66,6 +46,25 @@ class PlatformSelect(wx.Panel, StateHolder):
         self._platform_choice.Bind(
             wx.EVT_CHOICE,
             self._on_platform_change,
+        )
+
+    @classmethod
+    def from_data(
+        cls,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        **kwargs,
+    ):
+        """
+        :param parent: The parent window.
+        :param translation_manager: The translation manager to populate from.
+        """
+        return cls(
+            parent,
+            PlatformState(
+                translation_manager,
+                **kwargs,
+            ),
         )
 
     def _add_ui_element(
@@ -79,18 +78,6 @@ class PlatformSelect(wx.Panel, StateHolder):
             text.Hide()
             wx_obj.Hide()
         return wx_obj
-
-    # def _populate_platform(self):
-    #     """Update the UI with the valid platforms."""
-        # TODO
-        # platforms = self._translation_manager.platforms()
-        # if self._allowed_platforms is not None:
-        #     platforms = [p for p in platforms if p in self._allowed_platforms]
-        # if not self._allow_universal:
-        #     platforms = [p for p in platforms if p != "universal"]
-        # if not self._allow_vanilla:
-        #     platforms = [p for p in platforms if p == "universal"]
-        # self._platform_choice.SetItems(self.state.valid_platforms)
 
     def _update_platform(self):
         """Push the internal platform state to the UI."""
@@ -128,7 +115,7 @@ def demo():
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
-    obj = PlatformSelect(dialog, translation_manager, platform="java")
+    obj = PlatformSelect.from_data(dialog, translation_manager, platform="java")
     sizer.Add(
         obj,
         1,

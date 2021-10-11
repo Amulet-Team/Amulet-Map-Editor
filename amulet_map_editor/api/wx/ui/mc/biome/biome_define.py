@@ -63,39 +63,41 @@ class BiomeDefine(BaseDefine):
     def __init__(
         self,
         parent,
-        translation_manager: PyMCTranslate.TranslationManager,
+        state: BiomeResourceIDState,
         *,
-        state: BiomeResourceIDState = None,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        namespace: str = None,
-        base_name: str = None,
         show_pick_biome: bool = False,
         orientation=wx.VERTICAL,
     ):
-        if not isinstance(state, BiomeResourceIDState):
-            state = BiomeResourceIDState(
-                translation_manager,
-                platform=platform,
-                version_number=version_number,
-                force_blockstate=False,
-                namespace=namespace,
-                base_name=base_name,
-            )
+        assert isinstance(state, BiomeResourceIDState)
         super().__init__(
             parent,
-            translation_manager,
-            state=state,
+            state,
             orientation=orientation,
         )
         self._identifier_select = BiomeIdentifierSelect(
             self,
-            translation_manager,
-            state=state,
+            state,
             show_pick=show_pick_biome,
         )
         self._identifier_select.Bind(EVT_BIOME_ID_CHANGE, self._post_change)
         self._top_sizer.Add(self._identifier_select, 1, wx.EXPAND | wx.TOP, 5)
+
+    @classmethod
+    def from_data(
+        cls,
+        parent: wx.Window,
+        translation_manager: PyMCTranslate.TranslationManager,
+        *,
+        show_pick_biome: bool = False,
+        orientation=wx.VERTICAL,
+        **kwargs,
+    ):
+        return cls(
+            parent,
+            BiomeResourceIDState(translation_manager, **kwargs),
+            show_pick_biome=show_pick_biome,
+            orientation=orientation,
+        )
 
     def _post_change(self, evt):
         wx.PostEvent(
@@ -123,7 +125,7 @@ def demo():
     )
     sizer = wx.BoxSizer()
     dialog.SetSizer(sizer)
-    obj = BiomeDefine(dialog, translation_manager, orientation=wx.HORIZONTAL)
+    obj = BiomeDefine.from_data(dialog, translation_manager, orientation=wx.HORIZONTAL)
 
     def on_biome_change(evt: BiomeChangeEvent):
         print(
