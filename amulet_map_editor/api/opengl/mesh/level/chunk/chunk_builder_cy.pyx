@@ -1,4 +1,6 @@
 # cython: language_level=3, boundscheck=False, wraparound=False
+# distutils: extra_compile_args = -openmp
+# distutils: extra_link_args = -openmp
 
 import numpy
 cimport numpy
@@ -10,6 +12,7 @@ cdef extern from "stdlib.h":
 
 from cpython cimport array
 import array
+from cython.parallel import prange
 
 cdef float _brightness_step = 0.15
 cdef dict _brightness_multiplier = {
@@ -44,6 +47,46 @@ CULL_MAP[6][:] = (-1, 0, 0)
 DEF ARRAY_VERT_COUNT = 10_008  # The number of vertices in the table
 DEF ATTR_COUNT = 12  # The number of float attributes per vertex
 DEF ARRAY_SIZE = ARRAY_VERT_COUNT * ATTR_COUNT
+
+cdef struct BlockArray:
+    unsigned int* arr  # pointer to the array
+    int sx  # the shape of the array in the x axis
+    int sy  # the shape of the array in the y axis
+    int sz  # the shape of the array in the z axis
+    long dx # the displacement in the x axis
+    long dy # the displacement in the y axis
+    long dz # the displacement in the z axis
+
+cdef BlockArray* BlockArray_new(int sx, int sy, int sz) nogil:
+    self = <BlockArray*>calloc(1, sizeof(BlockArray))
+    self.arr = <unsigned int*>malloc(sx * sy * sz * sizeof(unsigned int))
+    self.sx = sx
+    self.sy = sy
+    self.sz = sz
+    self.dx = 0
+    self.dy = 0
+    self.dz = 0
+    return self
+
+cdef BlockArray* BlockArray_init(
+        unsigned int* arr,
+        int sx,
+        int sy,
+        int sz,
+        long dx,
+        long dy,
+        long dz,
+) nogil:
+    self = BlockArray_new(sx, sy, sz)
+    memcpy(self.arr, arr, sx * sy * sz * sizeof(unsigned int))
+    self.dx = dx
+    self.dy = dy
+    self.dz = dz
+    return self
+
+cdef void BlockArray_free(BlockArray* self) nogil:
+    free(self.arr)
+    free(self)
 
 
 cdef struct VertArray:
@@ -182,10 +225,17 @@ cdef void VertArrayContainerTuple_free(VertArrayContainerTuple* self) nogil:
     VertArrayContainer_free(self.verts_translucent)
     free(self)
 
+cdef unsigned int get_block(
+    BlockArray* block_array,
+    int x,
+    int y,
+    int z
+) nogil:
+    return block_array.arr[x * block_array.sz * block_array.sy + y * block_array.sz + z]
+
 cdef VertArrayContainerTuple* create_lod0_sub_chunk(
-    unsigned int[:, :, :] larger_blocks,
+    BlockArray* block_array,
     BlockModelManager block_model_manager,
-    long[:] sub_chunk_offset,
 ) nogil:
     cdef int x, y, z, x_, y_, z_, dx, dy, dz  # location variables
 
@@ -202,9 +252,9 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
     cdef VertArray* trans_vert_table = VertArray_new(ARRAY_SIZE)
     trans_vert_table.size = 0
 
-    cdef int size_x = larger_blocks.shape[0] - 2
-    cdef int size_y = larger_blocks.shape[1] - 2
-    cdef int size_z = larger_blocks.shape[2] - 2
+    cdef int size_x = block_array.sx - 2
+    cdef int size_y = block_array.sy - 2
+    cdef int size_z = block_array.sz - 2
 
     cdef VertArrayContainerTuple* verts = VertArrayContainerTuple_init()
 
@@ -214,7 +264,7 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
                 x_ = x + 1
                 y_ = y + 1
                 z_ = z + 1
-                block_id = larger_blocks[x_, y_, z_]
+                block_id = get_block(block_array, x_, y_, z_)
                 block_model = block_model_manager.blocks[block_id]
                 for cull_id in range(7):
                     if block_model.faces[cull_id]:
@@ -224,8 +274,8 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
                             dy = y_ + CULL_MAP[cull_id][1]
                             dz = z_ + CULL_MAP[cull_id][2]
                             # If the next block is opaque or both blocks are full transparent blocks, do nothing
-                            if block_model_manager.blocks[larger_blocks[dx, dy, dz]].is_transparent == 0 or \
-                               block_model_manager.blocks[larger_blocks[dx, dy, dz]].is_transparent == block_model_manager.blocks[larger_blocks[x_, y_, z_]].is_transparent == 1:
+                            if block_model_manager.blocks[get_block(block_array, dx, dy, dz)].is_transparent == 0 or \
+                               block_model_manager.blocks[get_block(block_array, dx, dy, dz)].is_transparent == block_model_manager.blocks[get_block(block_array, x_, y_, z_)].is_transparent == 1:
                                 continue
 
                         vert_array = block_model.faces[cull_id]
@@ -240,9 +290,9 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
                                 vert_end = vert_count
                             memcpy(&trans_vert_table.arr[trans_vert_table.size], vert_array.arr, vert_count * sizeof(float))
                             for vertex in range(trans_vert_table.size, vert_end, ATTR_COUNT):
-                                trans_vert_table.arr[vertex + 0] += sub_chunk_offset[0] + x
-                                trans_vert_table.arr[vertex + 1] += sub_chunk_offset[1] + y
-                                trans_vert_table.arr[vertex + 2] += sub_chunk_offset[2] + z
+                                trans_vert_table.arr[vertex + 0] += block_array.dx + x
+                                trans_vert_table.arr[vertex + 1] += block_array.dy + y
+                                trans_vert_table.arr[vertex + 2] += block_array.dz + z
                                 shade = ((trans_vert_table.arr[vertex + 1] / 32) % 2)
                                 if shade > 1:
                                     shade = - shade + 2
@@ -259,9 +309,9 @@ cdef VertArrayContainerTuple* create_lod0_sub_chunk(
                                 vert_end = vert_count
                             memcpy(&vert_table.arr[vert_table.size], vert_array.arr, vert_count * sizeof(float))
                             for vertex in range(vert_table.size, vert_end, ATTR_COUNT):
-                                vert_table.arr[vertex + 0] += sub_chunk_offset[0] + x
-                                vert_table.arr[vertex + 1] += sub_chunk_offset[1] + y
-                                vert_table.arr[vertex + 2] += sub_chunk_offset[2] + z
+                                vert_table.arr[vertex + 0] += block_array.dx + x
+                                vert_table.arr[vertex + 1] += block_array.dy + y
+                                vert_table.arr[vertex + 2] += block_array.dz + z
                                 shade = ((vert_table.arr[vertex + 1] / 32) % 2)
                                 if shade > 1:
                                     shade = - shade + 2
@@ -287,22 +337,35 @@ cdef tuple _create_lod0_chunk(
     list blocks,
     long[:] chunk_offset
 ):
-    cdef int sub_chunk_count = len(blocks)
-    cdef long[:] sub_chunk_offset
-    cdef long sub_chunk_y
-    cdef unsigned int[:, :, :] block_array
     cdef int i, j
+    cdef long sub_chunk_y
+    cdef unsigned int[:, :, ::1] block_array
+    cdef int sub_chunk_count = len(blocks)
+    block_array_list = <BlockArray**>calloc(sub_chunk_count, sizeof(BlockArray*))
     sub_chunk_verts = <VertArrayContainerTuple**>calloc(sub_chunk_count, sizeof(VertArrayContainerTuple*))
+
     for i in range(sub_chunk_count):
         block_array, sub_chunk_y = blocks[i]
-        sub_chunk_offset = chunk_offset.copy()
-        sub_chunk_offset[1] += sub_chunk_y
-
-        sub_chunk_verts[i] = create_lod0_sub_chunk(
-            block_array,
-            block_model_manager,
-            sub_chunk_offset,
+        block_array_list[i] = BlockArray_init(
+            &block_array[0, 0, 0],
+            block_array.shape[0],
+            block_array.shape[1],
+            block_array.shape[2],
+            chunk_offset[0],
+            chunk_offset[1] + sub_chunk_y,
+            chunk_offset[2]
         )
+
+    for i in prange(sub_chunk_count, nogil=True):
+    # for i in range(sub_chunk_count):
+        sub_chunk_verts[i] = create_lod0_sub_chunk(
+            block_array_list[i],
+            block_model_manager,
+        )
+
+    for i in range(sub_chunk_count):
+        BlockArray_free(block_array_list[i])
+    free(block_array_list)
 
     cdef unsigned long vert_size = 0
     cdef unsigned long vert_size_translucent = 0
