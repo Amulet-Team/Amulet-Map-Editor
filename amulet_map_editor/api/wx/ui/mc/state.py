@@ -18,16 +18,7 @@ from amulet_map_editor import log
 OnChangeType = Callable[[int], None]
 
 
-class State(Enum):
-    Platform = "platform"
-    VersionNumber = "version_number"
-    ForceBlockstate = "force_blockstate"
-    Namespace = "namespace"
-    BaseName = "base_name"
-    Properties = "properties"
-    PropertiesMultiple = "properties_multiple"
-    ValidProperties = "valid_properties"
-
+class StrEnum:
     def __str__(self):
         return self.value
 
@@ -40,11 +31,22 @@ class State(Enum):
         return hash(self.value)
 
 
+class State(StrEnum, Enum):
+    Platform = "platform"
+    VersionNumber = "version_number"
+    ForceBlockstate = "force_blockstate"
+    Namespace = "namespace"
+    BaseName = "base_name"
+    Properties = "properties"
+    PropertiesMultiple = "properties_multiple"
+    ValidProperties = "valid_properties"
+
+
 class BaseState(ABC):
     _translation_manager: TranslationManager
     _edit: bool
-    _state: Dict[State, Any]
-    _changed_state: Dict[State, Any]
+    _state: Dict[StrEnum, Any]
+    _changed_state: Dict[StrEnum, Any]
     _on_change: List[OnChangeType]
 
     def __init__(self, translation_manager: TranslationManager, **kwargs):
@@ -72,17 +74,17 @@ class BaseState(ABC):
             except:
                 log.warning(f"Error calling {on_change}", exc_info=True)
 
-    def is_changed(self, state: Union[State, str]):
+    def is_changed(self, state: Union[StrEnum, str]):
         """Check if the state has changed."""
         return state in self._changed_state
 
-    def _get_state(self, state: State) -> Any:
+    def _get_state(self, state: StrEnum) -> Any:
         if state in self._changed_state:
             return self._changed_state[state]
         else:
             return self._state[state]
 
-    def _set_state(self, state: State, value: Any):
+    def _set_state(self, state: StrEnum, value: Any):
         if not self._edit:
             raise Exception("The state has not been opened for editing.")
         self._changed_state[state] = value
