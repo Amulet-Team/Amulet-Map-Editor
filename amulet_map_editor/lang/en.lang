@@ -69,6 +69,22 @@ select_world.recent_worlds=Recently Opened Worlds
 select_world.no_loader_found=Could not find a loader for this world.
 select_world.loading_world_failed=Error loading world.
 
+
+# Minecraft object widget labels
+widget.mc.platform=Platform:
+widget.mc.version=Version:
+widget.mc.block_format=Format:
+widget.mc.block_format.native=native
+widget.mc.block_format.blockstate=blockstate
+widget.mc.namespace=Namespace:
+widget.mc.block.base_name=Block Name:
+widget.mc.biome.base_name=Biome Name:
+widget.mc.block.property.name=Property Name
+widget.mc.block.property.value=Property Value (SNBT)
+widget.mc.block.property.invalid_snbt=Invalid SNBT
+widget.mc.block.property.invalid_value_fstring={val} not valid
+
+
 # About
 ## The default program when a world is opened
 program_about.tab_name=About

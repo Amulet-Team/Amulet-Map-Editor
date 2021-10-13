@@ -1,6 +1,7 @@
 import wx
 import PyMCTranslate
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.image import COLOUR_PICKER
 from amulet_map_editor.api.wx.ui.mc.state import BaseResourceIDState, StateHolder, State
 from .events import (
@@ -33,7 +34,9 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
-        text = wx.StaticText(self, label="Namespace:", style=wx.ALIGN_CENTER)
+        text = wx.StaticText(
+            self, label=lang.get("widget.mc.namespace"), style=wx.ALIGN_CENTER
+        )
         sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
         self._namespace_combo = wx.ComboBox(self)
         sizer.Add(self._namespace_combo, 2)
@@ -51,7 +54,7 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         header_sizer.Add(
             wx.StaticText(
                 self,
-                label=f"{self.type_name.capitalize()} name:",
+                label=self.base_name_label,
                 style=wx.ALIGN_CENTER,
             ),
             1,
@@ -86,7 +89,7 @@ class BaseIdentifierSelect(wx.Panel, StateHolder):
         raise NotImplementedError
 
     @property
-    def type_name(self) -> str:
+    def base_name_label(self) -> str:
         raise NotImplementedError
 
     def _post_event(

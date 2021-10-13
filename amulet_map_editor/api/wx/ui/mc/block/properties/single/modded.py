@@ -5,6 +5,7 @@ from collections import namedtuple
 import amulet_nbt
 from amulet_nbt import SNBTType
 from amulet.api.block import PropertyDataTypes, PropertyType
+from amulet_map_editor import lang
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 from amulet_map_editor.api.wx.ui.mc.state import BlockState
 from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
@@ -33,10 +34,14 @@ class BaseModdedSingleProperty(BaseSingleProperty):
         )
         header_sizer.Add(add_button)
         self._sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
+        label = wx.StaticText(
+            self, label=lang.get("widget.mc.block.property.name"), style=wx.ALIGN_CENTER
+        )
         header_sizer.Add(label, 1, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         label = wx.StaticText(
-            self, label="Property Value (SNBT)", style=wx.ALIGN_CENTER
+            self,
+            label=lang.get("widget.mc.block.property.value"),
+            style=wx.ALIGN_CENTER,
         )
         header_sizer.Add(label, 1, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         header_sizer.AddStretchSpacer(1)
@@ -136,14 +141,18 @@ class BaseModdedSingleProperty(BaseSingleProperty):
         try:
             nbt = amulet_nbt.from_snbt(snbt)
         except:
-            snbt_text.SetLabel("Invalid SNBT")
+            snbt_text.SetLabel(lang.get("widget.mc.block.property.invalid_snbt"))
             snbt_text.SetBackgroundColour((255, 200, 200))
         else:
             if isinstance(nbt, PropertyDataTypes):
                 snbt_text.SetLabel(nbt.to_snbt())
                 snbt_text.SetBackgroundColour(wx.NullColour)
             else:
-                snbt_text.SetLabel(f"{nbt.__class__.__name__} not valid")
+                snbt_text.SetLabel(
+                    lang.get("widget.mc.block.property.invalid_value_fstring").format(
+                        val=nbt.__class__.__name__
+                    )
+                )
                 snbt_text.SetBackgroundColour((255, 200, 200))
         self.Layout()
 

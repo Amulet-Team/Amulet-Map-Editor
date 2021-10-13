@@ -1,6 +1,7 @@
 import wx
 
 import PyMCTranslate
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.mc.state import BiomeResourceIDState
 from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import (
     BaseIdentifierSelect,
@@ -17,8 +18,8 @@ class BiomeIdentifierSelect(BaseIdentifierSelect):
     """
 
     @property
-    def type_name(self) -> str:
-        return "Biome"
+    def base_name_label(self) -> str:
+        return lang.get("widget.mc.biome.base_name")
 
     @classmethod
     def from_data(

@@ -3,8 +3,9 @@ import wx
 import PyMCTranslate
 from typing import Type, Any
 
-from .events import PlatformChangeEvent, EVT_PLATFORM_CHANGE
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.mc.state import PlatformState, StateHolder, State
+from .events import PlatformChangeEvent, EVT_PLATFORM_CHANGE
 
 
 class PlatformSelect(wx.Panel, StateHolder):
@@ -40,7 +41,7 @@ class PlatformSelect(wx.Panel, StateHolder):
         self._sizer.AddGrowableCol(1)
 
         self._platform_choice: SimpleChoice = self._add_ui_element(
-            "Platform:", SimpleChoice
+            lang.get("widget.mc.platform"), SimpleChoice
         )
         self._update_platform()
         self._platform_choice.Bind(

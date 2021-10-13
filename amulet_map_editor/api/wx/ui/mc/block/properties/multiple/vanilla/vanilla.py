@@ -3,6 +3,7 @@ from typing import Dict, Tuple
 
 import amulet_nbt
 from amulet.api.block import PropertyTypeMultiple, PropertyValueType
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.mc.state import BlockState
 from ..base import BaseMultipleProperty
 from .popup import PropertyValueComboPopup
@@ -22,10 +23,14 @@ class BaseVanillaMultipleProperty(BaseMultipleProperty):
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
+        label = wx.StaticText(
+            self, label=lang.get("widget.mc.block.property.name"), style=wx.ALIGN_CENTER
+        )
         header_sizer.Add(label, 1)
         label = wx.StaticText(
-            self, label="Property Value (SNBT)", style=wx.ALIGN_CENTER
+            self,
+            label=lang.get("widget.mc.block.property.value"),
+            style=wx.ALIGN_CENTER,
         )
         header_sizer.Add(label, 1, wx.LEFT, 5)
         self._property_sizer = wx.GridSizer(2, 5, 5)

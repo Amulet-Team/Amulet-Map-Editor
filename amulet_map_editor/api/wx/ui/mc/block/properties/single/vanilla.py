@@ -2,6 +2,7 @@ import wx
 from typing import Dict, Tuple
 
 from amulet.api.block import PropertyType, PropertyValueType
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.mc.state import BlockState
 from amulet_map_editor.api.wx.ui.simple import ChoiceRaw
 from .base import BaseSingleProperty
@@ -20,10 +21,14 @@ class BaseVanillaSingleProperty(BaseSingleProperty):
         super().__init__(parent, state)
 
         self._property_sizer = wx.FlexGridSizer(2, 5, 5)
-        label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
+        label = wx.StaticText(
+            self, label=lang.get("widget.mc.block.property.name"), style=wx.ALIGN_CENTER
+        )
         self._property_sizer.Add(label, 1, wx.ALIGN_CENTER)
         label = wx.StaticText(
-            self, label="Property Value (SNBT)", style=wx.ALIGN_CENTER
+            self,
+            label=lang.get("widget.mc.block.property.value"),
+            style=wx.ALIGN_CENTER,
         )
         self._property_sizer.Add(label, 1, wx.ALIGN_CENTER)
 

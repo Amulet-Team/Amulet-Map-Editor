@@ -4,8 +4,9 @@ import PyMCTranslate
 from typing import Optional
 
 from amulet.api.data_types import VersionNumberTuple, PlatformType
-from .platform_select import PlatformSelect
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.mc.state import VersionState, State
+from .platform_select import PlatformSelect
 from .events import VersionChangeEvent, EVT_VERSION_CHANGE
 
 
@@ -33,7 +34,7 @@ class VersionSelect(PlatformSelect):
         super().__init__(parent, state, **kwargs)
 
         self._version_choice: Optional[ChoiceRaw] = self._add_ui_element(
-            "Version:", ChoiceRaw, reverse=True, sort=True
+            lang.get("widget.mc.version"), ChoiceRaw, reverse=True, sort=True
         )
         self._update_version_number()
         self._version_choice.Bind(
@@ -42,9 +43,16 @@ class VersionSelect(PlatformSelect):
         )
 
         self._blockstate_choice: Optional[SimpleChoice] = self._add_ui_element(
-            "Format:", SimpleChoice, shown=show_force_blockstate
+            lang.get("widget.mc.block_format"),
+            SimpleChoice,
+            shown=show_force_blockstate,
         )
-        self._blockstate_choice.SetItems(["native", "blockstate"])
+        self._blockstate_choice.SetItems(
+            [
+                lang.get("widget.mc.block_format.native"),
+                lang.get("widget.mc.block_format.blockstate"),
+            ]
+        )
         self._update_force_blockstate()
         self._blockstate_choice.Bind(wx.EVT_CHOICE, self._on_blockstate_change)
 
