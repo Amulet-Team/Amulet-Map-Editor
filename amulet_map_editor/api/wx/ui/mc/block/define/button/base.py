@@ -2,6 +2,7 @@ import wx
 from typing import Optional
 
 import PyMCTranslate
+from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
 from amulet_map_editor.api.wx.ui.mc.block.define import BaseBlockDefine
 from amulet_map_editor.api.wx.ui.mc.state import StateHolder, BlockState
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
@@ -52,16 +53,22 @@ class BaseBlockDefineButton(wx.Button, StateHolder):
     def _on_press(self, evt):
         dialog = SimpleDialog(self, "Pick a Block")
         self._block_widget = self._create_block_define(dialog)
+        self._child_state_holders.append(self._block_widget)
         dialog.sizer.Add(self._block_widget, 1, wx.EXPAND)
         dialog.Fit()
         if dialog.ShowModal() == wx.ID_OK:
             self.state = self._block_widget.state
-            self.update_button()
+        self._block_widget.state = None
+        self._child_state_holders.remove(self._block_widget)
         self._block_widget = None
         dialog.Destroy()
 
     def _create_block_define(self, dialog: wx.Dialog) -> BaseBlockDefine:
         raise NotImplementedError
+
+    def _on_state_change(self):
+        self.update_button()
+        wx.PostEvent(self, ChildSizeEvent(0))
 
     def update_button(self):
         raise NotImplementedError
