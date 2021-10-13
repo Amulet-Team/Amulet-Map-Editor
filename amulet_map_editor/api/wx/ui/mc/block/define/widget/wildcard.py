@@ -48,6 +48,7 @@ class WildcardBlockDefine(BaseBlockDefine):
         self._property_picker = MultiplePropertySelect(self, state)
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._property_picker.Bind(EVT_MULTIPLE_PROPERTIES_CHANGE, self._post_change)
+        self._child_state_holders.append(self._property_picker)
 
         self.Layout()
 

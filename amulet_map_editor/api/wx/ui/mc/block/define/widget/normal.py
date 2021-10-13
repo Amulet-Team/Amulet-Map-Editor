@@ -47,6 +47,7 @@ class BlockDefine(BaseBlockDefine):
         self._property_picker = self._create_property_picker()
         self._property_picker.Bind(EVT_SINGLE_PROPERTIES_CHANGE, self._post_change)
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
+        self._child_state_holders.append(self._property_picker)
         self.Layout()
 
     def _create_property_picker(self) -> SinglePropertySelect:

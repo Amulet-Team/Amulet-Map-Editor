@@ -39,6 +39,7 @@ class BaseBlockDefine(BaseDefine):
         )
         self._identifier_select.Bind(EVT_BLOCK_ID_CHANGE, self._post_change)
         self._top_sizer.Add(self._identifier_select, 1, wx.EXPAND | wx.TOP, 5)
+        self._child_state_holders.append(self._identifier_select)
 
     @classmethod
     def from_data(

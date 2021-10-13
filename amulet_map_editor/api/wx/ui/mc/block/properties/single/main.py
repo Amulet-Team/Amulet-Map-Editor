@@ -28,8 +28,10 @@ class SinglePropertySelect(BasePropertySelect):
 
         self._vanilla = self._create_automatic()
         self._sizer.Add(self._vanilla, 0, wx.EXPAND)
+        self._child_state_holders.append(self._vanilla)
         self._modded = self._create_manual()
         self._sizer.Add(self._modded, 0, wx.EXPAND)
+        self._child_state_holders.append(self._modded)
         self._do_show()
 
     def _create_automatic(self) -> VanillaSingleProperty:

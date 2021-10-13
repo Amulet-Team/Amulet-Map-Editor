@@ -1,5 +1,4 @@
 import wx
-import copy
 
 import PyMCTranslate
 
@@ -16,7 +15,7 @@ class BlockDefineButton(BaseBlockDefineButton):
     def _create_block_define(self, dialog: wx.Dialog) -> BlockDefine:
         return BlockDefine(
             dialog,
-            copy.deepcopy(self.state),
+            self.state.copy(),
             orientation=wx.HORIZONTAL,
         )
 

@@ -41,6 +41,7 @@ class BaseDefine(wx.Panel, StateHolder):
         self._version_picker = VersionSelect(self, state)
         self._version_picker.Bind(EVT_VERSION_CHANGE, self._post_change)
         self._top_sizer.Add(self._version_picker, 0, wx.EXPAND)
+        self._child_state_holders.append(self._version_picker)
         self.Layout()
 
     @classmethod

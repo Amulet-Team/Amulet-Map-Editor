@@ -107,19 +107,29 @@ class BaseState(ABC):
     def translation_manager(self) -> TranslationManager:
         return self._translation_manager
 
-    def __deepcopy__(self, memodict=None):
+    def copy(self):
         new_state = self.__class__(self.translation_manager)
         new_state._state = copy.deepcopy(self._state)
         new_state._changed_state = copy.deepcopy(self._state)
         return new_state
 
+    def __copy__(self):
+        return self.copy()
+
+    def __deepcopy__(self, memodict=None):
+        return self.copy()
+
 
 class StateHolder:
+    # The state stored for this instance.
     _state: BaseState
+    # A list of child states. When the state changes these will be updated
+    _child_state_holders: List["StateHolder"]
 
     def __init__(self, state: BaseState):
         assert isinstance(state, BaseState)
         self._state = state
+        self._child_state_holders = []
         self._state.bind_on_change(self._on_state_change)
 
     @property
@@ -131,7 +141,11 @@ class StateHolder:
         if self._state is not None:
             self._state.unbind_on_change(self._on_state_change)
         self._state = state
-        self._state.bind_on_change(self._on_state_change)
+        if state is not None:
+            self._state.bind_on_change(self._on_state_change)
+            self._on_state_change()
+        for child in self._child_state_holders:
+            child.state = state
 
     def _on_state_change(self):
         pass
@@ -186,8 +200,8 @@ class PlatformState(BaseState):
     def platform(self, platform: PlatformType):
         self._set_state(State.Platform, platform)
 
-    def __deepcopy__(self, memodict=None):
-        new_state = super().__deepcopy__(memodict=memodict)
+    def copy(self):
+        new_state = super().copy()
         new_state._allow_universal = self._allow_universal
         new_state._allow_vanilla = self._allow_vanilla
         new_state._platform_key = self._platform_key
@@ -283,8 +297,8 @@ class VersionState(PlatformState):
     def force_blockstate(self, force_blockstate: bool):
         self._set_state(State.ForceBlockstate, force_blockstate)
 
-    def __deepcopy__(self, memodict=None):
-        new_state = super().__deepcopy__(memodict=memodict)
+    def copy(self):
+        new_state = super().copy()
         new_state._allow_numerical = self._allow_numerical
         new_state._allow_blockstate = self._allow_blockstate
         return new_state
