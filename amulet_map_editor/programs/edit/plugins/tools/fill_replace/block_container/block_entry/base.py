@@ -1,27 +1,19 @@
 import wx
-from typing import Optional, Dict, Any
+from typing import Optional
 
 from amulet_map_editor.api.wx.ui.mc.block import BaseBlockDefineButton
 from .events import BlockCloseEvent
+from .custom_fill_button import SrcBlockState
 
 
 class BaseBlockEntry(wx.Panel):
     """A UI element that holds a block button, weight entry and close button"""
 
-    _button_props = (
-        "platform",
-        "version_number",
-        "force_blockstate",
-        "namespace",
-        "base_name",
-    )
-
     def __init__(
         self,
         parent: wx.Window,
-        **kwargs,
     ):
-        super().__init__(parent, **kwargs)
+        super().__init__(parent)
         self._sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.SetSizer(self._sizer)
         self._block_button: Optional[BaseBlockDefineButton] = None
@@ -51,10 +43,9 @@ class BaseBlockEntry(wx.Panel):
         self._close_button.Enable(enable)
 
     @property
-    def state(self) -> Dict[str, Any]:
-        return {prop: getattr(self.block_button, prop) for prop in self._button_props}
+    def state(self) -> SrcBlockState:
+        return self.block_button.state
 
     @state.setter
-    def state(self, state: Dict[str, Any]):
-        for prop in self._button_props:
-            setattr(self.block_button, prop, state.get(prop, None))
+    def state(self, state: SrcBlockState):
+        self.block_button.state = state

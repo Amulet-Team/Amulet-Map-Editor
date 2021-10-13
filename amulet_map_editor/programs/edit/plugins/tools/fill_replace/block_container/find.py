@@ -12,4 +12,4 @@ class FindBlockContainer(BaseBlockContainer):
         return lang.get("program_3d_edit.fill_tool.find")
 
     def _create_block(self) -> FindBlockEntry:
-        return FindBlockEntry(self, self._translation_manager, *self._version)
+        return FindBlockEntry(self, self.state)

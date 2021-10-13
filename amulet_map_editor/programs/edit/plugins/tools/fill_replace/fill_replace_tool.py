@@ -11,12 +11,29 @@ from amulet_map_editor.programs.edit.api.behaviour.block_selection_behaviour imp
 )
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from .fill_replace_widget import FillReplaceWidget
+from .block_container.block_entry.custom_fill_button import SrcBlockState
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
+"""
+FillReplaceTool(wx.BoxSizer)        A sizer containing the FillReplaceWidget.
+    FillReplaceWidget(wx.Panel)     A panel containing mode buttons and one or more fill/replace operations
+        OperationContainer(wx.lib.scrolledpanel.ScrolledPanel)  A ScrolledPanel containing one or more fill/replace operations.
+            ReplaceOperationWidget
+                FindBlockContainer
+                    FindBlockEntry
+                    ...
+                FillBlockContainer
+                    FillBlockEntry
+                    ...
+            ...
+"""
+
 
 class FillReplaceTool(wx.BoxSizer, DefaultBaseToolUI):
+    """A sizer containing the FillReplaceWidget."""
+
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         DefaultBaseToolUI.__init__(self, canvas)
@@ -31,12 +48,27 @@ class FillReplaceTool(wx.BoxSizer, DefaultBaseToolUI):
         self.Add(self._panel)
         panel_sizer = wx.BoxSizer(wx.VERTICAL)
         self._panel.SetSizer(panel_sizer)
-        self._operations = FillReplaceWidget(
-            self._panel,
+
+        find_state = SrcBlockState(
             self.canvas.world.translation_manager,
-            self.canvas.world.level_wrapper.platform,
-            self.canvas.world.level_wrapper.version,
+            platform="java",
+            version_number=(1, 16, 0),
+            namespace="minecraft",
+            base_name="air",
         )
+        fill_state = SrcBlockState(
+            self.canvas.world.translation_manager,
+            platform="java",
+            version_number=(1, 16, 0),
+            namespace="minecraft",
+            base_name="stone",
+        )
+        for state_ in (find_state, fill_state):
+            with state_ as state:
+                state.platform = self.canvas.world.level_wrapper.platform
+                state.version_number = self.canvas.world.level_wrapper.version
+
+        self._operations = FillReplaceWidget(self._panel, find_state, fill_state)
         panel_sizer.Add(self._operations, 1, wx.LEFT | wx.TOP, 5)
 
         self._button = wx.Button(self._panel, label="Run Operation")

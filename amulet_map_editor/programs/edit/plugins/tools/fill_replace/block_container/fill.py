@@ -2,10 +2,12 @@ from typing import Tuple, List
 from amulet_map_editor import lang
 from .base import BaseBlockContainer
 from .block_entry import FillBlockEntry
+from .block_entry.custom_fill_button import SrcBlockState
 
 
 class FillBlockContainer(BaseBlockContainer):
     _blocks: List[FillBlockEntry]
+    state: SrcBlockState
 
     @property
     def name(self) -> str:
@@ -20,7 +22,7 @@ class FillBlockContainer(BaseBlockContainer):
             self._blocks[-1].show_weight()
 
     def _create_block(self) -> FillBlockEntry:
-        return FillBlockEntry(self, self._translation_manager, *self._version)
+        return FillBlockEntry(self, self.state.copy())
 
     def _do_destroy_block_entry(self, window: FillBlockEntry):
         super()._do_destroy_block_entry(window)
@@ -28,9 +30,9 @@ class FillBlockContainer(BaseBlockContainer):
             block = self._blocks[-1]
             block.show_weight(False)
 
-    def set_from_source(self, from_source: bool):
+    def show_from_source(self, from_source: bool):
         for block in self._blocks:
-            block.set_from_source(from_source)
+            block.show_from_source(from_source)
 
     @property
     def weights(self) -> Tuple[float, ...]:

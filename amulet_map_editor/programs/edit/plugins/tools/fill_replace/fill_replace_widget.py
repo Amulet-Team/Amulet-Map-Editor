@@ -1,15 +1,13 @@
 from enum import Enum
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, List
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 
-import PyMCTranslate
-
-from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import ChoiceRaw
 from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
 from .block_container import FillBlockContainer, FindBlockContainer
+from .block_container.block_entry.custom_fill_button import SrcBlockState
 
 
 class ReplaceMode(Enum):
@@ -24,21 +22,15 @@ class ReplaceOperationWidget(wx.Panel):
     def __init__(
         self,
         parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        **kwargs,
+        default_find_state: SrcBlockState,
+        default_fill_state: SrcBlockState,
     ):
-        kwargs["style"] = kwargs.get("style", 0) | wx.BORDER_SIMPLE
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, style=wx.BORDER_SIMPLE)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
-        self._find = FindBlockContainer(
-            self, translation_manager, platform, version_number, force_blockstate
-        )
+        self._find = FindBlockContainer(self, default_find_state)
         self._find.Hide()
         sizer.Add(self._find, 0, wx.EXPAND | wx.ALL, 5)
 
@@ -49,9 +41,7 @@ class ReplaceOperationWidget(wx.Panel):
         self._swap_button.Hide()
         sizer.Add(self._swap_button, 0, wx.EXPAND | wx.ALL, 5)
 
-        self._fill = FillBlockContainer(
-            self, translation_manager, platform, version_number, force_blockstate
-        )
+        self._fill = FillBlockContainer(self, default_fill_state)
         sizer.Add(self._fill, 0, wx.EXPAND | wx.ALL, 5)
 
     def _post_change_size(self):
@@ -70,15 +60,17 @@ class ReplaceOperationWidget(wx.Panel):
         self._find.set_expert(expert)
         self._fill.set_expert(expert)
 
-    def set_from_source(self, from_source: bool):
-        self._fill.set_from_source(from_source)
+    def show_from_source(self, from_source: bool):
+        self._fill.show_from_source(from_source)
 
     @property
-    def operation(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    def operation(self) -> Tuple[List[SrcBlockState], List[SrcBlockState]]:
         return self._find.states, self._fill.states
 
 
 class OperationContainer(ScrolledPanel):
+    """A ScrolledPanel containing one or more fill/replace operations."""
+
     def __init__(self, parent: wx.Window):
         super().__init__(parent)
         self._operations: List[ReplaceOperationWidget] = []
@@ -107,20 +99,17 @@ class OperationContainer(ScrolledPanel):
 
 
 class FillReplaceWidget(wx.Panel):
+    """A panel containing mode buttons and one or more fill/replace operations"""
+
     def __init__(
         self,
         parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        **kwargs,
+        default_find_state: SrcBlockState,
+        default_fill_state: SrcBlockState,
     ):
-        super().__init__(parent, **kwargs)
-        self._translation_manager = translation_manager
-        self._platform = platform
-        self._version_number = version_number
-        self._force_blockstate = force_blockstate
+        super().__init__(parent)
+        self._default_find_state = default_find_state
+        self._default_fill_state = default_fill_state
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
@@ -173,11 +162,7 @@ class FillReplaceWidget(wx.Panel):
 
     def _add_operation(self):
         replace_operation = ReplaceOperationWidget(
-            self._operation_panel,
-            self._translation_manager,
-            self._platform,
-            self._version_number,
-            self._force_blockstate,
+            self._operation_panel, self._default_find_state, self._default_fill_state
         )
         replace_operation.set_expert(self.is_expert)
         replace_operation.set_replace(self.is_replace)
@@ -192,7 +177,7 @@ class FillReplaceWidget(wx.Panel):
         for operation in self._operation_panel:
             operation.set_replace(self.is_replace)
             operation.set_expert(self.is_expert)
-            operation.set_from_source(self.from_source)
+            operation.show_from_source(self.from_source)
         self._post_change_size()
 
     def _on_check_change(self, evt):
@@ -216,5 +201,5 @@ class FillReplaceWidget(wx.Panel):
         return self._replace_mode.GetCurrentObject()
 
     @property
-    def operations(self) -> List[Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]]:
+    def operations(self) -> List[Tuple[List[SrcBlockState], List[SrcBlockState]]]:
         return [op.operation for op in self._operation_panel]

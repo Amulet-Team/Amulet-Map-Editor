@@ -3,7 +3,10 @@ import PyMCTranslate
 from amulet_map_editor.programs.edit.plugins.tools.fill_replace.fill_replace_widget import (
     FillReplaceWidget,
 )
-from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE, ChildSizeEvent
+from amulet_map_editor.programs.edit.plugins.tools.fill_replace.block_container import (
+    SrcBlockState,
+)
+from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 
 if __name__ == "__main__":
 
@@ -14,10 +17,27 @@ if __name__ == "__main__":
             self.Add(self._panel)
             panel_sizer = wx.BoxSizer(wx.VERTICAL)
             self._panel.SetSizer(panel_sizer)
-            self._operations = FillReplaceWidget(
-                self._panel,
-                PyMCTranslate.new_translation_manager(),
+            translation_manager = PyMCTranslate.new_translation_manager()
+            find_state = SrcBlockState(
+                translation_manager,
+                platform="java",
+                version_number=(1, 16, 0),
+                namespace="minecraft",
+                base_name="air",
             )
+            fill_state = SrcBlockState(
+                translation_manager,
+                platform="java",
+                version_number=(1, 16, 0),
+                namespace="minecraft",
+                base_name="stone",
+            )
+            for state_ in (find_state, fill_state):
+                with state_ as state:
+                    state.platform = "bedrock"
+                    state.version_number = None
+
+            self._operations = FillReplaceWidget(self._panel, find_state, fill_state)
             panel_sizer.Add(self._operations, 1, wx.LEFT | wx.TOP, 5)
             self._button = wx.Button(self._panel, label="Run Operation")
             panel_sizer.Add(

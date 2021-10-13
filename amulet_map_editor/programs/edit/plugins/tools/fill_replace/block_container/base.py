@@ -1,29 +1,21 @@
 from typing import List, Dict, Any
 import wx
 
-import PyMCTranslate
-from amulet.api.data_types import VersionNumberTuple
 from amulet_map_editor.api.wx.ui.events import ChildSizeEvent
 from .block_entry import BaseBlockEntry, EVT_BLOCK_CLOSE
+from .block_entry.custom_fill_button import SrcBlockState
+from amulet_map_editor.api.wx.ui.mc.state import StateHolder
 
 
-class BaseBlockContainer(wx.Panel):
+class BaseBlockContainer(wx.Panel, StateHolder):
     """This is a UI element that contains one or more block buttons."""
 
     _blocks: List[BaseBlockEntry]
+    state: SrcBlockState
 
-    def __init__(
-        self,
-        parent: wx.Window,
-        translation_manager: PyMCTranslate.TranslationManager,
-        platform: str = None,
-        version_number: VersionNumberTuple = None,
-        force_blockstate: bool = None,
-        **kwargs,
-    ):
-        super().__init__(parent, **kwargs)
-        self._translation_manager = translation_manager
-        self._version = (platform, version_number, force_blockstate)
+    def __init__(self, parent: wx.Window, default_state: SrcBlockState):
+        StateHolder.__init__(self, default_state)
+        wx.Panel.__init__(self, parent)
         self._expert = False
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
@@ -104,10 +96,15 @@ class BaseBlockContainer(wx.Panel):
                 block.enable_close(False)
 
     @property
-    def states(self) -> List[Dict[str, Any]]:
+    def states(self) -> List[SrcBlockState]:
         return [block.state for block in self._blocks]
 
     @states.setter
-    def states(self, states: List[Dict[str, Any]]):
+    def states(self, states: List[SrcBlockState]):
+        while len(states) > len(self._blocks):
+            self._do_add_block()
+        while len(states) < len(self._blocks):
+            self._do_destroy_block_entry(self._blocks[-1])
         for state, block in zip(states, self._blocks):
             block.state = state
+        self._post_change_size()
