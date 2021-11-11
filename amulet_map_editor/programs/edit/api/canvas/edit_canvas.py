@@ -1,7 +1,7 @@
 import wx
 from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
 from types import GeneratorType
-import inspect
+from threading import RLock
 
 from .base_edit_canvas import BaseEditCanvas
 from ...edit import EDIT_CONFIG_ID
@@ -95,7 +95,12 @@ class EditCanvas(BaseEditCanvas):
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
         self.buttons.register_actions(self.key_binds)
+
+        # Tracks if an operation has been started and not finished.
         self._operation_running = False
+        # This lock stops two threads from editing the world simultaneously
+        # call run_operation to acquire it.
+        self._edit_lock = RLock()
 
     def _setup(self) -> Generator[OperationYieldType, None, None]:
         yield from super()._setup()
@@ -159,78 +164,68 @@ class EditCanvas(BaseEditCanvas):
         msg="Running Operation",
         throw_exceptions=False,
     ) -> Any:
-        if self._operation_running:
-            for frame_info in inspect.stack()[1:]:
-                # Compacted from this example
-                # https://stackoverflow.com/questions/54656758/get-function-object-from-stack-frame-object
-                frame = frame_info.frame
-                codename = frame.f_code.co_name
-                if "self" in frame.f_locals:
-                    fobj = getattr(frame.f_locals["self"].__class__, codename)
-                    if fobj == EditCanvas.run_operation:
-                        raise Exception(
-                            "run_operation cannot be called from within itself. "
-                            "This function has already been called by parent code so you do not need to run it again"
-                        )
-            raise Exception(
-                "An operation is already being run. Please wait for it to finish before running another one."
-            )
-        self._operation_running = True
+        with self._edit_lock:
+            if self._operation_running:
+                raise Exception(
+                    "run_operation cannot be called from within itself. "
+                    "This function has already been called by parent code so you do not need to run it again"
+                )
+            self._operation_running = True
 
-        def operation_wrapper():
-            yield 0, "Disabling Threads"
-            self.renderer.disable_threads()
-            yield 0, msg
-            op = operation()
-            if isinstance(op, GeneratorType):
-                yield from op
-            yield 0, "Creating Undo Point"
-            yield from self.create_undo_point_iter()
-            return op
+            def operation_wrapper():
+                yield 0, "Disabling Threads"
+                self.renderer.disable_threads()
+                yield 0, msg
+                op = operation()
+                if isinstance(op, GeneratorType):
+                    yield from op
+                yield 0, "Creating Undo Point"
+                yield from self.create_undo_point_iter()
+                return op
 
-        err = None
-        out = None
-        try:
-            out = show_loading_dialog(
-                operation_wrapper,
-                title,
-                msg,
-                self,
-            )
-        except OperationError as e:
-            msg = f"Error running operation: {e}"
-            log.info(msg)
-            self.world.restore_last_undo_point()
-            wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
-            err = e
-        except OperationSuccessful as e:
-            msg = str(e)
-            log.info(msg)
-            self.world.restore_last_undo_point()
-            wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
-            err = e
-        except OperationSilentAbort as e:
-            self.world.restore_last_undo_point()
-            err = e
-        except Exception as e:
-            log.error(traceback.format_exc())
-            dialog = TracebackDialog(
-                self,
-                "Exception while running operation",
-                str(e),
-                traceback.format_exc(),
-            )
-            dialog.ShowModal()
-            dialog.Destroy()
-            err = e
-            self.world.restore_last_undo_point()
+            err = None
+            out = None
+            try:
+                out = show_loading_dialog(
+                    operation_wrapper,
+                    title,
+                    msg,
+                    self,
+                )
+            except OperationError as e:
+                msg = f"Error running operation: {e}"
+                log.info(msg)
+                self.world.restore_last_undo_point()
+                wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
+                err = e
+            except OperationSuccessful as e:
+                msg = str(e)
+                log.info(msg)
+                self.world.restore_last_undo_point()
+                wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
+                err = e
+            except OperationSilentAbort as e:
+                self.world.restore_last_undo_point()
+                err = e
+            except Exception as e:
+                log.error(traceback.format_exc())
+                dialog = TracebackDialog(
+                    self,
+                    "Exception while running operation",
+                    str(e),
+                    traceback.format_exc(),
+                )
+                dialog.ShowModal()
+                dialog.Destroy()
+                err = e
+                self.world.restore_last_undo_point()
 
-        self.renderer.enable_threads()
-        self.renderer.render_world.rebuild_changed()
-        self._operation_running = False
-        if err is not None and throw_exceptions:
-            raise err
-        return out
+            self.renderer.enable_threads()
+            self.renderer.render_world.rebuild_changed()
+            self._operation_running = False
+            if err is not None and throw_exceptions:
+                raise err
+            return out
 
     def create_undo_point(self, world=True, non_world=True):
         self.world.create_undo_point(world, non_world)
