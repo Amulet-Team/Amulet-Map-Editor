@@ -18,9 +18,18 @@ if __name__ == "__main__":
             os.environ["PYOPENGL_PLATFORM"] = "egl"
 
     except Exception as e:
-        err = f"Failed to import requirements. Check that you extracted correctly.\n{e}"
+        err = ""
+        try:
+            import traceback
+
+            err += traceback.format_exc()
+        except:
+            pass
+        err += (
+            f"Failed to import requirements. Check that you extracted correctly.\n{e}"
+        )
         print(err)
-        with open("./logs/amulet_map_editor_.log") as f:
+        with open("./logs/amulet_map_editor_.log", "w") as f:
             f.write(err)
         input("Press ENTER to continue.")
     else:
