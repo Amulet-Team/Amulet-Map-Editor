@@ -1,27 +1,196 @@
+# App
+app.world_still_used=Eine Welt ist noch geöffnet, bitte schließen
+app.browser_open_tooltip=Durch Anklicken wird die Seite in Deinem Default-Browser geöffnet
+
 world.java_platform=Java
 world.bedrock_platform=Bedrock
 world.close_world=Welt schließen
 
+
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&Datei
+menu_bar.file.open_world=Welt öffnen
+menu_bar.file.close_world=Welt schließen
+menu_bar.file.quit=Beenden
+menu_bar.options.menu_name=&Optionen
+menu_bar.help.menu_name=&Hilfe
+
+# Main menu
+## The start screen
+main_menu.tab_name=Hauptmenü
+main_menu.open_world=Welt öffnen
+main_menu.help=Hilfe
+main_menu.discord=Amulet auf Discord
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=Eine neue Amulet Version ist verfügbar!
+update_check.new_version=Neue Version:
+update_check.current_version=Deine Version:
+update_check.update=Zum Download...
+update_check.ok=Ok
+
+# Select world
+## The window when selecting a world to open
+select_world.title=Weltenwahl
+select_world.open_world_warning=Schließe die Welt im Spiel und in anderen Tools, bevor du sie in Amulet öffnest.
 select_world.open_world_button=Andere Welt öffnen
 select_world.open_world_dialogue=Minecraft-Welt-Verzeichnis auswählen
 select_world.select_directory_failed=Verzeichnis konnte nicht ausgewählt werden!
 select_world.recent_worlds=Kürzlich geöffnete Welten
+select_world.no_loader_found=Es konnte keine Laderoutine für diese Welt gefunden werden.
+select_world.loading_world_failed=Fehler beim Laden der Welt.
 
-main_menu.tab_name=Hauptmenü
-main_menu.open_world=Welt öffnen
-main_menu.help=Hilfe
-
-program_about.tab_name=Impressum
+# About
+## The default program when a world is opened
+program_about.tab_name=Diese Welt
 program_about.currently_opened_world=Derzeit geöffnete Welt:
-program_about.choose_from_options=Wähle einen der linken Optionen aus.\nMan kann zwischen diesen beliebig wechseln.
+program_about.choose_from_options=Wähle links zwischen den vertikalen Tabs.\nMan kann zwischen diesen beliebig wechseln.
 
+# Convert
+## The program used to convert a world
 program_convert.tab_name=Konvertieren
 program_convert.convert_button=Konvertieren
 program_convert.input_world=Eingabewelt:
 program_convert.output_world=Ausgabewelt:
-program_convert.select_output_world=Ausgabewelt auswählen
-program_convert.input_output_must_different=Die Eingabewelt und Ausgabewelt müssen verschieden sein!
+program_convert.select_output_world=Ausgabewelt wählen
+program_convert.input_output_must_different=Eingabe- und Ausgabewelt müssen verschieden sein!
 program_convert.select_before_converting=Keine Welt ausgewählt! 
 program_convert.conversion_completed=Welt erfolgreich konvertiert!
 
+## Menu bar
+program_convert.menu_bar.help.user_guide=Benutzerhandbuch (online)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
 program_3d_edit.tab_name=3D-Editor
+
+## Canvas
+program_3d_edit.canvas.please_wait=Bitte warte, während der Renderer geladen wird
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Lade Bedrock Standard Ressourcenpaket herunter...
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Lade Java Standard Ressourcenpaket herunter...
+program_3d_edit.canvas.java_rp_failed=Java Standard Ressourcenpaket konnte nicht heruntergeladen werden.
+program_3d_edit.canvas.java_rp_failed_default=Bitte prüfe Deine Internetverbindung und starte Amulet neu.
+# WTF is this? Apple-specific?
+program_3d_edit.canvas.java_rp_failed_mac_certificates=Es fehlen Zertifikate für den Zugang zum Internet.\nBitte "Install Certificates.command" ausführen, zu finden in "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Lade Ressourcenpakete...
+program_3d_edit.canvas.creating_texture_atlas=Erstelle Texturatlas...
+program_3d_edit.canvas.setting_up_renderer=Richte Renderer ein...
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Speichern
+program_3d_edit.menu_bar.edit.menu_name=&Bearbeiten
+program_3d_edit.menu_bar.edit.undo=Rückgängig
+program_3d_edit.menu_bar.edit.redo=Wiederherstellen
+program_3d_edit.menu_bar.edit.cut=Ausschneiden
+program_3d_edit.menu_bar.edit.copy=Kopieren
+program_3d_edit.menu_bar.edit.paste=Einfügen
+program_3d_edit.menu_bar.edit.delete=Blöcke löschen
+program_3d_edit.menu_bar.edit.goto=Gehe zu...
+program_3d_edit.menu_bar.edit.select_all=Alles auswählen
+program_3d_edit.menu_bar.options.controls=Steuerung...
+program_3d_edit.menu_bar.options.options=Einstellungen...
+program_3d_edit.menu_bar.help.user_guide=Benutzerhandbuch (online)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Blöcke löschen
+program_3d_edit.select_tool.delete_button_tooltip=Ausgewählte Blöcke löschen.
+program_3d_edit.select_tool.copy_button=Kopieren
+program_3d_edit.select_tool.copy_button_tooltip=Kopiere Auswahl in den Zwischenspeicher. Kann anschliessend in jegliche Welt/Dimension eingefügt werden.
+program_3d_edit.select_tool.cut_button=Ausschneiden
+program_3d_edit.select_tool.cut_button_tooltip=Kopiere Auswahl in den Zwischenspeicher, und lösche dann. Kann anschliessend in jegliche Welt/Dimension eingefügt werden.
+program_3d_edit.select_tool.paste_button=Einfügen
+program_3d_edit.select_tool.paste_button_tooltip=Zuvor kopierte/ausgeschnittene Auswahl einfügen.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Lege die x-Koordinate der grünen Ecke des aktiven Bereiches fest. Gib eine Zahl ein oder nutze das Scrollrad der Maus.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Lege die y-Koordinate der grünen Ecke des aktiven Bereiches fest. Gib eine Zahl ein oder nutze das Scrollrad der Maus.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Lege die z-Koordinate der grünen Ecke des aktiven Bereiches fest. Gib eine Zahl ein oder nutze das Scrollrad der Maus.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Lege die x-Koordinate der grünen Ecke des aktiven Bereiches fest. Gib eine Zahl ein oder nutze das Scrollrad der Maus.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Lege die y-Koordinate der grünen Ecke des aktiven Bereiches fest. Gib eine Zahl ein oder nutze das Scrollrad der Maus.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Lege die z-Koordinate der grünen Ecke des aktiven Bereiches fest. Gib eine Zahl ein oder nutze das Scrollrad der Maus.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=Die Form der aktiven Auswahl unter Verwendung der Minecraft-Volumenauswahlnotation.
+program_3d_edit.select_tool.box_size_tooltip=Die Größe der aktiven Auswahlbox in Blöcken.
+program_3d_edit.select_tool.button_point1=Verschiebepunkt 1
+program_3d_edit.select_tool.button_point1_tooltip=Halte diese Taste gedrückt und verwende die Bewegungssteuerung, um den grünen Auswahlpunkt zu verschieben.
+program_3d_edit.select_tool.button_point2=Verschiebepunkt 2
+program_3d_edit.select_tool.button_point2_tooltip=Halte diese Taste gedrückt und verwende die Bewegungssteuerung, um den blauen Auswahlpunkt zu verschieben.
+program_3d_edit.select_tool.button_selection_box=Verschiebeauswahl
+program_3d_edit.select_tool.button_selection_box_tooltip=Halte diese Taste gedrückt und verwende die Bewegungssteuerung, um die aktive Box zu verschieben.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=Standort
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=Die x-Position, an der die Mitte der Auswahl platziert wird. Gib eine Zahl ein, scrolle darüber mit dem Mausrad oder verwende die Pfeiltasten, um zu dies ändern.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=Die y-Position, an der die Mitte der Auswahl platziert wird. Gib eine Zahl ein, scrolle darüber mit dem Mausrad oder verwende die Pfeiltasten, um zu dies ändern.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=Die z-Position, an der die Mitte der Auswahl platziert wird. Gib eine Zahl ein, scrolle darüber mit dem Mausrad oder verwende die Pfeiltasten, um zu dies ändern.
+program_3d_edit.paste_tool.move_selection_label=Auswahl verschieben
+program_3d_edit.paste_tool.move_selection_tooltip=Halte diese Taste gedrückt und verwende die Bewegungssteuerung, um die Auswahl zu verschieben.
+program_3d_edit.paste_tool.rotation_label=Rotation
+program_3d_edit.paste_tool.free_rotation_label=Freie Rotation
+program_3d_edit.paste_tool.free_rotation_tooltip=Wenn das Häkchen deaktiviert ist, kann die Auswahl um ein Vielfaches von 90 Grad gedreht werden. Wenn ein Häkchen gesetzt ist, kann die Auswahl in Schritten von einem Grad gedreht werden.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=Der Winkel in Grad auf der x-Achse, um den die Auswahl gedreht wird. Beachte, dass dies die x-Achse des Modells ist, die durch die z- und y-Drehung transformiert wird, sodass sie möglicherweise nicht mit der globalen x-Achse übereinstimmt.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=Der Winkel in Grad auf der y-Achse, um den die Auswahl gedreht wird. Beachte, dass dies die y-Achse des Modells ist, die durch die z-Drehung transformiert wird, sodass sie möglicherweise nicht mit der globalen y-Achse übereinstimmt.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=Der Winkel in Grad auf der z-Achse, um den die Auswahl gedreht wird.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Klicke, um die Auswahl um 90 Grad gegen den Uhrzeigersinn relativ zur Ansicht zu drehen.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Klicke, um die Auswahl um 90 Grad im Uhrzeigersinn relativ zur Ansicht zu drehen.
+program_3d_edit.paste_tool.scale_label=Skalieren
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=Der Maßstab des Modells auf der x-Achse.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=Der Maßstab des Modells auf der y-Achse.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=Der Maßstab des Modells auf der z-Achse.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Spiegelt die Auswahl horizontal relativ zur Blickrichtung der Kamera.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Spiegelt die Auswahl vertikal relativ zur Blickrichtung der Kamera.
+program_3d_edit.paste_tool.copy_air_label=Luft einfügen
+program_3d_edit.paste_tool.copy_air_tooltip=Wenn aktiviert, werden alle Luftblöcke in der eingefügten Auswahl angewendet und überschreiben alle vorhandenen Blöcke. Wenn diese Option deaktiviert ist, bleiben die vorhandenen Blöcke an diesen Stellen bestehen und die Luftblöcke werden nicht kopiert.
+program_3d_edit.paste_tool.copy_water_label=Wasser einfügen
+program_3d_edit.paste_tool.copy_water_tooltip=Wenn aktiviert, werden alle Wasserblöcke in der eingefügten Auswahl angewendet und überschreiben alle vorhandenen Blöcke. Wenn diese Option deaktiviert ist, bleiben die vorhandenen Blöcke an diesen Stellen bestehen und die Wasserblöcke werden nicht kopiert.
+program_3d_edit.paste_tool.copy_lava_label=Lava einfügen
+program_3d_edit.paste_tool.copy_lava_tooltip=Wenn aktiviert, werden alle Lavablöcke in der eingefügten Auswahl angewendet und überschreiben alle vorhandenen Blöcke. Wenn diese Option deaktiviert ist, bleiben die vorhandenen Blöcke an diesen Stellen bestehen und die Lavablöcke werden nicht kopiert.
+program_3d_edit.paste_tool.confirm_label=Bestätigen
+program_3d_edit.paste_tool.confirm_tooltip=Klicken, um die Auswahl in die Welt und die angegebene Position, Drehung und Skalierung einzufügen.
+program_3d_edit.paste_tool.zero_scale_message=Einer der Skalenwerte hatte den Wert Null, sodass nichts kopiert wurde.
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Min Y
+program_3d_edit.chunk_tool.min_y_tooltip=Die minimale y-Koordinate, die in der top-down-Ansicht gezeichnet werden soll. Dies kann verwendet werden, um einen Teil der Welt anzuzeigen und etwa Teile des Nether oder die Höhlen anzuzeigen.
+program_3d_edit.chunk_tool.max_y=Max Y
+program_3d_edit.chunk_tool.max_y_tooltip=Die maximale y-Koordinate, die in der top-down-Ansicht gezeichnet werden soll. Dies kann verwendet werden, um einen Teil der Welt anzuzeigen und etwa Teile des Nether oder die Höhlen anzuzeigen.
+program_3d_edit.chunk_tool.delete_chunks=Lösche ausgewählte Blöcke
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Lösche die ausgewählten Blöcke. Dadurch werden der eigentliche Block und alle darin enthaltenen Daten gelöscht. Wenn Du den Bereich das nächste Mal im Spiel lädst, werden die Blöcke neu erstellt.
+program_3d_edit.chunk_tool.prune_chunks=Lösche nicht ausgewählte Blöcke
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Lösche alle nicht ausgewählten Blöcke. Dadurch werden der eigentliche Block und alle darin enthaltenen Daten gelöscht. Wenn Du den Bereich das nächste Mal im Spiel lädst, werden die Blöcke neu erstellt. 
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Teleport
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Die x-Koordinate der Kamera. Gib eine Koordinate ein, um zum Standort zu gelangen. Strg + C, um die Koordinate zu kopieren. Strg + V zum Einfügen.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Die y-Koordinate der Kamera. Gib eine Koordinate ein, um zum Standort zu gelangen. Strg + C, um die Koordinate zu kopieren. Strg + V zum Einfügen.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Die z-Koordinate der Kamera. Gib eine Koordinate ein, um zum Standort zu gelangen. Strg + C, um die Koordinate zu kopieren. Strg + V zum Einfügen.
+program_3d_edit.goto_ui.copy_button_tooltip=Kopiere die x-, y- und z-Werte in die Zwischenablage im Format "0.0 0.0 0.0" (x, y und z)
+program_3d_edit.goto_ui.paste_button_tooltip=Füge eine zuvor kopierte Koordinate ein. Der kopierte Wert muss aus drei Zahlen bestehen, die durch Leerzeichen oder Kommas getrennt sind.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Plattform- und Datenversion der Welt
+program_3d_edit.file_ui.projection_tooltip=Ansicht ändern
+program_3d_edit.file_ui.location_tooltip=Kamera bewegen
+program_3d_edit.file_ui.dim_tooltip=Dimension auswählen
+program_3d_edit.file_ui.undo_tooltip=Rückgängig
+program_3d_edit.file_ui.redo_tooltip=Wiederherstellen
+program_3d_edit.file_ui.save_tooltip=Änderungen speichern
+program_3d_edit.file_ui.close_tooltip=Welt schließen
