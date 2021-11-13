@@ -1,11 +1,13 @@
-from typing import List, Optional
+from typing import List
 from setuptools import setup, find_packages
+from wheel.bdist_wheel import bdist_wheel
 from Cython.Build import cythonize
 import os
 import glob
 import shutil
 import sys
 import numpy
+import subprocess
 
 try:
     import versioneer
@@ -23,7 +25,12 @@ def load_requirements(path: str) -> List[str]:
     with open(path) as f:
         for line in f.readlines():
             line = line.strip()
-            if line.startswith("git+") or line.startswith("https:"):
+            if (
+                not line
+                or line.startswith("#")
+                or line.startswith("git+")
+                or line.startswith("https:")
+            ):
                 continue
             elif line.startswith("-r "):
                 requirements += load_requirements(line[3:])
@@ -33,69 +40,48 @@ def load_requirements(path: str) -> List[str]:
 
 
 required_packages = load_requirements("./requirements.txt")
+first_party = {
+    "amulet-core",
+    "amulet-nbt",
+    "pymctranslate",
+    "minecraft-resource-pack",
+}
 
-# Find the newest compatible version for the first party libraries.
-# This does not do any dependency resolution so the dependencies should already be compatible.
-# This makes sure that the source versions are using the same dependencies as the compiled version.
-# This also makes sure that the source version is using the newest version of the dependency.
-try:
-    # This used to use the internal pip freeze logic but with the new build system
-    # the packages are not installed first so it no longer works.
-    # Instead look on PyPi for the newest version.
-    import json
-    import urllib.request
-    import re
-    from packaging.requirements import Requirement
-    from packaging.version import Version
 
-    first_party = {
-        "amulet-core",
-        "amulet-nbt",
-        "pymctranslate",
-        "minecraft-resource-pack",
-    }
-
-    def get_compatible_version(requirement_str: str) -> Optional[str]:
-        """
-        Converts something like "amulet-core~=1.4.0" to "amulet-core==1.4.7"
-        :param requirement_str: "amulet-core~=1.4.0"
-        :return: "amulet-core==1.4.7"
-        """
+def freeze_requirements(packages: List[str]) -> List[str]:
+    # Pip install the requirements to find the newest compatible versions
+    # This makes sure that the source versions are using the same dependencies as the compiled version.
+    # This also makes sure that the source version is using the newest version of the dependency.
+    if any("~=" in r and r in first_party for r in packages):
+        print("pip-install")
         try:
-            requirement = Requirement(requirement_str)
-            if requirement.name in first_party:
-                release_versions = []
-                pypi_json = json.load(
-                    urllib.request.urlopen(
-                        f"https://pypi.org/pypi/{requirement.name}/json"
-                    )
+            # run pip install
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", *packages, "--upgrade"]
+            )
+            # run pip freeze
+            installed = (
+                subprocess.check_output(
+                    [sys.executable, "-m", "pip", "freeze"], encoding="utf-8"
                 )
-                for version, files in pypi_json["releases"].items():
-                    # for each release
-                    if any(not f["yanked"] for f in files):
-                        # If the are files that have not been yanked
-                        try:
-                            release_versions.append(Version(version))
-                        except:
-                            continue
-                release_versions.sort(reverse=True)
-                for release_version in release_versions:
-                    if release_version in requirement.specifier:
-                        return f"{requirement.name}=={release_version}"
-        except:
-            pass
-        return None
+                .strip()
+                .split("\n")
+            )
+            requirements_map = {r.split("==")[0].lower(): r for r in installed}
 
-    def fix_requirements():
-        for index, req in enumerate(required_packages):
-            fixed_req = get_compatible_version(req)
-            if fixed_req is not None:
-                required_packages[index] = fixed_req
+            print(installed, requirements_map)
+            for index, requirement in enumerate(packages):
+                if "~=" in requirement:
+                    lib = requirement.split("~=")[0].strip().lower()
+                    if lib in first_party and lib in requirements_map:
+                        packages[index] = requirements_map[lib]
+            print(f"Modified packages to {packages}")
+        except Exception as e:
+            print("Failed to bake versions:", e)
+    return packages
 
-    fix_requirements()
-except Exception as e:
-    print("Failed to bake versions:", e)
 
+# build cython extensions
 if next(glob.iglob("amulet_map_editor/**/*.pyx", recursive=True), None):
     # This throws an error if it does not match any files
     ext = cythonize("amulet_map_editor/**/*.pyx")
@@ -103,11 +89,52 @@ else:
     ext = ()
 
 
+cmdclass = versioneer.get_cmdclass()
+
+
+# There might be a better way of doing this
+# The extra argument needs to be defined in the sdist
+# so that it doesn't error. It doesn't actually use it.
+class SDist(cmdclass["sdist"]):
+    user_options = cmdclass["sdist"].user_options + [
+        ("find-libs=", None, ""),
+    ]
+
+    def initialize_options(self):
+        super().initialize_options()
+        self.find_libs = None
+
+
+class BDistWheel(bdist_wheel):
+    user_options = bdist_wheel.user_options + [
+        (
+            "find-libs=",
+            None,
+            "Find and fix the newest version of first party libraries. Only used internally.",
+        ),
+    ]
+
+    def initialize_options(self):
+        super().initialize_options()
+        self.find_libs = None
+
+    def finalize_options(self):
+        if self.find_libs:
+            self.distribution.install_requires = freeze_requirements(
+                list(self.distribution.install_requires)
+            )
+        super().finalize_options()
+
+
+cmdclass["sdist"] = SDist
+cmdclass["bdist_wheel"] = BDistWheel
+
+
 setup(
     install_requires=required_packages,
     packages=find_packages(),
     include_package_data=True,
-    cmdclass=versioneer.get_cmdclass(),
+    cmdclass=cmdclass,
     ext_modules=ext,
     include_dirs=[numpy.get_include()],
 )
