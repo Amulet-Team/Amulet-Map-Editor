@@ -52,7 +52,7 @@ def freeze_requirements(packages: List[str]) -> List[str]:
     # Pip install the requirements to find the newest compatible versions
     # This makes sure that the source versions are using the same dependencies as the compiled version.
     # This also makes sure that the source version is using the newest version of the dependency.
-    if any("~=" in r and r in first_party for r in packages):
+    if any("~=" in r and r.split("~=", 1)[0].lower() in first_party for r in packages):
         print("pip-install")
         try:
             # run pip install
