@@ -4,7 +4,6 @@ import wx
 import math
 
 from amulet.utils import block_coords_to_chunk_coords
-from amulet.api.chunk.biomes import BiomesShape
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.biome_select import BiomeDefine
 from amulet_map_editor.programs.edit.api.operations import SimpleOperationPanel
@@ -90,22 +89,16 @@ class SetBiome(SimpleOperationPanel):
         if self._show_pointer:
             self._show_pointer = False
             x, y, z = self._pointer.pointer_base
-
-            # TODO: replace with "get_biome(x, y, z)" if it'll be created
             cx, cz = block_coords_to_chunk_coords(
                 x, z, sub_chunk_size=self.world.sub_chunk_size
             )
-            offset_x, offset_z = x - 16 * cx, z - 16 * cz
             chunk = self.world.get_chunk(cx, cz, self.canvas.dimension)
 
-            if chunk.biomes.dimension == BiomesShape.Shape3D:
-                biome = chunk.biomes[offset_x // 4, y // 4, offset_z // 4]
-            elif chunk.biomes.dimension == BiomesShape.Shape2D:
-                biome = chunk.biomes[offset_x, offset_z]
-            else:
-                return
-
-            self._biome_choice.universal_biome = chunk.biome_palette[biome]
+            self._biome_choice.universal_biome = chunk.biome_palette[
+                chunk.biomes2.view_array_3d(y // 16, (16, 16, 16))[
+                    x % 16, y % 16, z % 16
+                ]
+            ]
 
     def _operation(
         self, world: "BaseLevel", dimension: "Dimension", selection: "SelectionGroup"
@@ -113,41 +106,23 @@ class SetBiome(SimpleOperationPanel):
         mode = self._mode.GetCurrentObject()
 
         iter_count = len(list(world.get_coord_box(dimension, selection, False)))
-        for count, (chunk, slices, _) in enumerate(
+        for count, (chunk, slices, box) in enumerate(
             world.get_chunk_slice_box(dimension, selection, False)
         ):
             new_biome = chunk.biome_palette.get_add_biome(
                 self._biome_choice.universal_biome
             )
+            x, y, z = slices
+            chunk.biomes2.get_array_2d((16, 16))[x, z] = new_biome
 
             if mode == BoxMode:
-                if chunk.biomes.dimension == BiomesShape.Shape3D:
-                    slices = (
-                        slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
-                        slice(slices[1].start // 4, math.ceil(slices[1].stop / 4)),
-                        slice(slices[2].start // 4, math.ceil(slices[2].stop / 4)),
-                    )
-                elif chunk.biomes.dimension == BiomesShape.Shape2D:
-                    slices = (slices[0], slices[2])
-                else:
-                    continue
+                for (cx, cy, cz), sub_box in box.sub_chunk_boxes():
+                    chunk.biomes2.get_array_3d(cy, (16, 16, 16))[
+                        sub_box.sub_chunk_slice(cx, cy, cz)
+                    ] = new_biome
             elif mode == ColumnMode:
-                if chunk.biomes.dimension == BiomesShape.Shape3D:
-                    slices = (
-                        slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
-                        slice(None, None, None),
-                        slice(slices[2].start // 4, math.ceil(slices[2].stop / 4)),
-                    )
-                elif chunk.biomes.dimension == BiomesShape.Shape2D:
-                    slices = (slices[0], slices[2])
-                else:
-                    continue
-            else:
-                raise ValueError(
-                    f"mode {mode} is not a valid mode for the Set Biome operation."
-                )
-
-            chunk.biomes[slices] = new_biome
+                for cy in chunk.biomes2.sub_chunks_3d:
+                    chunk.biomes2.get_array_3d(cy, (16, 16, 16))[x, :, z] = new_biome
 
             chunk.changed = True
             yield (count + 1) / iter_count
