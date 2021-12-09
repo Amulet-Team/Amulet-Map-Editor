@@ -46,7 +46,6 @@ class AmuletUI(wx.Frame):
             | wx.CLOSE_BOX
             | wx.MINIMIZE_BOX
             | wx.MAXIMIZE_BOX
-            | wx.MAXIMIZE
             | wx.SYSTEM_MENU
             | wx.TAB_TRAVERSAL
             | wx.CLIP_CHILDREN

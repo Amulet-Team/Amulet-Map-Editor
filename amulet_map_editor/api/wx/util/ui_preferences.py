@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Type, Tuple
 
 import atexit
 
@@ -16,63 +17,66 @@ def write_config():
 atexit.register(write_config)
 
 
-def on_idle(self):
-    global PRE_EXISTING_CONFIG
+class ExtendedTLW(wx.TopLevelWindow):
+    __resized: bool
+    __size: Tuple[int, int]
+    __position: Tuple[int, int]
 
+
+def on_idle(self: ExtendedTLW):
     qualified_name = ".".join((self.__module__, self.__class__.__name__))
 
     def wrapper(evt):
-        update_cfg = False
         if self.__resized:
             self.__resized = False
-            update_cfg = True
-        if self.__moved:
-            self.__moved = False
-            update_cfg = True
-        if update_cfg:
             PRE_EXISTING_CONFIG[qualified_name] = {
-                "size": self.GetSize().Get(),
-                "position": self.GetPosition().Get(),
+                "size": self.__size,
+                "position": self.__position,
+                "is_full_screen": self.IsMaximized(),
             }
-            self.Refresh()
-            self.Layout()
         evt.Skip()
 
     return wrapper
 
 
-def on_size(self):
+def on_resize(self: ExtendedTLW):
     def wrapper(evt):
         self.__resized = True
+        if not self.IsMaximized():
+            # only store the non-maximised state
+            self.__position = self.GetPosition().Get()
+            self.__size = self.GetSize().Get()
         evt.Skip()
 
     return wrapper
 
 
-def on_move(self):
-    def wrapper(evt):
-        self.__moved = True
-        evt.Skip()
-
-    return wrapper
-
-
-def preserve_ui_preferences(clazz):
+def preserve_ui_preferences(clazz: Type[wx.TopLevelWindow]):
+    assert issubclass(
+        clazz, wx.TopLevelWindow
+    ), "This takes a subclass of a top level window."
     original_init = clazz.__init__
     qualified_name = ".".join((clazz.__module__, clazz.__name__))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self: wx.TopLevelWindow, *args, **kwargs):
         original_init(self, *args, **kwargs)
         self.__resized = False
-        self.__moved = False
+        self.__position = self.GetPosition().Get()
+        self.__size = self.GetSize().Get()
+        self: ExtendedTLW
 
         if qualified_name in PRE_EXISTING_CONFIG:
-            self.SetSize(PRE_EXISTING_CONFIG[qualified_name]["size"])
-            self.SetPosition(PRE_EXISTING_CONFIG[qualified_name]["position"])
-            self.Refresh()
+            window_config = PRE_EXISTING_CONFIG[qualified_name]
+            self.SetPosition(window_config["position"])
+            self.SetSize(window_config["size"])
+            self.Maximize(window_config.get("is_full_screen", False))
+        else:
+            self.Maximize()
+        self.Layout()
+        self.Refresh()
 
-        self.Bind(wx.EVT_MOVE, on_move(self))
-        self.Bind(wx.EVT_SIZE, on_size(self))
+        self.Bind(wx.EVT_MOVE, on_resize(self))
+        self.Bind(wx.EVT_SIZE, on_resize(self))
         self.Bind(wx.EVT_IDLE, on_idle(self))
 
     clazz.__init__ = __init__
