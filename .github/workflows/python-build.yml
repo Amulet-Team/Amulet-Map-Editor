@@ -31,7 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine pyinstaller==4.2 build
+        pip install setuptools wheel twine pyinstaller==4.7 build
 
     - name: Setup
       run: |
