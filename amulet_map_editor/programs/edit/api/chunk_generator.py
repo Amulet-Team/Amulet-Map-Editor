@@ -31,7 +31,6 @@ if ThreadingEnabled:
                     self.thread_action()
                 time.sleep(1 / 60)
 
-
 else:
 
     class ChunkGenerator(ThreadedObjectContainer):
