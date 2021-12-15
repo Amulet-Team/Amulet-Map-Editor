@@ -3,6 +3,7 @@
 # Adds a clause allowing changes and new works
 # Adds a clause allowing distribution back to the licensor
 # These two clauses are modified from PolyForm Shield License 1.0.0
+# Added a clause to allow commercial educational usage
 
 ## Acceptance
 
@@ -45,6 +46,10 @@ to license, that you would infringe by using the software.
 ## Noncommercial Purposes
 
 Any noncommercial purpose is a permitted purpose.
+
+## Commercial Educational Purposes
+
+Commercial use purely for educational purpose is a permitted purpose.
 
 ## Personal Uses
 
