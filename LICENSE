@@ -1,6 +1,8 @@
-# PolyForm Strict License 1.0.0
-
-<https://polyformproject.org/licenses/strict/1.0.0>
+# Amulet Map Editor License 1.0.0
+# Based on PolyForm Strict License 1.0.0
+# Adds a clause allowing changes and new works
+# Adds a clause allowing distribution back to the licensor
+# These two clauses are modified from PolyForm Shield License 1.0.0
 
 ## Acceptance
 
@@ -10,11 +12,29 @@ your licenses.
 
 ## Copyright License
 
-The licensor grants you a copyright license for the software
-to do everything you might do with the software that would
-otherwise infringe the licensor's copyright in it for any
-permitted purpose, other than distributing the software or
-making changes or new works based on the software.
+The licensor grants you a copyright license for the
+software to do everything you might do with the software
+that would otherwise infringe the licensor's copyright
+in it for any permitted purpose.  However, you may
+only distribute the software according to [Distribution
+License](#distribution-license) and make changes or new works
+based on the software according to [Changes and New Works
+License](#changes-and-new-works-license).
+
+## Distribution License
+
+The licensor grants you an additional copyright license
+to distribute copies of the software for the sole purpose
+of submitting changes or new works to the licensor.
+Your license to distribute covers distributing the software
+with changes and new works permitted by [Changes and New Works
+License](#changes-and-new-works-license).
+
+## Changes and New Works License
+
+The licensor grants you an additional copyright license to
+make changes and new works based on the software for any
+permitted purpose.
 
 ## Patent License
 
