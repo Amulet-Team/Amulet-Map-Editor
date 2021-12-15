@@ -31,12 +31,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine pyinstaller==4.2 build
+        pip install setuptools wheel twine pyinstaller==4.7 build
 
     - name: Setup
       run: |
-        python -m build
-        python -m pip install dist/amulet_map_editor-*.whl
+        python -m build -C--global-option=--find-libs=True -C--global-option=--find-libs=True
+        python -m pip install dist/amulet_map_editor-*.whl --upgrade
 
     - name: PyInstaller build
       run: |
