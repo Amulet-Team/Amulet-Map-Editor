@@ -61,7 +61,7 @@ update_check.ok=OK
 # ワールド選択
 ## 開くワールドを選択するときの画面
 select_world.title=ワールドを選択
-select_world.open_world_warning=Amuletでワールドの開く前にゲームなどのツールではワールドを閉じてください
+select_world.open_world_warning=Amuletでワールドを開く前にほかのアプリケーションではワールドを閉じてください
 select_world.open_world_button=フォルダーを開く
 select_world.open_world_dialogue=ワールドディレクトリを選択
 select_world.select_directory_failed=ディレクトリのオープンに失敗しました。
@@ -77,13 +77,13 @@ program_about.choose_from_options=左端の選択肢から操作を選んでく�
 
 # 変換
 ## ワールドを変換するためのプログラム
-program_convert.tab_name=変換
-program_convert.convert_button=変換する
-program_convert.input_world=入力ワールド:
-program_convert.output_world=出力するワールド:
-program_convert.select_output_world=出力するワールドを選択
-program_convert.input_output_must_different=入力と出力のワールドが同じです。異なるワールドを選択してください。
-program_convert.select_before_converting=変換する前のワールドを選択してください。
+program_convert.tab_name=ワールド変換
+program_convert.convert_button=変換
+program_convert.input_world=変換するワールド:
+program_convert.output_world=変換先のワールド:
+program_convert.select_output_world=変換先のワールドを選択
+program_convert.input_output_must_different=同じワールドを選択しています。異なるワールドを選択してください。
+program_convert.select_before_converting=変換先のワールドを選択してください。
 program_convert.conversion_completed=ワールドの変換が完了しました。
 
 ## メニューバー
