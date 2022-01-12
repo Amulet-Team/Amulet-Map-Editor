@@ -15,7 +15,7 @@
 
 # メニューバーについて
 ## このコンテキストでは、「&」記号は特別な文字です。UIには表示されませんが、「alt」キーを押したときのショートカットとして次の文字が定義されます（注意：アクセント記号付きの文字はそれ自体が文字になります（é =/e））。
-## 例 例："&File "はUIでは "File "と表示されますが、"alt+f "を押すと対応するメニューが表示されます。
+## 例："&File "はUIでは "File "と表示されますが、"alt+f "を押すと対応するメニューが表示されます。
 ## 詳細は https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel をご覧ください。
 
 # 文字列について
@@ -61,7 +61,7 @@ update_check.ok=OK
 # ワールド選択
 ## 開くワールドを選択するときの画面
 select_world.title=ワールドを選択
-select_world.open_world_warning=Amuletでワールドの開く前にゲームなどのツールではワールドを閉じてください
+select_world.open_world_warning=Amuletでワールドを開く前にほかのアプリケーションではワールドを閉じてください
 select_world.open_world_button=フォルダーを開く
 select_world.open_world_dialogue=ワールドディレクトリを選択
 select_world.select_directory_failed=ディレクトリのオープンに失敗しました。
@@ -77,13 +77,13 @@ program_about.choose_from_options=左端の選択肢から操作を選んでく�
 
 # 変換
 ## ワールドを変換するためのプログラム
-program_convert.tab_name=変換
-program_convert.convert_button=変換する
-program_convert.input_world=入力ワールド:
-program_convert.output_world=出力するワールド:
-program_convert.select_output_world=出力するワールドを選択
-program_convert.input_output_must_different=入力と出力のワールドが同じです。異なるワールドを選択してください。
-program_convert.select_before_converting=変換する前のワールドを選択してください。
+program_convert.tab_name=ワールド変換
+program_convert.convert_button=変換
+program_convert.input_world=変換するワールド:
+program_convert.output_world=変換先のワールド:
+program_convert.select_output_world=変換先のワールドを選択
+program_convert.input_output_must_different=同じワールドを選択しています。異なるワールドを選択してください。
+program_convert.select_before_converting=変換先のワールドを選択してください。
 program_convert.conversion_completed=ワールドの変換が完了しました。
 
 ## メニューバー
@@ -135,10 +135,10 @@ program_3d_edit.select_tool.scroll_point_x2=x2
 program_3d_edit.select_tool.scroll_point_y2=y2
 program_3d_edit.select_tool.scroll_point_z2=z2
 program_3d_edit.select_tool.scroll_point_x1_tooltip=緑色の選択点のx座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
-program_3d_edit.select_tool.scroll_point_y1_tooltip=緑色の選択点のｙ座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.scroll_point_y1_tooltip=緑色の選択点のy座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
 program_3d_edit.select_tool.scroll_point_z1_tooltip=緑色の選択点のz座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
 program_3d_edit.select_tool.scroll_point_x2_tooltip=青色の選択点のx座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
-program_3d_edit.select_tool.scroll_point_y2_tooltip=青色の選択点のｙ座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.scroll_point_y2_tooltip=青色の選択点のy座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
 program_3d_edit.select_tool.scroll_point_z2_tooltip=青色の選択点のz座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
 program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
 program_3d_edit.select_tool.box_size_selector_tooltip=有効な選択範囲のMinecraft範囲セレクター表記
