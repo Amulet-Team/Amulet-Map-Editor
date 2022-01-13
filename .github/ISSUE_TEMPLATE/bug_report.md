@@ -34,7 +34,7 @@ If you have multiple issues then open another report.
 <!-- Please add the details of your environment. -->
 - OS: Windows | OSX | linux
 - Minecraft Platform: Java | Bedrock | Education Edition
-- Minecraft Version: <!-- Write the version number of the world(s) here. -->
+- Minecraft Version: <!-- Write the version number of the world(s) here. Eg 1.18.0 -->
 - Amulet Version: <!-- Write the version number of Amulet here. This can be found in the top left corner of the editor. -->
 
 ### Additional context
