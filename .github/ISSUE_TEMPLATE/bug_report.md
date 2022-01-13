@@ -12,11 +12,15 @@ labels: bug
 <!-- Click on the preview tab to see what your report will look like before submitting. -->
 
 ## Bug Report
+<!-- 
+Please report one issue per report.
+If you have multiple issues then open another report.
+-->
 ### Current Behaviour:
-<!-- A simple description of the current behaviour. -->
+<!-- A short description of the current behaviour. -->
 
 ### Expected behavior:
-<!-- A simple description of what you expected to happen. -->
+<!-- A short description of what you expected to happen. -->
 
 ### Steps To Reproduce:
 <!--
@@ -25,6 +29,16 @@ labels: bug
 3. Scroll down to '....'
 4. See error
 -->
+
+### Environment:
+<!-- Please add the details of your environment. -->
+- OS: Windows | OSX | linux
+- Minecraft Platform: Java | Bedrock | Education Edition
+- Minecraft Version: <!-- Write the version number of the world(s) here. -->
+- Amulet Version: <!-- Write the version number of Amulet here. This can be found in the top left corner of the editor. -->
+
+### Additional context
+<!-- Add any other context about the problem here. -->
 
 ## Attachments
 <!-- 
@@ -37,13 +51,3 @@ https://docs.github.com/en/github/writing-on-github/working-with-advanced-format
 
 ### Worlds
 <!-- If applicable, add the Minecraft world to help us debug the issue. -->
-
-### Environment:
-<!-- Please add the details of your environment. -->
- - OS: Windows | OSX | linux
- - Minecraft Platform: Java | Bedrock | Education Edition
- - Minecraft Version: <!-- Write the version number of the world(s) here. -->
- - Amulet Version: <!-- Write the version number of Amulet here. This can be found in the top left corner of the editor. -->
-
-### Additional context
-<!-- Add any other context about the problem here. -->
