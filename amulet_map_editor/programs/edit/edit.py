@@ -97,14 +97,16 @@ class EditExtension(wx.Panel, BaseProgram):
         Check if it is safe to close the UI.
         :return: True if the program can be closed, False otherwise
         """
-        if self._canvas is not None:
+        if self._canvas is None:
+            # if the edit program has never been opened then it can be closed
+            return True
+        else:
             if self._canvas.is_closeable():
                 return self._check_close_world()
             log.info(
                 f"The canvas in edit for world {self._world.level_wrapper.level_name} was not closeable for some reason."
             )
             return False
-        return not bool(self._world.history_manager.unsaved_changes)
 
     def _check_close_world(self) -> bool:
         """

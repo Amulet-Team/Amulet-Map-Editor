@@ -3,12 +3,10 @@ from typing import List, Callable, Tuple, Type, Union, Optional
 import traceback
 import importlib
 import pkgutil
-import re
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
-import amulet_map_editor
 from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
@@ -24,23 +22,13 @@ _fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [
 def load_extensions():
     if not _extensions:
         _extensions.extend(_fixed_extensions)
-        prefix = f"{programs.__name__}."
 
         extensions = []
 
-        # source support
-        for _, name, _ in pkgutil.iter_modules(programs.__path__, prefix):
-            extensions.append(load_extension(name))
-
-        # pyinstaller support
-        toc = set()
-        for importer in pkgutil.iter_importers(amulet_map_editor.__name__):
-            if hasattr(importer, "toc"):
-                toc |= importer.toc
-        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9_]*$")
-        for name in toc:
-            if match.fullmatch(name):
-                extensions.append(load_extension(name))
+        for _, module_name, _ in pkgutil.iter_modules(
+            programs.__path__, f"{programs.__name__}."
+        ):
+            extensions.append(load_extension(module_name))
 
         _extensions.extend(
             sorted((ext for ext in extensions if ext is not None), key=lambda x: x[0])
