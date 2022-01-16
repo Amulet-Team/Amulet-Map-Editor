@@ -1,22 +1,25 @@
 ---
-name: Feature request
+name: Feature Request
 about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+title: [Feature Request] Your Title Here
+labels: enhancement
 
 ---
 
-**Has your feature request already been suggested? Please check if your suggested feature has already been suggested.**
+<!-- Please read carefully before submitting. -->
+<!-- Please search to see if the feature has already been suggested. -->
+<!-- Any text contained in brackets like this will not appear in your final bug report. -->
+<!-- Click on the preview tab to see what your report will look like before submitting. -->
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Feature Request
+### The Problem
+<!-- a short description of the problem that the feature would be solve. -->
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+### Feature Description
+<!-- a short description of the feature you would like added. -->
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+### Alternatives
+<!-- a short description of alternatives you have considered. -->
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+### Additional context
+<!-- Add any other context about the problem here. -->
