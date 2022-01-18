@@ -168,7 +168,7 @@ class ConvertExtension(SimplePanel, BaseProgram):
         wx.MessageBox(message)
         work_count -= 1
 
-    def is_closeable(self):
+    def can_close(self):
         if work_count:
             log.info(
                 f"World {self.world.level_path} is still being converted. Please let it finish before closing"

@@ -192,7 +192,7 @@ class AmuletUI(wx.Frame):
     def _on_page_close(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
         page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetPage(evt.GetSelection())
         if page is not self._main_menu:
-            if page.is_closeable():
+            if page.can_close():
                 path = page.path
                 page.disable()
                 page.close()

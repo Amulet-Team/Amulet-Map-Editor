@@ -103,9 +103,11 @@ class WorldPageUI(wx.Notebook, BasePageUI):
                 )
                 continue
 
-    def is_closeable(self) -> bool:
-        """Check if all extensions are safe to be closed"""
-        return all(e.is_closeable() for e in self._extensions)
+    def can_close(self) -> bool:
+        """
+        Check if all extensions are safe to be closed
+        """
+        return all(e.can_close() for e in self._extensions)
 
     def close(self):
         """Close the world and destroy the UI

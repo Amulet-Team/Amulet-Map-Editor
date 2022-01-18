@@ -92,7 +92,7 @@ class EditExtension(wx.Panel, BaseProgram):
         if self._canvas is not None:
             self._canvas.close()
 
-    def is_closeable(self) -> bool:
+    def can_close(self) -> bool:
         """
         Check if it is safe to close the UI.
         :return: True if the program can be closed, False otherwise
