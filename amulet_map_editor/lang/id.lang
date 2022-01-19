@@ -1,0 +1,190 @@
+# Shared strings
+shared.check_console=Periksa konsol untuk lebih jelas.
+
+# App
+app.world_still_used=Dunia masih digunakan. Mohon tutup terlebih dahulu
+app.browser_open_tooltip=Mengklik akan membuka halaman di browser Anda
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Tutup Dunia
+
+# Menu bar
+menu_bar.file.menu_name=&File
+menu_bar.file.open_world=Buka Dunia
+menu_bar.file.close_world=Tutup Dunia
+menu_bar.file.quit=Keluar
+menu_bar.options.menu_name=&Opsi
+menu_bar.help.menu_name=&Bantuan
+
+# Main menu
+main_menu.tab_name=Menu Utama
+main_menu.open_world=Buka Dunia
+main_menu.help=Bantuan
+main_menu.discord=Discord Amulet
+
+# Update check
+update_check.newer_version_released=Versi baru Amulet telah dirilis!
+update_check.new_version=Versi Baru:
+update_check.current_version=Versi Anda:
+update_check.update=Pergi ke Halaman Unduh
+update_check.ok=Oke
+
+# Select world
+select_world.title=Pilih Dunia
+select_world.open_world_warning=Tutup dunia dalam game dan tools lainnya sebelum membuka pada Amulet.
+select_world.open_world_button=Buka dunia lainnya
+select_world.open_world_dialogue=Pilih direktori dunia Minecraft
+select_world.select_directory_failed=Gagal membuka direktori!
+select_world.recent_worlds=Dunia yang Baru Dibuka
+select_world.no_loader_found=Tidak dapat menemukan loader untuk dunia ini.
+select_world.loading_world_failed=Kesalahan saat membuka dunia.
+
+# About
+program_about.tab_name=Tentang
+program_about.currently_opened_world=Dunia yang Dibuka Saat Ini:
+program_about.choose_from_options=Pilih dari opsi di sebelah kiri apa yang ingin Anda lakukan.\nAnda dapat beralih di antara ini kapan saja.
+
+# Convert
+program_convert.tab_name=Konversi
+program_convert.convert_button=Konversi
+program_convert.input_world=Dunia Input:
+program_convert.output_world=Dunia Output:
+program_convert.select_output_world=Pilih Dunia Output
+program_convert.input_output_must_different=Dunia input dan output harus berbeda!
+program_convert.select_before_converting=Pilih dunia sebelum mengonversi!
+program_convert.conversion_completed=Konversi dunia selesai
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=Panduan Pengguna (online)
+
+# 3D Editor
+program_3d_edit.tab_name=Editor 3D
+
+## Canvas
+program_3d_edit.canvas.please_wait=Harap tunggu selagi pe-render memuat
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Mengunduh paket sumber daya vanilla Bedrock
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Mengunduh paket sumber daya vanilla Java
+program_3d_edit.canvas.java_rp_failed=Gagal mengunduh paket sumber daya Java terbaru.
+program_3d_edit.canvas.java_rp_failed_default=Periksa koneksi internet Anda dan mulai ulang Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=Sertifikat untuk mengakses internet tidak diinstal.\nJalankan program "Install Certificates.command" yang ada di "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Memuat paket sumber daya
+program_3d_edit.canvas.creating_texture_atlas=Membuat atlas tekstur
+program_3d_edit.canvas.setting_up_renderer=Menyiapkan renderer
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Simpan
+program_3d_edit.menu_bar.edit.menu_name=&Edit
+program_3d_edit.menu_bar.edit.undo=Undo
+program_3d_edit.menu_bar.edit.redo=Redo
+program_3d_edit.menu_bar.edit.cut=Potong
+program_3d_edit.menu_bar.edit.copy=Salin
+program_3d_edit.menu_bar.edit.paste=Tempel
+program_3d_edit.menu_bar.edit.delete=Hapus Blok
+program_3d_edit.menu_bar.edit.goto=Pergi ke
+program_3d_edit.menu_bar.edit.select_all=Pilih Semua
+program_3d_edit.menu_bar.options.controls=Kontrol...
+program_3d_edit.menu_bar.options.options=Opsi...
+program_3d_edit.menu_bar.help.user_guide=Panduan Pengguna (online)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Hapus Blok
+program_3d_edit.select_tool.delete_button_tooltip=Hapus blok pada area yang diseleksi.
+program_3d_edit.select_tool.copy_button=Salin
+program_3d_edit.select_tool.copy_button_tooltip=Salin area yang diseleksi untuk ditempelkan nanti. Dapat ditempelkan pada dunia dan dimensi apa pun.
+program_3d_edit.select_tool.cut_button=Potong
+program_3d_edit.select_tool.cut_button_tooltip=Potong area yang diseleksi untuk ditempelkan nanti dan dihapus. Dapat ditempelkan pada dunia dan dimensi apa pun.
+program_3d_edit.select_tool.paste_button=Tempel
+program_3d_edit.select_tool.paste_button_tooltip=Tempelkan area yang sebelumnya disalin atau dipotong ke dunia.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Atur koordinat x dari sudut hijau kotak aktif. Ketik angka atau scroll sambil mengarahkan kursor.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Atur koordinat y dari sudut hijau kotak aktif. Ketik angka atau scroll sambil mengarahkan kursor.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Atur koordinat z dari sudut hijau kotak aktif. Ketik angka atau scroll sambil mengarahkan kursor.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Atur koordinat x dari sudut biru kotak aktif. Ketik angka atau scroll sambil mengarahkan kursor.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Atur koordinat y dari sudut biru kotak aktif. Ketik angka atau scroll sambil mengarahkan kursor.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Atur koordinat z dari sudut biru kotak aktif. Ketik angka atau scroll sambil mengarahkan kursor.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=Bentuk seleksi aktif menggunakan notasi pemilih volume Minecraft.
+program_3d_edit.select_tool.box_size_tooltip=Ukuran kotak seleksi aktif dalam blok.
+program_3d_edit.select_tool.button_point1=Titik Pindah 1
+program_3d_edit.select_tool.button_point1_tooltip=Tekan dan tahan tombol ini dan gunakan kontrol gerakan untuk memindahkan titik pilihan warna hijau.
+program_3d_edit.select_tool.button_point2=Titik Pindah 2
+program_3d_edit.select_tool.button_point2_tooltip=Tekan dan tahan tombol ini dan gunakan kontrol gerakan untuk memindahkan titik pilihan warna biru.
+program_3d_edit.select_tool.button_selection_box=Pindahkan Kotak
+program_3d_edit.select_tool.button_selection_box_tooltip=Tekan dan tahan tombol ini dan gunakan kontrol gerakan untuk memindahkan kotak aktif.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=Lokasi
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=Lokasi x tempat pusat seleksi akan ditempatkan. Ketik angka, scroll, atau gunakan panah untuk mengubah.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=Lokasi y tempat pusat seleksi akan ditempatkan. Ketik angka, scroll, atau gunakan panah untuk mengubah.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=Lokasi z tempat pusat seleksi akan ditempatkan. Ketik angka, scroll, atau gunakan panah untuk mengubah.
+program_3d_edit.paste_tool.move_selection_label=Pindahkan Seleksi
+program_3d_edit.paste_tool.move_selection_tooltip=Tekan dan tahan tombol ini dan gunakan kontrol gerakan untuk memindahkan seleksi.
+program_3d_edit.paste_tool.rotation_label=Rotasi
+program_3d_edit.paste_tool.free_rotation_label=Rotasi Bebas
+program_3d_edit.paste_tool.free_rotation_tooltip=Jika tidak dicentang, seleksi akan diputar dalam kelipatan 90 derajat. Jika dicentang, seleksi dapat diputar dalam peningkatan satu derajat.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=Sudut derajat pada sumbu x diseleksi akan diputar. Perhatikan bahwa ini adalah sumbu x model yang ditransformasikan oleh rotasi z dan y sehingga ini mungkin tidak cocok dengan sumbu x global.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=Sudut derajat pada sumbu y diseleksi akan diputar. Perhatikan bahwa ini adalah sumbu y model yang ditransformasikan oleh rotasi z sehingga ini mungkin tidak cocok dengan sumbu y global.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=Sudut derajat pada sumbu z diseleksi akan diputar.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Klik untuk memutar yang diseleksi 90 derajat berlawanan arah jarum jam relatif terhadap rotasi tampilan.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Klik untuk memutar yang diseleksi 90 derajat searah jarum jam relatif terhadap rotasi tampilan.
+program_3d_edit.paste_tool.scale_label=Skala
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=Skala model pada sumbu x.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=Skala model pada sumbu y.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=Skala model pada sumbu z.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Mirror yang diseleksi secara horizontal relatif terhadap arah yang dilihat kamera.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Mirror yang diseleksi secara vertikal relatif terhadap arah yang dilihat kamera.
+program_3d_edit.paste_tool.copy_air_label=Tempelkan Udara
+program_3d_edit.paste_tool.copy_air_tooltip=Jika diaktifkan, semua blok udara dalam struktur yang ditempelkan akan diterapkan menimpa semua blok yang ada. Jika dinonaktifkan, blok yang ada di lokasi tersebut akan tetap ada dan udara tidak akan disalin.
+program_3d_edit.paste_tool.copy_water_label=Paste Water
+program_3d_edit.paste_tool.copy_water_tooltip=Jika diaktifkan, semua blok air dalam struktur yang ditempelkan akan diterapkan menimpa semua blok yang ada. Jika dinonaktifkan, blok yang ada di lokasi tersebut akan tetap ada dan air tidak akan disalin.
+program_3d_edit.paste_tool.copy_lava_label=Paste Lava
+program_3d_edit.paste_tool.copy_lava_tooltip=Jika diaktifkan, semua blok lava dalam struktur yang ditempelkan akan diterapkan untuk menimpa blok yang ada. Jika dinonaktifkan, blok yang ada di lokasi tersebut akan tetap ada dan lava tidak akan disalin.
+program_3d_edit.paste_tool.confirm_label=Konfirmasi
+program_3d_edit.paste_tool.confirm_tooltip=Klik untuk menempelkan struktur ke dunia dan lokasi, rotasi, dan skala yang ditentukan.
+program_3d_edit.paste_tool.zero_scale_message=Salah satu nilai skala memiliki nilai nol sehingga tidak ada yang disalin.
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Min Y
+program_3d_edit.chunk_tool.min_y_tooltip=Koordinat minimum y untuk diseleksi dari atas ke bawah. Ini dapat digunakan untuk melihat sepotong dunia dan membantu melihat dimensi seperti nether dan cave.
+program_3d_edit.chunk_tool.max_y=Max Y
+program_3d_edit.chunk_tool.max_y_tooltip=Koordinat maximum y untuk diseleksi dari atas ke bawah. Ini dapat digunakan untuk melihat sepotong dunia dan membantu melihat dimensi seperti nether dan cave.
+program_3d_edit.chunk_tool.delete_chunks=Hapus Chunk
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Hapus chunk yang diseleksi. Ini akan menghapus chunk aktual dan semua data yang terkandung di dalamnya. Selanjutnya ketika Anda memuat area di dalam game, itu akan membuat ulang chunk baru.
+program_3d_edit.chunk_tool.prune_chunks=Hapus Chunk Tidak Diseleksi
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Hapus chunk yang tidak diseleksi. Ini akan menghapus chunk aktual dan semua data yang terkandung di dalamnya. Selanjutnya ketika Anda memuat area di dalam game, itu akan membuat ulang chunk baru.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Teleportasi
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Koordinat x. Ketik koordinat untuk menuju ke lokasi. Ctrl + C untuk menyalin koordinat. Ctrl + V untuk menempel.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Koordinat y. Ketik koordinat untuk menuju ke lokasi. Ctrl + C untuk menyalin koordinat. Ctrl + V untuk menempel.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Koordinat z. Ketik koordinat untuk menuju ke lokasi. Ctrl + C untuk menyalin koordinat. Ctrl + V untuk menempel.
+program_3d_edit.goto_ui.copy_button_tooltip=Salin nilai x, y, dan z ke clipboard dalam bentuk "0.0 0.0 0.0" (x, y, dan z berturut-turut)
+program_3d_edit.goto_ui.paste_button_tooltip=Tempelkan koordinat yang sebelumnya disalin pada input. Nilai yang disalin harus tiga angka yang dipisahkan dengan spasi atau koma.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Platform dan versi data dunia
+program_3d_edit.file_ui.projection_tooltip=Ubah tampilan
+program_3d_edit.file_ui.location_tooltip=Pindahkan kamera
+program_3d_edit.file_ui.dim_tooltip=Select dimension
+program_3d_edit.file_ui.undo_tooltip=Undo
+program_3d_edit.file_ui.redo_tooltip=Redo
+program_3d_edit.file_ui.save_tooltip=Simpan perubahan
+program_3d_edit.file_ui.close_tooltip=Tutup dunia

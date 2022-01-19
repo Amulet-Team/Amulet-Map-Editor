@@ -1,5 +1,5 @@
 # if the below doesn't work please find an alternative from here: https://extras.wxpython.org/wxPython4/extras/linux/gtk3/
-wxPython
+wxPython>=4.1
 numpy
 pyopengl
 amulet-core~=1.6.0a0
