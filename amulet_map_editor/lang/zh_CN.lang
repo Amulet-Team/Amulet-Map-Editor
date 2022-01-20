@@ -1,13 +1,42 @@
 # Shared strings
 shared.check_console=查看控制台以获取更多信息.
 
-app.world_still_used=有一个世界仍在使用当中. 请先关闭它
+# App
+app.world_still_used=有一个世界仍在使用中. 请先关闭它
+app.browser_open_tooltip=点击后将在浏览器中打开页面.
 
 world.java_platform=Java版
 world.bedrock_platform=基岩版
 world.close_world=关闭世界
 
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=文件
+menu_bar.file.open_world=打开世界
+menu_bar.file.close_world=关闭世界
+menu_bar.file.quit=退出
+menu_bar.options.menu_name=选项
+menu_bar.help.menu_name=帮助
+
+# Main menu
+## The start screen
+main_menu.tab_name=主菜单
+main_menu.open_world=打开世界
+main_menu.help=帮助
+main_menu.discord=Amulet Discord
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=一个新版本的Amulet现已发布!
+update_check.new_version=新版本:
+update_check.current_version=你的版本:
+update_check.update=前往下载页面
+update_check.ok=确认
+
+# Select world
+## The window when selecting a world to open
 select_world.title=选择世界
+select_world.open_world_warning=该世界正在使用中. 请在游戏和其他工具中关闭世界, 然后重试.
 select_world.open_world_button=打开另外一个世界
 select_world.open_world_dialogue=选择一个Minecraft存档目录
 select_world.select_directory_failed=无法打开目录!
@@ -15,28 +44,14 @@ select_world.recent_worlds=最近打开的世界
 select_world.no_loader_found=无法为该世界找到一个加载器.
 select_world.loading_world_failed=世界加载失败.
 
-main_menu.tab_name=主菜单
-main_menu.open_world=打开世界
-main_menu.help=帮助
-main_menu.discord=Amulet Discord
-
-menu_bar.file.menu_name=文件
-menu_bar.file.open_world=打开世界
-menu_bar.file.close_world=关闭世界
-menu_bar.file.quit=离开
-menu_bar.options.menu_name=选项
-menu_bar.help.menu_name=帮助
-
-update_check.newer_version_released=一个新版本的Amulet现已发布!
-update_check.new_version=新版本:
-update_check.current_version=你的版本:
-update_check.update=前往下载页面
-update_check.ok=确认
-
+# About
+## The default program when a world is opened
 program_about.tab_name=信息
 program_about.currently_opened_world=当前打开的世界:
 program_about.choose_from_options=从左边的选项中选择你想进行的操作.\n你可以随时在这些选项之间进行切换.
 
+# Convert
+## The program used to convert a world
 program_convert.tab_name=转换
 program_convert.convert_button=转换
 program_convert.input_world=输入世界:
@@ -46,8 +61,40 @@ program_convert.input_output_must_different=输入和输出的世界不可以是
 program_convert.select_before_converting=你必须选择一个用于转换的世界!
 program_convert.conversion_completed=世界转换完成
 
+## Menu bar
+program_convert.menu_bar.help.user_guide=用户指南 (在线)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
 program_3d_edit.tab_name=3D 编辑器
 
+## Canvas
+program_3d_edit.canvas.please_wait=渲染器正在初始化, 请稍作等待
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下载基岩版纯净资源包
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=正在下载Java版纯净资源包
+program_3d_edit.canvas.java_rp_failed=无法下载最新版本的Java版纯净资源包.
+program_3d_edit.canvas.java_rp_failed_default=请检查你的网络连接或重启Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=未安装访问Internet的证书. \n运行 "Applications/Python 3.x" 中的 "Install Certificates.command" 程序.
+program_3d_edit.canvas.loading_resource_packs=正在加载资源包
+program_3d_edit.canvas.creating_texture_atlas=正在创建纹理
+program_3d_edit.canvas.setting_up_renderer=正在设置渲染器
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=保存
+program_3d_edit.menu_bar.edit.menu_name=编辑
+program_3d_edit.menu_bar.edit.undo=撤销
+program_3d_edit.menu_bar.edit.redo=重做
+program_3d_edit.menu_bar.edit.cut=剪切
+program_3d_edit.menu_bar.edit.copy=复制
+program_3d_edit.menu_bar.edit.paste=粘贴
+program_3d_edit.menu_bar.edit.delete=删除
+program_3d_edit.menu_bar.edit.goto=前往
+program_3d_edit.menu_bar.edit.select_all=全选
+program_3d_edit.menu_bar.options.controls=操控按键...
+program_3d_edit.menu_bar.options.options=其他选项...
+program_3d_edit.menu_bar.help.user_guide=用户指南 (在线)
+
+## Select tool
 program_3d_edit.select_tool.delete_button=删除
 program_3d_edit.select_tool.delete_button_tooltip=删除选中区域内的方块.
 program_3d_edit.select_tool.copy_button=复制
@@ -68,7 +115,6 @@ program_3d_edit.select_tool.scroll_point_z1_tooltip=设置选中区块中绿色�
 program_3d_edit.select_tool.scroll_point_x2_tooltip=设置选中区块中蓝色边缘的x坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
 program_3d_edit.select_tool.scroll_point_y2_tooltip=设置选中区块中蓝色边缘的y坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
 program_3d_edit.select_tool.scroll_point_z2_tooltip=设置选中区块中蓝色边缘的z坐标. 在悬停时输入一个数字或使用鼠标滚轮以及右侧的上下箭头进行调整.
-
 program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
 program_3d_edit.select_tool.box_size_selector_tooltip=当前Minecraft区块选择器选中的形状.
 program_3d_edit.select_tool.box_size_tooltip=当前选择框的尺寸大小, 以块为单位.
@@ -79,6 +125,7 @@ program_3d_edit.select_tool.button_point2_tooltip=按住这个按钮并使用移
 program_3d_edit.select_tool.button_selection_box=移动选择框
 program_3d_edit.select_tool.button_selection_box_tooltip=按住这个按钮并使用移动键(默认为WASD, 空格和shift)移动选中区块的坐标.
 
+## Paste tool
 program_3d_edit.paste_tool.location_label=位置
 program_3d_edit.paste_tool.location_x_label=x
 program_3d_edit.paste_tool.location_x_tooltip=选中区域将会被放置的中心位置的x坐标. 输入一个数字, 或使用鼠标滚轮以及右侧箭头来改变数值.
@@ -118,44 +165,33 @@ program_3d_edit.paste_tool.confirm_label=确认
 program_3d_edit.paste_tool.confirm_tooltip=点击此处将模板旋转, 并按比例粘贴到世界中的指定位置.
 program_3d_edit.paste_tool.zero_scale_message=比例中的一个数值为0, 所有没有任何内容被复制.
 
-program_3d_edit.chunk_tool.min_y=最小 Y
-program_3d_edit.chunk_tool.min_y_tooltip=在自上而下的俯视图中绘制的最低的Y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
-program_3d_edit.chunk_tool.max_y=最大 Y
-program_3d_edit.chunk_tool.max_y_tooltip=在自上而下的俯视图中绘制的最高的Y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=最小y坐标
+program_3d_edit.chunk_tool.min_y_tooltip=在自上而下的俯视图中绘制的最低的y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
+program_3d_edit.chunk_tool.max_y=最大y坐标
+program_3d_edit.chunk_tool.max_y_tooltip=在自上而下的俯视图中绘制的最高的y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
 program_3d_edit.chunk_tool.delete_chunks=删除选中区块
 program_3d_edit.chunk_tool.delete_chunks_tooltip=删除选中的区块. 该操作将会删除实际的区块和其中包含的所有数据. 下次你在游戏中加载该区域时, 游戏将会重新创建这些区块.
 program_3d_edit.chunk_tool.prune_chunks=仅保留选中区块
 program_3d_edit.chunk_tool.prune_chunks_tooltip=删除所有未被选中的区块. 该操作将会删除实际的区块和其中包含的所有数据. 下次你在游戏中加载该区域时, 游戏将会重新创建这些区块.
 
+## Goto/Teleport window
 program_3d_edit.goto_ui.title=传送
 program_3d_edit.goto_ui.x_label=x:
-program_3d_edit.goto_ui.x_label_tooltip=摄像机的X坐标. 输入一个坐标以前往该位置. 按 Ctrl+C 复制该坐标, Ctrl+V 粘贴.
+program_3d_edit.goto_ui.x_label_tooltip=摄像机的x坐标. 输入一个坐标以前往该位置. 按 Ctrl+C 复制该坐标, Ctrl+V 粘贴.
 program_3d_edit.goto_ui.y_label=y:
 program_3d_edit.goto_ui.y_label_tooltip=摄像机的y坐标. 输入一个坐标以前往该位置. 按 Ctrl+C 复制该坐标, Ctrl+V 粘贴.
 program_3d_edit.goto_ui.z_label=z:
 program_3d_edit.goto_ui.z_label_tooltip=摄像机的z坐标. 输入一个坐标以前往该位置. 按 Ctrl+C 复制该坐标, Ctrl+V 粘贴.
-program_3d_edit.goto_ui.copy_button_tooltip=以 "0.0 0.0 0.0" 的形式将x, y和z的值复制到剪贴板上 (分别为x、y和z).
+program_3d_edit.goto_ui.copy_button_tooltip=以 "0.0 0.0 0.0" (分别为x、y和z)的格式将x, y和z的值复制到剪贴板上.
 program_3d_edit.goto_ui.paste_button_tooltip=将先前复制的坐标粘贴到输入栏中. 复制的值必须是三个数字, 用空格或逗号隔开.
 
-program_3d_edit.canvas.please_wait=渲染器正在初始化, 请稍作等待
-program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下载基岩版纯净资源包
-program_3d_edit.canvas.downloading_java_vanilla_resource_pack=正在下载Java版纯净资源包
-program_3d_edit.canvas.java_rp_failed=无法下载最新版本的Java版纯净资源包.
-program_3d_edit.canvas.java_rp_failed_default=请检查你的网络连接或重启Amulet.
-program_3d_edit.canvas.loading_resource_packs=正在加载资源包
-program_3d_edit.canvas.creating_texture_atlas=正在创建纹理
-program_3d_edit.canvas.setting_up_renderer=正在设置渲染器
-
-program_3d_edit.menu_bar.file.save=保存
-program_3d_edit.menu_bar.edit.menu_name=编辑
-program_3d_edit.menu_bar.edit.undo=撤销
-program_3d_edit.menu_bar.edit.redo=恢复
-program_3d_edit.menu_bar.edit.cut=剪切
-program_3d_edit.menu_bar.edit.copy=复制
-program_3d_edit.menu_bar.edit.paste=粘贴
-program_3d_edit.menu_bar.edit.delete=删除
-program_3d_edit.menu_bar.edit.goto=前往
-program_3d_edit.menu_bar.edit.select_all=选择全部
-program_3d_edit.menu_bar.options.controls=操控按键...
-program_3d_edit.menu_bar.options.options=其他选项...
-program_3d_edit.menu_bar.help.user_guide=按键说明
+## File panel
+program_3d_edit.file_ui.version_tooltip=世界的平台和版本
+program_3d_edit.file_ui.projection_tooltip=切换视图
+program_3d_edit.file_ui.location_tooltip=移动摄像机
+program_3d_edit.file_ui.dim_tooltip=选择维度
+program_3d_edit.file_ui.undo_tooltip=撤销
+program_3d_edit.file_ui.redo_tooltip=重做
+program_3d_edit.file_ui.save_tooltip=保存更改
+program_3d_edit.file_ui.close_tooltip=关闭世界
