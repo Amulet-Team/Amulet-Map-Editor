@@ -1,5 +1,5 @@
 import sys
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Type
 from types import ModuleType
 import os
 import traceback
@@ -17,7 +17,7 @@ from amulet_map_editor import log
 
 
 class BaseOperationManager:
-    OperationClass: BaseOperationLoader = None
+    OperationClass: Type[BaseOperationLoader] = None
 
     def __init__(self, group_name: str):
         """Set up an operation manager that handles operations for a set group.
