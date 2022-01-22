@@ -103,6 +103,10 @@ class BaseOperationManager:
                 log.warning(
                     f"Failed to import {module_name}.\n{traceback.format_exc()}"
                 )
+            except SyntaxError:
+                log.warning(
+                    f"There was a syntax error in {module_name}.\n{traceback.format_exc()}"
+                )
             else:
                 if (
                     os.path.dirname(
