@@ -98,6 +98,7 @@ class BaseOperationManager:
             module_name = f"{package}{module_name}"
             try:
                 mod = importlib.import_module(module_name)
+                mod = importlib.reload(mod)
             except ImportError:
                 log.warning(
                     f"Failed to import {module_name}.\n{traceback.format_exc()}"
