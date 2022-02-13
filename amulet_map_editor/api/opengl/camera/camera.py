@@ -90,7 +90,7 @@ class Camera(CanvasContainer):
         self._projection_mode = Projection.PERSPECTIVE
         self._fov = [100.0, 70.0]
         self._clipping: List[Tuple[float, float]] = [
-            (-(10 ** 5), 10 ** 5),
+            (-(10**5), 10**5),
             (0.1, 10000.0),
         ]
         self._aspect_ratio = 4 / 3
