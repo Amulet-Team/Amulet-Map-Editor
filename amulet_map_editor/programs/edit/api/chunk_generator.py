@@ -1,5 +1,4 @@
 from typing import Optional
-import time
 from threading import Thread
 
 from amulet_map_editor.api.opengl import ThreadedObjectContainer
