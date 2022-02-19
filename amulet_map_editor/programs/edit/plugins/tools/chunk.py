@@ -123,7 +123,7 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
 
     def disable(self):
         super().disable()
-        self.canvas.camera.orthographic_clipping = -(10 ** 5), 10 ** 5
+        self.canvas.camera.orthographic_clipping = -(10**5), 10**5
 
     def _on_update_clipping(self, evt):
         self._update_clipping()
@@ -229,7 +229,7 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
             if depth_state:
                 glDisable(GL_DEPTH_TEST)
             clip = self.canvas.camera.orthographic_clipping
-            self.canvas.camera.orthographic_clipping = -(10 ** 5), 10 ** 5
+            self.canvas.camera.orthographic_clipping = -(10**5), 10**5
             self._selection.draw()
             self.canvas.camera.orthographic_clipping = clip
             if depth_state:

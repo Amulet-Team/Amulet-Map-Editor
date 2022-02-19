@@ -1,5 +1,5 @@
 import sys
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Type
 from types import ModuleType
 import os
 import traceback
@@ -17,7 +17,7 @@ from amulet_map_editor import log
 
 
 class BaseOperationManager:
-    OperationClass: BaseOperationLoader = None
+    OperationClass: Type[BaseOperationLoader] = None
 
     def __init__(self, group_name: str):
         """Set up an operation manager that handles operations for a set group.
@@ -98,9 +98,14 @@ class BaseOperationManager:
             module_name = f"{package}{module_name}"
             try:
                 mod = importlib.import_module(module_name)
+                mod = importlib.reload(mod)
             except ImportError:
                 log.warning(
                     f"Failed to import {module_name}.\n{traceback.format_exc()}"
+                )
+            except SyntaxError:
+                log.warning(
+                    f"There was a syntax error in {module_name}.\n{traceback.format_exc()}"
                 )
             else:
                 if (

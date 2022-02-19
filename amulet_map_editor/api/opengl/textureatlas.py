@@ -298,7 +298,7 @@ def create_atlas_iter(
             width = max(f.width, width)
             pixels += f.height * f.width
 
-    size = max(height, width, 1 << (math.ceil(pixels ** 0.5) - 1).bit_length())
+    size = max(height, width, 1 << (math.ceil(pixels**0.5) - 1).bit_length())
 
     atlas_created = False
     atlas = None
