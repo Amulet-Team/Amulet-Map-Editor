@@ -1,3 +1,4 @@
+import time
 from typing import Optional
 from threading import Thread
 
@@ -29,6 +30,9 @@ if ThreadingEnabled:
         def _generate_chunks(self):
             while self._enabled:
                 self.thread_action()
+                # we need to force the chunk generator to share with the UI code otherwise it eats up all processing time.
+                # TODO: find a better way to do this
+                time.sleep(0.01)
 
 else:
 
