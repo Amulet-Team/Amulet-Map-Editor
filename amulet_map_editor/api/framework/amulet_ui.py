@@ -41,12 +41,11 @@ class AmuletUI(wx.Frame):
             id=wx.ID_ANY,
             title=f"Amulet V{__version__}",
             pos=wx.DefaultPosition,
-            size=wx.Size(560, 400),
+            size=wx.Size(1000, 600),
             style=wx.CAPTION
             | wx.CLOSE_BOX
             | wx.MINIMIZE_BOX
             | wx.MAXIMIZE_BOX
-            | wx.MAXIMIZE
             | wx.SYSTEM_MENU
             | wx.TAB_TRAVERSAL
             | wx.CLIP_CHILDREN

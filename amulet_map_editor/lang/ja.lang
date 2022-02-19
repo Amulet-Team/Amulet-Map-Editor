@@ -1,0 +1,222 @@
+# 重要な注意事項
+## ユーザーインターフェース（UI）の翻訳に貢献したい場合は、「/contributing/lang.md」にあるコントリビューションファイルをお読みください。
+## 各翻訳エントリは、以下のように記述する必要があります。'unique.identifier=UIに表示されるテキスト'
+## ユニークな識別子は開発者が定義します。既存の識別子を知るためには、'en.lang'ファイルを参照してください。
+
+# 読み込み順と地域別の翻訳
+## 最初に「en.lang」がロードされ、任意のキーに対して少なくとも何かがあることを確認します。
+## 次に、言語コードに「_」シンボルが含まれている場合（例：「fr_CA」）、言語セクション（「fr」）のlangファイルが次にロードされます（「fr.lang」）。
+## 最後に、もし存在していれば、地域固有の言語ファイル（"fr_CA.lang"）が読み込まれ、地域間で異なる項目のみが含まれます。
+## これにより、地域間で大きな違いがない言語は、同じ言語ファイルを共有して重複を最小限に抑えることができます。
+
+# 翻訳ファイルでサポートされている機能
+## 行の最初（非スペース）の文字として「#」記号を使用することで、コメント行を書くことができます。インラインコメントには対応していません。
+## 翻訳文字列の中に「#」があると、UIでは改行として変換されます。
+
+# メニューバーについて
+## このコンテキストでは、「&」記号は特別な文字です。UIには表示されませんが、「alt」キーを押したときのショートカットとして次の文字が定義されます（注意：アクセント記号付きの文字はそれ自体が文字になります（é =/e））。
+## 例："&File "はUIでは "File "と表示されますが、"alt+f "を押すと対応するメニューが表示されます。
+## 詳細は https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel をご覧ください。
+
+# 文字列について
+## いくつかのエントリーでは、"{variable}"というパターンが使用されています。このパターンでは、アプリがテキストに値を入力することができます。
+## 例 "There are {n} changes" は、UIでは "There are 2 changes" に変換されます。
+## 正しく動作させるためには、このパターンを翻訳済みのエントリに残す必要があります。
+
+# 共用文字列
+shared.check_console=詳細はコンソールで確認してください。
+
+# アプリ
+app.world_still_used=ワールドはまだ使用されています。 先に閉じてください。
+app.browser_open_tooltip=ブラウザでページを表示します。
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=ワールドを閉じる
+
+# メニューバー
+## 画面の上部に表示されるメニュー
+menu_bar.file.menu_name=ファイル(&F)
+menu_bar.file.open_world=ワールドを開く
+menu_bar.file.close_world=ワールドを閉じる
+menu_bar.file.quit=終了(&Q)
+menu_bar.options.menu_name=オプション(&O)
+menu_bar.help.menu_name=ヘルプ(&H)
+
+# メインメニュー
+## スタート画面
+main_menu.tab_name=メインメニュー
+main_menu.open_world=ワールドを開く
+main_menu.help=Help
+main_menu.discord=Amulet Discord
+
+# アップデートチェック
+## Amuletのバージョンが上がったときに表示される画面
+update_check.newer_version_released=Amuletの新バージョンがリリースされました!
+update_check.new_version=新バージョン:
+update_check.current_version=現在のバージョン:
+update_check.update=ダウンロードページを開く
+update_check.ok=OK
+
+# ワールド選択
+## 開くワールドを選択するときの画面
+select_world.title=ワールドを選択
+select_world.open_world_warning=Amuletでワールドを開く前にほかのアプリケーションではワールドを閉じてください
+select_world.open_world_button=フォルダーを開く
+select_world.open_world_dialogue=ワールドディレクトリを選択
+select_world.select_directory_failed=ディレクトリのオープンに失敗しました。
+select_world.recent_worlds=最近開いたワールド
+select_world.no_loader_found=ワールドを見つけることができませんでした。
+select_world.loading_world_failed=エラー: ワールドを読み込めませんでした。
+
+# About
+## ワールドを開いたときのデフォルトプログラム
+program_about.tab_name=About
+program_about.currently_opened_world=現在開いているワールド:
+program_about.choose_from_options=左端の選択肢から操作を選んでください。
+
+# 変換
+## ワールドを変換するためのプログラム
+program_convert.tab_name=ワールド変換
+program_convert.convert_button=変換
+program_convert.input_world=変換するワールド:
+program_convert.output_world=変換先のワールド:
+program_convert.select_output_world=変換先のワールドを選択
+program_convert.input_output_must_different=同じワールドを選択しています。異なるワールドを選択してください。
+program_convert.select_before_converting=変換先のワールドを選択してください。
+program_convert.conversion_completed=ワールドの変換が完了しました。
+
+## メニューバー
+program_convert.menu_bar.help.user_guide=オンラインユーザーガイド
+
+# 3Dエディタ
+## 3Dビューアでワールドを編集するためのプログラムです。
+program_3d_edit.tab_name=3Dエディター
+
+## キャンバス
+program_3d_edit.canvas.please_wait=レンダラーがロードされるまでお待ちください
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Bedrockリソースパックのダウンロード中...
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Javaリソースパックのダウンロード中...
+program_3d_edit.canvas.java_rp_failed=最新のJavaリソースパックのダウンロードに失敗しました
+program_3d_edit.canvas.java_rp_failed_default=インターネットの接続状況を確認し、Amuletを再起動してください。
+program_3d_edit.canvas.java_rp_failed_mac_certificates=インターネットにアクセスするための証明書がインストールされていません。"Applications/Python 3.x"にある「Install Certificates.command」を実行してください。
+program_3d_edit.canvas.loading_resource_packs=リソースパックの読み込み中...
+program_3d_edit.canvas.creating_texture_atlas=テクスチャアトラスの作成中...
+program_3d_edit.canvas.setting_up_renderer=レンダラーの設定中...
+
+## メニューバー
+program_3d_edit.menu_bar.file.save=保存
+program_3d_edit.menu_bar.edit.menu_name=編集(&E)
+program_3d_edit.menu_bar.edit.undo=元に戻す
+program_3d_edit.menu_bar.edit.redo=やり直し
+program_3d_edit.menu_bar.edit.cut=切り取り
+program_3d_edit.menu_bar.edit.copy=コピー
+program_3d_edit.menu_bar.edit.paste=貼り付け
+program_3d_edit.menu_bar.edit.delete=ブロックを削除
+program_3d_edit.menu_bar.edit.goto=移動
+program_3d_edit.menu_bar.edit.select_all=すべて選択
+program_3d_edit.menu_bar.options.controls=操作設定...
+program_3d_edit.menu_bar.options.options=設定...
+program_3d_edit.menu_bar.help.user_guide=オンラインユーザーガイド
+
+## 選択ツール
+program_3d_edit.select_tool.delete_button=ブロックを削除
+program_3d_edit.select_tool.delete_button_tooltip=選択範囲のブロックを削除します。
+program_3d_edit.select_tool.copy_button=コピー
+program_3d_edit.select_tool.copy_button_tooltip=選択範囲をコピーして貼り付けることができます。どのワールド、どのディメンションにも貼り付けることができます。
+program_3d_edit.select_tool.cut_button=切り取り
+program_3d_edit.select_tool.cut_button_tooltip=選択範囲をコピーして貼り付けたり、削除したりすることができます。どのワールド、どのディメンションにも貼り付けることができます。
+program_3d_edit.select_tool.paste_button=貼り付け
+program_3d_edit.select_tool.paste_button_tooltip=コピーまたは切り取りした領域をワールドに貼り付けます。
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=緑色の選択点のx座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.scroll_point_y1_tooltip=緑色の選択点のy座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.scroll_point_z1_tooltip=緑色の選択点のz座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.scroll_point_x2_tooltip=青色の選択点のx座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.scroll_point_y2_tooltip=青色の選択点のy座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.scroll_point_z2_tooltip=青色の選択点のz座標を設定します。数字を入力するか、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=有効な選択範囲のMinecraft範囲セレクター表記
+program_3d_edit.select_tool.box_size_tooltip=有効な選択範囲のサイズ(ブロック単位)。
+program_3d_edit.select_tool.button_point1=Point 1を移動
+program_3d_edit.select_tool.button_point1_tooltip=長押ししながら移動操作で緑色の選択点を移動させます。
+program_3d_edit.select_tool.button_point2=Point 2を移動
+program_3d_edit.select_tool.button_point2_tooltip=長押ししながら移動操作で青色の選択点を移動させます。
+program_3d_edit.select_tool.button_selection_box=ボックスを移動
+program_3d_edit.select_tool.button_selection_box_tooltip=長押ししながら移動操作で有効な選択範囲を移動させます。
+
+## 貼り付けツール
+program_3d_edit.paste_tool.location_label=位置
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=選択範囲の中心のx座標です。数字を入力するか、矢印移動、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=選択範囲の中心のy座標です。数字を入力するか、矢印移動、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=選択範囲の中心のz座標です。数字を入力するか、矢印移動、マウスホバー中にスクロールホイールを操作して設定します。
+program_3d_edit.paste_tool.move_selection_label=選択範囲を移動
+program_3d_edit.paste_tool.move_selection_tooltip=長押ししながら移動操作で選択範囲を移動を移動させます。
+program_3d_edit.paste_tool.rotation_label=回転
+program_3d_edit.paste_tool.free_rotation_label=フリー回転
+program_3d_edit.paste_tool.free_rotation_tooltip=チェックされていない場合、選択範囲は90度ごとに回転させることができます。チェックを入れると、選択範囲を1度単位で回転させることができます。
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=選択範囲を回転させるx軸の角度（度）です。これはモデルのx軸で、y,z軸の回転によって変換されるため、グローバルなx軸とは一致しないことに注意してください。
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=選択範囲を回転させるy軸の角度（度）です。これはモデルのy軸で、z軸の回転によって変換されるため、グローバルなy軸とは一致しないことに注意してください。
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=選択範囲を回転させるz軸の角度（度）です。
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=選択範囲を反時計回りに90度回転します。
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=選択範囲を時計回りに90度回転します。
+program_3d_edit.paste_tool.scale_label=スケール
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=x軸の方向のスケール。
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=y軸の方向のスケール。
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=z軸の方向のスケール。
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=選択範囲を水平方向に反転します。
+program_3d_edit.paste_tool.mirror_vertical_tooltip=選択範囲を垂直方向に反転します。
+program_3d_edit.paste_tool.copy_air_label=空気を貼り付け
+program_3d_edit.paste_tool.copy_air_tooltip=有効にすると、貼り付けされた範囲内にあるすべての空気ブロックが、既存のブロックを上書きして適用されます。無効にすると、既存のブロックが上書きされずに残り、空気ブロックはコピーされません。
+program_3d_edit.paste_tool.copy_water_label=水を貼り付け
+program_3d_edit.paste_tool.copy_water_tooltip=有効にすると、貼り付けされた範囲内にあるすべての水ブロックが、既存のブロックを上書きして適用されます。無効にすると、既存のブロックが上書きされずに残り、水ブロックはコピーされません。
+program_3d_edit.paste_tool.copy_lava_label=溶岩を貼り付け
+program_3d_edit.paste_tool.copy_lava_tooltip=有効にすると、貼り付けされた範囲内にあるすべての溶岩ブロックが、既存のブロックを上書きして適用されます。無効にすると、既存のブロックが上書きされずに残り、溶岩ブロックはコピーされません。
+program_3d_edit.paste_tool.confirm_label=貼り付ける
+program_3d_edit.paste_tool.confirm_tooltip=構造物を指定された位置、回転、スケールでワールドに貼り付けます。
+program_3d_edit.paste_tool.zero_scale_message=スケール値の1つがゼロだったため、何もコピーされませんでした。
+
+## チャンクツール
+program_3d_edit.chunk_tool.min_y=最低表示高度
+program_3d_edit.chunk_tool.min_y_tooltip=トップダウンビューで表示する最低高度。ネザーや洞窟などの世界の一部分を表示するのに使用できます。
+program_3d_edit.chunk_tool.max_y=最高表示高度
+program_3d_edit.chunk_tool.max_y_tooltip=トップダウンビューで表示する最高高度。ネザーや洞窟などの世界の一部分を表示するのに使用できます。
+program_3d_edit.chunk_tool.delete_chunks=チャンクを削除
+program_3d_edit.chunk_tool.delete_chunks_tooltip=選択したチャンクを削除します。チャンクとチャンクに含まれるすべてのデータが削除されます。保存後、ゲーム内でそのエリアをロードすると、チャンクが再生成されます。
+program_3d_edit.chunk_tool.prune_chunks=選択範囲外のチャンクを削除
+program_3d_edit.chunk_tool.prune_chunks_tooltip=選択されていないすべてのチャンクを削除します。チャンクとチャンクに含まれるすべてのデータが削除されます。保存後、ゲーム内でそのエリアをロードすると、チャンクが再生成されます。
+
+## Goto/テレポートウィンドウ
+program_3d_edit.goto_ui.title=テレポート先
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=カメラのx座標です。座標を入力すると、その場所に移動します。Ctrl + C で座標をコピー、Ctrl + V でペーストします。
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=カメラのy座標です。座標を入力すると、その場所に移動します。Ctrl + C で座標をコピー、Ctrl + V でペーストします。
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=カメラのz座標です。座標を入力すると、その場所に移動します。Ctrl + C で座標をコピー、Ctrl + V でペーストします。
+program_3d_edit.goto_ui.copy_button_tooltip=x,y,zの値を "0.0 0.0 0.0"(それぞれx,y,z) の形式でクリップボードにコピーします。
+program_3d_edit.goto_ui.paste_button_tooltip=コピーした座標を入力に貼り付けます。貼り付ける値は、スペースまたはカンマで区切られた3つの数字でなければなりません。
+
+## ファイルパネル
+program_3d_edit.file_ui.version_tooltip=このワールドのプラットフォームとバージョン
+program_3d_edit.file_ui.projection_tooltip=視点の切替
+program_3d_edit.file_ui.location_tooltip=カメラを移動
+program_3d_edit.file_ui.dim_tooltip=ディメンションを選択
+program_3d_edit.file_ui.undo_tooltip=元に戻す
+program_3d_edit.file_ui.redo_tooltip=やり直し
+program_3d_edit.file_ui.save_tooltip=変更を保存
+program_3d_edit.file_ui.close_tooltip=ワールドを閉じる
