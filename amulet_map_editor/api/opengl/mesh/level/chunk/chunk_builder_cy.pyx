@@ -411,11 +411,16 @@ cdef tuple _create_lod0_chunk(
 
 
 def _extend_blocks(resource_pack, block_palette):
+    # TODO: This is kind of janky
+    #  set up a proper location for these
+    #  This needs to be cached somewhere so that the geometry does not need recreating each time.
+    #  The issue is that the cache is dependent on the resource pack being used and the block palette it is applied to
     if not hasattr(resource_pack, "block_model_manager"):
-        # TODO: set up a proper location for these
-        resource_pack.block_model_manager = BlockModelManager()
+        resource_pack.block_model_manager = {}
+    if id(block_palette) not in resource_pack.block_model_manager:
+        resource_pack.block_model_manager[id(block_palette)] = BlockModelManager()
 
-    block_model_manager = resource_pack.block_model_manager
+    block_model_manager = resource_pack.block_model_manager[id(block_palette)]
 
     done_count = len(block_model_manager)
     state_count = len(block_palette)
@@ -462,7 +467,7 @@ def create_lod0_chunk(
 ):
     _extend_blocks(resource_pack, block_palette)
     return _create_lod0_chunk(
-        resource_pack.block_model_manager,
+        resource_pack.block_model_manager[id(block_palette)],
         blocks,
         chunk_offset
     )
