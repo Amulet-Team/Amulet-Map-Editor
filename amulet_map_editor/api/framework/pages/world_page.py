@@ -1,5 +1,4 @@
 import threading
-import time
 
 import wx
 from typing import List, Callable, Tuple, Type, Union, Optional
@@ -116,19 +115,12 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         for ext in self._extensions:
             ext.close()
 
-        closed = False
-
-        def close_world():
-            nonlocal closed
-            self.world.close()
-            closed = True
-
         # close the world in a new thread
-        thread = threading.Thread(target=close_world)
+        thread = threading.Thread(target=self.world.close)
         thread.start()
         # sleep a little
-        time.sleep(0.1)
-        if not closed:
+        thread.join(0.1)
+        if thread.is_alive():
             # if not closed yet open a dialog to warn the user.
             # We do this on a delay so that it does not flick up for a split second
             dialog = wx.ProgressDialog(
@@ -140,9 +132,9 @@ class WorldPageUI(wx.Notebook, BasePageUI):
             dialog.Fit()
             dialog.Update(99)
             # wait until the world is closed then close the dialog
-            while not closed:
+            while thread.is_alive():
                 wx.GetApp().Yield()
-                time.sleep(0.1)
+                thread.join(0.1)
             dialog.Destroy()
 
     def _page_change(self, _):
