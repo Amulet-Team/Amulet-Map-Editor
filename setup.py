@@ -56,9 +56,7 @@ def freeze_requirements(packages: List[str]) -> List[str]:
         print("pip-install")
         try:
             # make sure pip is up to date
-            subprocess.run(
-                [sys.executable, "-m", "pip", "install", "--upgrade", "pip"]
-            )
+            subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
             # run pip install
             subprocess.run(
                 [sys.executable, "-m", "pip", "install", *packages, "--upgrade"]
