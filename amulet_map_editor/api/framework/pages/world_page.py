@@ -1,3 +1,5 @@
+import threading
+
 import wx
 from typing import List, Callable, Tuple, Type, Union, Optional
 import traceback
@@ -112,16 +114,28 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         Check is_closeable before running this"""
         for ext in self._extensions:
             ext.close()
-        dialog = wx.ProgressDialog(
-            "Closing World",
-            "Please be patient. This may take a little while.",
-            maximum=100,
-            parent=self,
-            style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_AUTO_HIDE,
-        )
-        dialog.Fit()
-        self.world.close()
-        dialog.Update(100)
+
+        # close the world in a new thread
+        thread = threading.Thread(target=self.world.close)
+        thread.start()
+        # sleep a little
+        thread.join(0.1)
+        if thread.is_alive():
+            # if not closed yet open a dialog to warn the user.
+            # We do this on a delay so that it does not flick up for a split second
+            dialog = wx.ProgressDialog(
+                "Closing World",
+                "Please be patient. This may take a little while.",
+                maximum=100,
+                style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_AUTO_HIDE,
+            )
+            dialog.Fit()
+            dialog.Update(99)
+            # wait until the world is closed then close the dialog
+            while thread.is_alive():
+                wx.GetApp().Yield()
+                thread.join(0.1)
+            dialog.Destroy()
 
     def _page_change(self, _):
         """Method to fire when the page is changed"""
