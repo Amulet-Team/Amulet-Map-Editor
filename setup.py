@@ -55,6 +55,8 @@ def freeze_requirements(packages: List[str]) -> List[str]:
     if any("~=" in r and r.split("~=", 1)[0].lower() in first_party for r in packages):
         print("pip-install")
         try:
+            # make sure pip is up to date
+            subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
             # run pip install
             subprocess.run(
                 [sys.executable, "-m", "pip", "install", *packages, "--upgrade"]
