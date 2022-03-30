@@ -1,71 +1,222 @@
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
+# Shared strings
+shared.check_console=Zkontrolujte konzoli pro více informací.
+
+# App
+app.world_still_used=Svět je stále otevřený. Nejprve jej prosím zavřete
+app.browser_open_tooltip=Kliknutím otevřete stránku ve vašem prohlížeči
 
 world.java_platform=Java
 world.bedrock_platform=Bedrock
 world.close_world=Zavřít Svět
 
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&Soubor
+menu_bar.file.open_world=Otevřít svět
+menu_bar.file.close_world=Zavřít svět
+menu_bar.file.quit=Odejít
+menu_bar.options.menu_name=&Možnosti
+menu_bar.help.menu_name=&Nápověda
+
+# Main menu
+## The start screen
+main_menu.tab_name=Hlavní nabídka
+main_menu.open_world=Otevřít svět
+main_menu.help=Nápověda
+main_menu.discord=Amulet Discord
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=Nová verze Amuletu byla vydána!
+update_check.new_version=Nejnovější verze:
+update_check.current_version=Vaše verze:
+update_check.update=Přejít na stránku stažení
+update_check.ok=Ok
+
+# Select world
+## The window when selecting a world to open
+select_world.title=Výběr světa
+select_world.open_world_warning=Zavřete svět ve hře a jiných nástrojích před otevřením v Amuletu.
 select_world.open_world_button=Otevřít jiný svět
-select_world.open_world_dialogue=Vyberte složku Minecraft světa
-select_world.select_directory_failed=Otevření složky světa selhalo!
-select_world.recent_worlds=Nedávno Otevřené Světy
+select_world.open_world_dialogue=Vyberte adresář obsahující Minecraft svět
+select_world.select_directory_failed=Chyba při otevírání adresáře!
+select_world.recent_worlds=Naposledy otevřené světy
+select_world.no_loader_found=Načítací soubor světa nebyl nalezen.
+select_world.loading_world_failed=Chyba při načítání světa.
 
-main_menu.tab_name=Hlavní Nabídka
-main_menu.open_world=Otevřít Svět
-main_menu.help=Pomoc
+# About
+## The default program when a world is opened
+program_about.tab_name=O světě
+program_about.currently_opened_world=Právě otevřený svět:
+program_about.choose_from_options=Vyberte si z možností v levo podle toho co právě chcete použít.\nMůžete je kdykoliv přepnout.
 
-program_about.tab_name=O Nás
-program_about.currently_opened_world=Nyní Otevřený Svět:
-program_about.choose_from_options=Vyberte si z možností na levo co budete chtít použít.\nMůžete je kdykoliv měnit.
-
+# Convert
+## The program used to convert a world
 program_convert.tab_name=Konvertovat
 program_convert.convert_button=Konvertovat
-program_convert.input_world=Vstupní Svět:
-program_convert.output_world=Výstupní Svět:
-program_convert.select_output_world=Vyberte Výstupní Svět
+program_convert.input_world=Vstupní svět:
+program_convert.output_world=Výstupní svět:
+program_convert.select_output_world=Zvolte výstupní svět
 program_convert.input_output_must_different=Vstupní a výstupní světy se musí lišit!
-program_convert.select_before_converting=Vyberte svět před konvertováním!
+program_convert.select_before_converting=Zvolte svět před konvertováním!
 program_convert.conversion_completed=Konvertování světa dokončeno
 
-program_3d_edit.tab_name=3D Editor
+## Menu bar
+program_convert.menu_bar.help.user_guide=Uživatelská Příručka (online)
 
-program_3d_edit.select_tool.delete_button=Odstranit
+# 3D Editor
+## The program used to edit a world with a 3D viewer
+program_3d_edit.tab_name=3D editor
+
+## Canvas
+program_3d_edit.canvas.please_wait=Prosím vyčkejte na načtení vykreslovače
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Stahování vanilla Bedrock balíčku zdrojů
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Stahování vanilla Java balíčku zdrojů
+program_3d_edit.canvas.java_rp_failed=Stažení nejnovějšího Java balíčku zdrojů selhalo.
+program_3d_edit.canvas.java_rp_failed_default=Zkontrolujte své připojení k internetu a restartujte Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=Certifikáty pro přístup k internetu nebyly nainstalovány.\nSpusťte program "Install Certificates.command", který naleznete v "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Načítání balíčků zdrojů
+program_3d_edit.canvas.creating_texture_atlas=Vytváření atlasu textur
+program_3d_edit.canvas.setting_up_renderer=Příprava vykreslování
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Uložit
+program_3d_edit.menu_bar.edit.menu_name=&Upravit
+program_3d_edit.menu_bar.edit.undo=Zpět
+program_3d_edit.menu_bar.edit.redo=Vpřed
+program_3d_edit.menu_bar.edit.cut=Vyjmout
+program_3d_edit.menu_bar.edit.copy=Kopírovat
+program_3d_edit.menu_bar.edit.paste=Vložit
+program_3d_edit.menu_bar.edit.delete=Odstranit bloky
+program_3d_edit.menu_bar.edit.goto=Přejít na
+program_3d_edit.menu_bar.edit.select_all=Vybrat vše
+program_3d_edit.menu_bar.options.controls=Ovládání...
+program_3d_edit.menu_bar.options.options=Možnosti...
+program_3d_edit.menu_bar.help.user_guide=Uživatelská příručka (online)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Odstranit bloky
 program_3d_edit.select_tool.delete_button_tooltip=Odstraní bloky ve vybraném území.
 program_3d_edit.select_tool.copy_button=Kopírovat
-program_3d_edit.select_tool.copy_button_tooltip=Zkopíruje vybrané území k pozdějšímu vložení. Může být vloženo do kteréhokoli světa či dimenze.
+program_3d_edit.select_tool.copy_button_tooltip=Kopíruje vybrané území ke vložení později. Může být vloženo do jakéhokoliv světa či dimenze.
 program_3d_edit.select_tool.cut_button=Vyjmout
-program_3d_edit.select_tool.cut_button_tooltip=zkopíruje vybrané území k pozdějšímu odstranění a vložení. Může být vloženo do kteréhokoli světa či dimenze.
+program_3d_edit.select_tool.cut_button_tooltip=Kopíruje vybrané území ke vložení a odstranění později. Může být vloženo do jakéhokoliv světa či dimenze.
 program_3d_edit.select_tool.paste_button=Vložit
-program_3d_edit.select_tool.paste_button_tooltip=Vloží naposledy zkopírované či vyjmuté území do světa.
-
+program_3d_edit.select_tool.paste_button_tooltip=Vloží naposledy kopírované či vyjmuté území do světa.
 program_3d_edit.select_tool.scroll_point_x1=x1
 program_3d_edit.select_tool.scroll_point_y1=y1
 program_3d_edit.select_tool.scroll_point_z1=z1
 program_3d_edit.select_tool.scroll_point_x2=x2
 program_3d_edit.select_tool.scroll_point_y2=y2
 program_3d_edit.select_tool.scroll_point_z2=z2
-program_3d_edit.select_tool.scroll_point_x1_tooltip=Určí x souřadnici zeleného rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
-program_3d_edit.select_tool.scroll_point_y1_tooltip=Určí y souřadnici zeleného rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
-program_3d_edit.select_tool.scroll_point_z1_tooltip=Určí z souřadnici zeleného rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
-program_3d_edit.select_tool.scroll_point_x2_tooltip=Určí x souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
-program_3d_edit.select_tool.scroll_point_y2_tooltip=Určí y souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
-program_3d_edit.select_tool.scroll_point_z2_tooltip=Určí z souřadnici modrého rohu aktivního boxu. Napište číslo nebo projížděte kolečkem při přejetí kursorem.
-
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Určí souřadnici x zeleného rohu aktivního výběru. Napište číslo nebo projížděte kolečkem myši při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Určí souřadnici y zeleného rohu aktivního výběru. Napište číslo nebo projížděte kolečkem myši při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Určí souřadnici z zeleného rohu aktivního výběru. Napište číslo nebo projížděte kolečkem myši při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Určí souřadnici x modrého rohu aktivního výběru. Napište číslo nebo projížděte kolečkem myši při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Určí souřadnici y modrého rohu aktivního výběru. Napište číslo nebo projížděte kolečkem myši při přejetí kursorem.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Určí souřadnici z modrého rohu aktivního výběru. Napište číslo nebo projížděte kolečkem myši při přejetí kursorem.
 program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
-program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
-program_3d_edit.select_tool.box_size_tooltip=Velikost aktivního výběrového boxu v blocích.
+program_3d_edit.select_tool.box_size_selector_tooltip=Tvar aktivního výběru ve formátu Minecraft objemového selektoru.
+program_3d_edit.select_tool.box_size_tooltip=Velikost aktivního výběru v blocích.
+program_3d_edit.select_tool.button_point1=Pohybový bod 1
+program_3d_edit.select_tool.button_point1_tooltip=Stiskněte a držte toto tlačítko a použijte pohybové ovládání pro pohyb zeleného bodu výběru.
+program_3d_edit.select_tool.button_point2=Pohybový bod 2
+program_3d_edit.select_tool.button_point2_tooltip=Stiskněte a držte toto tlačítko a použijte pohybové ovládání pro pohyb modrého bodu výběru.
+program_3d_edit.select_tool.button_selection_box=Pohyb s boxem
+program_3d_edit.select_tool.button_selection_box_tooltip=Stiskněte a držte toto tlačítko a použijte pohybové ovládání pro pohyb aktivního výběru.
 
-program_3d_edit.select_tool.button_point1=Pohybový Bod 1
-program_3d_edit.select_tool.button_point1_tooltip=Stiskněte a podržte toto tlačítko a použijte pohybové ovládání k pohybu zeleného výběrového bodu.
-program_3d_edit.select_tool.button_point2=Pohybový Bod 2
-program_3d_edit.select_tool.button_point2_tooltip=Stiskněte a podržte toto tlačítko a použijte pohybové ovládání k pohybu modrého výběrového bodu.
-program_3d_edit.select_tool.button_selection_box=Pohybový Box
-program_3d_edit.select_tool.button_selection_box_tooltip=Stiskněte a podržte toto tlačítko a použijte pohybové ovládání k pohybu aktivního výběrového boxu.
+## Paste tool
+program_3d_edit.paste_tool.location_label=Pozice
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=Pozice x kam bude střed výběru vložen. Napište číslo, projížděte kolečkem myši nebo použijte šipky pro změnu pozice.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=Pozice y kam bude střed výběru vložen. Napište číslo, projížděte kolečkem myši nebo použijte šipky pro změnu pozice.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=Pozice z kam bude střed výběru vložen. Napište číslo, projížděte kolečkem myši nebo použijte šipky pro změnu pozice.
+program_3d_edit.paste_tool.move_selection_label=Pohyb s výběrem
+program_3d_edit.paste_tool.move_selection_tooltip=Stiskněte a držte toto tlačítko a použijte pohybové ovládání pro pohyb výběru.
+program_3d_edit.paste_tool.rotation_label=Rotace
+program_3d_edit.paste_tool.free_rotation_label=Volná rotace
+program_3d_edit.paste_tool.free_rotation_tooltip=Nezaškrtnuto umožňuje rotaci pouze po 90 stupních. Zaškrtnuto umožňuje rotaci po jednom stupni.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=Úhel rotace osy x ve stupních. Všimněte si, že toto je osa x modelu, která je transformována rotací osy y a z, takže se nemusí shodovat s globální osou x. 
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=Úhel rotace osy y ve stupních. Všimněte si, že toto je osa y modelu, která je transformována rotací osy z, takže se nemusí shodovat s globální osou y. 
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=Úhel rotace osy z ve stupních
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Kliknutím otočíte výběr o 90 stupňů proti směru hodinových ručiček vzhledem k otočení pohledu.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Kliknutím otočíte výběr o 90 stupňů ve směru hodinových ručiček vzhledem k otočení pohledu.
+program_3d_edit.paste_tool.scale_label=Měřítko
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=Měřítko modelu na x souřadnici.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=Měřítko modelu na y souřadnici.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=Měřítko modelu na z souřadnici.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Zrcadlí výběr horizontálně vzhledem ke směru kterým se dívá kamera.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Zrcadlí výběr vertikálně vzhledem ke směru kterým se dívá kamera.
+program_3d_edit.paste_tool.copy_air_label=Vložit vzduch
+program_3d_edit.paste_tool.copy_air_tooltip=Pokud povolíte tuto možnost, všechny bloky vzduch ve vložené struktuře přepíšou jakéhokoliv existující blok. Pokud ji zakážete, existující bloky na těchto pozicích zůstanou a vzduch nebude kopírován.
+program_3d_edit.paste_tool.copy_water_label=Vložit vodu
+program_3d_edit.paste_tool.copy_water_tooltip=Pokud povolíte tuto možnost, všechny bloky vody ve vložené struktuře přepíšou jakéhokoliv existující blok. Pokud ji zakážete, existující bloky na těchto pozicích zůstanou a voda nebude kopírována.
+program_3d_edit.paste_tool.copy_lava_label=Vložit lávu
+program_3d_edit.paste_tool.copy_lava_tooltip=Pokud povolíte tuto možnost, všechny bloky lávy ve vložené struktuře přepíšou jakéhokoliv existující blok. Pokud ji zakážete, existující bloky na těchto pozicích zůstanou a láva nebude kopírována.
+program_3d_edit.paste_tool.confirm_label=Potvrdit
+program_3d_edit.paste_tool.confirm_tooltip=Kliknutím vložíte strukturu do světa na specifikovanou pozici se specifikovanou rotací a měřítkem.
+program_3d_edit.paste_tool.zero_scale_message=Jedna z hodnot měřítka se rovnala nule, takže nic nebylo kopírováno.
 
-program_3d_edit.goto_ui.title=Teleportovat
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Min Y
+program_3d_edit.chunk_tool.min_y_tooltip=Minimální souřadnice y která se zobrazí v pohledu zhora. Toto lze použít k pohledu na průřez světa a může pomoci s pohledem na jeskyně či dimenze jako nether.
+program_3d_edit.chunk_tool.max_y=Max Y
+program_3d_edit.chunk_tool.max_y_tooltip=Maximální souřadnice y která se zobrazí v pohledu zhora. Toto lze použít k pohledu na průřez světa a může pomoci s pohledem na jeskyně či dimenze jako nether.
+program_3d_edit.chunk_tool.delete_chunks=Vymazat chunky
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Vymaže všechny chunky jsou vybrané. Toto vymaže samotný chunk a všechna data uložená v něm. Při příštím načtení území ve hře se chunky znovu vygenerují.
+program_3d_edit.chunk_tool.prune_chunks=Vymazat nevybrané chunky
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Vymaže všechny chunky co nejsou vybrané. Toto vymaže samotný chunk a všechna data uložená v něm. Při příštím načtení území ve hře se chunky znovu vygenerují.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Teleportace
 program_3d_edit.goto_ui.x_label=x:
-program_3d_edit.goto_ui.x_label_tooltip=Souřadnice x pohledu kamery. Napište souřadnici k přesunu na dané místo. Ctrl + C k zakopírování. Ctrl + V ke vložení.
+program_3d_edit.goto_ui.x_label_tooltip=Souřadnice x kamery. Napište souřadnici kam chcete jít. Pomocí Ctrl + C kopírujete souřadnici. Pomocí Ctrl + V ji vložíte.
 program_3d_edit.goto_ui.y_label=y:
-program_3d_edit.goto_ui.y_label_tooltip=Souřadnice y pohledu kamery. Napište souřadnici k přesunu na dané místo. Ctrl + C k zakopírování. Ctrl + V ke vložení.
+program_3d_edit.goto_ui.y_label_tooltip=Souřadnice y kamery. Napište souřadnici kam chcete jít. Pomocí Ctrl + C kopírujete souřadnici. Pomocí Ctrl + V ji vložíte.
 program_3d_edit.goto_ui.z_label=z:
-program_3d_edit.goto_ui.z_label_tooltip=Souřadnice z pohledu kamery. Napište souřadnici k přesunu na dané místo. Ctrl + C k zakopírování. Ctrl + V ke vložení.
-program_3d_edit.goto_ui.copy_button_tooltip=Zkopíruje x, y a z hodnoty do schránky tímto způsobem "0.0 0.0 0.0" (x, y a z popořadě)
-program_3d_edit.goto_ui.paste_button_tooltip=vloží předem zkopírované souřadnice do vstupu. Zkopírovaná hodnota musí být 3 čísla oddělená mezerami nebo čárkami.
+program_3d_edit.goto_ui.z_label_tooltip=Souřadnice z kamery. Napište souřadnici kam chcete jít. Pomocí Ctrl + C kopírujete souřadnici. Pomocí Ctrl + V ji vložíte.
+program_3d_edit.goto_ui.copy_button_tooltip=Kopíruje hodnoty x, y a z do schránky ve formátu "0.0 0.0 0.0" (x, y a z resp.)
+program_3d_edit.goto_ui.paste_button_tooltip=Vloží předem kopírované hodnoty do vstupů. Kopírovné hodnoty musí být tři čísla oddělena mezerami nebo čárkami.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Platforma a verze dat světa
+program_3d_edit.file_ui.projection_tooltip=Změnit pohled
+program_3d_edit.file_ui.location_tooltip=Posunout kameru
+program_3d_edit.file_ui.dim_tooltip=Vybrat dimenzi
+program_3d_edit.file_ui.undo_tooltip=Zpět
+program_3d_edit.file_ui.redo_tooltip=Vpřed
+program_3d_edit.file_ui.save_tooltip=Uložit změny
+program_3d_edit.file_ui.close_tooltip=Zavřít svět
