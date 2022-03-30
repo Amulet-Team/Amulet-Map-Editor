@@ -15,6 +15,9 @@ from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import ChunkSelectionBehaviour
 from amulet.operations.delete_chunk import delete_chunk
 from amulet.api.data_types import Dimension
+from amulet.api.level import BaseLevel
+from amulet.api.selection import SelectionGroup
+from amulet.api.chunk import Chunk
 from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_operations.prune_chunks import (
     prune_chunks,
 )
@@ -64,6 +67,18 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         y_sizer.Add(self._max_y, flag=wx.ALIGN_CENTER)
         self._max_y.Bind(wx.EVT_SPINCTRL, self._on_update_clipping)
         self._dimensions: Dict[Dimension, Tuple[int, int]] = {}
+
+        create_button = wx.Button(
+            self._button_panel,
+            label=lang.get("program_3d_edit.chunk_tool.create_chunks"),
+        )
+        create_button.SetToolTip(
+            lang.get("program_3d_edit.chunk_tool.create_chunks_tooltip")
+        )
+        button_sizer.Add(
+            create_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5
+        )
+        create_button.Bind(wx.EVT_BUTTON, self._create_chunks)
 
         delete_button = wx.Button(
             self._button_panel,
@@ -191,6 +206,24 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         elif response == wx.ID_NO:
             return False
         return None
+
+    def _create_chunks(self, evt):
+        def create_chunks(
+            world: BaseLevel,
+            dimension: Dimension,
+            selection: SelectionGroup,
+        ):
+            for cx, cz in selection.chunk_locations():
+                if not world.has_chunk(cx, cz, dimension):
+                    world.put_chunk(Chunk(cx, cz), dimension)
+
+        self.canvas.run_operation(
+            lambda: create_chunks(
+                self.canvas.world,
+                self.canvas.dimension,
+                self.canvas.selection.selection_group,
+            )
+        )
 
     def _delete_chunks(self, evt):
         load_original = self._ask_delete_chunks()

@@ -50,13 +50,13 @@ class EditExtension(wx.Panel, BaseProgram):
             self._canvas = EditCanvas(self, self._world, self._close_self_callback)
             for arg in self._canvas.setup():
                 if isinstance(arg, (int, float)):
-                    self._temp_loading_bar.SetValue(min(arg, 1) * 10000)
+                    self._temp_loading_bar.SetValue(int(min(arg, 1) * 10000))
                 elif (
                     isinstance(arg, tuple)
                     and isinstance(arg[0], (int, float))
                     and isinstance(arg[1], str)
                 ):
-                    self._temp_loading_bar.SetValue(min(arg[0], 1) * 10000)
+                    self._temp_loading_bar.SetValue(int(min(arg[0], 1) * 10000))
                     self._temp_msg.SetLabel(arg[1])
                 self.Layout()
                 self.Update()
