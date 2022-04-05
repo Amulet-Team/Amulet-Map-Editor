@@ -77,9 +77,11 @@ class AmuletUI(wx.Frame):
         if update_check:
             self.Bind(
                 update_check.EVT_UPDATE_CHECK,
-                lambda evt: update_check.show_update_window(self, __version__, evt),
+                lambda evt: update_check.UpdateDialog(
+                    self, __version__, evt.GetVersion()
+                ).ShowModal(),
             )
-            update_check.check_for_update(__version__, self)
+            update_check.check_for_update(self, __version__)
 
     def create_menu(self):
         menu_dict = {}

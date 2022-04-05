@@ -206,7 +206,7 @@ class RaycastBehaviour(BaseBehaviour):
 
         for axis in range(3):
             vector = vectors[axis]
-            vector_size = numpy.sum(vector ** 2) ** 0.5
+            vector_size = numpy.sum(vector**2) ** 0.5
             # move the start position to the block edge behind the vector
             if vector[axis] > 0:
                 initial_offset = -vector * start[axis]
@@ -214,7 +214,7 @@ class RaycastBehaviour(BaseBehaviour):
                 initial_offset = -vector * (1 - start[axis])
 
             block_count = (
-                max_distance + numpy.sum(initial_offset ** 2) ** 0.5 - 0.001
+                max_distance + numpy.sum(initial_offset**2) ** 0.5 - 0.001
             ) // vector_size
 
             if block_count:
