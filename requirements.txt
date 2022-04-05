@@ -2,6 +2,7 @@
 wxPython>=4.1
 numpy
 pyopengl
+packaging
 amulet-core~=1.7.0
 amulet-nbt~=1.0.4
 pymctranslate~=1.1.0
