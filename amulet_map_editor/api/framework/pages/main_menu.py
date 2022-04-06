@@ -65,4 +65,4 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         webbrowser.open("https://discord.gg/BTm6jnf")
 
     def enable(self):
-        self.GetGrandParent().create_menu()
+        self.GetTopLevelParent().create_menu()

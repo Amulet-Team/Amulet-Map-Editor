@@ -1,10 +1,11 @@
+from __future__ import annotations
 import wx
 from wx.lib.agw import flatnotebook
 from typing import Dict, Union
 import traceback
 
 from amulet.api.errors import LoaderNoneMatched
-from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
+from amulet_map_editor.api.wx.ui.select_world import open_level
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor import __version__, lang, log
 from amulet_map_editor.api.framework.pages import WorldPageUI
@@ -34,6 +35,11 @@ wx.Image.SetDefaultLoadFlags(0)
 
 @preserve_ui_preferences
 class AmuletUI(wx.Frame):
+    """This is the top level frame that Amulet exists within."""
+
+    # The notebook to hold world pages
+    _level_notebook: AmuletLevelNotebook
+
     def __init__(self, parent):
         wx.Frame.__init__(
             self,
@@ -55,24 +61,12 @@ class AmuletUI(wx.Frame):
         icon.CopyFromBitmap(image.logo.amulet_logo.bitmap())
         self.SetIcon(icon)
 
-        self._open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE] = {}
-
-        self.world_tab_holder = flatnotebook.FlatNotebook(
+        self._level_notebook = AmuletLevelNotebook(
             self, agwStyle=NOTEBOOK_MENU_STYLE
         )
+        self._level_notebook.init()
 
-        self.world_tab_holder.Bind(
-            flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING, self._on_page_close
-        )
-
-        self._main_menu = AmuletMainMenu(self.world_tab_holder, self._open_world)
-
-        self._last_page: BasePageUI = self._main_menu
-
-        self._add_world_tab(self._main_menu, lang.get("main_menu.tab_name"))
-
-        self.Bind(wx.EVT_CLOSE, self._on_close_app)
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
+        self.Bind(wx.EVT_CLOSE, self._level_notebook.on_app_close)
 
         if update_check:
             self.Bind(
@@ -83,18 +77,31 @@ class AmuletUI(wx.Frame):
             )
             update_check.check_for_update(self, __version__)
 
+    def open_level(self, path: str):
+        """Open a level. You should use the method in the app."""
+        self._level_notebook.open_level(path)
+
+    def close_level(self, path: str):
+        """Close a given level. You should use the method in the app."""
+        self._level_notebook.close_level(path)
+
     def create_menu(self):
+        """
+        Create the UI menu.
+
+        Adds the top level menu items then extends it from the active page
+        """
         menu_dict = {}
         menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "system", {}
         ).setdefault(
-            lang.get("menu_bar.file.open_world"), lambda evt: self._show_open_world()
+            lang.get("menu_bar.file.open_world"), lambda evt: open_level(self)
         )
         # menu_dict.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
         menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "exit", {}
         ).setdefault(lang.get("menu_bar.file.quit"), lambda evt: self.Close())
-        menu_dict = self._last_page.menu(menu_dict)
+        menu_dict = self._level_notebook.extend_menu(menu_dict)
         menu_bar = wx.MenuBar()
         for menu_name, menu_data in menu_dict.items():
             menu = wx.Menu()
@@ -131,43 +138,36 @@ class AmuletUI(wx.Frame):
             menu_bar.Append(menu, menu_name)
         self.SetMenuBar(menu_bar)
 
-    def _page_change(self, _):
-        self._disable_enable()
 
-    def _disable_enable(self):
-        current: BasePageUI = self.world_tab_holder.GetCurrentPage()
-        if self._last_page != current:
-            if self._last_page is not None:
-                self._last_page.disable()
-            self._last_page: BasePageUI = current
-            if self._last_page is self._main_menu:
-                self.world_tab_holder.SetAGWWindowStyleFlag(NOTEBOOK_MENU_STYLE)
-            else:
-                self.world_tab_holder.SetAGWWindowStyleFlag(NOTEBOOK_STYLE)
-        if self._last_page is not None:
-            self._last_page.enable()
+class AmuletLevelNotebook(flatnotebook.FlatNotebook):
+    """A notebook to hold all world tabs."""
 
-    def _add_world_tab(self, obj, obj_name):
-        self.world_tab_holder.AddPage(obj, obj_name, True)
-        self._disable_enable()
+    # The main menu tab
+    _main_menu: AmuletMainMenu
 
-    def _show_open_world(self):
-        select_world = WorldSelectDialog(self, self._open_world)
-        select_world.ShowModal()
-        select_world.Destroy()
+    # Storage of open world tabs for easy lookup
+    _open_worlds: Dict[str, CLOSEABLE_PAGE_TYPE]
 
-    def _open_world(self, path: str):
-        """Open a world panel add add it to the notebook"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.Bind(flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING, self._on_page_closing)
+        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self._page_changing, self)
+        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_changed, self)
+
+        self._main_menu = AmuletMainMenu(self)
+        self._open_worlds = {}
+
+    def init(self):
+        self._add_world_tab(self._main_menu, lang.get("main_menu.tab_name"))
+
+    def open_level(self, path: str):
+        """Open a world panel add it to the notebook"""
         if path in self._open_worlds:
-            self.world_tab_holder.SetSelection(
-                self.world_tab_holder.GetPageIndex(self._open_worlds[path])
-            )
-            self._disable_enable()
+            self.SetSelection(self.GetPageIndex(self._open_worlds[path]))
         else:
             try:
-                world = WorldPageUI(
-                    self.world_tab_holder, path, lambda: self.close_world(path)
-                )
+                world = WorldPageUI(self, path, lambda: self.close_level(path))
             except LoaderNoneMatched as e:
                 log.error(f"Could not find a loader for this world.\n{e}")
                 wx.MessageBox(f"{lang.get('select_world.no_loader_found')}\n{e}")
@@ -185,28 +185,58 @@ class AmuletUI(wx.Frame):
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)
 
-    def close_world(self, path: str):
+    def _add_world_tab(self, page: BasePageUI, obj_name: str):
+        """Add a tab and enable it."""
+        self.AddPage(page, obj_name, True)
+
+    def close_level(self, path: str):
         """Close a given world and remove it from the notebook"""
         if path in self._open_worlds:
             world = self._open_worlds[path]
-            self.world_tab_holder.DeletePage(self.world_tab_holder.GetPageIndex(world))
+            # note we don't remove it from the dictionary here
+            # delete page starts the deletion but it can be vetoed
+            # it is deleted from the dictionary in _on_page_closing
+            self.DeletePage(self.GetPageIndex(world))
 
-    def _on_page_close(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
-        page: CLOSEABLE_PAGE_TYPE = self.world_tab_holder.GetPage(evt.GetSelection())
+    def _on_page_closing(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
+        """Handle the page closing."""
+        page: CLOSEABLE_PAGE_TYPE = self.GetPage(evt.GetSelection())
         if page is not self._main_menu:
-            if page.can_close():
+            if page.can_disable() and page.can_close():
                 path = page.path
                 page.disable()
                 page.close()
-                self._last_page = None
                 del self._open_worlds[path]
             else:
                 evt.Veto()
 
-    def _on_close_app(self, evt):
+    def _page_changing(self, evt: wx.BookCtrlEvent):
+        if evt.GetOldSelection() != wx.NOT_FOUND and not self.GetPage(evt.GetOldSelection()).can_disable():
+            evt.Veto()
+
+    def _page_changed(self, evt: wx.BookCtrlEvent):
+        """Handle the page changing."""
+        if evt.GetOldSelection() != evt.GetSelection():
+            if evt.GetOldSelection() != wx.NOT_FOUND:
+                print("disable", self.GetPage(evt.GetOldSelection()))
+                self.GetPage(evt.GetOldSelection()).disable()
+
+            if self.GetCurrentPage() is self._main_menu:
+                self.SetAGWWindowStyleFlag(NOTEBOOK_MENU_STYLE)
+            else:
+                self.SetAGWWindowStyleFlag(NOTEBOOK_STYLE)
+
+        if self.GetCurrentPage() is not None:
+            print("enable", self.GetCurrentPage())
+            self.GetCurrentPage().enable()
+
+    def on_app_close(self, evt: wx.CloseEvent):
         for path, page in list(self._open_worlds.items()):
-            self.close_world(path)
-        if self.world_tab_holder.GetPageCount() > 1:
+            self.close_level(path)
+        if self.GetPageCount() > 1:
             wx.MessageBox(lang.get("app.world_still_used"))
         else:
             evt.Skip()
+
+    def extend_menu(self, menu_dict: dict) -> dict:
+        return self.GetCurrentPage().menu(menu_dict)
