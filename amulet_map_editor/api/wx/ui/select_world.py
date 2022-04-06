@@ -357,3 +357,10 @@ class WorldSelectDialog(wx.Dialog):
             self.EndModal(0)
         else:
             self.Close()
+
+
+def open_level(parent: wx.Window):
+    """Show the open world dialog and open the selected world."""
+    select_world = WorldSelectDialog(parent, wx.App.Get().open_level)
+    select_world.ShowModal()
+    select_world.Destroy()
