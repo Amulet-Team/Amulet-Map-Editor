@@ -1,5 +1,3 @@
-
-
 class BaseTab:
     def enable(self):
         """Run when the tab is shown/enabled"""
