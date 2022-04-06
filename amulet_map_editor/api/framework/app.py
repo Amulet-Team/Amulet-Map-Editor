@@ -5,10 +5,13 @@ import locale
 
 
 class AmuletApp(wx.App):
+
+    _amulet_ui: AmuletUI
+
     def OnInit(self):
-        self._frame = AmuletUI(None)
-        self.SetTopWindow(self._frame)
-        self._frame.Show()
+        self._amulet_ui = AmuletUI(None)
+        self.SetTopWindow(self._amulet_ui)
+        self._amulet_ui.Show()
         return True
 
     def InitLocale(self):
@@ -20,3 +23,20 @@ class AmuletApp(wx.App):
             lang, enc = locale.getlocale()
             if lang is None:
                 self._initial_locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+
+    def open_level(self, path: str):
+        """
+        Open a level and create a tab for it.
+        If a tab already exists it will just be shown.
+
+        :param path: The path to the level to open.
+        """
+        self._amulet_ui.open_level(path)
+
+    def close_level(self, path: str):
+        """
+        Close a level tab.
+
+        :param path: The path to the level to close.
+        """
+        self._amulet_ui.close_level(path)
