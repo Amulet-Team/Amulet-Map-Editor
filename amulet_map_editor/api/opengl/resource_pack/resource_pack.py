@@ -131,7 +131,7 @@ class OpenGLResourcePack:
                         json.dump((mod_time, bounds), f)
 
             self._image_width, self._image_height = atlas.size
-            self._image = numpy.array(atlas).astype(numpy.uint8).ravel()
+            self._image = numpy.asarray(atlas, numpy.uint8).ravel()
             self._texture_bounds = bounds
 
     def _setup_texture(self, context_id: str):

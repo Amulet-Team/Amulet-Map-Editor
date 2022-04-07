@@ -102,8 +102,8 @@ class EditCanvas(BaseEditCanvas):
         # call run_operation to acquire it.
         self._edit_lock = RLock()
 
-    def _setup(self) -> Generator[OperationYieldType, None, None]:
-        yield from super()._setup()
+    def post_thread_setup(self) -> Generator[OperationYieldType, None, None]:
+        yield from super().post_thread_setup()
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
@@ -112,10 +112,6 @@ class EditCanvas(BaseEditCanvas):
 
         self._tool_sizer = ToolManagerSizer(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
-
-    def _finalise(self):
-        super()._finalise()
-        self._tool_sizer.enable()
 
     def bind_events(self):
         """Set up all events required to run.
