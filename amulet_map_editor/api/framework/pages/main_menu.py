@@ -4,7 +4,7 @@ import wx.lib.inspection
 
 from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
-from amulet_map_editor.api.wx.ui.select_world import open_level
+from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
 
 
 class AmuletMainMenu(wx.Panel, BasePageUI):
@@ -33,7 +33,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
             self, label=lang.get("main_menu.open_world"), size=(400, 70)
         )
         self._open_world_button.SetFont(button_font)
-        self._open_world_button.Bind(wx.EVT_BUTTON, lambda _: open_level(self))
+        self._open_world_button.Bind(wx.EVT_BUTTON, lambda _: open_level_from_dialog(self))
         sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._help_button = wx.Button(

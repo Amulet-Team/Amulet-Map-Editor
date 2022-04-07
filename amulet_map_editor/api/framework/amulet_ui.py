@@ -5,7 +5,7 @@ from typing import Dict, Union
 import traceback
 
 from amulet.api.errors import LoaderNoneMatched
-from amulet_map_editor.api.wx.ui.select_world import open_level
+from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor import __version__, lang, log
 from amulet_map_editor.api.framework.pages import WorldPageUI
@@ -95,7 +95,7 @@ class AmuletUI(wx.Frame):
         menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "system", {}
         ).setdefault(
-            lang.get("menu_bar.file.open_world"), lambda evt: open_level(self)
+            lang.get("menu_bar.file.open_world"), lambda evt: open_level_from_dialog(self)
         )
         # menu_dict.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
         menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
