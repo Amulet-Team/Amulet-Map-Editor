@@ -11,6 +11,7 @@ from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.programs import BaseProgram
+from amulet_map_editor import close_level
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
@@ -172,4 +173,4 @@ class ConvertExtension(SimplePanel, BaseProgram):
         return True
 
     def _close_world(self, evt):
-        self._close_self_callback()
+        close_level(self.world.level_path)

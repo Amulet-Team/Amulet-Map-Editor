@@ -20,6 +20,7 @@ from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
 from amulet_map_editor import CONFIG, log
+from amulet_map_editor import close_level
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.goto import show_goto
 from amulet_map_editor.programs.edit.api.ui.tool_manager import ToolManagerSizer
@@ -135,7 +136,7 @@ class EditCanvas(BaseEditCanvas):
         self._tool_sizer.disable()
 
     def _on_close(self, _):
-        self._close_callback()
+        close_level(self.world.level_path)
 
     @property
     def tools(self):

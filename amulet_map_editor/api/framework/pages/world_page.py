@@ -11,6 +11,7 @@ from amulet import load_level
 
 from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
+from amulet_map_editor.api.framework import app
 from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
@@ -85,7 +86,7 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "exit", {}
         ).setdefault(
-            lang.get("menu_bar.file.close_world"), lambda evt: self._close_self_callback
+            lang.get("menu_bar.file.close_world"), lambda evt: app.close_level(self.path)
         )
         return self._extensions[self.GetSelection()].menu(menu)
 

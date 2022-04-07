@@ -2,6 +2,7 @@ import wx
 from typing import Callable, TYPE_CHECKING
 
 from amulet_map_editor.api import lang
+from amulet_map_editor.api.framework import app
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.ui.select_world import WorldUI
 from amulet_map_editor.api.framework.programs import BaseProgram
@@ -43,4 +44,4 @@ class AboutProgram(SimplePanel, BaseProgram):
         )
 
     def _close_world(self, evt):
-        self._close_self_callback()
+        app.close_level(self.world.level_path)
