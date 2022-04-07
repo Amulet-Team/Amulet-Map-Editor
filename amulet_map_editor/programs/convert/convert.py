@@ -18,9 +18,7 @@ if TYPE_CHECKING:
 
 
 class ConvertExtension(SimplePanel, BaseProgram):
-    def __init__(
-        self, container, world: BaseLevel
-    ):
+    def __init__(self, container, world: BaseLevel):
         SimplePanel.__init__(self, container)
         self._thread: Optional[Thread] = None
         self.world = world

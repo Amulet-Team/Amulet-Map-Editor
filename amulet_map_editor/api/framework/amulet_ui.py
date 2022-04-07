@@ -61,9 +61,7 @@ class AmuletUI(wx.Frame):
         icon.CopyFromBitmap(image.logo.amulet_logo.bitmap())
         self.SetIcon(icon)
 
-        self._level_notebook = AmuletLevelNotebook(
-            self, agwStyle=NOTEBOOK_MENU_STYLE
-        )
+        self._level_notebook = AmuletLevelNotebook(self, agwStyle=NOTEBOOK_MENU_STYLE)
         self._level_notebook.init()
 
         self.Bind(wx.EVT_CLOSE, self._level_notebook.on_app_close)
@@ -95,7 +93,8 @@ class AmuletUI(wx.Frame):
         menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "system", {}
         ).setdefault(
-            lang.get("menu_bar.file.open_world"), lambda evt: open_level_from_dialog(self)
+            lang.get("menu_bar.file.open_world"),
+            lambda evt: open_level_from_dialog(self),
         )
         # menu_dict.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Create World', lambda: self.world.save())
         menu_dict.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
@@ -211,7 +210,10 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
                 evt.Veto()
 
     def _page_changing(self, evt: wx.BookCtrlEvent):
-        if evt.GetOldSelection() != wx.NOT_FOUND and not self.GetPage(evt.GetOldSelection()).can_disable():
+        if (
+            evt.GetOldSelection() != wx.NOT_FOUND
+            and not self.GetPage(evt.GetOldSelection()).can_disable()
+        ):
             evt.Veto()
 
     def _page_changed(self, evt: wx.BookCtrlEvent):

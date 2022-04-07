@@ -12,9 +12,7 @@ if TYPE_CHECKING:
 
 
 class AboutProgram(SimplePanel, BaseProgram):
-    def __init__(
-        self, container, world: "BaseLevel"
-    ):
+    def __init__(self, container, world: "BaseLevel"):
         SimplePanel.__init__(self, container)
         self.world = world
 
