@@ -90,9 +90,8 @@ def show_loading_dialog(
 
 
 class EditCanvas(BaseEditCanvas):
-    def __init__(self, parent: wx.Window, world: "BaseLevel", close_callback: Callable):
+    def __init__(self, parent: wx.Window, world: "BaseLevel"):
         super().__init__(parent, world)
-        self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
         self.buttons.register_actions(self.key_binds)

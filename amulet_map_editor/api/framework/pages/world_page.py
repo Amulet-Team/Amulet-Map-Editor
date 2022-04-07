@@ -62,11 +62,10 @@ def load_extension(
 
 class WorldPageUI(wx.Notebook, BasePageUI):
     def __init__(
-        self, parent: wx.Window, path: str, close_self_callback: Callable[[], None]
+        self, parent: wx.Window, path: str
     ):
         super().__init__(parent, style=wx.NB_LEFT)
         self._path = path
-        self._close_self_callback = close_self_callback
         try:
             self.world = load_level(path)
         except LoaderNoneMatched as e:
@@ -96,7 +95,7 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         select = True
         for extension_name, extension in _extensions:
             try:
-                ext = extension(self, self.world, self._close_self_callback)
+                ext = extension(self, self.world)
                 self._extensions.append(ext)
                 self.AddPage(ext, extension_name, select)
                 select = False

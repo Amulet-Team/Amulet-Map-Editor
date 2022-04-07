@@ -1,7 +1,7 @@
 import wx
 from threading import Thread
 import webbrowser
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Optional
 
 from amulet import load_format
 from amulet.api.level import BaseLevel
@@ -19,12 +19,11 @@ if TYPE_CHECKING:
 
 class ConvertExtension(SimplePanel, BaseProgram):
     def __init__(
-        self, container, world: BaseLevel, close_self_callback: Callable[[], None]
+        self, container, world: BaseLevel
     ):
         SimplePanel.__init__(self, container)
         self._thread: Optional[Thread] = None
         self.world = world
-        self._close_self_callback = close_self_callback
 
         self._close_world_button = wx.Button(
             self, wx.ID_ANY, label=lang.get("world.close_world")

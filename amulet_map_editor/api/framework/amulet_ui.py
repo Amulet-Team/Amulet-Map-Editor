@@ -167,7 +167,7 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
             self.SetSelection(self.GetPageIndex(self._open_worlds[path]))
         else:
             try:
-                world = WorldPageUI(self, path, lambda: self.close_level(path))
+                world = WorldPageUI(self, path)
             except LoaderNoneMatched as e:
                 log.error(f"Could not find a loader for this world.\n{e}")
                 wx.MessageBox(f"{lang.get('select_world.no_loader_found')}\n{e}")
@@ -218,7 +218,6 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
         """Handle the page changing."""
         if evt.GetOldSelection() != evt.GetSelection():
             if evt.GetOldSelection() != wx.NOT_FOUND:
-                print("disable", self.GetPage(evt.GetOldSelection()))
                 self.GetPage(evt.GetOldSelection()).disable()
 
             if self.GetCurrentPage() is self._main_menu:
@@ -227,7 +226,6 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
                 self.SetAGWWindowStyleFlag(NOTEBOOK_STYLE)
 
         if self.GetCurrentPage() is not None:
-            print("enable", self.GetCurrentPage())
             self.GetCurrentPage().enable()
 
     def on_app_close(self, evt: wx.CloseEvent):

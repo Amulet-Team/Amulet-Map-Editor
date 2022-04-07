@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 
 class EditExtension(wx.Panel, BaseProgram):
-    def __init__(self, parent, world: "World", close_self_callback: Callable[[], None]):
+    def __init__(self, parent, world: "World"):
         wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetBackgroundColour(
@@ -31,7 +31,6 @@ class EditExtension(wx.Panel, BaseProgram):
         self.SetSizer(self._sizer)
         self._world = world
         self._canvas: Optional[EditCanvas] = None
-        self._close_self_callback = close_self_callback
 
         self._sizer.AddStretchSpacer(1)
         self._temp_msg = wx.StaticText(
@@ -47,7 +46,7 @@ class EditExtension(wx.Panel, BaseProgram):
         if self._canvas is None:
             self.Update()
 
-            self._canvas = EditCanvas(self, self._world, self._close_self_callback)
+            self._canvas = EditCanvas(self, self._world)
             for arg in self._canvas.setup():
                 if isinstance(arg, (int, float)):
                     self._temp_loading_bar.SetValue(int(min(arg, 1) * 10000))
