@@ -3,6 +3,7 @@ from amulet_map_editor.programs.edit.api.ui.tool import BaseOperationChoiceToolU
 
 class ExportTool(BaseOperationChoiceToolUI):
     OperationGroupName = "export_operations"
+    ShowOpenFolder = False
 
     @property
     def name(self) -> str:
