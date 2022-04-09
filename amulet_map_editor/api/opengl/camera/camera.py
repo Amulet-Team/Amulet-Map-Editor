@@ -68,10 +68,18 @@ class ProjectionChangedEvent(wx.PyEvent):
 class Camera(CanvasContainer):
     """A class to hold the state information of the camera."""
 
+    _bounds: Tuple[Tuple[float, float, float], Tuple[float, float, float]]
+    _location: CameraLocationType
+    _rotation: CameraRotationType
+    _projection_mode: Projection
+    _fov: List[float]
+    _clipping: List[Tuple[float, float]]
+    _aspect_ratio: float
     _projection_matrix: Optional[TransformationMatrixType]
     _transformation_matrix: Optional[TransformationMatrixType]
 
     __slots__ = (
+        "_bounds",
         "_location",
         "_rotation",
         "_projection_mode",
@@ -84,18 +92,18 @@ class Camera(CanvasContainer):
 
     def __init__(self, canvas: glcanvas.GLCanvas):
         super().__init__(canvas)
-
-        self._location: CameraLocationType = (0.0, 0.0, 0.0)
-        self._rotation: CameraRotationType = (0.0, 0.0)
+        self._bounds = ((-1_000_000_000, -1_000_000_000, -1_000_000_000), (1_000_000_000, 1_000_000_000, 1_000_000_000))
+        self._location = (0.0, 0.0, 0.0)
+        self._rotation = (0.0, 0.0)
         self._projection_mode = Projection.PERSPECTIVE
         self._fov = [100.0, 70.0]
-        self._clipping: List[Tuple[float, float]] = [
+        self._clipping = [
             (-(10**5), 10**5),
             (0.1, 10000.0),
         ]
         self._aspect_ratio = 4 / 3
-        self._projection_matrix: Optional[TransformationMatrixType] = None
-        self._transformation_matrix: Optional[TransformationMatrixType] = None
+        self._projection_matrix = None
+        self._transformation_matrix = None
 
     def _reset_matrix(self):
         self._projection_matrix = None
@@ -136,7 +144,7 @@ class Camera(CanvasContainer):
         assert (
             len(camera_location) == 3
         ), "camera_location must be an iterable of three floats."
-        camera_location = tuple(map(float, camera_location))
+        camera_location = tuple(min(max(float(c), c_min), c_max) for c, c_min, c_max in zip(camera_location, *self._bounds))
         if camera_location != self._location:
             self._reset_matrix()
             self._location = camera_location
