@@ -92,7 +92,10 @@ class Camera(CanvasContainer):
 
     def __init__(self, canvas: glcanvas.GLCanvas):
         super().__init__(canvas)
-        self._bounds = ((-1_000_000_000, -1_000_000_000, -1_000_000_000), (1_000_000_000, 1_000_000_000, 1_000_000_000))
+        self._bounds = (
+            (-1_000_000_000, -1_000_000_000, -1_000_000_000),
+            (1_000_000_000, 1_000_000_000, 1_000_000_000),
+        )
         self._location = (0.0, 0.0, 0.0)
         self._rotation = (0.0, 0.0)
         self._projection_mode = Projection.PERSPECTIVE
@@ -144,7 +147,10 @@ class Camera(CanvasContainer):
         assert (
             len(camera_location) == 3
         ), "camera_location must be an iterable of three floats."
-        camera_location = tuple(min(max(float(c), c_min), c_max) for c, c_min, c_max in zip(camera_location, *self._bounds))
+        camera_location = tuple(
+            min(max(float(c), c_min), c_max)
+            for c, c_min, c_max in zip(camera_location, *self._bounds)
+        )
         if camera_location != self._location:
             self._reset_matrix()
             self._location = camera_location
