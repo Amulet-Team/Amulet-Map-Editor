@@ -19,6 +19,7 @@ from amulet.utils.matrix import (
 
 from amulet_map_editor import lang
 from amulet_map_editor.api import image
+from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.programs.edit.api.key_config import (
@@ -249,7 +250,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._moving = False
         self._is_enabled = False
 
-        self._paste_panel = wx.Panel(canvas)
+        self._paste_panel = SimpleScrollablePanel(canvas)
         self._paste_sizer = wx.BoxSizer(wx.VERTICAL)
         self._paste_panel.SetSizer(self._paste_sizer)
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
