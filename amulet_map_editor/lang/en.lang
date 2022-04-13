@@ -23,6 +23,9 @@
 ## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
 ## This pattern must stay in the translated entries for them to work properly
 
+# Meta
+meta.amulet=Amulet
+
 # Shared strings
 shared.check_console=Check the console for more details.
 
@@ -49,6 +52,11 @@ main_menu.tab_name=Main Menu
 main_menu.open_world=Open World
 main_menu.help=Help
 main_menu.discord=Amulet Discord
+
+# Language Select
+language_select.title=Language Select
+language_select.help=Select the language to use in Amulet from the list below.
+language_select.contribute=If you want to fix or add translations click here.
 
 # Update check
 ## The window displayed when a newer version of Amulet is available
