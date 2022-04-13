@@ -115,6 +115,9 @@ class LangSelectDialog(wx.Dialog):
         sizer_1.Add(self.hyperlink_1, 0, wx.ALIGN_CENTER)
 
         self._lang_list_box = wx.ListBox(self, choices=lang.get_languages())
+        self._lang_list_box.SetSelection(
+            self._lang_list_box.FindString(lang.get_language())
+        )
         sizer_1.Add(self._lang_list_box, 1, wx.EXPAND, 0)
 
         sizer_2 = wx.StdDialogButtonSizer()
