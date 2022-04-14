@@ -40,6 +40,17 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
         self.SetupScrolling()
         self.SetAutoLayout(1)
 
+    def DoGetBestSize(self):
+        sizer = self.GetSizer()
+        if sizer is None:
+            return -1, -1
+        else:
+            sx, sy = sizer.CalcMin()
+            return (
+                sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X),
+                sy,
+            )
+
 
 class SimpleChoice(wx.Choice):
     """A wrapper for wx.Choice that sets up the UI for you."""

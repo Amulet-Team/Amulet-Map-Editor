@@ -7,7 +7,7 @@ from amulet import load_format
 from amulet.api.level import BaseLevel
 
 from amulet_map_editor import lang, log
-from amulet_map_editor.api.wx.ui.simple import SimplePanel
+from amulet_map_editor.api.wx.ui.simple import SimplePanel, SimpleScrollablePanel
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.programs import BaseProgram
@@ -16,11 +16,11 @@ if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
 
 
-class ConvertExtension(SimplePanel, BaseProgram):
+class ConvertExtension(SimpleScrollablePanel, BaseProgram):
     def __init__(
         self, container, world: BaseLevel, close_self_callback: Callable[[], None]
     ):
-        SimplePanel.__init__(self, container)
+        super().__init__(container)
         self._thread: Optional[Thread] = None
         self.world = world
         self._close_self_callback = close_self_callback
