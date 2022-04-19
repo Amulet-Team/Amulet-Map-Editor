@@ -7,6 +7,7 @@ from amulet_map_editor.programs.edit.api.edit_canvas_container import (
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.programs.edit.api.events import (
     EVT_CAMERA_MOVED,
+    EVT_SPEED_CHANGED,
     EVT_UNDO,
     EVT_REDO,
     EVT_CREATE_UNDO,
@@ -53,8 +54,20 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
             lang.get("program_3d_edit.file_ui.location_tooltip")
         )
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
-
         self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
+
+        def set_speed(evt):
+            dialog = SpeedSelectDialog(canvas, self.canvas.camera.move_speed)
+            if dialog.ShowModal() == wx.ID_OK:
+                self.canvas.camera.move_speed = dialog.speed * 33 / 1000
+
+        self._speed_button = wx.Button(
+            canvas,
+            label=f"{self.canvas.camera.move_speed*1000/33:.4g}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}",
+        )
+        self._speed_button.SetToolTip(lang.get("program_3d_edit.file_ui.speed_tooltip"))
+        self._speed_button.Bind(wx.EVT_BUTTON, set_speed)
+        self.Add(self._speed_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
         self._dim_options = SimpleChoiceAny(canvas)
         self._dim_options.SetToolTip(lang.get("program_3d_edit.file_ui.dim_tooltip"))
@@ -105,6 +118,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
 
     def bind_events(self):
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_move)
+        self.canvas.Bind(EVT_SPEED_CHANGED, self._on_speed_change)
         self.canvas.Bind(EVT_UNDO, self._on_update_buttons)
         self.canvas.Bind(EVT_REDO, self._on_update_buttons)
         self.canvas.Bind(EVT_SAVE, self._on_update_buttons)
@@ -160,3 +174,69 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         if len(label) != len(old_label):
             self.canvas.Layout()
         evt.Skip()
+
+    def _on_speed_change(self, evt):
+        label = f"{self.canvas.camera.move_speed*1000/33:.4g}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}"
+        old_label = self._speed_button.GetLabel()
+        self._speed_button.SetLabel(label)
+        if len(label) != len(old_label):
+            self.canvas.Layout()
+        evt.Skip()
+
+
+class SpeedSelectDialog(wx.Dialog):
+    def __init__(self, parent: wx.Window, speed: float):
+        wx.Dialog.__init__(self, parent)
+        self.SetTitle(lang.get("program_3d_edit.file_ui.speed_dialog_name"))
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self._speed_spin_ctrl_double = wx.SpinCtrlDouble(
+            self, wx.ID_ANY, initial=speed, min=0.0, max=1_000_000_000.0
+        )
+        self._speed_spin_ctrl_double.SetToolTip(
+            lang.get("program_3d_edit.file_ui.speed_tooltip")
+        )
+
+        def on_mouse_wheel(evt: wx.MouseEvent):
+            if evt.GetWheelRotation() > 0:
+                self._speed_spin_ctrl_double.SetValue(
+                    self._speed_spin_ctrl_double.GetValue()
+                    + self._speed_spin_ctrl_double.GetIncrement()
+                )
+            else:
+                self._speed_spin_ctrl_double.SetValue(
+                    self._speed_spin_ctrl_double.GetValue()
+                    - self._speed_spin_ctrl_double.GetIncrement()
+                )
+
+        self._speed_spin_ctrl_double.Bind(wx.EVT_MOUSEWHEEL, on_mouse_wheel)
+        self._speed_spin_ctrl_double.SetIncrement(1.0)
+        self._speed_spin_ctrl_double.SetDigits(4)
+        sizer.Add(
+            self._speed_spin_ctrl_double, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5
+        )
+
+        button_sizer = wx.StdDialogButtonSizer()
+        sizer.Add(button_sizer, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
+
+        self._button_ok = wx.Button(self, wx.ID_OK, "")
+        self._button_ok.SetDefault()
+        button_sizer.AddButton(self._button_ok)
+
+        self._button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+        button_sizer.AddButton(self._button_cancel)
+
+        button_sizer.Realize()
+
+        self.SetSizer(sizer)
+        sizer.Fit(self)
+
+        self.SetAffirmativeId(self._button_ok.GetId())
+        self.SetEscapeId(self._button_cancel.GetId())
+
+        self.Layout()
+
+    @property
+    def speed(self) -> float:
+        return self._speed_spin_ctrl_double.GetValue()

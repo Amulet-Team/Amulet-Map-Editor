@@ -6,6 +6,8 @@ from amulet_map_editor.api.opengl.camera import (
     EVT_CAMERA_MOVED,
     ProjectionChangedEvent,
     EVT_PROJECTION_CHANGED,
+    SpeedChangedEvent,
+    EVT_SPEED_CHANGED,
 )
 
 from amulet_map_editor.api.opengl.events import (
