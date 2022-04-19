@@ -57,7 +57,9 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
 
         def set_speed(evt):
-            dialog = SpeedSelectDialog(canvas, self.canvas.camera.move_speed)
+            dialog = SpeedSelectDialog(
+                canvas, self.canvas.camera.move_speed * 1000 / 33
+            )
             if dialog.ShowModal() == wx.ID_OK:
                 self.canvas.camera.move_speed = dialog.speed * 33 / 1000
 
