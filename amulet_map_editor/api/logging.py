@@ -3,19 +3,40 @@ import sys
 import os
 
 log = logging.getLogger("amulet_map_editor")
-log_level = logging.DEBUG if "amulet-debug" in sys.argv else logging.INFO
 
-log.setLevel(log_level)
 
-_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+def _init_logging():
+    loggers = [
+        log,
+        logging.getLogger("amulet"),
+        logging.getLogger("minecraft_model_reader"),
+        logging.getLogger("PyMCTranslate"),
+    ]
 
-os.makedirs("./logs", exist_ok=True)
-_log_file = logging.FileHandler("./logs/amulet_map_editor.log", "w", encoding="utf-8")
-_log_file.setLevel(log_level)
-_log_file.setFormatter(_formatter)
-log.addHandler(_log_file)
+    # reset all existing handlers
+    for logger in loggers:
+        while logger.hasHandlers():
+            handler = logger.handlers[0]
+            logger.removeHandler(handler)
+            handler.close()
+        logger.setLevel(logging.DEBUG if "amulet-debug" in sys.argv else logging.INFO)
 
-_log_console = logging.StreamHandler()
-_log_console.setLevel(log_level)
-_log_console.setFormatter(_formatter)
-log.addHandler(_log_console)
+    # set up handlers
+    os.makedirs(os.path.join(".", "logs"), exist_ok=True)
+    file_handler = logging.FileHandler(
+        os.path.join(".", "logs", f"amulet_{os.getpid()}.log"), "w", encoding="utf-8"
+    )
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    )
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter("%(levelname)s - %(message)s"))
+
+    # bind the handlers to each logger
+    for logger in loggers:
+        logger.addHandler(file_handler)
+        logger.addHandler(console_handler)
+
+
+_init_logging()

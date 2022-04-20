@@ -1,3 +1,4 @@
+import logging
 import wx
 from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
 from types import GeneratorType
@@ -19,7 +20,7 @@ from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimen
 from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
-from amulet_map_editor import CONFIG, log
+from amulet_map_editor import CONFIG
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.goto import show_goto
 from amulet_map_editor.programs.edit.api.ui.tool_manager import ToolManagerSizer
@@ -46,6 +47,8 @@ from amulet_map_editor.programs.edit.api.ui.file import FilePanel
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
+
+log = logging.getLogger(__name__)
 
 
 def show_loading_dialog(

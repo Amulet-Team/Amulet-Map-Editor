@@ -1,9 +1,12 @@
 from typing import Dict, Set
 import os
 import locale
+import logging
 
 import amulet_map_editor
-from amulet_map_editor.api import config as CONFIG, log
+from amulet_map_editor.api import config as CONFIG
+
+log = logging.getLogger(__name__)
 
 # there might be a proper way to do this but this should be enough for now
 

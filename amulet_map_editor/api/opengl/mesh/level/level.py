@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING, Generator, Optional, Any
 import numpy
 import time
+import logging
 
 from amulet.api.data_types import Dimension, ChunkCoordinates
 
-from amulet_map_editor import log
 from .chunk import RenderChunk
 from .region import ChunkManager
 from .selection import GreenRenderSelectionGroup
@@ -21,6 +21,8 @@ from amulet_map_editor.api.opengl import Drawable, ThreadedObject, ContextManage
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
+
+log = logging.getLogger(__name__)
 
 
 class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextManager):

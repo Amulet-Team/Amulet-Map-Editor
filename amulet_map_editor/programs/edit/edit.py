@@ -1,10 +1,11 @@
 import wx
 from typing import TYPE_CHECKING, Optional, Callable
 import webbrowser
+import logging
 
 EDIT_CONFIG_ID = "amulet_edit"
 
-from amulet_map_editor import log, lang
+from amulet_map_editor import lang
 from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
@@ -19,6 +20,8 @@ from amulet_map_editor.api import config
 
 if TYPE_CHECKING:
     from amulet.api.level import World
+
+log = logging.getLogger(__name__)
 
 
 class EditExtension(wx.Panel, BaseProgram):

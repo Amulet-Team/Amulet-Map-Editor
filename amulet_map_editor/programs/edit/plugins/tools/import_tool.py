@@ -1,11 +1,11 @@
 import wx
 from typing import TYPE_CHECKING
 import traceback
+import logging
 
 import amulet
 from amulet.api.errors import LoaderNoneMatched
 
-from amulet_map_editor import log
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
@@ -13,6 +13,8 @@ from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehavio
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+log = logging.getLogger(__name__)
 
 
 class ImportTool(wx.BoxSizer, DefaultBaseToolUI):

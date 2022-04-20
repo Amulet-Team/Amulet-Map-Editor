@@ -1,3 +1,4 @@
+import logging
 from OpenGL.GL import (
     glBindTexture,
     GL_TEXTURE_2D,
@@ -28,7 +29,8 @@ import ctypes
 import numpy
 from amulet_map_editor.api.opengl.shaders import get_shader
 from amulet_map_editor.api.opengl import Drawable, ContextManager
-from amulet_map_editor import log
+
+log = logging.getLogger(__name__)
 
 
 class TriMesh(Drawable, ContextManager):

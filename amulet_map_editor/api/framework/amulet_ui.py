@@ -2,16 +2,19 @@ import wx
 from wx.lib.agw import flatnotebook
 from typing import Dict, Union
 import traceback
+import logging
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
-from amulet_map_editor import __version__, lang, log
+from amulet_map_editor import __version__, lang
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
 
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
+
+log = logging.getLogger(__name__)
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:

@@ -1,11 +1,12 @@
 from typing import Tuple, Optional, Any, TYPE_CHECKING
+import logging
 import wx
 import weakref
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.history.history_manager import ObjectHistoryManager
 from amulet.api.history import Changeable
 
-from amulet_map_editor import log
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas

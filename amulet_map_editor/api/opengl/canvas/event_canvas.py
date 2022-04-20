@@ -1,8 +1,10 @@
 import wx
 from typing import List, Tuple, Any
+import logging
 
-from amulet_map_editor import log
 from amulet_map_editor.api.opengl.canvas import BaseCanvas
+
+log = logging.getLogger(__name__)
 
 
 class EventCanvas(BaseCanvas):
