@@ -20,6 +20,7 @@ from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
 from amulet_map_editor import CONFIG, log
+from amulet_map_editor import close_level
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.goto import show_goto
 from amulet_map_editor.programs.edit.api.ui.tool_manager import ToolManagerSizer
@@ -88,9 +89,8 @@ def show_loading_dialog(
 
 
 class EditCanvas(BaseEditCanvas):
-    def __init__(self, parent: wx.Window, world: "BaseLevel", close_callback: Callable):
+    def __init__(self, parent: wx.Window, world: "BaseLevel"):
         super().__init__(parent, world)
-        self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
         self.buttons.register_actions(self.key_binds)
@@ -101,8 +101,8 @@ class EditCanvas(BaseEditCanvas):
         # call run_operation to acquire it.
         self._edit_lock = RLock()
 
-    def _setup(self) -> Generator[OperationYieldType, None, None]:
-        yield from super()._setup()
+    def post_thread_setup(self) -> Generator[OperationYieldType, None, None]:
+        yield from super().post_thread_setup()
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
@@ -111,10 +111,6 @@ class EditCanvas(BaseEditCanvas):
 
         self._tool_sizer = ToolManagerSizer(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
-
-    def _finalise(self):
-        super()._finalise()
-        self._tool_sizer.enable()
 
     def bind_events(self):
         """Set up all events required to run.
@@ -134,7 +130,7 @@ class EditCanvas(BaseEditCanvas):
         self._tool_sizer.disable()
 
     def _on_close(self, _):
-        self._close_callback()
+        close_level(self.world.level_path)
 
     @property
     def tools(self):
