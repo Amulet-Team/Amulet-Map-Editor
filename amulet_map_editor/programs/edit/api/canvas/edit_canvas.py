@@ -40,7 +40,6 @@ from amulet_map_editor.programs.edit.api.events import (
     RedoEvent,
     CreateUndoEvent,
     SaveEvent,
-    PasteEvent,
     ToolChangeEvent,
     EVT_EDIT_CLOSE,
 )
@@ -261,8 +260,12 @@ class EditCanvas(BaseEditCanvas):
         assert (
             dimension in structure.dimensions
         ), "The requested dimension does not exist for this object."
-        wx.PostEvent(self, ToolChangeEvent(tool="Paste"))
-        wx.PostEvent(self, PasteEvent(structure=structure, dimension=dimension))
+        wx.PostEvent(
+            self,
+            ToolChangeEvent(
+                tool="Paste", state={"structure": structure, "dimension": dimension}
+            ),
+        )
 
     def paste_from_cache(self):
         if structure_cache:

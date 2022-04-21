@@ -8,6 +8,7 @@ from OpenGL.GL import (
 from amulet.api.data_types import BlockCoordinates
 
 from amulet_map_editor import lang
+from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.api.wx.util.validators import IntValidator
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.programs.edit.api.events import EVT_SELECTION_CHANGE
@@ -78,7 +79,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._selection = BlockSelectionBehaviour(self.canvas)
         self._inspect_block = InspectBlockBehaviour(self.canvas, self._selection)
 
-        self._button_panel = wx.Panel(canvas)
+        self._button_panel = SimpleScrollablePanel(canvas)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 
@@ -286,11 +287,11 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
 
     def _add_row(self, label: str, wx_object: Type[wx.Object], **kwargs) -> Any:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._button_panel.GetSizer().Add(sizer, 0, 0)
+        self._button_panel.GetSizer().Add(sizer, 0, wx.EXPAND)
         name_text = wx.StaticText(self._button_panel, label=label)
         sizer.Add(name_text, flag=wx.ALIGN_CENTER | wx.ALL, border=5)
         obj = wx_object(self._button_panel, **kwargs)
-        sizer.Add(obj, flag=wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, border=5)
+        sizer.Add(obj, 1, flag=wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, border=5)
         return obj
 
     def _box_input_change(self, _):
