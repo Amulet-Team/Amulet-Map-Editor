@@ -2,7 +2,7 @@
 name: Bug Report
 about: Create a report to help us improve the program.
 title: "[Bug Report] Your Title Here"
-labels: 'type: bug'
+labels: ["type: bug", "state: triage"]
 assignees: ''
 
 ---
