@@ -1,9 +1,9 @@
 # if the below doesn't work please find an alternative from here: https://extras.wxpython.org/wxPython4/extras/linux/gtk3/
-wxPython>=4.1
-numpy
-pyopengl
+wxPython~=4.1
+numpy~=1.17
+pyopengl~=3.0
 packaging
-amulet-core~=1.7.1
-amulet-nbt~=1.0.4
-pymctranslate~=1.1.0
-minecraft-resource-pack~=1.2.0
+amulet-core~=1.7
+amulet-nbt~=1.1
+pymctranslate~=1.1
+minecraft-resource-pack~=1.2
