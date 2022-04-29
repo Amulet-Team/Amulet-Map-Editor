@@ -9,6 +9,8 @@ import numpy
 import weakref
 
 from amulet.api.data_types import PointCoordinates
+from amulet.api.level import BaseLevel
+from amulet.api.structure import structure_cache
 from amulet.operations.paste import paste_iter
 from amulet.utils.matrix import (
     rotation_matrix_xyz,
@@ -20,6 +22,7 @@ from amulet.utils.matrix import (
 from amulet_map_editor import lang
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.util.validators import IntValidator, FloatValidator
+from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.programs.edit.api.key_config import (
@@ -35,7 +38,6 @@ from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import (
     PointChangeEvent,
 )
 from amulet_map_editor.programs.edit.api.events import (
-    EVT_PASTE,
     InputPressEvent,
     EVT_INPUT_PRESS,
 )
@@ -256,7 +258,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._moving = False
         self._is_enabled = False
 
-        self._paste_panel = wx.Panel(canvas)
+        self._paste_panel = SimpleScrollablePanel(canvas)
         self._paste_sizer = wx.BoxSizer(wx.VERTICAL)
         self._paste_panel.SetSizer(self._paste_sizer)
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
@@ -480,7 +482,6 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
     def bind_events(self):
         super().bind_events()
         self._selection.bind_events()
-        self.canvas.Bind(EVT_PASTE, self._paste)
         self._cursor.bind_events()
         self.canvas.Bind(EVT_POINT_CHANGE, self._on_pointer_change)
         self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
@@ -490,6 +491,28 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._move_button.enable()
         self._selection.update_selection()
         self._moving = False
+
+    def set_state(self, state):
+        if (
+            isinstance(state, dict)
+            and isinstance(state.get("structure"), BaseLevel)
+            and isinstance(state.get("dimension"), str)
+        ):
+            structure = state["structure"]
+            dimension = state["dimension"]
+        elif structure_cache:
+            structure, dimension = structure_cache.get_structure()
+        else:
+            wx.MessageBox("A structure needs to be copied before one can be pasted.")
+            return
+
+        self._paste_panel.Enable()
+        self._is_enabled = True
+        self.canvas.renderer.fake_levels.clear()
+        self.canvas.renderer.fake_levels.append(
+            structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0)
+        )
+        self._moving = True
 
     def disable(self):
         super().disable()
@@ -628,17 +651,6 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
                         self._rotation_radians(),
                     )
         evt.Skip()
-
-    def _paste(self, evt):
-        self._paste_panel.Enable()
-        self._is_enabled = True
-        structure = evt.structure
-        dimension = evt.dimension
-        self.canvas.renderer.fake_levels.clear()
-        self.canvas.renderer.fake_levels.append(
-            structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0)
-        )
-        self._moving = True
 
     def _paste_operation(self):
         if all(self._scale.value):

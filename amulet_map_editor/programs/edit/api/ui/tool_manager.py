@@ -73,9 +73,8 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self._tools[tool.name] = tool
         self._tool_option_sizer.Add(tool, 1, wx.EXPAND, 0)
 
-    def _enable_tool_event(self, evt):
-        self._enable_tool(evt.tool)
-        # evt.Skip() # this causes issues if uncommented
+    def _enable_tool_event(self, evt: ToolChangeEvent):
+        self._enable_tool(evt.tool, evt.state)
 
     def enable(self):
         if isinstance(self._active_tool, SelectTool):
@@ -97,7 +96,7 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         if not isinstance(self._active_tool, SelectTool):
             self._enable_tool("Select")
 
-    def _enable_tool(self, tool: str):
+    def _enable_tool(self, tool: str, state=None):
         if tool in self._tools:
             if self._active_tool is not None:
                 self._active_tool.disable()
@@ -111,6 +110,7 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
             elif isinstance(self._active_tool, wx.Sizer):
                 self._active_tool.ShowItems(show=True)
             self._active_tool.enable()
+            self._active_tool.set_state(state)
             self.canvas.reset_bound_events()
             self.canvas.Layout()
 
