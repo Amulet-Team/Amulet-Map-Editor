@@ -6,4 +6,8 @@ from .camera import (
     EVT_PROJECTION_CHANGED,
     Projection,
 )
-from .controllable_camera import ControllableCamera
+from .controllable_camera import (
+    ControllableCamera,
+    EVT_SPEED_CHANGED,
+    SpeedChangedEvent,
+)
