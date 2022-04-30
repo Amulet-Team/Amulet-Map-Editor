@@ -1,7 +1,8 @@
 import wx
-from typing import Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from amulet_map_editor.api import lang
+from amulet_map_editor.api.framework import app
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
 from amulet_map_editor.api.wx.ui.select_world import WorldUI
 from amulet_map_editor.api.framework.programs import BaseProgram
@@ -11,12 +12,9 @@ if TYPE_CHECKING:
 
 
 class AboutProgram(SimplePanel, BaseProgram):
-    def __init__(
-        self, container, world: "BaseLevel", close_self_callback: Callable[[], None]
-    ):
+    def __init__(self, container, world: "BaseLevel"):
         SimplePanel.__init__(self, container)
         self.world = world
-        self._close_self_callback = close_self_callback
 
         self._close_world_button = wx.Button(
             self, wx.ID_ANY, label=lang.get("world.close_world")
@@ -43,4 +41,4 @@ class AboutProgram(SimplePanel, BaseProgram):
         )
 
     def _close_world(self, evt):
-        self._close_self_callback()
+        app.close_level(self.world.level_path)

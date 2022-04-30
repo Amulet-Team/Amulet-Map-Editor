@@ -5,16 +5,15 @@ import wx.lib.inspection
 
 from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
-from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
+from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
 
 
 class AmuletMainMenu(wx.Panel, BasePageUI):
-    def __init__(self, parent: wx.Window, open_world):
+    def __init__(self, parent: wx.Window):
         super(AmuletMainMenu, self).__init__(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
         sizer.AddStretchSpacer(1)
-        self._open_world_callback = open_world
         name_sizer = wx.BoxSizer()
         sizer.Add(name_sizer, 0, wx.CENTER)
         icon_img = image.logo.amulet_logo.bitmap(64, 64)
@@ -35,7 +34,9 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         button_font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
         self._open_world_button = wx.Button(self, size=(400, 70))
         self._open_world_button.SetFont(button_font)
-        self._open_world_button.Bind(wx.EVT_BUTTON, self._show_world_select)
+        self._open_world_button.Bind(
+            wx.EVT_BUTTON, lambda _: open_level_from_dialog(self)
+        )
         sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._help_button = wx.Button(self, size=(400, 70))
@@ -66,11 +67,6 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self._discord_button.SetLabel(lang.get("main_menu.discord"))
         self._discord_button.SetToolTip(lang.get("app.browser_open_tooltip"))
 
-    def _show_world_select(self, _):
-        select_world = WorldSelectDialog(self, self._open_world_callback)
-        select_world.ShowModal()
-        select_world.Destroy()
-
     @staticmethod
     def _documentation(_):
         webbrowser.open(
@@ -82,7 +78,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         webbrowser.open("https://discord.gg/BTm6jnf")
 
     def enable(self):
-        self.GetGrandParent().create_menu()
+        self.GetTopLevelParent().create_menu()
 
     def _select_language(self, evt):
         dialog = LangSelectDialog(self)

@@ -1,8 +1,12 @@
-import wx
-from typing import TYPE_CHECKING, Optional, Callable
+from typing import TYPE_CHECKING, Optional, Generator
 import webbrowser
+from threading import Thread
+
+import wx
 
 EDIT_CONFIG_ID = "amulet_edit"
+
+from amulet.api.data_types import OperationYieldType
 
 from amulet_map_editor import log, lang
 from amulet_map_editor.api.framework.programs import BaseProgram
@@ -22,7 +26,20 @@ if TYPE_CHECKING:
 
 
 class EditExtension(wx.Panel, BaseProgram):
-    def __init__(self, parent, world: "World", close_self_callback: Callable[[], None]):
+
+    # UI elements
+    _sizer: wx.BoxSizer
+    # these only exists on setup. Once setup is finished they will be None
+    _temp_msg: Optional[wx.StaticText]
+    _temp_loading_bar: Optional[wx.Gauge]
+
+    _world: "World"
+    _canvas: Optional[EditCanvas]
+
+    # setup is run in a different thread to avoid blocking the UI
+    _setup_thread: Optional[Thread]
+
+    def __init__(self, parent, world: "World"):
         wx.Panel.__init__(self, parent)
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetBackgroundColour(
@@ -30,8 +47,8 @@ class EditExtension(wx.Panel, BaseProgram):
         )
         self.SetSizer(self._sizer)
         self._world = world
-        self._canvas: Optional[EditCanvas] = None
-        self._close_self_callback = close_self_callback
+        self._canvas = None
+        self._setup_thread = None
 
         self._sizer.AddStretchSpacer(1)
         self._temp_msg = wx.StaticText(
@@ -45,43 +62,65 @@ class EditExtension(wx.Panel, BaseProgram):
 
     def enable(self):
         if self._canvas is None:
-            self.Update()
+            self._canvas = EditCanvas(self, self._world)
+            self._setup_thread = Thread(target=self._thread_setup)
+            self._setup_thread.start()
+        else:
+            self._canvas.enable()
 
-            self._canvas = EditCanvas(self, self._world, self._close_self_callback)
-            for arg in self._canvas.setup():
-                if isinstance(arg, (int, float)):
-                    self._temp_loading_bar.SetValue(int(min(arg, 1) * 10000))
-                elif (
-                    isinstance(arg, tuple)
-                    and isinstance(arg[0], (int, float))
-                    and isinstance(arg[1], str)
-                ):
-                    self._temp_loading_bar.SetValue(int(min(arg[0], 1) * 10000))
-                    self._temp_msg.SetLabel(arg[1])
-                self.Layout()
-                self.Update()
-                wx.Yield()
-
-            edit_config: dict = config.get(EDIT_CONFIG_ID, {})
-            self._canvas.camera.perspective_fov = edit_config.get("options", {}).get(
-                "fov", 70.0
-            )
-            if self._canvas.camera.perspective_fov > 180:
-                self._canvas.camera.perspective_fov = 70.0
-            self._canvas.renderer.render_distance = edit_config.get("options", {}).get(
-                "render_distance", 5
-            )
-            self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
-                "camera_sensitivity", 2.0
-            )
-
-            self._sizer.Clear(True)
-            self._sizer.Add(self._canvas, 1, wx.EXPAND)
-            self._canvas.Show()
-
+    def _update_loading(self, it: Generator[OperationYieldType, None, None]):
+        for arg in it:
+            if isinstance(arg, (int, float)):
+                self._temp_loading_bar.SetValue(int(min(arg, 1) * 10000))
+            elif (
+                isinstance(arg, tuple)
+                and isinstance(arg[0], (int, float))
+                and isinstance(arg[1], str)
+            ):
+                self._temp_loading_bar.SetValue(int(min(arg[0], 1) * 10000))
+                self._temp_msg.SetLabel(arg[1])
             self.Layout()
-        self._canvas.Update()
+
+    def _thread_setup(self):
+        """
+        Setup and enable all the UI elements.
+        This can take a while to run so should be done in a new thread.
+        Everything in here must be thread safe.
+        """
+        self._update_loading(self._canvas.thread_setup())
+        wx.CallAfter(self._post_thread_setup)
+
+    def _post_thread_setup(self):
+        """
+        Run any setup that is not thread safe.
+        """
+        self._update_loading(self._canvas.post_thread_setup())
+        edit_config: dict = config.get(EDIT_CONFIG_ID, {})
+        self._canvas.camera.perspective_fov = edit_config.get("options", {}).get(
+            "fov", 70.0
+        )
+        if self._canvas.camera.perspective_fov > 180:
+            self._canvas.camera.perspective_fov = 70.0
+        self._canvas.renderer.render_distance = edit_config.get("options", {}).get(
+            "render_distance", 5
+        )
+        self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
+            "camera_sensitivity", 2.0
+        )
+
+        self._temp_msg = None
+        self._temp_loading_bar = None
+        self._sizer.Clear(True)
+        self._sizer.Add(self._canvas, 1, wx.EXPAND)
+        self._canvas.Show()
+        self._canvas._set_size()
+
+        self.Layout()
         self._canvas.enable()
+        self._setup_thread = None
+
+    def can_disable(self) -> bool:
+        return self._setup_thread is None
 
     def disable(self):
         if self._canvas is not None:
@@ -92,17 +131,18 @@ class EditExtension(wx.Panel, BaseProgram):
         if self._canvas is not None:
             self._canvas.close()
 
-    def is_closeable(self) -> bool:
+    def can_close(self) -> bool:
         """
         Check if it is safe to close the UI.
         :return: True if the program can be closed, False otherwise
         """
-        if self._canvas is None:
-            # if the edit program has never been opened then it can be closed
+        if self._setup_thread is not None:
+            return False
+        elif self._canvas is None:
             return True
+        elif self._canvas.is_closeable():
+            return self._check_close_world()
         else:
-            if self._canvas.is_closeable():
-                return self._check_close_world()
             log.info(
                 f"The canvas in edit for world {self._world.level_wrapper.level_name} was not closeable for some reason."
             )

@@ -1,5 +1,5 @@
 import wx
-from typing import Union
+from typing import Union, Any
 
 from amulet_map_editor.programs.edit.api.edit_canvas_container import (
     EditCanvasContainer,
@@ -25,6 +25,16 @@ class BaseToolUI(EditCanvasContainer, CanvasToggleElement):
     def bind_events(self):
         """Bind all required events to the canvas.
         All events on the canvas will be automatically removed after the tool is disabled.
+        """
+        pass
+
+    def set_state(self, state: Any):
+        """
+        Set any state data.
+        In some cases one tool might bounce to another and want to do more than just starting it.
+        This will get called after enabling the tool.
+
+        :param state: The state to set. Validate that this data is correct because it may come from anywhere.
         """
         pass
 

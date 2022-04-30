@@ -1,5 +1,23 @@
+import wx
 from wx import glcanvas
 from .camera import Camera
+
+
+_SpeedChangedEventType = wx.NewEventType()
+EVT_SPEED_CHANGED = wx.PyEventBinder(_SpeedChangedEventType)
+
+
+class SpeedChangedEvent(wx.PyEvent):
+    """Run when the speed of the camera has changed."""
+
+    def __init__(self, speed: float):
+        wx.PyEvent.__init__(self, eventType=_SpeedChangedEventType)
+        self._speed = speed
+
+    @property
+    def speed(self) -> float:
+        """The speed of the camera."""
+        return self._speed
 
 
 class ControllableCamera(Camera):
@@ -22,6 +40,7 @@ class ControllableCamera(Camera):
     def move_speed(self, val: float):
         """Set the speed that the camera moves at."""
         self._move_speed = float(val)
+        wx.PostEvent(self.canvas, SpeedChangedEvent(self.move_speed))
 
     @property
     def rotate_speed(self) -> float:
