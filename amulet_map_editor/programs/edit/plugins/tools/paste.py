@@ -21,6 +21,7 @@ from amulet.utils.matrix import (
 
 from amulet_map_editor import lang
 from amulet_map_editor.api import image
+from amulet_map_editor.api.wx.util.validators import IntValidator, FloatValidator
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
@@ -52,6 +53,7 @@ BottomLeftRightExpand = BottomLeftRight | wx.EXPAND
 
 class TupleInput(wx.FlexGridSizer):
     WindowCls: Union[Type[wx.SpinCtrl], Type[wx.SpinCtrlDouble]] = None
+    Validator: Type[wx.Validator] = None
 
     def __init__(
         self,
@@ -71,6 +73,7 @@ class TupleInput(wx.FlexGridSizer):
         self.x = self.WindowCls(
             parent, min=min_value, max=max_value, initial=start_value, style=style
         )
+        self.x.SetValidator(self.Validator())
         self.Add(self.x, 0, wx.EXPAND)
 
         y_label = wx.StaticText(parent, label=y_str)
@@ -78,6 +81,7 @@ class TupleInput(wx.FlexGridSizer):
         self.y = self.WindowCls(
             parent, min=min_value, max=max_value, initial=start_value, style=style
         )
+        self.y.SetValidator(self.Validator())
         self.Add(self.y, 0, wx.EXPAND)
 
         z_label = wx.StaticText(parent, label=z_str)
@@ -85,6 +89,7 @@ class TupleInput(wx.FlexGridSizer):
         self.z = self.WindowCls(
             parent, min=min_value, max=max_value, initial=start_value, style=style
         )
+        self.z.SetValidator(self.Validator())
         self.Add(self.z, 0, wx.EXPAND)
         self.AddGrowableCol(1)
 
@@ -101,6 +106,7 @@ class TupleInput(wx.FlexGridSizer):
 
 class TupleIntInput(TupleInput):
     WindowCls = wx.SpinCtrl
+    Validator = IntValidator
 
     @property
     def value(self) -> Tuple[int, int, int]:
@@ -115,6 +121,7 @@ class TupleIntInput(TupleInput):
 
 class TupleFloatInput(TupleInput):
     WindowCls = wx.SpinCtrlDouble
+    Validator = FloatValidator
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
