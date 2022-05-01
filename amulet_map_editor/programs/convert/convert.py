@@ -1,8 +1,8 @@
 import wx
 from threading import Thread
 import webbrowser
-from typing import TYPE_CHECKING, Callable, Optional
 import logging
+from typing import TYPE_CHECKING, Optional
 
 from amulet import load_format
 from amulet.api.level import BaseLevel
@@ -12,6 +12,7 @@ from amulet_map_editor.api.wx.ui.simple import SimplePanel, SimpleScrollablePane
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.programs import BaseProgram
+from amulet_map_editor import close_level
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
@@ -20,13 +21,10 @@ log = logging.getLogger(__name__)
 
 
 class ConvertExtension(SimpleScrollablePanel, BaseProgram):
-    def __init__(
-        self, container, world: BaseLevel, close_self_callback: Callable[[], None]
-    ):
+    def __init__(self, container, world: BaseLevel):
         super().__init__(container)
         self._thread: Optional[Thread] = None
         self.world = world
-        self._close_self_callback = close_self_callback
 
         self._close_world_button = wx.Button(
             self, wx.ID_ANY, label=lang.get("world.close_world")
@@ -166,7 +164,7 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
         self.convert_button.Enable()
         wx.MessageBox(message)
 
-    def is_closeable(self):
+    def can_close(self):
         if self._thread is not None:
             log.info(
                 f"World {self.world.level_path} is still being converted. Please let it finish before closing"
@@ -175,4 +173,4 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
         return True
 
     def _close_world(self, evt):
-        self._close_self_callback()
+        close_level(self.world.level_path)

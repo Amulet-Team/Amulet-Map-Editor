@@ -3,7 +3,12 @@ from typing import TYPE_CHECKING, Optional
 import traceback
 import logging
 
-from amulet_map_editor.api.image import REFRESH_ICON
+import os
+import sys
+import subprocess
+
+from amulet_map_editor import log
+from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 
@@ -21,6 +26,8 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
     OperationGroupName = None
     _active_operation: Optional[OperationUIType]
 
+    ShowOpenFolder = True
+
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         BaseToolUI.__init__(self, canvas)
@@ -30,29 +37,36 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
         horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self._operation_choice = SimpleChoiceAny(self.canvas)
-        self._reload_operation = wx.BitmapButton(
-            self.canvas, bitmap=REFRESH_ICON.bitmap(16, 16)
-        )
-        self._reload_operation.SetToolTip("Reload Operations")
-
-        horizontal_sizer.Add(self._operation_choice)
-        horizontal_sizer.Add(self._reload_operation)
-
-        self.Add(horizontal_sizer)
-
         assert isinstance(
             self.OperationGroupName, str
         ), "OperationGroupName has not been set or is not a string."
-
+        # The operation selection
+        self._operation_choice = SimpleChoiceAny(self.canvas)
+        horizontal_sizer.Add(self._operation_choice)
         self._operations = UIOperationManager(self.OperationGroupName)
-
         self._operation_choice.SetItems(
             {op.identifier: op.name for op in self._operations.operations}
         )
         self._operation_choice.Bind(wx.EVT_CHOICE, self._on_operation_change)
 
+        # The reload button
+        self._reload_operation = wx.BitmapButton(
+            self.canvas, bitmap=image.REFRESH_ICON.bitmap(16, 16)
+        )
+        self._reload_operation.SetToolTip("Reload Operations")
+        horizontal_sizer.Add(self._reload_operation)
         self._reload_operation.Bind(wx.EVT_BUTTON, self._on_reload_operations)
+
+        # The open folder button
+        if self.ShowOpenFolder:
+            self._open_folder = wx.BitmapButton(
+                self.canvas, bitmap=image.TABLERICONS.folder.bitmap(16, 16)
+            )
+            self._open_folder.SetToolTip("Open Plugin Folder")
+            horizontal_sizer.Add(self._open_folder)
+            self._open_folder.Bind(wx.EVT_BUTTON, self._on_open_folder)
+
+        self.Add(horizontal_sizer)
 
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
         self.Add(self._operation_sizer, 1, wx.EXPAND)
@@ -163,3 +177,13 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
             self._setup_operation()
             self.canvas.reset_bound_events()
+
+    def _on_open_folder(self, evt):
+        path = self._operations.public_path
+        if not os.path.exists(path):
+            os.makedirs(path)
+        if sys.platform == "win32":
+            os.startfile(path)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])

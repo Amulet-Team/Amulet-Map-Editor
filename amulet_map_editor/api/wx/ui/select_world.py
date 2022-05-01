@@ -12,6 +12,7 @@ from amulet.api.errors import FormatError
 from amulet_map_editor import lang, CONFIG
 from amulet_map_editor.api.wx.ui import simple
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
+from amulet_map_editor.api.framework import app
 
 
 if TYPE_CHECKING:
@@ -360,3 +361,10 @@ class WorldSelectDialog(wx.Dialog):
             self.EndModal(0)
         else:
             self.Close()
+
+
+def open_level_from_dialog(parent: wx.Window):
+    """Show the open world dialog and open the selected world."""
+    select_world = WorldSelectDialog(parent, app.open_level)
+    select_world.ShowModal()
+    select_world.Destroy()

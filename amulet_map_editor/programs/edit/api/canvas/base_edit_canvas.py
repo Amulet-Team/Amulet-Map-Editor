@@ -78,7 +78,7 @@ class BaseEditCanvas(EventCanvas):
         self._mouse: MouseMovement = MouseMovement(self)
         self._mouse.set_middle()
 
-        # load the resource packs
+        # create the resource packs location
         try:
             os.makedirs("resource_packs", exist_ok=True)
             if not os.path.isfile("resource_packs/readme.txt"):
@@ -90,22 +90,13 @@ class BaseEditCanvas(EventCanvas):
             ) from e
 
         self._renderer: Optional[Renderer] = None
+        self._opengl_resource_pack = None
 
-    def __setattr__(self, name, value):
-        if not self.__dict__.get("_init", False) or hasattr(self, name):
-            super().__setattr__(name, value)
-        else:
-            print(name, value)
-            traceback.print_stack()
-
-    def setup(self) -> Generator[OperationYieldType, None, None]:
-        """Set up objects that take a while to set up.
-        If you want to extend setup subclass the _setup method not this method."""
-        yield from self._setup()
-        self._finalise()
-
-    def _setup(self) -> Generator[OperationYieldType, None, None]:
-        """Set up objects that take a while to set up."""
+    def thread_setup(self) -> Generator[OperationYieldType, None, None]:
+        """
+        Set up objects that take a while to set up.
+        All code in here must be thread safe.
+        """
         packs = []
         user_packs = [
             load_resource_pack(os.path.join("resource_packs", rp))
@@ -193,24 +184,25 @@ class BaseEditCanvas(EventCanvas):
         for i in resource_pack.reload():
             yield i / 4 + 0.5
 
-        opengl_resource_pack = OpenGLResourcePack(resource_pack, translator)
+        self._opengl_resource_pack = OpenGLResourcePack(resource_pack, translator)
 
         yield 0.75, lang.get("program_3d_edit.canvas.creating_texture_atlas")
-        for i in opengl_resource_pack.setup():
+        for i in self._opengl_resource_pack.setup():
             yield i / 4 + 0.75
 
+    def post_thread_setup(self) -> Generator[OperationYieldType, None, None]:
+        """
+        Any logic that needs to be run after everything has been set up.
+        Code here will be run from the main thread.
+        """
         yield 1.0, lang.get("program_3d_edit.canvas.setting_up_renderer")
-
         self._renderer: Optional[Renderer] = Renderer(
             self,
             self.world,
             self.context_identifier,
-            opengl_resource_pack,
+            self._opengl_resource_pack,
         )
 
-    def _finalise(self):
-        """Any logic that needs to be run after everything has been set up."""
-        self._init = True
         try:
             player = self.world.get_player(LOCAL_PLAYER)
             self._camera.location_rotation = player.location, player.rotation
@@ -293,8 +285,7 @@ class BaseEditCanvas(EventCanvas):
 
     def _set_size(self):
         size = self.GetClientSize() * self.GetContentScaleFactor()
-        width = size.width
-        height = size.height
+        width, height = size
         self.SetCurrent(self._context)
         glViewport(0, 0, width, height)
         if height > 0:

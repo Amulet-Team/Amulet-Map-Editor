@@ -32,6 +32,10 @@ class BaseOperationManager:
         self.reload()
 
     @property
+    def public_path(self) -> str:
+        return os.path.abspath(os.path.join(CUSTOM_PLUGINS_DIR, self._group_name))
+
+    @property
     def operations(self) -> Tuple[BaseOperationLoader, ...]:
         return tuple(self._operations.values())
 
@@ -50,9 +54,7 @@ class BaseOperationManager:
             os.path.join(STOCK_PLUGINS_DIR, self._group_name),
             ".".join([STOCK_PLUGINS_NAME, self._group_name]),
         )
-        self._load_external_submodules(
-            os.path.join(CUSTOM_PLUGINS_DIR, self._group_name)
-        )
+        self._load_external_submodules(self.public_path)
 
     def _load_internal_submodules(self, package_path: str, package_name: str):
         """
@@ -71,8 +73,6 @@ class BaseOperationManager:
 
         :param path: The path to the directory to find modules in.
         """
-        # clean the path
-        path = os.path.abspath(path)
 
         # create the directory
         os.makedirs(path, exist_ok=True)

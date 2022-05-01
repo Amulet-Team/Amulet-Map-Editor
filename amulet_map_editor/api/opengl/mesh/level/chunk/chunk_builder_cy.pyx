@@ -4,6 +4,7 @@
 
 import numpy
 cimport numpy
+numpy.import_array()
 
 from libc.stdlib cimport malloc, calloc, free
 

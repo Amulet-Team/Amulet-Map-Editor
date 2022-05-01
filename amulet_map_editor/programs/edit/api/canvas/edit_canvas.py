@@ -1,8 +1,9 @@
 import logging
+import warnings
 import wx
 from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
 from types import GeneratorType
-from threading import RLock
+from threading import RLock, Thread
 
 from .base_edit_canvas import BaseEditCanvas
 from ...edit import EDIT_CONFIG_ID
@@ -21,13 +22,15 @@ from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
 from amulet_map_editor import CONFIG
+from amulet_map_editor import close_level
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.goto import show_goto
 from amulet_map_editor.programs.edit.api.ui.tool_manager import ToolManagerSizer
-from amulet_map_editor.programs.edit.api.operations import (
+from amulet_map_editor.programs.edit.api.operations.errors import (
     OperationError,
-    OperationSuccessful,
     OperationSilentAbort,
+    BaseLoudException,
+    BaseSilentException,
 )
 from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_operations import (
     cut,
@@ -49,11 +52,13 @@ if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
 
 log = logging.getLogger(__name__)
+OperationType = Callable[[], OperationReturnType]
 
 
 def show_loading_dialog(
-    run: Callable[[], OperationReturnType], title: str, message: str, parent: wx.Window
+    run: OperationType, title: str, message: str, parent: wx.Window
 ) -> Any:
+    warnings.warn("show_loading_dialog is depreciated.", DeprecationWarning)
     dialog = wx.ProgressDialog(
         title,
         message,
@@ -90,10 +95,57 @@ def show_loading_dialog(
     return obj
 
 
+class OperationThread(Thread):
+    # The operation to run
+    _operation: OperationType
+
+    # Should the operation be stopped. Set externally
+    stop: bool
+    # The starting message for the progress dialog
+    message: str
+    # The operation progress (from 0-1)
+    progress: float
+    # The return value from the operation
+    out: Any
+    # The error raised if any
+    error: Optional[BaseException]
+
+    def __init__(self, operation: OperationType, message: str):
+        super().__init__()
+        self._operation = operation
+        self.stop = False
+        self.message = message
+        self.progress = 0.0
+        self.out = None
+        self.error = None
+
+    def run(self) -> None:
+        t = time.time()
+        try:
+            obj = self._operation()
+            if isinstance(obj, GeneratorType):
+                try:
+                    while True:
+                        if self.stop:
+                            raise OperationSilentAbort
+                        progress = next(obj)
+                        if isinstance(progress, (list, tuple)):
+                            if len(progress) >= 2:
+                                self.message = progress[1]
+                            if len(progress) >= 1:
+                                self.progress = progress[0]
+                        elif isinstance(progress, (int, float)):
+                            self.progress = progress
+                except StopIteration as e:
+                    self.out = e.value
+        except BaseException as e:
+            self.error = e
+        time.sleep(max(0.2 - time.time() + t, 0))
+
+
 class EditCanvas(BaseEditCanvas):
-    def __init__(self, parent: wx.Window, world: "BaseLevel", close_callback: Callable):
+    def __init__(self, parent: wx.Window, world: "BaseLevel"):
         super().__init__(parent, world)
-        self._close_callback = close_callback
         self._file_panel: Optional[FilePanel] = None
         self._tool_sizer: Optional[ToolManagerSizer] = None
         self.buttons.register_actions(self.key_binds)
@@ -104,8 +156,8 @@ class EditCanvas(BaseEditCanvas):
         # call run_operation to acquire it.
         self._edit_lock = RLock()
 
-    def _setup(self) -> Generator[OperationYieldType, None, None]:
-        yield from super()._setup()
+    def post_thread_setup(self) -> Generator[OperationYieldType, None, None]:
+        yield from super().post_thread_setup()
         canvas_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(canvas_sizer)
 
@@ -114,10 +166,6 @@ class EditCanvas(BaseEditCanvas):
 
         self._tool_sizer = ToolManagerSizer(self)
         canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
-
-    def _finalise(self):
-        super()._finalise()
-        self._tool_sizer.enable()
 
     def bind_events(self):
         """Set up all events required to run.
@@ -137,7 +185,7 @@ class EditCanvas(BaseEditCanvas):
         self._tool_sizer.disable()
 
     def _on_close(self, _):
-        self._close_callback()
+        close_level(self.world.level_path)
 
     @property
     def tools(self):
@@ -161,73 +209,103 @@ class EditCanvas(BaseEditCanvas):
 
     def run_operation(
         self,
-        operation: Callable[[], OperationReturnType],
+        operation: OperationType,
         title="Amulet",
         msg="Running Operation",
         throw_exceptions=False,
+    ) -> Any:
+        try:
+            out = self._run_operation(operation, title, msg, True)
+        except Exception as e:
+            if throw_exceptions:
+                raise e
+        else:
+            # If there were no errors create an undo point
+            def create_undo():
+                yield 0, "Creating Undo Point"
+                yield from self.create_undo_point_iter()
+
+            self._run_operation(create_undo, title, msg, False)
+
+            return out
+
+    def _run_operation(
+        self,
+        operation: OperationType,
+        title: str,
+        msg: str,
+        cancelable: bool,
     ) -> Any:
         with self._edit_lock:
             if self._operation_running:
                 raise Exception(
                     "run_operation cannot be called from within itself. "
-                    "This function has already been called by parent code so you do not need to run it again"
+                    "This function has already been called by parent code so you cannot run it again"
                 )
             self._operation_running = True
 
-            def operation_wrapper():
-                yield 0, "Disabling Threads"
-                self.renderer.disable_threads()
-                yield 0, msg
-                op = operation()
-                if isinstance(op, GeneratorType):
-                    yield from op
-                yield 0, "Creating Undo Point"
-                yield from self.create_undo_point_iter()
-                return op
+            self.renderer.disable_threads()
 
-            err = None
-            out = None
-            try:
-                out = show_loading_dialog(
-                    operation_wrapper,
-                    title,
-                    msg,
-                    self,
-                )
-            except OperationError as e:
-                msg = f"Error running operation: {e}"
-                log.info(msg)
+            style = (
+                wx.PD_APP_MODAL
+                | wx.PD_ELAPSED_TIME
+                | wx.PD_REMAINING_TIME
+                | wx.PD_AUTO_HIDE
+                | (wx.PD_CAN_ABORT * cancelable)
+            )
+            dialog = wx.ProgressDialog(
+                title,
+                msg,
+                maximum=10_000,
+                parent=self,
+                style=style,
+            )
+            dialog.Fit()
+
+            # Set up a thread to run the actual operation
+            op = OperationThread(operation, msg)
+            # run the operation
+            op.start()
+            while op.is_alive():
+                op.join(0.1)
+                dialog.Update(max(0, min(int(op.progress * 10_000), 9999)), op.message)
+                wx.Yield()
+                if dialog.WasCancelled():
+                    op.stop = True
+
+            dialog.Destroy()
+            wx.Yield()
+
+            if op.error is not None:
+                # If there is any kind of error restore the last undo point
                 self.world.restore_last_undo_point()
-                wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
-                err = e
-            except OperationSuccessful as e:
-                msg = str(e)
-                log.info(msg)
-                self.world.restore_last_undo_point()
-                wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
-                err = e
-            except OperationSilentAbort as e:
-                self.world.restore_last_undo_point()
-                err = e
-            except Exception as e:
-                log.error(traceback.format_exc())
-                dialog = TracebackDialog(
-                    self,
-                    "Exception while running operation",
-                    str(e),
-                    traceback.format_exc(),
-                )
-                dialog.ShowModal()
-                dialog.Destroy()
-                err = e
-                self.world.restore_last_undo_point()
+
+                if isinstance(op.error, BaseLoudException):
+                    msg = str(op.error)
+                    if isinstance(op.error, OperationError):
+                        msg = f"Error running operation: {msg}"
+                    log.info(msg)
+                    wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
+                elif isinstance(op.error, BaseSilentException):
+                    pass
+                elif isinstance(op.error, BaseException):
+                    log.error(traceback.format_exc())
+                    dialog = TracebackDialog(
+                        self,
+                        "Exception while running operation",
+                        str(op.error),
+                        traceback.format_exc(),
+                    )
+                    dialog.ShowModal()
+                    dialog.Destroy()
+                    self.world.restore_last_undo_point()
 
             self.renderer.enable_threads()
             self.renderer.render_world.rebuild_changed()
             self._operation_running = False
-            if err is not None and throw_exceptions:
-                raise err
-            return out
+            if op.error is not None:
+                raise op.error
+            return op.out
 
     def create_undo_point(self, world=True, non_world=True):
         self.world.create_undo_point(world, non_world)
@@ -323,8 +401,6 @@ class EditCanvas(BaseEditCanvas):
             self.selection.selection_corners = []
 
     def save(self):
-        self.renderer.disable_threads()
-
         def save():
             yield 0, "Running Pre-Save Operations."
             pre_save_op = self.world.pre_save_operation()
@@ -341,6 +417,5 @@ class EditCanvas(BaseEditCanvas):
             for chunk_index, chunk_count in self.world.save_iter():
                 yield chunk_index / chunk_count
 
-        show_loading_dialog(save, "Saving world.", "Please wait.", self)
+        self._run_operation(save, "Saving world.", "Please wait.", False)
         wx.PostEvent(self, SaveEvent())
-        self.renderer.enable_threads()
