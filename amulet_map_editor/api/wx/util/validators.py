@@ -8,6 +8,7 @@ SpecialChrs = {
     wx.WXK_HOME,
     wx.WXK_LEFT,
     wx.WXK_RIGHT,
+    wx.WXK_RETURN,
 }
 
 
