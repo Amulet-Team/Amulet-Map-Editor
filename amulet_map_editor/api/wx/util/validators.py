@@ -9,7 +9,7 @@ SpecialChrs = {
     wx.WXK_LEFT,
     wx.WXK_RIGHT,
     wx.WXK_RETURN,
-    *range(1, 27)
+    *range(1, 27),
 }
 
 

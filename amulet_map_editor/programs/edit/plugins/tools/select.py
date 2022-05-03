@@ -125,32 +125,32 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._x1 = self._add_spin_ctrl(
             lang.get("program_3d_edit.select_tool.scroll_point_x1"),
             lang.get("program_3d_edit.select_tool.scroll_point_x1_tooltip"),
-            (160, 215, 145)
+            (160, 215, 145),
         )
         self._y1 = self._add_spin_ctrl(
             lang.get("program_3d_edit.select_tool.scroll_point_y1"),
             lang.get("program_3d_edit.select_tool.scroll_point_y1_tooltip"),
-            (160, 215, 145)
+            (160, 215, 145),
         )
         self._z1 = self._add_spin_ctrl(
             lang.get("program_3d_edit.select_tool.scroll_point_z1"),
             lang.get("program_3d_edit.select_tool.scroll_point_z1_tooltip"),
-            (160, 215, 145)
+            (160, 215, 145),
         )
         self._x2 = self._add_spin_ctrl(
             lang.get("program_3d_edit.select_tool.scroll_point_x2"),
             lang.get("program_3d_edit.select_tool.scroll_point_x2_tooltip"),
-            (150, 150, 215)
+            (150, 150, 215),
         )
         self._y2 = self._add_spin_ctrl(
             lang.get("program_3d_edit.select_tool.scroll_point_y2"),
             lang.get("program_3d_edit.select_tool.scroll_point_y2_tooltip"),
-            (150, 150, 215)
+            (150, 150, 215),
         )
         self._z2 = self._add_spin_ctrl(
             lang.get("program_3d_edit.select_tool.scroll_point_z2"),
             lang.get("program_3d_edit.select_tool.scroll_point_z2_tooltip"),
-            (150, 150, 215)
+            (150, 150, 215),
         )
 
         self._box_size_selector_fstring = lang.get(
@@ -240,12 +240,22 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._point2_move.disable()
         self._selection_move.disable()
 
-    def _add_spin_ctrl(self, label: str, tooltip: str, colour: Tuple[int, int, int]) -> wx.SpinCtrl:
+    def _add_spin_ctrl(
+        self, label: str, tooltip: str, colour: Tuple[int, int, int]
+    ) -> wx.SpinCtrl:
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._button_panel.GetSizer().Add(sizer, 0, wx.EXPAND)
         name_text = wx.StaticText(self._button_panel, label=label)
         sizer.Add(name_text, flag=wx.ALIGN_CENTER | wx.ALL, border=5)
-        obj = wx.SpinCtrl(self._button_panel, style=wx.SP_ARROW_KEYS | wx.TE_PROCESS_ENTER | wx.ALIGN_CENTER_VERTICAL | wx.WANTS_CHARS, min=-30000000,max=30000000)
+        obj = wx.SpinCtrl(
+            self._button_panel,
+            style=wx.SP_ARROW_KEYS
+            | wx.TE_PROCESS_ENTER
+            | wx.ALIGN_CENTER_VERTICAL
+            | wx.WANTS_CHARS,
+            min=-30000000,
+            max=30000000,
+        )
         sizer.Add(obj, 1, flag=wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, border=5)
         obj.Bind(wx.EVT_SPINCTRL, self._box_input_change)
         obj.SetValidator(IntValidator())
