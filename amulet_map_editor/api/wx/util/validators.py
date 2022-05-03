@@ -9,6 +9,7 @@ SpecialChrs = {
     wx.WXK_LEFT,
     wx.WXK_RIGHT,
     wx.WXK_RETURN,
+    *range(1, 27)
 }
 
 
@@ -36,9 +37,11 @@ class BaseValidator(wx.Validator):
 
 
 class IntValidator(BaseValidator):
-    def OnChar(self, event):
+    def OnChar(self, event: wx.KeyEvent):
         keycode = int(event.GetKeyCode())
         if keycode in SpecialChrs or 48 <= keycode <= 57 or keycode == 45:
+            event.Skip()
+        elif event.ControlDown():
             event.Skip()
 
 
