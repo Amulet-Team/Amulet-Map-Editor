@@ -50,6 +50,12 @@ main_menu.open_world=Open World
 main_menu.help=Help
 main_menu.discord=Amulet Discord
 
+# Warning Dialog
+warning_dialog.title=Welcome to Amulet
+warning_dialog.content=Hello and welcome to Amulet.\n\nWe suggest creating backups of your worlds before opening them in Amulet.\n\nWe try to make sure that Amulet does not corrupt worlds but the save format is undocumented and constantly changing and sometimes we just get things wrong.\n\nFor these reasons we only officially support full releases we have tested against.\nJava snapshots, Bedrock betas and experimental features may work but are untested so not officially supported.\n\nCurrently entities are not supported and items are only supported within the same platform.\nIf you find a feature you want added or a bug that needs fixing report it on our bug tracker.\nPlease use the search tool to see if it has been reported before creating a new ticket.\n\nIf you are new we suggest reading the user manual to familiarise yourself with the program.\n\n- The Amulet Team
+warning_dialog.do_not_show_again=Do not show this again
+warning_dialog.i_understand=I Understand
+
 # Update check
 ## The window displayed when a newer version of Amulet is available
 update_check.newer_version_released=A new version of Amulet has been released!
