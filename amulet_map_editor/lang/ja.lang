@@ -47,7 +47,8 @@ menu_bar.help.menu_name=ヘルプ(&H)
 ## スタート画面
 main_menu.tab_name=メインメニュー
 main_menu.open_world=ワールドを開く
-main_menu.help=Help
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Amulet Discord
 
 # アップデートチェック

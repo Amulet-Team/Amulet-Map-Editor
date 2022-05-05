@@ -38,13 +38,21 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         )
         sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
 
-        self._help_button = wx.Button(
-            self, label=lang.get("main_menu.help"), size=(400, 70)
+        self._user_manual_button = wx.Button(
+            self, label=lang.get("main_menu.user_manual"), size=(400, 70)
         )
-        self._help_button.SetToolTip(lang.get("app.browser_open_tooltip"))
-        self._help_button.SetFont(button_font)
-        self._help_button.Bind(wx.EVT_BUTTON, self._documentation)
-        sizer.Add(self._help_button, 0, wx.ALL | wx.CENTER, 5)
+        self._user_manual_button.SetToolTip(lang.get("app.browser_open_tooltip"))
+        self._user_manual_button.SetFont(button_font)
+        self._user_manual_button.Bind(wx.EVT_BUTTON, self._documentation)
+        sizer.Add(self._user_manual_button, 0, wx.ALL | wx.CENTER, 5)
+
+        self._bug_tracker_button = wx.Button(
+            self, label=lang.get("main_menu.bug_tracker"), size=(400, 70)
+        )
+        self._bug_tracker_button.SetToolTip(lang.get("app.browser_open_tooltip"))
+        self._bug_tracker_button.SetFont(button_font)
+        self._bug_tracker_button.Bind(wx.EVT_BUTTON, self._bugs)
+        sizer.Add(self._bug_tracker_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._discord_button = wx.Button(
             self, label=lang.get("main_menu.discord"), size=(400, 70)
@@ -60,6 +68,12 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
     def _documentation(_):
         webbrowser.open(
             "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/readme.md"
+        )
+
+    @staticmethod
+    def _bugs(_):
+        webbrowser.open(
+            "https://github.com/Amulet-Team/Amulet-Map-Editor/issues?q=is%3Aissue"
         )
 
     @staticmethod

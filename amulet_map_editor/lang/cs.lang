@@ -47,7 +47,8 @@ menu_bar.help.menu_name=&Nápověda
 ## The start screen
 main_menu.tab_name=Hlavní nabídka
 main_menu.open_world=Otevřít svět
-main_menu.help=Nápověda
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Amulet Discord
 
 # Update check

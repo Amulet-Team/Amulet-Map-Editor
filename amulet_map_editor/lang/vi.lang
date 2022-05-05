@@ -47,7 +47,8 @@ menu_bar.help.menu_name=T&rợ giúp
 ## The start screen
 main_menu.tab_name=Bảng chọn chính
 main_menu.open_world=Mở thế giới
-main_menu.help=Trợ giúp
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Discord của Amulet
 
 # Update check

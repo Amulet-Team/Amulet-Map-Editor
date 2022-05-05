@@ -22,7 +22,8 @@ menu_bar.help.menu_name=帮助
 ## The start screen
 main_menu.tab_name=主菜单
 main_menu.open_world=打开世界
-main_menu.help=帮助
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Amulet Discord
 
 # Update check

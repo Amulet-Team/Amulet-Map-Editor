@@ -47,7 +47,8 @@ menu_bar.help.menu_name=&Aide
 ## L'écran d'accueil
 main_menu.tab_name=Menu Principal
 main_menu.open_world=Ouvrir un monde
-main_menu.help=Aide
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Discord d'Amulet
 
 # Vérification de mise à jour

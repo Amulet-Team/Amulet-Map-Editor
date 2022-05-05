@@ -20,7 +20,8 @@ menu_bar.help.menu_name=&Bantuan
 # Main menu
 main_menu.tab_name=Menu Utama
 main_menu.open_world=Buka Dunia
-main_menu.help=Bantuan
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Discord Amulet
 
 # Update check
