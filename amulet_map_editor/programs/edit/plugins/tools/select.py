@@ -262,22 +262,6 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         obj.Disable()
         obj.SetToolTip(tooltip)
         obj.SetBackgroundColour(colour)
-
-        def chr_hk(evt: wx.KeyEvent):
-            # there might be a better way to do this
-            # currently the event seems to get passed up the UI allowing the menu to handle it first
-            # ideally the widget should get the chance to handle it and if it doesn't it should go to the menu
-            key = evt.GetKeyCode()
-            if key == wx.WXK_DELETE:
-                return
-            elif evt.ControlDown():
-                if key in (ord("c"), ord("C")):
-                    wx.UIActionSimulator().KeyDown(wx.WXK_CONTROL_C)
-                return
-            evt.Skip()
-
-        obj.Bind(wx.EVT_CHAR_HOOK, chr_hk)
-
         return obj
 
     def _box_input_change(self, _):
