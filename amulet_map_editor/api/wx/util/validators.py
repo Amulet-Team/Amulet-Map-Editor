@@ -39,9 +39,12 @@ class BaseValidator(wx.Validator):
 class IntValidator(BaseValidator):
     def OnChar(self, event: wx.KeyEvent):
         keycode = int(event.GetKeyCode())
-        if keycode in SpecialChrs or 48 <= keycode <= 57 or keycode == 45:
-            event.Skip()
-        elif event.ControlDown():
+        if (
+            keycode in SpecialChrs
+            or event.ControlDown()
+            or 48 <= keycode <= 57
+            or keycode == 45
+        ):
             event.Skip()
 
 
