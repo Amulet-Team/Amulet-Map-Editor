@@ -161,7 +161,6 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         """Disable a page. Defaults to the current page."""
         page = self.GetSelection() if page is None else page
         if page != wx.NOT_FOUND:
-            print("disable", self.GetPage(page))
             try:
                 self.GetPage(page).disable()
             except Exception as e:
@@ -172,7 +171,6 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         """Enable a page. Defaults to the current page."""
         page = self.GetSelection() if page is None else page
         if page != wx.NOT_FOUND:
-            print("enable", self.GetPage(page))
             try:
                 self.GetPage(page).enable()
                 self.GetTopLevelParent().create_menu()

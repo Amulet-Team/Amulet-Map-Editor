@@ -16,7 +16,8 @@ menu_bar.help.menu_name=&
 
 main_menu.tab_name=메인 메뉴
 main_menu.open_world=오픈 월드
-main_menu.help=도움말
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=아뮬렛 디스코드
 
 update_check.newer_version_released=아뮬렛의 새 버전이 출시되었습니다!

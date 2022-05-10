@@ -47,7 +47,8 @@ menu_bar.help.menu_name=&Помощь
 ## Начальный экран
 main_menu.tab_name=Главное Меню
 main_menu.open_world=Открыть мир
-main_menu.help=Помощь
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Амулет Дискорд
 
 # Проверка обновлений

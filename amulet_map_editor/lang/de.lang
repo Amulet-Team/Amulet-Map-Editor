@@ -20,7 +20,8 @@ menu_bar.help.menu_name=&Hilfe
 ## The start screen
 main_menu.tab_name=Hauptmenü
 main_menu.open_world=Welt öffnen
-main_menu.help=Hilfe
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Amulet auf Discord
 
 # Update check
