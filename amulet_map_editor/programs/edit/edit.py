@@ -1,16 +1,13 @@
 from typing import TYPE_CHECKING, Optional, Generator
 import webbrowser
 import logging
-
-EDIT_CONFIG_ID = "amulet_edit"
-
 from threading import Thread
 
 import wx
 
-EDIT_CONFIG_ID = "amulet_edit"
-
 from amulet.api.data_types import OperationYieldType
+
+EDIT_CONFIG_ID = "amulet_edit"
 
 from amulet_map_editor import lang
 from amulet_map_editor.api.framework.programs import BaseProgram
