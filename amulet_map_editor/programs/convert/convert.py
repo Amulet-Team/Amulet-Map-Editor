@@ -1,31 +1,27 @@
 import wx
-from concurrent.futures import ThreadPoolExecutor
+from threading import Thread
 import webbrowser
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Optional
 
 from amulet import load_format
 from amulet.api.level import BaseLevel
 
 from amulet_map_editor import lang, log
-from amulet_map_editor.api.wx.ui.simple import SimplePanel
+from amulet_map_editor.api.wx.ui.simple import SimplePanel, SimpleScrollablePanel
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.programs import BaseProgram
+from amulet_map_editor import close_level
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
 
-thread_pool_executor = ThreadPoolExecutor(max_workers=1)
-work_count = 0
 
-
-class ConvertExtension(SimplePanel, BaseProgram):
-    def __init__(
-        self, container, world: BaseLevel, close_self_callback: Callable[[], None]
-    ):
-        SimplePanel.__init__(self, container)
+class ConvertExtension(SimpleScrollablePanel, BaseProgram):
+    def __init__(self, container, world: BaseLevel):
+        super().__init__(container)
+        self._thread: Optional[Thread] = None
         self.world = world
-        self._close_self_callback = close_self_callback
 
         self._close_world_button = wx.Button(
             self, wx.ID_ANY, label=lang.get("world.close_world")
@@ -142,13 +138,10 @@ class ConvertExtension(SimplePanel, BaseProgram):
             wx.MessageBox(lang.get("program_convert.select_before_converting"))
             return
         self.convert_button.Disable()
-        global work_count
-        work_count += 1
-        thread_pool_executor.submit(self._convert_method)
-        # self.world.save(self.out_world, self._update_loading_bar)
+        self._thread = Thread(target=self._convert_method)
+        self._thread.start()
 
     def _convert_method(self):
-        global work_count
         try:
             out_world = load_format(self.out_world_path)
             log.info(f"Converting world {self.world.level_path} to {out_world.path}")
@@ -164,16 +157,17 @@ class ConvertExtension(SimplePanel, BaseProgram):
             message = f"Error during conversion\n{e}"
             log.error(message, exc_info=True)
         self._update_loading_bar(0, 100)
+        self._thread = None
         self.convert_button.Enable()
         wx.MessageBox(message)
-        work_count -= 1
 
-    def is_closeable(self):
-        if work_count:
+    def can_close(self):
+        if self._thread is not None:
             log.info(
                 f"World {self.world.level_path} is still being converted. Please let it finish before closing"
             )
-        return work_count == 0
+            return False
+        return True
 
     def _close_world(self, evt):
-        self._close_self_callback()
+        close_level(self.world.level_path)

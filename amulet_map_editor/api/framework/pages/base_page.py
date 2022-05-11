@@ -1,15 +1,7 @@
 from amulet_map_editor.api.datatypes import MenuData
+from amulet_map_editor.api.framework.base_tab import BaseTab
 
 
-class BasePageUI:
-    def disable(self):
-        pass
-
-    def enable(self):
-        pass
-
-    def close(self):
-        pass
-
+class BasePageUI(BaseTab):
     def menu(self, menu: MenuData) -> MenuData:
         return menu

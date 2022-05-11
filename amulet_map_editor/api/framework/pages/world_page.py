@@ -1,7 +1,7 @@
 import threading
 
 import wx
-from typing import List, Callable, Tuple, Type, Union, Optional
+from typing import List, Tuple, Type, Union, Optional
 import traceback
 import importlib
 import pkgutil
@@ -11,6 +11,7 @@ from amulet import load_level
 
 from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
+from amulet_map_editor.api.framework import app
 from amulet_map_editor.api.framework.pages import BasePageUI
 from amulet_map_editor.api.framework.programs import BaseProgram, AboutProgram
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
@@ -60,22 +61,24 @@ def load_extension(
 
 
 class WorldPageUI(wx.Notebook, BasePageUI):
-    def __init__(
-        self, parent: wx.Window, path: str, close_self_callback: Callable[[], None]
-    ):
+    def __init__(self, parent: wx.Window, path: str):
         super().__init__(parent, style=wx.NB_LEFT)
         self._path = path
-        self._close_self_callback = close_self_callback
         try:
             self.world = load_level(path)
         except LoaderNoneMatched as e:
             self.Destroy()
             raise e
         self.world_name = self.world.level_wrapper.level_name
-        self._extensions: List[BaseProgram] = []
-        self._active_extension: int = -1
         self._load_extensions()
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
+        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self._page_changing, self)
+        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_changed, self)
+
+    def GetPage(self, page) -> BaseProgram:
+        wx_page = super().GetPage(page)
+        if not isinstance(wx_page, BaseProgram):
+            raise Exception("GetPage did not return BaseProgram instance.")
+        return wx_page
 
     @property
     def path(self) -> str:
@@ -85,9 +88,10 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "exit", {}
         ).setdefault(
-            lang.get("menu_bar.file.close_world"), lambda evt: self._close_self_callback
+            lang.get("menu_bar.file.close_world"),
+            lambda evt: app.close_level(self.path),
         )
-        return self._extensions[self.GetSelection()].menu(menu)
+        return self.GetPage(self.GetSelection()).menu(menu)
 
     def _load_extensions(self):
         """Load and create instances of each of the extensions"""
@@ -95,8 +99,7 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         select = True
         for extension_name, extension in _extensions:
             try:
-                ext = extension(self, self.world, self._close_self_callback)
-                self._extensions.append(ext)
+                ext = extension(self, self.world)
                 self.AddPage(ext, extension_name, select)
                 select = False
             except Exception as e:
@@ -105,15 +108,19 @@ class WorldPageUI(wx.Notebook, BasePageUI):
                 )
                 continue
 
-    def is_closeable(self) -> bool:
+    def can_close(self) -> bool:
         """Check if all extensions are safe to be closed"""
-        return all(e.is_closeable() for e in self._extensions)
+        return all(
+            self.GetPage(page).can_close() for page in range(self.GetPageCount())
+        )
 
     def close(self):
-        """Close the world and destroy the UI
-        Check is_closeable before running this"""
-        for ext in self._extensions:
-            ext.close()
+        """
+        Close the world and destroy the UI
+        Check can_close before running this
+        """
+        for page in range(self.GetPageCount()):
+            self.GetPage(page).close()
 
         # close the world in a new thread
         thread = threading.Thread(target=self.world.close)
@@ -137,42 +144,58 @@ class WorldPageUI(wx.Notebook, BasePageUI):
                 thread.join(0.1)
             dialog.Destroy()
 
-    def _page_change(self, _):
-        """Method to fire when the page is changed"""
-        if self.GetSelection() != self._active_extension:
-            self._enable_active()
+    def _page_changing(self, evt: wx.BookCtrlEvent):
+        """Method to fire when the page is changing."""
+        if (
+            self.GetSelection() != wx.NOT_FOUND
+            and not self.GetPage(self.GetSelection()).can_disable()
+        ):
+            evt.Veto()
 
-    def _disable_active(self):
-        if self._active_extension >= 0:
+    def _page_changed(self, evt: wx.BookCtrlEvent):
+        """Method to fire when the page has changed."""
+        self._disable_page(evt.GetOldSelection())
+        self._enable_page(evt.GetSelection())
+
+    def _disable_page(self, page: Optional[int] = None):
+        """Disable a page. Defaults to the current page."""
+        page = self.GetSelection() if page is None else page
+        if page != wx.NOT_FOUND:
             try:
-                self._extensions[self._active_extension].disable()
+                self.GetPage(page).disable()
             except Exception as e:
                 log.critical(traceback.format_exc())
-            finally:
-                self._active_extension = -1
+                # raise e
 
-    def _enable_active(self):
-        self._disable_active()
-        try:
-            self._extensions[self.GetSelection()].enable()
-            self.GetGrandParent().create_menu()
-        except Exception as e:
-            log.critical(traceback.format_exc())
-            dialog = TracebackDialog(
-                self, "Exception loading sub-program", str(e), traceback.format_exc()
-            )
-            dialog.ShowModal()
-            dialog.Destroy()
-            self._extensions.pop(self.GetSelection())
-            self._active_extension = -1
-            self.DeletePage(self.GetSelection())
-        else:
-            self._active_extension = self.GetSelection()
+    def _enable_page(self, page: Optional[int] = None):
+        """Enable a page. Defaults to the current page."""
+        page = self.GetSelection() if page is None else page
+        if page != wx.NOT_FOUND:
+            try:
+                self.GetPage(page).enable()
+                self.GetTopLevelParent().create_menu()
+            except Exception as e:
+                log.critical(traceback.format_exc())
+                dialog = TracebackDialog(
+                    self,
+                    "Exception loading sub-program",
+                    str(e),
+                    traceback.format_exc(),
+                )
+                dialog.ShowModal()
+                dialog.Destroy()
+                self.DeletePage(page)
+
+    def can_disable(self) -> bool:
+        return (
+            self.GetSelection() == wx.NOT_FOUND
+            or self.GetPage(self.GetSelection()).can_disable()
+        )
 
     def disable(self):
         """Disable all containers in the world page"""
-        self._disable_active()
+        self._disable_page()
 
     def enable(self):
         """Enable the world page"""
-        self._enable_active()
+        self._enable_page()

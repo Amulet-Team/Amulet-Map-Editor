@@ -1,3 +1,30 @@
+#This license applies to this file only.
+#
+#-- begin license --
+#MIT License
+#
+#Copyright (c) 2021 Amulet-Team
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+#-- end license --
+
+
 # Important notes
 ## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
 ## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
@@ -23,6 +50,9 @@
 ## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
 ## This pattern must stay in the translated entries for them to work properly
 
+# Meta
+meta.amulet=Amulet
+
 # Shared strings
 shared.check_console=Check the console for more details.
 
@@ -47,8 +77,20 @@ menu_bar.help.menu_name=&Help
 ## The start screen
 main_menu.tab_name=Main Menu
 main_menu.open_world=Open World
-main_menu.help=Help
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Amulet Discord
+
+# Language Select
+language_select.title=Language Select
+language_select.help=Select the language to use in Amulet from the list below.
+language_select.contribute=If you want to fix or add translations click here.
+
+# Warning Dialog
+warning_dialog.title=Welcome to Amulet
+warning_dialog.content=Hello and welcome to Amulet.\n\nWe suggest creating backups of your worlds before opening them in Amulet.\n\nWe try to make sure that Amulet does not corrupt worlds but the save format is undocumented and constantly changing and sometimes we just get things wrong.\n\nFor these reasons we only officially support full releases we have tested against.\nJava snapshots, Bedrock betas and experimental features may work but are untested so not officially supported.\n\nCurrently entities are not supported and items are only supported within the same platform.\nIf you find a feature you want added or a bug that needs fixing report it on our bug tracker.\nPlease use the search tool to see if it has been reported before creating a new ticket.\n\nIf you are new we suggest reading the user manual to familiarise yourself with the program.\n\n- The Amulet Team
+warning_dialog.do_not_show_again=Do not show this again
+warning_dialog.i_understand=I Understand
 
 # Update check
 ## The window displayed when a newer version of Amulet is available
@@ -217,6 +259,9 @@ program_3d_edit.goto_ui.paste_button_tooltip=Paste a previously copied coordinat
 program_3d_edit.file_ui.version_tooltip=Platform and data version of the world
 program_3d_edit.file_ui.projection_tooltip=Change view
 program_3d_edit.file_ui.location_tooltip=Move camera
+program_3d_edit.file_ui.speed_blocks_per_second=bps
+program_3d_edit.file_ui.speed_tooltip=Camera speed in blocks per second
+program_3d_edit.file_ui.speed_dialog_name=Set camera speed
 program_3d_edit.file_ui.dim_tooltip=Select dimension
 program_3d_edit.file_ui.undo_tooltip=Undo
 program_3d_edit.file_ui.redo_tooltip=Redo
