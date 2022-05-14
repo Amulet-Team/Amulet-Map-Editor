@@ -135,7 +135,9 @@ class EditExtension(wx.Panel, BaseProgram):
             self._canvas.Show()
             self._canvas._set_size()
             self.Layout()
-            wx.CallAfter(self._canvas.enable)  # This must be called after the show handler is run
+            wx.CallAfter(
+                self._canvas.enable
+            )  # This must be called after the show handler is run
             self._setup_thread = None
         except Exception as e:
             wx.CallAfter(self._display_error, str(e), traceback.format_exc())

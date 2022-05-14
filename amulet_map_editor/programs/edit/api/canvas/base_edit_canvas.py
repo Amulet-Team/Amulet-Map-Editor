@@ -198,16 +198,19 @@ class BaseEditCanvas(EventCanvas):
             self._opengl_resource_pack,
         )
 
-        try:
-            player = self.world.get_player(LOCAL_PLAYER)
-            self._camera.location_rotation = player.location, player.rotation
-            self.dimension = player.dimension
-        except:
-            self._camera.location_rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
-
     def _init_opengl(self):
         super()._init_opengl()
         glClearColor(*self.background_colour, 1.0)
+
+        try:
+            player = self.world.get_player(LOCAL_PLAYER)
+            location, rotation = player.location, player.rotation
+            self.dimension = player.dimension
+        except:
+            location, rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
+
+        self._camera.location_rotation = location, rotation
+        self._renderer.move_camera(location, rotation)
 
     def bind_events(self):
         """Set up all events required to run.

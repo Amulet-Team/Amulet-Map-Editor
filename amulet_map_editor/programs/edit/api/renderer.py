@@ -188,9 +188,10 @@ class Renderer(EditCanvasContainer):
 
     def _on_camera_moved(self, evt: CameraMovedEvent):
         """The camera has moved. Update each class's camera state."""
-        location = evt.camera_location
-        rotation = evt.camera_rotation
+        self.move_camera(evt.camera_location, evt.camera_rotation)
+        evt.Skip()
 
+    def move_camera(self, location, rotation):
         # TODO: add combined methods
         self.render_world.camera_location = location
         self.render_world.camera_rotation = rotation
@@ -199,8 +200,6 @@ class Renderer(EditCanvasContainer):
         self.fake_levels.set_camera_rotation(*rotation)
 
         self.sky_box.set_camera_location(location)
-
-        evt.Skip()
 
     def _do_draw(self, evt):
         wx.PostEvent(self.canvas, PreDrawEvent())

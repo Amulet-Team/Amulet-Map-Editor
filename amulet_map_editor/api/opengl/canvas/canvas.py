@@ -52,8 +52,6 @@ class BaseCanvas(glcanvas.GLCanvas):
         if not self._context.IsOK():
             raise Exception(f"Failed setting up context")
 
-        # self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
-
         self._init = False
 
         self.Bind(wx.EVT_SHOW, self._on_show)
