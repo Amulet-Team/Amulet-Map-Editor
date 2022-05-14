@@ -149,6 +149,9 @@ class EditCanvas(BaseEditCanvas):
         self._tool_sizer: Optional[ToolManagerSizer] = None
         self.buttons.register_actions(self.key_binds)
 
+        self._canvas_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self._canvas_sizer)
+
         # Tracks if an operation has been started and not finished.
         self._operation_running = False
         # This lock stops two threads from editing the world simultaneously
@@ -157,14 +160,14 @@ class EditCanvas(BaseEditCanvas):
 
     def post_thread_setup(self) -> Generator[OperationYieldType, None, None]:
         yield from super().post_thread_setup()
-        canvas_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(canvas_sizer)
-
         self._file_panel = FilePanel(self)
-        canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
+        self._canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
 
+    def _init_opengl(self):
+        super()._init_opengl()
         self._tool_sizer = ToolManagerSizer(self)
-        canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
+        self._canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
+        # self.enable()
 
     def bind_events(self):
         """Set up all events required to run.

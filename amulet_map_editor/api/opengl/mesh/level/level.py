@@ -60,9 +60,7 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         self._draw_floor = draw_floor
         self._draw_ceil = draw_ceil
         self._limit_bounds = limit_bounds
-        self._selection = GreenRenderSelectionGroup(
-            context_identifier, self.resource_pack, self.level.bounds(self.dimension)
-        )
+        self._selection = None
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
 
         self._last_rebuild_camera_location: Optional[
@@ -272,6 +270,12 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
     def draw(self, camera_matrix: TransformationMatrix):
         self._chunk_manager.draw(camera_matrix, self.camera_location)
         if self._draw_box:
+            if self._selection is None:
+                self._selection = GreenRenderSelectionGroup(
+                    self.context_identifier,
+                    self.resource_pack,
+                    self.level.bounds(self.dimension),
+                )
             self._selection.draw(
                 camera_matrix,
                 self.camera_location,
