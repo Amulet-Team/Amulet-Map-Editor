@@ -167,7 +167,6 @@ class EditCanvas(BaseEditCanvas):
         super()._init_opengl()
         self._tool_sizer = ToolManagerSizer(self)
         self._canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
-        # self.enable()
 
     def bind_events(self):
         """Set up all events required to run.
