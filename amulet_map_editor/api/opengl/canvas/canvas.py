@@ -68,7 +68,6 @@ class BaseCanvas(glcanvas.GLCanvas):
 
     def _on_show(self, evt: wx.ShowEvent):
         if not self._init and evt.IsShown():
-            print("show")
             self._init = True
             self._init_opengl()
 
