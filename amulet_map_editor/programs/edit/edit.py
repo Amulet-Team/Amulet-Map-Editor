@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Optional, Generator
 import webbrowser
 from threading import Thread
+import traceback
 
 import wx
 
@@ -12,6 +13,7 @@ from amulet_map_editor import log, lang
 from amulet_map_editor.api.framework.programs import BaseProgram
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.programs.edit.api.canvas.edit_canvas import EditCanvas
 from amulet_map_editor.programs.edit.api.key_config import (
@@ -63,6 +65,7 @@ class EditExtension(wx.Panel, BaseProgram):
     def enable(self):
         if self._canvas is None:
             self._canvas = EditCanvas(self, self._world)
+            self._canvas.Hide()
             self._setup_thread = Thread(target=self._thread_setup)
             self._setup_thread.start()
         else:
@@ -81,43 +84,64 @@ class EditExtension(wx.Panel, BaseProgram):
                 self._temp_msg.SetLabel(arg[1])
             self.Layout()
 
+    def _display_error(self, msg, tb):
+        dialog = TracebackDialog(
+            self,
+            "Exception while setting up canvas",
+            msg,
+            tb,
+        )
+        dialog.ShowModal()
+        dialog.Destroy()
+        self.Destroy()
+
     def _thread_setup(self):
         """
         Setup and enable all the UI elements.
         This can take a while to run so should be done in a new thread.
         Everything in here must be thread safe.
         """
-        self._update_loading(self._canvas.thread_setup())
-        wx.CallAfter(self._post_thread_setup)
+        try:
+            self._update_loading(self._canvas.thread_setup())
+        except Exception as e:
+            wx.CallAfter(self._display_error, str(e), traceback.format_exc())
+            raise e
+        else:
+            wx.CallAfter(self._post_thread_setup)
 
     def _post_thread_setup(self):
         """
         Run any setup that is not thread safe.
         """
-        self._update_loading(self._canvas.post_thread_setup())
-        edit_config: dict = config.get(EDIT_CONFIG_ID, {})
-        self._canvas.camera.perspective_fov = edit_config.get("options", {}).get(
-            "fov", 70.0
-        )
-        if self._canvas.camera.perspective_fov > 180:
-            self._canvas.camera.perspective_fov = 70.0
-        self._canvas.renderer.render_distance = edit_config.get("options", {}).get(
-            "render_distance", 5
-        )
-        self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
-            "camera_sensitivity", 2.0
-        )
+        try:
+            self._update_loading(self._canvas.post_thread_setup())
+            edit_config: dict = config.get(EDIT_CONFIG_ID, {})
+            self._canvas.camera.perspective_fov = edit_config.get("options", {}).get(
+                "fov", 70.0
+            )
+            if self._canvas.camera.perspective_fov > 180:
+                self._canvas.camera.perspective_fov = 70.0
+            self._canvas.renderer.render_distance = edit_config.get("options", {}).get(
+                "render_distance", 5
+            )
+            self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
+                "camera_sensitivity", 2.0
+            )
 
-        self._temp_msg = None
-        self._temp_loading_bar = None
-        self._sizer.Clear(True)
-        self._sizer.Add(self._canvas, 1, wx.EXPAND)
-        self._canvas.Show()
-        self._canvas._set_size()
-
-        self.Layout()
-        self._canvas.enable()
-        self._setup_thread = None
+            self._temp_msg = None
+            self._temp_loading_bar = None
+            self._sizer.Clear(True)
+            self._sizer.Add(self._canvas, 1, wx.EXPAND)
+            self._canvas.Show()
+            self._canvas._set_size()
+            self.Layout()
+            wx.CallAfter(
+                self._canvas.enable
+            )  # This must be called after the show handler is run
+            self._setup_thread = None
+        except Exception as e:
+            wx.CallAfter(self._display_error, str(e), traceback.format_exc())
+            raise e
 
     def can_disable(self) -> bool:
         return self._setup_thread is None

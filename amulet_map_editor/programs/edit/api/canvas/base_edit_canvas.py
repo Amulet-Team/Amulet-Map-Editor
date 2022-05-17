@@ -56,9 +56,6 @@ class BaseEditCanvas(EventCanvas):
 
     def __init__(self, parent: wx.Window, world: BaseLevel):
         super().__init__(parent)
-        glClearColor(*self.background_colour, 1.0)
-        self.Hide()
-
         self._world = weakref.ref(world)
 
         self._selection: Optional[SelectionHistoryManager] = SelectionHistoryManager(
@@ -92,7 +89,7 @@ class BaseEditCanvas(EventCanvas):
     def thread_setup(self) -> Generator[OperationYieldType, None, None]:
         """
         Set up objects that take a while to set up.
-        All code in here must be thread safe.
+        All code in here must be thread safe and not touch the OpenGL state.
         """
         packs = []
         user_packs = [
@@ -191,6 +188,7 @@ class BaseEditCanvas(EventCanvas):
         """
         Any logic that needs to be run after everything has been set up.
         Code here will be run from the main thread.
+        The canvas has still not been shown here so do not touch the OpenGL state. Do this in _init_opengl.
         """
         yield 1.0, lang.get("program_3d_edit.canvas.setting_up_renderer")
         self._renderer: Optional[Renderer] = Renderer(
@@ -200,12 +198,19 @@ class BaseEditCanvas(EventCanvas):
             self._opengl_resource_pack,
         )
 
+    def _init_opengl(self):
+        super()._init_opengl()
+        glClearColor(*self.background_colour, 1.0)
+
         try:
             player = self.world.get_player(LOCAL_PLAYER)
-            self._camera.location_rotation = player.location, player.rotation
+            location, rotation = player.location, player.rotation
             self.dimension = player.dimension
         except:
-            self._camera.location_rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
+            location, rotation = (0.0, 100.0, 0.0), (45.0, 45.0)
+
+        self._camera.location_rotation = location, rotation
+        self._renderer.move_camera(location, rotation)
 
     def bind_events(self):
         """Set up all events required to run.
@@ -234,7 +239,6 @@ class BaseEditCanvas(EventCanvas):
     def close(self):
         """Destroy all contained data so that the window can be safely destroyed."""
         self.renderer.close()
-        super().close()
 
     @property
     def world(self) -> BaseLevel:

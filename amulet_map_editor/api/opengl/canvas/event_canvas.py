@@ -9,8 +9,8 @@ class EventCanvas(BaseCanvas):
     """A modification of the normal canvas to make it easier to add and remove events."""
 
     def __init__(self, parent: wx.Window):
-        super().__init__(parent)
         self._bound_events: List[Tuple[wx.PyEventBinder, Any, Any]] = []
+        super().__init__(parent)
 
     def reset_bound_events(self):
         """Unbind all events and re-bind the default events.
