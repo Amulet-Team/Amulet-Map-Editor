@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-if __name__ == "__main__":
+
+def main():
     try:
         import sys
 
@@ -41,3 +42,7 @@ if __name__ == "__main__":
                 f"Amulet Crashed. Sorry about that. Please report it to a developer if you think this is an issue. \n{traceback.format_exc()}"
             )
             input("Press ENTER to continue.")
+
+
+if __name__ == "__main__":
+    main()
