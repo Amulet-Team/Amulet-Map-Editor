@@ -158,13 +158,10 @@ class EditCanvas(BaseEditCanvas):
         # call run_operation to acquire it.
         self._edit_lock = RLock()
 
-    def post_thread_setup(self) -> Generator[OperationYieldType, None, None]:
-        yield from super().post_thread_setup()
-        self._file_panel = FilePanel(self)
-        self._canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
-
     def _init_opengl(self):
         super()._init_opengl()
+        self._file_panel = FilePanel(self)
+        self._canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
         self._tool_sizer = ToolManagerSizer(self)
         self._canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
 
