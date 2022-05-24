@@ -17,8 +17,7 @@ class SkyBox(TriMesh, OpenGLResourcePackManager):
     """A class to define the logic to generate geometry from a block array"""
 
     def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
-        texture = resource_pack.get_atlas_id(context_identifier)
-        TriMesh.__init__(self, context_identifier, texture)
+        TriMesh.__init__(self, context_identifier, resource_pack)
         OpenGLResourcePackManager.__init__(self, resource_pack)
         self._camera_location: CameraLocationType = (0, 0, 0)
         self._rebuild()

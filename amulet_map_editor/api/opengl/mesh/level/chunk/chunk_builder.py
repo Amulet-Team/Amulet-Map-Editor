@@ -18,13 +18,11 @@ except:
     )
 
 
-class RenderChunkBuilder(TriMesh, OpenGLResourcePackManagerStatic):
+class RenderChunkBuilder(TriMesh):
     """A class to define the logic to generate geometry from a block array"""
 
     def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
-        texture = resource_pack.get_atlas_id(context_identifier)
-        TriMesh.__init__(self, context_identifier, texture)
-        OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
+        TriMesh.__init__(self, context_identifier, resource_pack)
 
     @property
     def chunk(self) -> Chunk:

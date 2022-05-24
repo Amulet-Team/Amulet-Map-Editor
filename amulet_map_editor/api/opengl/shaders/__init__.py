@@ -22,6 +22,13 @@ GL_VERSION_MATCH = re.compile(r"^(?P<major>\d+)\.(?P<minor>\d+)?")
 def get_shader(
     context_identifier: str, shader_name: str
 ) -> OpenGL.GL.shaders.ShaderProgram:
+    """
+    Get the specified shader program.
+    This must be called from the same thread that initialised the context
+    :param context_identifier: The identifier for the context
+    :param shader_name: The name of the shader to load
+    :return: The shader program
+    """
     shader_key = (context_identifier, shader_name)
     if shader_key not in _shaders:
         gl_version_match = GL_VERSION_MATCH.match(
