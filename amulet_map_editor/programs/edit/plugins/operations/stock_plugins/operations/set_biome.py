@@ -156,9 +156,11 @@ class SetBiome(SimpleOperationPanel):
                     continue
             elif mode == ColumnMode:
                 if chunk.biomes.dimension == BiomesShape.Shape3D:
+                    bounds = world.bounds(dimension)
                     slices = (
                         slice(slices[0].start // 4, math.ceil(slices[0].stop / 4)),
-                        slice(None, None, None),
+                        # TODO this might cause issues with infinite height worlds. The biome handling needs a rewrite
+                        slice(bounds.min_y // 4, math.ceil(bounds.max_y / 4)),
                         slice(slices[2].start // 4, math.ceil(slices[2].stop / 4)),
                     )
                 elif chunk.biomes.dimension == BiomesShape.Shape2D:
