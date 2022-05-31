@@ -8,6 +8,7 @@ from typing import Dict, Tuple, Set
 import sys
 import os
 import glob
+import importlib.util
 
 # pyinstaller moves the current directory to the front
 # We would prefer to find modules in site packages first
@@ -15,17 +16,17 @@ cwd = os.path.normcase(os.path.realpath(os.getcwd()))
 sys.path = [path for path in sys.path if os.path.normcase(os.path.realpath(path)) != cwd]
 sys.path.append(cwd)
 
-import amulet
-import PyMCTranslate
-import minecraft_model_reader
-import amulet_map_editor
-
 sys.modules["FixTk"] = None
 
-AMULET_PATH = amulet.__path__[0]
-PYMCT_PATH = PyMCTranslate.__path__[0]
-MINECRAFT_MODEL_READER = minecraft_model_reader.__path__[0]
-AMULET_MAP_EDITOR = amulet_map_editor.__path__[0]
+
+def get_package_path(mod: str):
+    return os.path.dirname(importlib.util.find_spec(mod).origin)
+
+
+AMULET_PATH = get_package_path("amulet")
+PYMCT_PATH = get_package_path("PyMCTranslate")
+MINECRAFT_MODEL_READER = get_package_path("minecraft_model_reader")
+AMULET_MAP_EDITOR = get_package_path("amulet_map_editor")
 
 
 hidden = []
