@@ -44,12 +44,28 @@ hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 OBFUSCATE_KEY = "_" + "".join(random.choices(string.ascii_lowercase, k=10))
 
 
+def _obfuscate(s: str) -> str:
+    return re.sub(r"(?<![a-zA-Z0-9_])(?P<name>_[a-zA-Z0-9][a-zA-Z0-9_]*)", lambda match: f"{OBFUSCATE_KEY}{match.group('name')}", s)
+
+
 def obfuscate(mod_path: str):
     """Prefix all private variables (_var or self._var) with _{OBFUSCATE_KEY}"""
     for py_path in glob.glob(os.path.join(mod_path, "**", "*.py"), recursive=True):
         with open(py_path) as f:
             py_code = f.read()
-        py_code = re.sub(r"(?<![a-zA-Z0-9_])(?P<name>_[a-zA-Z0-9][a-zA-Z0-9_]*)", lambda match: f"{OBFUSCATE_KEY}{match.group('name')}", py_code)
+        rel_py_path = os.path.relpath(py_path, mod_path)
+        ob_rel_py_path = _obfuscate(rel_py_path)
+        if rel_py_path != ob_rel_py_path:
+            # the path has changed. Delete the old one
+            os.remove(py_path)
+            try:
+                os.removedirs(os.path.dirname(py_path))
+            except OSError:
+                pass
+            py_path = os.path.join(mod_path, ob_rel_py_path)
+            os.makedirs(py_path, exist_ok=True)
+
+        py_code = _obfuscate(py_code)
         with open(py_path, "w") as f:
             f.write(py_code)
 
