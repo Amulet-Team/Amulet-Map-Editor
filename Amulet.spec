@@ -9,6 +9,9 @@ import sys
 import os
 import glob
 import importlib.util
+import string
+import random
+import re
 
 # pyinstaller moves the current directory to the front
 # We would prefer to find modules in site packages first
@@ -37,6 +40,24 @@ hidden.extend(collect_submodules("OpenGL"))
 hidden.extend(collect_submodules("OpenGL.GL"))
 hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 
+
+OBFUSCATE_KEY = "_" + "".join(random.choices(string.ascii_lowercase, k=10))
+
+
+def obfuscate(mod_path: str):
+    """Prefix all private variables (_var or self._var) with _{OBFUSCATE_KEY}"""
+    for py_path in glob.glob(os.path.join(mod_path, "**", "*.py"), recursive=True):
+        with open(py_path) as f:
+            py_code = f.read()
+        py_code = re.sub(r"(?<![a-zA-Z0-9_])(?P<name>_[a-zA-Z0-9][a-zA-Z0-9_]*)", lambda match: f"{OBFUSCATE_KEY}{match.group('name')}", py_code)
+        with open(py_path, "w") as f:
+            f.write(py_code)
+
+
+obfuscate(AMULET_PATH)
+obfuscate(PYMCT_PATH)
+obfuscate(MINECRAFT_MODEL_READER)
+obfuscate(AMULET_MAP_EDITOR)
 
 a = Analysis(
     [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
