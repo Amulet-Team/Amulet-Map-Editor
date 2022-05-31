@@ -50,7 +50,10 @@ def _obfuscate(s: str) -> str:
 
 def obfuscate(mod_path: str):
     """Prefix all private variables (_var or self._var) with _{OBFUSCATE_KEY}"""
+    mod_path = os.path.realpath(mod_path)
     for py_path in glob.glob(os.path.join(mod_path, "**", "*.py"), recursive=True):
+        if not os.path.isfile(py_path):
+            continue
         with open(py_path) as f:
             py_code = f.read()
         rel_py_path = os.path.relpath(py_path, mod_path)
@@ -63,7 +66,7 @@ def obfuscate(mod_path: str):
             except OSError:
                 pass
             py_path = os.path.join(mod_path, ob_rel_py_path)
-            os.makedirs(py_path, exist_ok=True)
+            os.makedirs(os.path.dirname(py_path), exist_ok=True)
 
         py_code = _obfuscate(py_code)
         with open(py_path, "w") as f:
@@ -71,7 +74,7 @@ def obfuscate(mod_path: str):
 
 
 obfuscate(AMULET_PATH)
-obfuscate(PYMCT_PATH)
+# obfuscate(PYMCT_PATH)
 obfuscate(MINECRAFT_MODEL_READER)
 obfuscate(AMULET_MAP_EDITOR)
 
