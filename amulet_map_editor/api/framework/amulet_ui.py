@@ -13,6 +13,9 @@ from .pages import AmuletMainMenu, BasePageUI
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 
+from sys import argv
+from os.path import exists
+
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
 try:
     from amulet_map_editor.api.framework import update_check
@@ -73,7 +76,11 @@ class AmuletUI(wx.Frame):
 
         self.Bind(wx.EVT_CLOSE, self._on_close_app)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
-
+        
+        if len(argv) == 2:
+            if exists(argv[1]):
+                self._open_world(argv[1])
+        
         if update_check:
             self.Bind(
                 update_check.EVT_UPDATE_CHECK,
