@@ -76,11 +76,11 @@ class AmuletUI(wx.Frame):
 
         self.Bind(wx.EVT_CLOSE, self._on_close_app)
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_change)
-        
+
         if len(argv) == 2:
             if exists(argv[1]):
                 self._open_world(argv[1])
-        
+
         if update_check:
             self.Bind(
                 update_check.EVT_UPDATE_CHECK,
