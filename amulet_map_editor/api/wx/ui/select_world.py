@@ -1,8 +1,7 @@
 import os
-import os.path
 import wx
 import glob
-from sys import platform, argv
+from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
 import traceback
 
@@ -322,10 +321,6 @@ class WorldSelectAndRecentUI(wx.Panel):
         bottom_sizer.Add(right_sizer, 1, wx.EXPAND)
         self._recent_worlds = RecentWorldUI(self, self._update_recent)
         right_sizer.Add(self._recent_worlds, 1, wx.EXPAND, 5)
-        if len(sys.argv) == 2:
-            if os.path.exists(sys.argv[1]):
-                self._recent_worlds.rebuild(sys.argv[1])
-                self._open_world_callback(sys.argv[1])
 
     def _update_recent(self, path):
         self._recent_worlds.rebuild(path)
