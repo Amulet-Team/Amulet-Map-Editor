@@ -166,14 +166,26 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         self._options[option_name] = option
 
     def _create_file_save_picker(self, option_name: str, options: Sequence):
+        if options:
+            path, *options = options
+            if not isinstance(path, str):
+                path = ""
+        else:
+            path = ""
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.FilePickerCtrl(self, style=wx.FLP_SAVE | wx.FLP_USE_TEXTCTRL)
+        option = wx.FilePickerCtrl(self, path=path, style=wx.FLP_SAVE | wx.FLP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
 
     def _create_file_open_picker(self, option_name: str, options: Sequence):
+        if options:
+            path, *options = options
+            if not isinstance(path, str):
+                path = ""
+        else:
+            path = ""
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.FilePickerCtrl(self, style=wx.FLP_OPEN | wx.FLP_USE_TEXTCTRL)
+        option = wx.FilePickerCtrl(self, path=path, style=wx.FLP_OPEN | wx.FLP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
 
