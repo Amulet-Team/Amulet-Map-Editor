@@ -8,6 +8,10 @@ from typing import Dict, Tuple, Set
 import sys
 import os
 import glob
+import importlib.util
+import string
+import random
+import re
 
 # pyinstaller moves the current directory to the front
 # We would prefer to find modules in site packages first
@@ -15,17 +19,17 @@ cwd = os.path.normcase(os.path.realpath(os.getcwd()))
 sys.path = [path for path in sys.path if os.path.normcase(os.path.realpath(path)) != cwd]
 sys.path.append(cwd)
 
-import amulet
-import PyMCTranslate
-import minecraft_model_reader
-import amulet_map_editor
-
 sys.modules["FixTk"] = None
 
-AMULET_PATH = amulet.__path__[0]
-PYMCT_PATH = PyMCTranslate.__path__[0]
-MINECRAFT_MODEL_READER = minecraft_model_reader.__path__[0]
-AMULET_MAP_EDITOR = amulet_map_editor.__path__[0]
+
+def get_package_path(mod: str):
+    return os.path.dirname(importlib.util.find_spec(mod).origin)
+
+
+AMULET_PATH = get_package_path("amulet")
+PYMCT_PATH = get_package_path("PyMCTranslate")
+MINECRAFT_MODEL_READER = get_package_path("minecraft_model_reader")
+AMULET_MAP_EDITOR = get_package_path("amulet_map_editor")
 
 
 hidden = []
@@ -36,6 +40,43 @@ hidden.extend(collect_submodules("OpenGL"))
 hidden.extend(collect_submodules("OpenGL.GL"))
 hidden.extend(collect_submodules("OpenGL.GL.shaders"))
 
+
+OBFUSCATE_KEY = "_" + "".join(random.choices(string.ascii_lowercase, k=10))
+
+
+def _obfuscate(s: str) -> str:
+    return re.sub(r"(?<![a-zA-Z0-9_])(?P<name>_[a-zA-Z0-9][a-zA-Z0-9_]*)", lambda match: f"{OBFUSCATE_KEY}{match.group('name')}", s)
+
+
+def obfuscate(mod_path: str):
+    """Prefix all private variables (_var or self._var) with _{OBFUSCATE_KEY}"""
+    mod_path = os.path.realpath(mod_path)
+    for py_path in glob.glob(os.path.join(mod_path, "**", "*.py"), recursive=True):
+        if not os.path.isfile(py_path):
+            continue
+        with open(py_path) as f:
+            py_code = f.read()
+        rel_py_path = os.path.relpath(py_path, mod_path)
+        ob_rel_py_path = _obfuscate(rel_py_path)
+        if rel_py_path != ob_rel_py_path:
+            # the path has changed. Delete the old one
+            os.remove(py_path)
+            try:
+                os.removedirs(os.path.dirname(py_path))
+            except OSError:
+                pass
+            py_path = os.path.join(mod_path, ob_rel_py_path)
+            os.makedirs(os.path.dirname(py_path), exist_ok=True)
+
+        py_code = _obfuscate(py_code)
+        with open(py_path, "w") as f:
+            f.write(py_code)
+
+
+obfuscate(AMULET_PATH)
+# obfuscate(PYMCT_PATH)
+obfuscate(MINECRAFT_MODEL_READER)
+obfuscate(AMULET_MAP_EDITOR)
 
 a = Analysis(
     [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
