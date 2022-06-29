@@ -173,7 +173,9 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         else:
             path = ""
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.FilePickerCtrl(self, path=path, style=wx.FLP_SAVE | wx.FLP_USE_TEXTCTRL)
+        option = wx.FilePickerCtrl(
+            self, path=path, style=wx.FLP_SAVE | wx.FLP_USE_TEXTCTRL
+        )
         sizer.Add(option)
         self._options[option_name] = option
 
@@ -185,7 +187,9 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         else:
             path = ""
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.FilePickerCtrl(self, path=path, style=wx.FLP_OPEN | wx.FLP_USE_TEXTCTRL)
+        option = wx.FilePickerCtrl(
+            self, path=path, style=wx.FLP_OPEN | wx.FLP_USE_TEXTCTRL
+        )
         sizer.Add(option)
         self._options[option_name] = option
 
