@@ -201,9 +201,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         else:
             path = ""
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.DirPickerCtrl(
-            self, path=path, style=wx.DIRP_USE_TEXTCTRL
-        )
+        option = wx.DirPickerCtrl(self, path=path, style=wx.DIRP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
 
