@@ -194,8 +194,14 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         self._options[option_name] = option
 
     def _create_directory_picker(self, option_name: str, options: Sequence):
+        if options:
+            path, *options = options
+            if not isinstance(path, str):
+                path = ""
+        else:
+            path = ""
         sizer = self._create_horizontal_options_sizer(option_name)
-        option = wx.DirPickerCtrl(self, style=wx.DIRP_USE_TEXTCTRL)
+        option = wx.DirPickerCtrl(self, path=path, style=wx.DIRP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
 
