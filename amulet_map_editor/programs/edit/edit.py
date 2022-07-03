@@ -50,13 +50,13 @@ class EditExtension(wx.Panel, BaseProgram):
             self._canvas = EditCanvas(self, self._world, self._close_self_callback)
             for arg in self._canvas.setup():
                 if isinstance(arg, (int, float)):
-                    self._temp_loading_bar.SetValue(min(arg, 1) * 10000)
+                    self._temp_loading_bar.SetValue(int(min(arg, 1) * 10000))
                 elif (
                     isinstance(arg, tuple)
                     and isinstance(arg[0], (int, float))
                     and isinstance(arg[1], str)
                 ):
-                    self._temp_loading_bar.SetValue(min(arg[0], 1) * 10000)
+                    self._temp_loading_bar.SetValue(int(min(arg[0], 1) * 10000))
                     self._temp_msg.SetLabel(arg[1])
                 self.Layout()
                 self.Update()
@@ -97,14 +97,16 @@ class EditExtension(wx.Panel, BaseProgram):
         Check if it is safe to close the UI.
         :return: True if the program can be closed, False otherwise
         """
-        if self._canvas is not None:
+        if self._canvas is None:
+            # if the edit program has never been opened then it can be closed
+            return True
+        else:
             if self._canvas.is_closeable():
                 return self._check_close_world()
             log.info(
                 f"The canvas in edit for world {self._world.level_wrapper.level_name} was not closeable for some reason."
             )
             return False
-        return not bool(self._world.history_manager.unsaved_changes)
 
     def _check_close_world(self) -> bool:
         """

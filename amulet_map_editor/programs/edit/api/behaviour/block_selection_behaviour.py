@@ -389,13 +389,13 @@ class BlockSelectionBehaviour(PointerBehaviour):
         if self._pointer_moved:
             if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
                 camera = self.canvas.camera.location
-                camera = (camera[0], 10 ** 9, camera[2])
+                camera = (camera[0], 10**9, camera[2])
                 look_vector = self.look_vector()
                 selection_group, box_index, max_distance = self._get_box_hit_data(
                     camera, look_vector
                 )
                 location, hit_block = self.closest_block_2d(
-                    int(10 ** 9 - min(max_distance, 10 ** 9)) + 1
+                    int(10**9 - min(max_distance, 10**9)) + 1
                 )
             else:
                 (

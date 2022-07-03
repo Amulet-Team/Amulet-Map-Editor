@@ -49,7 +49,7 @@ class NudgeButton(wx.Button):
         label: str,
         tooltip: str,
     ):
-        super().__init__(parent, label=label)
+        super().__init__(parent, label=label, style=wx.WANTS_CHARS)
         self.SetToolTip(tooltip)
         self._camera = weakref.ref(camera)
         self._buttons = ButtonInput(self)

@@ -1,14 +1,14 @@
+import threading
+
 import wx
 from typing import List, Callable, Tuple, Type, Union, Optional
 import traceback
 import importlib
 import pkgutil
-import re
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
-import amulet_map_editor
 from amulet_map_editor import programs, log, lang
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework.pages import BasePageUI
@@ -24,23 +24,13 @@ _fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [
 def load_extensions():
     if not _extensions:
         _extensions.extend(_fixed_extensions)
-        prefix = f"{programs.__name__}."
 
         extensions = []
 
-        # source support
-        for _, name, _ in pkgutil.iter_modules(programs.__path__, prefix):
-            extensions.append(load_extension(name))
-
-        # pyinstaller support
-        toc = set()
-        for importer in pkgutil.iter_importers(amulet_map_editor.__name__):
-            if hasattr(importer, "toc"):
-                toc |= importer.toc
-        match = re.compile(f"^{re.escape(prefix)}[a-zA-Z0-9_]*$")
-        for name in toc:
-            if match.fullmatch(name):
-                extensions.append(load_extension(name))
+        for _, module_name, _ in pkgutil.iter_modules(
+            programs.__path__, f"{programs.__name__}."
+        ):
+            extensions.append(load_extension(module_name))
 
         _extensions.extend(
             sorted((ext for ext in extensions if ext is not None), key=lambda x: x[0])
@@ -124,16 +114,28 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         Check is_closeable before running this"""
         for ext in self._extensions:
             ext.close()
-        dialog = wx.ProgressDialog(
-            "Closing World",
-            "Please be patient. This may take a little while.",
-            maximum=100,
-            parent=self,
-            style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_AUTO_HIDE,
-        )
-        dialog.Fit()
-        self.world.close()
-        dialog.Update(100)
+
+        # close the world in a new thread
+        thread = threading.Thread(target=self.world.close)
+        thread.start()
+        # sleep a little
+        thread.join(0.1)
+        if thread.is_alive():
+            # if not closed yet open a dialog to warn the user.
+            # We do this on a delay so that it does not flick up for a split second
+            dialog = wx.ProgressDialog(
+                "Closing World",
+                "Please be patient. This may take a little while.",
+                maximum=100,
+                style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_AUTO_HIDE,
+            )
+            dialog.Fit()
+            dialog.Update(99)
+            # wait until the world is closed then close the dialog
+            while thread.is_alive():
+                wx.GetApp().Yield()
+                thread.join(0.1)
+            dialog.Destroy()
 
     def _page_change(self, _):
         """Method to fire when the page is changed"""
