@@ -16,12 +16,14 @@ sys.path = [path for path in sys.path if os.path.normcase(os.path.realpath(path)
 sys.path.append(cwd)
 
 import amulet
+import amulet_nbt
 import PyMCTranslate
 import minecraft_model_reader
 import amulet_map_editor
 
 sys.modules["FixTk"] = None
 
+AMULET_NBT_PATH = amulet_nbt.__path__[0]
 AMULET_PATH = amulet.__path__[0]
 PYMCT_PATH = PyMCTranslate.__path__[0]
 MINECRAFT_MODEL_READER = minecraft_model_reader.__path__[0]
@@ -46,6 +48,7 @@ a = Analysis(
         os.path.join(AMULET_MAP_EDITOR, "__pyinstaller"),
         os.path.join(AMULET_PATH, "__pyinstaller"),
         os.path.join(PYMCT_PATH, "__pyinstaller"),
+        os.path.join(AMULET_NBT_PATH, "__pyinstaller"),
     ],
     runtime_hooks=[],
     excludes=["FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter"],
@@ -85,14 +88,6 @@ non_data_ext = ["*.pyc", "*.py", "*.dll", "*.so", "*.dylib"]
 a.datas += Tree(AMULET_PATH, "amulet", excludes=non_data_ext)
 a.datas += Tree(AMULET_MAP_EDITOR, "amulet_map_editor", excludes=non_data_ext)
 a.datas += Tree(MINECRAFT_MODEL_READER, "minecraft_model_reader", excludes=non_data_ext)
-a.datas += Tree(PYMCT_PATH, "PyMCTranslate", excludes=non_data_ext + ["json"])
-a.datas += [
-    (
-        os.path.join("PyMCTranslate", "build_number"),
-        os.path.join(PYMCT_PATH, "build_number"),
-        "DATA",
-    )
-]
 
 print("Added data files")
 for d in filter(lambda dt: "PyMCTranslate" in dt[0], a.datas):
