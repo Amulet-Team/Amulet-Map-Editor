@@ -7,6 +7,11 @@ from amulet.api.selection import SelectionGroup
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 
+# function example for the Button input example.
+def function_name():
+    print("you have clicked a button.")
+
+
 operation_options = {  # options is a dictionary where the key is the description shown to the user and the value describes how to build the UI
     "Text Label": ["label"],  # This will just be a label
     # bool examples  https://wxpython.org/Phoenix/docs/html/wx.CheckBox.html
@@ -55,7 +60,10 @@ operation_options = {  # options is a dictionary where the key is the descriptio
     # OS examples
     "File Open picker": ["file_open"],  # UI to pick an existing file
     "File Save picker": ["file_save"],  # UI to pick a file to save to
-    "Folder picker": ["directory"],  # UI to pick a directory
+    "Folder picker": ["directory"],  # UI to pick a directory,
+    # This will be a button input and it will run the function_name()
+    # function when clicked by the user.
+    "Button input": ["button", "button name", function_name],
 }
 
 
