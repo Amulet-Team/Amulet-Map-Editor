@@ -55,6 +55,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
             "file_open": self._create_file_open_picker,
             "file_save": self._create_file_save_picker,
             "directory": self._create_directory_picker,
+            "button": self._create_button,
         }
         for option_name, option in options.items():
             if not (isinstance(option, (list, tuple)) and option):
@@ -204,6 +205,25 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         option = wx.DirPickerCtrl(self, path=path, style=wx.DIRP_USE_TEXTCTRL)
         sizer.Add(option)
         self._options[option_name] = option
+
+    def _create_button(self, option_name: str, options: Sequence):
+        def _get_on_click(self, callback):
+            def _on_click(event):
+                return callback()
+
+            return _on_click
+
+        if options:
+            button_name, callback, *options = options
+            if not isinstance(button_name, str):
+                button_name = ""
+        else:
+            button_name = ""
+
+        button = wx.Button(self, wx.ID_ANY, button_name)
+        button.Bind(wx.EVT_BUTTON, _get_on_click(self, callback))
+        sizer = self._create_horizontal_options_sizer(option_name)
+        sizer.Add(button)
 
     def _get_values(self) -> Dict[str, Any]:
         options = {}
