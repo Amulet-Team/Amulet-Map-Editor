@@ -1,5 +1,6 @@
 import wx
 from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
+import logging
 
 from amulet_map_editor.api.wx.util.validators import IntValidator
 
@@ -9,6 +10,8 @@ from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
     from amulet.api.level import BaseLevel
+
+log = logging.getLogger(__name__)
 
 FixedOperationType = Callable[
     ["BaseLevel", "Dimension", "SelectionGroup", Dict[str, Any]], OperationReturnType
@@ -57,15 +60,16 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
             "directory": self._create_directory_picker,
             "button": self._create_button,
         }
-        for option_name, option in options.items():
-            if not (isinstance(option, (list, tuple)) and option):
-                continue
-            option_type, option = option[0], option[1:]
-            if option_type not in create_functions:
-                continue
-            create_functions[option_type](option_name, option)
+        for option_name, args in options.items():
+            try:
+                option_type, *args = args
+                if option_type not in create_functions:
+                    raise ValueError(f"Invalid option type {option_type}")
+                create_functions[option_type](option_name, *args)
+            except Exception as e:
+                log.exception(e)
 
-    def _create_label(self, option_name: str, options: Sequence):
+    def _create_label(self, option_name: str, *options):
         label = wx.StaticText(self, label=option_name)
         self._options_sizer.Add(label, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 
@@ -76,7 +80,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         self._options_sizer.Add(sizer, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         return sizer
 
-    def _create_bool(self, option_name: str, options: Sequence):
+    def _create_bool(self, option_name: str, *options):
         if options and not isinstance(options[0], bool):
             return
         sizer = self._create_horizontal_options_sizer(option_name)
@@ -86,7 +90,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
             option.SetValue(options[0])
         self._options[option_name] = option
 
-    def _create_int(self, option_name: str, options: Sequence):
+    def _create_int(self, option_name: str, *options):
         if len(options) in {0, 1, 3} and all(isinstance(o, int) for o in options):
             sizer = self._create_horizontal_options_sizer(option_name)
             if len(options) == 0:
@@ -116,7 +120,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
             sizer.Add(option)
             self._options[option_name] = option
 
-    def _create_float(self, option_name: str, options: Sequence):
+    def _create_float(self, option_name: str, *options):
         if len(options) in {0, 1, 3} and all(
             isinstance(o, (int, float)) for o in options
         ):
@@ -147,7 +151,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
             sizer.Add(option)
             self._options[option_name] = option
 
-    def _create_string(self, option_name: str, options: Sequence):
+    def _create_string(self, option_name: str, *options):
         if options and not isinstance(options[0], str):
             return
         sizer = self._create_horizontal_options_sizer(option_name)
@@ -157,7 +161,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
             option.SetValue(options[0])
         self._options[option_name] = option
 
-    def _create_str_choice(self, option_name: str, options: Sequence):
+    def _create_str_choice(self, option_name: str, *options):
         if not (options and all(isinstance(o, str) for o in options)):
             return
         sizer = self._create_horizontal_options_sizer(option_name)
@@ -166,7 +170,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         sizer.Add(option)
         self._options[option_name] = option
 
-    def _create_file_save_picker(self, option_name: str, options: Sequence):
+    def _create_file_save_picker(self, option_name: str, *options):
         if options:
             path, *options = options
             if not isinstance(path, str):
@@ -180,7 +184,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         sizer.Add(option)
         self._options[option_name] = option
 
-    def _create_file_open_picker(self, option_name: str, options: Sequence):
+    def _create_file_open_picker(self, option_name: str, *options):
         if options:
             path, *options = options
             if not isinstance(path, str):
@@ -194,7 +198,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         sizer.Add(option)
         self._options[option_name] = option
 
-    def _create_directory_picker(self, option_name: str, options: Sequence):
+    def _create_directory_picker(self, option_name: str, *options):
         if options:
             path, *options = options
             if not isinstance(path, str):
@@ -206,14 +210,16 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         sizer.Add(option)
         self._options[option_name] = option
 
-    def _create_button(self, option_name: str, options: Sequence):
+    def _create_button(self, option_name: str, *options):
         if options:
             button_name, callback, *options = options
             if not isinstance(button_name, str):
                 button_name = ""
         else:
+
             def callback():
                 pass
+
             button_name = ""
 
         button = wx.Button(self, wx.ID_ANY, button_name)
