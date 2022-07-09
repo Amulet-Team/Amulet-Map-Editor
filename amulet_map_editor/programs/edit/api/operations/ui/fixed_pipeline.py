@@ -207,21 +207,17 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         self._options[option_name] = option
 
     def _create_button(self, option_name: str, options: Sequence):
-        def _get_on_click(self, callback):
-            def _on_click(event):
-                return callback()
-
-            return _on_click
-
         if options:
             button_name, callback, *options = options
             if not isinstance(button_name, str):
                 button_name = ""
         else:
+            def callback():
+                pass
             button_name = ""
 
         button = wx.Button(self, wx.ID_ANY, button_name)
-        button.Bind(wx.EVT_BUTTON, _get_on_click(self, callback))
+        button.Bind(wx.EVT_BUTTON, lambda evt: callback())
         sizer = self._create_horizontal_options_sizer(option_name)
         sizer.Add(button)
 
