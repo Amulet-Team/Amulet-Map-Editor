@@ -7,6 +7,11 @@ from amulet.api.selection import SelectionGroup
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 
+# function example for the Button input.
+def function_name():
+    print("you have clicked a button.")
+
+
 operation_options = {  # options is a dictionary where the key is the description shown to the user and the value describes how to build the UI
     "Text Label": ["label"],  # This will just be a label
     # bool examples  https://wxpython.org/Phoenix/docs/html/wx.CheckBox.html
@@ -53,9 +58,14 @@ operation_options = {  # options is a dictionary where the key is the descriptio
     # string choice examples  https://wxpython.org/Phoenix/docs/html/wx.Choice.html
     "Text choice": ["str_choice", "choice 1", "choice 2", "choice 3"],
     # OS examples
-    "File Open picker": ["file_open"],  # UI to pick an existing file
-    "File Save picker": ["file_save"],  # UI to pick a file to save to
-    "Folder picker": ["directory"],  # UI to pick a directory
+    "File Open picker": ["file_open"],  # UI to pick an existing file, will be blank
+    "File Save picker": ["file_save"],  # UI to pick a file to save to, will be blank
+    "Folder picker": ["directory"],  # UI to pick a directory, will be blank
+    "File Open picker": ["file_open", path],  # UI to pick an existing file with a path
+    "File Save picker": ["file_save", path],  # UI to pick a file to save to with a path
+    "Folder picker": ["directory", path],  # UI to pick a directory with a path
+    # UI to add a button and it will run the function_name() when clicked
+    "Button input": ["button", "button name", function_name],
 }
 
 
