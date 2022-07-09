@@ -2,44 +2,13 @@ from typing import List
 from setuptools import setup, find_packages
 from wheel.bdist_wheel import bdist_wheel
 from Cython.Build import cythonize
-import os
 import glob
-import shutil
 import sys
 import numpy
 import subprocess
-
-try:
-    import versioneer
-except ImportError:
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-    import versioneer
-
-# there were issues with other builds carrying over their cache
-for d in glob.glob("*.egg-info"):
-    shutil.rmtree(d)
+import versioneer
 
 
-def load_requirements(path: str) -> List[str]:
-    requirements = []
-    with open(path) as f:
-        for line in f.readlines():
-            line = line.strip()
-            if (
-                not line
-                or line.startswith("#")
-                or line.startswith("git+")
-                or line.startswith("https:")
-            ):
-                continue
-            elif line.startswith("-r "):
-                requirements += load_requirements(line[3:])
-            else:
-                requirements.append(line)
-    return requirements
-
-
-required_packages = load_requirements("./requirements.txt")
 first_party = {
     "amulet-core",
     "amulet-nbt",
@@ -133,10 +102,9 @@ cmdclass["bdist_wheel"] = BDistWheel
 
 
 setup(
-    install_requires=required_packages,
-    packages=find_packages(),
-    include_package_data=True,
+    version=versioneer.get_version(),
     cmdclass=cmdclass,
-    ext_modules=ext,
     include_dirs=[numpy.get_include()],
+    packages=find_packages(),
+    ext_modules=ext,
 )
