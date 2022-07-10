@@ -26,8 +26,12 @@ def _patch_warn():
 
     def _call_home(message, category, stack):
         try:
-            stack = stack.replace(os.getcwd(), ".")  # remove the parent path. We don't need it
-            stack = stack.replace(getpass.getuser(), "%username%")  # Remove the username just in case
+            stack = stack.replace(
+                os.getcwd(), "."
+            )  # remove the parent path. We don't need it
+            stack = stack.replace(
+                getpass.getuser(), "%username%"
+            )  # Remove the username just in case
         except:
             pass
 
@@ -40,7 +44,7 @@ def _patch_warn():
                     f"entry.961557167={urllib.parse.quote(message)}&"
                     f"entry.2137739277={urllib.parse.quote(str(category))}&"
                     f"entry.1185835095={urllib.parse.quote(stack)}",
-                    timeout=5
+                    timeout=5,
                 )
             except URLError:
                 pass
@@ -49,7 +53,10 @@ def _patch_warn():
 
     def _on_warn(message, category=None, **kwargs):
         _old_warn(message, category, **kwargs)
-        t = Thread(target=_call_home, args=(message, category, "".join(traceback.format_stack(limit=5)[:-1])))
+        t = Thread(
+            target=_call_home,
+            args=(message, category, "".join(traceback.format_stack(limit=5)[:-1])),
+        )
         t.start()
 
     warnings.warn = _on_warn
