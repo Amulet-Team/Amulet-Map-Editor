@@ -1,3 +1,2 @@
 recursive-include amulet_map_editor *.py *.pyi *.pyx *.pxd *.jpg *.png *.vert *.frag *.mcmeta *.lang *.json
-include versioneer.py
 include icon.ico
