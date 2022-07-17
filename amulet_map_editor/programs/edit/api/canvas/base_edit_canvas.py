@@ -8,6 +8,7 @@ import os
 from typing import Optional, Generator
 import weakref
 import sys
+import time
 
 from minecraft_model_reader.api.resource_pack.java.download_resources import (
     get_java_vanilla_latest_iter,
@@ -159,14 +160,25 @@ class BaseEditCanvas(EventCanvas):
                     msg,
                     exc_info=True,
                 )
-                dialog = TracebackDialog(
-                    self,
-                    lang.get("program_3d_edit.canvas.java_rp_failed"),
-                    f"{msg}\n{e}",
-                    traceback.format_exc(),
-                )
-                dialog.ShowModal()
-                dialog.Destroy()
+                wait = True
+
+                def show_error():
+                    nonlocal wait
+                    try:
+                        dialog = TracebackDialog(
+                            self,
+                            lang.get("program_3d_edit.canvas.java_rp_failed"),
+                            f"{msg}\n{e}",
+                            traceback.format_exc(),
+                        )
+                        dialog.ShowModal()
+                        dialog.Destroy()
+                    finally:
+                        wait = False
+
+                wx.CallAfter(show_error)
+                while wait:
+                    time.sleep(0.1)
 
             yield 0.5, lang.get("program_3d_edit.canvas.loading_resource_packs")
             packs += [pack for pack in user_packs if isinstance(pack, JavaResourcePack)]
