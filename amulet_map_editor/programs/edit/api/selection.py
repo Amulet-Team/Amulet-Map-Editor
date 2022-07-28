@@ -1,6 +1,7 @@
 from typing import Tuple, Optional, Any, TYPE_CHECKING
 import wx
 import weakref
+from amulet.api.data_types import BlockCoordinates
 from amulet.api.selection import SelectionGroup, SelectionBox
 from amulet.api.history.history_manager import ObjectHistoryManager
 from amulet.api.history import Changeable
@@ -10,7 +11,7 @@ from amulet_map_editor import log
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
-BoxType = Tuple[Tuple[int, int, int], Tuple[int, int, int]]  # min and max positions
+BoxType = Tuple[BlockCoordinates, BlockCoordinates]  # min and max positions
 
 
 _SelectionChangeEventType = wx.NewEventType()
@@ -60,7 +61,7 @@ class SelectionManager(Changeable):
     @property
     def selection_corners(
         self,
-    ) -> Tuple[Tuple[Tuple[int, int, int], Tuple[int, int, int]], ...]:
+    ) -> Tuple[BoxType, ...]:
         """Get the minimum and maximum points of each selection
         :return: The minimum and maximum points of each selection
         """
@@ -69,9 +70,7 @@ class SelectionManager(Changeable):
     @selection_corners.setter
     def selection_corners(
         self,
-        selection_corners: Tuple[
-            Tuple[Tuple[int, int, int], Tuple[int, int, int]], ...
-        ],
+        selection_corners: Tuple[BoxType, ...],
     ):
         """Set the minimum and maximum points of each selection
         Will create events that allow the program to update.
@@ -84,9 +83,7 @@ class SelectionManager(Changeable):
 
     def set_selection_corners(
         self,
-        selection_corners: Tuple[
-            Tuple[Tuple[int, int, int], Tuple[int, int, int]], ...
-        ],
+        selection_corners: Tuple[BoxType, ...],
     ):
         """Set the minimum and maximum points of each selection
         Note this method will not trigger the history logic.

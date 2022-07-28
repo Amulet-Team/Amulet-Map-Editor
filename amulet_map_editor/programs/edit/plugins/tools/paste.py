@@ -1,5 +1,5 @@
 import wx
-from typing import TYPE_CHECKING, Tuple, Union, Type
+from typing import TYPE_CHECKING, Tuple, Union, Type, Optional
 from OpenGL.GL import (
     glClear,
     GL_DEPTH_BUFFER_BIT,
@@ -8,7 +8,7 @@ import math
 import numpy
 import weakref
 
-from amulet.api.data_types import PointCoordinates
+from amulet.api.data_types import PointCoordinates, BlockCoordinates
 from amulet.operations.paste import paste_iter
 from amulet.utils.matrix import (
     rotation_matrix_xyz,
@@ -101,11 +101,11 @@ class TupleIntInput(TupleInput):
     WindowCls = wx.SpinCtrl
 
     @property
-    def value(self) -> Tuple[int, int, int]:
+    def value(self) -> BlockCoordinates:
         return self.x.GetValue(), self.y.GetValue(), self.z.GetValue()
 
     @value.setter
-    def value(self, value: Tuple[int, int, int]):
+    def value(self, value: BlockCoordinates):
         self.x.SetValue(value[0])
         self.y.SetValue(value[1])
         self.z.SetValue(value[2])
@@ -233,7 +233,7 @@ class MoveButton(NudgeButton):
         super().__init__(parent, camera, keybinds, label, tooltip)
         self._paste_tool = weakref.ref(paste_tool)
 
-    def _move(self, offset: Tuple[int, int, int]):
+    def _move(self, offset: BlockCoordinates):
         ox, oy, oz = offset
         x, y, z = self._paste_tool().location
         self._paste_tool().location = x + ox, y + oy, z + oz
@@ -243,13 +243,31 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         DefaultBaseToolUI.__init__(self, canvas)
-
-        self._selection = StaticSelectionBehaviour(self.canvas)
-        self._cursor = PointerBehaviour(self.canvas)
+        self._selection: Optional[StaticSelectionBehaviour] = None
+        self._cursor: Optional[PointerBehaviour] = None
         self._moving = False
         self._is_enabled = False
+        self._paste_panel: Optional[wx.Panel] = None
+        self._paste_sizer: Optional[wx.BoxSizer] = None
+        self._location: Optional[TupleIntInput] = None
+        self._move_button: Optional[MoveButton] = None
+        self._free_rotation: Optional[wx.CheckBox] = None
+        self._rotation: Optional[RotationTupleInput] = None
+        self._rotate_left_button: Optional[wx.BitmapButton] = None
+        self._rotate_right_button: Optional[wx.BitmapButton] = None
+        self._scale: Optional[TupleFloatInput] = None
+        self._mirror_horizontal_button: Optional[wx.BitmapButton] = None
+        self._mirror_vertical_button: Optional[wx.BitmapButton] = None
+        self._copy_air: Optional[wx.CheckBox] = None
+        self._copy_water: Optional[wx.CheckBox] = None
+        self._copy_lava: Optional[wx.CheckBox] = None
 
-        self._paste_panel = wx.Panel(canvas)
+    def setup(self):
+        super().setup()
+        self._selection = StaticSelectionBehaviour(self.canvas)
+        self._cursor = PointerBehaviour(self.canvas)
+
+        self._paste_panel = wx.Panel(self.canvas)
         self._paste_sizer = wx.BoxSizer(wx.VERTICAL)
         self._paste_panel.SetSizer(self._paste_sizer)
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)

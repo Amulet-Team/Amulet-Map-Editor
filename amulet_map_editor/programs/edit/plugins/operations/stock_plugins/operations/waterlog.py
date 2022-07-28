@@ -2,9 +2,9 @@ import numpy
 from typing import TYPE_CHECKING, Tuple
 import wx
 
-from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine
+from amulet_map_editor.api.wx.ui.mc.block import BlockDefine
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 from amulet_map_editor.api import image
 
@@ -80,10 +80,10 @@ class Waterlog(wx.Panel, DefaultOperationUI):
         )
         self._mode_description.Fit()
 
-        self._block_define = BlockDefine(
+        self._block_define = BlockDefine.from_data(
             self,
             world.level_wrapper.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(options.get("fill_block_options", []) or [world.level_wrapper.platform]),
             show_pick_block=True
         )

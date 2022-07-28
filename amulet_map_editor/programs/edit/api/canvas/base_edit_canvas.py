@@ -30,6 +30,7 @@ from amulet.api.player import LOCAL_PLAYER
 from amulet.api.data_types import OperationYieldType, Dimension
 
 from amulet_map_editor import experimental_bedrock_resources
+from amulet_map_editor.api.wx.ui.events import EVT_CHILD_SIZE
 from amulet_map_editor.api.opengl.canvas import EventCanvas
 from amulet_map_editor.api.opengl.resource_pack.resource_pack import OpenGLResourcePack
 from amulet_map_editor.programs.edit.api.selection import (
@@ -223,6 +224,7 @@ class BaseEditCanvas(EventCanvas):
         self.buttons.bind_events()
         self.mouse.bind_events()
         self.renderer.bind_events()
+        self.Bind(EVT_CHILD_SIZE, self._do_layout)
 
     def enable(self):
         """Enable the canvas and start it working."""
@@ -283,6 +285,10 @@ class BaseEditCanvas(EventCanvas):
     def selection(self) -> SelectionManager:
         """A simple class for storing the selection state."""
         return self._selection.value
+
+    def _do_layout(self, evt):
+        self.Layout()
+        evt.Skip()
 
     def _on_size(self, evt):
         wx.CallAfter(self._set_size)

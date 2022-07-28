@@ -3,8 +3,8 @@ import wx
 
 from amulet.operations.fill import fill
 
-from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine
+from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.mc.block import BlockDefine
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 
 if TYPE_CHECKING:
@@ -28,10 +28,10 @@ class Fill(wx.Panel, DefaultOperationUI):
 
         options = self._load_options({})
 
-        self._block_define = BlockDefine(
+        self._block_define = BlockDefine.from_data(
             self,
             world.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(options.get("fill_block_options", []) or [world.level_wrapper.platform]),
             show_pick_block=True
         )

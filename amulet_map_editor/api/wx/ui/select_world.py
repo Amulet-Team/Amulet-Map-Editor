@@ -2,7 +2,7 @@ import os
 import wx
 import glob
 from sys import platform
-from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
+from typing import List, Dict, Tuple, Callable, TYPE_CHECKING, Optional
 import traceback
 
 from amulet import load_format
@@ -57,7 +57,7 @@ def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
         or world_images[image_path][0] != os.stat(image_path)[8]
     ):
         img = wx.Image(image_path, wx.BITMAP_TYPE_ANY)
-        width = min((img.GetWidth() / img.GetHeight()) * 128, 300)
+        width = int(min((img.GetWidth() / img.GetHeight()) * 128, 300))
 
         world_images[image_path] = (
             os.stat(image_path)[8],
@@ -327,17 +327,34 @@ class WorldSelectAndRecentUI(wx.Panel):
         self._open_world_callback(path)
 
 
+WORLD_SELECT_DIALOG_STYLE = (
+    wx.DEFAULT_DIALOG_STYLE
+    | wx.MAXIMIZE_BOX
+    | wx.TAB_TRAVERSAL
+    | wx.CLIP_CHILDREN
+    | wx.RESIZE_BORDER
+)
+
+
 @preserve_ui_preferences
 class WorldSelectDialog(wx.Dialog):
-    def __init__(self, parent: wx.Window, open_world_callback: Callable[[str], None]):
+    def __init__(
+        self,
+        parent: Optional[wx.Window],
+        open_world_callback: Callable[[str], None],
+        **kwargs,
+    ):
+        if isinstance(parent, wx.Window):
+            size = wx.Size(*[int(s * 0.95) for s in parent.GetSize()])
+        else:
+            size = wx.DefaultSize
         super().__init__(
             parent,
             title=lang.get("select_world.title"),
             pos=wx.Point(50, 50),
-            size=wx.Size(*[int(s * 0.95) for s in parent.GetSize()]),
-            style=wx.CAPTION | wx.CLOSE_BOX | wx.MAXIMIZE_BOX
-            # | wx.MAXIMIZE
-            | wx.SYSTEM_MENU | wx.TAB_TRAVERSAL | wx.CLIP_CHILDREN | wx.RESIZE_BORDER,
+            size=size,
+            style=kwargs.pop("style", WORLD_SELECT_DIALOG_STYLE),
+            **kwargs,
         )
         self.Bind(wx.EVT_CLOSE, self._hide_event)
 
@@ -349,7 +366,8 @@ class WorldSelectDialog(wx.Dialog):
         self._open_world_callback(path)
 
     def _hide_event(self, evt):
-        self._close()
+        if self.IsModal():
+            self.EndModal(0)
         evt.Skip()
 
     def _close(self):
@@ -357,3 +375,27 @@ class WorldSelectDialog(wx.Dialog):
             self.EndModal(0)
         else:
             self.Close()
+
+
+def demo():
+    """
+    Show a demo version of the UI.
+    An app instance must be created first.
+    """
+
+    def open_world_callback(path):
+        print(f"Open world {path}")
+
+    dialog = WorldSelectDialog(
+        None,
+        open_world_callback,
+        style=WORLD_SELECT_DIALOG_STYLE | wx.DIALOG_NO_PARENT,
+    )
+    dialog.Bind(wx.EVT_CLOSE, lambda evt: dialog.Destroy())
+    dialog.Show()
+
+
+if __name__ == "__main__":
+    app = wx.App()
+    demo()
+    app.MainLoop()

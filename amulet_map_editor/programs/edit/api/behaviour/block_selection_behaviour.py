@@ -299,7 +299,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
     @property
     def active_block_positions(
         self,
-    ) -> Tuple[Tuple[int, int, int], Tuple[int, int, int]]:
+    ) -> Tuple[BlockCoordinates, BlockCoordinates]:
         """Get the active box positions.
         The coordinates for the maximum point of the box will be one less because this is the block position."""
         if self._active_selection is None:
@@ -310,7 +310,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
 
     @active_block_positions.setter
     def active_block_positions(
-        self, positions: Tuple[Tuple[int, int, int], Tuple[int, int, int]]
+        self, positions: Tuple[BlockCoordinates, BlockCoordinates]
     ):
         """Set the active box positions.
         This should only be used when not editing.

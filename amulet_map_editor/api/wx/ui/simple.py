@@ -5,8 +5,6 @@ import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 from typing import Iterable, Union, Any, List, Optional, Sequence, Dict, Tuple
 
-from amulet_map_editor import log
-
 
 class SimpleSizer:
     def __init__(self, sizer_dir=wx.VERTICAL):
@@ -40,6 +38,17 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
         self.SetupScrolling()
         self.SetAutoLayout(1)
 
+    def DoGetBestSize(self):
+        sizer = self.GetSizer()
+        if sizer is None:
+            return -1, -1
+        else:
+            sx, sy = sizer.CalcMin()
+            return (
+                sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X),
+                sy + wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y),
+            )
+
 
 class SimpleChoice(wx.Choice):
     """A wrapper for wx.Choice that sets up the UI for you."""
@@ -62,17 +71,35 @@ class SimpleChoice(wx.Choice):
 
 
 StringableType = Any
+ChoicesType = Iterable[Union[StringableType, Tuple[Any, str]]]
 
 
-class SimpleChoiceAny(wx.Choice):
-    """An extension for wx.Choice that enables showing and returning objects that are not strings."""
+class ChoiceRaw(wx.Choice):
+    """
+    An extension for wx.Choice that enables handling for more than just strings.
+    The normal wx.Choice class only allows the storage of string objects.
+    This became an issue when more complex data needed to be displayed in a choice.
+    This class can be created from an iterable of any object and the result of str(obj) will be displayed to the user.
+    It can also be given a iterable of tuples containing the object and a string to show to the user.
+    """
 
-    def __init__(self, parent: wx.Window, sort=True, reverse=False):
+    def __init__(
+        self,
+        parent: wx.Window,
+        *,
+        choices: ChoicesType = (),
+        default: Any = None,
+        sort=False,
+        reverse=False
+    ):
         super().__init__(parent)
         self._values: List[Any] = []  # the data hidden behind the string
         self._keys: List[str] = []  # the strings shown to the user
         self._sorted = sort
         self._reverse = reverse
+        if choices:
+            self.SetItems(choices)
+            self.SetObject(default)
 
     @property
     def keys(self) -> Tuple[str, ...]:
@@ -89,49 +116,70 @@ class SimpleChoiceAny(wx.Choice):
         """Get the string value and the data hidden behind the value"""
         return tuple(zip(self._keys, self._values))
 
+    def _set_items(self, items: Iterable[Tuple[Any, str]], default: Any = None):
+        if items:
+            if self._sorted:
+                try:
+                    items = sorted(items, key=lambda x: x[0])
+                except TypeError:
+                    items = sorted(items, key=lambda x: x[1])
+            if self._reverse:
+                items = reversed(items)
+            self._values, self._keys = zip(*items)
+            super().SetItems(self._keys)
+            if default in self._values:
+                self.SetSelection(self._values.index(default))
+            else:
+                self.SetSelection(0)
+
     def SetItems(
         self,
-        items: Union[Iterable[StringableType], Dict[StringableType, Any]],
+        items: Union[
+            Iterable[Tuple[Any, str]],
+            Iterable[StringableType],
+            Dict[StringableType, Any],
+        ],
         default: StringableType = None,
     ):
-        """Set items. Does not have to be strings.
-        If items is a dictionary the string of the values are show to the user and the key is returned from GetAny
+        """
+        Set items. Does not have to be strings.
+        Can be an iterable of any object and the result of str(obj) will be displayed to the user.
+        If the object is a tuple
+        It can also be given a iterable of tuples containing the object and a string to show to the user.
+
+
+        If items is a dictionary the string of the values are show to the user and the key is returned from GetCurrentObject
         If it is just an iterable the string of the values are shown and the raw equivalent input is returned."""
-        if not items:
-            return
         if isinstance(items, dict):
-            items: List[Tuple[str, Any]] = [
-                (str(value), key) for key, value in items.items()
-            ]
-            if self._sorted:
-                items = sorted(items, key=lambda x: x[0], reverse=self._reverse)
-            self._keys = [key.strip() for key, _ in items]
-            self._values = [value for _, value in items]
+            items = tuple(items.items())
         else:
-            if self._sorted:
-                self._values = list(sorted(items))
-                if self._reverse:
-                    self._values.reverse()
-            else:
-                self._values = list(items)
-            self._keys = [str(v).strip() for v in self._values]
-        super().SetItems(self._keys)
-        if default is not None and default in self._values:
-            self.SetSelection(self._values.index(default))
-        else:
+            items_ = []
+            for item in items:
+                if (
+                    isinstance(item, (tuple, list))
+                    and len(item) == 2
+                    and isinstance(item[1], str)
+                ):
+                    item = (item[0], str(item[1]))
+                else:
+                    item = (item, str(item))
+                items_.append(item)
+            items = items_
+        self._set_items(items, default)
+
+    def SetObject(self, obj: Any):
+        """Set the selected item from the data hidden behind the text."""
+        if obj in self._values:
+            self.SetSelection(self._values.index(obj))
+        elif self.GetCurrentSelection() == wx.NOT_FOUND and self._values:
             self.SetSelection(0)
 
-    def SetValue(self, value: Any):
-        if value in self._keys:
-            self.SetSelection(self._keys.index(value))
-
-    def GetAny(self) -> Optional[Any]:
-        """Return the value currently selected in the form before it was converted to a string"""
-        log.warning(
-            "SimpleChoiceAny.GetAny is being depreciated and will be removed in the future. Please use SimpleChoiceAny.GetCurrentObject instead",
-            exc_info=True,
-        )
-        return self.GetCurrentObject()
+    def SetValue(self, key: Any):
+        """Set the selected item based on the text in the choice."""
+        if key in self._keys:
+            self.SetSelection(self._keys.index(key))
+        elif self.GetCurrentSelection() == wx.NOT_FOUND and self._values:
+            self.SetSelection(0)
 
     def GetCurrentObject(self) -> Optional[Any]:
         """Return the value currently selected in the form before it was converted to a string"""
@@ -141,6 +189,9 @@ class SimpleChoiceAny(wx.Choice):
     def GetCurrentString(self) -> str:
         """Get the string form of the value currently selected."""
         return self.GetString(self.GetSelection())
+
+
+SimpleChoiceAny = ChoiceRaw
 
 
 class SimpleDialog(wx.Dialog):

@@ -1,5 +1,5 @@
 import wx
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 import traceback
 
 import amulet
@@ -19,10 +19,14 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
     def __init__(self, canvas: "EditCanvas"):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         DefaultBaseToolUI.__init__(self, canvas)
+        self._selection: Optional[StaticSelectionBehaviour] = None
+        self._open_file_button: Optional[wx.Button] = None
 
+    def setup(self):
+        super().setup()
         self._selection = StaticSelectionBehaviour(self.canvas)
 
-        self._open_file_button = wx.Button(canvas, label="Import File")
+        self._open_file_button = wx.Button(self.canvas, label="Import File")
         self._open_file_button.Bind(wx.EVT_BUTTON, self._on_open_file)
         self.AddStretchSpacer()
         self.Add(self._open_file_button, flag=wx.ALL, border=10)

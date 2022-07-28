@@ -7,7 +7,7 @@ from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.level.formats.sponge_schem import SpongeSchemFormatWrapper
 
-from amulet_map_editor.api.wx.ui.version_select import VersionSelect
+from amulet_map_editor.api.wx.ui.mc.version import VersionSelect
 from amulet_map_editor.programs.edit.api.operations import (
     SimpleOperationPanel,
     OperationError,
@@ -37,10 +37,10 @@ class ExportSpongeSchematic(SimpleOperationPanel):
             style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
         )
         self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
-        self._version_define = VersionSelect(
+        self._version_define = VersionSelect.from_data(
             self,
             world.translation_manager,
-            options.get("platform", None) or world.level_wrapper.platform,
+            platform=options.get("platform", None) or world.level_wrapper.platform,
             allowed_platforms=("java",),
             allow_numerical=False,
         )

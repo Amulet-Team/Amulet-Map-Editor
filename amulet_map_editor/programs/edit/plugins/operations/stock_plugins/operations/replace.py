@@ -4,8 +4,8 @@ import numpy
 
 from amulet.api.block import Block
 
-from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
-from amulet_map_editor.api.wx.ui.block_select import BlockDefine
+from amulet_map_editor.api.wx.ui.mc.base.base_identifier_select import EVT_PICK
+from amulet_map_editor.api.wx.ui.mc.block import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 
@@ -27,10 +27,10 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         self.Freeze()
         options = self._load_options({})
 
-        self._original_block = BlockDefine(
+        self._original_block = BlockDefine.from_data(
             self,
             world.level_wrapper.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(
                 options.get("original_block_options", [])
                 or [world.level_wrapper.platform]
@@ -40,10 +40,10 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         )
         self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self._original_block.Bind(EVT_PICK, lambda evt: self._on_pick_block_button(1))
-        self._replacement_block = BlockDefine(
+        self._replacement_block = BlockDefine.from_data(
             self,
             world.level_wrapper.translation_manager,
-            wx.VERTICAL,
+            orientation=wx.VERTICAL,
             *(
                 options.get("replacement_block_options", [])
                 or [world.level_wrapper.platform]
@@ -177,17 +177,6 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
 
             count += 1
             yield count / iter_count
-
-    def DoGetBestClientSize(self):
-        sizer = self.GetSizer()
-        if sizer is None:
-            return -1, -1
-        else:
-            sx, sy = self.GetSizer().CalcMin()
-            return (
-                sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X),
-                sy + wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y),
-            )
 
 
 export = {

@@ -5,6 +5,7 @@ import weakref
 import numpy
 import math
 
+from amulet.api.data_types import BlockCoordinates
 from amulet_map_editor.api.opengl.camera import Camera
 from amulet_map_editor.api.opengl.matrix import rotation_matrix_xy
 from amulet_map_editor.programs.edit.api.key_config import (
@@ -102,7 +103,7 @@ class NudgeButton(wx.Button):
             if self._timeout:
                 self._timeout -= 1
 
-    def _rotate(self, offset: Tuple[int, int, int]) -> Tuple[int, int, int]:
+    def _rotate(self, offset: BlockCoordinates) -> BlockCoordinates:
         x, y, z = offset
         ry = self.camera.rotation[0]
         x, y, z, _ = (
@@ -117,5 +118,5 @@ class NudgeButton(wx.Button):
         )
         return x, y, z
 
-    def _move(self, offset: Tuple[int, int, int]):
+    def _move(self, offset: BlockCoordinates):
         pass
