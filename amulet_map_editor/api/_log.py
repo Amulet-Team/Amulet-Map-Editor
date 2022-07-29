@@ -1,6 +1,8 @@
 import logging
 import sys
 import os
+import glob
+import time
 
 
 def _init_logging():
@@ -19,8 +21,14 @@ def _init_logging():
             handler.close()
         logger.setLevel(logging.DEBUG if "amulet-debug" in sys.argv else logging.INFO)
 
+    logs_path = os.path.join(".", "logs")
     # set up handlers
-    os.makedirs(os.path.join(".", "logs"), exist_ok=True)
+    os.makedirs(logs_path, exist_ok=True)
+    # remove all log files older than a week
+    for path in glob.glob(os.path.join(logs_path, "*.log")):
+        if os.path.isfile(path) and os.path.getmtime(path) < time.time() - 3600 * 24 * 7:
+            os.remove(path)
+
     file_handler = logging.FileHandler(
         os.path.join(".", "logs", f"amulet_{os.getpid()}.log"), "w", encoding="utf-8"
     )
