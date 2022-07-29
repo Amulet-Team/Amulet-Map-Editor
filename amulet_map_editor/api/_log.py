@@ -2,12 +2,10 @@ import logging
 import sys
 import os
 
-log = logging.getLogger("amulet_map_editor")
-
 
 def _init_logging():
     loggers = [
-        log,
+        logging.getLogger("amulet_map_editor"),
         logging.getLogger("amulet"),
         logging.getLogger("minecraft_model_reader"),
         logging.getLogger("PyMCTranslate"),

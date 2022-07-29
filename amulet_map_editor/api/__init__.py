@@ -1,1 +1,1 @@
-from .logging import log
+from . import _log

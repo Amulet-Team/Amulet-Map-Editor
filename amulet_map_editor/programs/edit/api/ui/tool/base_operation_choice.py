@@ -7,7 +7,6 @@ import os
 import sys
 import subprocess
 
-from amulet_map_editor import log
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
