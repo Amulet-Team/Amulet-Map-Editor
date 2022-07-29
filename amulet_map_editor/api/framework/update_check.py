@@ -5,6 +5,7 @@ import urllib.request
 import threading
 import json
 import webbrowser
+import logging
 
 import wx
 from packaging.version import Version
@@ -15,6 +16,8 @@ URL = "http://api.github.com/repos/Amulet-Team/Amulet-Map-Editor/releases"
 
 _EVT_UPDATE_CHECK = wx.NewEventType()
 EVT_UPDATE_CHECK = wx.PyEventBinder(_EVT_UPDATE_CHECK, 1)
+
+log = logging.getLogger(__name__)
 
 
 class UpdateEvent(wx.PyCommandEvent):
@@ -101,7 +104,7 @@ def _get_newest_version(url: str, current_version_str: str) -> Optional[str]:
 
         if current_version.local is not None:
             # if the version has a local extension (eg. "+0.gee5780.dirty")
-            print("Running from source, not showing update dialog")
+            log.info("Running from source, not showing update dialog")
             return
 
         conn = urllib.request.urlopen(url, timeout=5)
