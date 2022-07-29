@@ -1,10 +1,2 @@
-graft amulet_map_editor
-include requirements.txt
-include versioneer.py
+recursive-include amulet_map_editor *.py *.pyi *.pyx *.pxd *.jpg *.png *.vert *.frag *.mcmeta *.lang *.json
 include icon.ico
-prune */__pycache__/*
-global-exclude *.py[cod]
-global-exclude *.c
-global-exclude *.html
-global-exclude *.log
-global-exclude *.md

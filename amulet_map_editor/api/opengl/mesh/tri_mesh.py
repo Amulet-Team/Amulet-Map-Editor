@@ -29,11 +29,15 @@ import ctypes
 import numpy
 from amulet_map_editor.api.opengl.shaders import get_shader
 from amulet_map_editor.api.opengl import Drawable, ContextManager
+from amulet_map_editor.api.opengl.resource_pack import (
+    OpenGLResourcePackManagerStatic,
+    OpenGLResourcePack,
+)
 
 log = logging.getLogger(__name__)
 
 
-class TriMesh(Drawable, ContextManager):
+class TriMesh(Drawable, OpenGLResourcePackManagerStatic, ContextManager):
     """The base class for a triangular face mesh.
     Implements the base logic to set up and unload OpenGL."""
 
@@ -45,10 +49,11 @@ class TriMesh(Drawable, ContextManager):
     )
     _vert_len = sum(_vertex_attrs)
 
-    def __init__(self, context_identifier: str, texture: int):
+    def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
         """Create a new TriMesh.
         The object can be created from another thread so OpenGL
         variables cannot be set from here"""
+        OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
         ContextManager.__init__(self, context_identifier)
         self._vao = None  # vertex array object
         self._vbo = None  # vertex buffer object
@@ -57,7 +62,7 @@ class TriMesh(Drawable, ContextManager):
             None  # the reference within the shader program of the transformation matrix
         )
         self._texture_location = None  # the location of the texture in the shader
-        self._texture = texture
+        self._texture = None
         self.verts = self.new_empty_verts()  # the vertices to draw
         self.draw_start = 0
         self.draw_count = 0  # the number of vertices to draw
@@ -81,6 +86,7 @@ class TriMesh(Drawable, ContextManager):
     def _setup(self):
         """Setup OpenGL attributes if required"""
         if self._vao is None:  # if the opengl state has not been set
+            self._texture = self.resource_pack.get_atlas_id(self.context_identifier)
             self._shader = get_shader(self.context_identifier, self.shader_name)
             glUseProgram(self._shader)
             self._transform_location = glGetUniformLocation(

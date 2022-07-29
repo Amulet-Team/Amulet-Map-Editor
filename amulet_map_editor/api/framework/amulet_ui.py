@@ -6,11 +6,13 @@ import traceback
 import logging
 
 from amulet.api.errors import LoaderNoneMatched
+from amulet_map_editor.api import config
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor import __version__, lang
 from amulet_map_editor.api.framework.pages import WorldPageUI
 from .pages import AmuletMainMenu, BasePageUI
+from .warning_dialog import WarningDialog
 
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
@@ -69,6 +71,14 @@ class AmuletUI(wx.Frame):
         self._level_notebook.init()
 
         self.Bind(wx.EVT_CLOSE, self._level_notebook.on_app_close)
+
+        meta_config = config.get("amulet_meta", {})
+        if not meta_config.get("do_not_show_warning_dialog", False):
+            warning_dialog = WarningDialog(self)
+            warning_dialog.ShowModal()
+            if warning_dialog.do_not_show_again:
+                meta_config["do_not_show_warning_dialog"] = True
+                config.put("amulet_meta", meta_config)
 
         if update_check:
             self.Bind(

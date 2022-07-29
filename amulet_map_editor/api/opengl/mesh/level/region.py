@@ -146,9 +146,7 @@ class RenderRegion(TriMesh):
         resource_pack: OpenGLResourcePack,
     ):
         """A group of RenderChunks to minimise the number of draw calls"""
-        super().__init__(
-            context_identifier, resource_pack.get_atlas_id(context_identifier)
-        )
+        super().__init__(context_identifier, resource_pack)
         self.rx = rx
         self.rz = rz
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}

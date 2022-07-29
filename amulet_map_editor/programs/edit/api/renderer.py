@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 import wx
 from OpenGL.GL import (
     glClear,
@@ -44,6 +44,9 @@ class Renderer(EditCanvasContainer):
         "_gc_timer",
     )
 
+    _sky_box: Optional[SkyBox]
+    _fake_levels: Optional[LevelGroup]
+
     def __init__(
         self,
         canvas: "EditCanvas",
@@ -66,16 +69,8 @@ class Renderer(EditCanvasContainer):
         )
         self._chunk_generator.register(self._render_world)
 
-        self._fake_levels: LevelGroup = LevelGroup(
-            context_identifier,
-            opengl_resource_pack,
-        )
-        self._chunk_generator.register(self._fake_levels)
-
-        self._sky_box: SkyBox = SkyBox(
-            context_identifier,
-            opengl_resource_pack,
-        )
+        self._fake_levels = None
+        self._sky_box = None
 
         self._draw_timer = wx.Timer(self.canvas)
         self._gc_timer = wx.Timer(self.canvas)
@@ -135,29 +130,6 @@ class Renderer(EditCanvasContainer):
     #     self._resource_pack = JavaResourcePackManager(resource_packs)
     #     for _ in self._create_atlas():
     #         pass
-    #
-    # def _create_atlas(self) -> Generator[float, None, None]:
-    #     """Create and bind the atlas texture."""
-    #     atlas_iter = textureatlas.create_atlas(self._resource_pack.textures)
-    #     try:
-    #         while True:
-    #             yield next(atlas_iter)
-    #     except StopIteration as e:
-    #         texture_atlas, self._texture_bounds, width, height = e.value
-    #     glBindTexture(GL_TEXTURE_2D, self._gl_texture_atlas)
-    #     glTexImage2D(
-    #         GL_TEXTURE_2D,
-    #         0,
-    #         GL_RGBA,
-    #         width,
-    #         height,
-    #         0,
-    #         GL_RGBA,
-    #         GL_UNSIGNED_BYTE,
-    #         texture_atlas,
-    #     )
-    #     glBindTexture(GL_TEXTURE_2D, 0)
-    #     log.info("Finished setting up texture atlas in OpenGL")
 
     @property
     def opengl_resource_pack(self) -> OpenGLResourcePack:
@@ -170,11 +142,22 @@ class Renderer(EditCanvasContainer):
     @property
     def fake_levels(self) -> LevelGroup:
         """Floating levels that are not the main level."""
+        if self._fake_levels is None:
+            self._fake_levels: LevelGroup = LevelGroup(
+                self.canvas.context_identifier,
+                self.opengl_resource_pack,
+            )
+            self._chunk_generator.register(self._fake_levels)
         return self._fake_levels
 
     @property
     def sky_box(self) -> SkyBox:
-        """Floating levels that are not the main level."""
+        """The cube in the distance displaying the sky."""
+        if self._sky_box is None:
+            self._sky_box = SkyBox(
+                self._render_world.context_identifier,
+                self._opengl_resource_pack,
+            )
         return self._sky_box
 
     @property
@@ -205,9 +188,10 @@ class Renderer(EditCanvasContainer):
 
     def _on_camera_moved(self, evt: CameraMovedEvent):
         """The camera has moved. Update each class's camera state."""
-        location = evt.camera_location
-        rotation = evt.camera_rotation
+        self.move_camera(evt.camera_location, evt.camera_rotation)
+        evt.Skip()
 
+    def move_camera(self, location, rotation):
         # TODO: add combined methods
         self.render_world.camera_location = location
         self.render_world.camera_rotation = rotation
@@ -216,8 +200,6 @@ class Renderer(EditCanvasContainer):
         self.fake_levels.set_camera_rotation(*rotation)
 
         self.sky_box.set_camera_location(location)
-
-        evt.Skip()
 
     def _do_draw(self, evt):
         wx.PostEvent(self.canvas, PreDrawEvent())

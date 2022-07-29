@@ -98,10 +98,18 @@ class OpenGLResourcePack:
 
             atlas: Image.Image
 
+            if not self._resource_pack.pack_paths:
+                log.warning("There are no resource packs to load.")
+
             mod_time = max(
-                os.stat(path).st_mtime
-                for pack in self._resource_pack.pack_paths
-                for path in glob.glob(os.path.join(pack, "**", "*.*"), recursive=True)
+                (
+                    os.stat(path).st_mtime
+                    for pack in self._resource_pack.pack_paths
+                    for path in glob.glob(
+                        os.path.join(pack, "**", "*.*"), recursive=True
+                    )
+                ),
+                default=0,
             )
 
             cache_dir = os.path.join(".", "cache", "resource_pack")

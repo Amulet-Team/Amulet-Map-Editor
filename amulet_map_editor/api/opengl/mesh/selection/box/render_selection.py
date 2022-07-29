@@ -32,10 +32,7 @@ class RenderSelection(TriMesh, OpenGLResourcePackManagerStatic):
     """A drawable selection box"""
 
     def __init__(self, context_identifier: str, resource_pack: OpenGLResourcePack):
-        OpenGLResourcePackManagerStatic.__init__(self, resource_pack)
-        TriMesh.__init__(
-            self, context_identifier, resource_pack.get_atlas_id(context_identifier)
-        )
+        TriMesh.__init__(self, context_identifier, resource_pack)
         self._points: numpy.ndarray = numpy.zeros(
             (2, 3), dtype=numpy.int64
         )  # The points set using point1 and point2

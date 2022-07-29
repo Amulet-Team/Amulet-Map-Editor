@@ -1,6 +1,5 @@
 from typing import Optional
 import wx
-import wx.lib.expando
 from amulet_map_editor.api import image
 
 
@@ -36,7 +35,7 @@ class TracebackDialog(wx.Dialog):
         error_text = wx.StaticText(self, wx.ID_ANY, error)
         error_sizer.Add(error_text, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
 
-        traceback_text = wx.lib.expando.ExpandoTextCtrl(
+        traceback_text = wx.TextCtrl(
             self,
             wx.ID_ANY,
             traceback,

@@ -55,7 +55,7 @@ class NBTEditor(simple.SimplePanel):
             nbt.TAG_Compound: self.image_list.Add(
                 nbt_resources.nbt_tag_compound.bitmap()
             ),
-            nbt.NBTFile: self.image_list.ImageCount - 1,
+            nbt.NamedTag: self.image_list.ImageCount - 1,
             nbt.TAG_List: self.image_list.Add(nbt_resources.nbt_tag_list.bitmap()),
             nbt.TAG_Byte_Array: self.image_list.Add(
                 nbt_resources.nbt_tag_array.bitmap()
