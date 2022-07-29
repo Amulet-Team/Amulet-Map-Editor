@@ -21,14 +21,16 @@ import json
 from PIL import Image
 import numpy
 import glob
+import logging
 
 from minecraft_model_reader.api.resource_pack.base import BaseResourcePackManager
 from minecraft_model_reader import BlockMesh
 import PyMCTranslate
 from amulet.api.block import Block
 
-from amulet_map_editor import log
 from amulet_map_editor.api.opengl import textureatlas
+
+log = logging.getLogger(__name__)
 
 
 class OpenGLResourcePack:

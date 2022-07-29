@@ -1,11 +1,13 @@
 from typing import Callable, Any, Optional
+import logging
 
 from .base_operation_loader import BaseOperationLoader
 
-from amulet_map_editor import log
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 from amulet.api.selection import SelectionGroup
+
+log = logging.getLogger(__name__)
 
 
 class OperationLoader(BaseOperationLoader):

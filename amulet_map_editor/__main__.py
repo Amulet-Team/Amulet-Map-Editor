@@ -11,7 +11,7 @@ def main():
         import os
         import traceback
         import wx
-        from amulet_map_editor import log
+        import logging
         from amulet_map_editor.api.framework import AmuletApp
 
         if sys.platform == "linux" and wx.VERSION >= (4, 1, 1):
@@ -38,6 +38,7 @@ def main():
             app = AmuletApp(0)
             app.MainLoop()
         except Exception as e:
+            log = logging.getLogger(__name__)
             log.critical(
                 f"Amulet Crashed. Sorry about that. Please report it to a developer if you think this is an issue. \n{traceback.format_exc()}"
             )

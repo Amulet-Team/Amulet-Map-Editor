@@ -1,11 +1,12 @@
 import wx
 from typing import TYPE_CHECKING, Optional
 import traceback
+import logging
+
 import os
 import sys
 import subprocess
 
-from amulet_map_editor import log
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
@@ -16,6 +17,8 @@ from .base_tool_ui import BaseToolUI
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+log = logging.getLogger(__name__)
 
 
 class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):

@@ -1,12 +1,13 @@
 import wx
 from threading import Thread
 import webbrowser
+import logging
 from typing import TYPE_CHECKING, Optional
 
 from amulet import load_format
 from amulet.api.level import BaseLevel
 
-from amulet_map_editor import lang, log
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimplePanel, SimpleScrollablePanel
 from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog, WorldUI
 from amulet_map_editor.api.datatypes import MenuData
@@ -15,6 +16,8 @@ from amulet_map_editor import close_level
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
+
+log = logging.getLogger(__name__)
 
 
 class ConvertExtension(SimpleScrollablePanel, BaseProgram):

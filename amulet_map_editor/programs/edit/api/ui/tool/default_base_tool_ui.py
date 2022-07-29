@@ -1,3 +1,4 @@
+import logging
 import wx
 from typing import TYPE_CHECKING
 from OpenGL.GL import (
@@ -10,7 +11,6 @@ import os
 import amulet
 from amulet.api.errors import LoaderNoneMatched
 
-from amulet_map_editor import log
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.opengl.camera import Projection
 from .base_tool_ui import BaseToolUI
@@ -19,6 +19,8 @@ from amulet_map_editor.programs.edit.api.behaviour import CameraBehaviour
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+log = logging.getLogger(__name__)
 
 
 class DefaultBaseToolUI(BaseToolUI):

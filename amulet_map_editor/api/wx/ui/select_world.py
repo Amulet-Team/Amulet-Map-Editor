@@ -4,11 +4,12 @@ import glob
 from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
 import traceback
+import logging
 
 from amulet import load_format
 from amulet.api.errors import FormatError
 
-from amulet_map_editor import lang, log, CONFIG
+from amulet_map_editor import lang, CONFIG
 from amulet_map_editor.api.wx.ui import simple
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 from amulet_map_editor.api.framework import app
@@ -16,6 +17,8 @@ from amulet_map_editor.api.framework import app
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
+
+log = logging.getLogger(__name__)
 
 
 # Windows 	%APPDATA%\.minecraft

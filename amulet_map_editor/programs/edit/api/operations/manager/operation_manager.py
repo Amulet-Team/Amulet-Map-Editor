@@ -5,6 +5,7 @@ import os
 import traceback
 import pkgutil
 import importlib
+import logging
 
 from .loader import (
     BaseOperationLoader,
@@ -13,7 +14,7 @@ from .loader import (
 )
 from .util import STOCK_PLUGINS_DIR, STOCK_PLUGINS_NAME, CUSTOM_PLUGINS_DIR
 
-from amulet_map_editor import log
+log = logging.getLogger(__name__)
 
 
 class BaseOperationManager:

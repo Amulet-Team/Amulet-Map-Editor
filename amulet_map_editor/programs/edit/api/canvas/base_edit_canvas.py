@@ -1,3 +1,4 @@
+import logging
 import wx
 import traceback
 from OpenGL.GL import (
@@ -37,7 +38,7 @@ from amulet_map_editor.programs.edit.api.selection import (
     SelectionManager,
     SelectionHistoryManager,
 )
-from amulet_map_editor import log, lang
+from amulet_map_editor import lang
 import amulet_map_editor.programs.edit as amulet_edit
 
 from amulet_map_editor.api.opengl.camera import ControllableCamera
@@ -47,6 +48,8 @@ from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from ..renderer import Renderer
 
 from amulet.api.level import BaseLevel
+
+log = logging.getLogger(__name__)
 
 
 class BaseEditCanvas(EventCanvas):

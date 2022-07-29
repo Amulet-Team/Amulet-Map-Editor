@@ -10,10 +10,13 @@ import glob
 from typing import Dict, Optional, List, Tuple
 import os
 import locale
+import logging
 import re
 
 import amulet_map_editor
-from amulet_map_editor.api import config as CONFIG, log
+from amulet_map_editor.api import config as CONFIG
+
+log = logging.getLogger(__name__)
 
 # there might be a proper way to do this but this should be enough for now
 

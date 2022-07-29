@@ -1,3 +1,4 @@
+import logging
 from OpenGL.GL import (
     glBindTexture,
     GL_TEXTURE_2D,
@@ -32,7 +33,8 @@ from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManagerStatic,
     OpenGLResourcePack,
 )
-from amulet_map_editor import log
+
+log = logging.getLogger(__name__)
 
 
 class TriMesh(Drawable, OpenGLResourcePackManagerStatic, ContextManager):

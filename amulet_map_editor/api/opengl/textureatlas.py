@@ -22,10 +22,12 @@
 #
 """Texture Atlas and Map File Generation Utility Classes"""
 
+import logging
 from PIL import Image
 import math
 from typing import Dict, Tuple, List, Optional, Generator
-from amulet_map_editor import log
+
+log = logging.getLogger(__name__)
 
 DESCRIPTION = """Packs many smaller images into one larger image, a Texture
 Atlas. A companion file (.map), is created that defines where each texture is

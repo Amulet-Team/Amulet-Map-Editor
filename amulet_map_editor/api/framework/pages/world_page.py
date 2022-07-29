@@ -5,11 +5,12 @@ from typing import List, Tuple, Type, Union, Optional
 import traceback
 import importlib
 import pkgutil
+import logging
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet import load_level
 
-from amulet_map_editor import programs, log, lang
+from amulet_map_editor import programs, lang
 from amulet_map_editor.api.datatypes import MenuData
 from amulet_map_editor.api.framework import app
 from amulet_map_editor.api.framework.pages import BasePageUI
@@ -20,6 +21,8 @@ _extensions: List[Tuple[str, Type[BaseProgram]]] = []
 _fixed_extensions: List[Tuple[str, Type[BaseProgram]]] = [
     (lang.get("program_about.tab_name"), AboutProgram)
 ]
+
+log = logging.getLogger(__name__)
 
 
 def load_extensions():

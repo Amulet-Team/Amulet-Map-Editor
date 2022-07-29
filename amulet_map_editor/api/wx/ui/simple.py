@@ -1,11 +1,12 @@
 """A collection of classes for wx objects to abstract away
 the repeated code and make working with wx a bit more simple."""
 
+import logging
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 from typing import Iterable, Union, Any, List, Optional, Sequence, Dict, Tuple
 
-from amulet_map_editor import log
+log = logging.getLogger(__name__)
 
 
 class SimpleSizer:

@@ -2,7 +2,7 @@ import numpy
 from typing import TYPE_CHECKING, Tuple, List, Union
 import weakref
 import itertools
-from amulet_map_editor import log
+import logging
 
 from amulet.api.errors import ChunkLoadError, ChunkDoesNotExist
 from amulet.api.chunk.blocks import Blocks
@@ -15,6 +15,8 @@ from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
 
 if TYPE_CHECKING:
     from amulet.api.chunk import Chunk
+
+log = logging.getLogger(__name__)
 
 
 class RenderChunk(RenderChunkBuilder):

@@ -3,11 +3,12 @@ import inspect
 import os
 import struct
 import hashlib
+import logging
+
 import wx
 
 from .base_operation_loader import BaseOperationLoader
 
-from amulet_map_editor import log
 from amulet.api.level import BaseLevel
 from amulet_map_editor.programs.edit.api.operations import (
     OperationUI,
@@ -18,6 +19,8 @@ from amulet_map_editor.programs.edit.api.operations import (
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
     from amulet.api.level import BaseLevel
+
+log = logging.getLogger(__name__)
 
 ValidChrs = set("-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
