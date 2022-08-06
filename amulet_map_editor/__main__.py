@@ -33,6 +33,7 @@ try:
     import traceback
     import glob
     import time
+    import wx
 
     if sys.platform == "linux" and wx.VERSION >= (4, 1, 1):
         # bug 247
@@ -72,12 +73,11 @@ def _init_log():
 def main():
     try:
         _init_log()
-
-        import wx
         from amulet_map_editor.api.framework import AmuletApp
 
     except Exception as e:
         _on_error(e)
+        AmuletApp = None
 
     try:
         app = AmuletApp(0)
