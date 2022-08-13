@@ -56,7 +56,7 @@ def _patch_warn():
         _old_warn(message, category, **kwargs)
         t = Thread(
             target=_call_home,
-            args=(message, category, "".join(traceback.format_stack(limit=5)[:-1])),
+            args=(message, category, "".join(traceback.format_stack(limit=6))),
         )
         t.start()
 
