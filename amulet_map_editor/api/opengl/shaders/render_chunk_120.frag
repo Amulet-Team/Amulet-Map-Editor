@@ -1,4 +1,4 @@
-# version 120
+#version 120
 varying vec2 fTexCoord;
 varying vec4 fTexOffset;
 varying vec3 fTint;

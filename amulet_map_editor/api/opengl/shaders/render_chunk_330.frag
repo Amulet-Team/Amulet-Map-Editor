@@ -1,4 +1,4 @@
-# version 330
+#version 330
 in vec2 fTexCoord;
 in vec4 fTexOffset;
 in vec3 fTint;
