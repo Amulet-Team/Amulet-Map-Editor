@@ -25,30 +25,30 @@
 #-- end license --
 
 
-# Important notes
-## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
-## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
-## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+# Notas Importantes
+## Si quieres contribuir a la traducción de la interfaz de usuario (IU), por favor, lee el archivo de contribución correspondiente ubicado en '/contributing/lang.md'
+## Cada traducción debe estar escrita de la siguiente manera: 'identificador.unico=El texto mostrado en la interfaz.'
+## Los Identificadores Únicos son definidos por los desarrolladores. Para saber los identificadores existentes, por favor lee el archivo 'en.lang'.
 
-# Loading order and region specific translations
-## First the 'en.lang' is loaded to ensure that there is at least something for any given key
-## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
-## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
-## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+# Orden de carga y traducciones específicas por región
+## Primero, 'en.lang' es cargado para asegurarse que todo tiene por lo menos una traducción.
+## Luego, si el código de idioma tiene el símbolo "_" (por ejemplo "fr_CA"), el archivo de idioma para el lenguage ("fr") será cargado. En este caso: ("fr.lang")
+## Finalmente, si existe, la región específica para ese lenguage ("fr_CA.lang") será cargada, la cual solo debe de tener traducciones propia de la región.
+## Esto permite que lenguajes que no varíen mucho de región compartan el mismo archivo para evitar duplicados.
 
-# Supported features in translation files
-## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
-## Any "\n" in a translation string will be converted as a new line in the UI
+# Funciones soportadas en los archivos de idioma
+## Puedes escribir una línea de comnetarios con el símbolo "#" en el primer carácter (sin espacios) de una línea. Los comentarios entre-línea no están soportados.
+## Cualquier "\n" en una traducción será convertida a una nueva línea en la IU.
 
-# About the menu bar
-## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
-## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
-## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+# Acerca de la barra del menú
+## El símbolo "&" es un carácter especial en este contexto. No será mostrado en la IU pero definirá el siguiente carácter como un atajo cuando la tecla "alt" sea presionada (advertencia: letras acentuadas son su propio carácter (é =/= e))
+## Ejemplo: "&Archivo" se muestra como "Archivo" en la IU, pero permitirá al usuario usar "alt+a" para abrir el menú correspondiente.
+## Puedes encontrar más información en: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
 
-# About the fstrings
-## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
-## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
-## This pattern must stay in the translated entries for them to work properly
+# Acerca de las f-strings
+## El patrón "{variable}" es usado en algunas entradas, este patrón permite al programa ingresar datos en el texto de la interfaz.
+## Ejemplo: "Hay {n} cambios" se muestra como "Hay 2 cambios" en la interfaz.
+## Este patrón debe permanecer en las traducciones para que funcione correctamente.
 
 # Meta
 meta.amulet=Amulet
