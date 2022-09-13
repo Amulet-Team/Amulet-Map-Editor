@@ -109,24 +109,24 @@ select_world.open_world_dialogue=Selecciona un directorio de Minecraft
 select_world.select_directory_failed=¡Error al abrir el directorio!
 select_world.recent_worlds=Mundos abiertos recientemente
 select_world.no_loader_found=No se pudo encontrar un loader para este mundo.
-select_world.loading_world_failed=Error abriendo el mundo.
+select_world.loading_world_failed=Error al abrir el mundo.
 
 # About
 ## The default program when a world is opened
-program_about.tab_name=About
-program_about.currently_opened_world=Currently Opened World:
-program_about.choose_from_options=Choose from the options on the left what you would like to do.\nYou can switch between these at any time.
+program_about.tab_name=Acerca De
+program_about.currently_opened_world=Mundo abierto actualmente:
+program_about.choose_from_options=Selecciona de las opciones de la izquierda lo que quieras hacer.\Puedes cambiar entre estas en cualquier momento.
 
 # Convert
 ## The program used to convert a world
-program_convert.tab_name=Convert
-program_convert.convert_button=Convert
-program_convert.input_world=Input World:
-program_convert.output_world=Output World:
-program_convert.select_output_world=Select Output World
-program_convert.input_output_must_different=The input and output worlds must be different!
-program_convert.select_before_converting=Select a world before converting!
-program_convert.conversion_completed=World conversion completed
+program_convert.tab_name=Convertir
+program_convert.convert_button=Convertir
+program_convert.input_world=Mundo de Entrada:
+program_convert.output_world=Mundo de Salida:
+program_convert.select_output_world=Selecciona el Mundo de Salida
+program_convert.input_output_must_different=¡El mundo de entrada y salida deben ser diferentes!
+program_convert.select_before_converting=¡Selecciona un mundo antes de convertir!
+program_convert.conversion_completed=Conversión del mundo completa.
 
 ## Menu bar
 program_convert.menu_bar.help.user_guide=User Guide (online)
