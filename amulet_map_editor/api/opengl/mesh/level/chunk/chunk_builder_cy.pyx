@@ -1,6 +1,6 @@
 # cython: language_level=3, boundscheck=False, wraparound=False
-# distutils: extra_compile_args = ["-fopenmp", "-openmp"]
-# distutils: extra_link_args = ["-fopenmp", "-openmp"]
+# distutils: extra_compile_args = OPENMP_CCARGS
+# distutils: extra_link_args = OPENMP_CLARGS
 
 import numpy
 cimport numpy
