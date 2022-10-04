@@ -1,0 +1,269 @@
+#This license applies to this file only.
+#
+#-- begin license --
+#MIT License
+#
+#Copyright (c) 2021 Amulet-Team
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+#-- end license --
+
+
+# Notas Importantes
+## Si quieres contribuir a la traducción de la interfaz de usuario (IU), por favor, lee el archivo de contribución correspondiente ubicado en '/contributing/lang.md'
+## Cada traducción debe estar escrita de la siguiente manera: 'identificador.unico=El texto mostrado en la interfaz.'
+## Los Identificadores Únicos son definidos por los desarrolladores. Para saber los identificadores existentes, por favor lee el archivo 'en.lang'.
+
+# Orden de carga y traducciones específicas por región
+## Primero, 'en.lang' es cargado para asegurarse que todo tiene por lo menos una traducción.
+## Luego, si el código de idioma tiene el símbolo "_" (por ejemplo "fr_CA"), el archivo de idioma para el lenguage ("fr") será cargado. En este caso: ("fr.lang")
+## Finalmente, si existe, la región específica para ese lenguage ("fr_CA.lang") será cargada, la cual solo debe de tener traducciones propia de la región.
+## Esto permite que lenguajes que no varíen mucho de región compartan el mismo archivo para evitar duplicados.
+
+# Funciones soportadas en los archivos de idioma
+## Puedes escribir una línea de comnetarios con el símbolo "#" en el primer carácter (sin espacios) de una línea. Los comentarios entre-línea no están soportados.
+## Cualquier "\n" en una traducción será convertida a una nueva línea en la IU.
+
+# Acerca de la barra del menú
+## El símbolo "&" es un carácter especial en este contexto. No será mostrado en la IU pero definirá el siguiente carácter como un atajo cuando la tecla "alt" sea presionada (advertencia: letras acentuadas son su propio carácter (é =/= e))
+## Ejemplo: "&Archivo" se muestra como "Archivo" en la IU, pero permitirá al usuario usar "alt+a" para abrir el menú correspondiente.
+## Puedes encontrar más información en: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# Acerca de las f-strings
+## El patrón "{variable}" es usado en algunas entradas, este patrón permite al programa ingresar datos en el texto de la interfaz.
+## Ejemplo: "Hay {n} cambios" se muestra como "Hay 2 cambios" en la interfaz.
+## Este patrón debe permanecer en las traducciones para que funcione correctamente.
+
+# Meta
+meta.amulet=Amulet
+
+# Shared strings
+shared.check_console=Revisa la consola para más detalles.
+
+# App
+app.world_still_used=Un mundo todavía está en uso. Por favor, ciérralo primero.
+app.browser_open_tooltip=Se abrirá esta página en tu navegador si das click.
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Cerrar Mundo
+
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&Archivo
+menu_bar.file.open_world=Abrir Mundo
+menu_bar.file.close_world=Cerrar Mundo
+menu_bar.file.quit=Salir
+menu_bar.options.menu_name=&Opciones
+menu_bar.help.menu_name=&Ayuda
+
+# Main menu
+## The start screen
+main_menu.tab_name=Menú Principal
+main_menu.open_world=Abrir Mundo
+main_menu.user_manual=Manual del Usuario
+main_menu.bug_tracker=Rastreador de Bugs
+main_menu.discord=Discord de Amulet
+
+# Language Select
+language_select.title=Selector de Idioma
+language_select.help=Selecciona el idioma de la lista de abajo que quieras usar en Amulet.
+language_select.contribute=Si quieres mejorar o agregar traducciones, da click aquí.
+
+# Warning Dialog
+warning_dialog.title=Bienvenido/a a Amulet
+warning_dialog.content=Hola y bienvenido/a a Amulet.\n\Te sugerimos crear un respaldo de tu mundo antes de abrirlo en Amulet.\n\nIntentamos de asegurarnos de no corromper tu mundo, pero el formato de guardado está indocumentado y en cambios constantes y aveces nos equivocamos.\n\nPor esta razón, solo soportamos oficialmente versiones completas las cuales hemos probado.\nLas versiones experimentales de Java (snapshots), versiones beta y funciones experimentales de Bedrock podrían funcionar pero están sin probar, así que no las soportamos oficialmente.\n\nActualmente, las entidades no están soportadas y los ítems son solo soportados en la misma plataforma.\nSi quieres agregar una funcionalidad nueva o un bug que necesita ser arreglado, repórtalo en nuestro rastreador de bugs.\nPor favor usa la herramienta de búsqueda para ver si ya ha sido reportado antes de crear un ticket.\n\nSi eres nuevo, te sugerimos que leas el manual del usuario para familiarizarte con el programa.\n\n- El Equipo de Amulet
+warning_dialog.do_not_show_again=No mostrar denuevo
+warning_dialog.i_understand=Entiendo
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=¡Una nueva versión de Amulet está disponible!
+update_check.new_version=Nueva Versión:
+update_check.current_version=Tu Versión:
+update_check.update=Ir a la Página de Descarga
+update_check.ok=Ok
+
+# Select world
+## The window when selecting a world to open
+select_world.title=Selector de Mundo
+select_world.open_world_warning=Cierra el mundo dentro del juego y en otras herramientas antes de abrirlo en Amulet.
+select_world.open_world_button=Abrir otro mundo
+select_world.open_world_dialogue=Selecciona un directorio de Minecraft
+select_world.select_directory_failed=¡Error al abrir el directorio!
+select_world.recent_worlds=Mundos abiertos recientemente
+select_world.no_loader_found=No se pudo encontrar un loader para este mundo.
+select_world.loading_world_failed=Error al abrir el mundo.
+
+# About
+## The default program when a world is opened
+program_about.tab_name=Acerca De
+program_about.currently_opened_world=Mundo abierto actualmente:
+program_about.choose_from_options=Selecciona de las opciones de la izquierda lo que quieras hacer.\Puedes cambiar entre estas en cualquier momento.
+
+# Convert
+## The program used to convert a world
+program_convert.tab_name=Convertir
+program_convert.convert_button=Convertir
+program_convert.input_world=Mundo de Entrada:
+program_convert.output_world=Mundo de Salida:
+program_convert.select_output_world=Selecciona el Mundo de Salida
+program_convert.input_output_must_different=¡El mundo de entrada y salida deben ser diferentes!
+program_convert.select_before_converting=¡Selecciona un mundo antes de convertir!
+program_convert.conversion_completed=Conversión del mundo completa.
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=Guía de Usuario (online)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
+program_3d_edit.tab_name=Editor 3D
+
+## Canvas
+program_3d_edit.canvas.please_wait=Por favor espera mientras el renderizador carga
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Descargando el paquete de recursos vanilla de Bedrock
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Descargando el paquete de recursos vanilla de Java
+program_3d_edit.canvas.java_rp_failed=Error al descargar el último paquete de recursos de Java.
+program_3d_edit.canvas.java_rp_failed_default=Revisa tu conexión a internet y reincia Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=Los certificados para acceder a internet no fueron instalados.\nEjecuta el programa "Install Certificates.command" que puede ser encontrado en "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Cargando paquetes de recursos
+program_3d_edit.canvas.creating_texture_atlas=Creando atlas de texturas
+program_3d_edit.canvas.setting_up_renderer=Configurando renderizador
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Guardar
+program_3d_edit.menu_bar.edit.menu_name=&Editar
+program_3d_edit.menu_bar.edit.undo=Deshacer
+program_3d_edit.menu_bar.edit.redo=Rehacer
+program_3d_edit.menu_bar.edit.cut=Cortar
+program_3d_edit.menu_bar.edit.copy=Copiar
+program_3d_edit.menu_bar.edit.paste=Pegar
+program_3d_edit.menu_bar.edit.delete=Eliminar Bloques
+program_3d_edit.menu_bar.edit.goto=Ir a
+program_3d_edit.menu_bar.edit.select_all=Seleccionar todo
+program_3d_edit.menu_bar.options.controls=Controles...
+program_3d_edit.menu_bar.options.options=Opciones...
+program_3d_edit.menu_bar.help.user_guide=Guía de Usuario (online)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Eliminar Bloques
+program_3d_edit.select_tool.delete_button_tooltip=Elimina los bloques en el área seleccionada.
+program_3d_edit.select_tool.copy_button=Copiar
+program_3d_edit.select_tool.copy_button_tooltip=Copia el área selecciona para pegarla después. Puede ser pegada en cualquier mundo o dimensión.
+program_3d_edit.select_tool.cut_button=Cortar
+program_3d_edit.select_tool.cut_button_tooltip=Corta el área selecciona para pegarla después. Puede ser pegada en cualquier mundo o dimensión.
+program_3d_edit.select_tool.paste_button=Pegar
+program_3d_edit.select_tool.paste_button_tooltip=Pega un area cortada o copiada anteriormente en el mundo.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Asigna la coordenada x1 de la de la esquina de la caja verde activa. Escribe un numero o usa la rueda del ratón cuando el puntero esté encima.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Asigna la coordenada y1 de la de la esquina de la caja verde activa. Escribe un numero o usa la rueda del ratón cuando el puntero esté encima.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Asigna la coordenada z1 de la de la esquina de la caja verde activa. Escribe un numero o usa la rueda del ratón cuando el puntero esté encima.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Asigna la coordenada x2 de la de la esquina de la caja verde activa. Escribe un numero o usa la rueda del ratón cuando el puntero esté encima.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Asigna la coordenada y2 de la de la esquina de la caja verde activa. Escribe un numero o usa la rueda del ratón cuando el puntero esté encima.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Asigna la coordenada z2 de la de la esquina de la caja verde activa. Escribe un numero o usa la rueda del ratón cuando el puntero esté encima.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=La forma de la selección activa usando la notación de selector de volumen de Minecraft.
+program_3d_edit.select_tool.box_size_tooltip=El tamaño de la caja de la selección activa en bloques.
+program_3d_edit.select_tool.button_point1=Mover Punto 1
+program_3d_edit.select_tool.button_point1_tooltip=Presiona y mantén pulsado este boton y usa las teclas de movimiento para mover el punto de selección verde.
+program_3d_edit.select_tool.button_point2=Mover Punto 2
+program_3d_edit.select_tool.button_point2_tooltip=Presiona y mantén pulsado este boton y usa las teclas de movimiento para mover el punto de selección azul.
+program_3d_edit.select_tool.button_selection_box=Mover Caja
+program_3d_edit.select_tool.button_selection_box_tooltip=Presiona y mantén pulsado este boton y usa las teclas de movimiento para mover la caja.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=Ubicación
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=El punto x donde el centro de la selección será ubicado. Escribe un numero, usa la rueda del ratón o las flechas para cambiar.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=El punto y donde el centro de la selección será ubicado. Escribe un numero, usa la rueda del ratón o las flechas para cambiar.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=El punto z donde el centro de la selección será ubicado. Escribe un numero, usa la rueda del ratón o las flechas para cambiar.
+program_3d_edit.paste_tool.move_selection_label=Mover selección
+program_3d_edit.paste_tool.move_selection_tooltip=Presiona y mantén pulsado este botón y usa las teclas de movimiento para mover la selección.
+program_3d_edit.paste_tool.rotation_label=Rotación
+program_3d_edit.paste_tool.free_rotation_label=Desbloquar Rotación
+program_3d_edit.paste_tool.free_rotation_tooltip=Si no está marcado, la selección puede ser rotada en múltiplos de 90 grados. Si está marcada, la selección puede rotarse en incrementos de 1 grado.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=El ángulo en grados en el eje x en el la selección será rotada. Ten en cuenta que este es el eje x del modelo el cual es transformado por la rotación del eje Z y el eje Y así que puede que no coincida con el eje X global.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=El ángulo en grados en el eje x en el la selección será rotada. Ten en cuenta que este es el eje x del modelo el cual es transformado por la rotación del eje Z así que puede que no coincida con el eje Y global.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=El ángulo en grados en el eje x en el la selección será rotada.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Click para rotar la selección 90 grados en sentido contrario a las agujas del reloj relativo a la vista de rotación.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Click para rotar la selección 90 grados en sentido a las agujas del reloj relativo a la vista de rotación.
+program_3d_edit.paste_tool.scale_label=Escalar
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=La escala del modelo en el eje x.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=La escala del modelo en el eje y.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=La escala del modelo en el eje z.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Voltea la selección horizontalmente relativo a la dirección en el que la cámara está mirando.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Voltea la selección verticalmente relativo a la dirección en el que la cámara está mirando.
+program_3d_edit.paste_tool.copy_air_label=Pegar Aire
+program_3d_edit.paste_tool.copy_air_tooltip=Si está habilitado, todos los bloques de aire en la estructura pegada sobreescribirán cualquier otro bloque existente.
+program_3d_edit.paste_tool.copy_water_label=Pegar Agua
+program_3d_edit.paste_tool.copy_water_tooltip=Si está habilitado, todos los bloques de agua en la estructura pegada sobreescribirán cualquier otro bloque existente.
+program_3d_edit.paste_tool.copy_lava_label=Pegar Lava
+program_3d_edit.paste_tool.copy_lava_tooltip=Si está habilitado, todos los bloques de lava en la estructura pegada sobreescribirán cualquier otro bloque existente. Si está deshabilitado los bloques existentes en esas ubicaciónes quedarán y la lava no será copiada.
+program_3d_edit.paste_tool.confirm_label=Confirmar
+program_3d_edit.paste_tool.confirm_tooltip=Click para pegar la estructura en el mundo en la ubicación, rotación y escala especificada.
+program_3d_edit.paste_tool.zero_scale_message=Uno de los valores de la escala era cero, así que no se copió nada
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Min Y
+program_3d_edit.chunk_tool.min_y_tooltip=La coordenada y mínima para dibujar in la vista de arriba hacia abajo. Esto puede ser usado para ver una rodaja del mundo y ayudar a ver dimensiones como el nether y cuevas.
+program_3d_edit.chunk_tool.max_y=Max Y
+program_3d_edit.chunk_tool.max_y_tooltip=La coordenada y máxima para dibujar in la vista de arriba hacia abajo. Esto puede ser usado para ver una rodaja del mundo y ayudar a ver dimensiones como el nether y cuevas.
+program_3d_edit.chunk_tool.create_chunks=Crear Chunks Vacíos
+program_3d_edit.chunk_tool.create_chunks_tooltip=Crea todos los chunks en la selección que todavía no existen. Los chunks existentes estarán intactos.
+program_3d_edit.chunk_tool.delete_chunks=Eliminar Chunks
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Elimina los chunks seleccionados. Esto eliminará el chunk y todos los datos dentro de él. La siguiente vez que vayas a ese chunk, el juego lo recreará.
+program_3d_edit.chunk_tool.prune_chunks=Eliminar Chunks No Seleccionados
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Elimina todos los chunks que no estén seleccionados. Esto eliminará el chunk y todos los datos dentro de él. La siguiente vez que vayas a ese chunk, el juego lo recreará.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Teletransportarse
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=La coordenada x de la cámara. Escribe una coordenada para ir a esa ubicación. Ctrl + C para copiar la coordenada. Ctrl + V para pegar.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=La coordenada y de la cámara. Escribe una coordenada para ir a esa ubicación. Ctrl + C para copiar la coordenada. Ctrl + V para pegar.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=La coordenada z de la cámara. Escribe una coordenada para ir a esa ubicación. Ctrl + C para copiar la coordenada. Ctrl + V para pegar.
+program_3d_edit.goto_ui.copy_button_tooltip=Copia los valores de X, Y y Zal portapapeles en la forma "0.0 0.0 0.0" (X, Y y Z respectivamente)
+program_3d_edit.goto_ui.paste_button_tooltip=Pega una coordenada copiada anteriormente en los campos. Los valores copiados deben ser 3, separados por comas o espacios.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Plataforma y versión de datos del mundo
+program_3d_edit.file_ui.projection_tooltip=Cambiar vista
+program_3d_edit.file_ui.location_tooltip=Mover cámara
+program_3d_edit.file_ui.speed_blocks_per_second=bps
+program_3d_edit.file_ui.speed_tooltip=Velocidad de la cámara en bloques por segundo
+program_3d_edit.file_ui.speed_dialog_name=Asignar velocidad de cámara
+program_3d_edit.file_ui.dim_tooltip=Seleccionar Dimensión
+program_3d_edit.file_ui.undo_tooltip=Deshacer
+program_3d_edit.file_ui.redo_tooltip=Rehacer
+program_3d_edit.file_ui.save_tooltip=Guardar Cambios
+program_3d_edit.file_ui.close_tooltip=Cerrar Mundo
