@@ -1,35 +1,27 @@
-# Licenses
+# License Summary
 
-See [LICENSE]() for the real license.
-This is a simplified version.
+This document is a summary of the license terms. For the full terms please see the [actual license](LICENSE).
 
-There are two licences that cover the various Amulet codebases.
-1) The Amulet Map Editor License
-2) The Amulet Library License
-
-The former applies to the code that makes up the user interface (this repository) and the bundled form of the program and the latter applies to a number of libraries that Amulet uses.
-
-This summary will only cover the former. See the libraries for the latter.
+The license covers the use of the program by end users and the use of our code by other code.
 
 ## Motive
-We want everyone to be able to use and contribute to Amulet, however developing the program costs money.
-Pathway are currently sponsoring the project but we need to design the licence to leave open potential income sources.
+We want everyone to be able to use and contribute to Amulet, however development costs money.
+The license is designed to be as open as possible while still protecting our investment in the project.
 
 ## License Summary
-- The program is free to use for non-commercial users.
-- The program is free to use for purely educational commercial purposes.
-- If your use case does not fit in the above you should chat to us about a commercial licence.
+- The program and code are free to use for non-commercial users and purely educational commercial purposes.
+- If your use case does not fit in the above you will need to purchase a commercial license.
 - You are allowed to modify the code however you wish and submit changes to us if you like.
-- You are not allowed to redistribute our code unless explicitly licenced to allow otherwise.
-
+- You are allowed to use and redistribute our code provided that you are not competing with us. You must make it clear that you are using our code but that you are not affiliated with us.
+- You are not allowed to use or modify our code in a way that violates a third party's license, terms or copyright.
 
 ## Frequently Asked Questions
 
 ### Am I allowed to use Amulet to edit my world?
 
-You can use Amulet for free as long as:
-- You are not making money using Amulet.
-- You are not making money from the content made using Amulet.
+You can use Amulet for free as long as you are not making money using Amulet or from content made using Amulet.
+
+You may not use Amulet in a way that violates a third party's license, terms or copyright.
 
 ### Can I make money using Amulet in an education setting?
 You are allowed to use Amulet for free and make money if your usage is purely educational.
@@ -42,31 +34,31 @@ Any content (eg. worlds or structures) created during that time must be used sol
 
 ### Can I make money using Amulet?
 
-Commercial usage includes getting paid to use Amulet and the manufacture of content (eg. worlds or structures) that is later monetised.
+Commercial usage includes getting paid to use Amulet and the manufacture of content (eg. worlds or structures) that are later monetised.
 
-If you are using Amulet in a commercial setting that does not fit into the educational exception then you should contact us about a commercial licence.
+If you are using Amulet in a commercial setting that does not fit into the educational exception then you must purchase a commercial license.
 
-### Can I redistribute or rehost your code?
-No. Unless the code is explicitly licensed to allow otherwise, you cannot redistribute or rehost any code from Amulet.
+### Can I distribute or rehost your code?
+You may distribute or rehost our code, but it must remain under the same license and have the following copyright notice.
 
-This includes the code in both source and compiled forms.
+`Copyright Amulet Team. (https://www.amuletmc.com/)`
 
-The only exception to this is forking the original repository on Github with the aim to modify or improve on the code.
+It must be clear to anyone that receives the code or application containing the code that it is written by us and that you are not affiliated with us.
 
-Some files (such as editor operations) are released under the MIT licence to allow redistribution. These files will have the MIT licence at the top of the file.
+We request, where possible, that you use the versions of the code that we host on pypi instead of distributing it yourself.
 
 ### Can I modify any part of Amulet?
-You are allowed to modify Amulet however you like.
+You are allowed to modify Amulet however you like provided it does not violate a third party's license, terms or copyright.
 
-If you want to make improvements we accept code submissions through pull requests.
+If you want to make improvements to our code we accept code submissions through pull requests on Github.
 
 ### Can I make and sell plugins for Amulet?
-Plugins are extensions to Amulet. 3D Editor Operations are an example of plugins for Amulet.
+Plugins are extensions that add features or functionality within our application ecosystem.
 
-Operations are programs that can be run from within Amulet Map Editor in the operations tab of the 3D editor.
+3D Editor Operations are an example of plugins for Amulet.
 
-You are allowed to make, distribute and license your operations however you wish.
+We wavie the noncompete and noncommercial clauses for plugins that exist within our application ecosystem.
 
-You are also allowed to make money through the sale or licensing of your operations if you wish.
+This means you are allowed to make, distribute, compete and license your plugins however you wish.
 
-Your operations can call Amulet code but may not directly include any Amulet code unless licenced to allow redistribution.
+You are also allowed to make money through the sale or licensing of your plugins if you wish.
