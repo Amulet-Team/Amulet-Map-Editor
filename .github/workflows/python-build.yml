@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.cfg.python-version }} ${{ matrix.cfg.architecture }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.cfg.python-version }}
         architecture: ${{ matrix.cfg.architecture }}
