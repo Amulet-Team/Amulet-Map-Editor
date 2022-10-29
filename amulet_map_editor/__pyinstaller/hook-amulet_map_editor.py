@@ -1,12 +1,4 @@
-import pkgutil
-from PyInstaller.utils.hooks import collect_data_files
-from amulet_map_editor import api, programs
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
-hiddenimports = [
-    name for _, name, _ in pkgutil.walk_packages(api.__path__, api.__name__ + ".")
-] + [
-    name
-    for _, name, _ in pkgutil.walk_packages(programs.__path__, programs.__name__ + ".")
-]
-
+hiddenimports = collect_submodules("amulet_map_editor")
 datas = collect_data_files("amulet_map_editor")
