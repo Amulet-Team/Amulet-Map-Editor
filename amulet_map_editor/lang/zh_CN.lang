@@ -109,7 +109,6 @@ program_3d_edit.tab_name=3D 编辑器
 
 ## Canvas
 program_3d_edit.canvas.please_wait=渲染器正在初始化, 请稍作等待
-program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下载 Bedrock vanilla 纯净资源包
 program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下载基岩版纯净资源包
 program_3d_edit.canvas.downloading_java_vanilla_resource_pack=正在下载Java版纯净资源包
 program_3d_edit.canvas.java_rp_failed=无法下载最新版本的Java版纯净资源包.
