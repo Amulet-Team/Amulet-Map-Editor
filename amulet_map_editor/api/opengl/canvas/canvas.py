@@ -1,5 +1,6 @@
 from typing import Optional
 import logging
+import sys
 
 import wx
 from wx import glcanvas
@@ -48,7 +49,16 @@ class BaseCanvas(glcanvas.GLCanvas):
             style=wx.WANTS_CHARS,
         )
 
-        self._context = glcanvas.GLContext(self)
+        if sys.platform == "linux":
+            # setup the OpenGL context. This apparently fixes Amulet-Team/Amulet-Map-Editor#84
+            self._context = glcanvas.GLContext(self)
+        else:
+            # This is required for MacOS. Amulet-Team/Amulet-Map-Editor#597
+            context_attributes = wx.glcanvas.GLContextAttrs()
+            context_attributes.CoreProfile().Robust().ResetIsolation().EndList()
+            self._context = glcanvas.GLContext(
+                self, ctxAttrs=context_attributes
+            )  # setup the OpenGL context
         if not self._context.IsOK():
             raise Exception(f"Failed setting up context")
 
