@@ -11,7 +11,7 @@ KeyCharacterSet = set(string.ascii_lowercase + string.digits + "_.")
 class LangTestCase(unittest.TestCase):
     def test_lang(self):
         for lang_dir in lang_dirs():
-            for lang_path in glob.glob(os.path.join(lang_dir, "*")):
+            for lang_path in glob.glob(os.path.join(glob.escape(lang_dir), "*")):
                 self.assertTrue(
                     lang_path.endswith(".lang"),
                     f'{lang_path} does not end with ".lang".',

@@ -106,7 +106,7 @@ class OpenGLResourcePack:
                     os.stat(path).st_mtime
                     for pack in self._resource_pack.pack_paths
                     for path in glob.glob(
-                        os.path.join(pack, "**", "*.*"), recursive=True
+                        os.path.join(glob.escape(pack), "**", "*.*"), recursive=True
                     )
                 ),
                 default=0,

@@ -69,7 +69,7 @@ for module_path in (
     MINECRAFT_MODEL_READER,
 ):
     for path in glob.glob(
-        os.path.join(os.path.abspath(module_path), "**", "*.py"), recursive=True
+        os.path.join(glob.escape(os.path.abspath(module_path)), "**", "*.py"), recursive=True
     ):
         if path not in added_source:
             rel_path: str = os.path.relpath(path, os.path.dirname(module_path))
