@@ -92,7 +92,7 @@ def get_languages() -> List[str]:
     """Get a list of all supported language codes."""
     langs = set()
     for d in _lang_dirs:
-        for l in glob.glob(os.path.join(d, "*.lang")):
+        for l in glob.glob(os.path.join(glob.escape(d), "*.lang")):
             langs.add(os.path.basename(l)[:-5])
     return sorted(langs)
 
@@ -124,7 +124,7 @@ def _find_langs(path: str) -> Tuple[Optional[str], Optional[str], Optional[str]]
     """Find the default, language specific and region specific lang paths."""
     langs = {
         parse_language_id(os.path.basename(lpath)[:-5]): lpath
-        for lpath in glob.glob(os.path.join(path, "*.lang"))
+        for lpath in glob.glob(os.path.join(glob.escape(path), "*.lang"))
     }
 
     default_key = parse_language_id(_default_language)
