@@ -47,7 +47,7 @@ def _init_log():
     # set up handlers
     os.makedirs(logs_path, exist_ok=True)
     # remove all log files older than a week
-    for path in glob.glob(os.path.join(logs_path, "*.log")):
+    for path in glob.glob(os.path.join(glob.escape(logs_path), "*.log")):
         if (
             os.path.isfile(path)
             and os.path.getmtime(path) < time.time() - 3600 * 24 * 7

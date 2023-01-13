@@ -49,15 +49,26 @@ menu_bar.help.menu_name=帮助
 ## The start screen
 main_menu.tab_name=主菜单
 main_menu.open_world=打开世界
-main_menu.user_manual=User Manual
-main_menu.bug_tracker=Bug Tracker
+main_menu.user_manual=用户帮助文档
+main_menu.bug_tracker=Bug反馈
 main_menu.discord=Amulet Discord
+
+# Language Select
+language_select.title=设置语言
+language_select.help=请从以下列表中选取需要在Amulet使用的语言.
+language_select.contribute=点击此处前往官方页面修复错误或添加语言
+
+# Warning Dialog
+warning_dialog.title=欢迎使用Amulet
+warning_dialog.content=你好, 欢迎使用Amulet.\n\n我们建议您在打开您需要修改的地图之前先进行备份.\n\n我们尽力确保 Amulet 不会损毁地图, 但是所保存的格式没有文档记录, 并且在不断变化, 有时我们会出错.\n\n出于这些原因, 我们只支持已经过测试的完整正式版本.\nMinecraft Java版快照、Bedrock测试版和实验功能可能在Amulet中有效, 但未经测试, 因此不受Amulet官方支持.\n\n当前暂不支持实体(entities), 物品(items)仅在与原地图相同平台内支持 (例如需要修改的地图为Java平台版本, 仅支持输出时仍为Java版平台的地图, 输出为基岩版时则可能导致地图物品出错, 不受到官方支持).\n如果您发现需要添加的功能或Amulet存在需要修复的Bug, 请在编辑器主菜单选择 “Bug反馈” 前往提交问题反馈.\n在您创建新反馈前, 请先搜索该问题是否已经被其他人所报告.\n\n如果您第一次使用本工具, 我们推荐您先阅读官方 “帮助手册” 以熟悉本程序的操作流程.\n\n- Amulet团队 致上
+warning_dialog.do_not_show_again=不再显示
+warning_dialog.i_understand=我明白了
 
 # Update check
 ## The window displayed when a newer version of Amulet is available
 update_check.newer_version_released=一个新版本的Amulet现已发布!
 update_check.new_version=新版本:
-update_check.current_version=你的版本:
+update_check.current_version=你当前使用的版本:
 update_check.update=前往下载页面
 update_check.ok=确认
 
@@ -74,9 +85,9 @@ select_world.loading_world_failed=世界加载失败.
 
 # About
 ## The default program when a world is opened
-program_about.tab_name=信息
+program_about.tab_name=世界信息
 program_about.currently_opened_world=当前打开的世界:
-program_about.choose_from_options=从左边的选项中选择你想进行的操作.\n你可以随时在这些选项之间进行切换.
+program_about.choose_from_options=从左侧的标签页中选择你想进行的操作.\n你可以随时在这些页面之间进行切换.
 
 # Convert
 ## The program used to convert a world
@@ -198,11 +209,12 @@ program_3d_edit.chunk_tool.min_y=最小y坐标
 program_3d_edit.chunk_tool.min_y_tooltip=在自上而下的俯视图中绘制的最低的y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
 program_3d_edit.chunk_tool.max_y=最大y坐标
 program_3d_edit.chunk_tool.max_y_tooltip=在自上而下的俯视图中绘制的最高的y坐标. 该功能可以用来检视世界的一个切片, 并帮助查看像地狱和洞穴这样的区域.
+program_3d_edit.chunk_tool.create_chunks=创建空白区块
+program_3d_edit.chunk_tool.create_chunks_tooltip=创建选择中尚未存在的区块. 已经存在的区块将保持不变.
 program_3d_edit.chunk_tool.delete_chunks=删除选中区块
 program_3d_edit.chunk_tool.delete_chunks_tooltip=删除选中的区块. 该操作将会删除实际的区块和其中包含的所有数据. 下次你在游戏中加载该区域时, 游戏将会重新创建这些区块.
 program_3d_edit.chunk_tool.prune_chunks=仅保留选中区块
 program_3d_edit.chunk_tool.prune_chunks_tooltip=删除所有未被选中的区块. 该操作将会删除实际的区块和其中包含的所有数据. 下次你在游戏中加载该区域时, 游戏将会重新创建这些区块.
-
 ## Goto/Teleport window
 program_3d_edit.goto_ui.title=传送
 program_3d_edit.goto_ui.x_label=x:
@@ -217,7 +229,9 @@ program_3d_edit.goto_ui.paste_button_tooltip=将先前复制的坐标粘贴到�
 ## File panel
 program_3d_edit.file_ui.version_tooltip=世界的平台和版本
 program_3d_edit.file_ui.projection_tooltip=切换视图
+program_3d_edit.file_ui.speed_blocks_per_second=bps
 program_3d_edit.file_ui.location_tooltip=移动摄像机
+program_3d_edit.file_ui.speed_dialog_name=设置视角移动速度
 program_3d_edit.file_ui.dim_tooltip=选择维度
 program_3d_edit.file_ui.undo_tooltip=撤销
 program_3d_edit.file_ui.redo_tooltip=重做

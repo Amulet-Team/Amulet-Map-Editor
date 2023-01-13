@@ -106,7 +106,7 @@ class OpenGLResourcePack:
                     os.stat(path).st_mtime
                     for pack in self._resource_pack.pack_paths
                     for path in glob.glob(
-                        os.path.join(pack, "**", "*.*"), recursive=True
+                        os.path.join(glob.escape(pack), "**", "*.*"), recursive=True
                     )
                 ),
                 default=0,
@@ -141,7 +141,7 @@ class OpenGLResourcePack:
                         json.dump((mod_time, bounds), f)
 
             self._image_width, self._image_height = atlas.size
-            self._image = numpy.asarray(atlas, numpy.uint8).ravel()
+            self._image = numpy.array(atlas, numpy.uint8).ravel()
             self._texture_bounds = bounds
 
     def _setup_texture(self, context_id: str):

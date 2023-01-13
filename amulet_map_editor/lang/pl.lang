@@ -1,0 +1,269 @@
+#This license applies to this file only.
+#
+#-- begin license --
+#MIT License
+#
+#Copyright (c) 2021 Amulet-Team
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+#-- end license --
+
+
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
+# Meta
+meta.amulet=Amulet
+
+# Shared strings
+shared.check_console=Sprawdź konsolę po więcej szczegółów.
+
+# App
+app.world_still_used=Świat jest wciąż używany. Prosimy go najpierw zamknąć.
+app.browser_open_tooltip=Kliknięcie otworzy stronę w Twojej przeglądarce
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Zamknij Świat
+
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&Plik
+menu_bar.file.open_world=Otwórz Świat
+menu_bar.file.close_world=Zamknij Świat
+menu_bar.file.quit=Wyjdź
+menu_bar.options.menu_name=&Opcje
+menu_bar.help.menu_name=&Pomoc
+
+# Main menu
+## The start screen
+main_menu.tab_name=Menu Główne
+main_menu.open_world=Otwórz Świat
+main_menu.user_manual=Instrukcja
+main_menu.bug_tracker=Bug Tracker
+main_menu.discord=Discord Amuleta
+
+# Language Select
+language_select.title=Wybór Języka
+language_select.help=Wybierz język z poniższej listy, którego chcesz używać w Amulecie.
+language_select.contribute=Jeśli chcesz naprawić lub dodać tłumaczenia, kliknij tutaj.
+
+# Warning Dialog
+warning_dialog.title=Witaj w Amulecie
+warning_dialog.content=Cześć, witaj w Amulecie.\n\nZalecamy tworzenie kopii zapasowych Twoich światów przed otwieraniem ich w Amulecie.\n\nStaramy się upewniać, że Amulet nie uszkadza światów, ale format zapisu jest nieudokumentowany, ciągle się zmienia i czasami po prostu się mylimy.\n\nZ tych powodów oficjalnie wspieramy tylko pełne wydania, na których program przetestowaliśmy.\nSnapshoty Javy, bety Bedrocka i funkcje eksperymentalne mogą działać, ale są nieprzetestowane i nie są oficjalnie wspierane.\n\nObecnie moby nie są wspierane i przedmioty są wspierane tylko na tych samych platformach.\nJeśli chcesz, żeby jakaś funkcja została dodana lub znajdziesz błąd, który wymana naprawy, zgłoś to na bug trackerze.\nProsimy użyć narzędzia wyszukiwania, aby zobaczyć, czy zostało to już zgłoszone przed stworzeniem nowego ticketa.\n\nJeśli jesteś tu nowy/a, zalecamy przeczytanie instrukcji obsługi, aby zapoznać się z programem.\n\n- Zespół Amulet
+warning_dialog.do_not_show_again=Nie pokazuj tego ponownie
+warning_dialog.i_understand=Rozumiem
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=Została wydana nowa wersja Amuleta!
+update_check.new_version=Nowa Wersja:
+update_check.current_version=Twoja Wersja:
+update_check.update=Przejdź na stronę pobierania
+update_check.ok=Ok
+
+# Select world
+## The window when selecting a world to open
+select_world.title=Wybór Świata
+select_world.open_world_warning=Zamknij świat w grze oraz inne narzędzia przed otwarciem go w Amulecie.
+select_world.open_world_button=Otwórz inny świat
+select_world.open_world_dialogue=Wybierz katalog świata Minecraft
+select_world.select_directory_failed=Nie udało się otworzyć folderu!
+select_world.recent_worlds=Ostatnio otwarte światy:
+select_world.no_loader_found=Nie znaleziono loadera dla tego świata.
+select_world.loading_world_failed=Błąd przy wczytywaniu świata.
+
+# About
+## The default program when a world is opened
+program_about.tab_name=Informacje
+program_about.currently_opened_world=Aktualnie otwarty świat:
+program_about.choose_from_options=Wybierz z opcji po lewej, co chcesz zrobić.\nMożesz się pomiędzy nimi przełączać w dowolnej chwili.
+
+# Convert
+## The program used to convert a world
+program_convert.tab_name=Konwertowanie
+program_convert.convert_button=Konwertuj
+program_convert.input_world=Świat Wejściowy:
+program_convert.output_world=Świat Wyjściowy:
+program_convert.select_output_world=Wybierz Świat Wyjściowy
+program_convert.input_output_must_different=Świat wejściowy i wyjściowy nie mogą być takie same!
+program_convert.select_before_converting=Wybierz świat przed konwertowaniem!
+program_convert.conversion_completed=Konwertowanie świata ukończone
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=Instrukcja (online)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
+program_3d_edit.tab_name=Edytor 3D
+
+## Canvas
+program_3d_edit.canvas.please_wait=Renderer się wczytuję, proszę czekać
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Pobieranie paczki zasobów vanilla Bedrocka
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Pobieranie paczki zasobów vanilla Javy
+program_3d_edit.canvas.java_rp_failed=Nie udało się pobrać najnowszej paczki zasobów vanilla Javy.
+program_3d_edit.canvas.java_rp_failed_default=Sprawdź swoje połączenie z internetem i uruchom ponownie Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=Certyfikaty dostępu do internetu nie zostały zainstalowane.\nUruchom program "Install Certificates.command", który znajdziesz w "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Ładowanie paczek zasobów
+program_3d_edit.canvas.creating_texture_atlas=Tworzenie atlasu tekstur
+program_3d_edit.canvas.setting_up_renderer=Konfigurowanie renderera
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Zapisz
+program_3d_edit.menu_bar.edit.menu_name=&Edytuj
+program_3d_edit.menu_bar.edit.undo=Cofnij
+program_3d_edit.menu_bar.edit.redo=Ponów
+program_3d_edit.menu_bar.edit.cut=Wytnij
+program_3d_edit.menu_bar.edit.copy=Kopiuj
+program_3d_edit.menu_bar.edit.paste=Wklej
+program_3d_edit.menu_bar.edit.delete=Usuń Bloki
+program_3d_edit.menu_bar.edit.goto=Przejdź do
+program_3d_edit.menu_bar.edit.select_all=Wybierz Wszystko
+program_3d_edit.menu_bar.options.controls=Sterowanie...
+program_3d_edit.menu_bar.options.options=Opcje...
+program_3d_edit.menu_bar.help.user_guide=Instrukcja (online)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Usuń Bloki
+program_3d_edit.select_tool.delete_button_tooltip=Usuwa bloki w zaznaczonym obszarze.
+program_3d_edit.select_tool.copy_button=Kopiuj
+program_3d_edit.select_tool.copy_button_tooltip=Kopiuje zaznaczony obszar, aby później go wkleić. Można go wkleić do dowolnego świata i wymiaru.
+program_3d_edit.select_tool.cut_button=Wytnij
+program_3d_edit.select_tool.cut_button_tooltip=Kopiuje i usuwa zaznaczony obszar, aby później go wkleić. Można go wkleić do dowolnego świata i wymiaru.
+program_3d_edit.select_tool.paste_button=Wklej
+program_3d_edit.select_tool.paste_button_tooltip=Wkleja na świat poprzednio skopiowany lub wycięty obszar.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Ustawia współrzędną x zielonego rogu aktywnego obszaru. Wpisz liczbę lub użyj scrolla myszki po najechaniu.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Ustawia współrzędną y zielonego rogu aktywnego obszaru. Wpisz liczbę lub użyj scrolla myszki po najechaniu.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Ustawia współrzędną z zielonego rogu aktywnego obszaru. Wpisz liczbę lub użyj scrolla myszki po najechaniu.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Ustawia współrzędną x niebieskiego rogu aktywnego obszaru. Wpisz liczbę lub użyj scrolla myszki po najechaniu.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Ustawia współrzędną y niebieskiego rogu aktywnego obszaru. Wpisz liczbę lub użyj scrolla myszki po najechaniu.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Ustawia współrzędną z niebieskiego rogu aktywnego obszaru. Wpisz liczbę lub użyj scrolla myszki po najechaniu.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=Kształt aktywnego obszaru za pomocą oznakowania Minecraftowego selektora rozmiaru.
+program_3d_edit.select_tool.box_size_tooltip=Rozmiar aktywnego obszaru w blokach.
+program_3d_edit.select_tool.button_point1=Przesuń punkt nr 1
+program_3d_edit.select_tool.button_point1_tooltip=Wciśnij i przytrzymaj ten przycisk, i steruj ruchem, by przesunąć zielony punkt zaznaczenia.
+program_3d_edit.select_tool.button_point2=Przesuń punkt nr 2
+program_3d_edit.select_tool.button_point2_tooltip=Wciśnij i przytrzymaj ten przycisk, i steruj ruchem, by przesunąć niebieski punkt zaznaczenia.
+program_3d_edit.select_tool.button_selection_box=Przesuń obszar
+program_3d_edit.select_tool.button_selection_box_tooltip=Wciśnij i przytrzymaj ten przycisk, i steruj ruchem, by przesunąć aktywny obszar.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=Lokalizacja
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=Lokalizacja x, gdzie środek zaznaczonego obszaru zostanie położony. Wpisz liczbę, użyj scrolla myszki po najechaniu lub strzałek, by zmienić.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=Lokalizacja y, gdzie środek zaznaczonego obszaru zostanie położony. Wpisz liczbę, użyj scrolla myszki po najechaniu lub strzałek, by zmienić.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=Lokalizacja z, gdzie środek zaznaczonego obszaru zostanie położony. Wpisz liczbę, użyj scrolla myszki po najechaniu lub strzałek, by zmienić.
+program_3d_edit.paste_tool.move_selection_label=Przesuń wybrany obszar
+program_3d_edit.paste_tool.move_selection_tooltip=Wciśnij i przytrzymaj ten przycisk, i steruj ruchem, by przesunąć zaznaczony obszar.
+program_3d_edit.paste_tool.rotation_label=Rotacja
+program_3d_edit.paste_tool.free_rotation_label=Swobodny Wybór Rotacji
+program_3d_edit.paste_tool.free_rotation_tooltip=Jeśli nie zaznaczono, wybrany obszar może być obracany o wielokrotności 90 stopni. Jeśli zaznaczono, wybrany obszar może być obracany precyzyjniej, o jeden stopień.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=Kąt w stopniach na osi x, o który zaznaczony obszar jest obrócony. Pamiętaj, że jest to oś x modelu, która jest przekształcana przez rotację z i y, więc może nie pasować do globalnej osi x.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=Kąt w stopniach na osi y, o który zaznaczony obszar jest obrócony. Pamiętaj, że jest to oś y modelu, która jest przekształcana przez rotację z, więc może nie pasować do globalnej osi y.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=Kąt w stopniach na osi z, o który zaznaczony obszar jest obrócony.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Kliknij, by obrócić zaznaczony obszar o 90 stopni przeciwnie do ruchu wskazówek zegara względem rotacji widoku.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Kliknij, by obrócić zaznaczony obszar o 90 stopni zgodnie z ruchem wskazówek zegara względem rotacji widoku.
+program_3d_edit.paste_tool.scale_label=Skala
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=Skala modelu na osi x.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=Skala modelu na osi y.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=Skala modelu na osi z.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Odbija poziomo zaznaczony obszar w stosunku do kierunku, w którym patrzy kamera.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Odbija pionowo zaznaczony obszar w stosunku do kierunku, w którym patrzy kamera.
+program_3d_edit.paste_tool.copy_air_label=Wklej Powietrze
+program_3d_edit.paste_tool.copy_air_tooltip=Jeśli włączone, wszystkie bloki powietrza w wklejonej strukturze nadpiszą inne istniejące bloki. Jeśli wyłączone, istniejące bloki w tych lokalizacjach zostaną nienaruszone i powietrze nie zostanie skopiowane.
+program_3d_edit.paste_tool.copy_water_label=Wklej Wodę
+program_3d_edit.paste_tool.copy_water_tooltip=Jeśli włączone, wszystkie bloki wody w wklejonej strukturze nadpiszą inne istniejące bloki. Jeśli wyłączone, istniejące bloki w tych lokalizacjach zostaną nienaruszone i woda nie zostanie skopiowana.
+program_3d_edit.paste_tool.copy_lava_label=Wklej Lawę
+program_3d_edit.paste_tool.copy_lava_tooltip=Jeśli włączone, wszystkie bloki lawy w wklejonej strukturze nadpiszą inne istniejące bloki. Jeśli wyłączone, istniejące bloki w tych lokalizacjach zostaną nienaruszone i lawa nie zostanie skopiowana.
+program_3d_edit.paste_tool.confirm_label=Potwierdź
+program_3d_edit.paste_tool.confirm_tooltip=Kliknij, aby wkleić strukturę do świata o określonej lokalizacji, rotacji i skali.
+program_3d_edit.paste_tool.zero_scale_message=Jedna z wartości skali wynosiła 0, więc nic nie zostało skopiowane.
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Min Y
+program_3d_edit.chunk_tool.min_y_tooltip=Minimalna współrzędna y do wyświetlenia w widoku z lotu ptaka. Można tego użyć do obejrzenia kawałka świata lub jako pomoc przy oglądaniu netheru, czy jaskiń.
+program_3d_edit.chunk_tool.max_y=Max Y
+program_3d_edit.chunk_tool.max_y_tooltip=Maksymalna współrzędna y do wyświetlenia w widoku z lotu ptaka. Można tego użyć do obejrzenia kawałka świata lub jako pomoc przy oglądaniu netheru, czy jaskiń.
+program_3d_edit.chunk_tool.create_chunks=Stwórz Puste Chunki
+program_3d_edit.chunk_tool.create_chunks_tooltip=Tworzy wszystkie chunki w zaznaczonym obszarze, które jeszcze nie istnieją. Chunki, które już istnieją, pozostaną niezmienione.
+program_3d_edit.chunk_tool.delete_chunks=Usuń Chunki
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Usuwa zaznaczone chunki. To usunie chunki wraz z ich wszystkimi danymi. Następnym razem, gdy wczytasz ich obszar w grze, zostaną one wygenerowane na nowo.
+program_3d_edit.chunk_tool.prune_chunks=Usuń Niezaznaczone Chunki
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Usuwa wszystkie niezaznaczone chunki. To usunie chunki wraz z ich wszystkimi danymi. Następnym razem, gdy wczytasz ich obszar w grze, zostaną one wygenerowane na nowo.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Teleportacja
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Współrzędna x kamery. Wpisz współrzędną, do której chcesz się przenieść. Ctrl + C, by skopiować współrzędną. Ctrl + V, by wkleić.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Współrzędna y kamery. Wpisz współrzędną, do której chcesz się przenieść. Ctrl + C, by skopiować współrzędną. Ctrl + V, by wkleić.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Współrzędna z kamery. Wpisz współrzędną, do której chcesz się przenieść. Ctrl + C, by skopiować współrzędną. Ctrl + V, by wkleić.
+program_3d_edit.goto_ui.copy_button_tooltip=Kopiuje wartości x, y oraz z do schowka w formacie "0.0 0.0 0.0" (odpowiednio x, y oraz z)
+program_3d_edit.goto_ui.paste_button_tooltip=Wkleja poprzednio skopiowane koordynaty do ich miejsc. Skopiowana wartość musi zawierać trzy liczby oddzielone spacją lub przecinkami.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Platforma i wersja danych świata
+program_3d_edit.file_ui.projection_tooltip=Zmień widok
+program_3d_edit.file_ui.location_tooltip=Przesuń kamerę
+program_3d_edit.file_ui.speed_blocks_per_second=bns
+program_3d_edit.file_ui.speed_tooltip=Szybkość kamery w blokach na sekundę
+program_3d_edit.file_ui.speed_dialog_name=Ustaw szybkość kamery
+program_3d_edit.file_ui.dim_tooltip=Wybierz wymiar
+program_3d_edit.file_ui.undo_tooltip=Cofnij
+program_3d_edit.file_ui.redo_tooltip=Ponów
+program_3d_edit.file_ui.save_tooltip=Zapisz zmiany
+program_3d_edit.file_ui.close_tooltip=Zamknij świat

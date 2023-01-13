@@ -308,7 +308,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             render_distance_ui = wx.SpinCtrl(
-                dialog, min=0, max=50, initial=render_distance
+                dialog, min=0, max=500, initial=render_distance
             )
 
             def set_render_distance(evt):

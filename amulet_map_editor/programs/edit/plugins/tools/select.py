@@ -170,7 +170,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         button_sizer.Add(self._box_size_selector_text, 0, wx.ALL | wx.EXPAND, 5)
 
         self._box_volume_text = wx.StaticText(
-            self._button_panel, label="0x0x0", style=wx.ALIGN_CENTER_HORIZONTAL
+            self._button_panel, label="0x0x0=0", style=wx.ALIGN_CENTER_HORIZONTAL
         )
         button_sizer.Add(self._box_volume_text, 0, wx.ALL | wx.EXPAND, 5)
         self._box_volume_text.SetToolTip(
@@ -291,15 +291,18 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._x2.SetValue(x2)
         self._y2.SetValue(y2)
         self._z2.SetValue(z2)
+        xdim = int(abs(x2 - x1))
+        ydim = int(abs(y2 - y1))
+        zdim = int(abs(z2 - z1))
         self._box_size_selector_text.SetLabel(
             self._box_size_selector_fstring.format(
-                x=int(abs(x2 - x1)),
-                y=int(abs(y2 - y1)),
-                z=int(abs(z2 - z1)),
+                x=xdim,
+                y=ydim,
+                z=zdim,
             )
         )
         self._box_volume_text.SetLabel(
-            f"{int(abs(x2 - x1)) + 1}x{int(abs(y2 - y1)) + 1}x{int(abs(z2 - z1)) + 1}"
+            f"{xdim + 1}x{ydim + 1}x{zdim + 1}={(xdim + 1)*(ydim + 1)*(zdim + 1):,}"
         )
         self.Layout()
 

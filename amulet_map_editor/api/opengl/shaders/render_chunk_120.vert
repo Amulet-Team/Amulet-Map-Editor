@@ -1,4 +1,4 @@
-# version 120
+#version 120
 #extension GL_ARB_explicit_attrib_location : enable
 
 layout(location = 0) in vec3 positions;

@@ -1,6 +1,6 @@
 # cython: language_level=3, boundscheck=False, wraparound=False
-# distutils: extra_compile_args = -openmp
-# distutils: extra_link_args = -openmp
+# distutils: extra_compile_args = OPENMP_CCARGS
+# distutils: extra_link_args = OPENMP_CLARGS
 
 import numpy
 cimport numpy
@@ -14,6 +14,15 @@ cdef extern from "stdlib.h":
 from cpython cimport array
 import array
 from cython.parallel import prange
+
+cdef extern from *:
+    """
+    #ifdef _OPENMP
+    #pragma message ("openmp enabled")
+    #else
+    #pragma message ("openmp disabled")
+    #endif
+    """
 
 cdef float _brightness_step = 0.15
 cdef dict _brightness_multiplier = {

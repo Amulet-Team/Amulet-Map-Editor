@@ -83,7 +83,9 @@ def show_loading_dialog(
                         if len(progress) >= 1:
                             progress = progress[0]
                     if isinstance(progress, (int, float)) and isinstance(message, str):
-                        dialog.Update(min(9999, max(0, progress * 10_000)), message)
+                        dialog.Update(
+                            min(9999, max(0, int(progress * 10_000))), message
+                        )
                     wx.Yield()
             except StopIteration as e:
                 obj = e.value
