@@ -48,17 +48,19 @@ class BaseCanvas(glcanvas.GLCanvas):
             size=parent.GetClientSize(),
             style=wx.WANTS_CHARS,
         )
-
-        if sys.platform == "linux":
-            # setup the OpenGL context. This apparently fixes Amulet-Team/Amulet-Map-Editor#84
-            self._context = glcanvas.GLContext(self)
-        else:
+        if sys.platform == "darwin":
             # This is required for MacOS. Amulet-Team/Amulet-Map-Editor#597
             context_attributes = wx.glcanvas.GLContextAttrs()
             context_attributes.CoreProfile().Robust().ResetIsolation().EndList()
             self._context = glcanvas.GLContext(
                 self, ctxAttrs=context_attributes
             )  # setup the OpenGL context
+        else:
+            # This is required for linux and windows.
+            # Amulet-Team/Amulet-Map-Editor#84
+            # Amulet-Team/Amulet-Map-Editor#856
+            self._context = glcanvas.GLContext(self)
+
         if not self._context.IsOK():
             raise Exception(f"Failed setting up context")
 
