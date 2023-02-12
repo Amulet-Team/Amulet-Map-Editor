@@ -1,0 +1,269 @@
+#This license applies to this file only.
+#
+#-- begin license --
+#MIT License
+#
+#Copyright (c) 2021 Amulet-Team
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+#-- end license --
+
+
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
+# Meta
+meta.amulet=Amulet
+
+# Загальні строки
+shared.check_console=Перевірте консоль для отримання більш детальної інформації.
+
+# Додаток
+app.world_still_used=Світ досі використовується. Будь ласка, спочатку закрийте його
+app.browser_open_tooltip=При натисканні відкриється сторінка у браузері
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Закрити світ
+
+# Строка меню
+## Меню, що відображається у верхній частині екрана
+menu_bar.file.menu_name=&Файл
+menu_bar.file.open_world=Відкрити світ
+menu_bar.file.close_world=Закрити світ
+menu_bar.file.quit=Вихід
+menu_bar.options.menu_name=&Параметри
+menu_bar.help.menu_name=&Допомога
+
+# Головне меню
+## Стартовий екран
+main_menu.tab_name=Головне меню
+main_menu.open_world=Відкрити світ
+main_menu.user_manual=Посібник користувача
+main_menu.bug_tracker=Відстеження помилок
+main_menu.discord=Amulet Discord
+
+# Вибір мови
+language_select.title=Вибір мови
+language_select.help=Виберіть мову для використання в Amulet зі списку нижче.
+language_select.contribute=Якщо ви бажаєте виправити або додати переклад, натисніть тут.
+
+# Діалог попередження
+warning_dialog.title=Ласкаво просимо в Amulet
+warning_dialog.content=Ласкаво просимо в Amulet.\n\nМи рекомендуємо створювати резервні копії ваших світів, перш ніж відкривати їх у Amulet.\n\nММи намагаємося зробити так, щоб Amulet не пошкоджував світи, але формат збереження не документований і постійно змінюється, а іноді Amulet просто помиляється.\n\nЗ цих причин ми офіційно підтримуємо лише повні версії, які ми протестували.\nJava snapshot-и, бета-версії Bedrock та експериментальні функції можуть працювати, але вони не протестовані і не підтримуються офіційно.\n\nНа даний момент сутності не підтримуються, а елементи підтримуються лише в межах однієї платформи.\nЯкщо ви хочете запропонувати нову функцію, або знайшли помилку, яку необхідно виправити, повідомте про неї у нашому баг-трекері.\nПерш ніж створювати новий запит, скористайтеся інструментом пошуку, щоб дізнатися, чи повідомлялося про нього раніше.\n\nЯкщо ви новачок, ми рекомендуємо прочитати посібник користувача, щоб ознайомитися з програмою.\n\n- Команда Amulet
+warning_dialog.do_not_show_again=Не показуйте це знову
+warning_dialog.i_understand=Зрозуміло
+
+# Перевірка оновлень
+## Вікно, що відображається при появі новішої версії Amulet
+update_check.newer_version_released=Вийшла нова версія Amulet!
+update_check.new_version=Нова версія:
+update_check.current_version=Ваша версія:
+update_check.update=Перейти на сторінку завантаження
+update_check.ok=ОК
+
+# Оберіть світ
+## Вікно при виборі світу для відкриття
+select_world.title=Вибір світу
+select_world.open_world_warning=Закрийте світ у грі та інші інструменти перед відкриттям в Amulet.
+select_world.open_world_button=Відкрити інший світ
+select_world.open_world_dialogue=Виберіть папку світу Minecraft
+select_world.select_directory_failed=Не вдалося відкрити папку!
+select_world.recent_worlds=Нещодавно відкриті світи
+select_world.no_loader_found=Неможливо знайти завантажувач для цього світу.
+select_world.loading_world_failed=Помилка завантаження світу.
+
+# Додатково
+## Програма за замовчуванням під час відкриття світу
+program_about.tab_name=Додатково
+program_about.currently_opened_world=Поточний відкритий світ:
+program_about.choose_from_options=Виберіть із запропонованих зліва варіантів те, що ви хочете зробити.\nВи можете перемикатися між ними в будь-який час.
+
+# Перетворення
+## Програма, що використовується для перетворення світу
+program_convert.tab_name=Перетворити
+program_convert.convert_button=Перетворити
+program_convert.input_world=Вхідний світ:
+program_convert.output_world=Вихідний світ:
+program_convert.select_output_world=Виберіть вихідний світ
+program_convert.input_output_must_different=Вхідний та вихідний світи мають бути різними!
+program_convert.select_before_converting=Виберіть світ перед перетворенням!
+program_convert.conversion_completed=Перетворення світу завершено
+
+## Панель меню
+program_convert.menu_bar.help.user_guide=Посібник користувача (онлайн)
+
+# 3D-редактор
+## Програма, що використовується для редагування світу за допомогою 3D-переглядача
+program_3d_edit.tab_name=3D-редактор
+
+## Канвас
+program_3d_edit.canvas.please_wait=Зачекайте, поки рендерер завантажиться
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Завантаження ванільного ресурсного пакету Bedrock
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Завантаження ванільного ресурсного пакету Java
+program_3d_edit.canvas.java_rp_failed=Не вдалося завантажити останній пакет ресурсів Java.
+program_3d_edit.canvas.java_rp_failed_default=Перевірте підключення до Інтернету та перезапустіть Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=Сертифікати для доступу до Інтернету не були встановлені.\nЗапустіть програму "Install Certificates.command", яку можна знайти в "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Завантаження пакетів ресурсів
+program_3d_edit.canvas.creating_texture_atlas=Створення атласу текстур
+program_3d_edit.canvas.setting_up_renderer=Налаштування рендерингу
+
+## Панель меню
+program_3d_edit.menu_bar.file.save=Зберегти
+program_3d_edit.menu_bar.edit.menu_name=&Редагування
+program_3d_edit.menu_bar.edit.undo=Скасувати
+program_3d_edit.menu_bar.edit.redo=Повторити
+program_3d_edit.menu_bar.edit.cut=Вирізати
+program_3d_edit.menu_bar.edit.copy=Копіювати
+program_3d_edit.menu_bar.edit.paste=Вставити
+program_3d_edit.menu_bar.edit.delete=Видалити блоки
+program_3d_edit.menu_bar.edit.goto=Перейти
+program_3d_edit.menu_bar.edit.select_all=Виділити усе
+program_3d_edit.menu_bar.options.controls=Керування...
+program_3d_edit.menu_bar.options.options=Параметри...
+program_3d_edit.menu_bar.help.user_guide=Посібник користувача (онлайн)
+
+## Інструмент вибору
+program_3d_edit.select_tool.delete_button=Видалити блоки
+program_3d_edit.select_tool.delete_button_tooltip=Видалити блоки в обраній області.
+program_3d_edit.select_tool.copy_button=Копіювати
+program_3d_edit.select_tool.copy_button_tooltip=Копіювання обраної області для подальшої вставки. Можна вставити в будь-який світ і вимір.
+program_3d_edit.select_tool.cut_button=Вирізати
+program_3d_edit.select_tool.cut_button_tooltip=Копіювання обраної області для подальшої вставки та видалення. Може бути вставлена в будь-який світ та вимір.
+program_3d_edit.select_tool.paste_button=Вставити
+program_3d_edit.select_tool.paste_button_tooltip=Вставити раніше скопійовану або вирізану область у світ.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Встановіть координату x зеленого кута активного поля. Введіть число або прокрутіть колесо миші під час наведення.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Встановіть координату y зеленого кута активного поля. Введіть число або прокрутіть колесо миші під час наведення.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Встановіть координату z зеленого кута активного поля. Введіть число або прокрутіть колесо миші під час наведення.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Встановіть координату x синього кута активного поля. Введіть число або прокрутіть колесо миші під час наведення.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Встановіть координату y синього кута активного поля. Введіть число або прокрутіть колесо миші під час наведення.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Встановіть координату z синього кута активного поля. Введіть число або прокрутіть колесо миші під час наведення.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=Форма активного виділення з використанням позначення селектора обсягу Minecraft.
+program_3d_edit.select_tool.box_size_tooltip=Розмір активного поля вибору у блоках.
+program_3d_edit.select_tool.button_point1=Перемістити точку 1
+program_3d_edit.select_tool.button_point1_tooltip=Натисніть та утримуйте цю кнопку та використовуйте елементи керування переміщенням для переміщення зеленої точки виділення.
+program_3d_edit.select_tool.button_point2=Перемістити точку 2
+program_3d_edit.select_tool.button_point2_tooltip=Натисніть та утримуйте цю кнопку та використовуйте елементи керування переміщенням для переміщення синьої точки виділення.
+program_3d_edit.select_tool.button_selection_box=Перемістити поле
+program_3d_edit.select_tool.button_selection_box_tooltip=Натисніть та утримуйте цю кнопку та використовуйте елементи керування рухом для переміщення активного поля.
+
+## Інструмент вставки
+program_3d_edit.paste_tool.location_label=Розташування
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=Положення x, в якому буде розміщено центр виділення. Введіть число, прокрутіть колесо або скористайтеся стрілками для зміни.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=Положення y, в якому буде розміщено центр виділення. Введіть число, прокрутіть колесо або скористайтеся стрілками для зміни.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=Положення по z, в якому буде розміщено центр виділення. Введіть число, прокрутіть колесо або скористайтеся стрілками для зміни.
+program_3d_edit.paste_tool.move_selection_label=Перемістити виділену область
+program_3d_edit.paste_tool.move_selection_tooltip=Натисніть та утримуйте цю кнопку та використовуйте елементи керування переміщенням для переміщення виділення.
+program_3d_edit.paste_tool.rotation_label=Обертання
+program_3d_edit.paste_tool.free_rotation_label=Вільне обертання
+program_3d_edit.paste_tool.free_rotation_tooltip=Якщо прапорець не встановлений, можна повернути виділення на кут, кратний 90 градусам. Якщо прапорець встановлено, виділення можна повертати з кроком на один градус.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=Кут у градусах по осі x, на який повернуто виділення. Зверніть увагу, що це вісь x моделі, яка перетворюється обертанням по z та y, тому вона може не співпадати із глобальною віссю x.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=Кут у градусах по осі y, на який повернуто виділення. Зверніть увагу, що це вісь y моделі, яка перетворюється обертанням по z, тому вона може не співпадати із глобальною віссю y.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=Кут у градусах по осі z, на який повернуто виділення.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Натисніть, щоб повернути виділення на 90 градусів проти годинникової стрілки щодо повороту зовнішнього вигляду.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Натисніть, щоб повернути виділення на 90 градусів за годинниковою стрілкою щодо повороту зовнішнього вигляду.
+program_3d_edit.paste_tool.scale_label=Масштаб
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=Масштаб моделі по осі x.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=Масштаб моделі по осі y.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=Масштаб моделі по осі z.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Дзеркальне відображення виділення по горизонталі щодо напряму погляду камери.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Дзеркальне відображення виділення по вертикалі щодо напрямку погляду камери.
+program_3d_edit.paste_tool.copy_air_label=Копіювати повітря
+program_3d_edit.paste_tool.copy_air_tooltip=Якщо увімкнено, всі повітряні блоки у вставленій структурі будуть застосовані, перезаписуючи всі існуючі блоки. Якщо відключити, існуючі блоки в цих місцях залишаться, а повітря не буде скопійовано.
+program_3d_edit.paste_tool.copy_water_label=Копіювати воду
+program_3d_edit.paste_tool.copy_water_tooltip=Якщо увімкнено, всі блоки води у вставленій структурі будуть застосовані, перезаписуючи всі існуючі блоки. Якщо відключити, існуючі блоки в цих місцях залишаться, а вода не буде скопійована.
+program_3d_edit.paste_tool.copy_lava_label=Копіювати лаву
+program_3d_edit.paste_tool.copy_lava_tooltip=Якщо увімкнено, всі блоки лави у вставленій структурі будуть застосовані, перезаписуючи всі блоки. Якщо відключити, то існуючі блоки в цих місцях залишаться, а лава не буде скопійована.
+program_3d_edit.paste_tool.confirm_label=Підтвердити
+program_3d_edit.paste_tool.confirm_tooltip=Натисніть, щоб вставити структуру у світ із зазначеним розташуванням, поворотом та масштабом.
+program_3d_edit.paste_tool.zero_scale_message=Одне зі значень шкали мало нульове значення, тому нічого не було скопійовано.
+
+## Інструмент чанк
+program_3d_edit.chunk_tool.min_y=Мін Y
+program_3d_edit.chunk_tool.min_y_tooltip=Мінімальна координата для малювання у вигляді зверху вниз. Це може бути використано для перегляду чанка світу та допомагає побачити такі виміри, як надра та печери.
+program_3d_edit.chunk_tool.max_y=Макс Y
+program_3d_edit.chunk_tool.max_y_tooltip=Максимальна координата y для малювання в режимі перегляду зверху донизу. Це може бути використано для перегляду чанка світу та допомагає побачити такі виміри, як надра та печери.
+program_3d_edit.chunk_tool.create_chunks=Створити порожні чанки
+program_3d_edit.chunk_tool.create_chunks_tooltip=Створити усі чанки у виділенні, які ще не існують. Чанки, які вже існують, залишаться без змін.
+program_3d_edit.chunk_tool.delete_chunks=Видалити чанки
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Видалити вибрані чанки. При цьому буде видалено сам чанк і всі дані, що містяться в ньому. При завантаженні області в гру чанки будуть створені заново.
+program_3d_edit.chunk_tool.prune_chunks=Видалити не вибрані чанки
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Видалити всі не вибрані чанки. При цьому буде видалено сам чанк і всі дані, що містяться в ньому. При завантаженні області в гру чанки будуть створені заново.
+
+## Вікно Перейти/Телепорт
+program_3d_edit.goto_ui.title=Телепорт
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Координата x камери. Введіть координату, щоб перейти до цього місця. Ctrl+C, щоб скопіювати координату. Ctrl+V для вставки.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Координата y камери. Введіть координату, щоб перейти до цього місця. Ctrl+C, щоб скопіювати координату. Ctrl+V для вставки.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Координата z камери. Введіть координату, щоб перейти до цього місця. Ctrl+C, щоб скопіювати координату. Ctrl+V для вставки.
+program_3d_edit.goto_ui.copy_button_tooltip=Копіювання значень x, y та z в буфер обміну у вигляді "0.0 0.0 0.0" (x, y та z відповідно).
+program_3d_edit.goto_ui.paste_button_tooltip=Вставити раніше скопійовану координату у вхідні дані. Значення, що копіюється, повинно складатися з трьох чисел, розділених пробілами або комами.
+
+## Панель файлів
+program_3d_edit.file_ui.version_tooltip=Платформа та версія даних
+program_3d_edit.file_ui.projection_tooltip=Змінити вигляд
+program_3d_edit.file_ui.location_tooltip=Перемістити камеру
+program_3d_edit.file_ui.speed_blocks_per_second=Б/С
+program_3d_edit.file_ui.speed_tooltip=Швидкість камери в блоках за секунду
+program_3d_edit.file_ui.speed_dialog_name=Встановити швидкість камери
+program_3d_edit.file_ui.dim_tooltip=Вибрати вимір
+program_3d_edit.file_ui.undo_tooltip=Скасувати
+program_3d_edit.file_ui.redo_tooltip=Повторити
+program_3d_edit.file_ui.save_tooltip=Зберегти зміни
+program_3d_edit.file_ui.close_tooltip=Закрити світ
