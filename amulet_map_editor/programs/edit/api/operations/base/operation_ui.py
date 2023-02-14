@@ -56,7 +56,8 @@ class OperationUI(EditCanvasContainer, CanvasToggleElement):
 
     def enable(self):
         """Set the state of the UI for being enabled.
-        Do not bind events to the canvas here because they will get removed. Do this in bind_events."""
+        Do not bind events to the canvas here because they will get removed. Do this in bind_events.
+        """
         pass
 
     def bind_events(self):
@@ -68,7 +69,8 @@ class OperationUI(EditCanvasContainer, CanvasToggleElement):
     def disable(self):
         """Stop the UI and make it safe to be destroyed.
         Unload any excessive data. May get resumed again with a call to enable.
-        All events bound to the canvas will be automatically removed after this is run."""
+        All events bound to the canvas will be automatically removed after this is run.
+        """
         if hasattr(self, "unload") and callable(self.unload):
             warnings.warn(
                 "OperationUI.unload is depreciated and will be removed in the future. Please used OperationUI.disable instead",

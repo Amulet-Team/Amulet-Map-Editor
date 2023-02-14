@@ -31,7 +31,6 @@ log = logging.getLogger(__name__)
 
 
 class EditExtension(wx.Panel, BaseProgram):
-
     # UI elements
     _sizer: wx.BoxSizer
     # these only exists on setup. Once setup is finished they will be None

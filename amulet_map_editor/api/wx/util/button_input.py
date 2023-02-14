@@ -152,7 +152,8 @@ class ButtonInput(WindowContainer):
 
     def unpress_all(self):
         """Unpress all keys.
-        This is useful if the window focus is lost because key release events will not be detected."""
+        This is useful if the window focus is lost because key release events will not be detected.
+        """
         self._pressed_keys.clear()
         self._clean_up_actions()
 

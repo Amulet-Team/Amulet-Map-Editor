@@ -35,7 +35,8 @@ class RenderChunkBuilder(TriMesh):
     @staticmethod
     def _get_block_data(blocks: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
         """Given a Chunk object will return the chunk arrays needed to generate geometry
-        :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks"""
+        :returns: block array of the chunk, block array one block larger than the chunk, array of unique blocks
+        """
         larger_blocks = numpy.zeros(blocks.shape + numpy.array((2, 2, 2)), blocks.dtype)
         larger_blocks[1:-1, 1:-1, 1:-1] = blocks
         unique_blocks = numpy.unique(larger_blocks)

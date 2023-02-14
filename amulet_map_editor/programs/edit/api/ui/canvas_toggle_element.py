@@ -4,7 +4,8 @@ class CanvasToggleElement:
 
     def enable(self):
         """Set the state of the UI for being enabled.
-        Do not bind events to the canvas here because they will get removed. Do this in bind_events."""
+        Do not bind events to the canvas here because they will get removed. Do this in bind_events.
+        """
         raise NotImplementedError
 
     def bind_events(self):
@@ -15,5 +16,6 @@ class CanvasToggleElement:
 
     def disable(self):
         """Stop the UI. Unload any excessive data. May get resumed again with a call to enable.
-        All events bound to the canvas will be automatically removed after this is run."""
+        All events bound to the canvas will be automatically removed after this is run.
+        """
         raise NotImplementedError

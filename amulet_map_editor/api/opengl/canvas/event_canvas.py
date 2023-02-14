@@ -16,13 +16,15 @@ class EventCanvas(BaseCanvas):
 
     def reset_bound_events(self):
         """Unbind all events and re-bind the default events.
-        We are allowing users to bind custom events so we should have a way to reset what is bound."""
+        We are allowing users to bind custom events so we should have a way to reset what is bound.
+        """
         self.tear_down_events()
         self.bind_events()
 
     def tear_down_events(self):
         """Unbind all events.
-        We are allowing users to bind custom events so we should have a way to reset what is bound."""
+        We are allowing users to bind custom events so we should have a way to reset what is bound.
+        """
         for event, handler, source in self._bound_events:
             if source is None:
                 while super().Unbind(event):

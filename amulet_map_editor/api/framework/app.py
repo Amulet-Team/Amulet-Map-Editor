@@ -5,7 +5,6 @@ import locale
 
 
 class AmuletApp(wx.App):
-
     _amulet_ui: amulet_ui.AmuletUI
 
     def OnInit(self):
