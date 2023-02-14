@@ -54,7 +54,8 @@ log = logging.getLogger(__name__)
 
 class BaseEditCanvas(EventCanvas):
     """Adds base logic for drawing everything related to the edit program to the canvas.
-    All the user interaction code is implemented in ControllableEditCanvas to make them easier to read."""
+    All the user interaction code is implemented in ControllableEditCanvas to make them easier to read.
+    """
 
     background_colour = (0.61, 0.70, 0.85)
 

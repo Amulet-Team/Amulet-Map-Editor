@@ -58,7 +58,9 @@ def get_shader(
 
         try:
             shader = compile_shader()
-        except OpenGL.GL.shaders.ShaderValidationError:  # on Mac the above fails if there is no VBO bound
+        except (
+            OpenGL.GL.shaders.ShaderValidationError
+        ):  # on Mac the above fails if there is no VBO bound
             glBindVertexArray(glGenVertexArrays(1))
             shader = compile_shader()
             glBindVertexArray(0)

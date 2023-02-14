@@ -70,7 +70,11 @@ class InspectBlockBehaviour(BaseBehaviour):
                 platform,
                 version,
             )
-            (version_block, version_block_entity, _,) = translator.block.from_universal(
+            (
+                version_block,
+                version_block_entity,
+                _,
+            ) = translator.block.from_universal(
                 block, block_entity, block_location=(x, y, z)
             )
             if isinstance(version, tuple):
