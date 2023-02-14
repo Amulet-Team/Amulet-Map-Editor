@@ -113,19 +113,22 @@ class MouseMovement(WindowContainer):
     @property
     def delta_x(self) -> int:
         """The x pixel distance between the current location and the location when reset_delta was called.
-        If the pointer was warped the offset before it was warped will be added to this."""
+        If the pointer was warped the offset before it was warped will be added to this.
+        """
         return self.delta_xy[0]
 
     @property
     def delta_y(self) -> int:
         """The y pixel distance between the current location and the location when reset_delta was called.
-        If the pointer was warped the offset before it was warped will be added to this."""
+        If the pointer was warped the offset before it was warped will be added to this.
+        """
         return self.delta_xy[1]
 
     @property
     def delta_xy(self) -> Tuple[int, int]:
         """The x and y pixel distance between the current location and the location when reset_delta was called.
-        If the pointer was warped the offset before it was warped will be added to this."""
+        If the pointer was warped the offset before it was warped will be added to this.
+        """
         return self._to_absolute(
             self._x - self._start_x + self._delta_x,
             self._y - self._start_y + self._delta_y,

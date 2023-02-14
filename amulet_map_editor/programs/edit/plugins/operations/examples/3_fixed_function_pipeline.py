@@ -7,6 +7,7 @@ from amulet.api.selection import SelectionGroup
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 
+
 # function example for the Button input.
 def function_name():
     print("you have clicked a button.")

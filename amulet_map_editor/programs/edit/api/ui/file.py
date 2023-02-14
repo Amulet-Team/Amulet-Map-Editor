@@ -162,7 +162,8 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
 
     def _change_dimension(self, evt: DimensionChangeEvent):
         """Run when the dimension attribute in the canvas is changed.
-        This is run when the user changes the attribute and when it is changed manually in code."""
+        This is run when the user changes the attribute and when it is changed manually in code.
+        """
         dimension = evt.dimension
         index = self._dim_options.FindString(dimension)
         if not (index == wx.NOT_FOUND or index == self._dim_options.GetSelection()):

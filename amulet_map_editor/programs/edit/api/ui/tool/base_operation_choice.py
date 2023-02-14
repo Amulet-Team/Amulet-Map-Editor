@@ -78,7 +78,8 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
     @property
     def active_operation_id(self) -> str:
         """The identifier of the operation selected by the choice input.
-        Note if in the process of changing this may be different to self._active_operation."""
+        Note if in the process of changing this may be different to self._active_operation.
+        """
         return self._operation_choice.GetCurrentObject()
 
     def _on_operation_change(self, evt):
