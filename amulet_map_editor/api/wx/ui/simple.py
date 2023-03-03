@@ -108,7 +108,8 @@ class SimpleChoiceAny(wx.Choice):
     ):
         """Set items. Does not have to be strings.
         If items is a dictionary the string of the values are show to the user and the key is returned from GetAny
-        If it is just an iterable the string of the values are shown and the raw equivalent input is returned."""
+        If it is just an iterable the string of the values are shown and the raw equivalent input is returned.
+        """
         if not items:
             return
         if isinstance(items, dict):

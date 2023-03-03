@@ -72,7 +72,6 @@ class SelectionMoveButton(BaseSelectionMoveButton):
 
 
 class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
-
     _x1: wx.SpinCtrl
     _y1: wx.SpinCtrl
     _z1: wx.SpinCtrl

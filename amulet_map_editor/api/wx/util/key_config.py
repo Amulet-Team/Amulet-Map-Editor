@@ -235,7 +235,6 @@ _mouse_events = {
 def serialise_modifier(
     evt: Union[wx.KeyEvent, wx.MouseEvent], key: int
 ) -> ModifierType:
-
     modifier = []
     if evt.ControlDown():
         if key not in (wx.WXK_SHIFT, wx.WXK_ALT):
@@ -275,7 +274,6 @@ def serialise_key_event(
     evt: Union[wx.KeyEvent, wx.MouseEvent]
 ) -> Optional[SerialisedKeyType]:
     if isinstance(evt, wx.KeyEvent):
-
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
         if key == wx.WXK_CONTROL:
             return

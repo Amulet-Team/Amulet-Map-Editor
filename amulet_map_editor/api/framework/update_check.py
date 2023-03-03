@@ -78,6 +78,7 @@ class UpdateDialog(wx.Dialog):
 
 def _is_compatible(current_version: Version, release_version: Version) -> bool:
     """The release version is only compatible with the current version if it is newer and more stable."""
+
     # release > beta > beta.dev > alpha.dev
     #                > alpha > alpha.dev
     def get_release_stage(version: Version) -> int:

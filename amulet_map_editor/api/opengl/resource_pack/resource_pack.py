@@ -71,7 +71,8 @@ class OpenGLResourcePack:
 
     def get_texture_path(self, namespace: Optional[str], relative_path: str):
         """Get the absolute path of the image from the relative components.
-        Useful for getting the id of textures for hard coded textures not connected to a resource pack."""
+        Useful for getting the id of textures for hard coded textures not connected to a resource pack.
+        """
         return self._resource_pack.get_texture_path(namespace, relative_path)
 
     def texture_bounds(self, texture_path: str) -> Tuple[float, float, float, float]:

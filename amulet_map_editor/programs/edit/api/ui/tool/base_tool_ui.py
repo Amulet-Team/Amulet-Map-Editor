@@ -19,7 +19,8 @@ class BaseToolUI(EditCanvasContainer, CanvasToggleElement):
 
     def enable(self):
         """Set the state of the tool for being enabled.
-        Do not bind events to the canvas here because they will get removed. Do this in bind_events."""
+        Do not bind events to the canvas here because they will get removed. Do this in bind_events.
+        """
         pass
 
     def bind_events(self):
@@ -40,5 +41,6 @@ class BaseToolUI(EditCanvasContainer, CanvasToggleElement):
 
     def disable(self):
         """Stop the tool. Unload any excessive data. May get resumed again with a call to enable.
-        All events bound to the canvas will be automatically removed after this is run."""
+        All events bound to the canvas will be automatically removed after this is run.
+        """
         pass

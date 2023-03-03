@@ -78,13 +78,15 @@ class RenderSelectionEditable(RenderSelectionHighlightable):
     @property
     def locked(self) -> bool:
         """Is the selection locked or not.
-        If locked (True) the highlight colour will be used, if unlocked (False) the moving colour will be used."""
+        If locked (True) the highlight colour will be used, if unlocked (False) the moving colour will be used.
+        """
         return self._locked
 
     @locked.setter
     def locked(self, lock: bool):
         """Set if the selection locked or not.
-        If locked (True) the highlight colour will be used, if unlocked (False) the moving colour will be used."""
+        If locked (True) the highlight colour will be used, if unlocked (False) the moving colour will be used.
+        """
         self._locked = bool(lock)
 
     def _create_geometry_(self):

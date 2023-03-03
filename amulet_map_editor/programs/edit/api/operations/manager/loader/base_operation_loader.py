@@ -43,7 +43,8 @@ class BaseOperationLoader:
     @property
     def identifier(self) -> str:
         """The identifier for this operation.
-        This is formed of the path and optionally a number if there are multiple operations in the file."""
+        This is formed of the path and optionally a number if there are multiple operations in the file.
+        """
         return self._identifier
 
     @property

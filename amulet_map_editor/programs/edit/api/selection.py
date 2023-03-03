@@ -51,7 +51,8 @@ class SelectionManager(Changeable):
 
     def _start_undo_point(self):
         """Start a timer to create an undo point after a period of time.
-        If this is called again before the timer runs then the last call will not happen."""
+        If this is called again before the timer runs then the last call will not happen.
+        """
         self._timer.StartOnce(400)
 
     def _on_destroy(self, evt):

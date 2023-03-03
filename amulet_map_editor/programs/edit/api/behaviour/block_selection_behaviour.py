@@ -301,7 +301,8 @@ class BlockSelectionBehaviour(PointerBehaviour):
         self,
     ) -> Tuple[Tuple[int, int, int], Tuple[int, int, int]]:
         """Get the active box positions.
-        The coordinates for the maximum point of the box will be one less because this is the block position."""
+        The coordinates for the maximum point of the box will be one less because this is the block position.
+        """
         if self._active_selection is None:
             return (0, 0, 0), (0, 0, 0)
         else:
@@ -314,7 +315,8 @@ class BlockSelectionBehaviour(PointerBehaviour):
     ):
         """Set the active box positions.
         This should only be used when not editing.
-        The coordinates for the maximum point of the box will be one greater because this is the block position."""
+        The coordinates for the maximum point of the box will be one greater because this is the block position.
+        """
         if self._active_selection is not None and not self._editing:
             self._pointer_mask[:] = False
             self._start_point_1[:] = positions[0]
@@ -342,7 +344,8 @@ class BlockSelectionBehaviour(PointerBehaviour):
     def selection_group(self, selection_group: SelectionGroup):
         """Set the selection group of the static and active selection.
         This will only trigger a grapical change and will not update the global selection.
-        A call to push_selection is required to push the updated selection to the global selection."""
+        A call to push_selection is required to push the updated selection to the global selection.
+        """
         self._escape()
         if len(selection_group) == 0:
             # unload the active selection
@@ -436,7 +439,6 @@ class BlockSelectionBehaviour(PointerBehaviour):
                     if self._active_selection is not None:
                         self._active_selection.reset_highlight_edges()
                 else:
-
                     self._highlight = True
                     faces_hit = self._get_box_faces_manual(
                         camera, look_vector, selection_group, box_index, max_distance
