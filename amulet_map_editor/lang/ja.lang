@@ -42,13 +42,16 @@
 
 # メニューバーについて
 ## このコンテキストでは、「&」記号は特別な文字です。UIには表示されませんが、「alt」キーを押したときのショートカットとして次の文字が定義されます（注意：アクセント記号付きの文字はそれ自体が文字になります（é =/e））。
-## 例："&File "はUIでは "File "と表示されますが、"alt+f "を押すと対応するメニューが表示されます。
+## 例："&File"はUIでは "File"と表示されますが、"alt+f"を押すと対応するメニューが表示されます。
 ## 詳細は https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel をご覧ください。
 
 # 文字列について
 ## いくつかのエントリーでは、"{variable}"というパターンが使用されています。このパターンでは、アプリがテキストに値を入力することができます。
 ## 例 "There are {n} changes" は、UIでは "There are 2 changes" に変換されます。
 ## 正しく動作させるためには、このパターンを翻訳済みのエントリに残す必要があります。
+
+# Meta
+meta.amulet=Amulet
 
 # 共用文字列
 shared.check_console=詳細はコンソールで確認してください。
@@ -74,9 +77,20 @@ menu_bar.help.menu_name=ヘルプ(&H)
 ## スタート画面
 main_menu.tab_name=メインメニュー
 main_menu.open_world=ワールドを開く
-main_menu.user_manual=User Manual
-main_menu.bug_tracker=Bug Tracker
+main_menu.user_manual=ユーザーマニュアル
+main_menu.bug_tracker=バグトラッカー
 main_menu.discord=Amulet Discord
+
+# Language Select
+language_select.title=言語選択
+language_select.help=使用する言語を選択してください
+language_select.contribute=翻訳を修正・追加したい場合はこちらをご覧ください
+
+# Warning Dialog
+warning_dialog.title=ようこそ Amulet へ
+warning_dialog.content=こんにちは、Amuletへようこそ。\n\nAmuletで開く前にワールドのバックアップを作成することをお勧めします。\n\n私たちは、Amuletがワールドを破壊しないように努めていますが、保存形式は文書化されておらず、常に変化しているため、どうしても間違ってしまうことがあります。\n\nこのような理由から、私たちはテスト済みのフルリリースのみを公式にサポートしています。\nJava版スナップショット、Bedrock版preview、および実験的な機能は動作するかもしれませんが、未検証のため公式にはサポートされません。\n\n現在、エンティティはサポートされておらず、アイテムは同じプラットフォーム内でのみサポートされています。\nもし、追加してほしい機能や修正すべきバグを見つけた場合は、バグトラッカーに報告してください。\n\n初めての方は、ユーザーマニュアルを読んで、プログラムに慣れることをお勧めします。\n\n- The Amulet Team
+warning_dialog.do_not_show_again=二度と表示しない
+warning_dialog.i_understand=理解しました
 
 # アップデートチェック
 ## Amuletのバージョンが上がったときに表示される画面
@@ -223,6 +237,8 @@ program_3d_edit.chunk_tool.min_y=最低表示高度
 program_3d_edit.chunk_tool.min_y_tooltip=トップダウンビューで表示する最低高度。ネザーや洞窟などの世界の一部分を表示するのに使用できます。
 program_3d_edit.chunk_tool.max_y=最高表示高度
 program_3d_edit.chunk_tool.max_y_tooltip=トップダウンビューで表示する最高高度。ネザーや洞窟などの世界の一部分を表示するのに使用できます。
+program_3d_edit.chunk_tool.create_chunks=空のチャンクを作成
+program_3d_edit.chunk_tool.create_chunks_tooltip=選択範囲内でまだ存在しないすべてのチャンクを作成します。既に存在するチャンクは変更されません。
 program_3d_edit.chunk_tool.delete_chunks=チャンクを削除
 program_3d_edit.chunk_tool.delete_chunks_tooltip=選択したチャンクを削除します。チャンクとチャンクに含まれるすべてのデータが削除されます。保存後、ゲーム内でそのエリアをロードすると、チャンクが再生成されます。
 program_3d_edit.chunk_tool.prune_chunks=選択範囲外のチャンクを削除
@@ -243,6 +259,9 @@ program_3d_edit.goto_ui.paste_button_tooltip=コピーした座標を入力に�
 program_3d_edit.file_ui.version_tooltip=このワールドのプラットフォームとバージョン
 program_3d_edit.file_ui.projection_tooltip=視点の切替
 program_3d_edit.file_ui.location_tooltip=カメラを移動
+program_3d_edit.file_ui.speed_blocks_per_second=bps
+program_3d_edit.file_ui.speed_tooltip=カメラ速度（ブロック/秒)
+program_3d_edit.file_ui.speed_dialog_name=カメラスピードの設定
 program_3d_edit.file_ui.dim_tooltip=ディメンションを選択
 program_3d_edit.file_ui.undo_tooltip=元に戻す
 program_3d_edit.file_ui.redo_tooltip=やり直し
