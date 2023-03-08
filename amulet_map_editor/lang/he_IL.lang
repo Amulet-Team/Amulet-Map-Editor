@@ -25,6 +25,10 @@
 #-- end license --
 
 
+# Translated from en.lang by O7410 or 7410
+
+
+
 # Important notes
 ## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
 ## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
