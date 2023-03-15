@@ -1,0 +1,273 @@
+#This license applies to this file only.
+#
+#-- begin license --
+#MIT License
+#
+#Copyright (c) 2021 Amulet-Team
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+#-- end license --
+
+
+# Translated from en.lang by O7410 or 7410
+
+
+
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
+# Meta
+meta.amulet=Amulet
+
+# Shared strings
+shared.check_console=‫בדוק את הקונסולה לפרטים נוספים.
+
+# App
+app.world_still_used=יש עולם שעדיין פתוח. בבקשה תסגור אותו לפני
+app.browser_open_tooltip=לחיצה תפתח את הדף בדפדפן שלך
+
+world.java_platform=ג'אווה
+world.bedrock_platform=בדרוק
+world.close_world=סגור עולם
+
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=‫&קובץ
+menu_bar.file.open_world=פתח עולם
+menu_bar.file.close_world=סגור עולם
+menu_bar.file.quit=‫צא
+menu_bar.options.menu_name=‫&אפשרויות
+menu_bar.help.menu_name=‫&עזרה
+
+# Main menu
+## The start screen
+main_menu.tab_name=תפריט ראשי
+main_menu.open_world=פתח עולם
+main_menu.user_manual=מדריך למשתמש
+main_menu.bug_tracker=עוקב באגים
+main_menu.discord=‫הדיסקורד של Amulet
+
+# Language Select
+language_select.title=בחר שפה
+language_select.help=‫בחר את השפה לשימוש ב - Amulet מהרשימה למטה.
+language_select.contribute=אם תרצה לתקן או להוסיף תרגומים לחץ כאן
+
+# Warning Dialog
+warning_dialog.title=‮ברוך הבא ל - ‭Amulet
+warning_dialog.content=Hello and welcome to Amulet.\n\nWe suggest creating backups of your worlds before opening them in Amulet.\n\nWe try to make sure that Amulet does not corrupt worlds but the save format is undocumented and constantly changing and sometimes we just get things wrong.\n\nFor these reasons we only officially support full releases we have tested against.\nJava snapshots, Bedrock betas and experimental features may work but are untested so not officially supported.\n\nCurrently entities are not supported and items are only supported within the same platform.\nIf you find a feature you want added or a bug that needs fixing report it on our bug tracker.\nPlease use the search tool to see if it has been reported before creating a new ticket.\n\nIf you are new we suggest reading the user manual to familiarise yourself with the program.\n\n- The Amulet Team
+warning_dialog.do_not_show_again=אל תציג את זה שוב
+warning_dialog.i_understand=אני מבין
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=‫גרסה חדשה של Amulet שוחררה!
+update_check.new_version=‫גרסה חדשה:
+update_check.current_version=‫הגרסה שלך:
+update_check.update=עבור לדף ההורדה
+update_check.ok=בסדר
+
+# Select world
+## The window when selecting a world to open
+select_world.title=בחירת עולם
+select_world.open_world_warning=‮‫סגור את העולם במשחק ובכלים אחרים לפני הפתיחה ב - Amulet.
+select_world.open_world_button=פתח עולם אחר
+select_world.open_world_dialogue=בחר תיקיית עולמות מיינקראפט
+select_world.select_directory_failed=‫נכשל לפתוח תיקייה!
+select_world.recent_worlds=עולמות שנפתחו לאחרונה
+select_world.no_loader_found=‫לא יכל למצוא טוען לעולם הזה.
+select_world.loading_world_failed=‫שגיאה בטעינת העולם.
+
+# About
+## The default program when a world is opened
+program_about.tab_name=מידע
+program_about.currently_opened_world=‫עולם פתוח כרגע:
+program_about.choose_from_options=‫בחר מהאפשרויות משמאל מה תרצה לעשות. אתה יכול לעבור בין אלה בכל זמן.
+
+# Convert
+## The program used to convert a world
+program_convert.tab_name=המר
+program_convert.convert_button=המר
+program_convert.input_world=‫עולם קלט:
+program_convert.output_world=עולם פלט
+program_convert.select_output_world=בחר עולם פלט
+program_convert.input_output_must_different=‫עולמות הקלט והפלט חייבים להיות שונים!
+program_convert.select_before_converting=‫בחר עולם לפני המרה!
+program_convert.conversion_completed=המרת עולם הושלמה
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=מדריך למשתמש (אונליין)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
+program_3d_edit.tab_name=עורך תלת מימדי
+
+## Canvas
+program_3d_edit.canvas.please_wait=Please wait while the renderer loads
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=מוריד חבילת משאבים רגילה של בדרוק
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=מוריד חבילת משאבים רגילה של ג'אווה
+program_3d_edit.canvas.java_rp_failed=‫הורדת חבילת המשאבים העדכנית ביותר של ג'אווה נכשלה.
+program_3d_edit.canvas.java_rp_failed_default=‫בדוק את חיבור האינטרנט שלך והפעל מחדש את Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=The certificates to access the internet were not installed.\nRun the "Install Certificates.command" program that can be found in "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=טוען חבילות משאבים
+program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
+program_3d_edit.canvas.setting_up_renderer=Setting up renderer
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=שמור
+program_3d_edit.menu_bar.edit.menu_name=‫&ערוך
+program_3d_edit.menu_bar.edit.undo=בטל
+program_3d_edit.menu_bar.edit.redo=החזר
+program_3d_edit.menu_bar.edit.cut=חתוך
+program_3d_edit.menu_bar.edit.copy=העתק
+program_3d_edit.menu_bar.edit.paste=הדבק
+program_3d_edit.menu_bar.edit.delete=מחק בלוקים
+program_3d_edit.menu_bar.edit.goto=לך אל
+program_3d_edit.menu_bar.edit.select_all=בחר הכל
+program_3d_edit.menu_bar.options.controls=‫מקשים...
+program_3d_edit.menu_bar.options.options=‫אפשרויות...
+program_3d_edit.menu_bar.help.user_guide=מדריך למשתמש (אונליין)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=מחק בלוקים
+program_3d_edit.select_tool.delete_button_tooltip=מוחק את הבלוקים באיזור הבחור
+program_3d_edit.select_tool.copy_button=העתק
+program_3d_edit.select_tool.copy_button_tooltip=‫העתק את האזור שנבחר להדבקה מאוחר יותר. ניתן להדביק לכל עולם ומימד.
+program_3d_edit.select_tool.cut_button=חתוך
+program_3d_edit.select_tool.cut_button_tooltip=‫העתק את האזור שנבחר להדבקה מאוחר יותר ומחק. ניתן להדביק לכל עולם ומימד.
+program_3d_edit.select_tool.paste_button=הדבק
+program_3d_edit.select_tool.paste_button_tooltip=‫הדבק לעולם אזור שהועתק או נכתך בעבר.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=‫הגדר את מיקום ה-x של הפינה הירוקה של הקופסה הפעילה. הקלד מספר או גלגל בגלגלת תוך כדי ריחוף.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=‫הגדר את מיקום ה-y של הפינה הירוקה של הקופסה הפעילה. הקלד מספר או גלגל בגלגלת תוך כדי ריחוף.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=‫הגדר את מיקום ה-z של הפינה הירוקה של הקופסה הפעילה. הקלד מספר או גלגל בגלגלת תוך כדי ריחוף.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=‫הגדר את מיקום ה-x של הפינה הכחולה של הקופסה הפעילה. הקלד מספר או גלגל בגלגלת תוך כדי ריחוף.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=‫הגדר את מיקום ה-y של הפינה הכחולה של הקופסה הפעילה. הקלד מספר או גלגל בגלגלת תוך כדי ריחוף.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=‫הגדר את מיקום ה-z של הפינה הכחולה של הקופסה הפעילה. הקלד מספר או גלגל בגלגלת תוך כדי ריחוף.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=‫צורת הבחירה הפעילה באמצעות יחידות נפח של מיינקראפט.
+program_3d_edit.select_tool.box_size_tooltip=‫גודל קופסת הבחירה הפעילה בבלוקים.
+program_3d_edit.select_tool.button_point1=הזז נקודה 1
+program_3d_edit.select_tool.button_point1_tooltip=‫לחץ והחזק את המקש הזה והשתמש במקשי התנועה כדי להזיז את נקודת הבחירה הירוקה.
+program_3d_edit.select_tool.button_point2=הזז נקודה 2
+program_3d_edit.select_tool.button_point2_tooltip=‫לחץ והחזק את המקש הזה והשתמש במקשי התנועה כדי להזיז את נקודת הבחירה הכחולה.
+program_3d_edit.select_tool.button_selection_box=הזז קופסה
+program_3d_edit.select_tool.button_selection_box_tooltip=‫לחץ והחזק את המקש הזה והשתמש במקשי התנועה כדי להזיז את הקופסה הפעילה.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=מיקום
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=‫מיקום x שבו ימוקם מרכז הבחירה. הקלד מספר, גלול בגלגלת מעל או השתמש בחצים כדי לשנות.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=‫מיקום y שבו ימוקם מרכז הבחירה. הקלד מספר, גלול בגלגלת מעל או השתמש בחצים כדי לשנות.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=‫מיקום z שבו ימוקם מרכז הבחירה. הקלד מספר, גלול בגלגלת מעל או השתמש בחצים כדי לשנות.
+program_3d_edit.paste_tool.move_selection_label=הזז בחירה
+program_3d_edit.paste_tool.move_selection_tooltip=‫לחץ והחזק את המקש הזה והשתמש במקשי התנועה כדי להזיז את הבחירה.
+program_3d_edit.paste_tool.rotation_label=סיבוב
+program_3d_edit.paste_tool.free_rotation_label=סיבוב חופשי
+program_3d_edit.paste_tool.free_rotation_tooltip=‫אם לא מסומן, ניתן לסובב את הבחירה בכפולות של 90 מעלות. אם מסומן, ניתן לסובב את הבחירה במרווחים של מעלה אחת.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=‫הזווית במעלות בציר ה-x שבו הבחירה מסובבת. שים לב שזהו ציר ה-x של הדגם אשר משתנה על ידי סיבוב z ו-y כך שזה עשוי שלא להתאים לציר ה-x העולמי.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=‫הזווית במעלות בציר ה-y שבו הבחירה מסובבת. שים לב שזהו ציר ה-y של הדגם אשר משתנה על ידי סיבוב z, כך שזה עשוי שלא להתאים לציר ה-y העולמי.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=‫הזווית במעלות בציר z שבה הבחירה מסובבת.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=‫לחץ כדי לסובב את הבחירה 90 מעלות נגד כיוון השעון ביחס לסיבוב המבט.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=‫לחץ כדי לסובב את הבחירה 90 מעלות בכיוון השעון ביחס לסיבוב המבט.
+program_3d_edit.paste_tool.scale_label=גודל
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=‫גודל המודל בציר x.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=‫גודל המודל בציר y.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=‫גודל המודל בציר z.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=‫משקף את הבחירה אופקית ביחס לכיוון אליו המצלמה מסתכלת.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=‫משקף את הבחירה אנכית ביחס לכיוון אליו המצלמה מסתכלת.
+program_3d_edit.paste_tool.copy_air_label=הדבק אוויר
+program_3d_edit.paste_tool.copy_air_tooltip=‫אם מופעל כל בלוקי האוויר במבנה המודבק יוחלו תוך החלפת כל בלוקים קיימים. אם כבוי, הבלוקים הקיימים במקומות אלה יישארו והאוויר לא יועתק.
+program_3d_edit.paste_tool.copy_water_label=הדבר מים
+program_3d_edit.paste_tool.copy_water_tooltip=‫אם מופעל כל בלוקי המים במבנה המודבק יוחלו תוך החלפת כל בלוקים קיימים. אם כבוי, הבלוקים הקיימים במקומות אלה יישארו והמים לא יועתקו.
+program_3d_edit.paste_tool.copy_lava_label=הדבק לבה
+program_3d_edit.paste_tool.copy_lava_tooltip=‫אם מופעל כל בלוקי המים במבנה המודבק יוחלו תוך החלפת כל בלוקים קיימים. אם כבוי, הבלוקים הקיימים במקומות אלה יישארו והלבה לא תועתק.
+program_3d_edit.paste_tool.confirm_label=אשר
+program_3d_edit.paste_tool.confirm_tooltip=‫לחץ כדי להדביק את המבנה אל העולם, המיקום, הסיבוב והגודל שצוינו.
+program_3d_edit.paste_tool.zero_scale_message=‫לאחד מערכי הגודל היה ערך של אפס ולכן כלום לא הועתק.
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=‫Y מינימלי
+program_3d_edit.chunk_tool.min_y_tooltip=‫מיקום ה-y המקסימלי לצייר בתצוגה ממבט עליון. זה יכול לשמש כדי להציג חתיכה מהעולם ולעזור לראות ממדים כמו הגיהנום והמערות.
+program_3d_edit.chunk_tool.max_y=‫Y מקסימלי
+program_3d_edit.chunk_tool.max_y_tooltip=‫מיקום ה-y המקסימלי לצייר בתצוגה ממבט עליון. זה יכול לשמש כדי להציג חתיכה מהעולם ולעזור לראות ממדים כמו הגיהנום והמערות.
+program_3d_edit.chunk_tool.create_chunks=צור צ'אנקים ריקים
+program_3d_edit.chunk_tool.create_chunks_tooltip=‫צור את כל הצ'אנקים בבבחירה שעדיין לא קיימים. צ'אנקים שכבר קיימים יישארו ללא שינוי.
+program_3d_edit.chunk_tool.delete_chunks=מחק צ'אנקים
+program_3d_edit.chunk_tool.delete_chunks_tooltip=‫מוחק את הצ'אנקים שנבחרו. פעולה זו תמחק את הצ'אנק האמיתי ואת כל הנתונים הכלולים בו. בפעם הבאה שאתה טוען את הצ'אנק במשחק המשחק ייצר אותו מחדש.
+program_3d_edit.chunk_tool.prune_chunks=מחק צ'אנקים לא בחורים
+program_3d_edit.chunk_tool.prune_chunks_tooltip=‫מחק את כל הצ'אנקים שלא נבחרו. פעולה זו תמחק את הצ'אנק האמיתי ואת כל הנתונים הכלולים בו. בפעם הבאה שאתה טוען את הצ'אנק במשחק המשחק ייצר אותו מחדש.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=השתגר
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=‫מיקום x של המצלמה. הקלד מיקום כדי לעבור אליו. Ctrl + C כדי להעתיק את המיקום. Ctrl + V כדי להדביק.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=‫מיקום y של המצלמה. הקלד מיקום כדי לעבור אליו. Ctrl + C כדי להעתיק את המיקום. Ctrl + V כדי להדביק.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=‫מיקום z של המצלמה. הקלד מיקום כדי לעבור אליו. Ctrl + C כדי להעתיק את המיקום. Ctrl + V כדי להדביק.
+program_3d_edit.goto_ui.copy_button_tooltip=‫העתק את ערכי x,‏ y ו-z ללוח בצורה "0.0 0.0 0.0" (x,‏ y ו-z בהתאמה)‫
+program_3d_edit.goto_ui.paste_button_tooltip=‫הדבק מיקום שהועתק בעבר לתוך הקלטים. הערך המועתק חייב להיות שלושה מספרים מופרדים ברווחים או בפסיקים.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=פלטפורמה וגרסת הנתונים של העולם
+program_3d_edit.file_ui.projection_tooltip=שנה מבט
+program_3d_edit.file_ui.location_tooltip=הזז מצלמה
+program_3d_edit.file_ui.speed_blocks_per_second=‫ בלוקים לשנייה
+program_3d_edit.file_ui.speed_tooltip=מהירות מצלמה בבלוקים לשנייה
+program_3d_edit.file_ui.speed_dialog_name=בחר מהירות מצלמה
+program_3d_edit.file_ui.dim_tooltip=בחר מימד
+program_3d_edit.file_ui.undo_tooltip=בטל
+program_3d_edit.file_ui.redo_tooltip=החזר
+program_3d_edit.file_ui.save_tooltip=שמור שינויים
+program_3d_edit.file_ui.close_tooltip=סגור עולם
