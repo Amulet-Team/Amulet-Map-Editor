@@ -1,0 +1,269 @@
+#This license applies to this file only.
+#
+#-- begin license --
+#MIT License
+#
+#Copyright (c) 2021 Amulet-Team
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+#-- end license --
+
+
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
+# Meta
+meta.amulet=Amulet
+
+# Shared strings
+shared.check_console=Check the console for more details.
+
+# App
+app.world_still_used=A world is still being used. Please close it first
+app.browser_open_tooltip=Clicking will open the page in your browser
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Close World
+
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&File
+menu_bar.file.open_world=Open World
+menu_bar.file.close_world=Close World
+menu_bar.file.quit=Quit
+menu_bar.options.menu_name=&Options
+menu_bar.help.menu_name=&Help
+
+# Main menu
+## The start screen
+main_menu.tab_name=Main Menu
+main_menu.open_world=Open World
+main_menu.user_manual=User Manual
+main_menu.bug_tracker=Bug Tracker
+main_menu.discord=Amulet Discord
+
+# Language Select
+language_select.title=Language Select
+language_select.help=Select the language to use in Amulet from the list below.
+language_select.contribute=If you want to fix or add translations click here.
+
+# Warning Dialog
+warning_dialog.title=Welcome to Amulet
+warning_dialog.content=Hello and welcome to Amulet.\n\nWe suggest creating backups of your worlds before opening them in Amulet.\n\nWe try to make sure that Amulet does not corrupt worlds but the save format is undocumented and constantly changing and sometimes we just get things wrong.\n\nFor these reasons we only officially support full releases we have tested against.\nJava snapshots, Bedrock betas and experimental features may work but are untested so not officially supported.\n\nCurrently entities are not supported and items are only supported within the same platform.\nIf you find a feature you want added or a bug that needs fixing report it on our bug tracker.\nPlease use the search tool to see if it has been reported before creating a new ticket.\n\nIf you are new we suggest reading the user manual to familiarise yourself with the program.\n\n- The Amulet Team
+warning_dialog.do_not_show_again=Do not show this again
+warning_dialog.i_understand=I Understand
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=A new version of Amulet has been released!
+update_check.new_version=New Version:
+update_check.current_version=Your Version:
+update_check.update=Go to Download Page
+update_check.ok=Ok
+
+# Select world
+## The window when selecting a world to open
+select_world.title=World Select
+select_world.open_world_warning=Close the world in game and other tools before opening in Amulet.
+select_world.open_world_button=Open other world
+select_world.open_world_dialogue=Select a Minecraft world directory
+select_world.select_directory_failed=Failed to open directory!
+select_world.recent_worlds=Recently Opened Worlds
+select_world.no_loader_found=Could not find a loader for this world.
+select_world.loading_world_failed=Error loading world.
+
+# About
+## The default program when a world is opened
+program_about.tab_name=About
+program_about.currently_opened_world=Currently Opened World:
+program_about.choose_from_options=Choose from the options on the left what you would like to do.\nYou can switch between these at any time.
+
+# Convert
+## The program used to convert a world
+program_convert.tab_name=Convert
+program_convert.convert_button=Convert
+program_convert.input_world=Input World:
+program_convert.output_world=Output World:
+program_convert.select_output_world=Select Output World
+program_convert.input_output_must_different=The input and output worlds must be different!
+program_convert.select_before_converting=Select a world before converting!
+program_convert.conversion_completed=World conversion completed
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=User Guide (online)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
+program_3d_edit.tab_name=3D Editor
+
+## Canvas
+program_3d_edit.canvas.please_wait=Please wait while the renderer loads
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Downloading Bedrock vanilla resource pack
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Downloading Java vanilla resource pack
+program_3d_edit.canvas.java_rp_failed=Failed to download the latest Java resource pack.
+program_3d_edit.canvas.java_rp_failed_default=Check your internet connection and restart Amulet.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=The certificates to access the internet were not installed.\nRun the "Install Certificates.command" program that can be found in "Applications/Python 3.x".
+program_3d_edit.canvas.loading_resource_packs=Loading resource packs
+program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
+program_3d_edit.canvas.setting_up_renderer=Setting up renderer
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Save
+program_3d_edit.menu_bar.edit.menu_name=&Edit
+program_3d_edit.menu_bar.edit.undo=Undo
+program_3d_edit.menu_bar.edit.redo=Redo
+program_3d_edit.menu_bar.edit.cut=Cut
+program_3d_edit.menu_bar.edit.copy=Copy
+program_3d_edit.menu_bar.edit.paste=Paste
+program_3d_edit.menu_bar.edit.delete=Delete Blocks
+program_3d_edit.menu_bar.edit.goto=Goto
+program_3d_edit.menu_bar.edit.select_all=Select All
+program_3d_edit.menu_bar.options.controls=Controls...
+program_3d_edit.menu_bar.options.options=Options...
+program_3d_edit.menu_bar.help.user_guide=User Guide (online)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Delete Blocks
+program_3d_edit.select_tool.delete_button_tooltip=Delete the blocks in the selected area.
+program_3d_edit.select_tool.copy_button=Copy
+program_3d_edit.select_tool.copy_button_tooltip=Copy the selected area to paste later. Can be pasted into any world and dimension.
+program_3d_edit.select_tool.cut_button=Cut
+program_3d_edit.select_tool.cut_button_tooltip=Copy the selected area to paste later and delete. Can be pasted into any world and dimension.
+program_3d_edit.select_tool.paste_button=Paste
+program_3d_edit.select_tool.paste_button_tooltip=Paste a previously copied or cut area into the world.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Set the x coordinate of the active box's green corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Set the y coordinate of the active box's green corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Set the z coordinate of the active box's green corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Set the x coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Set the y coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Set the z coordinate of the active box's blue corner. Type a number or scroll wheel while hovering.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=The shape of the active selection using Minecraft volume selector notation.
+program_3d_edit.select_tool.box_size_tooltip=The size of the active selection box in blocks.
+program_3d_edit.select_tool.button_point1=Move Point 1
+program_3d_edit.select_tool.button_point1_tooltip=Press and hold this button and use the movement controls to move the green selection point.
+program_3d_edit.select_tool.button_point2=Move Point 2
+program_3d_edit.select_tool.button_point2_tooltip=Press and hold this button and use the movement controls to move the blue selection point.
+program_3d_edit.select_tool.button_selection_box=Move Box
+program_3d_edit.select_tool.button_selection_box_tooltip=Press and hold this button and use the movement controls to move the active box.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=Location
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=The x location where the centre of the selection will be placed. Type in a number, scroll wheel over or use the arrows to change.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=The y location where the centre of the selection will be placed. Type in a number, scroll wheel over or use the arrows to change.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=The z location where the centre of the selection will be placed. Type in a number, scroll wheel over or use the arrows to change.
+program_3d_edit.paste_tool.move_selection_label=Move Selection
+program_3d_edit.paste_tool.move_selection_tooltip=Press and hold this button and use the movement controls to move the selection.
+program_3d_edit.paste_tool.rotation_label=Rotation
+program_3d_edit.paste_tool.free_rotation_label=Free Rotation
+program_3d_edit.paste_tool.free_rotation_tooltip=If unticked the selection can be rotated in multiples of 90 degrees. If ticked the selection can be rotated in single degree increments.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=The angle in degrees in the x axis that the selection is rotated in. Note this is the model's x axis which is transformed by the z and y rotation so this may not match the global x axis.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=The angle in degrees in the y axis that the selection is rotated in. Note this is the model's y axis which is transformed by the z rotation so this may not match the global y axis.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=The angle in degrees in the z axis that the selection is rotated in.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Click to rotate the selection 90 degrees anti-clockwise relative to the look rotation.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Click to rotate the selection 90 degrees clockwise relative to the look rotation.
+program_3d_edit.paste_tool.scale_label=Scale
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=The scale of the model in the x axis.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=The scale of the model in the y axis.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=The scale of the model in the z axis.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Mirror the selection horizontally relative to the direction the camera is looking.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Mirror the selection vertically relative to the direction the camera is looking.
+program_3d_edit.paste_tool.copy_air_label=Paste Air
+program_3d_edit.paste_tool.copy_air_tooltip=If enabled all air blocks in the pasted structure will be applied overwriting any existing blocks. If disabled the existing blocks at those locations will remain and air will not be copied.
+program_3d_edit.paste_tool.copy_water_label=Paste Water
+program_3d_edit.paste_tool.copy_water_tooltip=If enabled all water blocks in the pasted structure will be applied overwriting any existing blocks. If disabled the existing blocks at those locations will remain and water will not be copied.
+program_3d_edit.paste_tool.copy_lava_label=Paste Lava
+program_3d_edit.paste_tool.copy_lava_tooltip=If enabled all lava blocks in the pasted structure will be applied overwriting any existing blocks. If disabled the existing blocks at those locations will remain and lava will not be copied.
+program_3d_edit.paste_tool.confirm_label=Confirm
+program_3d_edit.paste_tool.confirm_tooltip=Click to paste the structure into the world and the specified location, rotation and scale.
+program_3d_edit.paste_tool.zero_scale_message=One of the scale values had a value of zero so nothing was copied.
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Min Y
+program_3d_edit.chunk_tool.min_y_tooltip=The minimum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.max_y=Max Y
+program_3d_edit.chunk_tool.max_y_tooltip=The maximum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.create_chunks=Create Empty Chunks
+program_3d_edit.chunk_tool.create_chunks_tooltip=Create all chunks in the selection that do not already exist. Chunks that already exists will remain unchanged.
+program_3d_edit.chunk_tool.delete_chunks=Delete Chunks
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Delete the selected chunks. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
+program_3d_edit.chunk_tool.prune_chunks=Delete Unselected Chunks
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Delete all chunks that are not selected. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Teleport
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=The x coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=The y coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=The z coordinate of the camera. Type a coordinate to go to the location. Ctrl + C to copy the coordinate. Ctrl + V to paste.
+program_3d_edit.goto_ui.copy_button_tooltip=Copy the x, y and z values to the clipboard in the form "0.0 0.0 0.0" (x, y and z respectively)
+program_3d_edit.goto_ui.paste_button_tooltip=Paste a previously copied coordinate into the inputs. Copied value must three numbers separated with spaces or commas.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Platform and data version of the world
+program_3d_edit.file_ui.projection_tooltip=Change view
+program_3d_edit.file_ui.location_tooltip=Move camera
+program_3d_edit.file_ui.speed_blocks_per_second=bps
+program_3d_edit.file_ui.speed_tooltip=Camera speed in blocks per second
+program_3d_edit.file_ui.speed_dialog_name=Set camera speed
+program_3d_edit.file_ui.dim_tooltip=Select dimension
+program_3d_edit.file_ui.undo_tooltip=Undo
+program_3d_edit.file_ui.redo_tooltip=Redo
+program_3d_edit.file_ui.save_tooltip=Save changes
+program_3d_edit.file_ui.close_tooltip=Close world
