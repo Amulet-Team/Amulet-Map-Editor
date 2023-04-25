@@ -1,0 +1,269 @@
+#This license applies to this file only.
+#
+#-- begin license --
+#MIT License
+#
+#Copyright (c) 2021 Amulet-Team
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+#-- end license --
+
+
+# Important notes
+## If you want to contribute to the translation of the User Interface (UI), please read the corresponding contribution file located at '/contributing/lang.md'
+## Each translation entry must be written as follows: 'unique.identifier=The text shown in the UI'
+## Unique identifiers are defined by the devs. In order to know what are the existing identifiers, please refer to the 'en.lang' file
+
+# Loading order and region specific translations
+## First the 'en.lang' is loaded to ensure that there is at least something for any given key
+## Then, if the language code contains an "_" symbol (for example "fr_CA"), the lang file for the language section ("fr") will be loaded next ("fr.lang")
+## Finally, if it exists, the region specific language file ("fr_CA.lang") will be loaded which should only contain entries that vary between regions
+## This allows languages that do not vary much between regions to share the same language file to minimise duplication
+
+# Supported features in translation files
+## You can write a comment line by using the "#" symbol as the first (non-space) character of a line. Inline comments are not supported
+## Any "\n" in a translation string will be converted as a new line in the UI
+
+# About the menu bar
+## The "&" symbol is a special character in this context. It will not be shown in the UI but will define the following character as a shortcut when the "alt" key is pressed (warning: accented letters are they own characters (é =/= e))
+## Example: "&File" translates to "File" in the UI, but will allow the user to press "alt+f" to open the corresponding menu
+## More info can be found at: https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+
+# About the fstrings
+## The pattern "{variable}" is used in some entries, this pattern allows the app to input values in the text
+## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
+## This pattern must stay in the translated entries for them to work properly
+
+# Meta
+meta.amulet=Amulet
+
+# Shared strings
+shared.check_console=Daha fazla detay için konsolu kontrol edin.
+
+# App
+app.world_still_used=Dünya hala kullanılıyor. Lütfen devam etmeden önce onu kapatın.
+app.browser_open_tooltip=Tıklayınca tarayıcınızda sayfa açılacaktır.
+
+world.java_platform=Java
+world.bedrock_platform=Bedrock
+world.close_world=Dünyayı kapat
+
+# Menu bar
+## The menu displayed at the top of the screen
+menu_bar.file.menu_name=&Dosya
+menu_bar.file.open_world=Dünyayı aç
+menu_bar.file.close_world=Dünyayı kapat
+menu_bar.file.quit=Çık
+menu_bar.options.menu_name=&Ayarlar
+menu_bar.help.menu_name=&Yardım
+
+# Main menu
+## The start screen
+main_menu.tab_name=Ana Menü
+main_menu.open_world=Dünya Aç
+main_menu.user_manual=Kullanım Kılavuzu
+main_menu.bug_tracker=Bug Tracker
+main_menu.discord=Amulet Discord
+
+# Language Select
+language_select.title=Dil Seçimi
+language_select.help=Aşağıdaki listeden kullanmak istediğiniz dili seçin.
+language_select.contribute=Eğer çevirileri düzeltmek veya yeni çeviri eklemek istiyorsanız buraya tıklayın.
+
+# Warning Dialog
+warning_dialog.title=Amulet'e Hoş Geldiniz
+warning_dialog.content=Amulet'e hoş geldiniz.\n\nDünyalarınızı Amulet ile açmadan önce yedek almanızı öneririz.\n\nAmulet'in dünyaları bozmadığından emin olmaya çalışsak da kayıt biçiminin belgelenmemiş ve sürekli değişiyor olması sebebiyle yanlış bir şeyler yapabiliyoruz.\n\nBelirtilen nedenlerden dolayı sadece test edilen tam sürümleri resmi olarak destekliyor olsak da Java sürümleri, Bedrock betaları ve deneysel özellikler kesinlikle çalışmayacak anlamına gelmiyor.\n\nŞu anda yaratıklar desteklenmiyor, eşyalar ise yalnızca aynı platformda destekleniyor.\nEklenecek bir özellik veya düzeltilecek bir hata bulursanız, lütfen Bug Tracker aracılığıyla rapor edin. Yeni bir talep oluşturmadan önce rapor edilip edilmediğini kontrol edin.\n\nEğer yeniyseniz, programı tanımak için kullanım kılavuzumuzu okumanızı öneririz.\n\n- Amulet Ekibi
+warning_dialog.do_not_show_again=Bunu tekrar gösterme
+warning_dialog.i_understand=Anladım
+
+# Update check
+## The window displayed when a newer version of Amulet is available
+update_check.newer_version_released=Amulet'in yeni bir sürümü yayınlandı!
+update_check.new_version=Yeni Sürüm:
+update_check.current_version=Mevcut Sürüm:
+update_check.update=İndirme Sayfasına Git
+update_check.ok=Tamam
+
+# Select world
+## The window when selecting a world to open
+select_world.title=Dünya Seç
+select_world.open_world_warning=Dünyayı Amulet üzerinden açmadan önce oyunda ve başka bir uygulama üzerinde açık olmadığından emin olun.
+select_world.open_world_button=Başka bir dünya aç
+select_world.open_world_dialogue=Minecraft dünya klasörü seçin
+select_world.select_directory_failed=Klasör açılırken bir hata oluştu!
+select_world.recent_worlds=Son Açılan Dünyalar
+select_world.no_loader_found=Bu dünya için yükleyici bulunamadı.
+select_world.loading_world_failed=Dünya açılırken bir hata oluştu.
+
+# About
+## The default program when a world is opened
+program_about.tab_name=Hakkında
+program_about.currently_opened_world=Şu an Açık Dünya:
+program_about.choose_from_options=Solda bulunan seçenekler arasından yapmak istediğinizi seçin.\nSeçimler arasında istediğiniz zaman geçiş yapabilirsiniz.
+
+# Convert
+## The program used to convert a world
+program_convert.tab_name=Dönüştür
+program_convert.convert_button=Dönüştür
+program_convert.input_world=Kaynak Dünya:
+program_convert.output_world=Hedef Dünya:
+program_convert.select_output_world=Hedef Dünya Seçin
+program_convert.input_output_must_different=Kaynak dünya ile hedef dünya aynı olamaz!
+program_convert.select_before_converting=Dönüştürmeye başlamadan önce bir dünya seçin.
+program_convert.conversion_completed=Dünya dönüştürüldü.
+
+## Menu bar
+program_convert.menu_bar.help.user_guide=Kullanım Kılavuzu (çevrim içi)
+
+# 3D Editor
+## The program used to edit a world with a 3D viewer
+program_3d_edit.tab_name=3D Düzenleyici
+
+## Canvas
+program_3d_edit.canvas.please_wait=İşleyici yüklenirken lütfen bekleyin
+program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=Bedrock vanilla kaynak paketi indiriliyor
+program_3d_edit.canvas.downloading_java_vanilla_resource_pack=Java vanilla kaynak paketi indiriliyor
+program_3d_edit.canvas.java_rp_failed=Java kaynak paketi indirilirken bir hata oluştu.
+program_3d_edit.canvas.java_rp_failed_default=İnternet bağlantınızı kontrol edip Amulet'i yeniden başlatın.
+program_3d_edit.canvas.java_rp_failed_mac_certificates=İnternete erişmek için gerekli olan sertifikalar yüklü değil.\n"Applications/Python 3.x" klasöründe bulunan "Install Certificates.command" programını çalıştırın.
+program_3d_edit.canvas.loading_resource_packs=Kaynak paketleri yükleniyor
+program_3d_edit.canvas.creating_texture_atlas=Doku haritası oluşturuluyor
+program_3d_edit.canvas.setting_up_renderer=İşleyici ayarlanıyor.
+
+## Menu bar
+program_3d_edit.menu_bar.file.save=Kaydet
+program_3d_edit.menu_bar.edit.menu_name=&Düzenle
+program_3d_edit.menu_bar.edit.undo=Geri al
+program_3d_edit.menu_bar.edit.redo=Tekrarla
+program_3d_edit.menu_bar.edit.cut=Kes
+program_3d_edit.menu_bar.edit.copy=Kopyala
+program_3d_edit.menu_bar.edit.paste=Yapıştır
+program_3d_edit.menu_bar.edit.delete=Blokları sil
+program_3d_edit.menu_bar.edit.goto=Git
+program_3d_edit.menu_bar.edit.select_all=Hepsini seç
+program_3d_edit.menu_bar.options.controls=Kontroller...
+program_3d_edit.menu_bar.options.options=Ayarlar...
+program_3d_edit.menu_bar.help.user_guide=Kullanım kılavuzu (çevrim içi)
+
+## Select tool
+program_3d_edit.select_tool.delete_button=Blokları sil
+program_3d_edit.select_tool.delete_button_tooltip=Seçili bölgedeki blokları sil.
+program_3d_edit.select_tool.copy_button=Kopyala
+program_3d_edit.select_tool.copy_button_tooltip=Seçili bölgeyi daha sonra tekrar yapıştırmak üzere kopyala. Herhangi bir boyuta veya dünyaya yapıştırabilir.
+program_3d_edit.select_tool.cut_button=Kes
+program_3d_edit.select_tool.cut_button_tooltip=Seçilen bölgeyi daha sonra tekrar yapıştırmak üzere kes. Herhangi bir boyuta veya dünyaya yapıştırabilir.
+program_3d_edit.select_tool.paste_button=Yapıştır
+program_3d_edit.select_tool.paste_button_tooltip=Daha önceden kopyalanmış bölgeyi yapıştır.
+program_3d_edit.select_tool.scroll_point_x1=x1
+program_3d_edit.select_tool.scroll_point_y1=y1
+program_3d_edit.select_tool.scroll_point_z1=z1
+program_3d_edit.select_tool.scroll_point_x2=x2
+program_3d_edit.select_tool.scroll_point_y2=y2
+program_3d_edit.select_tool.scroll_point_z2=z2
+program_3d_edit.select_tool.scroll_point_x1_tooltip=Aktif alanın yeşil köşesinin x koordinatını ayarla. Bir sayı yazabilir veya farenin tekerleğini kullanabilirsiniz.
+program_3d_edit.select_tool.scroll_point_y1_tooltip=Aktif alanın yeşil köşesinin y koordinatını ayarla. Bir sayı yazabilir veya farenin tekerleğini kullanabilirsiniz.
+program_3d_edit.select_tool.scroll_point_z1_tooltip=Aktif alanın yeşil köşesinin z koordinatını ayarla. Bir sayı yazabilir veya farenin tekerleğini kullanabilirsiniz.
+program_3d_edit.select_tool.scroll_point_x2_tooltip=Aktif alanın mavi köşesinin x koordinatını ayarla. Bir sayı yazabilir veya farenin tekerleğini kullanabilirsiniz.
+program_3d_edit.select_tool.scroll_point_y2_tooltip=Aktif alanın mavi köşesinin y koordinatını ayarla. Bir sayı yazabilir veya farenin tekerleğini kullanabilirsiniz.
+program_3d_edit.select_tool.scroll_point_z2_tooltip=Aktif alanın mavi köşesinin z koordinatını ayarla. Bir sayı yazabilir veya farenin tekerleğini kullanabilirsiniz.
+program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
+program_3d_edit.select_tool.box_size_selector_tooltip=Minecraft'ın ses seçici gösterimini kullanan aktif seçimin şekli.
+program_3d_edit.select_tool.box_size_tooltip=Seçilen alanın blok cinsinden boyutu.
+program_3d_edit.select_tool.button_point1=1. Noktayı taşı
+program_3d_edit.select_tool.button_point1_tooltip=Bu butona basılı tutup hareket kontrollerini kullanarak yeşil alanı taşıyın.
+program_3d_edit.select_tool.button_point2=2. Noktayı Taşı
+program_3d_edit.select_tool.button_point2_tooltip=Bu butona basılı tutup hareket kontrollerini kullanarak mavi alanı taşıyın.
+program_3d_edit.select_tool.button_selection_box=Alanı Taşı
+program_3d_edit.select_tool.button_selection_box_tooltip=Bu butona basılı tutup hareket kontrollerini kullanarak seçili alanı taşıyın.
+
+## Paste tool
+program_3d_edit.paste_tool.location_label=Konum
+program_3d_edit.paste_tool.location_x_label=x
+program_3d_edit.paste_tool.location_x_tooltip=Seçili alanın merkezinin yerleştirileceği x konumu. Bir sayı yazarak, farenin tekerleğini veya ok tuşlarını kullanarak değiştirebilirsiniz.
+program_3d_edit.paste_tool.location_y_label=y
+program_3d_edit.paste_tool.location_y_tooltip=Seçili alanın merkezinin yerleştirileceği y konumu. Bir sayı yazarak, farenin tekerleğini veya ok tuşlarını kullanarak değiştirebilirsiniz.
+program_3d_edit.paste_tool.location_z_label=z
+program_3d_edit.paste_tool.location_z_tooltip=Seçili alanın merkezinin yerleştirileceği z konumu. Bir sayı yazarak, farenin tekerleğini veya ok tuşlarını kullanarak değiştirebilirsiniz.
+program_3d_edit.paste_tool.move_selection_label=Alanı Taşı
+program_3d_edit.paste_tool.move_selection_tooltip=Bu butona basılı tutup hareket kontrollerini kullanarak seçili alanı taşıyın.
+program_3d_edit.paste_tool.rotation_label=Döndürme
+program_3d_edit.paste_tool.free_rotation_label=Serbest Döndürme
+program_3d_edit.paste_tool.free_rotation_tooltip=Etkinleştirilmezse seçim yalnızca 90 derecenin katları halinde döndürülebilir. Etkinleştirilirse seçim tek derecelik artışlarla döndürülebilir.
+program_3d_edit.paste_tool.rotation_x_label=x
+program_3d_edit.paste_tool.rotation_x_tooltip=Seçilen öğenin x eksenindeki açının derecesidir. Unutmayın ki modelin x ekseni, z ve y eksenlerine göre değişkenlik gösterebilir, bu durumda genel x ekseninden farklı olabilir.
+program_3d_edit.paste_tool.rotation_y_label=y
+program_3d_edit.paste_tool.rotation_y_tooltip=Seçilen öğenin y eksenindeki açının derecesidir. Unutmayın ki modelin y ekseni, z eksenine göre değişkenlik gösterebilir, bu durumda genel y ekseninden farklı olabilir.
+program_3d_edit.paste_tool.rotation_z_label=z
+program_3d_edit.paste_tool.rotation_z_tooltip=Seçilen alanın  z ekseni etrafında döndürüldüğü derece cinsinden açı.
+program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip=Bakış yönüne göre seçilen alanı saat yönünün tersinde 90 derece döndürmek için tıklayın.
+program_3d_edit.paste_tool.rotate_clockwise_tooltip=Bakış yönüne göre seçilen alanı saat yönünde 90 derece döndürmek için tıklayın.
+program_3d_edit.paste_tool.scale_label=Ölçek
+program_3d_edit.paste_tool.scale_x_label=x
+program_3d_edit.paste_tool.scale_x_tooltip=Modelin x eksenndeki ölçeği.
+program_3d_edit.paste_tool.scale_y_label=y
+program_3d_edit.paste_tool.scale_y_tooltip=Modelin y eksenndeki ölçeği.
+program_3d_edit.paste_tool.scale_z_label=z
+program_3d_edit.paste_tool.scale_z_tooltip=Modelin z eksenndeki ölçeği.
+program_3d_edit.paste_tool.mirror_horizontal_tooltip=Kamera bakış yönüne göre seçilen alanı yatay eksende çevir.
+program_3d_edit.paste_tool.mirror_vertical_tooltip=Kamera bakış yönüne göre seçilen alanı dikey eksende çevir.
+program_3d_edit.paste_tool.copy_air_label=Boşlukları dahil et
+program_3d_edit.paste_tool.copy_air_tooltip=Etkinleştirilirse kopyalanan yapıdaki boş bloklar mevcut blokların üzerine yazılır. Devre dışı bırakılırsa konumda halihazırda bulunan bloklar değişmeyecektir.
+program_3d_edit.paste_tool.copy_water_label=Suları yapıştır
+program_3d_edit.paste_tool.copy_water_tooltip=Etkinleştirilirse kopyalanan yapıdaki su blokları mevcut blokların üzerine yazılır. Devre dışı bırakılırsa konumda halihazırda bulunan bloklar değişmeyecektir.
+program_3d_edit.paste_tool.copy_lava_label=Lavları yapıştır
+program_3d_edit.paste_tool.copy_lava_tooltip=Etkinleştirilirse kopyalanan yapıdaki lav blokları mevcut blokların üzerine yazılır. Devre dışı bırakılırsa konumda halihazırda bulunan bloklar değişmeyecektir.
+program_3d_edit.paste_tool.confirm_label=Onayla
+program_3d_edit.paste_tool.confirm_tooltip=Yapıyı belirlenen şekilde yapıştırmak için tıklayın.
+program_3d_edit.paste_tool.zero_scale_message=Ölçek değerlerinden birisi sıfırdı, bu yüzden hiçbir şey kopyalanmadı.
+
+## Chunk tool
+program_3d_edit.chunk_tool.min_y=Minimum Y değeri
+program_3d_edit.chunk_tool.min_y_tooltip=Kuşbakışı kamera açısında gösterilecek minimum y değeri. Bu özellik, dünyanın bir diliminin ya da nether ve mağaralar gibi alanların görüntülemesine yardımcı olmak için kullanılabilir.
+program_3d_edit.chunk_tool.max_y=Maksimum Y değeri
+program_3d_edit.chunk_tool.max_y_tooltip=Kuşbakışı kamera açısında gösterilecek maksimum y değeri. Bu özellik, dünyanın bir diliminin ya da nether ve mağaralar gibi alanların görüntülemesine yardımcı olmak için kullanılabilir.
+program_3d_edit.chunk_tool.create_chunks=Boş chunklar oluştur.
+program_3d_edit.chunk_tool.create_chunks_tooltip=Seçili alanda var olmayan chunkları oluşturur. Halihazırda var olan chunklar düzenlenmeden kalacaktır.
+program_3d_edit.chunk_tool.delete_chunks=Seçili chunkları sil
+program_3d_edit.chunk_tool.delete_chunks_tooltip=Seçili chunkları sil. Bu chunkları ve chunkların içerisindeki tüm verileri silecektir. Oyunda tekrar yükleneceği zaman chunklar yeniden oluşturulacaktır.
+program_3d_edit.chunk_tool.prune_chunks=Seçili olmayan chunkları sil.
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Seçili olmayan chunkları sil. Bu chunkları ve chunkların içerisindeki tüm verileri silecektir. Oyunda tekrar yükleneceği zaman chunklar yeniden oluşturulacaktır.
+
+## Goto/Teleport window
+program_3d_edit.goto_ui.title=Işınlan
+program_3d_edit.goto_ui.x_label=x:
+program_3d_edit.goto_ui.x_label_tooltip=Kameranın x koordinatı. Konuma gitmek için bir koordinat yazın. Ctrl + C ile koordinatı kopyalayabilir, Ctrl + V ile yapıştırabilirsiniz.
+program_3d_edit.goto_ui.y_label=y:
+program_3d_edit.goto_ui.y_label_tooltip=Kameranın y koordinatı. Konuma gitmek için bir koordinat yazın. Ctrl + C ile koordinatı kopyalayabilir, Ctrl + V ile yapıştırabilirsiniz.
+program_3d_edit.goto_ui.z_label=z:
+program_3d_edit.goto_ui.z_label_tooltip=Kameranın z koordinatı. Konuma gitmek için bir koordinat yazın. Ctrl + C ile koordinatı kopyalayabilir, Ctrl + V ile yapıştırabilirsiniz.
+program_3d_edit.goto_ui.copy_button_tooltip=x, y ve z koordinatlarını sırasıyla "0.0 0.0 0.0" formatında kopyalayın.
+program_3d_edit.goto_ui.paste_button_tooltip=Kopyalanmış bir koordinatı yapıştırın. Kopyalanmış koordinat boşluk ya da virgül ile ayrılmış üç sayıdan oluşmalıdır.
+
+## File panel
+program_3d_edit.file_ui.version_tooltip=Dünya platformu ve sürümü
+program_3d_edit.file_ui.projection_tooltip=Görünümü değiştir
+program_3d_edit.file_ui.location_tooltip=Kamerayı taşı
+program_3d_edit.file_ui.speed_blocks_per_second=b/s
+program_3d_edit.file_ui.speed_tooltip=Kameranın bir saniye içerisinde hareket edeceği blok sayısı
+program_3d_edit.file_ui.speed_dialog_name=Kamera hızını değiştir
+program_3d_edit.file_ui.dim_tooltip=Alan seç
+program_3d_edit.file_ui.undo_tooltip=Geri al
+program_3d_edit.file_ui.redo_tooltip=Tekrarla
+program_3d_edit.file_ui.save_tooltip=Değişiklikleri kaydet
+program_3d_edit.file_ui.close_tooltip=Dünyayı kapat
