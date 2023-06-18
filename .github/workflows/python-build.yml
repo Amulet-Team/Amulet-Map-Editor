@@ -17,8 +17,8 @@ jobs:
     strategy:
       matrix:
         cfg:
-        - {os: windows-latest, python-version: 3.7, architecture: x64}
-        - {os: windows-latest, python-version: 3.7, architecture: x86}
+        - {os: windows-latest, python-version: '3.9', architecture: x64}
+        - {os: windows-latest, python-version: '3.9', architecture: x86}
 
     steps:
     - uses: actions/checkout@v2
