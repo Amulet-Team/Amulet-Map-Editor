@@ -88,7 +88,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
 
     @staticmethod
     def _discord(_):
-        webbrowser.open("https://discord.gg/BTm6jnf")
+        webbrowser.open("https://www.amuletmc.com/discord")
 
     def enable(self):
         self.GetTopLevelParent().create_menu()
