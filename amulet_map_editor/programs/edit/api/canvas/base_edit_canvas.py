@@ -77,16 +77,13 @@ class BaseEditCanvas(EventCanvas):
         self._mouse: MouseMovement = MouseMovement(self)
         self._mouse.set_middle()
 
+        resource_packs_dir = os.path.join(os.environ["DATA_DIR"], "resource_packs")
+        readme_path = os.path.join(resource_packs_dir, "readme.txt")
         # create the resource packs location
-        try:
-            os.makedirs("resource_packs", exist_ok=True)
-            if not os.path.isfile("resource_packs/readme.txt"):
-                with open("resource_packs/readme.txt", "w") as f:
-                    f.write("Put the Java resource pack you want loaded in here.")
-        except PermissionError as e:
-            raise PermissionError(
-                "Amulet is not able to write to the install directory. Try moving Amulet to somewhere else on your computer."
-            ) from e
+        os.makedirs(resource_packs_dir, exist_ok=True)
+        if not os.path.isfile(readme_path):
+            with open(readme_path, "w") as f:
+                f.write("Put the Java resource pack you want loaded in here.")
 
         self._renderer: Optional[Renderer] = None
         self._opengl_resource_pack = None
@@ -97,10 +94,11 @@ class BaseEditCanvas(EventCanvas):
         All code in here must be thread safe and not touch the OpenGL state.
         """
         packs = []
+        resource_packs_dir = os.path.join(os.environ["DATA_DIR"], "resource_packs")
         user_packs = [
-            load_resource_pack(os.path.join("resource_packs", rp))
-            for rp in os.listdir("resource_packs")
-            if os.path.isdir(os.path.join("resource_packs", rp))
+            load_resource_pack(os.path.join(resource_packs_dir, rp))
+            for rp in os.listdir(resource_packs_dir)
+            if os.path.isdir(os.path.join(resource_packs_dir, rp))
         ]
         if (
             self.world.level_wrapper.platform == "bedrock"

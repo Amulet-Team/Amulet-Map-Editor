@@ -3,7 +3,7 @@ import pickle
 import gzip
 from typing import Any
 
-_path = os.path.abspath(os.path.join(".", "config"))
+_path = os.path.abspath(os.path.join(os.environ["CONFIG_DIR"]))
 
 
 def get(identifier: str, default: Any = None) -> Any:

@@ -113,7 +113,7 @@ class OpenGLResourcePack:
                 default=0,
             )
 
-            cache_dir = os.path.join(".", "cache", "resource_pack")
+            cache_dir = os.path.join(os.environ["CACHE_DIR"], "resource_packs", "atlas")
             img_path = os.path.join(cache_dir, f"{cache_id}.png")
             bounds_path = os.path.join(cache_dir, f"{cache_id}.json")
             try:
