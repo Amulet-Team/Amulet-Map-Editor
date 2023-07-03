@@ -3,24 +3,30 @@
 
 def _on_error(e):
     """Code to handle errors"""
-    err_list = []
     try:
         import traceback
+        import sys
+        import os
 
-        err_list.append(traceback.format_exc())
-    except:
-        pass
-    if isinstance(e, ImportError):
-        err_list.append(
-            f"Failed to import requirements. Check that you extracted correctly."
+    except ImportError as e:
+        # Something has gone seriously wrong
+        print(e)
+        print("Failed to import requirements. Check that you extracted correctly.")
+        input("Press ENTER to continue.")
+    else:
+        err = "\n".join(
+            [traceback.format_exc()] +
+            ["Failed to import requirements. Check that you extracted correctly."] * isinstance(e, ImportError) +
+            [str(e)]
         )
-    err_list.append(str(e))
-    err = "\n".join(err_list)
-    print(err)
-    with open("./logs/crash.log", "w") as f:
-        f.write(err)
-    input("Press ENTER to continue.")
-    sys.exit(1)
+        print(err)
+        try:
+            with open("crash.log", "w") as f:
+                f.write(err)
+        except OSError:
+            pass
+        input("Press ENTER to continue.")
+        sys.exit(1)
 
 
 try:
@@ -34,16 +40,17 @@ try:
     import glob
     import time
     import wx
+    import platformdirs
 
     if sys.platform == "linux" and wx.VERSION >= (4, 1, 1):
         # bug 247
         os.environ["PYOPENGL_PLATFORM"] = "egl"
-except Exception as e:
-    _on_error(e)
+except Exception as e_:
+    _on_error(e_)
 
 
 def _init_log():
-    logs_path = os.path.join(".", "logs")
+    logs_path = os.environ["LOG_DIR"]
     # set up handlers
     os.makedirs(logs_path, exist_ok=True)
     # remove all log files older than a week
@@ -72,22 +79,34 @@ def _init_log():
 
 def main():
     try:
+        # Initialise default paths.
+        data_dir = platformdirs.user_data_dir("AmuletMapEditor", "AmuletTeam")
+        os.environ.setdefault("DATA_DIR", data_dir)
+        config_dir = platformdirs.user_config_dir("AmuletMapEditor", "AmuletTeam")
+        if config_dir == data_dir:
+            config_dir = os.path.join(data_dir, "Config")
+        os.environ.setdefault("CONFIG_DIR", config_dir)
+        os.environ.setdefault(
+            "CACHE_DIR", platformdirs.user_cache_dir("AmuletMapEditor", "AmuletTeam")
+        )
+        os.environ.setdefault("LOG_DIR", platformdirs.user_log_dir("AmuletMapEditor", "AmuletTeam"))
+
         _init_log()
         from amulet_map_editor.api.framework import AmuletApp
 
     except Exception as e:
         _on_error(e)
-        AmuletApp = None
+    else:
+        try:
+            app = AmuletApp(0)
+            app.MainLoop()
+        except Exception as e:
+            log = logging.getLogger(__name__)
+            log.critical(
+                f"Amulet Crashed. Sorry about that. Please report it to a developer if you think this is an issue. \n{traceback.format_exc()}"
+            )
+            input("Press ENTER to continue.")
 
-    try:
-        app = AmuletApp(0)
-        app.MainLoop()
-    except Exception as e:
-        log = logging.getLogger(__name__)
-        log.critical(
-            f"Amulet Crashed. Sorry about that. Please report it to a developer if you think this is an issue. \n{traceback.format_exc()}"
-        )
-        input("Press ENTER to continue.")
     sys.exit(0)
 
 
