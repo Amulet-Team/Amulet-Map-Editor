@@ -15,9 +15,10 @@ def _on_error(e):
         input("Press ENTER to continue.")
     else:
         err = "\n".join(
-            [traceback.format_exc()] +
-            ["Failed to import requirements. Check that you extracted correctly."] * isinstance(e, ImportError) +
-            [str(e)]
+            [traceback.format_exc()]
+            + ["Failed to import requirements. Check that you extracted correctly."]
+            * isinstance(e, ImportError)
+            + [str(e)]
         )
         print(err)
         try:
@@ -89,7 +90,9 @@ def main():
         os.environ.setdefault(
             "CACHE_DIR", platformdirs.user_cache_dir("AmuletMapEditor", "AmuletTeam")
         )
-        os.environ.setdefault("LOG_DIR", platformdirs.user_log_dir("AmuletMapEditor", "AmuletTeam"))
+        os.environ.setdefault(
+            "LOG_DIR", platformdirs.user_log_dir("AmuletMapEditor", "AmuletTeam")
+        )
 
         _init_log()
         from amulet_map_editor.api.framework import AmuletApp
