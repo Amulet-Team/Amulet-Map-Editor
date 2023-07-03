@@ -36,7 +36,8 @@ class UIOperationLoader(BaseOperationLoader):
         """Parse the export dictionary and setup as required."""
         options_path = os.path.abspath(
             os.path.join(
-                "config",
+                os.environ["CONFIG_DIR"],
+                "plugins",
                 "edit_plugins",
                 f"""{''.join(c for c in self._name if c in ValidChrs)}_{
                 struct.unpack(
