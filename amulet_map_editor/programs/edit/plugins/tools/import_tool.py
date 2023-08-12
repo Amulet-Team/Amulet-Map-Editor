@@ -51,7 +51,7 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
             "Open a Minecraft data file",
             wildcard="|".join(
                 [  # TODO: Automatically load these from the FormatWrapper classes.
-                    "All files (*.construction;*.mcstructure;*.schematic)|*.construction;*.mcstructure;*.schematic",
+                    "All files (*.construction;*.mcstructure;*.schematic .schem)|*.construction;*.mcstructure;*.schematic;*.schem",
                     "Construction file (*.construction)|*.construction",
                     "Bedrock mcstructure file (*.mcstructure)|*.mcstructure",
                     "Legacy Schematic file (*.schematic)|*.schematic",
