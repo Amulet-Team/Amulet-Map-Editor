@@ -283,7 +283,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
     def _update_selection_inputs(
         self, point1: BlockCoordinates, point2: BlockCoordinates
     ):
-        (x1, y1, z1), (x2, y2, z2) = point1, point2
+        x1, y1, z1, x2, y2, z2 = map(int, (*point1, *point2))
         self._x1.SetValue(x1)
         self._y1.SetValue(y1)
         self._z1.SetValue(z1)
