@@ -35,7 +35,7 @@ jobs:
 
     - name: Setup
       run: |
-        python -m build -C--global-option=--find-libs=True -C--global-option=--find-libs=True
+        python -m build -C--build-option=--find-libs=True
         python -m pip install dist/amulet_map_editor-*.whl --upgrade
 
     - name: PyInstaller build
