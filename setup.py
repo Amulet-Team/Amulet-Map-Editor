@@ -8,6 +8,7 @@ import numpy
 import subprocess
 import logging
 import re
+import os
 import versioneer
 
 
@@ -117,41 +118,15 @@ else:
 cmdclass = versioneer.get_cmdclass()
 
 
-# There might be a better way of doing this
-# The extra argument needs to be defined in the sdist
-# so that it doesn't error. It doesn't actually use it.
-class SDist(cmdclass["sdist"]):
-    user_options = cmdclass["sdist"].user_options + [
-        ("find-libs=", None, ""),
-    ]
-
-    def initialize_options(self):
-        super().initialize_options()
-        self.find_libs = None
-
-
 class BDistWheel(bdist_wheel):
-    user_options = bdist_wheel.user_options + [
-        (
-            "find-libs=",
-            None,
-            "Find and fix the newest version of first party libraries. Only used internally.",
-        ),
-    ]
-
-    def initialize_options(self):
-        super().initialize_options()
-        self.find_libs = None
-
     def finalize_options(self):
-        if self.find_libs:
+        if "BDISTWHEELFREEZELIBS" in os.environ:
             self.distribution.install_requires = freeze_requirements(
                 list(self.distribution.install_requires)
             )
         super().finalize_options()
 
 
-cmdclass["sdist"] = SDist
 cmdclass["bdist_wheel"] = BDistWheel
 
 
