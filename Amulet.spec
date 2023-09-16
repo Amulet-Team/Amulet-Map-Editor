@@ -105,7 +105,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=os.name == "nt", # Only show the console on windows
     icon="icon.ico",
 )
 coll = COLLECT(
