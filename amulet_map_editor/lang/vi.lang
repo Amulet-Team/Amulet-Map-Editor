@@ -50,6 +50,9 @@
 ## Example: "There are {n} changes" translates to "There are 2 changes" in the UI
 ## This pattern must stay in the translated entries for them to work properly
 
+# Meta
+meta.amulet=Amulet
+
 # Shared strings
 shared.check_console=Kiểm tra cửa sổ lệnh để biết thên chi tiết.
 
@@ -74,9 +77,20 @@ menu_bar.help.menu_name=T&rợ giúp
 ## The start screen
 main_menu.tab_name=Bảng chọn chính
 main_menu.open_world=Mở thế giới
-main_menu.user_manual=User Manual
-main_menu.bug_tracker=Bug Tracker
+main_menu.user_manual=Hướng dẫn sử dụng
+main_menu.bug_tracker=Trình theo dõi lỗi
 main_menu.discord=Discord của Amulet
+
+# Language Select
+language_select.title=Lựa chọn ngôn ngữ
+language_select.help=Lựa chọn ngôn ngữ để sử dụng trong Amulet từ danh sách bên dưới.
+language_select.contribute=Nếu bạn muốn sửa hoặc thêm bản dịch, nháy vào đây.
+
+# Warning Dialog
+warning_dialog.title=Chào mừng đến với Amulet
+warning_dialog.content=Xin chào và chào mừng bạn đến với Amulet.\n\nChúng tôi khuyên bạn nên tạo bản sao lưu các thế giới của mình trước khi mở chúng trong Amulet.\n\nChúng tôi cố gắng đảm bảo rằng Amulet không làm hỏng các thế giới nhưng mà định dạng lưu lại không được ghi chép lại và liên tục thay đổi và đôi khi chúng tôi gặp sự cố.\n\nVì những lý do này, chúng tôi chỉ chính thức hỗ trợ các bản phát hành đầy đủ mà chúng tôi đã thử nghiệm.\nCác bản thử nghiệm (snapshot) Java, bản beta Bedrock và các tính năng thử nghiệm có thể hoạt động nhưng chưa được kiểm tra nên không được hỗ trợ chính thức.\n\nHiện nay các thực thể không được hỗ trợ và các vật phẩm chỉ được hỗ trợ trong cùng một nền tảng.\nNếu bạn muốn thêm một tính năng hay tìm thấy một lỗi cần sửa, hãy báo cáo trên trình theo dõi lỗi của chúng tôi.\nVui lòng sử dụng công cụ tìm kiếm để xem liệu nó đã được báo cáo hay chưa trước khi tạo một vấn đề mới.\n\nNếu bạn là người mới, chúng tôi khuyên bạn nên đọc hướng dẫn sử dụng để làm quen với chương trình. \n\n- Nhóm Amulet
+warning_dialog.do_not_show_again=Không hiện lại nữa
+warning_dialog.i_understand=Tôi đã hiểu
 
 # Update check
 ## The window displayed when a newer version of Amulet is available
@@ -112,10 +126,10 @@ program_convert.output_world=Thế giới đầu ra:
 program_convert.select_output_world=Lựa chọn thế giới đầu ra
 program_convert.input_output_must_different=Thế giới đầu vào và đầu ra phải khác nhau!
 program_convert.select_before_converting=Hãy chọn một thế giới trước khi chuyển đổi!
-program_convert.conversion_completed=Đã thành việc chuyển đổi thế giới
+program_convert.conversion_completed=Đã hoàn thành việc chuyển đổi thế giới
 
 ## Menu bar
-program_convert.menu_bar.help.user_guide=Hướng dẫn người dùng (trực tuyến)
+program_convert.menu_bar.help.user_guide=Hướng dẫn sử dụng (trực tuyến)
 
 # 3D Editor
 ## The program used to edit a world with a 3D viewer
@@ -145,7 +159,7 @@ program_3d_edit.menu_bar.edit.goto=Đi đến
 program_3d_edit.menu_bar.edit.select_all=Chọn tất cả
 program_3d_edit.menu_bar.options.controls=Điều khiển...
 program_3d_edit.menu_bar.options.options=Tuỳ chọn...
-program_3d_edit.menu_bar.help.user_guide=Hướng dẫn người dùng (trực tuyến)
+program_3d_edit.menu_bar.help.user_guide=Hướng dẫn sử dụng (trực tuyến)
 
 ## Select tool
 program_3d_edit.select_tool.delete_button=Xoá các khối
@@ -153,7 +167,7 @@ program_3d_edit.select_tool.delete_button_tooltip=Xoá các khối trong khu v�
 program_3d_edit.select_tool.copy_button=Sao chép
 program_3d_edit.select_tool.copy_button_tooltip=Sao chép khu vực được chọn để dán về sau. Có thể được dán vào bất cứ thế giới và chiều không gian nào.
 program_3d_edit.select_tool.cut_button=Cắt
-program_3d_edit.select_tool.cut_button_tooltip=Sao chép khu vực được chọn để dán về sau. Có thể được dán vào bất cứ thế giới và chiều không gian nào.
+program_3d_edit.select_tool.cut_button_tooltip=Sao chép khu vực được chọn để dán về sau và xoá. Có thể được dán vào bất cứ thế giới và chiều không gian nào.
 program_3d_edit.select_tool.paste_button=Dán
 program_3d_edit.select_tool.paste_button_tooltip=Dán một khu vực đã được cắt hoặc sao chép trước đó vào thế giới.
 program_3d_edit.select_tool.scroll_point_x1=x1
@@ -220,9 +234,11 @@ program_3d_edit.paste_tool.zero_scale_message=Một trong số các giá trị t
 
 ## Chunk tool
 program_3d_edit.chunk_tool.min_y=Y nhỏ nhất
-program_3d_edit.chunk_tool.min_y_tooltip=The minimum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.min_y_tooltip=Toạ độ y nhỏ nhất để vẽ lên khung nhìn trên xuống. Cái này có thể được dùng để xem một lát cắt của thế giới và giúp xem các chiều không gian như Nether và hang động.
 program_3d_edit.chunk_tool.max_y=Y lớn nhất
-program_3d_edit.chunk_tool.max_y_tooltip=The maximum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
+program_3d_edit.chunk_tool.max_y_tooltip=Toạ độ y lớn nhất để vẽ lên khung nhìn trên xuống. Cái này có thể được dùng để xem một lát cắt của thế giới và giúp xem các chiều không gian như Nether và hang động.
+program_3d_edit.chunk_tool.create_chunks=Tạo các đoạn khúc rỗng
+program_3d_edit.chunk_tool.create_chunks_tooltip=Tạo tất cả các đoạn khúc chưa tồn tại trong phần được chọn. Các đoạn khúc đã tồn tại sẽ được để nguyên.
 program_3d_edit.chunk_tool.delete_chunks=Xoá các đoạn khúc
 program_3d_edit.chunk_tool.delete_chunks_tooltip=Xoá những đoạn khúc được chọn. Cái này sẽ xoá hẳn đoạn khúc và và tất cả thông tin mà nó chứa bên trong. Lần tiếp theo bạn nạp khu vực này trong trò chơi thì nó sẽ tạo lại những đoạn khúc đó.
 program_3d_edit.chunk_tool.prune_chunks=Xoá các đoạn khúc không được chọn
@@ -243,6 +259,9 @@ program_3d_edit.goto_ui.paste_button_tooltip=Dán một toạ độ đã đượ
 program_3d_edit.file_ui.version_tooltip=Phiên bản dữ liệu và nền tảng của thế giới
 program_3d_edit.file_ui.projection_tooltip=Thay đổi góc nhìn
 program_3d_edit.file_ui.location_tooltip=Di chuyển máy quay
+program_3d_edit.file_ui.speed_blocks_per_second=bps
+program_3d_edit.file_ui.speed_tooltip=Tốc độ máy quay theo khối trên giây
+program_3d_edit.file_ui.speed_dialog_name=Đặt tốc độ máy quay
 program_3d_edit.file_ui.dim_tooltip=Lựa chọn chiều không gian
 program_3d_edit.file_ui.undo_tooltip=Hoàn tác
 program_3d_edit.file_ui.redo_tooltip=Làm lại
