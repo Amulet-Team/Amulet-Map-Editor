@@ -217,7 +217,7 @@ class EditCanvas(BaseEditCanvas):
     ) -> Any:
         try:
             out = self._run_operation(operation, title, msg, True)
-        except Exception as e:
+        except BaseException as e:
             if throw_exceptions:
                 raise e
         else:
