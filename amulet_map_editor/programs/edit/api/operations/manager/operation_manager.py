@@ -100,13 +100,9 @@ class BaseOperationManager:
             try:
                 mod = importlib.import_module(module_name)
                 mod = importlib.reload(mod)
-            except ImportError:
+            except BaseException:
                 log.warning(
-                    f"Failed to import {module_name}.\n{traceback.format_exc()}"
-                )
-            except SyntaxError:
-                log.warning(
-                    f"There was a syntax error in {module_name}.\n{traceback.format_exc()}"
+                    f"There was an exception while loading operation {module_name}.\n{traceback.format_exc()}"
                 )
             else:
                 if (
