@@ -36,13 +36,13 @@ class AmuletApp(wx.App):
                 config.put("amulet_meta", meta_config)
 
         if update_check:
-            self.Bind(
+            self._amulet_ui.Bind(
                 update_check.EVT_UPDATE_CHECK,
                 lambda evt: update_check.UpdateDialog(
-                    self, __version__, evt.GetVersion()
+                    self._amulet_ui, __version__, evt.GetVersion()
                 ).ShowModal(),
             )
-            update_check.check_for_update(self, __version__)
+            update_check.check_for_update(self._amulet_ui, __version__)
 
         return True
 
