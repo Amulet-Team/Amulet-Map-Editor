@@ -24,7 +24,9 @@ SOFTWARE.
 from typing import TYPE_CHECKING, Tuple
 import wx
 
-from amulet.operations.fill import fill
+from amulet.api.selection import SelectionGroup
+from amulet.api.block import Block
+from amulet.api.data_types import Dimension, OperationReturnType
 
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
@@ -104,14 +106,45 @@ class Fill(wx.Panel, DefaultOperationUI):
         )
 
     def _run_operation(self, _):
-        self.canvas.run_operation(
-            lambda: fill(
-                self.world,
-                self.canvas.dimension,
-                self.canvas.selection.selection_group,
-                self._get_fill_block(),
-            )
-        )
+        self.canvas.run_operation(self._fill)
+
+    def _fill(self):
+        world = self.world
+        dimension = self.canvas.dimension
+        target_box = self.canvas.selection.selection_group
+        fill_block, block_entity = self._block_define.universal_block
+
+        internal_id = world.block_palette.get_add_block(fill_block)
+
+        iter_count = len(list(world.get_coord_box(dimension, target_box, True)))
+        count = 0
+
+        for chunk, slices, _ in world.get_chunk_slice_box(dimension, target_box, True):
+            chunk.blocks[slices] = internal_id
+
+            chunk_x, chunk_z = chunk.coordinates
+            chunk_x *= 16
+            chunk_z *= 16
+            x_min = chunk_x + slices[0].start
+            y_min = slices[1].start
+            z_min = chunk_z + slices[2].start
+            x_max = chunk_x + slices[0].stop
+            y_max = slices[1].stop
+            z_max = chunk_z + slices[2].stop
+
+            if block_entity is None:
+                for x, y, z in list(chunk.block_entities.keys()):
+                    if x_min <= x < x_max and y_min <= y < y_max and z_min <= z < z_max:
+                        chunk.block_entities.pop((x, y, z))
+            else:
+                for x in range(x_min, x_max):
+                    for y in range(y_min, y_max):
+                        for z in range(z_min, z_max):
+                            chunk.block_entities[(x, y, z)] = block_entity
+
+            chunk.changed = True
+            count += 1
+            yield count / iter_count
 
 
 export = {

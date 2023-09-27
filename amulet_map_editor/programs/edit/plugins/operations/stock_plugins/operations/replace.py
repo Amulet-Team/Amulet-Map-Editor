@@ -137,7 +137,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         )
 
     def _run_operation(self, _):
-        self.canvas.run_operation(lambda: self._replace())
+        self.canvas.run_operation(self._replace)
 
     def _replace(self):
         world = self.world
@@ -159,7 +159,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             self._original_block.block_name,
             self._original_block.str_properties,
         )
-        replacement_block = self._get_replacement_block()
+        replacement_block, block_entity = self._replacement_block.universal_block
 
         replacement_block_id = world.block_palette.get_add_block(replacement_block)
 
@@ -196,6 +196,27 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             blocks = chunk.blocks[slices]
             blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
             chunk.blocks[slices] = blocks
+
+            chunk_x, chunk_z = chunk.coordinates
+            chunk_x *= 16
+            chunk_z *= 16
+            x_min = chunk_x + slices[0].start
+            y_min = slices[1].start
+            z_min = chunk_z + slices[2].start
+            x_max = chunk_x + slices[0].stop
+            y_max = slices[1].stop
+            z_max = chunk_z + slices[2].stop
+
+            if block_entity is None:
+                for x, y, z in list(chunk.block_entities.keys()):
+                    if x_min <= x < x_max and y_min <= y < y_max and z_min <= z < z_max:
+                        chunk.block_entities.pop((x, y, z))
+            else:
+                for x in range(x_min, x_max):
+                    for y in range(y_min, y_max):
+                        for z in range(z_min, z_max):
+                            chunk.block_entities[(x, y, z)] = block_entity
+
             chunk.changed = True
 
             count += 1
