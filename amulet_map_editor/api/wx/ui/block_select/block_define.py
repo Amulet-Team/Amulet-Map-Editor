@@ -60,7 +60,9 @@ class BlockDefine(BaseDefine):
             self._version_picker.force_blockstate,
             self._picker.namespace,
             self._picker.name,
-            properties,
+            None
+            if properties is None
+            else {key: val.to_snbt() for key, val in properties.items()},
             wildcard_properties,
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
