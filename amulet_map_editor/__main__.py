@@ -96,13 +96,51 @@ def main():
 
         _init_log()
         from amulet_map_editor.api.framework import AmuletApp
+        from amulet_map_editor.programs.convert import Converter
 
     except Exception as e:
         _on_error(e)
     else:
         try:
-            app = AmuletApp(0)
-            app.MainLoop()
+            if len(sys.argv) > 1:
+                import getopt
+
+                # Remove 1st argument from the
+                # list of command line arguments
+                argumentList = sys.argv[1:]
+
+                # Options
+                options = "w:o:"
+
+                # Long options
+                long_options = ["world=", "out-world="]
+
+                # Parsing argument
+                arguments, values = getopt.getopt(argumentList, options, long_options)
+
+                world_path = None
+                out_world_path = None
+
+                # Checking each argument
+                for currentArgument, currentValue in arguments:
+                    if currentArgument in ("-w", "--world"):
+                        world_path = currentValue
+
+                    elif currentArgument in ("-o", "--out-world"):
+                        out_world_path = currentValue
+
+                if world_path is None:
+                    print("The path to the world is not set")
+                    sys.exit(1)
+
+                if out_world_path is None:
+                    print("The path to the output world is not set")
+                    sys.exit(1)
+
+                app = Converter(world_path, out_world_path)
+            else:
+                app = AmuletApp(0)
+                app.MainLoop()
         except Exception as e:
             log = logging.getLogger(__name__)
             log.critical(
