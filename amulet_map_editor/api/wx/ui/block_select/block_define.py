@@ -1,10 +1,11 @@
 import wx
 import wx.lib.scrolledpanel
-from typing import Tuple, Optional, Dict
+from typing import Tuple, Optional, Dict, Mapping, Union
 
 import PyMCTranslate
-from amulet.api.block import PropertyType, Block
+from amulet.api.block import PropertyType, Block, PropertyValueType
 from amulet.api.block_entity import BlockEntity
+from amulet_nbt import SNBTType, AbstractBaseTag
 
 from amulet_map_editor.api.wx.ui.base_define import BaseDefine
 from amulet_map_editor.api.wx.ui.block_select import BlockSelect
@@ -27,7 +28,7 @@ class BlockDefine(BaseDefine):
         force_blockstate: bool = None,
         namespace: str = None,
         block_name: str = None,
-        properties: PropertyType = None,
+        properties: Mapping[str, Union[SNBTType, PropertyValueType]] = None,
         wildcard_properties=False,
         show_pick_block: bool = False,
         **kwargs,
@@ -60,9 +61,10 @@ class BlockDefine(BaseDefine):
             self._version_picker.force_blockstate,
             self._picker.namespace,
             self._picker.name,
-            None
-            if properties is None
-            else {key: val.to_snbt() for key, val in properties.items()},
+            {
+                key: val.to_snbt() if isinstance(val, AbstractBaseTag) else val
+                for key, val in (properties or {}).items()
+            },
             wildcard_properties,
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
