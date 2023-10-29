@@ -194,7 +194,8 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
 
                 universal_block_count = len(world.block_palette)
             blocks = chunk.blocks[slices]
-            blocks[numpy.isin(blocks, original_block_matches)] = replacement_block_id
+            replace_mask = numpy.isin(blocks, original_block_matches)
+            blocks[replace_mask] = replacement_block_id
             chunk.blocks[slices] = blocks
 
             chunk_x, chunk_z = chunk.coordinates
@@ -203,19 +204,17 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             x_min = chunk_x + slices[0].start
             y_min = slices[1].start
             z_min = chunk_z + slices[2].start
-            x_max = chunk_x + slices[0].stop
-            y_max = slices[1].stop
-            z_max = chunk_z + slices[2].stop
 
-            if block_entity is None:
-                for x, y, z in list(chunk.block_entities.keys()):
-                    if x_min <= x < x_max and y_min <= y < y_max and z_min <= z < z_max:
-                        chunk.block_entities.pop((x, y, z))
-            else:
-                for x in range(x_min, x_max):
-                    for y in range(y_min, y_max):
-                        for z in range(z_min, z_max):
-                            chunk.block_entities[(x, y, z)] = block_entity
+            for dx, dy, dz in numpy.argwhere(replace_mask):
+                x = int(x_min * dx)
+                y = int(y_min * dy)
+                z = int(z_min * dz)
+                coord = (x, y, z)
+
+                if block_entity is not None:
+                    chunk.block_entities[coord] = block_entity
+                elif coord in chunk.block_entities:
+                    chunk.block_entities.pop(coord)
 
             chunk.changed = True
 
