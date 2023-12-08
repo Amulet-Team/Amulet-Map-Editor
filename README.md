@@ -37,6 +37,7 @@ When installing from source the following dependencies will be installed
 - [Amulet-NBT](https://github.com/Amulet-Team/Amulet-NBT)  The library to handle reading and saving NBT and SNBT.
 - [PyMCTranslate](https://github.com/gentlegiantJGC/PyMCTranslate)  The library to handle block, block entity, entity and biome translation. between versions
 - [Minecraft-Model-Reader](https://github.com/gentlegiantJGC/Minecraft-Model-Reader)  The library to handle loading block models and textures from a resource pack for use in the renderer.
+- [Amulet-LevelDB](https://github.com/Amulet-Team/Amulet-LevelDB)  The wrapper for Mojang's custom LevelDB.
 
 ## Contributing
 
