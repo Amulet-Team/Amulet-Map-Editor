@@ -51,8 +51,19 @@ main_menu.user_manual=User Manual
 main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Discord Amulet
 
+# Language Select
+language_select.title=Pemilihan Bahasa
+language_select.help=Pilih bahasa yang akan digunakan di Amulet dari daftar di bawah ini.
+language_select.contribute=Jika Anda ingin memperbaiki atau menambahkan terjemahan, klik di sini.
+
+# Warning Dialog
+warning_dialog.title=Selamat datang di Amulet
+warning_dialog.content=Halo dan selamat datang di Amulet!\n\nKami menyarankan untuk membuat cadangan dunia Anda sebelum membukanya di Amulet.\n\nKami mencoba untuk memastikan bahwa Amulet tidak merusak dunia, namun format penyimpanan terkadang tidak terdokumentasi dan terus berubah-ubah, dan terkadang kami melakukan kesalahan.\n\nKarena alasan ini, kami hanya secara resmi mendukung rilis penuh yang sudah kami uji coba.\n\nSnapshot Java, beta Bedrock, dan fitur-fitur eksperimental dapat berfungsi namun belum teruji, sehingga tidak secara resmi didukung. Saat ini entitas tidak didukung dan item hanya didukung dalam platform yang sama.\n\nJika Anda menemukan fitur yang ingin ditambahkan atau bug yang perlu diperbaiki, laporkan di pelacak bug kami.\n\nSilakan gunakan alat pencarian untuk melihat apakah sudah dilaporkan sebelum membuat tiket baru.\n\nJika Anda masih baru, kami sarankan untuk membaca buku panduan untuk membiasakan diri dengan program ini.\n\n- Tim Amulet
+warning_dialog.do_not_show_again=Jangan tampilkan ini lagi
+warning_dialog.i_understand=Saya paham
+
 # Update check
-update_check.newer_version_released=Versi baru Amulet telah dirilis!
+update_check.newer_version_released=Versi baru Amulet telah dikeluarkan!
 update_check.new_version=Versi Baru:
 update_check.current_version=Versi Anda:
 update_check.update=Pergi ke Halaman Unduh
@@ -211,8 +222,12 @@ program_3d_edit.goto_ui.paste_button_tooltip=Tempelkan koordinat yang sebelumnya
 program_3d_edit.file_ui.version_tooltip=Platform dan versi data dunia
 program_3d_edit.file_ui.projection_tooltip=Ubah tampilan
 program_3d_edit.file_ui.location_tooltip=Pindahkan kamera
-program_3d_edit.file_ui.dim_tooltip=Select dimension
-program_3d_edit.file_ui.undo_tooltip=Undo
-program_3d_edit.file_ui.redo_tooltip=Redo
+program_3d_edit.file_ui.location_tooltip=Geser Kamera
+program_3d_edit.file_ui.speed_blocks_per_second=bps
+program_3d_edit.file_ui.speed_tooltip=Kecepatan kamera dalam blok per detik
+program_3d_edit.file_ui.speed_dialog_name=Atur kecepatan kamera
+program_3d_edit.file_ui.dim_tooltip=Pilih dimensi
+program_3d_edit.file_ui.undo_tooltip=Batalkan
+program_3d_edit.file_ui.redo_tooltip=Kembalikan
 program_3d_edit.file_ui.save_tooltip=Simpan perubahan
 program_3d_edit.file_ui.close_tooltip=Tutup dunia
