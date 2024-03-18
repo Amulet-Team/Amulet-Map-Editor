@@ -6,6 +6,7 @@ All other lines should have the format `key=value` where `key` is the language k
 Keys should match the regex [a-z.]+ (lower case a-z and the full stop character) and values can contain any unicode character.
 Files must be utf-8 encoded.
 """
+
 import glob
 from typing import Dict, Optional, List, Tuple
 import os
@@ -21,9 +22,9 @@ log = logging.getLogger(__name__)
 # there might be a proper way to do this but this should be enough for now
 
 _lang_dirs: List[str] = []  # the language directories
-_lang: Dict[
-    str, str
-] = {}  # a storage for the language strings. unique_identifier: language_string
+_lang: Dict[str, str] = (
+    {}
+)  # a storage for the language strings. unique_identifier: language_string
 
 _default_language = "en"
 _active_language: Optional[str] = None

@@ -65,9 +65,9 @@ class RenderLevel(OpenGLResourcePackManager, Drawable, ThreadedObject, ContextMa
         self._selection = None
         self._chunk_manager = ChunkManager(self.context_identifier, self.resource_pack)
 
-        self._last_rebuild_camera_location: Optional[
-            numpy.ndarray
-        ] = None  # x, z camera location
+        self._last_rebuild_camera_location: Optional[numpy.ndarray] = (
+            None  # x, z camera location
+        )
         self._needs_rebuild = (
             True  # Should we go back to the beginning and re-find chunks to rebuild
         )
