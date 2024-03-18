@@ -92,9 +92,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
             (2, 3)
         )  # the state of the cursor when editing starts
         self._highlight = False  # is a box being highlighted
-        self._initial_box: Optional[
-            NPArray2x3
-        ] = None  # the state of the box when editing started
+        self._initial_box: Optional[NPArray2x3] = (
+            None  # the state of the box when editing started
+        )
         self._pointer_mask: NPArray2x3 = numpy.zeros((2, 3), dtype=bool)
         self._resizing = False  # is a box being resized
         self._pointer_distance2 = 0  # the pointer distance used when resizing

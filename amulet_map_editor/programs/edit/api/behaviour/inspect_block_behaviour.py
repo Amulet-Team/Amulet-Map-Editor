@@ -44,9 +44,11 @@ class InspectBlockBehaviour(BaseBehaviour):
                 max_line_length = max(-1, max_line_length)
                 s = "\n".join(
                     [
-                        line[: max_line_length - 3] + "..."
-                        if len(line) > max_line_length
-                        else line
+                        (
+                            line[: max_line_length - 3] + "..."
+                            if len(line) > max_line_length
+                            else line
+                        )
                         for line in s.split("\n")
                     ]
                 )

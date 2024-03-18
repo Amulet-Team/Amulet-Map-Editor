@@ -266,9 +266,7 @@ def create_atlas(
         return e.value
 
 
-def create_atlas_iter(
-    texture_tuple: Tuple[str, ...]
-) -> Generator[
+def create_atlas_iter(texture_tuple: Tuple[str, ...]) -> Generator[
     float,
     None,
     Tuple[Image.Image, Dict[str, Tuple[float, float, float, float]]],
