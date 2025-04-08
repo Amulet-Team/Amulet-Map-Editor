@@ -27,12 +27,13 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
     ShowOpenFolder = True
 
-    def __init__(self, canvas: "EditCanvas"):
+    def __init__(self, canvas: "EditCanvas", wx_parent):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         BaseToolUI.__init__(self, canvas)
 
         self._active_operation: Optional[OperationUIType] = None
         self._last_active_operation_id: Optional[str] = None
+        self._wx_parent = wx_parent
 
         horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -40,7 +41,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
             self.OperationGroupName, str
         ), "OperationGroupName has not been set or is not a string."
         # The operation selection
-        self._operation_choice = SimpleChoiceAny(self.canvas)
+        self._operation_choice = SimpleChoiceAny(self._wx_parent)
         horizontal_sizer.Add(self._operation_choice)
         self._operations = UIOperationManager(self.OperationGroupName)
         self._operation_choice.SetItems(
@@ -50,7 +51,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
         # The reload button
         self._reload_operation = wx.BitmapButton(
-            self.canvas, bitmap=image.REFRESH_ICON.bitmap(16, 16)
+            self._wx_parent, bitmap=image.REFRESH_ICON.bitmap(16, 16)
         )
         self._reload_operation.SetToolTip("Reload Operations")
         horizontal_sizer.Add(self._reload_operation)
@@ -59,7 +60,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         # The open folder button
         if self.ShowOpenFolder:
             self._open_folder = wx.BitmapButton(
-                self.canvas, bitmap=image.TABLERICONS.folder.bitmap(16, 16)
+                self._wx_parent, bitmap=image.TABLERICONS.folder.bitmap(16, 16)
             )
             self._open_folder.SetToolTip("Open Plugin Folder")
             horizontal_sizer.Add(self._open_folder)
@@ -103,7 +104,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
             self._operation_sizer.Clear(delete_windows=True)
             try:
                 self._active_operation = operation(
-                    self.canvas, self.canvas, self.canvas.world
+                    self._wx_parent, self.canvas, self.canvas.world
                 )
                 self._operation_sizer.Add(
                     self._active_operation, *self._active_operation.wx_add_options

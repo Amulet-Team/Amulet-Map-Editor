@@ -249,7 +249,7 @@ class MoveButton(NudgeButton):
 
 
 class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
-    def __init__(self, canvas: "EditCanvas"):
+    def __init__(self, canvas: "EditCanvas", wx_parent):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         DefaultBaseToolUI.__init__(self, canvas)
 
@@ -258,7 +258,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._moving = False
         self._is_enabled = False
 
-        self._paste_panel = SimpleScrollablePanel(canvas)
+        self._paste_panel = SimpleScrollablePanel(wx_parent)
         self._paste_sizer = wx.BoxSizer(wx.VERTICAL)
         self._paste_panel.SetSizer(self._paste_sizer)
         self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)

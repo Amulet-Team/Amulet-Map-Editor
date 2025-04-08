@@ -1,6 +1,7 @@
 import logging
 import warnings
 import wx
+import sys
 from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
 from types import GeneratorType
 from threading import RLock, Thread
@@ -163,8 +164,18 @@ class EditCanvas(BaseEditCanvas):
 
     def _init_opengl(self):
         super()._init_opengl()
-        self._file_panel = FilePanel(self)
-        self._canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
+        if sys.platform == "linux":
+            self.panel = wx.Panel(self, style=wx.STAY_ON_TOP)
+            self.button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            self.button_sizer.AddStretchSpacer(1)
+            self.button_sizer.Add(self.panel, 0, wx.EXPAND, 0)
+            self._file_panel = FilePanel(self, self.panel)
+            self.panel.SetSizer(self._file_panel)
+            self.panel.SetBackgroundColour((155, 178, 216, 255))
+            self._canvas_sizer.Add(self.button_sizer, 0, wx.EXPAND, 0)
+        else:
+            self._file_panel = FilePanel(self, self)
+            self._canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
         self._tool_sizer = ToolManagerSizer(self)
         self._canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
 

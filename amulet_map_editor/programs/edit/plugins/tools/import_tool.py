@@ -18,13 +18,13 @@ log = logging.getLogger(__name__)
 
 
 class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
-    def __init__(self, canvas: "EditCanvas"):
+    def __init__(self, canvas: "EditCanvas", wx_parent):
         wx.BoxSizer.__init__(self, wx.VERTICAL)
         DefaultBaseToolUI.__init__(self, canvas)
 
         self._selection = StaticSelectionBehaviour(self.canvas)
 
-        self._open_file_button = wx.Button(canvas, label="Import File")
+        self._open_file_button = wx.Button(wx_parent, label="Import File")
         self._open_file_button.Bind(wx.EVT_BUTTON, self._on_open_file)
         self.AddStretchSpacer()
         self.Add(self._open_file_button, flag=wx.ALL, border=10)

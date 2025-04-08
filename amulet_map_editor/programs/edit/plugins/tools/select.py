@@ -79,14 +79,14 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
     _y2: wx.SpinCtrl
     _z2: wx.SpinCtrl
 
-    def __init__(self, canvas: "EditCanvas"):
+    def __init__(self, canvas: "EditCanvas", wx_parent):
         wx.BoxSizer.__init__(self, wx.HORIZONTAL)
         DefaultBaseToolUI.__init__(self, canvas)
 
         self._selection = BlockSelectionBehaviour(self.canvas)
         self._inspect_block = InspectBlockBehaviour(self.canvas, self._selection)
 
-        self._button_panel = SimpleScrollablePanel(canvas)
+        self._button_panel = SimpleScrollablePanel(wx_parent)
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 

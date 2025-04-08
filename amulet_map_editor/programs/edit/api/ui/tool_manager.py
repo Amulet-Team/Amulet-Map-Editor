@@ -1,4 +1,5 @@
 import wx
+import sys
 from typing import TYPE_CHECKING, Type, Dict, Optional
 
 from amulet_map_editor.programs.edit.api import EditCanvasContainer
@@ -32,10 +33,19 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self._tools: Dict[str, BaseToolUIType] = {}
         self._active_tool: Optional[BaseToolUIType] = None
 
+        self._tool_option_panel = wx.Panel(canvas)
+        if sys.platform == "linux":
+            self._tool_option_panel.SetBackgroundColour((155, 178, 216, 255))
         self._tool_option_sizer = wx.BoxSizer(wx.VERTICAL)
+        self._tool_option_panel.SetSizer(self._tool_option_sizer)
+        self._tool_option_sizer_shove_left = wx.BoxSizer(wx.HORIZONTAL)
+        self._tool_option_sizer_shove_left.Add(self._tool_option_panel, 0, wx.EXPAND, 0)
+        self._tool_option_sizer_shove_left.AddStretchSpacer(1)
+        self.AddStretchSpacer(1)
         self.Add(
-            self._tool_option_sizer, 1, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0
+            self._tool_option_sizer_shove_left, 0, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0
         )
+        self.AddStretchSpacer(1)
 
         tool_select_sizer = wx.BoxSizer(wx.HORIZONTAL)
         tool_select_sizer.AddStretchSpacer(1)
@@ -44,12 +54,12 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         tool_select_sizer.AddStretchSpacer(1)
         self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
 
-        self.register_tool(SelectTool)
-        self.register_tool(PasteTool)
-        self.register_tool(OperationTool)
-        self.register_tool(ImportTool)
-        self.register_tool(ExportTool)
-        self.register_tool(ChunkTool)
+        self.register_tool(SelectTool, self._tool_option_panel)
+        self.register_tool(PasteTool, self._tool_option_panel)
+        self.register_tool(OperationTool, self._tool_option_panel)
+        self.register_tool(ImportTool, self._tool_option_panel)
+        self.register_tool(ExportTool, self._tool_option_panel)
+        self.register_tool(ChunkTool, self._tool_option_panel)
 
     @property
     def tools(self):
@@ -60,11 +70,11 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
             self._active_tool.bind_events()
         self.canvas.Bind(EVT_TOOL_CHANGE, self._enable_tool_event)
 
-    def register_tool(self, tool_cls: Type[BaseToolUIType]):
+    def register_tool(self, tool_cls: Type[BaseToolUIType], wx_parent):
         assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(
             tool_cls, BaseToolUI
         )
-        tool = tool_cls(self.canvas)
+        tool = tool_cls(self.canvas, wx_parent)
         self._tool_select.register_tool(tool.name)
         if isinstance(tool, wx.Window):
             tool.Hide()
