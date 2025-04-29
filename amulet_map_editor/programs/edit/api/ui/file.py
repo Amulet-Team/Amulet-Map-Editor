@@ -73,7 +73,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
 
         self._speed_button = wx.Button(
             canvas,
-            label=f"{_format_float(self.canvas.camera.move_speed * 1000 / 33)}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}",
+            label=f"{_format_float(self.canvas.camera.move_speed * 1000 / 33)} {lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}",
         )
         self._speed_button.SetToolTip(lang.get("program_3d_edit.file_ui.speed_tooltip"))
         self._speed_button.Bind(wx.EVT_BUTTON, set_speed)
@@ -187,7 +187,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         evt.Skip()
 
     def _on_speed_change(self, evt):
-        label = f"{_format_float(self.canvas.camera.move_speed * 1000 / 33)}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}"
+        label = f"{_format_float(self.canvas.camera.move_speed * 1000 / 33)} {lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}"
         old_label = self._speed_button.GetLabel()
         self._speed_button.SetLabel(label)
         if len(label) != len(old_label):
