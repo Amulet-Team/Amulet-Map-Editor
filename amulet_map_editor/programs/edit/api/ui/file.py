@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Optional
+from math import floor, log10
 import wx
 
 from amulet_map_editor.programs.edit.api.edit_canvas_container import (
@@ -22,6 +23,13 @@ from amulet_map_editor.api.opengl.camera import Projection
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+
+def _format_float(num: float) -> str:
+    if num < 100:
+        return f"{num:.0{max(0, 2 - floor(log10(num)))}f}".rstrip("0").rstrip(".")
+    else:
+        return f"{num:.0f}"
 
 
 class FilePanel(wx.BoxSizer, EditCanvasContainer):
@@ -65,7 +73,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
 
         self._speed_button = wx.Button(
             canvas,
-            label=f"{self.canvas.camera.move_speed*1000/33:.4g}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}",
+            label=f"{_format_float(self.canvas.camera.move_speed * 1000 / 33)}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}",
         )
         self._speed_button.SetToolTip(lang.get("program_3d_edit.file_ui.speed_tooltip"))
         self._speed_button.Bind(wx.EVT_BUTTON, set_speed)
@@ -179,7 +187,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         evt.Skip()
 
     def _on_speed_change(self, evt):
-        label = f"{self.canvas.camera.move_speed*1000/33:.4g}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}"
+        label = f"{_format_float(self.canvas.camera.move_speed * 1000 / 33)}{lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}"
         old_label = self._speed_button.GetLabel()
         self._speed_button.SetLabel(label)
         if len(label) != len(old_label):
