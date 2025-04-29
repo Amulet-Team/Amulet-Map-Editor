@@ -271,7 +271,7 @@ def serialise_key(evt: Union[wx.KeyEvent, wx.MouseEvent]) -> Optional[KeyType]:
 
 
 def serialise_key_event(
-    evt: Union[wx.KeyEvent, wx.MouseEvent]
+    evt: Union[wx.KeyEvent, wx.MouseEvent],
 ) -> Optional[SerialisedKeyType]:
     if isinstance(evt, wx.KeyEvent):
         key = evt.GetUnicodeKey() or evt.GetKeyCode()

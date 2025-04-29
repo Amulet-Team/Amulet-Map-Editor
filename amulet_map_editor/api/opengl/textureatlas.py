@@ -256,7 +256,7 @@ class TextureAtlasMap(object):
 
 
 def create_atlas(
-    texture_tuple: Tuple[str, ...]
+    texture_tuple: Tuple[str, ...],
 ) -> Tuple[Image.Image, Dict[str, Tuple[float, float, float, float]]]:
     atlas_iter = create_atlas_iter(texture_tuple)
     try:
