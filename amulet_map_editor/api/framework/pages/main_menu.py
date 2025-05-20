@@ -92,6 +92,9 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
                 "https://raw.githubusercontent.com/Amulet-Team/sponsors/main/sponsors.json"
             ) as f:
                 sponsors = json.load(f)
+        except Exception:
+            pass
+        else:
             github_sponsor_text = wx.TextCtrl(
                 self,
                 value="   ".join(sponsors),
@@ -100,8 +103,6 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
             )
             github_sponsor_text.SetBackgroundColour(self.GetBackgroundColour())
             sponsor_sizer.Add(github_sponsor_text, 1)
-        except (URLError, json.JSONDecodeError):
-            pass
 
         self._load_strings()
 
