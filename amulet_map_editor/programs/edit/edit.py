@@ -58,7 +58,7 @@ class EditExtension(wx.Panel, BaseProgram):
         self._temp_msg = wx.StaticText(
             self, label=lang.get("program_3d_edit.canvas.please_wait")
         )
-        self._temp_msg.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        self._temp_msg.SetFont(wx.Font(40, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         self._sizer.Add(self._temp_msg, 0, flag=wx.ALIGN_CENTER_HORIZONTAL)
         self._temp_loading_bar = wx.Gauge(self, range=10000)
         self._sizer.Add(self._temp_loading_bar, 0, flag=wx.EXPAND)

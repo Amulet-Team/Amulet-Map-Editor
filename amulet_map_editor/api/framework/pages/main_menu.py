@@ -36,12 +36,12 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         name_sizer.Add(icon, flag=wx.CENTER)
 
         self._amulet_name = wx.StaticText(self)
-        self._amulet_name.SetFont(wx.Font(40, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        self._amulet_name.SetFont(wx.Font(40, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         name_sizer.Add(
             self._amulet_name, flag=wx.CENTER | wx.LEFT | wx.RIGHT, border=10
         )
         name_sizer.Add(icon2, flag=wx.CENTER)
-        button_font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
+        button_font = wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         self._open_world_button = wx.Button(self, size=(400, 70))
         self._open_world_button.SetFont(button_font)
         self._open_world_button.Bind(
