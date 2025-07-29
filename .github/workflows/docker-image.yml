@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags:
+      - "v*"  # Trigger on version tags like v1.0, v0.10, etc.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: |
+        docker build . --file Dockerfile --tag amulet-editor:latest
+
+    - name: Save Docker image to tar archive
+      run: |
+        docker save amulet-editor:latest -o amulet-editor.tar
+
+    - name: Upload image to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: amulet-editor.tar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
