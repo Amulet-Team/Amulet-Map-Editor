@@ -20,10 +20,9 @@ jobs:
     - name: Save Docker image to tar archive
       run: |
         docker save amulet-editor:latest -o amulet-editor.tar
-
-    - name: Upload image to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: amulet-editor.tar
+        
+    - name: Upload Release Asset
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.TOKEN }}
+      run: |
+        gh release upload ${{github.event.release.tag_name}} ./dist/${{env.BUILT_PATH}}#${{env.BUILT_PATH}}
