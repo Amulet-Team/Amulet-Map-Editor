@@ -1,9 +1,9 @@
 name: Docker Image CI
 
+
 on:
-  push:
-    tags:
-      - "v*"  # Trigger on version tags like v1.0, v0.10, etc.
+  release:
+    types: [published]
 
 jobs:
   build:
