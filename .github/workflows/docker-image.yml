@@ -1,6 +1,5 @@
 name: Docker Image CI
 
-
 on:
   workflow_run:
     workflows: [python-build]
@@ -17,14 +16,19 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build . --file Dockerfile --tag amulet-editor:latest
+        docker build \
+          . \
+          --file Dockerfile \
+          --tag amulet-editor:latest \
+          --build-arg AMULET_VERSION=${{ github.event.release.tag_name }}
 
     - name: Save Docker image to tar archive
       run: |
         docker save amulet-editor:latest -o amulet-editor.tar
-        
+
     - name: Upload Release Asset
       env:
-        GITHUB_TOKEN: ${{ github.TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release upload ${{github.event.release.tag_name}} amulet-editor.tar#Amulet-v${{ github.event.release.tag_name }}-docker.tar
+        gh release upload ${{ github.event.release.tag_name }} \
+          amulet-editor.tar#Amulet-v${{ github.event.release.tag_name }}-docker.tar
