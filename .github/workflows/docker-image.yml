@@ -3,7 +3,7 @@ name: Docker Image CI
 
 on:
   workflow_run:
-    workflows: [Python-build]
+    workflows: [python-build]
     types:
       - completed
 
