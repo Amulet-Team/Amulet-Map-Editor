@@ -2,8 +2,10 @@ name: Docker Image CI
 
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: [First Continuous Deployment]
+    types:
+      - completed
 
 jobs:
   build:
