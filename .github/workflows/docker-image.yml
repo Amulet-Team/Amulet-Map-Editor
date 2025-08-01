@@ -25,4 +25,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.TOKEN }}
       run: |
-        gh release upload ${{github.event.release.tag_name}} ./dist/${{env.BUILT_PATH}}#${{env.BUILT_PATH}}
+        gh release upload ${{github.event.release.tag_name}} amulet-editor.tar#Amulet-v${{ github.event.release.tag_name }}-docker.tar
