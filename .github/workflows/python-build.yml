@@ -66,4 +66,16 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.TOKEN }}
       run: |
+      
+    - name: Update AMULET_VERSION variable
+      env:
+        GH_TOKEN: ${{ github.TOKEN }}
+      run: |
+        gh api \
+          --method PATCH \
+          -H "Accept: application/vnd.github+json" \
+          /repos/${{ github.repository }}/actions/variables/AMULET_VERSION \
+          -f name="AMULET_VERSION" \
+          -f value="${{ github.event.release.tag_name }}"
+
         gh release upload ${{github.event.release.tag_name}} ./dist/${{env.BUILT_PATH}}#${{env.BUILT_PATH}}
