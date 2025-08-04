@@ -20,6 +20,7 @@ jobs:
           . \
           --file Dockerfile \
           --tag amulet-editor:latest \
+
           --build-arg AMULET_VERSION=${{ vars.AMULET_VERSION }}
 
     - name: Save Docker image to tar archive
@@ -30,5 +31,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+
         gh release upload ${{ vars.AMULET_VERSION }} \
           amulet-editor.tar#Amulet-v${{ vars.AMULET_VERSION }}-docker.tar
