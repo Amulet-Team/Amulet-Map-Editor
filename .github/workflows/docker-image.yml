@@ -1,10 +1,8 @@
-name: Docker Image CI
+name: Build Docker
 
 on:
-  workflow_run:
-    workflows: [Build]
-    types:
-      - completed
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -20,7 +18,7 @@ jobs:
           . \
           --file Dockerfile \
           --tag amulet-editor:latest \
-          --build-arg AMULET_VERSION=${{ github.event.release.tag_name }}
+          --build-arg AMULET_VERSION=LOCAL
 
     - name: Save Docker image to tar archive
       run: |
