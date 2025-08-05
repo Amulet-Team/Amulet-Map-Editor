@@ -18,7 +18,7 @@ jobs:
           . \
           --file Dockerfile \
           --tag amulet-editor:latest \
-          --build-arg AMULET_VERSION=LOCAL
+          --build-arg AMULET_VERSION=PATH:$PWD
 
     - name: Save Docker image to tar archive
       run: |
