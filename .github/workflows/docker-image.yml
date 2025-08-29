@@ -20,13 +20,13 @@ jobs:
           --tag amulet-editor:latest \
           --build-arg AMULET_VERSION=CUSTOM:git+https://github.com/Amulet-Team/Amulet-Map-Editor.git@${{ github.event.release.tag_name }}
 
-    - name: Save Docker image to tar archive
+    - name: Save and compress Docker image
       run: |
-        docker save amulet-editor:latest -o amulet-editor.tar
+        docker save amulet-editor:latest | xz -9e > amulet-editor.tar.xz
 
     - name: Upload Release Asset
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         gh release upload ${{ github.event.release.tag_name }} \
-          amulet-editor.tar#Amulet-v${{ github.event.release.tag_name }}-docker.tar
+          amulet-editor.tar.gz#Amulet-v${{ github.event.release.tag_name }}-docker.tar.xz
