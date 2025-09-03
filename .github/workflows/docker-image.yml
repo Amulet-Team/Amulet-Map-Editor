@@ -29,4 +29,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         gh release upload ${{ github.event.release.tag_name }} \
-          amulet-editor.tar.gz#Amulet-v${{ github.event.release.tag_name }}-docker.tar.xz
+          amulet-editor.tar.xz#Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
