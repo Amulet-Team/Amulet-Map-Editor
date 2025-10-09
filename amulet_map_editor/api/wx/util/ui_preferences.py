@@ -8,6 +8,7 @@ import wx
 
 from amulet_map_editor import CONFIG
 
+
 class WindowConfig(TypedDict):
     size: Tuple[int, int]
     position: Tuple[int, int]
