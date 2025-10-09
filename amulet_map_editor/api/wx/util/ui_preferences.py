@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Type, Tuple
+
+from typing import Type, Tuple, TypedDict, Dict
 
 import atexit
 
@@ -7,7 +8,13 @@ import wx
 
 from amulet_map_editor import CONFIG
 
-PRE_EXISTING_CONFIG = CONFIG.get("window_preferences", {})
+class WindowConfig(TypedDict):
+    size: Tuple[int, int]
+    position: Tuple[int, int]
+    is_full_screen: bool
+
+
+PRE_EXISTING_CONFIG: Dict[str, WindowConfig] = CONFIG.get("window_preferences", {})
 
 
 def write_config():
@@ -17,67 +24,56 @@ def write_config():
 atexit.register(write_config)
 
 
-class ExtendedTLW(wx.TopLevelWindow):
-    __resized: bool
-    __size: Tuple[int, int]
-    __position: Tuple[int, int]
+def preserve_ui_preferences(cls: Type[wx.TopLevelWindow]):
+    assert issubclass(
+        cls, wx.TopLevelWindow
+    ), "This takes a subclass of a top level window."
 
+    qualified_name = ".".join((cls.__module__, cls.__qualname__))
 
-def on_idle(self: ExtendedTLW):
-    qualified_name = ".".join((self.__module__, self.__class__.__name__))
+    class TopLevelWindowWrapper(cls):
+        __resized: bool
+        __size: Tuple[int, int]
+        __position: Tuple[int, int]
 
-    def wrapper(evt):
-        if self.__resized:
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
             self.__resized = False
-            PRE_EXISTING_CONFIG[qualified_name] = {
-                "size": self.__size,
-                "position": self.__position,
-                "is_full_screen": self.IsMaximized(),
-            }
-        evt.Skip()
-
-    return wrapper
-
-
-def on_resize(self: ExtendedTLW):
-    def wrapper(evt):
-        self.__resized = True
-        if not self.IsMaximized():
-            # only store the non-maximised state
             self.__position = self.GetPosition().Get()
             self.__size = self.GetSize().Get()
-        evt.Skip()
 
-    return wrapper
+            if qualified_name in PRE_EXISTING_CONFIG:
+                window_config = PRE_EXISTING_CONFIG[qualified_name]
+                x, y = window_config["position"]
+                dx, dy = window_config["size"]
+                self.SetPosition(wx.Point(x, y))
+                self.SetSize(wx.Size(dx, dy))
+                self.Maximize(window_config.get("is_full_screen", False))
+            else:
+                self.Maximize()
+            self.Layout()
+            self.Refresh()
 
+            self.Bind(wx.EVT_MOVE, self.__on_resize)
+            self.Bind(wx.EVT_SIZE, self.__on_resize)
+            self.Bind(wx.EVT_IDLE, self.__on_idle)
 
-def preserve_ui_preferences(clazz: Type[wx.TopLevelWindow]):
-    assert issubclass(
-        clazz, wx.TopLevelWindow
-    ), "This takes a subclass of a top level window."
-    original_init = clazz.__init__
-    qualified_name = ".".join((clazz.__module__, clazz.__name__))
+        def __on_idle(self, evt):
+            if self.__resized:
+                self.__resized = False
+                PRE_EXISTING_CONFIG[qualified_name] = {
+                    "size": self.__size,
+                    "position": self.__position,
+                    "is_full_screen": self.IsMaximized(),
+                }
+            evt.Skip()
 
-    def __init__(self: wx.TopLevelWindow, *args, **kwargs):
-        original_init(self, *args, **kwargs)
-        self.__resized = False
-        self.__position = self.GetPosition().Get()
-        self.__size = self.GetSize().Get()
-        self: ExtendedTLW
+        def __on_resize(self, evt):
+            self.__resized = True
+            if not self.IsMaximized():
+                # only store the non-maximised state
+                self.__position = self.GetPosition().Get()
+                self.__size = self.GetSize().Get()
+            evt.Skip()
 
-        if qualified_name in PRE_EXISTING_CONFIG:
-            window_config = PRE_EXISTING_CONFIG[qualified_name]
-            self.SetPosition(window_config["position"])
-            self.SetSize(window_config["size"])
-            self.Maximize(window_config.get("is_full_screen", False))
-        else:
-            self.Maximize()
-        self.Layout()
-        self.Refresh()
-
-        self.Bind(wx.EVT_MOVE, on_resize(self))
-        self.Bind(wx.EVT_SIZE, on_resize(self))
-        self.Bind(wx.EVT_IDLE, on_idle(self))
-
-    clazz.__init__ = __init__
-    return clazz
+    return TopLevelWindowWrapper
