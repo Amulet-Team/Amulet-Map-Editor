@@ -46,6 +46,22 @@ def preserve_ui_preferences(cls: Type[wx.TopLevelWindow]):
                 window_config = PRE_EXISTING_CONFIG[qualified_name]
                 x, y = window_config["position"]
                 dx, dy = window_config["size"]
+
+                # Check if the window header intersects on a connected display.
+                display_count = wx.Display.GetCount()
+                for i in range(display_count):
+                    display = wx.Display(i)
+                    geometry = display.GetGeometry()
+                    if geometry.Intersects(wx.Rect(x, y, dx, 10)):
+                        break
+                else:
+                    if display_count:
+                        # If there is no display at that point move it to the first display.
+                        display = wx.Display(0)
+                        geometry = display.GetGeometry()
+                        x = geometry.x
+                        y = geometry.y
+
                 self.SetPosition(wx.Point(x, y))
                 self.SetSize(wx.Size(dx, dy))
                 self.Maximize(window_config.get("is_full_screen", False))
