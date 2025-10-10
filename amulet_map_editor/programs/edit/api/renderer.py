@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Optional
+import sys
 import wx
 from OpenGL.GL import (
     glClear,
@@ -85,6 +86,9 @@ class Renderer(EditCanvasContainer):
         )
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_moved)
         self.canvas.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy, self.canvas)
+
+        if sys.platform == "linux":
+            self.canvas.Bind(wx.EVT_PAINT, self._on_paint)
 
     def enable(self):
         """Enable and start working."""
@@ -201,10 +205,26 @@ class Renderer(EditCanvasContainer):
 
         self.sky_box.set_camera_location(location)
 
-    def _do_draw(self, evt):
+    if sys.platform == "linux":
+
+        def _do_draw(self, evt):
+            self.canvas.Refresh(False)
+
+    else:
+
+        def _do_draw(self, evt):
+            self._gl_draw()
+
+    def _gl_draw(self):
+        self.canvas.SetCurrent(self.canvas.context)
         wx.PostEvent(self.canvas, PreDrawEvent())
         wx.PostEvent(self.canvas, DrawEvent())
         wx.PostEvent(self.canvas, PostDrawEvent())
+        self.canvas.SwapBuffers()
+
+    def _on_paint(self, evt):
+        dc = wx.PaintDC(self.canvas)
+        self._gl_draw()
 
     def default_draw(self):
         """The default draw logic."""
@@ -235,13 +255,12 @@ class Renderer(EditCanvasContainer):
 
         def end_draw(self):
             """Run commands after drawing."""
-            self.canvas.SwapBuffers()
+            pass
 
     else:
 
         def end_draw(self):
             """Run commands after drawing."""
-            self.canvas.SwapBuffers()
             self._chunk_generator.thread_action()
 
     def _gc(self, event):
