@@ -16,6 +16,7 @@ from OpenGL.GL import (
     GL_ONE_MINUS_SRC_ALPHA,
     glGetString,
     GL_VERSION,
+    glViewport,
 )
 from OpenGL.GL.ARB.explicit_attrib_location import glInitExplicitAttribLocationARB
 
