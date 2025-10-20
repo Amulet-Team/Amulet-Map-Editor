@@ -290,12 +290,17 @@ class EditCanvas(BaseEditCanvas):
                 elif isinstance(op.error, BaseSilentException):
                     pass
                 elif isinstance(op.error, BaseException):
-                    log.error(traceback.format_exc())
+                    tb = "".join(
+                        traceback.format_exception(
+                            type(op.error), op.error, op.error.__traceback__
+                        )
+                    )
+                    log.error(tb)
                     dialog = TracebackDialog(
                         self,
                         "Exception while running operation",
                         str(op.error),
-                        traceback.format_exc(),
+                        tb,
                     )
                     dialog.ShowModal()
                     dialog.Destroy()
