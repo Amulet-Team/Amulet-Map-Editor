@@ -82,7 +82,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self._dim_options = SimpleChoiceAny(canvas)
         self._dim_options.SetToolTip(lang.get("program_3d_edit.file_ui.dim_tooltip"))
         self._dim_options.SetItems(level.level_wrapper.dimensions)
-        self._dim_options.SetValue(level.level_wrapper.dimensions[0])
+        self._set_dimension(canvas.dimension)
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
         self.Add(self._dim_options, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
@@ -172,7 +172,9 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         """Run when the dimension attribute in the canvas is changed.
         This is run when the user changes the attribute and when it is changed manually in code.
         """
-        dimension = evt.dimension
+        self._set_dimension(evt.dimension)
+
+    def _set_dimension(self, dimension: str) -> None:
         index = self._dim_options.FindString(dimension)
         if not (index == wx.NOT_FOUND or index == self._dim_options.GetSelection()):
             self._dim_options.SetSelection(index)
