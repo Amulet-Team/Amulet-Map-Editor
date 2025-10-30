@@ -101,7 +101,7 @@ app.browser_open_tooltip=点击将在浏览器中打开页面
 
 # 世界
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.bedrock_education_store=教育版（商店）
 world.bedrock_education_desktop=教育版（桌面）
 world.bedrock_netease=Bedrock（网易）

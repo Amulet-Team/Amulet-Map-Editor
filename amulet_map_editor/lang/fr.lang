@@ -58,7 +58,7 @@ app.world_still_used=Un monde est toujours en cours d'utilisation. Veuillez d'ab
 app.browser_open_tooltip=Cliquer ouvrira la page dans votre navigateur
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Fermer le monde
 
 # Barre de menu

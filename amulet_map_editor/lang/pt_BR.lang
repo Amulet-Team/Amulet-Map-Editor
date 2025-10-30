@@ -61,7 +61,7 @@ app.world_still_used=Um mundo ainda está sendo usado. Por favor, feche-o primei
 app.browser_open_tooltip=Clicar irá abrir a página em seu navegador
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Fechar Mundo
 
 # Menu bar

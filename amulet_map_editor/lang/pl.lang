@@ -61,7 +61,7 @@ app.world_still_used=Świat jest wciąż używany. Prosimy go najpierw zamknąć
 app.browser_open_tooltip=Kliknięcie otworzy stronę w Twojej przeglądarce
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Zamknij Świat
 
 # Menu bar

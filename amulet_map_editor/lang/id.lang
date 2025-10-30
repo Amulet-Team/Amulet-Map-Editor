@@ -33,7 +33,7 @@ app.world_still_used=Dunia masih digunakan. Mohon tutup terlebih dahulu
 app.browser_open_tooltip=Mengklik akan membuka halaman di browser Anda
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Tutup Dunia
 
 # Menu bar

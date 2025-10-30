@@ -61,7 +61,7 @@ app.world_still_used=Dünya hala kullanılıyor. Lütfen devam etmeden önce onu
 app.browser_open_tooltip=Tıklayınca tarayıcınızda sayfa açılacaktır.
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Dünyayı kapat
 
 # Menu bar

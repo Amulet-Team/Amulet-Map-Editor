@@ -25,49 +25,121 @@ log = logging.getLogger(__name__)
 # macOS 	~/Library/Application Support/minecraft
 # Linux 	~/.minecraft
 
-minecraft_world_paths = {}
+minecraft_world_paths: list[tuple[str, str]] = []
 
 if platform == "win32":
-    minecraft_world_paths[lang.get("world.java_platform")] = os.path.join(
-        os.getenv("APPDATA"), ".minecraft", "saves"
+    minecraft_world_paths.append(
+        (
+            lang.get("world.java_platform"),
+            os.path.join(os.getenv("APPDATA"), ".minecraft", "saves"),
+        )
     )
-    minecraft_world_paths[lang.get("world.bedrock_platform")] = os.path.join(
-        os.getenv("LOCALAPPDATA"),
-        "Packages",
-        "Microsoft.MinecraftUWP_8wekyb3d8bbwe",
-        "LocalState",
-        "games",
-        "com.mojang",
-        "minecraftWorlds",
+    minecraft_world_paths.append(
+        (
+            lang.get("world.bedrock_uwp"),
+            os.path.join(
+                os.getenv("LOCALAPPDATA"),
+                "Packages",
+                "Microsoft.MinecraftUWP_8wekyb3d8bbwe",
+                "LocalState",
+                "games",
+                "com.mojang",
+                "minecraftWorlds",
+            ),
+        )
     )
-    minecraft_world_paths[lang.get("world.bedrock_education_store")] = os.path.join(
-        os.getenv("LOCALAPPDATA"),
-        "Packages",
-        "Microsoft.MinecraftEducationEdition_8wekyb3d8bbwe",
-        "LocalState",
-        "games",
-        "com.mojang",
-        "minecraftWorlds",
+    minecraft_world_paths.append(
+        (
+            lang.get("world.bedrock_uwp_beta"),
+            os.path.join(
+                os.getenv("LOCALAPPDATA"),
+                "Packages",
+                "Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe",
+                "LocalState",
+                "games",
+                "com.mojang",
+                "minecraftWorlds",
+            ),
+        )
     )
-    minecraft_world_paths[lang.get("world.bedrock_education_desktop")] = os.path.join(
-        os.getenv("APPDATA"),
-        "Minecraft Education Edition",
-        "games",
-        "com.mojang",
-        "minecraftWorlds",
+    minecraft_world_paths.append(
+        (
+            lang.get("world.bedrock_education_store"),
+            os.path.join(
+                os.getenv("LOCALAPPDATA"),
+                "Packages",
+                "Microsoft.MinecraftEducationEdition_8wekyb3d8bbwe",
+                "LocalState",
+                "games",
+                "com.mojang",
+                "minecraftWorlds",
+            ),
+        )
     )
-    minecraft_world_paths[lang.get("world.bedrock_netease")] = os.path.join(
-        os.getenv("APPDATA"),
-        "MinecraftPE_Netease",
-        "minecraftWorlds",
+    minecraft_world_paths.append(
+        (
+            lang.get("world.bedrock_education_desktop"),
+            os.path.join(
+                os.getenv("APPDATA"),
+                "Minecraft Education Edition",
+                "games",
+                "com.mojang",
+                "minecraftWorlds",
+            ),
+        )
     )
+    minecraft_world_paths.append(
+        (
+            lang.get("world.bedrock_netease"),
+            os.path.join(
+                os.getenv("APPDATA"),
+                "MinecraftPE_Netease",
+                "minecraftWorlds",
+            ),
+        )
+    )
+    for group, key in (
+        ("Minecraft Bedrock", "world.bedrock_gdk"),
+        ("Minecraft Bedrock Preview", "world.bedrock_gdk_preview"),
+    ):
+        for worlds_path in glob.glob(
+            os.path.join(
+                glob.escape(os.getenv("APPDATA")),
+                group,
+                "Users",
+                "*",
+                "games",
+                "com.mojang",
+                "minecraftWorlds",
+            )
+        ):
+            user_id = worlds_path.split(os.sep)[-4]
+            minecraft_world_paths.append(
+                (
+                    f"{lang.get(key)} {user_id}",
+                    worlds_path,
+                )
+            )
+
 elif platform == "darwin":
-    minecraft_world_paths[lang.get("world.java_platform")] = os.path.join(
-        os.path.expanduser("~"), "Library", "Application Support", "minecraft", "saves"
+    minecraft_world_paths.append(
+        (
+            lang.get("world.java_platform"),
+            os.path.join(
+                os.path.expanduser("~"),
+                "Library",
+                "Application Support",
+                "minecraft",
+                "saves",
+            ),
+        )
     )
 elif platform == "linux":
-    minecraft_world_paths[lang.get("world.java_platform")] = os.path.join(
-        os.path.expanduser("~"), ".minecraft", "saves"
+    minecraft_world_paths.append(
+        (
+            lang.get("world.java_platform"),
+            os.path.join(os.path.expanduser("~"), ".minecraft", "saves"),
+        )
     )
 
 world_images: Dict[str, Tuple[int, wx.Bitmap, int]] = {}
@@ -215,7 +287,7 @@ class ScrollableWorldsUI(simple.SimpleScrollablePanel):
         for val in self.dirs.values():
             val.Destroy()
         self.dirs.clear()
-        for group_name, directory in minecraft_world_paths.items():
+        for group_name, directory in sorted(minecraft_world_paths, key=lambda x: x[0]):
             if os.path.isdir(directory):
                 world_list = CollapsibleWorldListUI(
                     self,

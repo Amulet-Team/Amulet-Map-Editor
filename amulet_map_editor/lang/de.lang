@@ -30,7 +30,7 @@ app.world_still_used=Eine Welt ist noch geöffnet, bitte schließen
 app.browser_open_tooltip=Durch Anklicken wird die Seite in Deinem Default-Browser geöffnet
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Welt schließen
 
 

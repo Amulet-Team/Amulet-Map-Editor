@@ -61,7 +61,7 @@ app.world_still_used=Một thế giới vẫn đang được sử dụng. Xin h�
 app.browser_open_tooltip=Nháy chuột vào sẽ mở trang này trong trình duyệt của bạn
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.bedrock_education_store=Education Edition (Store)
 world.bedrock_education_desktop=Education Edition (Desktop)
 world.bedrock_netease=Bedrock (Netease)

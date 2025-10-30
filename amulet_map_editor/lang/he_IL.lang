@@ -65,7 +65,7 @@ app.world_still_used=יש עולם שעדיין פתוח. בבקשה תסגור 
 app.browser_open_tooltip=לחיצה תפתח את הדף בדפדפן שלך
 
 world.java_platform=ג'אווה
-world.bedrock_platform=בדרוק
+world.bedrock_uwp=בדרוק
 world.close_world=סגור עולם
 
 # Menu bar

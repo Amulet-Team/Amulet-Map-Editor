@@ -59,7 +59,7 @@ shared.check_console=Проверьте консоль для получения
 # Приложение
 app.browser_open_tooltip=При нажатии откроется страница в браузере
 app.world_still_used=Мир все ещё используется. Пожалуйста, сначала закройте его
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Закрыть мир
 world.java_platform=Java
 

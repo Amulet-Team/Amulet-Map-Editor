@@ -58,7 +58,7 @@ app.world_still_used=Svět je stále otevřený. Nejprve jej prosím zavřete
 app.browser_open_tooltip=Kliknutím otevřete stránku ve vašem prohlížeči
 
 world.java_platform=Java
-world.bedrock_platform=Bedrock
+world.bedrock_uwp=Bedrock UWP
 world.close_world=Zavřít Svět
 
 # Menu bar
