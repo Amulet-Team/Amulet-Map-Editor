@@ -94,6 +94,17 @@ language_select.title=Language Select
 language_select.help=Select the language to use in Amulet from the list below.
 language_select.contribute=If you want to fix or add translations click here.
 
+# Support Dialog
+support_dialog.title=I Need Your Support!
+support_dialog.support_button=I am contributing to Amulet.
+support_dialog.ignore_button_wait=Continue without contributing. Wait {t} seconds
+support_dialog.ignore_button=Continue without contributing.
+support_dialog.content_1=Pathway Studios have been funding the development of Amulet for the past 6 years but have decided to stop funding development from 2026.
+support_dialog.content_2=Who am I?\nI am James. You may know me as gentlegiantJGC.\nAmulet has been my job since 2019 but to continue I need financial support.\nAny contribution, no matter how small, is greatly appreciated.\nWithout your support, development and maintenance of Amulet will stop and Amulet will not be able to open worlds from new versions.
+support_dialog.github_sponsor=Support Amulet on Github
+support_dialog.paypal_sponsor=Support Amulet on Paypal
+support_dialog.content_3=The future of Amulet\nFor the past two years I have been rewriting Amulet from the ground up.\nMost of the libraries are now written in C++ for improved speed and parallelisation and the new application uses Qt to allow more control over the user interface.\nI still have a way to go until the rewrite can replace this version of Amulet but experimental versions of the rewrite should be out soon.
+
 # Warning Dialog
 warning_dialog.title=Welcome to Amulet
 warning_dialog.content=Hello and welcome to Amulet.\n\nWe suggest creating backups of your worlds before opening them in Amulet.\n\nWe try to make sure that Amulet does not corrupt worlds but the save format is undocumented and constantly changing and sometimes we just get things wrong.\n\nFor these reasons we only officially support full releases we have tested against.\nJava snapshots, Bedrock betas and experimental features may work but are untested so not officially supported.\n\nCurrently entities are not supported and items are only supported within the same platform.\nIf you find a feature you want added or a bug that needs fixing report it on our bug tracker.\nPlease use the search tool to see if it has been reported before creating a new ticket.\n\nIf you are new we suggest reading the user manual to familiarise yourself with the program.\n\n- The Amulet Team

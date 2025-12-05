@@ -3,10 +3,12 @@ from . import amulet_ui
 import sys
 import locale
 import logging
+import time
 
 from amulet_map_editor.api import config
 from amulet_map_editor import __version__
 from .warning_dialog import WarningDialog
+from .support_dialog import SupportDialog
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +29,16 @@ class AmuletApp(wx.App):
         self._amulet_ui.Show()
 
         meta_config = config.get("amulet_meta", {})
+
+        support_dialog_show_time = meta_config.get("support_dialog_show_time", 0)
+        if support_dialog_show_time < time.time() - 3600 * 24 * 7:
+            # Last shown more than a week ago
+            support_dialog = SupportDialog(self._amulet_ui, 60, support_dialog_show_time == 0)
+            support_dialog.Centre()
+            if support_dialog.ShowModal() == wx.ID_OK:
+                meta_config["support_dialog_show_time"] = time.time()
+                config.put("amulet_meta", meta_config)
+
         if not meta_config.get("do_not_show_warning_dialog", False):
             warning_dialog = WarningDialog(self._amulet_ui)
             warning_dialog.Centre()
