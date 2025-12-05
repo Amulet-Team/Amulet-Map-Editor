@@ -56,7 +56,7 @@ class SupportDialog(wx.Dialog):
             self,
             wx.ID_ANY,
             lang.get("support_dialog.github_sponsor"),
-            URL="https://github.com/sponsors/Amulet-Team"
+            URL="https://github.com/sponsors/Amulet-Team",
         )
         font = github_sponsor_link.GetFont()
         font.SetPointSize(12)
@@ -69,7 +69,7 @@ class SupportDialog(wx.Dialog):
             self,
             wx.ID_ANY,
             lang.get("support_dialog.paypal_sponsor"),
-            URL="https://www.paypal.com/donate/?hosted_button_id=6G7P8K36W7TX2"
+            URL="https://www.paypal.com/donate/?hosted_button_id=6G7P8K36W7TX2",
         )
         font = paypal_sponsor_link.GetFont()
         font.SetPointSize(12)
@@ -125,7 +125,9 @@ class SupportDialog(wx.Dialog):
     def _set_ignore_text(self) -> None:
         if 0 < self._wait_time:
             self._ignore_button.Disable()
-            self._ignore_button.SetLabel(lang.get("support_dialog.ignore_button_wait").format(t=self._wait_time))
+            self._ignore_button.SetLabel(
+                lang.get("support_dialog.ignore_button_wait").format(t=self._wait_time)
+            )
         else:
             self._support_button.Enable()
             self._ignore_button.Enable()

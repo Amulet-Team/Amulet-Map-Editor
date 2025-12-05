@@ -33,7 +33,9 @@ class AmuletApp(wx.App):
         support_dialog_show_time = meta_config.get("support_dialog_show_time", 0)
         if support_dialog_show_time < time.time() - 3600 * 24 * 7:
             # Last shown more than a week ago
-            support_dialog = SupportDialog(self._amulet_ui, 60, support_dialog_show_time == 0)
+            support_dialog = SupportDialog(
+                self._amulet_ui, 60, support_dialog_show_time == 0
+            )
             support_dialog.Centre()
             if support_dialog.ShowModal() == wx.ID_OK:
                 meta_config["support_dialog_show_time"] = time.time()
