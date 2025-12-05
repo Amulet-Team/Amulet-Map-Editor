@@ -83,11 +83,12 @@ menu_bar.help.menu_name=&Help
 ## The start screen
 main_menu.tab_name=Main Menu
 main_menu.open_world=Open World
+main_menu.support=Support Amulet
 main_menu.user_manual=User Manual
 main_menu.bug_tracker=Bug Tracker
 main_menu.discord=Amulet Discord
 main_menu.our_sponsors=Our Sponsors
-main_menu.sponsor_link=(Sponsor us to get your name here)
+main_menu.sponsor_link=(Click here to support us on Github and get your name here)
 
 # Language Select
 language_select.title=Language Select

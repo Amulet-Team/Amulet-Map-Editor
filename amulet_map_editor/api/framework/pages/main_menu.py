@@ -8,6 +8,7 @@ import wx.lib.inspection
 
 from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
+from ..support_dialog import SupportDialog
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
 
 
@@ -48,6 +49,11 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
             wx.EVT_BUTTON, lambda _: open_level_from_dialog(self)
         )
         sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
+
+        self._support_button = wx.Button(self, size=(400, 70))
+        self._support_button.SetFont(button_font)
+        self._support_button.Bind(wx.EVT_BUTTON, self._support)
+        sizer.Add(self._support_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._user_manual_button = wx.Button(self, size=(400, 70))
         self._user_manual_button.SetFont(button_font)
@@ -109,6 +115,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
     def _load_strings(self):
         self._amulet_name.SetLabel(lang.get("meta.amulet"))
         self._open_world_button.SetLabel(lang.get("main_menu.open_world"))
+        self._support_button.SetLabel(lang.get("main_menu.support"))
         self._user_manual_button.SetLabel(lang.get("main_menu.user_manual"))
         self._user_manual_button.SetToolTip(lang.get("app.browser_open_tooltip"))
         self._bug_tracker_button.SetLabel(lang.get("main_menu.bug_tracker"))
@@ -117,6 +124,11 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self._discord_button.SetToolTip(lang.get("app.browser_open_tooltip"))
         self._sponsor_label.SetLabel(lang.get("main_menu.our_sponsors"))
         self._sponsor_link.SetLabel(lang.get("main_menu.sponsor_link"))
+
+    def _support(self, _):
+        support_dialog = SupportDialog(self, 0, False)
+        support_dialog.Centre()
+        support_dialog.ShowModal()
 
     @staticmethod
     def _documentation(_):
