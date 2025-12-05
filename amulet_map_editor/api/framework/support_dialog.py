@@ -96,7 +96,6 @@ class SupportDialog(wx.Dialog):
         main_sizer.Add(button_sizer, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
         self._ignore_button = wx.Button(self, wx.ID_CANCEL)
-        self._set_ignore_text()
         self._ignore_button.SetDefault()
         self.SetEscapeId(self._ignore_button.GetId())
         button_sizer.Add(self._ignore_button)
@@ -108,6 +107,8 @@ class SupportDialog(wx.Dialog):
             self._support_button.Disable()
         button_sizer.Add(self._support_button)
         self.SetAffirmativeId(self._support_button.GetId())
+
+        self._set_ignore_text()
 
         button_sizer.Realize()
 
