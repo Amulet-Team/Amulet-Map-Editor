@@ -22,11 +22,11 @@ jobs:
 
     - name: Save and compress Docker image
       run: |
-        docker save amulet-editor:latest | xz -9e > amulet-editor.tar.xz
+        docker save amulet-editor:latest | xz -9e > Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
 
     - name: Upload Release Asset
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         gh release upload ${{ github.event.release.tag_name }} \
-          amulet-editor.tar.xz#Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
+          Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz#Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
