@@ -4,6 +4,7 @@ from wx.lib.agw import flatnotebook
 from typing import Dict, Union
 import traceback
 import logging
+import platform
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
@@ -27,6 +28,20 @@ NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
 CLOSEABLE_PAGE_TYPE = Union[WorldPageUI]
 
 wx.Image.SetDefaultLoadFlags(0)
+
+if platform.system() == "Windows" and 22000 <= int(
+    platform.version().rsplit(".", 1)[-1]
+):
+    # The wx rendering of FlatNotebook is kind of broken on Windows 11
+    flatnotebook.FNB_HEIGHT_SPACER = 20
+    _FNBRenderer_CalcTabWidth_Orig = flatnotebook.FNBRenderer.CalcTabWidth
+
+    def _FNBRenderer_CalcTabWidth(self, pageContainer, tabIdx, tabHeight):
+        return (
+            _FNBRenderer_CalcTabWidth_Orig(self, pageContainer, tabIdx, tabHeight) + 20
+        )
+
+    flatnotebook.FNBRenderer.CalcTabWidth = _FNBRenderer_CalcTabWidth
 
 
 @preserve_ui_preferences
