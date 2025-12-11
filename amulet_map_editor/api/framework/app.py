@@ -8,7 +8,7 @@ import time
 from amulet_map_editor.api import config
 from amulet_map_editor import __version__
 from .warning_dialog import WarningDialog
-from .support_dialog import SupportDialog
+from .licence_dialog import LicenceDialog
 
 log = logging.getLogger(__name__)
 
@@ -30,16 +30,17 @@ class AmuletApp(wx.App):
 
         meta_config = config.get("amulet_meta", {})
 
-        support_dialog_show_time = meta_config.get("support_dialog_show_time", 0)
-        if support_dialog_show_time < time.time() - 3600 * 24 * 7:
-            # Last shown more than a week ago
-            support_dialog = SupportDialog(
-                self._amulet_ui, 60, support_dialog_show_time == 0
-            )
-            support_dialog.Centre()
-            if support_dialog.ShowModal() == wx.ID_OK:
-                meta_config["support_dialog_show_time"] = time.time()
-                config.put("amulet_meta", meta_config)
+        if not getattr(sys, 'frozen', False):
+            licence_dialog_show_time = meta_config.get("licence_dialog_show_time", 0)
+            if licence_dialog_show_time < time.time() - 3600 * 24 * 30:
+                # Last shown more than a month ago
+                licence_dialog = LicenceDialog(self._amulet_ui)
+                licence_dialog.Centre()
+                if licence_dialog.ShowModal() == wx.ID_OK:
+                    meta_config["licence_dialog_show_time"] = time.time()
+                    config.put("amulet_meta", meta_config)
+                else:
+                    return False
 
         if not meta_config.get("do_not_show_warning_dialog", False):
             warning_dialog = WarningDialog(self._amulet_ui)
