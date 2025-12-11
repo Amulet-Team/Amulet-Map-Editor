@@ -25,8 +25,7 @@ jobs:
         docker save amulet-editor:latest | xz -9e > Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
 
     - name: Upload Release Asset
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release upload ${{ github.event.release.tag_name }} \
-          Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz#Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
+      uses: actions/upload-artifact@v4
+      with:
+        name: Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
+        path: Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
