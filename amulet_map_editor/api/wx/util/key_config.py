@@ -307,7 +307,9 @@ class KeyCatcher(wx.Dialog):
     def __init__(self, parent: wx.Window, action: str):
         super().__init__(
             parent,
-            title=lang.get("key_config.press_label").format(action=lang.get(f"action.{action.lower()}")),
+            title=lang.get("key_config.press_label").format(
+                action=lang.get(f"action.{action.lower()}")
+            ),
             style=wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS,
         )
 
@@ -414,7 +416,11 @@ class KeyConfig(wx.BoxSizer):
         self._key_buttons: Dict[str, wx.Button] = {}
         for action in entries:
             grid_sizer.Add(
-                wx.StaticText(self._options, label=lang.get(f"action.{action.lower()}")), 0, wx.ALIGN_CENTER
+                wx.StaticText(
+                    self._options, label=lang.get(f"action.{action.lower()}")
+                ),
+                0,
+                wx.ALIGN_CENTER,
             )
             self._key_buttons[action] = button = wx.Button(self._options)
             button.Bind(wx.EVT_BUTTON, lambda evt, a=action: self._modify_button(a))
@@ -457,7 +463,9 @@ class KeyConfig(wx.BoxSizer):
     def _request_group_name(self) -> Optional[str]:
         group_name = ""
         while group_name == "":
-            msg = wx.TextEntryDialog(self._options, lang.get("key_config.enter_group_name"))
+            msg = wx.TextEntryDialog(
+                self._options, lang.get("key_config.enter_group_name")
+            )
             if msg.ShowModal() == wx.ID_OK:
                 group_name = msg.GetValue()
                 if (
