@@ -28,7 +28,7 @@ from ..key_config import (
     ACT_INCR_SELECT_DISTANCE,
     ACT_DECR_SELECT_DISTANCE,
     ACT_DESELECT_ALL_BOXES,
-    ACT_DELESECT_BOX,
+    ACT_DESELECT_BOX,
 )
 
 if TYPE_CHECKING:
@@ -231,7 +231,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
                 self._post_change_event()
             else:
                 self._escape()
-        elif evt.action_id == ACT_DELESECT_BOX:
+        elif evt.action_id == ACT_DESELECT_BOX:
             if ACT_DESELECT_ALL_BOXES not in self.canvas.buttons.pressed_actions:
                 selection_group = self.selection_group
                 if selection_group:

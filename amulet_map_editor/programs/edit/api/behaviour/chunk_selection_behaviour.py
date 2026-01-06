@@ -19,7 +19,7 @@ from amulet_map_editor.api.opengl.camera import Projection
 from ..key_config import (
     ACT_BOX_CLICK,
     ACT_DESELECT_ALL_BOXES,
-    ACT_DELESECT_BOX,
+    ACT_DESELECT_BOX,
 )
 
 if TYPE_CHECKING:
@@ -94,7 +94,7 @@ class ChunkSelectionBehaviour(PointerBehaviour):
         elif evt.action_id == ACT_DESELECT_ALL_BOXES:
             self._selection.selection_group = SelectionGroup()
             self._create_undo()
-        elif evt.action_id == ACT_DELESECT_BOX:
+        elif evt.action_id == ACT_DESELECT_BOX:
             if ACT_DESELECT_ALL_BOXES not in self.canvas.buttons.pressed_actions:
                 self._selection.selection_group = SelectionGroup()
                 self._create_undo()

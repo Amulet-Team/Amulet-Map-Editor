@@ -130,6 +130,12 @@ select_world.recent_worlds=Recently Opened Worlds
 select_world.no_loader_found=Could not find a loader for this world.
 select_world.loading_world_failed=Error loading world.
 
+# Key configuration dialog
+key_config.key_select=Key Select
+key_config.press_label=Press the key you want assigned to {action}
+key_config.enter_group_name=Enter a new group name.
+key_config.active_not_editable=The active key group is not editable. Would you like to create a new group to edit?
+
 # About
 ## The default program when a world is opened
 program_about.tab_name=About
@@ -165,6 +171,27 @@ program_3d_edit.canvas.loading_resource_packs=Loading resource packs
 program_3d_edit.canvas.retry_download=Failed to download the resource pack. Do you want to retry?
 program_3d_edit.canvas.creating_texture_atlas=Creating texture atlas
 program_3d_edit.canvas.setting_up_renderer=Setting up renderer
+
+## Controls
+action.act_move_up=Move Up
+action.act_move_down=Move Down
+action.act_move_forwards=Move Forwards
+action.act_move_backwards=Move Backwards
+action.act_move_left=Move Left
+action.act_move_right=Move Right
+action.act_box_click=Select Box
+action.act_box_click_add=Add Box
+action.act_change_mouse_mode=Rotate Camera
+action.act_incr_speed=Increase Speed (3D)
+action.act_decr_speed=Decrease Speed (3D)
+action.act_zoom_in=Zoom In (2D)
+action.act_zoom_out=Zoom Out (2D)
+action.act_incr_select_distance=Increase Selection Distance
+action.act_decr_select_distance=Decrease Selection Distance
+action.act_deselect_all_boxes=Deselect All Boxes
+action.act_deselect_box=Deselect Active Box
+action.act_inspect_block=Inspect Block
+action.act_change_projection=Toggle Projection
 
 ## Menu bar
 program_3d_edit.menu_bar.file.save=Save

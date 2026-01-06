@@ -25,6 +25,8 @@ from ..key_config import (
     ACT_CHANGE_MOUSE_MODE,
     ACT_INCR_SPEED,
     ACT_DECR_SPEED,
+    ACT_ZOOM_IN,
+    ACT_ZOOM_OUT,
     ACT_CHANGE_PROJECTION,
 )
 
@@ -86,12 +88,14 @@ class CameraBehaviour(BaseBehaviour):
         elif evt.action_id == ACT_INCR_SPEED:
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
                 self.canvas.camera.move_speed *= 1.1
-            elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
-                self.canvas.camera.fov = max(0.5, self.canvas.camera.fov / 1.1)
         elif evt.action_id == ACT_DECR_SPEED:
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
                 self.canvas.camera.move_speed /= 1.1
-            elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+        elif evt.action_id == ACT_ZOOM_IN:
+            if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
+                self.canvas.camera.fov = max(0.5, self.canvas.camera.fov / 1.1)
+        elif evt.action_id == ACT_ZOOM_OUT:
+            if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
                 self.canvas.camera.fov = min(1000.0, self.canvas.camera.fov * 1.1)
 
     def _on_input_held(self, evt: InputHeldEvent):

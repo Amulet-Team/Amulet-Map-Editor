@@ -26,10 +26,12 @@ ACT_BOX_CLICK_ADD = "ACT_BOX_CLICK_ADD"
 ACT_CHANGE_MOUSE_MODE = "ACT_CHANGE_MOUSE_MODE"
 ACT_INCR_SPEED = "ACT_INCR_SPEED"
 ACT_DECR_SPEED = "ACT_DECR_SPEED"
+ACT_ZOOM_IN = "ACT_ZOOM_IN"
+ACT_ZOOM_OUT = "ACT_ZOOM_OUT"
 ACT_INCR_SELECT_DISTANCE = "ACT_INCR_SELECT_DISTANCE"
 ACT_DECR_SELECT_DISTANCE = "ACT_DECR_SELECT_DISTANCE"
 ACT_DESELECT_ALL_BOXES = "ACT_DESELECT_ALL_BOXES"
-ACT_DELESECT_BOX = "ACT_DELESECT_BOX"
+ACT_DESELECT_BOX = "ACT_DESELECT_BOX"
 ACT_INSPECT_BLOCK = "ACT_INSPECT_BLOCK"
 ACT_CHANGE_PROJECTION = "ACT_CHANGE_PROJECTION"
 
@@ -45,10 +47,12 @@ KeybindKeys: List[KeyActionType] = [
     ACT_CHANGE_MOUSE_MODE,
     ACT_INCR_SPEED,
     ACT_DECR_SPEED,
+    ACT_ZOOM_IN,
+    ACT_ZOOM_OUT,
     ACT_INCR_SELECT_DISTANCE,
     ACT_DECR_SELECT_DISTANCE,
     ACT_DESELECT_ALL_BOXES,
-    ACT_DELESECT_BOX,
+    ACT_DESELECT_BOX,
     ACT_INSPECT_BLOCK,
     ACT_CHANGE_PROJECTION,
 ]
@@ -66,10 +70,12 @@ PresetKeybinds: KeybindContainer = {
         ACT_CHANGE_MOUSE_MODE: ((), MouseRight),
         ACT_INCR_SPEED: ((), MouseWheelScrollUp),
         ACT_DECR_SPEED: ((), MouseWheelScrollDown),
+        ACT_ZOOM_IN: ((), MouseWheelScrollUp),
+        ACT_ZOOM_OUT: ((), MouseWheelScrollDown),
         ACT_INCR_SELECT_DISTANCE: ((), "R"),
         ACT_DECR_SELECT_DISTANCE: ((), "F"),
         ACT_DESELECT_ALL_BOXES: ((Control, Shift), "D"),
-        ACT_DELESECT_BOX: ((Control,), "D"),
+        ACT_DESELECT_BOX: ((Control,), "D"),
         ACT_INSPECT_BLOCK: ((), Alt),
         ACT_CHANGE_PROJECTION: ((), Tab),
     },
@@ -85,10 +91,12 @@ PresetKeybinds: KeybindContainer = {
         ACT_CHANGE_MOUSE_MODE: ((), MouseRight),
         ACT_INCR_SPEED: ((), "."),
         ACT_DECR_SPEED: ((), ","),
+        ACT_ZOOM_IN: ((), "."),
+        ACT_ZOOM_OUT: ((), ","),
         ACT_INCR_SELECT_DISTANCE: ((), "R"),
         ACT_DECR_SELECT_DISTANCE: ((), "F"),
         ACT_DESELECT_ALL_BOXES: ((Control, Shift), "D"),
-        ACT_DELESECT_BOX: ((Control,), "D"),
+        ACT_DESELECT_BOX: ((Control,), "D"),
         ACT_INSPECT_BLOCK: ((), Alt),
         ACT_CHANGE_PROJECTION: ((), Tab),
     },
@@ -104,10 +112,12 @@ PresetKeybinds: KeybindContainer = {
         ACT_CHANGE_MOUSE_MODE: ((), MouseRight),
         ACT_INCR_SPEED: ((), MouseWheelScrollUp),
         ACT_DECR_SPEED: ((), MouseWheelScrollDown),
+        ACT_ZOOM_IN: ((), MouseWheelScrollUp),
+        ACT_ZOOM_OUT: ((), MouseWheelScrollDown),
         ACT_INCR_SELECT_DISTANCE: ((), "Y"),
         ACT_DECR_SELECT_DISTANCE: ((), "H"),
         ACT_DESELECT_ALL_BOXES: ((Control, Shift), "D"),
-        ACT_DELESECT_BOX: ((Control,), "D"),
+        ACT_DESELECT_BOX: ((Control,), "D"),
         ACT_INSPECT_BLOCK: ((), Alt),
         ACT_CHANGE_PROJECTION: ((), Tab),
     },
@@ -123,10 +133,12 @@ PresetKeybinds: KeybindContainer = {
         ACT_CHANGE_MOUSE_MODE: ((), MouseRight),
         ACT_INCR_SPEED: ((), "."),
         ACT_DECR_SPEED: ((), ","),
+        ACT_ZOOM_IN: ((), "."),
+        ACT_ZOOM_OUT: ((), ","),
         ACT_INCR_SELECT_DISTANCE: ((), "Y"),
         ACT_DECR_SELECT_DISTANCE: ((), "H"),
         ACT_DESELECT_ALL_BOXES: ((Control, Shift), "D"),
-        ACT_DELESECT_BOX: ((Control,), "D"),
+        ACT_DESELECT_BOX: ((Control,), "D"),
         ACT_INSPECT_BLOCK: ((), Alt),
         ACT_CHANGE_PROJECTION: ((), Tab),
     },

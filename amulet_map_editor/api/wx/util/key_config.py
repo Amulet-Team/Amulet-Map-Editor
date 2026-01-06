@@ -1,4 +1,5 @@
 import wx
+from amulet_map_editor.api import lang
 from amulet_map_editor.api.wx.ui.simple import (
     SimpleDialog,
     SimpleScrollablePanel,
@@ -306,7 +307,7 @@ class KeyCatcher(wx.Dialog):
     def __init__(self, parent: wx.Window, action: str):
         super().__init__(
             parent,
-            title=f"Press the key you want assigned to {action}",
+            title=lang.get("key_config.press_label").format(action=lang.get(f"action.{action.lower()}")),
             style=wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS,
         )
 
@@ -356,7 +357,7 @@ class KeyConfigDialog(SimpleDialog):
         fixed_keybinds: KeybindContainer,
         user_keybinds: KeybindContainer,
     ):
-        super().__init__(parent, "Key Select")
+        super().__init__(parent, lang.get("key_config.key_select"))
         self._key_config = KeyConfig(
             self, selected_group, entries, fixed_keybinds, user_keybinds
         )
@@ -413,7 +414,7 @@ class KeyConfig(wx.BoxSizer):
         self._key_buttons: Dict[str, wx.Button] = {}
         for action in entries:
             grid_sizer.Add(
-                wx.StaticText(self._options, label=action.title()), 0, wx.ALIGN_CENTER
+                wx.StaticText(self._options, label=lang.get(f"action.{action.lower()}")), 0, wx.ALIGN_CENTER
             )
             self._key_buttons[action] = button = wx.Button(self._options)
             button.Bind(wx.EVT_BUTTON, lambda evt, a=action: self._modify_button(a))
@@ -456,7 +457,7 @@ class KeyConfig(wx.BoxSizer):
     def _request_group_name(self) -> Optional[str]:
         group_name = ""
         while group_name == "":
-            msg = wx.TextEntryDialog(self._options, "Enter a new group name.")
+            msg = wx.TextEntryDialog(self._options, lang.get("key_config.enter_group_name"))
             if msg.ShowModal() == wx.ID_OK:
                 group_name = msg.GetValue()
                 if (
@@ -495,7 +496,7 @@ class KeyConfig(wx.BoxSizer):
         if self._choice.GetCurrentString() in self._fixed_keybinds:
             msg = wx.MessageDialog(
                 self._options,
-                "The active key group is not editable. Would you like to create a new group to edit?",
+                lang.get("key_config.active_not_editable"),
                 style=wx.YES_NO,
             )
             if msg.ShowModal() == wx.ID_YES:
