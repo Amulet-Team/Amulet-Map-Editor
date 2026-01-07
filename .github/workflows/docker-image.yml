@@ -18,7 +18,7 @@ jobs:
           . \
           --file Dockerfile \
           --tag amulet-editor:latest \
-          --build-arg AMULET_VERSION=CUSTOM:git+https://github.com/Amulet-Team/Amulet-Map-Editor.git@${{ github.event.release.tag_name }}
+          --build-arg AMULET_VERSION=CUSTOM:git+https://github.com/${{ github.repository }}.git@${{ github.event.release.tag_name }}
 
     - name: Save and compress Docker image
       run: |
