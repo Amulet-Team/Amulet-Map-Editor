@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --upgrade pip
-RUN wget https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.4-cp310-cp310-linux_x86_64.whl && pip3 install wxPython-4.2.4-cp310-cp310-linux_x86_64.whl
+RUN wget https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.4-cp310-cp310-linux_x86_64.whl && pip3 install wxpython-4.2.4-cp310-cp310-linux_x86_64.whl
 
 ARG AMULET_VERSION=RELEASE  # defaults to the latest version if no arg is given in build command.
 RUN if [ "$(echo "$AMULET_VERSION" | cut -c1-7)" = "CUSTOM:" ]; then \
