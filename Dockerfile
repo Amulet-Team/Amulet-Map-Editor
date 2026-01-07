@@ -1,19 +1,33 @@
-FROM python:3.9-bullseye
-RUN apt-get update && apt install libgtk-3-dev dbus-x11 wget libnotify4 -y
-RUN pip install --upgrade pip
-RUN wget https://extras.wxpython.org/wxPython4/extras/linux/gtk3/debian-11/wxPython-4.2.0-cp39-cp39-linux_x86_64.whl && pip install wxPython-4.2.0-cp39-cp39-linux_x86_64.whl
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during apt install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Python 3.10 (default on Ubuntu 22.04) and required dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    libgtk-3-dev \
+    dbus-x11 \
+    wget \
+    libnotify4 \
+    libSDL2-2.0 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip
+RUN wget https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.4-cp310-cp310-linux_x86_64.whl && pip3 install wxPython-4.2.4-cp310-cp310-linux_x86_64.whl
+
 ARG AMULET_VERSION=RELEASE  # defaults to the latest version if no arg is given in build command.
 RUN if [ "$(echo "$AMULET_VERSION" | cut -c1-7)" = "CUSTOM:" ]; then \
-        pip install "$(echo "$AMULET_VERSION" | cut -c8-)"; \
+        pip3 install "$(echo "$AMULET_VERSION" | cut -c8-)"; \
     elif [ "$AMULET_VERSION" = "RELEASE" ]; then \
-        pip install --upgrade --upgrade-strategy eager amulet-map-editor; \
+        pip3 install --upgrade --upgrade-strategy eager amulet-map-editor; \
     elif [ "$AMULET_VERSION" = "BETA" ]; then \
-        pip install --upgrade --upgrade-strategy eager amulet-map-editor>=0b0; \
+        pip3 install --upgrade --upgrade-strategy eager amulet-map-editor>=0b0; \
     elif [ "$AMULET_VERSION" = "ALPHA" ]; then \
-        pip install --upgrade --upgrade-strategy eager amulet-map-editor>=0a0; \
+        pip3 install --upgrade --upgrade-strategy eager amulet-map-editor>=0a0; \
     else \
-        pip install --upgrade --upgrade-strategy eager amulet-map-editor==$AMULET_VERSION; \
+        pip3 install --upgrade --upgrade-strategy eager amulet-map-editor==$AMULET_VERSION; \
     fi
-RUN apt-get install libSDL2-2.0 -y
 
-ENTRYPOINT [ "/usr/local/bin/python", "-m", "amulet_map_editor" ]
+ENTRYPOINT [ "/usr/bin/python3", "-m", "amulet_map_editor" ]
