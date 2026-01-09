@@ -407,7 +407,7 @@ class EditCanvas(BaseEditCanvas):
             self.selection.selection_corners = []
 
     def save(self):
-        def save():
+        def pre_save() -> Generator[OperationYieldType, None, Any]:
             yield 0, "Running Pre-Save Operations."
             pre_save_op = self.world.pre_save_operation()
             try:
@@ -419,9 +419,11 @@ class EditCanvas(BaseEditCanvas):
                 else:
                     self.world.restore_last_undo_point()
 
+        def save() -> Generator[OperationYieldType, None, Any]:
             yield 0, "Saving Chunks."
             for chunk_index, chunk_count in self.world.save_iter():
                 yield chunk_index / chunk_count
 
+        self._run_operation(pre_save, "Running Pre-Save Operations.", "Please wait.", False)
         self._run_operation(save, "Saving world.", "Please wait.", False)
         wx.PostEvent(self, SaveEvent())
