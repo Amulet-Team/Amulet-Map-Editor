@@ -424,6 +424,8 @@ class EditCanvas(BaseEditCanvas):
             for chunk_index, chunk_count in self.world.save_iter():
                 yield chunk_index / chunk_count
 
-        self._run_operation(pre_save, "Running Pre-Save Operations.", "Please wait.", False)
+        self._run_operation(
+            pre_save, "Running Pre-Save Operations.", "Please wait.", False
+        )
         self._run_operation(save, "Saving world.", "Please wait.", False)
         wx.PostEvent(self, SaveEvent())
