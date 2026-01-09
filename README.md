@@ -24,6 +24,11 @@ Extract the contained folder to a location on your computer and run the executab
 3) run `python -m pip install amulet-map-editor` to install the library and all its dependencies.
 4) run `python -m amulet_map_editor` to run the program
 
+## Running with Docker (Linux)
+The Docker image runs on any Linux distro with Docker support.
+To run the Docker image, clone this repository and run `rundocker.sh`.
+Compatibility with wayland is done through xwayland for x11 support.
+
 ### Notes
 
 If you have python 2 installed `python` may point to the wrong version in which case you will have to swap out `python` for `python3`
