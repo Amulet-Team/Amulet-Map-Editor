@@ -10,6 +10,9 @@ from amulet_map_editor import __version__
 from .warning_dialog import WarningDialog
 from .licence_dialog import LicenceDialog
 
+# Disable OpenGL_accelerate logging
+logging.getLogger("OpenGL.acceleratesupport").setLevel(logging.CRITICAL)
+
 log = logging.getLogger(__name__)
 
 # Uses a conditional so if this breaks a build, we can just delete the file and it will skip the check
