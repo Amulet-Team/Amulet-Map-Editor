@@ -4,6 +4,7 @@ from wx.lib.agw import flatnotebook
 from typing import Dict, Union
 import traceback
 import logging
+import sys
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
@@ -37,11 +38,14 @@ class AmuletUI(wx.Frame):
     _level_notebook: AmuletLevelNotebook
 
     def __init__(self, parent):
+        title = f"Amulet {__version__}"
+        if not getattr(sys, "frozen", False):
+            title += " (source)"
         wx.Frame.__init__(
             self,
             parent,
             id=wx.ID_ANY,
-            title=f"Amulet V{__version__}",
+            title=title,
             pos=wx.DefaultPosition,
             size=wx.Size(1000, 600),
             style=wx.CAPTION
