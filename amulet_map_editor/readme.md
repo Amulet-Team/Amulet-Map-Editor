@@ -18,7 +18,7 @@ On the left should be some expandable panes containing the worlds stored in the 
 
 Click on a world to open it with Amulet.
 
-If you wish to open a world from a different location press the "open other world" button and select the world folder.
+If you wish to open a world from a different location press the "Open World Directory" button and select the world folder.
 
 On the right will be worlds that you have recently opened in Amulet (this will be blank if you have not opened any worlds yet).
 

@@ -123,9 +123,16 @@ update_check.ok=Ok
 ## The window when selecting a world to open
 select_world.title=World Select
 select_world.open_world_warning=Close the world in game and other tools before opening in Amulet.
-select_world.open_world_button=Open other world
+select_world.open_world_button=Open World Directory
 select_world.open_world_dialogue=Select a Minecraft world directory
 select_world.select_directory_failed=Failed to open directory!
+select_world.open_mcworld_button=Open Bedrock .mcworld File
+select_world.open_mcworld_dialogue=Select .mcworld file
+select_world.extract_mcworld_dialogue=Select directory to extract .mcworld file into
+select_world.extracting_world_wait=Extracting world. Please wait.
+select_world.extracting_world_not_empty=The directory must be empty.
+select_world.extracting_world_failed=Failed extracting world.
+select_world.extracting_world_finished=Finished extracting world. Amulet will edit the extracted world.
 select_world.recent_worlds=Recently Opened Worlds
 select_world.no_loader_found=Could not find a loader for this world.
 select_world.loading_world_failed=Error loading world.

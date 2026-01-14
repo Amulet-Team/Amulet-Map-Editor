@@ -1,19 +1,21 @@
 import os
-import wx
 import glob
 from sys import platform
 from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
 import traceback
 import logging
+import zipfile
+
+import wx
 
 from amulet import load_format
 from amulet.api.errors import FormatError
 
 from amulet_map_editor import lang, CONFIG
 from amulet_map_editor.api.wx.ui import simple
+from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 from amulet_map_editor.api.framework import app
-
 
 if TYPE_CHECKING:
     from amulet.api.wrapper import WorldFormatWrapper
@@ -313,11 +315,31 @@ class WorldSelectUI(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
+        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(header_sizer, 0, wx.EXPAND)
+        header_sizer.AddStretchSpacer()
+
         self.header_open_world = wx.Button(
             self, label=lang.get("select_world.open_world_button")
         )
+        font = self.header_open_world.GetFont()
+        font.SetPointSize(16)
+        self.header_open_world.SetFont(font)
         self.header_open_world.Bind(wx.EVT_BUTTON, self._open_world)
-        sizer.Add(self.header_open_world)
+        header_sizer.Add(self.header_open_world)
+
+        header_sizer.AddSpacer(20)
+
+        self.header_open_mcworld = wx.Button(
+            self, label=lang.get("select_world.open_mcworld_button")
+        )
+        font = self.header_open_mcworld.GetFont()
+        font.SetPointSize(16)
+        self.header_open_mcworld.SetFont(font)
+        self.header_open_mcworld.Bind(wx.EVT_BUTTON, self._open_mcworld)
+        header_sizer.Add(self.header_open_mcworld)
+
+        header_sizer.AddStretchSpacer()
 
         content = ScrollableWorldsUI(self, open_world_callback)
         sizer.Add(content, 1, wx.EXPAND)
@@ -339,6 +361,66 @@ class WorldSelectUI(wx.Panel):
         finally:
             dir_dialog.Destroy()
         self.open_world_callback(path)
+
+    def _open_mcworld(self, evt):
+        mcworld_dialog = wx.FileDialog(
+            None,
+            lang.get("select_world.open_mcworld_dialogue"),
+            "",
+            style=wx.FD_DEFAULT_STYLE | wx.FD_FILE_MUST_EXIST,
+            wildcard="Bedrock world archive (*.mcworld)|*.mcworld",
+        )
+        try:
+            if mcworld_dialog.ShowModal() == wx.ID_CANCEL:
+                return
+            mcworld_path = mcworld_dialog.GetPath()
+        except Exception:
+            wx.LogError(lang.get("select_world.select_directory_failed"))
+            return
+        finally:
+            mcworld_dialog.Destroy()
+
+        dir_dialog = wx.DirDialog(
+            None,
+            lang.get("select_world.extract_mcworld_dialogue"),
+            "",
+            wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST,
+        )
+        try:
+            if dir_dialog.ShowModal() == wx.ID_CANCEL:
+                return
+            extract_dir = dir_dialog.GetPath()
+        except Exception:
+            wx.LogError(lang.get("select_world.select_directory_failed"))
+            return
+        finally:
+            dir_dialog.Destroy()
+
+        if next(os.scandir(extract_dir), None) is not None:
+            wx.LogError(lang.get("select_world.extracting_world_not_empty"))
+            return
+
+        busy_msg = wx.BusyInfo(lang.get("select_world.extracting_world_wait"))
+
+        try:
+            zipfile.ZipFile(mcworld_path).extractall(extract_dir)
+        except Exception as e:
+            del busy_msg
+            dialog = TracebackDialog(
+                self,
+                lang.get("select_world.extracting_world_failed"),
+                str(e),
+                traceback.format_exc(),
+            )
+            dialog.ShowModal()
+            dialog.Destroy()
+            return
+        else:
+            del busy_msg
+
+        wx.MessageBox(lang.get("select_world.extracting_world_finished"), "Info", wx.OK)
+
+        self.open_world_callback(extract_dir)
 
 
 class RecentWorldUI(wx.Panel):
