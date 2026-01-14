@@ -366,8 +366,7 @@ cdef tuple _create_lod0_chunk(
             chunk_offset[2]
         )
 
-    for i in prange(sub_chunk_count, nogil=True):
-    # for i in range(sub_chunk_count):
+    for i in prange(sub_chunk_count, nogil=True, num_threads=1):
         sub_chunk_verts[i] = create_lod0_sub_chunk(
             block_array_list[i],
             block_model_manager,
