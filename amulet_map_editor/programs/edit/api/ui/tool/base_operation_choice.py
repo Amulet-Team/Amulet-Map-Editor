@@ -98,38 +98,42 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         if operation_path:
             # only reload the operation if the
             operation = self._operations[operation_path]
-            if self._active_operation is not None:
-                self._active_operation.disable()
-            self._operation_sizer.Clear(delete_windows=True)
+            self.canvas.Freeze()
             try:
-                self._active_operation = operation(
-                    self.canvas, self.canvas, self.canvas.world
-                )
-                self._operation_sizer.Add(
-                    self._active_operation, *self._active_operation.wx_add_options
-                )
-                self._active_operation.enable()
-            except Exception as e:
-                # If something went wrong clear the created UI
-                self._active_operation = None
+                if self._active_operation is not None:
+                    self._active_operation.disable()
                 self._operation_sizer.Clear(delete_windows=True)
-                for window in self.canvas.GetChildren():
-                    window: wx.Window
-                    # remove orphaned windows.
-                    # If the Sizer.Add method was not run it will not be in self._operation_sizer
-                    if window.GetContainingSizer() is None:
-                        window.Destroy()
-                log.error("Error loading Operation UI.", exc_info=True)
-                dialog = TracebackDialog(
-                    self.canvas,
-                    "Error loading Operation UI.",
-                    str(e),
-                    traceback.format_exc(),
-                )
-                dialog.ShowModal()
-                dialog.Destroy()
+                try:
+                    self._active_operation = operation(
+                        self.canvas, self.canvas, self.canvas.world
+                    )
+                    self._operation_sizer.Add(
+                        self._active_operation, *self._active_operation.wx_add_options
+                    )
+                    self._active_operation.enable()
+                except Exception as e:
+                    # If something went wrong clear the created UI
+                    self._active_operation = None
+                    self._operation_sizer.Clear(delete_windows=True)
+                    for window in self.canvas.GetChildren():
+                        window: wx.Window
+                        # remove orphaned windows.
+                        # If the Sizer.Add method was not run it will not be in self._operation_sizer
+                        if window.GetContainingSizer() is None:
+                            window.Destroy()
+                    log.error("Error loading Operation UI.", exc_info=True)
+                    dialog = TracebackDialog(
+                        self.canvas,
+                        "Error loading Operation UI.",
+                        str(e),
+                        traceback.format_exc(),
+                    )
+                    dialog.ShowModal()
+                    dialog.Destroy()
+                finally:
+                    self._last_active_operation_id = operation.identifier
             finally:
-                self._last_active_operation_id = operation.identifier
+                self.canvas.Thaw()
                 self.Layout()
 
     def bind_events(self):
