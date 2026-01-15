@@ -30,13 +30,9 @@ class ExportSpongeSchematic(SimpleOperationPanel):
 
         options = self._load_options({})
 
-        self._file_picker = wx.FilePickerCtrl(
-            self,
-            path=options.get("path", ""),
-            wildcard="sponge schematic file (*.schem)|*.schem",
-            style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
+        self._path = options.get("path", "")
+
         )
-        self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
         self._version_define = VersionSelect(
             self,
             world.translation_manager,
@@ -53,10 +49,31 @@ class ExportSpongeSchematic(SimpleOperationPanel):
     def disable(self):
         self._save_options(
             {
-                "path": self._file_picker.GetPath(),
+                "path": self._path,
                 "version": self._version_define.version_number,
             }
         )
+
+    def _pre_operation(self) -> bool:
+        try:
+            path = os.path.realpath(self._path)
+            fname = os.path.basename(path)
+            fdir = os.path.dirname(path)
+        except:
+            fname = ""
+            fdir = ""
+        with wx.FileDialog(
+            self,
+            "Select Save Location",
+            defaultDir=fdir,
+            defaultFile=fname,
+            wildcard="sponge schematic file (*.schem)|*.schem",
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+        ) as file_dialog:
+            if file_dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            self._path = file_dialog.GetPath()
+        return True
 
     def _operation(
         self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
@@ -68,19 +85,15 @@ class ExportSpongeSchematic(SimpleOperationPanel):
                 "The Sponge Schematic format only supports a single selection box."
             )
 
-        path = self._file_picker.GetPath()
-        version = self._version_define.version_number
+        path = self._path
         if isinstance(path, str):
             wrapper = SpongeSchemFormatWrapper(path)
-            if wrapper.exists:
-                response = wx.MessageDialog(
-                    self,
-                    f"A file is already present at {path}. Do you want to continue?",
-                    style=wx.YES | wx.NO,
-                ).ShowModal()
-                if response == wx.ID_CANCEL:
-                    return
-            wrapper.create_and_open("java", version, selection, True)
+            wrapper.create_and_open(
+                "java",
+                self._version_define.version_number,
+                selection,
+                True,
+            )
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))

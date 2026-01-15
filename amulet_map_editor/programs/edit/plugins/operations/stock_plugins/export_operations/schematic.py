@@ -41,13 +41,8 @@ class ExportSchematic(SimpleOperationPanel):
 
         options = self._load_options({})
 
-        self._file_picker = wx.FilePickerCtrl(
-            self,
-            path=options.get("path", ""),
-            wildcard="Schematic file (*.schematic)|*.schematic",
-            style=wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE,
-        )
-        self._sizer.Add(self._file_picker, 0, wx.ALL | wx.CENTER, 5)
+        self._path = options.get("path", "")
+
         self._platform_define = PlatformSelect(
             self,
             world.translation_manager,
@@ -61,16 +56,38 @@ class ExportSchematic(SimpleOperationPanel):
             wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.CENTER,
             5,
         )
+
         self._add_run_button("Export")
         self.Layout()
 
     def disable(self):
         self._save_options(
             {
-                "path": self._file_picker.GetPath(),
+                "path": self._path,
                 "platform": self._platform_define.platform,
             }
         )
+
+    def _pre_operation(self) -> bool:
+        try:
+            path = os.path.realpath(self._path)
+            fname = os.path.basename(path)
+            fdir = os.path.dirname(path)
+        except:
+            fname = ""
+            fdir = ""
+        with wx.FileDialog(
+            self,
+            "Select Save Location",
+            defaultDir=fdir,
+            defaultFile=fname,
+            wildcard="Schematic file (*.schematic)|*.schematic",
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+        ) as file_dialog:
+            if file_dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            self._path = file_dialog.GetPath()
+        return True
 
     def _operation(
         self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
@@ -82,18 +99,10 @@ class ExportSchematic(SimpleOperationPanel):
                 "The schematic format only supports a single selection box."
             )
 
-        path = self._file_picker.GetPath()
+        path = self._path
         platform = self._platform_define.platform
         if isinstance(path, str):
             wrapper = SchematicFormatWrapper(path)
-            if wrapper.exists:
-                response = wx.MessageDialog(
-                    self,
-                    f"A file is already present at {path}. Do you want to continue?",
-                    style=wx.YES | wx.NO,
-                ).ShowModal()
-                if response == wx.ID_CANCEL:
-                    return
             wrapper.create_and_open(platform, (1, 12, 2), selection, True)
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]

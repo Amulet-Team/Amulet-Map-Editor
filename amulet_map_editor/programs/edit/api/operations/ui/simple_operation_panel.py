@@ -32,11 +32,22 @@ class SimpleOperationPanel(wx.Panel, DefaultOperationUI):
         self.Layout()
 
     def _run_operation(self, _):
+        if not self._pre_operation():
+            return
         self.canvas.run_operation(
             lambda: self._operation(
                 self.world, self.canvas.dimension, self.canvas.selection.selection_group
             )
         )
+
+    def _pre_operation(self) -> bool:
+        """
+        Run code before running the operation.
+        This code is not included in the operation time.
+        This can be used to get extra options e.g. a save location.
+        Return True to continue with the operation.
+        """
+        return True
 
     def _operation(
         self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
