@@ -61,7 +61,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             wildcard_properties=True,
             show_pick_block=True
         )
-        self._sizer.Add(self._original_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._sizer.Add(self._original_block, 1, wx.ALL | wx.EXPAND, 5)
         self._original_block.Bind(EVT_PICK, lambda evt: self._on_pick_block_button(1))
         self._replacement_block = BlockDefine(
             self,
@@ -74,7 +74,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             show_pick_block=True
         )
         self._sizer.Add(
-            self._replacement_block, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5
+            self._replacement_block, 1, wx.ALL | wx.EXPAND, 5
         )
         self._replacement_block.Bind(
             EVT_PICK, lambda evt: self._on_pick_block_button(2)
@@ -82,7 +82,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
-        self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self._sizer.Add(self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5)
 
         self.Layout()
         self.Thaw()

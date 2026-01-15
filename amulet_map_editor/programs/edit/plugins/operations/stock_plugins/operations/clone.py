@@ -46,6 +46,7 @@ class Clone(SimpleOperationPanel):
         options_path: str,
     ):
         SimpleOperationPanel.__init__(self, parent, canvas, world, options_path)
+        self._sizer.AddSpacer(5)
         self._add_run_button()
         self.Layout()
 

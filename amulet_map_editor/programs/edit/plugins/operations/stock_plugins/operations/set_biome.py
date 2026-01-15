@@ -93,7 +93,7 @@ class SetBiome(SimpleOperationPanel):
             show_pick_biome=True,
         )
         self._biome_choice.Bind(EVT_PICK, self._on_pick_biome_button)
-        self._sizer.Add(self._biome_choice, 1, Border, 5)
+        self._sizer.Add(self._biome_choice, 1, wx.ALL | wx.EXPAND, 5)
 
         self._add_run_button()
 

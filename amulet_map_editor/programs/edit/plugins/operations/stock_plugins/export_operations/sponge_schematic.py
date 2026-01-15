@@ -44,7 +44,9 @@ class ExportSpongeSchematic(SimpleOperationPanel):
             allowed_platforms=("java",),
             allow_numerical=False,
         )
-        self._sizer.Add(self._version_define, 0, wx.CENTRE, 5)
+        self._sizer.Add(
+            self._version_define, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
+        )
         self._add_run_button("Export")
         self.Layout()
 

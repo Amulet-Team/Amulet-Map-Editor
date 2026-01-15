@@ -54,11 +54,11 @@ class ExportSchematic(SimpleOperationPanel):
             options.get("platform", None) or world.level_wrapper.platform,
             allow_universal=False,
         )
-        self._sizer.Add(self._platform_define, 0, wx.CENTRE, 5)
+        self._sizer.Add(self._platform_define, 0, wx.ALL | wx.EXPAND, 5)
         self._sizer.Add(
             wx.StaticText(self, label=WarningMsg, style=wx.ALIGN_CENTRE_HORIZONTAL),
             0,
-            wx.ALL | wx.CENTER,
+            wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.CENTER,
             5,
         )
         self._add_run_button("Export")

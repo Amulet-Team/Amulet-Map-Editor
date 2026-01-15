@@ -43,7 +43,8 @@ class ExportConstruction(SimpleOperationPanel):
             options.get("platform", None) or world.level_wrapper.platform,
             allow_universal=False,
         )
-        self._sizer.Add(self._version_define, 0, wx.CENTRE, 5)
+        self._sizer.Add(self._version_define, 0, wx.ALL | wx.EXPAND, 5)
+
         self._add_run_button("Export")
         self.Layout()
 
