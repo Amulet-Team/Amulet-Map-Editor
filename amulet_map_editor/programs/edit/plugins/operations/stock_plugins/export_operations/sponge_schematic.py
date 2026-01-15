@@ -32,7 +32,21 @@ class ExportSpongeSchematic(SimpleOperationPanel):
 
         self._path = options.get("path", "")
 
+        self._schematic_version_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._schematic_version_label = wx.StaticText(self, label="Schematic Version:")
+        self._schematic_version_choice = wx.Choice(self, choices=["2", "3"])
+        self._schematic_version_choice.SetSelection(1)
+        self._schematic_version_sizer.Add(
+            self._schematic_version_label, 0, wx.RIGHT | wx.CENTER, 5
         )
+        self._schematic_version_sizer.Add(self._schematic_version_choice, 1, wx.CENTRE)
+        self._sizer.Add(
+            self._schematic_version_sizer,
+            0,
+            wx.ALL | wx.EXPAND,
+            5,
+        )
+
         self._version_define = VersionSelect(
             self,
             world.translation_manager,
@@ -88,11 +102,18 @@ class ExportSpongeSchematic(SimpleOperationPanel):
         path = self._path
         if isinstance(path, str):
             wrapper = SpongeSchemFormatWrapper(path)
+            if self._schematic_version_choice.GetStringSelection() == "2":
+                schematic_version = 2
+            elif self._schematic_version_choice.GetStringSelection() == "3":
+                schematic_version = 3
+            else:
+                raise OperationError("Unrecognised Schematic Version.")
             wrapper.create_and_open(
                 "java",
                 self._version_define.version_number,
                 selection,
                 True,
+                schematic_version=schematic_version,
             )
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
