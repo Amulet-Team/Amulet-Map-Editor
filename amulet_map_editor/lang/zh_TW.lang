@@ -67,79 +67,94 @@
 #重要說明
 ##如果您想為使用者介面（UI）的翻譯做出貢獻，請閱讀位於'/contributing/lang.md'的相應貢獻檔案
 ##每個翻譯條目必須按以下管道編寫：'unique.identifier=UI中顯示的文字'
-##唯一識別字由開發人員定義。 為了瞭解現有的識別字，請參攷'en.lang'檔案
+##唯一識別字由開發人員定義。 為了瞭解現有的識別字，請參考'en.lang'檔案
 
-#加載順序和特定區域的翻譯
-##首先加載'en.lang'以確保任何給定鍵都至少有一些內容
-##然後，如果語言程式碼包含“_”符號（例如“fr_CA”），則會接下來加載語言部分（“fr”）的語言檔案（“fr.lang”）
-##最後，如果存在，將加載特定區域的語言檔案（“fr_CA.lang”），該檔案應僅包含區域間不同的條目
-##這允許在區域間差异不大的語言共亯相同的語言檔案，以减少重複
+#載入順序和特定區域的翻譯
+##首先載入'en.lang'以確保所有按鍵都至少有一些內容
+##然後，如果語言程式碼包含“_”符號（例如“fr_CA”），則會載入語言部分（“fr”）的語言檔案（“fr.lang”）
+##最後，如果存在，將載入特定區域的語言檔案（“fr_CA.lang”），該檔案應只包含區域之間有不同翻譯的條目
+##這允許在區域間差異不大的語言共享相同的語言檔案，以減少重複
 
-#翻譯檔案中支持的功能
-##您可以通過在行的第一個（非空格）字元處使用“#”符號來編寫注釋行。 不支持行內注釋
+#翻譯檔案中支援的功能
+##您可以通過在每一行的第一個（非空格）字元處使用“#”符號來編寫注釋行。 但不可以行內注釋
 ##翻譯字串中的任何“\n”都將在UI中轉換為新行
 
 #關於功能表列
-##在此上下文中，“&”符號是一個特殊字元。 它不會在UI中顯示，但會在按下“alt”鍵時將隨後的字元定義為快速鍵（警告：帶重音的字母是它們自己的字元（é≠e））
-##示例：“&File”在UI中翻譯為“File”，但允許用戶按“alt+f”打開相應的選單
+##在此上下文中，“&”符號是一個特殊字元。 它不會在UI中顯示，但會在按下“alt”鍵時將隨後的字元定義為便捷鍵（警告：帶變音符號的字母與原來的字母並不一樣（é≠e））
+##示例：“&File”在UI中會顯示為“File”，但用戶可以按“alt+f”打開相應的選單
 ##更多資訊可訪問： https://docs.wxpython.org/wx.MenuItem.html#wx.MenuItem.SetItemLabel
+##注意：在中文環境中，便捷鍵必須獨立標示在譯文之後！（示例：“&File”應該翻譯為"檔案(&F)"）。以往有譯者在翻譯後直接把“&”符號留在原來位置，導致便捷鍵被設定為中文而無法正常使用。
 
-#關於f字串
-##在某些條目中使用了“{variable}”模式，此模式允許應用程序在文字中輸入值
-##示例：“There are {n} changes”在UI中翻譯為“There are 2 changes”
+#關於格式化字串（fstring）
+##在某些條目中使用了“{variable}”格式，這允許應用程式在文字中直接輸入值
+##示例：“There are {n} changes”在UI中會顯示為“There are 2 changes”
 ##為了使翻譯條目正常工作，此模式必須保留在翻譯條目中
 
 # 中繼資料
 meta.amulet=Amulet
 
 # 共享字串
-shared.check_console=查看控制台以獲得更多詳細資訊。
+shared.check_console=查看控制台以取得更多詳細資訊。
 
-# 應用程序
-app.world_still_used=仍在使用一個世界。請先關閉它
-app.browser_open_tooltip=點擊將在瀏覽器中打開頁面
+# 應用程式
+app.world_still_used=有世界仍在使用中。請先關閉它
+app.browser_open_tooltip=按下將在瀏覽器中打開頁面
 
 # 世界
 world.java_platform=Java
 world.bedrock_uwp=Bedrock UWP
+world.bedrock_uwp_beta=Bedrock UWP 測試版
+world.bedrock_gdk=Bedrock GDK
+world.bedrock_gdk_preview=Bedrock GDK 預覽版
 world.bedrock_education_store=教育版（商店）
 world.bedrock_education_desktop=教育版（桌面）
 world.bedrock_netease=Bedrock（網易）
 world.close_world=關閉世界
 
-# 菜單欄
-## 屏幕頂部的菜單
-menu_bar.file.menu_name=&文件
-menu_bar.file.open_world=打開世界
+# 選單欄
+## 畫面頂部的選單
+menu_bar.file.menu_name=檔案(&F)
+menu_bar.file.open_world=開啟世界
 menu_bar.file.close_world=關閉世界
 menu_bar.file.quit=退出
-menu_bar.options.menu_name=&選項
-menu_bar.help.menu_name=&幫助
+menu_bar.options.menu_name=選項(&O)
+menu_bar.help.menu_name=說明(&H)
 
-# 主菜單
-## 開始屏幕
-main_menu.tab_name=主菜單
-main_menu.open_world=打開世界
+# 主選單
+## 開始畫面
+main_menu.tab_name=主選單
+main_menu.open_world=開啟世界
 main_menu.user_manual=用戶手冊
-main_menu.bug_tracker=錯誤跟蹤器
+main_menu.bug_tracker=錯誤追蹤器
 main_menu.discord=Amulet Discord
-main_menu.our_sponsors=我們的贊助商
-main_menu.sponsor_link=(贊助我們，讓您的名字出現在這裡)
+main_menu.our_sponsors=我們的贊助者
+main_menu.sponsor_link=(在GitHub贊助我們，讓您的名字出現在這裡)
 
 # 語言選擇
 language_select.title=選擇語言
 language_select.help=從下面的列表中選擇要在Amulet中使用的語言。
-language_select.contribute=如果您想修復或添加翻譯，請點擊這裡。
+language_select.contribute=如果您想改善或增加翻譯，請點擊這裡。
+
+# 資助視窗
+licence_dialog.title=Amulet
+licence_dialog.header=您必須擁有許可證才能使用Amulet。
+licence_dialog.quit_button=關閉Amulet。
+licence_dialog.continue_button=我有許可證。
+licence_dialog.buy_button=購買許可證。
+licence_dialog.content_1=由2025年12月11日起，您必須擁有許可證才能使用Amulet。
+licence_dialog.content_2=Pathway Studios在過去六年裡一直在資助 Amulet 的開發，但他們已決定從2026年起停止資助。
+licence_dialog.content_3=我一直希望Amulet能免費提供給那些經濟有困難的用戶使用。這在Pathway Studios資助這個計畫期間確實實現了，但這段時間已經結束了。我認為唯一能夠支持Amulet持續開發的方法就是向用戶收費。我明白這個決定可能不受歡迎，但這是我能想到的唯一讓Amulet繼續運作下去的方法。
+licence_dialog.content_4=Amulet的未來 \n在過去兩年，我一直在從零開始重寫Amulet。 \n現在，大部分函式庫都使用C++編寫，以提高速度和平行運算能力。而新應用程式則使用Qt來提供更多針對使用者介面的控制。 \n現在，重寫後的版本距離能夠完全取代目前版本的Amulet還有一段路要走，但如果資金允許，重寫後的測試版本應該很快就會發布。
 
 # 警告對話框
 warning_dialog.title=歡迎使用Amulet
-warning_dialog.content=您好，歡迎使用Amulet。 \n\n我們建議在Amulet中打開世界之前先備份您的世界。 \n\n我們努力確保Amulet不會損壞世界，但保存格式沒有檔案記錄且不斷變化，有時我們也會出現錯誤。 \n\n出於這些原因，我們僅支持經過測試的正式版Minecraft。 \nJava快照、Bedrock測試版和實驗性功能可能可以工作，但未經測試，囙此不正式支持。 \n\n現時不支持實體，且項目僅在同一平臺內支持。 \n如果您發現需要添加的功能或需要修復的錯誤，請在我們的錯誤跟踪器中報告。 \n在創建新議題之前，請使用搜索工具查看是否已有人報告過。 \n\n如果您是新手，我們建議您閱讀用戶手冊以熟悉程式。 \n\n- Amulet團隊
+warning_dialog.content=您好，歡迎使用Amulet。 \n\n我們建議在Amulet中開啟世界之前先備份您的世界。 \n\n我們努力確保Amulet不會損壞世界，但儲存格式的說明文件不足且不斷變化，有時我們也會出現錯誤。 \n\n出於這些原因，我們僅支援經過測試的正式版Minecraft。 \nJava快照、Bedrock測試版和實驗性功能或者能正常使用，但未經測試，因此不正式支援。 \n\n現時我們暫不支援修改實體，而物品則僅支援在同一平臺內修改。 \n如果您發現需要增加的功能或需要修復的錯誤，請在我們的錯誤追蹤器中報告。 \n在建立新議題之前，請使用搜尋工具查看是否已有人報告過。 \n\n如果您是新手，我們建議您閱讀用戶手冊以熟悉程式。 \n\n- Amulet團隊
 warning_dialog.do_not_show_again=不再顯示
 warning_dialog.i_understand=我已瞭解
 
 # 更新檢查
 ## 當Amulet有新版本可用時顯示的窗口
-update_check.newer_version_released=Amulet的新版本已發布！
+update_check.newer_version_released=Amulet的新版本已經發布！
 update_check.new_version=新版本：
 update_check.current_version=您的版本：
 update_check.update=轉到下載頁面
@@ -148,18 +163,31 @@ update_check.ok=確定
 # 選擇世界
 ## 選擇要打開的世界時顯示的窗口
 select_world.title=選擇世界
-select_world.open_world_warning=請在Amulet中打開之前，先在遊戲中和其他工具中關閉世界。
-select_world.open_world_button=打開其他世界
+select_world.open_world_warning=在Amulet中開啟世界之前，請先在遊戲和其他工具中關閉該世界。
+select_world.open_world_button=開啟世界目錄
 select_world.open_world_dialogue=選擇Minecraft世界目錄
 select_world.select_directory_failed=無法打開目錄！
+select_world.open_mcworld_button=開啟基岩版 .mcworld 檔案
+select_world.open_mcworld_dialogue=選擇 .mcworld 檔案
+select_world.extract_mcworld_dialogue=選擇存放解壓縮 .mcworld 檔案後的文件的目錄
+select_world.extracting_world_wait=正在解壓縮世界。請稍候。
+select_world.extracting_world_not_empty=所選的目錄必須是空的。
+select_world.extracting_world_failed=解壓縮世界失敗。
+select_world.extracting_world_finished=解壓縮世界完成。 Amulet將編輯已解壓縮的世界。
 select_world.recent_worlds=最近打開的世界
-select_world.no_loader_found=無法為此世界找到加載器。
-select_world.loading_world_failed=加載世界時出錯。
+select_world.no_loader_found=無法為這個世界找到載入器。
+select_world.loading_world_failed=載入世界時發生錯誤。
+
+# 按鍵設定視窗
+key_config.key_select=選擇按鍵
+key_config.press_label=請按下您想要指定為 {action} 的按鍵
+key_config.enter_group_name=請輸入一個新的群組名稱。
+key_config.active_not_editable=作用中的按鍵群組是無法編輯的。你想建立一個新群組來編輯嗎？
 
 # 關於
 ## 打開世界時的預設程式
 program_about.tab_name=關於
-program_about.currently_opened_world=當前打開的世界：
+program_about.currently_opened_world=目前開啟中的世界：
 program_about.choose_from_options=從左側的選項中選擇您想要執行的操作。\n您可以隨時在這些選項之間切換。
 
 # 轉換
@@ -171,7 +199,7 @@ program_convert.output_world=輸出世界：
 program_convert.select_output_world=選擇輸出世界
 program_convert.input_output_must_different=輸入和輸出世界必須不同！
 program_convert.select_before_converting=在轉換之前請選擇一個世界！
-program_convert.conversion_completed=世界轉換完成
+program_convert.conversion_completed=世界轉換完成。 \n您可能需要傳送到正確的位置以檢視已完成轉換的區塊。
 
 ## 選單列
 program_convert.menu_bar.help.user_guide=用戶指南（線上）
@@ -181,25 +209,46 @@ program_convert.menu_bar.help.user_guide=用戶指南（線上）
 program_3d_edit.tab_name=3D 編輯器
 
 ## 畫布
-program_3d_edit.canvas.please_wait=請等待渲染器加載
+program_3d_edit.canvas.please_wait=請等待渲染器載入
 program_3d_edit.canvas.downloading_bedrock_vanilla_resource_pack=正在下載Bedrock原版資源包
 program_3d_edit.canvas.downloading_java_vanilla_resource_pack=正在下載Java原版資源包
 program_3d_edit.canvas.java_rp_failed=無法下載最新的Java資源包。
 program_3d_edit.canvas.java_rp_failed_default=請檢查您的網絡連接並重啟Amulet。
-program_3d_edit.canvas.java_rp_failed_mac_certificates=未安裝訪問互聯網的證書。\n運行位於“應用程式/Python 3.x”中的“Install Certificates.command”程式。
-program_3d_edit.canvas.loading_resource_packs=正在加載資源包
-program_3d_edit.canvas.retry_download=資源包下載失敗。您想重試嗎？
-program_3d_edit.canvas.creating_texture_atlas=正在創建紋理圖集
-program_3d_edit.canvas.setting_up_renderer=正在設置渲染器
+program_3d_edit.canvas.java_rp_failed_mac_certificates=未安裝訪問網際網路的證書。\n請執行位於“應用程式/Python 3.x”中的“Install Certificates.command”程式。
+program_3d_edit.canvas.loading_resource_packs=正在載入資源包
+program_3d_edit.canvas.retry_download=資源包下載失敗。您想要重試嗎？
+program_3d_edit.canvas.creating_texture_atlas=正在建立紋理圖集
+program_3d_edit.canvas.setting_up_renderer=正在設定渲染器
+
+## 控制
+action.act_move_up=向上移動
+action.act_move_down=向下移動
+action.act_move_forwards=向前移動
+action.act_move_backwards=向後移動
+action.act_move_left=向左移動
+action.act_move_right=向右移動
+action.act_box_click=選取選擇框
+action.act_box_click_add=增加選擇框
+action.act_change_mouse_mode=旋轉相機
+action.act_incr_speed=提升速度 (3D)
+action.act_decr_speed=減少速度 (3D)
+action.act_zoom_in=放大 (2D)
+action.act_zoom_out=縮小 (2D)
+action.act_incr_select_distance=增加選取距離
+action.act_decr_select_distance=減少選取距離
+action.act_deselect_all_boxes=取消選取所有選擇框
+action.act_deselect_box=取消作用中的選擇框
+action.act_inspect_block=檢查方塊
+action.act_change_projection=切換投影模式
 
 ## 選單列
-program_3d_edit.menu_bar.file.save=保存
+program_3d_edit.menu_bar.file.save=儲存
 program_3d_edit.menu_bar.edit.menu_name=編輯(&E)
 program_3d_edit.menu_bar.edit.undo=撤銷
 program_3d_edit.menu_bar.edit.redo=重做
-program_3d_edit.menu_bar.edit.cut=剪切
+program_3d_edit.menu_bar.edit.cut=剪下
 program_3d_edit.menu_bar.edit.copy=複製
-program_3d_edit.menu_bar.edit.paste=粘貼
+program_3d_edit.menu_bar.edit.paste=貼上
 program_3d_edit.menu_bar.edit.delete=刪除方塊
 program_3d_edit.menu_bar.edit.goto=前往
 program_3d_edit.menu_bar.edit.select_all=全選
@@ -211,11 +260,11 @@ program_3d_edit.menu_bar.help.user_guide=用戶指南（線上）
 program_3d_edit.select_tool.delete_button=刪除方塊
 program_3d_edit.select_tool.delete_button_tooltip=刪除選定區域內的方塊。
 program_3d_edit.select_tool.copy_button=複製
-program_3d_edit.select_tool.copy_button_tooltip=將選定區域複製到稍後粘貼。可以粘貼到任何世界和維度。
-program_3d_edit.select_tool.cut_button=剪切
-program_3d_edit.select_tool.cut_button_tooltip=將選定區域複製到稍後粘貼並刪除。可以粘貼到任何世界和維度。
-program_3d_edit.select_tool.paste_button=粘貼
-program_3d_edit.select_tool.paste_button_tooltip=將之前複製或剪切的區域粘貼到世界中。
+program_3d_edit.select_tool.copy_button_tooltip=將選定區域複製到稍後貼上。可以在任何世界和維度貼上。
+program_3d_edit.select_tool.cut_button=剪下
+program_3d_edit.select_tool.cut_button_tooltip=將選定區域複製到稍後貼上並刪除。可以在任何世界和維度貼上。
+program_3d_edit.select_tool.paste_button=貼上
+program_3d_edit.select_tool.paste_button_tooltip=將之前複製或剪下的區域貼上到世界中。
 program_3d_edit.select_tool.scroll_point_x1=x1
 program_3d_edit.select_tool.scroll_point_y1=y1
 program_3d_edit.select_tool.scroll_point_z1=z1
@@ -229,16 +278,16 @@ program_3d_edit.select_tool.scroll_point_x2_tooltip=設置活動框藍色角的x
 program_3d_edit.select_tool.scroll_point_y2_tooltip=設置活動框藍色角的y坐標。鍵入數字或在懸停時滾動滾輪。
 program_3d_edit.select_tool.scroll_point_z2_tooltip=設置活動框藍色角的z坐標。鍵入數字或在懸停時滾動滾輪。
 program_3d_edit.select_tool.box_size_selector_fstring=dx={x},dy={y},dz={z}
-program_3d_edit.select_tool.box_size_selector_tooltip=使用Minecraft體積選擇器符號表示的活動選擇區域的形狀。
-program_3d_edit.select_tool.box_size_tooltip=活動選擇框的大小（以方塊為單位）。
+program_3d_edit.select_tool.box_size_selector_tooltip=使用Minecraft體積選擇器符號表示的作用中的選擇區域的形狀。
+program_3d_edit.select_tool.box_size_tooltip=作用中的選擇框的大小（以方塊為單位）。
 program_3d_edit.select_tool.button_point1=移動點1
 program_3d_edit.select_tool.button_point1_tooltip=按下並按住此按鈕，然後使用移動控件來移動綠色選擇點。
 program_3d_edit.select_tool.button_point2=移動點2
 program_3d_edit.select_tool.button_point2_tooltip=按下並按住此按鈕，然後使用移動控件來移動藍色選擇點。
 program_3d_edit.select_tool.button_selection_box=移動框
-program_3d_edit.select_tool.button_selection_box_tooltip=按下並按住此按鈕，然後使用移動控件來移動活動框。
+program_3d_edit.select_tool.button_selection_box_tooltip=按下並按住此按鈕，然後使用移動控件來移動作用中的選擇框。
 
-## 粘貼工具
+## 粘貼(貼上)工具
 program_3d_edit.paste_tool.location_label=位置
 program_3d_edit.paste_tool.location_x_label=x
 program_3d_edit.paste_tool.location_x_tooltip=選擇中心將放置的x位置。可以鍵入數字、懸停時滾動滾輪或使用箭頭鍵來更改。
@@ -268,38 +317,38 @@ program_3d_edit.paste_tool.scale_z_label=z
 program_3d_edit.paste_tool.scale_z_tooltip=模型在z軸上的縮放比例。
 program_3d_edit.paste_tool.mirror_horizontal_tooltip=相對於攝像機查看的方向水平鏡像選擇區域。
 program_3d_edit.paste_tool.mirror_vertical_tooltip=相對於攝像機查看的方向垂直鏡像選擇區域。
-program_3d_edit.paste_tool.copy_air_label=粘貼空氣
-program_3d_edit.paste_tool.copy_air_tooltip=如果啟用，則粘貼結構中的所有空氣塊將覆蓋現有塊。 如果禁用，則這些位置的現有塊將保持不變，且不會複製空氣。
-program_3d_edit.paste_tool.copy_water_label=粘貼水
-program_3d_edit.paste_tool.copy_water_tooltip=如果啟用，則粘貼結構中的所有水塊將覆蓋現有塊。如果禁用，則這些位置的現有塊將保持不變，且不會復製水。
-program_3d_edit.paste_tool.copy_lava_label=粘貼岩漿
-program_3d_edit.paste_tool.copy_lava_tooltip=如果啟用，則粘貼結構中的所有岩漿塊將覆蓋現有塊。如果禁用，則這些位置的現有塊將保持不變，且不會復製岩漿。
+program_3d_edit.paste_tool.copy_air_label=貼上空氣
+program_3d_edit.paste_tool.copy_air_tooltip=如果啟用，則待貼上結構中的空氣方塊將覆蓋現有方塊。如果禁用，則這些位置的現有方塊將保持不變，且不會複製空氣。
+program_3d_edit.paste_tool.copy_water_label=貼上水
+program_3d_edit.paste_tool.copy_water_tooltip=如果啟用，則待貼上結構中的水方塊將覆蓋現有方塊。如果禁用，則這些位置的現有方塊將保持不變，且不會複製水。
+program_3d_edit.paste_tool.copy_lava_label=貼上岩漿
+program_3d_edit.paste_tool.copy_lava_tooltip=如果啟用，則待貼上結構中的岩漿方塊將覆蓋現有方塊。如果禁用，則這些位置的現有方塊將保持不變，且不會複製岩漿。
 program_3d_edit.paste_tool.confirm_label=確認
-program_3d_edit.paste_tool.confirm_tooltip=點擊以將結構粘貼到世界的指定位置、旋轉和縮放。
-program_3d_edit.paste_tool.zero_scale_message=其中一個縮放值為零，因此沒有復製任何內容。
+program_3d_edit.paste_tool.confirm_tooltip=按下以將結構貼上到世界的指定位置、旋轉和縮放。
+program_3d_edit.paste_tool.zero_scale_message=其中一個縮放值為零，因此沒有複製任何內容。
 
 ## 區塊工具
 program_3d_edit.chunk_tool.min_y=最小Y值
 program_3d_edit.chunk_tool.min_y_tooltip=在頂視圖中繪製時的最小y坐標。這可用於查看世界的一個切片，有助於觀察如下界和洞穴等維度。
 program_3d_edit.chunk_tool.max_y=最大Y值
 program_3d_edit.chunk_tool.max_y_tooltip=在頂視圖中繪製時的最大y坐標。這可用於查看世界的一個切片，有助於觀察如下界和洞穴等維度。
-program_3d_edit.chunk_tool.create_chunks=創建空區塊
-program_3d_edit.chunk_tool.create_chunks_tooltip=在所選區域內創建所有尚不存在的區塊。已存在的區塊將保持不變。
+program_3d_edit.chunk_tool.create_chunks=建立空區塊
+program_3d_edit.chunk_tool.create_chunks_tooltip=在所選範圍中尚未建立區塊的區域建立新區塊。已建立的區塊將保持不變。
 program_3d_edit.chunk_tool.delete_chunks=刪除區塊
-program_3d_edit.chunk_tool.delete_chunks_tooltip=刪除所選的區塊。這將刪除實際的區塊及其包含的所有數據。下次在遊戲中加載該區域時，將重新創建這些區塊。
+program_3d_edit.chunk_tool.delete_chunks_tooltip=刪除所選的區塊。這將刪除實際的區塊及其包含的所有數據。下次在遊戲中載入該區域時，將重新建立這些區塊。
 program_3d_edit.chunk_tool.prune_chunks=刪除未選中的區塊
-program_3d_edit.chunk_tool.prune_chunks_tooltip=刪除所有未選中的區塊。這將刪除實際的區塊及其包含的所有數據。下次在遊戲中加載該區域時，將重新創建這些區塊。
+program_3d_edit.chunk_tool.prune_chunks_tooltip=刪除所有未選中的區塊。這將刪除實際的區塊及其包含的所有數據。下次在遊戲中載入該區域時，將重新建立這些區塊。
 
 ## 傳送/瞬移視窗
 program_3d_edit.goto_ui.title=傳送
 program_3d_edit.goto_ui.x_label=x:
-program_3d_edit.goto_ui.x_label_tooltip=相機的x坐標。輸入坐標以傳送到指定位置。Ctrl + C複製坐標，Ctrl + V粘貼。
+program_3d_edit.goto_ui.x_label_tooltip=相機的x坐標。輸入坐標以傳送到指定位置。Ctrl + C複製坐標，Ctrl + V貼上。
 program_3d_edit.goto_ui.y_label=y:
-program_3d_edit.goto_ui.y_label_tooltip=相機的y坐標。輸入坐標以傳送到指定位置。Ctrl + C複製坐標，Ctrl + V粘貼。
+program_3d_edit.goto_ui.y_label_tooltip=相機的y坐標。輸入坐標以傳送到指定位置。Ctrl + C複製坐標，Ctrl + V貼上。
 program_3d_edit.goto_ui.z_label=z:
-program_3d_edit.goto_ui.z_label_tooltip=相機的z坐標。輸入坐標以傳送到指定位置。Ctrl + C複製坐標，Ctrl + V粘貼。
+program_3d_edit.goto_ui.z_label_tooltip=相機的z坐標。輸入坐標以傳送到指定位置。Ctrl + C複製坐標，Ctrl + V貼上。
 program_3d_edit.goto_ui.copy_button_tooltip=將x、y和z值以“0.0 0.0 0.0”（分別為x、y和z）的形式複製到剪貼板
-program_3d_edit.goto_ui.paste_button_tooltip=將之前複製的坐標粘貼到輸入框中。複製的值必須是三個由空格或逗號分隔的數字。
+program_3d_edit.goto_ui.paste_button_tooltip=將之前複製的坐標貼上到輸入框中。複製的值必須是三個由空格或逗號分隔的數字。
 
 ## 文件面板
 program_3d_edit.file_ui.version_tooltip=世界的平臺和數據版本
@@ -307,9 +356,9 @@ program_3d_edit.file_ui.projection_tooltip=改變視圖
 program_3d_edit.file_ui.location_tooltip=移動相機
 program_3d_edit.file_ui.speed_blocks_per_second=b/s
 program_3d_edit.file_ui.speed_tooltip=相機速度（每秒移動的方塊數）
-program_3d_edit.file_ui.speed_dialog_name=設置相機速度
+program_3d_edit.file_ui.speed_dialog_name=設定相機速度
 program_3d_edit.file_ui.dim_tooltip=選擇維度
 program_3d_edit.file_ui.undo_tooltip=撤銷
 program_3d_edit.file_ui.redo_tooltip=重做
-program_3d_edit.file_ui.save_tooltip=保存更改
+program_3d_edit.file_ui.save_tooltip=儲存更改
 program_3d_edit.file_ui.close_tooltip=關閉世界
