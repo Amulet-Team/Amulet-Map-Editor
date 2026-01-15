@@ -202,17 +202,20 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
                 evt.Veto()
 
     def _page_changing(self, evt: wx.BookCtrlEvent):
-        if (
-            evt.GetOldSelection() != wx.NOT_FOUND
-            and not self.GetPage(evt.GetOldSelection()).can_disable()
-        ):
-            evt.Veto()
+        old_selection_index = evt.GetOldSelection()
+        if old_selection_index != wx.NOT_FOUND:
+            old_page = self.GetPage(old_selection_index)
+            if old_page is not None and not old_page.can_disable():
+                evt.Veto()
 
     def _page_changed(self, evt: wx.BookCtrlEvent):
         """Handle the page changing."""
         if evt.GetOldSelection() != evt.GetSelection():
             if evt.GetOldSelection() != wx.NOT_FOUND:
-                self.GetPage(evt.GetOldSelection()).disable()
+                # self.GetPage(evt.GetOldSelection()).disable()
+                old_page = self.GetPage(evt.GetOldSelection())
+                if old_page is not None:
+                    old_page.disable()
 
             if self.GetCurrentPage() is self._main_menu:
                 self.SetAGWWindowStyleFlag(NOTEBOOK_MENU_STYLE)
