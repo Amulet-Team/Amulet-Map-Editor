@@ -65,7 +65,9 @@ class Fill(wx.Panel, DefaultOperationUI):
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
-        self._sizer.Add(self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5)
+        self._sizer.Add(
+            self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
+        )
 
         self.Layout()
         self.Thaw()

@@ -28,7 +28,9 @@ class SimpleOperationPanel(wx.Panel, DefaultOperationUI):
     def _add_run_button(self, label="Run Operation"):
         self._run_button = wx.Button(self, label=label)
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
-        self._sizer.Add(self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5)
+        self._sizer.Add(
+            self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
+        )
         self.Layout()
 
     def _run_operation(self, _):
