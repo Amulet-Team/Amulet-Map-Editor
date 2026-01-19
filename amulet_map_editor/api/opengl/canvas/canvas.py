@@ -95,9 +95,14 @@ class BaseCanvas(GLCanvas):
         return str(id(self._context))
 
     def _on_show(self, evt: wx.ShowEvent):
-        if not self._init and evt.IsShown():
-            self._init = True
-            self._init_opengl()
+        try:
+            if not self._init and evt.IsShown():
+                self._init = True
+                log.debug("Initialising OpenGL")
+                self._init_opengl()
+                log.debug("Finished initialising OpenGL")
+        except Exception as e:
+            log.exception(f"Failed initialising OpenGL: {e}")
 
     def _init_opengl(self):
         """Set up the OpenGL state after the window is first shown."""
