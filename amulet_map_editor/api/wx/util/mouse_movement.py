@@ -98,7 +98,7 @@ class MouseMovement(WindowContainer):
         x, y = map(int, xy)
         self._delta_x += self._x - self._start_x
         self._delta_y += self._y - self._start_y
-        (self._start_x, self._start_y) = (self._x, self._y) = self._to_relative(x, y)
+        self._start_x, self._start_y = (self._x, self._y) = self._to_relative(x, y)
         self._warp()
 
     def reset_delta(self):

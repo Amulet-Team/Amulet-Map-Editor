@@ -4,7 +4,6 @@ import string
 import unittest
 from amulet_map_editor.api.lang import lang_dirs
 
-
 KeyCharacterSet = set(string.ascii_lowercase + string.digits + "_.")
 
 

@@ -11,7 +11,6 @@ import re
 import os
 import versioneer
 
-
 first_party = {
     "amulet-core",
     "amulet-nbt",
