@@ -116,7 +116,7 @@ def _init_log():
     faulthandler.enable(log_file)
 
 
-def main():
+def main() -> NoReturn:
     try:
         # Initialise default paths.
         data_dir = platformdirs.user_data_dir("AmuletMapEditor", "AmuletTeam")
@@ -133,7 +133,21 @@ def main():
         )
 
         _init_log()
+        log = logging.getLogger(__name__)
+        log.debug("Importing numpy")
+        import numpy
+        log.debug("Importing amulet_nbt")
+        import amulet_nbt
+        log.debug("Importing leveldb")
+        import leveldb
+        log.debug("Importing PyMCTranslate and amulet")
+        import PyMCTranslate
+        import amulet
+        log.debug("Importing minecraft_model_reader")
+        import minecraft_model_reader
+        log.debug("Importing amulet_map_editor")
         from amulet_map_editor.api.framework import AmuletApp
+        log.debug("Finished importing")
 
     except Exception as e:
         _on_error(e)
@@ -142,7 +156,6 @@ def main():
             app = AmuletApp(0)
             app.MainLoop()
         except Exception as e:
-            log = logging.getLogger(__name__)
             log.critical(
                 f"Amulet Crashed. Sorry about that. Please report it to a developer if you think this is an issue. \n{traceback.format_exc()}"
             )
