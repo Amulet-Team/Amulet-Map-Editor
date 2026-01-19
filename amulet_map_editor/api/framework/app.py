@@ -12,6 +12,8 @@ from .licence_dialog import LicenceDialog
 
 # Disable OpenGL_accelerate logging
 logging.getLogger("OpenGL.acceleratesupport").setLevel(logging.CRITICAL)
+logging.getLogger("OpenGL.GL.shaders").setLevel(logging.INFO)
+logging.getLogger("PIL.PngImagePlugin").setLevel(logging.INFO)
 
 log = logging.getLogger(__name__)
 
