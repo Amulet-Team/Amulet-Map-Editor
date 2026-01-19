@@ -71,9 +71,7 @@ class UpdateDialog(wx.Dialog):
 
     @staticmethod
     def goto_download_page(new_version, _):
-        webbrowser.open(
-            f"https://github.com/Amulet-Team/Amulet-Map-Editor/releases/tag/{new_version}"
-        )
+        webbrowser.open(f"https://www.amuletmc.com")
 
 
 def _is_compatible(current_version: Version, release_version: Version) -> bool:
