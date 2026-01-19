@@ -4,7 +4,7 @@
 
 from PyInstaller.utils.hooks import collect_submodules
 
-from typing import Dict, Tuple, Set
+from typing import Dict, Tuple, Set, TYPE_CHECKING
 import sys
 import os
 import glob
@@ -20,6 +20,13 @@ import amulet_nbt
 import PyMCTranslate
 import minecraft_model_reader
 import amulet_map_editor
+
+if TYPE_CHECKING:
+    from PyInstaller.building.build_main import Analysis
+    from PyInstaller.building.datastruct import Tree
+    from PyInstaller.building.api import PYZ, EXE, COLLECT
+    import PyInstaller.building.osx
+    from PyInstaller.building.osx import BUNDLE
 
 sys.modules["FixTk"] = None
 
