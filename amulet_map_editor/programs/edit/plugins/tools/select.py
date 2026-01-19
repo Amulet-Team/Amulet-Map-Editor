@@ -35,6 +35,7 @@ if TYPE_CHECKING:
 
 
 log = logging.getLogger(__name__)
+paint_log_count = 0
 
 
 class BaseSelectionMoveButton(NudgeButton):
@@ -329,6 +330,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
             scroll.Enable(state)
 
     def _on_draw(self, evt):
+        global paint_log_count
         try:
             self.canvas.renderer.start_draw()
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
@@ -339,3 +341,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
             self.canvas.renderer.end_draw()
         except Exception as e:
             log.exception(f"Failed painting: {e}")
+        else:
+            if paint_log_count < 10:
+                paint_log_count += 1
+                log.debug(f"Painted frame. {paint_log_count}/10")
