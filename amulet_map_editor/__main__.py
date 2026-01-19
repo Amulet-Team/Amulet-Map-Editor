@@ -136,17 +136,23 @@ def main() -> NoReturn:
         log = logging.getLogger(__name__)
         log.debug("Importing numpy")
         import numpy
+
         log.debug("Importing amulet_nbt")
         import amulet_nbt
+
         log.debug("Importing leveldb")
         import leveldb
+
         log.debug("Importing PyMCTranslate and amulet")
         import PyMCTranslate
         import amulet
+
         log.debug("Importing minecraft_model_reader")
         import minecraft_model_reader
+
         log.debug("Importing amulet_map_editor")
         from amulet_map_editor.api.framework import AmuletApp
+
         log.debug("Finished importing")
 
     except Exception as e:
