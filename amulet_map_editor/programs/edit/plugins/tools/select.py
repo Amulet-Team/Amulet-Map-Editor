@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Type, Any, Callable, Tuple
+from typing import TYPE_CHECKING, Callable, Tuple
+import logging
+
 import wx
 from OpenGL.GL import (
     glClear,
@@ -30,6 +32,9 @@ from amulet_map_editor.programs.edit.api.ui.nudge_button import NudgeButton
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+
+log = logging.getLogger(__name__)
 
 
 class BaseSelectionMoveButton(NudgeButton):
@@ -324,10 +329,13 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
             scroll.Enable(state)
 
     def _on_draw(self, evt):
-        self.canvas.renderer.start_draw()
-        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-            self.canvas.renderer.draw_sky_box()
-            glClear(GL_DEPTH_BUFFER_BIT)
-        self.canvas.renderer.draw_level()
-        self._selection.draw()
-        self.canvas.renderer.end_draw()
+        try:
+            self.canvas.renderer.start_draw()
+            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+                self.canvas.renderer.draw_sky_box()
+                glClear(GL_DEPTH_BUFFER_BIT)
+            self.canvas.renderer.draw_level()
+            self._selection.draw()
+            self.canvas.renderer.end_draw()
+        except Exception as e:
+            log.exception(f"Failed painting: {e}")

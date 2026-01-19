@@ -51,12 +51,15 @@ class DefaultBaseToolUI(BaseToolUI):
 
     def _on_draw(self, evt):
         """The render loop for this tool."""
-        self.canvas.renderer.start_draw()
-        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-            self.canvas.renderer.draw_sky_box()
-            glClear(GL_DEPTH_BUFFER_BIT)
-        self.canvas.renderer.draw_level()
-        self.canvas.renderer.end_draw()
+        try:
+            self.canvas.renderer.start_draw()
+            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+                self.canvas.renderer.draw_sky_box()
+                glClear(GL_DEPTH_BUFFER_BIT)
+            self.canvas.renderer.draw_level()
+            self.canvas.renderer.end_draw()
+        except Exception as e:
+            log.exception(f"Failed painting: {e}")
 
     def _on_drop_files(self, evt: wx.DropFilesEvent):
         """Logic to run when a file is dropped into the canvas."""

@@ -1,4 +1,6 @@
 from typing import TYPE_CHECKING, Dict, Tuple, Optional
+import logging
+
 import wx
 from OpenGL.GL import (
     glClear,
@@ -24,6 +26,9 @@ from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_o
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+
+log = logging.getLogger(__name__)
 
 
 class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
@@ -250,21 +255,24 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
             )
 
     def _on_draw(self, evt):
-        self.canvas.renderer.start_draw()
-        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-            self.canvas.renderer.draw_sky_box()
-            glClear(GL_DEPTH_BUFFER_BIT)
-        self.canvas.renderer.draw_level()
-        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-            self._selection.draw()
-        else:
-            depth_state = glGetBoolean(GL_DEPTH_TEST)
-            if depth_state:
-                glDisable(GL_DEPTH_TEST)
-            clip = self.canvas.camera.orthographic_clipping
-            self.canvas.camera.orthographic_clipping = -(10**5), 10**5
-            self._selection.draw()
-            self.canvas.camera.orthographic_clipping = clip
-            if depth_state:
-                glEnable(GL_DEPTH_TEST)
-        self.canvas.renderer.end_draw()
+        try:
+            self.canvas.renderer.start_draw()
+            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+                self.canvas.renderer.draw_sky_box()
+                glClear(GL_DEPTH_BUFFER_BIT)
+            self.canvas.renderer.draw_level()
+            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+                self._selection.draw()
+            else:
+                depth_state = glGetBoolean(GL_DEPTH_TEST)
+                if depth_state:
+                    glDisable(GL_DEPTH_TEST)
+                clip = self.canvas.camera.orthographic_clipping
+                self.canvas.camera.orthographic_clipping = -(10**5), 10**5
+                self._selection.draw()
+                self.canvas.camera.orthographic_clipping = clip
+                if depth_state:
+                    glEnable(GL_DEPTH_TEST)
+            self.canvas.renderer.end_draw()
+        except Exception as e:
+            log.exception(f"Failed painting: {e}")

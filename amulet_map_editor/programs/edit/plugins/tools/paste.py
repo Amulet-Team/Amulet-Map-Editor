@@ -1,12 +1,14 @@
 import wx
 from typing import TYPE_CHECKING, Tuple, Union, Type
+import logging
+import math
+import numpy
+import weakref
+
 from OpenGL.GL import (
     glClear,
     GL_DEPTH_BUFFER_BIT,
 )
-import math
-import numpy
-import weakref
 
 from amulet.api.data_types import PointCoordinates
 from amulet.api.level import BaseLevel
@@ -45,6 +47,8 @@ from amulet_map_editor.programs.edit.api.key_config import ACT_BOX_CLICK
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+log = logging.getLogger(__name__)
 
 BottomLeftRight = wx.BOTTOM | wx.LEFT | wx.RIGHT
 BottomLeftRightCentre = BottomLeftRight | wx.ALIGN_CENTER_HORIZONTAL
@@ -679,11 +683,14 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self.canvas.run_operation(self._paste_operation)
 
     def _on_draw(self, evt):
-        self.canvas.renderer.start_draw()
-        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-            self.canvas.renderer.draw_sky_box()
-            glClear(GL_DEPTH_BUFFER_BIT)
-        self.canvas.renderer.draw_level()
-        self.canvas.renderer.draw_fake_levels()
-        self._selection.draw()
-        self.canvas.renderer.end_draw()
+        try:
+            self.canvas.renderer.start_draw()
+            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+                self.canvas.renderer.draw_sky_box()
+                glClear(GL_DEPTH_BUFFER_BIT)
+            self.canvas.renderer.draw_level()
+            self.canvas.renderer.draw_fake_levels()
+            self._selection.draw()
+            self.canvas.renderer.end_draw()
+        except Exception as e:
+            log.exception(f"Failed painting: {e}")

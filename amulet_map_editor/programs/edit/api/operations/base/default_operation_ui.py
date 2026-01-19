@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+import logging
 import wx
 from OpenGL.GL import (
     glClear,
@@ -24,6 +25,9 @@ from amulet_map_editor.programs.edit.api.key_config import (
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
     from amulet.api.level import BaseLevel
+
+
+log = logging.getLogger(__name__)
 
 
 class DefaultOperationUI(OperationUI):
@@ -54,15 +58,18 @@ class DefaultOperationUI(OperationUI):
         self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
 
     def _on_draw(self, evt):
-        self.canvas.renderer.start_draw()
-        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-            self.canvas.renderer.draw_sky_box()
-            glClear(GL_DEPTH_BUFFER_BIT)
-        self.canvas.renderer.draw_level()
-        self._selection.draw()
-        if self._show_pointer:
-            self._pointer.draw()
-        self.canvas.renderer.end_draw()
+        try:
+            self.canvas.renderer.start_draw()
+            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+                self.canvas.renderer.draw_sky_box()
+                glClear(GL_DEPTH_BUFFER_BIT)
+            self.canvas.renderer.draw_level()
+            self._selection.draw()
+            if self._show_pointer:
+                self._pointer.draw()
+            self.canvas.renderer.end_draw()
+        except Exception as e:
+            log.exception(f"Failed painting: {e}")
 
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == ACT_BOX_CLICK:
