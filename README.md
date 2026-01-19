@@ -7,7 +7,7 @@
 
 A new Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
 
-![edit](resource/img/edit.jpg)
+![cover](resource/img/cover.jpg)
 
 ## Running compiled builds (Currently Windows only)
 
