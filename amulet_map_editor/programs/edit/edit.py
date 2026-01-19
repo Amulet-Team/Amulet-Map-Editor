@@ -199,11 +199,9 @@ class EditExtension(wx.Panel, BaseProgram):
             elif response == wx.ID_NO:
                 return True
             elif response == wx.ID_CANCEL:
-                log.info(
-                    f"""Aborting closing world {
+                log.info(f"""Aborting closing world {
                     self._world.level_wrapper.level_name
-                    } because the user pressed cancel."""
-                )
+                    } because the user pressed cancel.""")
                 return False
         return True
 

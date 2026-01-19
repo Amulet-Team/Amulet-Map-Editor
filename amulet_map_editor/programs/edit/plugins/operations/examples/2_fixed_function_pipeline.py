@@ -7,7 +7,6 @@ from amulet.api.selection import SelectionGroup
 from amulet.api.level import BaseLevel
 from amulet.api.data_types import Dimension
 
-
 # Notes about the operation
 # The operation is allowed to yield floats in the range 0 to 1.
 #       This is used to update the loading bar in the UI. Without this the UI may appear to be not responding

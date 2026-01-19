@@ -5,7 +5,6 @@ import wx.lib.agw.hyperlink
 
 from amulet_map_editor import lang
 
-
 _padding = 20
 
 

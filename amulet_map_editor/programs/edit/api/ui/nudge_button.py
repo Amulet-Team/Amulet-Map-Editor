@@ -27,7 +27,6 @@ from amulet_map_editor.api.wx.util.button_input import (
     EVT_INPUT_HELD,
 )
 
-
 _MoveActions = {
     ACT_MOVE_UP,
     ACT_MOVE_DOWN,

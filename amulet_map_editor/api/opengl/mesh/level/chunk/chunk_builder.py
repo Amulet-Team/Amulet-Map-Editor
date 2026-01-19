@@ -9,7 +9,6 @@ from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePack,
 )
 
-
 try:
     from .chunk_builder_cy import create_lod0_chunk
 except:

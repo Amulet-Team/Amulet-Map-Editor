@@ -2,7 +2,6 @@ import wx
 from wx import glcanvas
 from .camera import Camera
 
-
 _SpeedChangedEventType = wx.NewEventType()
 EVT_SPEED_CHANGED = wx.PyEventBinder(_SpeedChangedEventType)
 
