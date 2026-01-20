@@ -678,9 +678,10 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             level_index: int = fake_levels.active_level_index
             if level_index is not None:
                 render_level: RenderLevel = fake_levels.render_levels[level_index]
-                paste_rule = {1: PasteRule.PasteExist, 2: PasteRule.PasteNotExist}.get(
-                    self._paste_rule.GetSelection(), PasteRule.PasteAll
-                )
+                paste_rule = {
+                    1: PasteRule.PasteExist,
+                    2: PasteRule.PasteNotExist,
+                }.get(self._paste_rule.GetSelection(), PasteRule.PasteAll)
                 yield from paste_iter(
                     self.canvas.world,
                     self.canvas.dimension,
