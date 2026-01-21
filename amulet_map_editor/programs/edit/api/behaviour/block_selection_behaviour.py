@@ -307,7 +307,9 @@ class BlockSelectionBehaviour(PointerBehaviour):
             return (0, 0, 0), (0, 0, 0)
         else:
             p1, p2 = self._get_active_points()
-            return tuple(p1[0].tolist()), tuple(p2[0].tolist())
+            x1, y1, z1 = p1[0].tolist()
+            x2, y2, z2 = p2[0].tolist()
+            return (x1, y1, z1), (x2, y2, z2)
 
     @active_block_positions.setter
     def active_block_positions(
