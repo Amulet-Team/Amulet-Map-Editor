@@ -147,13 +147,13 @@ class Camera(CanvasContainer):
         assert (
             len(camera_location) == 3
         ), "camera_location must be an iterable of three floats."
-        camera_location = tuple(
-            min(max(float(c), c_min), c_max)
-            for c, c_min, c_max in zip(camera_location, *self._bounds)
-        )
-        if camera_location != self._location:
+        x = min(max(float(camera_location[0]), self._bounds[0][0]), self._bounds[1][0])
+        y = min(max(float(camera_location[1]), self._bounds[0][1]), self._bounds[1][1])
+        z = min(max(float(camera_location[2]), self._bounds[0][2]), self._bounds[1][2])
+        camera_location_tuple = (x, y, z)
+        if camera_location_tuple != self._location:
             self._reset_matrix()
-            self._location = camera_location
+            self._location = camera_location_tuple
             return True
         return False
 
@@ -249,7 +249,7 @@ class Camera(CanvasContainer):
 
     def _set_clipping(self, mode: Projection, clipping: Tuple[float, float]):
         assert len(clipping) == 2, "camera_rotation must be an iterable of two floats."
-        self._clipping[mode.value] = tuple(map(float, clipping))
+        self._clipping[mode.value] = (float(clipping[0]), float(clipping[1]))
         self._reset_matrix()
 
     @property

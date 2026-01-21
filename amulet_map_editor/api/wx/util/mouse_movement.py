@@ -46,7 +46,7 @@ class MouseMovement(WindowContainer):
     def _screen_middle(self) -> Tuple[int, int]:
         """Get the pixel coordinate of the middle of the screen"""
         x, y = self.window.GetSize()
-        return (int(x / 2), int(y / 2))
+        return int(x / 2), int(y / 2)
 
     def warp_middle(self):
         """Warp the cursor to the middle of the screen."""
