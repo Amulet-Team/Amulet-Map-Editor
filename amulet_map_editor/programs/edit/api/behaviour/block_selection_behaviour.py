@@ -458,7 +458,10 @@ class BlockSelectionBehaviour(PointerBehaviour):
     ) -> Tuple[PointCoordinates, NPVector3, SelectionGroup, Optional[int], float]:
         camera = self.canvas.camera.location
         look_vector = self.look_vector()
-        return (camera, look_vector) + self._get_box_hit_data(camera, look_vector)
+        selection_group, box_index, max_distance = self._get_box_hit_data(
+            camera, look_vector
+        )
+        return camera, look_vector, selection_group, box_index, max_distance
 
     def _get_box_hit_data(
         self, camera: PointCoordinates, look_vector: NPVector3
