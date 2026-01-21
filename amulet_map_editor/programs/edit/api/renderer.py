@@ -37,7 +37,6 @@ class Renderer(EditCanvasContainer):
         "_chunk_generator",
         "_opengl_resource_pack",
         "_render_world",
-        "_chunk_generator",
         "_fake_levels",
         "_sky_box",
         "_draw_timer",
