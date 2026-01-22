@@ -703,15 +703,12 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
     def _paste_confirm(self, evt):
         self.canvas.run_operation(self._paste_operation)
 
-    def _on_draw(self, evt):
-        try:
-            self.canvas.renderer.start_draw()
-            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-                self.canvas.renderer.draw_sky_box()
-                glClear(GL_DEPTH_BUFFER_BIT)
-            self.canvas.renderer.draw_level()
-            self.canvas.renderer.draw_fake_levels()
-            self._selection.draw()
-            self.canvas.renderer.end_draw()
-        except Exception as e:
-            log.exception(f"Failed painting: {e}")
+    def _draw(self):
+        self.canvas.renderer.start_draw()
+        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+            self.canvas.renderer.draw_sky_box()
+            glClear(GL_DEPTH_BUFFER_BIT)
+        self.canvas.renderer.draw_level()
+        self.canvas.renderer.draw_fake_levels()
+        self._selection.draw()
+        self.canvas.renderer.end_draw()

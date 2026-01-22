@@ -329,19 +329,15 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         for scroll in (self._x1, self._y1, self._z1, self._x2, self._y2, self._z2):
             scroll.Enable(state)
 
-    def _on_draw(self, evt):
+    def _draw(self):
         global paint_log_count
-        try:
-            self.canvas.renderer.start_draw()
-            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-                self.canvas.renderer.draw_sky_box()
-                glClear(GL_DEPTH_BUFFER_BIT)
-            self.canvas.renderer.draw_level()
-            self._selection.draw()
-            self.canvas.renderer.end_draw()
-        except Exception as e:
-            log.exception(f"Failed painting: {e}")
-        else:
-            if paint_log_count < 10:
-                paint_log_count += 1
-                log.debug(f"Painted frame. {paint_log_count}/10")
+        self.canvas.renderer.start_draw()
+        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+            self.canvas.renderer.draw_sky_box()
+            glClear(GL_DEPTH_BUFFER_BIT)
+        self.canvas.renderer.draw_level()
+        self._selection.draw()
+        self.canvas.renderer.end_draw()
+        if paint_log_count < 10:
+            paint_log_count += 1
+            log.debug(f"Painted frame. {paint_log_count}/10")

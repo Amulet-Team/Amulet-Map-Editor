@@ -59,17 +59,21 @@ class DefaultOperationUI(OperationUI):
 
     def _on_draw(self, evt):
         try:
-            self.canvas.renderer.start_draw()
-            if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
-                self.canvas.renderer.draw_sky_box()
-                glClear(GL_DEPTH_BUFFER_BIT)
-            self.canvas.renderer.draw_level()
-            self._selection.draw()
-            if self._show_pointer:
-                self._pointer.draw()
-            self.canvas.renderer.end_draw()
+            self.canvas.SetCurrent(self.canvas.context)
+            self._draw()
         except Exception as e:
             log.exception(f"Failed painting: {e}")
+
+    def _draw(self):
+        self.canvas.renderer.start_draw()
+        if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
+            self.canvas.renderer.draw_sky_box()
+            glClear(GL_DEPTH_BUFFER_BIT)
+        self.canvas.renderer.draw_level()
+        self._selection.draw()
+        if self._show_pointer:
+            self._pointer.draw()
+        self.canvas.renderer.end_draw()
 
     def _on_input_press(self, evt: InputPressEvent):
         if evt.action_id == ACT_BOX_CLICK:
