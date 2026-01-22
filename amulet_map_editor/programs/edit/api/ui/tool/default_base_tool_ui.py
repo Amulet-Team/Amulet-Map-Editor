@@ -14,7 +14,6 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.opengl.camera import Projection
 from .base_tool_ui import BaseToolUI
-from amulet_map_editor.programs.edit.api.events import EVT_DRAW
 from amulet_map_editor.programs.edit.api.behaviour import CameraBehaviour
 
 if TYPE_CHECKING:
@@ -43,7 +42,7 @@ class DefaultBaseToolUI(BaseToolUI):
         """Bind all required events to the canvas.
         All events on the canvas will be automatically removed after the tool is disabled.
         """
-        self.canvas.Bind(EVT_DRAW, self._on_draw)
+        self.canvas.Bind(wx.EVT_PAINT, self._on_draw)
         self.canvas.SetDropTarget(None)  # fixes #239
         self.canvas.DragAcceptFiles(True)
         self.canvas.Bind(wx.EVT_DROP_FILES, self._on_drop_files)

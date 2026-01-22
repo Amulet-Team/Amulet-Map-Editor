@@ -8,4 +8,3 @@ from .camera import (
 )
 
 PreDrawEvent, EVT_PRE_DRAW = newevent.NewEvent()
-DrawEvent, EVT_DRAW = newevent.NewEvent()

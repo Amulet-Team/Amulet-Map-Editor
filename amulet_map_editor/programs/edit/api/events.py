@@ -13,8 +13,6 @@ from amulet_map_editor.api.opengl.camera import (
 from amulet_map_editor.api.opengl.events import (
     PreDrawEvent,
     EVT_PRE_DRAW,
-    DrawEvent,
-    EVT_DRAW,
 )
 
 from amulet_map_editor.api.wx.util.button_input import (

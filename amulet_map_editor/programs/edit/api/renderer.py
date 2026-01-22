@@ -21,7 +21,6 @@ from .events import (
     CameraMovedEvent,
     EVT_CAMERA_MOVED,
     PreDrawEvent,
-    DrawEvent,
 )
 
 if TYPE_CHECKING:
@@ -201,7 +200,7 @@ class Renderer(EditCanvasContainer):
 
     def _do_draw(self, evt):
         wx.PostEvent(self.canvas, PreDrawEvent())
-        wx.PostEvent(self.canvas, DrawEvent())
+        self.canvas.Refresh(False)
 
     def default_draw(self):
         """The default draw logic."""
