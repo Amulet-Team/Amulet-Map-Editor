@@ -240,6 +240,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._point1_move.enable()
         self._point2_move.enable()
         self._selection_move.enable()
+        self._button_panel.Show()
         self._resize()
 
     def disable(self):
@@ -247,6 +248,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._point1_move.disable()
         self._point2_move.disable()
         self._selection_move.disable()
+        self._button_panel.Hide()
 
     def _add_spin_ctrl(
         self, label: str, tooltip: str, colour: Tuple[int, int, int]
@@ -337,9 +339,9 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         evt.Skip()
 
     def _resize(self):
-        panel_size = self._button_panel.BestSize
+        panel_size = self._button_panel.GetBestSize()
         canvas_height = self.canvas.GetSize().GetHeight()
-        allowed_canvas_height = canvas_height - 70
+        allowed_canvas_height = canvas_height - 60
         ideal_path_height = panel_size.GetHeight()
         panel_height = min(ideal_path_height, allowed_canvas_height)
         panel_width = panel_size.GetWidth()
