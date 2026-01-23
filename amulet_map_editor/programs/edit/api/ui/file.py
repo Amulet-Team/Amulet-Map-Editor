@@ -38,13 +38,17 @@ class FilePanel(EditCanvasContainer):
 
         level = self.canvas.world
 
-        self._version_text = wx.StaticText(
-            canvas.GetParent(),
-            label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}",
-        )
-        self._version_text.SetBackgroundColour(
+        self._version_panel = wx.Panel(canvas.GetParent())
+        self._version_panel.SetBackgroundColour(
             wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
         )
+        self._version_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._version_panel.SetSizer(self._version_sizer)
+        self._version_text = wx.StaticText(
+            self._version_panel,
+            label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}",
+        )
+        self._version_sizer.Add(self._version_text)
         self._version_text.SetToolTip(
             lang.get("program_3d_edit.file_ui.version_tooltip")
         )
@@ -210,11 +214,11 @@ class FilePanel(EditCanvasContainer):
         evt.Skip()
 
     def _resize(self) -> None:
-        version_text_size = self._version_text.GetBestSize()
-        self._version_text.SetSize(
+        version_text_size = self._version_panel.GetBestSize()
+        self._version_panel.SetSize(
             wx.Rect(0, 0, version_text_size.GetWidth(), version_text_size.GetHeight())
         )
-        self._version_text.Raise()
+        self._version_panel.Raise()
 
         self._button_window.Layout()
         window_size = self._button_window.GetBestSize()
