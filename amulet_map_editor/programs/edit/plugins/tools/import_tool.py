@@ -23,12 +23,6 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._selection = StaticSelectionBehaviour(self.canvas)
 
-        self._open_file_button = wx.Button(canvas, label="Import File")
-        self._open_file_button.Bind(wx.EVT_BUTTON, self._on_open_file)
-        self.AddStretchSpacer()
-        self.Add(self._open_file_button, flag=wx.ALL, border=10)
-        self.AddStretchSpacer()
-
     @property
     def name(self) -> str:
         return "Import"
@@ -40,11 +34,9 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
     def enable(self):
         super().enable()
         self._selection.update_selection()
+        self._open_file()
 
-    def disable(self):
-        super().disable()
-
-    def _on_open_file(self, evt):
+    def _open_file(self):
         with wx.FileDialog(
             self.canvas,
             "Open a Minecraft data file",
