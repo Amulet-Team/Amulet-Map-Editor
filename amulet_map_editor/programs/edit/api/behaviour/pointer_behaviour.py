@@ -86,9 +86,7 @@ class PointerBehaviour(RaycastBehaviour):
 
     def _post_change_event(self):
         x, y, z = self._pointer.point1.tolist()
-        wx.PostEvent(
-            self.canvas, PointChangeEvent((x, y, z))
-        )
+        wx.PostEvent(self.canvas, PointChangeEvent((x, y, z)))
 
     def _update_pointer(self):
         """Update the pointer location."""
