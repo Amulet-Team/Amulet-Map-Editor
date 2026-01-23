@@ -514,6 +514,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._selection.update_selection()
         self._moving = False
         self._paste_panel.Show()
+        self._resize()
 
     def set_state(self, state):
         if (
