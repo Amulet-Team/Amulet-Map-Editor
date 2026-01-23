@@ -66,6 +66,19 @@ class PointerBehaviour(RaycastBehaviour):
         self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
 
     def _on_input_press(self, evt: InputPressEvent):
+        # Check if we're in camera rotation mode (mouse selection mode disabled)
+        # If so, block all selection-related actions
+        if (
+            hasattr(self.canvas, "_mouse_selection_mode")
+            and not self.canvas._mouse_selection_mode
+            and hasattr(self.canvas, "_touch_controls_enabled")
+            and self.canvas._touch_controls_enabled
+        ):
+            # In camera rotation mode with touch controls enabled,
+            # block all selection pointer operations
+            evt.Skip()
+            return
+
         if evt.action_id == ACT_INCR_SELECT_DISTANCE:
             self._pointer_distance += 1
             self._pointer_moved = True
@@ -75,6 +88,19 @@ class PointerBehaviour(RaycastBehaviour):
         evt.Skip()
 
     def _invalidate_pointer(self, evt):
+        # Check if we're in camera rotation mode (mouse selection mode disabled)
+        # If so, don't update the pointer for selection purposes
+        if (
+            hasattr(self.canvas, "_mouse_selection_mode")
+            and not self.canvas._mouse_selection_mode
+            and hasattr(self.canvas, "_touch_controls_enabled")
+            and self.canvas._touch_controls_enabled
+        ):
+            # In camera rotation mode with touch controls enabled,
+            # don't update the selection pointer
+            evt.Skip()
+            return
+
         self._pointer_moved = True
         evt.Skip()
 

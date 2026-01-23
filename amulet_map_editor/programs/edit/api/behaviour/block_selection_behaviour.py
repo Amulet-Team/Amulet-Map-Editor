@@ -150,6 +150,19 @@ class BlockSelectionBehaviour(PointerBehaviour):
         wx.PostEvent(self.canvas, RenderBoxEnableInputsEvent())
 
     def _on_input_press(self, evt: InputPressEvent):
+        # Check if we're in camera rotation mode (mouse selection mode disabled)
+        # If so, block all selection-related actions
+        if (
+            hasattr(self.canvas, "_mouse_selection_mode")
+            and not self.canvas._mouse_selection_mode
+            and hasattr(self.canvas, "_touch_controls_enabled")
+            and self.canvas._touch_controls_enabled
+        ):
+            # In camera rotation mode with touch controls enabled,
+            # block all selection box operations
+            evt.Skip()
+            return
+
         if evt.action_id == ACT_INCR_SELECT_DISTANCE:
             if self._resizing:
                 self._pointer_distance2 += 1
@@ -251,6 +264,19 @@ class BlockSelectionBehaviour(PointerBehaviour):
         evt.Skip()
 
     def _on_input_release(self, evt: InputReleaseEvent):
+        # Check if we're in camera rotation mode (mouse selection mode disabled)
+        # If so, block all selection-related actions
+        if (
+            hasattr(self.canvas, "_mouse_selection_mode")
+            and not self.canvas._mouse_selection_mode
+            and hasattr(self.canvas, "_touch_controls_enabled")
+            and self.canvas._touch_controls_enabled
+        ):
+            # In camera rotation mode with touch controls enabled,
+            # block all selection box operations
+            evt.Skip()
+            return
+
         if evt.action_id == ACT_BOX_CLICK:
             if self._editing and time.time() - self._press_time > 0.1:
                 self._editing = self._resizing = False

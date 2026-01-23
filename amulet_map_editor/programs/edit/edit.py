@@ -266,16 +266,37 @@ class EditExtension(wx.Panel, BaseProgram):
         edit_config = config.get(EDIT_CONFIG_ID, {})
         keybind_id = edit_config.get("keybind_group", DefaultKeybindGroupId)
         user_keybinds = edit_config.get("user_keybinds", {})
+        touch_enabled = bool(
+            edit_config.get("options", {}).get("touch_controls", False)
+        )
         key_config = KeyConfigDialog(
-            self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds
+            self,
+            keybind_id,
+            KeybindKeys,
+            PresetKeybinds,
+            user_keybinds,
+            touch_controls_enabled=touch_enabled,
         )
         if key_config.ShowModal() == wx.ID_OK:
-            user_keybinds, keybind_id, keybinds = key_config.options
+            user_keybinds, keybind_id, keybinds, touch_controls_enabled = (
+                key_config.options
+            )
             edit_config["user_keybinds"] = user_keybinds
             edit_config["keybind_group"] = keybind_id
+            edit_config.setdefault("options", {})
+            edit_config["options"]["touch_controls"] = bool(touch_controls_enabled)
             config.put(EDIT_CONFIG_ID, edit_config)
             self._canvas.buttons.clear_registered_actions()
             self._canvas.buttons.register_actions(keybinds)
+            if hasattr(self._canvas, "set_touchscreen_mode"):
+                # Global touchscreen mode controls toolbar visibility and enables on-screen buttons feature
+                self._canvas.set_touchscreen_mode(bool(touch_controls_enabled))
+            if hasattr(self._canvas, "set_touch_controls_enabled"):
+                # Preserve the user's previous per-session visibility when enabling mode; default to mode state
+                self._canvas.set_touch_controls_enabled(bool(touch_controls_enabled))
+            # Update the toggle states in the top toolbar (FilePanel)
+            if hasattr(self._canvas, "_file_panel"):
+                self._canvas._file_panel.update_touch_toggles()
 
     def _edit_options(self):
         if self._canvas is not None:
@@ -293,7 +314,9 @@ class EditExtension(wx.Panel, BaseProgram):
 
             fov_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_fov)
             sizer.Add(
-                wx.StaticText(dialog, label="Field of View"),
+                wx.StaticText(
+                    dialog, label=lang.get("program_3d_edit.options.field_of_view")
+                ),
                 flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
                 border=5,
             )
@@ -312,7 +335,9 @@ class EditExtension(wx.Panel, BaseProgram):
 
             render_distance_ui.Bind(wx.EVT_SPINCTRL, set_render_distance)
             sizer.Add(
-                wx.StaticText(dialog, label="Render Distance"),
+                wx.StaticText(
+                    dialog, label=lang.get("program_3d_edit.options.render_distance")
+                ),
                 flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
                 border=5,
             )
@@ -323,7 +348,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             camera_sensitivity_ui = wx.SpinCtrlDouble(
-                dialog, min=0, max=10, initial=camera_sensitivity
+                dialog, min=0.1, max=10, initial=camera_sensitivity, inc=0.1
             )
 
             def set_camera_sensitivity(evt):
@@ -331,7 +356,9 @@ class EditExtension(wx.Panel, BaseProgram):
 
             camera_sensitivity_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_camera_sensitivity)
             sizer.Add(
-                wx.StaticText(dialog, label="Camera Sensitivity"),
+                wx.StaticText(
+                    dialog, label=lang.get("program_3d_edit.options.camera_sensitivity")
+                ),
                 flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
                 border=5,
             )

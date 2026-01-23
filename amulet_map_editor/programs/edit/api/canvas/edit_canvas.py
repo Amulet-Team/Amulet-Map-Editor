@@ -161,6 +161,23 @@ class EditCanvas(BaseEditCanvas):
         # call run_operation to acquire it.
         self._edit_lock = RLock()
 
+        # Touchscreen mode (global) and touch controls overlay (per-session)
+        self._touchscreen_mode = bool(
+            CONFIG.get(EDIT_CONFIG_ID, {})
+            .get("options", {})
+            .get("touch_controls", False)
+        )
+        # On-screen movement buttons visibility (controlled by toolbar checkbox)
+        self._touch_controls_enabled = bool(self._touchscreen_mode)
+        self._touch_panel_left: Optional[wx.Panel] = None
+        self._touch_panel_right: Optional[wx.Panel] = None
+        # When touch controls are enabled, default to selection mode (mouse mode enabled)
+        # When touch controls are disabled, default to camera rotation mode (mouse mode disabled)
+        self._mouse_selection_mode = (
+            not self._touch_controls_enabled
+        )  # True = selection mode, False = camera rotation mode
+        self._build_touch_overlay()
+
     def _init_opengl(self):
         super()._init_opengl()
         self._file_panel = FilePanel(self)
@@ -177,16 +194,56 @@ class EditCanvas(BaseEditCanvas):
         self._file_panel.bind_events()
         self.Bind(EVT_EDIT_CLOSE, self._on_close)
 
+        # Ensure touch controls stay on top when other UI elements change
+        self.Bind(wx.EVT_WINDOW_CREATE, self._on_window_create)
+        self.Bind(wx.EVT_CHILD_FOCUS, self._on_child_focus)
+
     def enable(self):
         super().enable()
         self._tool_sizer.enable()
+        # Initialize touch controls state
+        if hasattr(self, "_file_panel"):
+            self._file_panel.update_touch_toggles()
+
+        # Initialize touch buttons
+        if hasattr(self, "_touch_buttons"):
+            self._position_touch_overlay()
+            for btn in self._touch_buttons.values():
+                btn.Show(self._touch_controls_enabled)
+
+        # Ensure touch controls are on top when enabled
+        if self._touch_controls_enabled:
+            self._ensure_touch_controls_on_top()
 
     def disable(self):
         super().disable()
         self._tool_sizer.disable()
+        # Hide touch buttons
+        if hasattr(self, "_touch_buttons"):
+            for btn in self._touch_buttons.values():
+                btn.Hide()
 
     def _on_close(self, _):
         close_level(self.world.level_path)
+
+    def _on_window_create(self, evt):
+        """Ensure touch controls stay on top when new windows are created."""
+        if self._touch_controls_enabled:
+            wx.CallAfter(self._ensure_touch_controls_on_top)
+        evt.Skip()
+
+    def _on_child_focus(self, evt):
+        """Ensure touch controls stay on top when child windows get focus."""
+        if self._touch_controls_enabled:
+            wx.CallAfter(self._ensure_touch_controls_on_top)
+        evt.Skip()
+
+    def _ensure_touch_controls_on_top(self):
+        """Force touch controls to be on top of other UI elements."""
+        if hasattr(self, "_touch_buttons"):
+            for btn in self._touch_buttons.values():
+                if btn.IsShown():
+                    btn.Raise()
 
     @property
     def tools(self):
@@ -203,6 +260,222 @@ class EditCanvas(BaseEditCanvas):
             return PresetKeybinds[group]
         else:
             return DefaultKeys
+
+    @property
+    def touch_controls_enabled(self) -> bool:
+        return self._touch_controls_enabled
+
+    @touch_controls_enabled.setter
+    def touch_controls_enabled(self, enabled: bool) -> None:
+        """Show or hide on-screen movement buttons.
+        Does not affect visibility of toolbar controls; that is controlled by touchscreen mode.
+        """
+        self._touch_controls_enabled = bool(enabled)
+
+        # Show/hide touch buttons (only if touchscreen mode is enabled)
+        for btn in self._touch_buttons.values():
+            btn.Show(self._touchscreen_mode and self._touch_controls_enabled)
+
+        # When touch controls are enabled, default to selection mode (mouse mode enabled)
+        # When touch controls are disabled, default to camera rotation mode (mouse mode disabled)
+        if (
+            not hasattr(self, "_mouse_selection_mode_initialized")
+            or not self._mouse_selection_mode_initialized
+        ):
+            self._mouse_selection_mode = not self._touch_controls_enabled
+            self._mouse_selection_mode_initialized = True
+            # Apply the initial mouse mode setting
+            self.mouse_selection_mode = self._mouse_selection_mode
+
+        # Ensure touch controls are positioned correctly and on top
+        if enabled and self._touchscreen_mode:
+            self._position_touch_overlay()
+
+        self.Layout()
+
+        # Update the toggle in the top toolbar (FilePanel)
+        if hasattr(self, "_file_panel"):
+            self._file_panel.update_touch_toggles()
+
+    # Backwards-compatible method for existing callers
+    def set_touch_controls_enabled(self, enabled: bool):
+        self.touch_controls_enabled = enabled
+
+    @property
+    def touchscreen_mode(self) -> bool:
+        return self._touchscreen_mode
+
+    @touchscreen_mode.setter
+    def touchscreen_mode(self, enabled: bool) -> None:
+        """Enable/disable touchscreen mode (global).
+        Controls whether the toolbar Touch Controls/Selector button is visible and
+        whether on-screen movement buttons can be shown at all.
+        """
+        self._touchscreen_mode = bool(enabled)
+        # If disabling touchscreen mode, also hide on-screen buttons
+        if not self._touchscreen_mode:
+            self._touch_controls_enabled = False
+        # Apply visibility to on-screen buttons
+        for btn in self._touch_buttons.values():
+            btn.Show(self._touchscreen_mode and self._touch_controls_enabled)
+        # Update toolbar controls visibility/state
+        self._file_panel.update_touch_toggles()
+        self.Layout()
+
+    # Backwards-compatible method for existing callers
+    def set_touchscreen_mode(self, enabled: bool):
+        self.touchscreen_mode = enabled
+
+    @property
+    def mouse_selection_mode(self) -> bool:
+        return self._mouse_selection_mode
+
+    @mouse_selection_mode.setter
+    def mouse_selection_mode(self, selection_mode: bool) -> None:
+        """Set mouse mode: True for selection mode, False for camera rotation mode."""
+        self._mouse_selection_mode = bool(selection_mode)
+        # Update camera behavior based on mode
+        if not selection_mode:
+            # Camera rotation mode - enable mouse rotation
+            self.camera.rotating = True
+            self.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
+        else:
+            # Selection mode - disable mouse rotation
+            self.camera.rotating = False
+            self.SetCursor(wx.NullCursor)
+
+        # Update the toggle in the top toolbar (FilePanel)
+        self._file_panel.update_touch_toggles()
+
+    # Backwards-compatible method for existing callers
+    def set_mouse_selection_mode(self, selection_mode: bool):
+        self.mouse_selection_mode = selection_mode
+
+    def _build_touch_overlay(self):
+        try:
+            import amulet_map_editor.api.image as image
+        except Exception:
+            image = None
+
+        def make_btn(icon_attr: str, action_id: str, pos: tuple):
+            size = 56
+            if (
+                image is not None
+                and hasattr(image.icon, "tablericons")
+                and hasattr(image.icon.tablericons, icon_attr)
+            ):
+                bmp = getattr(image.icon.tablericons, icon_attr).bitmap(size, size)
+                btn = wx.ToggleButton(self, pos=pos, size=(size + 8, size + 8))
+                try:
+                    btn.SetBitmap(bmp)
+                except Exception:
+                    # Fallback: show a text label if bitmap can't be set
+                    btn.SetLabel(icon_attr)
+            else:
+                btn = wx.ToggleButton(
+                    self, pos=pos, size=(size + 8, size + 8), label=icon_attr
+                )
+
+            def on_toggle(evt):
+                if btn.GetValue():
+                    try:
+                        self.buttons.press_action(action_id)
+                    except Exception:
+                        wx.PostEvent(self, InputPressEvent(action_id))
+                else:
+                    try:
+                        self.buttons.release_action(action_id)
+                    except Exception:
+                        wx.PostEvent(self, InputReleaseEvent(action_id))
+                evt.Skip()
+
+            btn.Bind(wx.EVT_TOGGLEBUTTON, on_toggle)
+            return btn
+
+        from amulet_map_editor.programs.edit.api.key_config import (
+            ACT_MOVE_FORWARDS,
+            ACT_MOVE_BACKWARDS,
+            ACT_MOVE_LEFT,
+            ACT_MOVE_RIGHT,
+            ACT_MOVE_UP,
+            ACT_MOVE_DOWN,
+        )
+        from amulet_map_editor.api.wx.util.button_input import (
+            InputPressEvent,
+            InputReleaseEvent,
+        )
+
+        # Create buttons directly on canvas without panels
+        # We'll position them in _position_touch_overlay
+        self._touch_buttons = {
+            "left": make_btn("arrow_control_left", ACT_MOVE_LEFT, (0, 0)),
+            "right": make_btn("arrow_control_right", ACT_MOVE_RIGHT, (0, 0)),
+            "forward": make_btn("arrow_control_forward", ACT_MOVE_FORWARDS, (0, 0)),
+            "back": make_btn("arrow_control_backward", ACT_MOVE_BACKWARDS, (0, 0)),
+            "up": make_btn("arrow_control_fly_up", ACT_MOVE_UP, (0, 0)),
+            "down": make_btn("arrow_control_fly_down", ACT_MOVE_DOWN, (0, 0)),
+        }
+
+        # Hide all buttons initially
+        for btn in self._touch_buttons.values():
+            btn.Hide()
+
+        # Store references for compatibility
+        self._touch_panel_left = None
+        self._touch_panel_right = None
+
+        # keep overlay positioned over the canvas corners
+        self.Bind(wx.EVT_SIZE, self._on_canvas_resize_overlay)
+
+    def _on_canvas_resize_overlay(self, evt):
+        self._position_touch_overlay()
+        evt.Skip()
+
+    def _position_touch_overlay(self):
+        if hasattr(self, "_touch_buttons"):
+            margin = 10
+            btn_size = 64
+            spacing = 8  # Increased spacing between buttons to prevent overlap
+            cw, ch = self.GetClientSize()
+
+            # Position left cluster (WASD pattern) - moved right to avoid overlapping with left panel
+            left_x = (
+                margin + 150
+            )  # Increased margin further to avoid left panel overlap
+            left_y = ch - (btn_size * 3 + spacing * 2) - margin
+
+            # Row 1: Forward button (center)
+            self._touch_buttons["forward"].SetPosition(
+                (left_x + btn_size + spacing, left_y)
+            )
+
+            # Row 2: Left and Right buttons - increased spacing to prevent overlap
+            self._touch_buttons["left"].SetPosition(
+                (left_x, left_y + btn_size + spacing)
+            )
+            self._touch_buttons["right"].SetPosition(
+                (left_x + (btn_size + spacing) * 2, left_y + btn_size + spacing)
+            )
+
+            # Row 3: Back button (center)
+            self._touch_buttons["back"].SetPosition(
+                (left_x + btn_size + spacing, left_y + (btn_size + spacing) * 2)
+            )
+
+            # Position right cluster (Up/Down) - restore original spacing
+            right_x = cw - btn_size - margin
+            right_y = (
+                ch - (btn_size * 2 + btn_size) - margin
+            )  # Space for up, gap (one button size), down
+
+            self._touch_buttons["up"].SetPosition((right_x, right_y))
+            self._touch_buttons["down"].SetPosition(
+                (right_x, right_y + btn_size * 2)
+            )  # Skip one button space between up and down
+
+            # Ensure touch controls are always on top of other UI elements
+            for btn in self._touch_buttons.values():
+                btn.Raise()
 
     def _deselect(self):
         # TODO: Re-implement this

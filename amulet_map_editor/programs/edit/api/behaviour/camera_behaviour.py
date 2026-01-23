@@ -42,6 +42,8 @@ class CameraBehaviour(BaseBehaviour):
         self._previous_mouse_lock = self.canvas.camera.rotating = False
         self._toggle_mouse_time = 0
         self._last_camera_rotation: CameraRotationType = (0.0, 0.0)
+        self._saved_mouse_selection_mode = None
+        self._camera_moved_with_touch = False
 
     def bind_events(self):
         """Set up all events required to run."""
@@ -73,18 +75,33 @@ class CameraBehaviour(BaseBehaviour):
                 self.canvas.camera.rotation = self._last_camera_rotation
                 self.canvas.camera.projection_mode = Projection.PERSPECTIVE
         elif evt.action_id == ACT_CHANGE_MOUSE_MODE:
-            self.canvas.SetFocus()
-            self._previous_mouse_lock = self.canvas.camera.rotating
-            self._capture_mouse()
-            self._toggle_mouse_time = time.time()
+            # Only handle mouse mode changes if touch controls are not enabled
+            # or if we're not using the new touch control system
+            if (
+                not hasattr(self.canvas, "_touch_controls_enabled")
+                or not self.canvas._touch_controls_enabled
+            ):
+                self.canvas.SetFocus()
+                self._previous_mouse_lock = self.canvas.camera.rotating
+                self._capture_mouse()
+                self._toggle_mouse_time = time.time()
 
     def _on_input_release(self, evt: InputReleaseEvent):
         """Logic to run each time the input release event is run."""
         if evt.action_id == ACT_CHANGE_MOUSE_MODE:
-            if self._previous_mouse_lock or time.time() - self._toggle_mouse_time > 0.1:
-                self._release_mouse()
-            else:
-                self._capture_mouse()
+            # Only handle mouse mode changes if touch controls are not enabled
+            # or if we're not using the new touch control system
+            if (
+                not hasattr(self.canvas, "_touch_controls_enabled")
+                or not self.canvas._touch_controls_enabled
+            ):
+                if (
+                    self._previous_mouse_lock
+                    or time.time() - self._toggle_mouse_time > 0.1
+                ):
+                    self._release_mouse()
+                else:
+                    self._capture_mouse()
         elif evt.action_id == ACT_INCR_SPEED:
             if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
                 self.canvas.camera.move_speed *= 1.1
@@ -97,6 +114,22 @@ class CameraBehaviour(BaseBehaviour):
         elif evt.action_id == ACT_ZOOM_OUT:
             if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
                 self.canvas.camera.fov = min(1000.0, self.canvas.camera.fov * 1.1)
+        else:
+            # Check if we need to restore mouse mode state after touch movement
+            if (
+                self._camera_moved_with_touch
+                and hasattr(self.canvas, "_touch_controls_enabled")
+                and self.canvas._touch_controls_enabled
+                and hasattr(self.canvas, "set_mouse_selection_mode")
+                and self._saved_mouse_selection_mode is not None
+            ):
+
+                # Restore the saved mouse mode state
+                self.canvas.set_mouse_selection_mode(self._saved_mouse_selection_mode)
+                self._saved_mouse_selection_mode = None
+                self._camera_moved_with_touch = False
+
+        evt.Skip()
 
     def _on_input_held(self, evt: InputHeldEvent):
         """Logic to run each time the input held event is run."""
@@ -106,6 +139,19 @@ class CameraBehaviour(BaseBehaviour):
             ACT_MOVE_BACKWARDS in evt.action_ids
         )
         right += (ACT_MOVE_RIGHT in evt.action_ids) - (ACT_MOVE_LEFT in evt.action_ids)
+
+        # Check if we're moving with touch controls and save mouse mode state
+        if (
+            hasattr(self.canvas, "_touch_controls_enabled")
+            and self.canvas._touch_controls_enabled
+            and hasattr(self.canvas, "_mouse_selection_mode")
+            and any((forward, up, right))
+        ):
+
+            # Save the current mouse mode state before movement
+            if self._saved_mouse_selection_mode is None:
+                self._saved_mouse_selection_mode = self.canvas._mouse_selection_mode
+                self._camera_moved_with_touch = True
 
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             if self.canvas.camera.rotating:
@@ -182,6 +228,9 @@ class CameraBehaviour(BaseBehaviour):
     def _on_loss_focus(self, evt):
         """Event fired when the user tabs out of the window."""
         self._escape()
+        # Clear touch movement tracking state
+        self._saved_mouse_selection_mode = None
+        self._camera_moved_with_touch = False
         evt.Skip()
 
     def _escape(self):
@@ -189,3 +238,6 @@ class CameraBehaviour(BaseBehaviour):
         # self._persistent_actions.clear()
         self.canvas.buttons.unpress_all()
         self._release_mouse()
+        # Clear touch movement tracking state
+        self._saved_mouse_selection_mode = None
+        self._camera_moved_with_touch = False

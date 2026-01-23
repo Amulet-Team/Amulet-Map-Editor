@@ -244,7 +244,12 @@ program_3d_edit.chunk_tool.max_y_tooltip=Максимальная координ
 program_3d_edit.chunk_tool.min_y=Мин Y
 program_3d_edit.chunk_tool.min_y_tooltip=Минимальная координата y для рисования в виде сверху вниз. Это может быть использовано для просмотра чанка мира и помогает увидеть такие измерения, как недра и пещеры.
 program_3d_edit.chunk_tool.prune_chunks=Удалить не выбранные чанки
-program_3d_edit.chunk_tool.prune_chunks_tooltip=Удалить все не выбранные чанки. При этом будет удалён сам чанк и все содержащиеся в нем данные. При следующей загрузке области в игру чанки будут созданы заново.
+program_3d_edit.chunk_tool.prune_chunks_tooltip=Удалить чанки, которые находятся вне области выделения.
+
+# Настройки
+program_3d_edit.options.field_of_view=Поле зрения
+program_3d_edit.options.render_distance=Дистанция рендера
+program_3d_edit.options.camera_sensitivity=Чувствительность камеры
 
 ## Окно Перейти/Телепорт
 program_3d_edit.goto_ui.copy_button_tooltip=Копирование значений x, y и z в буфер обмена в виде "0.0 0.0 0.0" (x, y и z соответственно).
@@ -269,3 +274,10 @@ program_3d_edit.file_ui.speed_dialog_name=Установить скорость 
 program_3d_edit.file_ui.speed_tooltip=Скорость камеры в блоках в секунду
 program_3d_edit.file_ui.undo_tooltip=Отменить
 program_3d_edit.file_ui.version_tooltip=Платформа и версия данных
+
+# Сенсорное управление
+program_3d_edit.touch_controls.toggle_label=Сенсорное управление
+program_3d_edit.touch_controls.toggle_tooltip=Показать/скрыть сенсорные кнопки управления на экране
+program_3d_edit.mouse_mode.toggle_label=Выделитель/Камера
+program_3d_edit.mouse_mode.toggle_tooltip=Переключение между режимом выделения областей и поворотом направления взгляда камеры
+

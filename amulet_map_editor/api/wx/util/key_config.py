@@ -358,18 +358,33 @@ class KeyConfigDialog(SimpleDialog):
         entries: Sequence[KeyActionType],
         fixed_keybinds: KeybindContainer,
         user_keybinds: KeybindContainer,
+        *,
+        touch_controls_enabled: bool = False,
     ):
         super().__init__(parent, lang.get("key_config.key_select"))
         self._key_config = KeyConfig(
             self, selected_group, entries, fixed_keybinds, user_keybinds
         )
         self.sizer.Add(self._key_config, 1, wx.EXPAND)
+
+        # Touch controls toggle (placed at the bottom of this dialog)
+        bottom = wx.BoxSizer(wx.HORIZONTAL)
+        self._touch_checkbox = wx.CheckBox(
+            self, label="Enable touchscreen mode (experemental)"
+        )
+        self._touch_checkbox.SetValue(bool(touch_controls_enabled))
+        bottom.Add(self._touch_checkbox, 0, wx.ALL, 50)
+        self.sizer.Add(bottom, 0, wx.EXPAND)
+
         self.Layout()
         self.Fit()
 
     @property
-    def options(self) -> Tuple[KeybindContainer, KeybindGroupIdType, KeybindGroup]:
-        return self._key_config.options
+    def options(
+        self,
+    ) -> Tuple[KeybindContainer, KeybindGroupIdType, KeybindGroup, bool]:
+        user_keybinds, group_id, keybinds = self._key_config.options
+        return user_keybinds, group_id, keybinds, self._touch_checkbox.GetValue()
 
 
 class KeyConfig(wx.BoxSizer):

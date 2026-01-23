@@ -47,6 +47,33 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         )
         self.Add(self._version_text, 0)
         self.AddStretchSpacer(1)
+
+        # Touch controls and mouse mode controls (to the LEFT of the 3D button)
+        # Touch controls toggle as a sticky (toggle) button
+        self._touch_controls_checkbox = wx.ToggleButton(
+            canvas, label=lang.get("program_3d_edit.touch_controls.toggle_label")
+        )
+        self._touch_controls_checkbox.SetToolTip(
+            lang.get("program_3d_edit.touch_controls.toggle_tooltip")
+        )
+        # We'll set the min height to match the projection button after it is created
+        self.Add(
+            self._touch_controls_checkbox,
+            0,
+            wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER,
+            5,
+        )
+
+        # Selector/Camera mode toggle as a button (like 3D/2D)
+        self._mouse_mode_button = wx.Button(canvas, label="Selector")
+        self._mouse_mode_button.SetToolTip(
+            lang.get("program_3d_edit.mouse_mode.toggle_tooltip")
+        )
+        self.Add(
+            self._mouse_mode_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5
+        )
+
+        # 3D/2D projection button
         self._projection_button = wx.Button(canvas, label="3D")
         self._projection_button.SetToolTip(
             lang.get("program_3d_edit.file_ui.projection_tooltip")
@@ -55,6 +82,12 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self.Add(
             self._projection_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5
         )
+
+        # Bind events
+        self._touch_controls_checkbox.Bind(
+            wx.EVT_TOGGLEBUTTON, self._on_touch_controls_toggle
+        )
+        self._mouse_mode_button.Bind(wx.EVT_BUTTON, self._on_mouse_mode_button)
         self._location_button = wx.Button(
             canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location])
         )
@@ -123,6 +156,34 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self.Add(close_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         self._update_buttons()
+
+        # Ensure the touch checkbox height matches button height
+        try:
+            btn_h = self._projection_button.GetSize().height
+            cur_w, _ = self._touch_controls_checkbox.GetSize()
+            self._touch_controls_checkbox.SetMinSize((max(cur_w, 110), btn_h))
+        except Exception:
+            pass
+
+        # Initialize touch controls UI if canvas is ready
+        try:
+            if hasattr(self.canvas, "_touch_controls_enabled") and hasattr(
+                self.canvas, "_mouse_selection_mode"
+            ):
+                self.update_touch_toggles()
+            else:
+                # Set default values if canvas is not ready
+                self._touch_controls_checkbox.SetValue(False)
+                self._mouse_mode_button.SetLabel("Selector")
+                self._touch_controls_checkbox.Show(False)
+                self._mouse_mode_button.Show(False)
+        except Exception as e:
+            print(f"Error initializing touch toggles in constructor: {e}")
+            # Set default values and show toggles
+            self._touch_controls_checkbox.SetValue(False)
+            self._mouse_mode_button.SetLabel("Selector")
+            self._touch_controls_checkbox.Show(False)
+            self._mouse_mode_button.Show(False)
 
         self.Layout()
 
@@ -195,6 +256,53 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         if len(label) != len(old_label):
             self.canvas.Layout()
         evt.Skip()
+
+    def _on_touch_controls_toggle(self, evt):
+        """Handle touch controls visibility toggle."""
+        enabled = self._touch_controls_checkbox.GetValue()
+        if hasattr(self.canvas, "set_touch_controls_enabled"):
+            self.canvas.set_touch_controls_enabled(enabled)
+        evt.Skip()
+
+    def _on_mouse_mode_button(self, evt):
+        """Toggle between Selector and Camera modes via a button."""
+        if hasattr(self.canvas, "_mouse_selection_mode"):
+            new_mode = not bool(self.canvas._mouse_selection_mode)
+            if hasattr(self.canvas, "set_mouse_selection_mode"):
+                self.canvas.set_mouse_selection_mode(new_mode)
+        evt.Skip()
+
+    def update_touch_toggles(self):
+        """Public method to update toggle states from external changes."""
+        try:
+            if hasattr(self.canvas, "_touch_controls_enabled"):
+                self._touch_controls_checkbox.SetValue(
+                    self.canvas._touch_controls_enabled
+                )
+            else:
+                self._touch_controls_checkbox.SetValue(False)
+            # Update label to reflect current mode
+            if (
+                hasattr(self.canvas, "_mouse_selection_mode")
+                and self.canvas._mouse_selection_mode
+            ):
+                self._mouse_mode_button.SetLabel("Selector")
+            else:
+                self._mouse_mode_button.SetLabel("Camera")
+
+            # Show or hide the controls based on global touchscreen mode
+            show_controls = bool(getattr(self.canvas, "_touchscreen_mode", False))
+            self._touch_controls_checkbox.Show(show_controls)
+            self._mouse_mode_button.Show(show_controls)
+
+            self.Layout()
+        except Exception as e:
+            print(f"Error in update_touch_toggles: {e}")
+            # Hide toggles if there's an error
+            if hasattr(self, "_touch_controls_checkbox"):
+                self._touch_controls_checkbox.Show(False)
+            if hasattr(self, "_mouse_mode_button"):
+                self._mouse_mode_button.Show(False)
 
 
 class SpeedSelectDialog(wx.Dialog):
