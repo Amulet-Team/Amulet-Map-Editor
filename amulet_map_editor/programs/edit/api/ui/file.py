@@ -210,7 +210,10 @@ class FilePanel(EditCanvasContainer):
         evt.Skip()
 
     def _resize(self) -> None:
-        self._version_text.SetPosition(wx.Point(0, 0))
+        version_text_size = self._version_text.GetBestSize()
+        self._version_text.SetSize(
+            wx.Rect(0, 0, version_text_size.GetWidth(), version_text_size.GetHeight())
+        )
         self._version_text.Raise()
 
         self._button_window.Layout()
