@@ -35,13 +35,17 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         self._last_active_operation_id: Optional[str] = None
 
         self._settings_panel = wx.Panel(canvas.GetParent())
-        self._settings_panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self._settings_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         self._settings_panel.Hide()
         self._settings_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._settings_panel.SetSizer(self._settings_sizer)
 
         self._operation_panel = wx.Panel(canvas.GetParent())
-        self._operation_panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self._operation_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         self._operation_panel.Hide()
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
         self._operation_panel.SetSizer(self._operation_sizer)
@@ -212,7 +216,11 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
     def _resize(self):
         settings_panel_size = self._settings_panel.GetBestSize()
-        self._settings_panel.SetSize(wx.Rect(0, 30, settings_panel_size.GetWidth(), settings_panel_size.GetHeight()))
+        self._settings_panel.SetSize(
+            wx.Rect(
+                0, 30, settings_panel_size.GetWidth(), settings_panel_size.GetHeight()
+            )
+        )
         self._settings_panel.Raise()
 
         self._operation_panel.Layout()
@@ -222,10 +230,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         ideal_path_height = panel_size.GetHeight()
         panel_height = min(ideal_path_height, allowed_canvas_height)
         panel_width = panel_size.GetWidth()
-        self._operation_panel.SetSize(wx.Rect(
-            0,
-            30 + settings_panel_size.GetHeight(),
-            panel_width,
-            panel_height
-        ))
+        self._operation_panel.SetSize(
+            wx.Rect(0, 30 + settings_panel_size.GetHeight(), panel_width, panel_height)
+        )
         self._operation_panel.Raise()

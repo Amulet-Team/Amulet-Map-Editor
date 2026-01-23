@@ -42,13 +42,17 @@ class FilePanel(EditCanvasContainer):
             canvas.GetParent(),
             label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}",
         )
-        self._version_text.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self._version_text.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         self._version_text.SetToolTip(
             lang.get("program_3d_edit.file_ui.version_tooltip")
         )
 
         self._button_window = wx.Panel(canvas.GetParent())
-        self._button_window.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self._button_window.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         self._button_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._button_window.SetSizer(self._button_sizer)
 
@@ -57,11 +61,10 @@ class FilePanel(EditCanvasContainer):
             lang.get("program_3d_edit.file_ui.projection_tooltip")
         )
         self._projection_button.Bind(wx.EVT_BUTTON, self._on_projection_button)
-        self._button_sizer.Add(
-            self._projection_button
-        )
+        self._button_sizer.Add(self._projection_button)
         self._location_button = wx.Button(
-            self._button_window, label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location])
+            self._button_window,
+            label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location]),
         )
         self._location_button.SetToolTip(
             lang.get("program_3d_edit.file_ui.location_tooltip")
@@ -213,12 +216,14 @@ class FilePanel(EditCanvasContainer):
         self._button_window.Layout()
         window_size = self._button_window.GetBestSize()
         canvas_size = self.canvas.GetSize()
-        self._button_window.SetSize(wx.Rect(
-            max(0, canvas_size.GetWidth() - window_size.GetWidth()),
-            0,
-            window_size.GetWidth(),
-            window_size.GetHeight(),
-        ))
+        self._button_window.SetSize(
+            wx.Rect(
+                max(0, canvas_size.GetWidth() - window_size.GetWidth()),
+                0,
+                window_size.GetWidth(),
+                window_size.GetHeight(),
+            )
+        )
         self._button_window.Raise()
         self._button_window.Refresh(False)
 

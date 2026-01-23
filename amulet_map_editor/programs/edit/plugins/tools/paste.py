@@ -265,7 +265,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._paste_panel = SimpleScrollablePanel(canvas.GetParent())
         self._paste_panel.Hide()
-        self._paste_panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self._paste_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         self._paste_sizer = wx.BoxSizer(wx.VERTICAL)
         self._paste_panel.SetSizer(self._paste_sizer)
 
@@ -721,12 +723,11 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         panel_width = panel_size.GetWidth()
         if allowed_canvas_height < ideal_path_height:
             panel_width += wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X)
-        self._paste_panel.SetSize(wx.Rect(
-            0,
-            canvas_height // 2 - panel_height // 2,
-            panel_width,
-            panel_height
-        ))
+        self._paste_panel.SetSize(
+            wx.Rect(
+                0, canvas_height // 2 - panel_height // 2, panel_width, panel_height
+            )
+        )
         self._paste_panel.Layout()
         self._paste_panel.Raise()
         self._paste_panel.Refresh(False)

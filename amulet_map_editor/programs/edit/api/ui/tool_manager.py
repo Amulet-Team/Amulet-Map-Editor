@@ -132,11 +132,13 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
     def _resize(self) -> None:
         window_size = self._tool_panel.GetBestSize()
         canvas_size = self.canvas.GetSize()
-        self._tool_panel.SetSize(wx.Rect(
-            max(0, canvas_size.GetWidth() // 2 - window_size.GetWidth() // 2),
-            canvas_size.GetHeight() - window_size.GetHeight(),
-            window_size.GetWidth(),
-            window_size.GetHeight(),
-        ))
+        self._tool_panel.SetSize(
+            wx.Rect(
+                max(0, canvas_size.GetWidth() // 2 - window_size.GetWidth() // 2),
+                canvas_size.GetHeight() - window_size.GetHeight(),
+                window_size.GetWidth(),
+                window_size.GetHeight(),
+            )
+        )
         self._tool_panel.Raise()
         self._tool_panel.Refresh(False)

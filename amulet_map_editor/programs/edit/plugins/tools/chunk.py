@@ -39,7 +39,9 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         self._selection = ChunkSelectionBehaviour(self.canvas)
 
         self._button_panel = wx.Panel(canvas.GetParent())
-        self._button_panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self._button_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         self._button_panel.Hide()
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
@@ -271,12 +273,11 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         panel_width = panel_size.GetWidth()
         if allowed_canvas_height < ideal_path_height:
             panel_width += wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X)
-        self._button_panel.SetSize(wx.Rect(
-            0,
-            canvas_height // 2 - panel_height // 2,
-            panel_width,
-            panel_height
-        ))
+        self._button_panel.SetSize(
+            wx.Rect(
+                0, canvas_height // 2 - panel_height // 2, panel_width, panel_height
+            )
+        )
         self._button_panel.Layout()
         self._button_panel.Raise()
         self._button_panel.Refresh(False)

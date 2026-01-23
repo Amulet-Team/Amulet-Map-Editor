@@ -93,7 +93,9 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._inspect_block = InspectBlockBehaviour(self.canvas, self._selection)
 
         self._button_panel = SimpleScrollablePanel(canvas.Parent)
-        self._button_panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        self._button_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 
@@ -347,12 +349,11 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         panel_width = panel_size.GetWidth()
         if allowed_canvas_height < ideal_path_height:
             panel_width += wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X)
-        self._button_panel.SetSize(wx.Rect(
-            0,
-            canvas_height // 2 - panel_height // 2,
-            panel_width,
-            panel_height
-        ))
+        self._button_panel.SetSize(
+            wx.Rect(
+                0, canvas_height // 2 - panel_height // 2, panel_width, panel_height
+            )
+        )
         self._button_panel.Layout()
         self._button_panel.Raise()
 
