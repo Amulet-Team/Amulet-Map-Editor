@@ -36,7 +36,7 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self.Add(
             self._tool_option_sizer, 1, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0
         )
-        self.AddSpacer(35)
+        self.AddSpacer(30)
 
         self._tool_panel = wx.Panel(canvas.GetParent())
         self._tool_sizer = wx.BoxSizer(wx.HORIZONTAL)
