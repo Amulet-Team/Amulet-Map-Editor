@@ -38,7 +38,11 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._selection = ChunkSelectionBehaviour(self.canvas)
 
-        self._button_panel = wx.Panel(canvas)
+        self._button_panel = wx.Panel(canvas.GetParent())
+        self._button_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
+        self._button_panel.Hide()
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 
@@ -106,8 +110,7 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         button_sizer.Add(prune_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
         prune_button.Bind(wx.EVT_BUTTON, self._prune_chunks)
-
-        self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
+        self._resize()
 
     @property
     def name(self) -> str:
@@ -117,9 +120,10 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         super().bind_events()
         self._selection.bind_events()
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_update_clipping)
+        self.canvas.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
-        self.Layout()
+        self._button_panel.Show()
         self.canvas.camera.projection_mode = Projection.TOP_DOWN
         self._selection.enable()
         self._update_clipping()
@@ -140,10 +144,12 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         self._min_y.SetValue(miny)
         self._max_y.SetValue(maxy)
         self._update_clipping()
+        self._resize()
 
     def disable(self):
         super().disable()
         self.canvas.camera.orthographic_clipping = -(10**5), 10**5
+        self._button_panel.Hide()
 
     def _on_update_clipping(self, evt):
         self._update_clipping()
@@ -253,6 +259,28 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
                     load_original,
                 )
             )
+
+    def _on_resize(self, evt):
+        self._resize()
+        evt.Skip()
+
+    def _resize(self):
+        panel_size = self._button_panel.GetBestSize()
+        canvas_height = self.canvas.GetSize().GetHeight()
+        allowed_canvas_height = canvas_height - 60
+        ideal_path_height = panel_size.GetHeight()
+        panel_height = min(ideal_path_height, allowed_canvas_height)
+        panel_width = panel_size.GetWidth()
+        if allowed_canvas_height < ideal_path_height:
+            panel_width += wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X)
+        self._button_panel.SetSize(
+            wx.Rect(
+                0, canvas_height // 2 - panel_height // 2, panel_width, panel_height
+            )
+        )
+        self._button_panel.Layout()
+        self._button_panel.Raise()
+        self._button_panel.Refresh(False)
 
     def _draw(self):
         self.canvas.renderer.start_draw()

@@ -32,37 +32,49 @@ def _format_float(num: float) -> str:
         return f"{num:.0f}"
 
 
-class FilePanel(wx.BoxSizer, EditCanvasContainer):
+class FilePanel(EditCanvasContainer):
     def __init__(self, canvas: "EditCanvas"):
-        wx.BoxSizer.__init__(self, wx.HORIZONTAL)
-        EditCanvasContainer.__init__(self, canvas)
+        super().__init__(canvas)
 
         level = self.canvas.world
+
+        self._version_panel = wx.Panel(canvas.GetParent())
+        self._version_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
+        self._version_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._version_panel.SetSizer(self._version_sizer)
         self._version_text = wx.StaticText(
-            canvas,
+            self._version_panel,
             label=f"{level.level_wrapper.platform}, {level.level_wrapper.version}",
         )
+        self._version_sizer.Add(self._version_text)
         self._version_text.SetToolTip(
             lang.get("program_3d_edit.file_ui.version_tooltip")
         )
-        self.Add(self._version_text, 0)
-        self.AddStretchSpacer(1)
-        self._projection_button = wx.Button(canvas, label="3D")
+
+        self._button_window = wx.Panel(canvas.GetParent())
+        self._button_window.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
+        self._button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._button_window.SetSizer(self._button_sizer)
+
+        self._projection_button = wx.Button(self._button_window, label="3D")
         self._projection_button.SetToolTip(
             lang.get("program_3d_edit.file_ui.projection_tooltip")
         )
         self._projection_button.Bind(wx.EVT_BUTTON, self._on_projection_button)
-        self.Add(
-            self._projection_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5
-        )
+        self._button_sizer.Add(self._projection_button)
         self._location_button = wx.Button(
-            canvas, label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location])
+            self._button_window,
+            label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location]),
         )
         self._location_button.SetToolTip(
             lang.get("program_3d_edit.file_ui.location_tooltip")
         )
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
-        self.Add(self._location_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
+        self._button_sizer.Add(self._location_button)
 
         def set_speed(evt):
             dialog = SpeedSelectDialog(
@@ -72,59 +84,53 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
                 self.canvas.camera.move_speed = dialog.speed * 33 / 1000
 
         self._speed_button = wx.Button(
-            canvas,
+            self._button_window,
             label=f"{_format_float(self.canvas.camera.move_speed * 1000 / 33)} {lang.get('program_3d_edit.file_ui.speed_blocks_per_second')}",
         )
         self._speed_button.SetToolTip(lang.get("program_3d_edit.file_ui.speed_tooltip"))
         self._speed_button.Bind(wx.EVT_BUTTON, set_speed)
-        self.Add(self._speed_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
+        self._button_sizer.Add(self._speed_button)
 
-        self._dim_options = SimpleChoiceAny(canvas)
+        self._dim_options = SimpleChoiceAny(self._button_window)
         self._dim_options.SetToolTip(lang.get("program_3d_edit.file_ui.dim_tooltip"))
         self._dim_options.SetItems(level.level_wrapper.dimensions)
         self._set_dimension(canvas.dimension)
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
 
-        self.Add(self._dim_options, 0, wx.TOP | wx.BOTTOM | wx.RIGHT | wx.CENTER, 5)
+        self._button_sizer.Add(self._dim_options)
 
         def create_button(text, operation):
-            button = wx.Button(canvas, label=text)
+            button = wx.Button(self._button_window, label=text)
             button.Bind(wx.EVT_BUTTON, operation)
-            self.Add(button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+            self._button_sizer.Add(button)
             return button
 
-        self._undo_button: Optional[wx.Button] = create_button(
-            "0", lambda evt: self.canvas.undo()
-        )
+        self._undo_button = create_button("0", lambda evt: self.canvas.undo())
         self._undo_button.SetBitmap(image.icon.tablericons.arrow_back_up.bitmap(20, 20))
         self._undo_button.SetToolTip(lang.get("program_3d_edit.file_ui.undo_tooltip"))
 
-        self._redo_button: Optional[wx.Button] = create_button(
-            "0", lambda evt: self.canvas.redo()
-        )
+        self._redo_button = create_button("0", lambda evt: self.canvas.redo())
         self._redo_button.SetBitmap(
             image.icon.tablericons.arrow_forward_up.bitmap(20, 20)
         )
         self._redo_button.SetToolTip(lang.get("program_3d_edit.file_ui.redo_tooltip"))
 
-        self._save_button: Optional[wx.Button] = create_button(
-            "0", lambda evt: self.canvas.save()
-        )
+        self._save_button = create_button("0", lambda evt: self.canvas.save())
         self._save_button.SetBitmap(image.icon.tablericons.device_floppy.bitmap(20, 20))
         self._save_button.SetToolTip(lang.get("program_3d_edit.file_ui.save_tooltip"))
 
-        close_button = wx.BitmapButton(
-            canvas, bitmap=image.icon.tablericons.square_x.bitmap(20, 20)
+        self._close_button = create_button(
+            "", lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
         )
-        close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
-        close_button.Bind(
-            wx.EVT_BUTTON, lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
-        )
-        self.Add(close_button, 0, wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+        self._close_button.SetBitmap(image.icon.tablericons.square_x.bitmap(20, 20))
+        self._close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
+        size = self._close_button.GetSize()
+        self._close_button.SetSize(wx.Size(size.GetHeight(), size.GetHeight()))
+        self._close_button.SetMinSize(wx.Size(size.GetHeight(), size.GetHeight()))
 
         self._update_buttons()
 
-        self.Layout()
+        self._resize()
 
     def bind_events(self):
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_move)
@@ -135,6 +141,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         self.canvas.Bind(EVT_CREATE_UNDO, self._on_update_buttons)
         self.canvas.Bind(EVT_PROJECTION_CHANGED, self._on_projection_change)
         self.canvas.Bind(EVT_DIMENSION_CHANGE, self._change_dimension)
+        self.canvas.Bind(wx.EVT_SIZE, self._on_resize)
 
     def _on_update_buttons(self, evt):
         self._update_buttons()
@@ -185,7 +192,7 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         old_label = self._location_button.GetLabel()
         self._location_button.SetLabel(label)
         if len(label) != len(old_label):
-            self.canvas.Layout()
+            self._resize()
         evt.Skip()
 
     def _on_speed_change(self, evt):
@@ -193,8 +200,33 @@ class FilePanel(wx.BoxSizer, EditCanvasContainer):
         old_label = self._speed_button.GetLabel()
         self._speed_button.SetLabel(label)
         if len(label) != len(old_label):
-            self.canvas.Layout()
+            self._resize()
         evt.Skip()
+
+    def _on_resize(self, evt) -> None:
+        self._resize()
+        evt.Skip()
+
+    def _resize(self) -> None:
+        version_text_size = self._version_panel.GetBestSize()
+        self._version_panel.SetSize(
+            wx.Rect(0, 0, version_text_size.GetWidth(), version_text_size.GetHeight())
+        )
+        self._version_panel.Raise()
+
+        self._button_window.Layout()
+        window_size = self._button_window.GetBestSize()
+        canvas_size = self.canvas.GetSize()
+        self._button_window.SetSize(
+            wx.Rect(
+                max(0, canvas_size.GetWidth() - window_size.GetWidth()),
+                0,
+                window_size.GetWidth(),
+                window_size.GetHeight(),
+            )
+        )
+        self._button_window.Raise()
+        self._button_window.Refresh(False)
 
 
 class SpeedSelectDialog(wx.Dialog):
@@ -226,9 +258,7 @@ class SpeedSelectDialog(wx.Dialog):
         self._speed_spin_ctrl_double.Bind(wx.EVT_MOUSEWHEEL, on_mouse_wheel)
         self._speed_spin_ctrl_double.SetIncrement(1.0)
         self._speed_spin_ctrl_double.SetDigits(4)
-        sizer.Add(
-            self._speed_spin_ctrl_double, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5
-        )
+        sizer.Add(self._speed_spin_ctrl_double)
 
         button_sizer = wx.StdDialogButtonSizer()
         sizer.Add(button_sizer, 0, wx.ALIGN_RIGHT | wx.ALL, 4)

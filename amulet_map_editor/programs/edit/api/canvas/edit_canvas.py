@@ -164,7 +164,7 @@ class EditCanvas(BaseEditCanvas):
     def _init_opengl(self):
         super()._init_opengl()
         self._file_panel = FilePanel(self)
-        self._canvas_sizer.Add(self._file_panel, 0, wx.EXPAND, 0)
+        self._canvas_sizer.AddSpacer(30)
         self._tool_sizer = ToolManagerSizer(self)
         self._canvas_sizer.Add(self._tool_sizer, 1, wx.EXPAND, 0)
 

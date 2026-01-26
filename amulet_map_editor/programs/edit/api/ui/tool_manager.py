@@ -36,13 +36,11 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self.Add(
             self._tool_option_sizer, 1, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0
         )
+        self.AddSpacer(30)
 
-        tool_select_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        tool_select_sizer.AddStretchSpacer(1)
-        self._tool_select = ToolSelect(canvas)
-        tool_select_sizer.Add(self._tool_select, 0, wx.EXPAND, 0)
-        tool_select_sizer.AddStretchSpacer(1)
-        self.Add(tool_select_sizer, 0, wx.EXPAND, 0)
+        self._tool_panel = wx.Panel(canvas.GetParent())
+        self._tool_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._tool_panel.SetSizer(self._tool_sizer)
 
         self.register_tool(SelectTool)
         self.register_tool(PasteTool)
@@ -50,6 +48,8 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self.register_tool(ImportTool)
         self.register_tool(ExportTool)
         self.register_tool(ChunkTool)
+
+        self._resize()
 
     @property
     def tools(self):
@@ -59,13 +59,24 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         if self._active_tool is not None:
             self._active_tool.bind_events()
         self.canvas.Bind(EVT_TOOL_CHANGE, self._enable_tool_event)
+        self.canvas.Bind(wx.EVT_SIZE, self._on_resize)
 
     def register_tool(self, tool_cls: Type[BaseToolUIType]):
         assert issubclass(tool_cls, (wx.Window, wx.Sizer)) and issubclass(
             tool_cls, BaseToolUI
         )
         tool = tool_cls(self.canvas)
-        self._tool_select.register_tool(tool.name)
+        tool_name = tool.name
+
+        button = wx.Button(self._tool_panel, label=tool_name)
+        button.Bind(
+            wx.EVT_BUTTON,
+            lambda evt: wx.PostEvent(self.canvas, ToolChangeEvent(tool=tool_name)),
+        )
+        self._tool_sizer.Add(button)
+        self._tool_sizer.Fit(self._tool_panel)
+        self._tool_panel.Layout()
+
         if isinstance(tool, wx.Window):
             tool.Hide()
         elif isinstance(tool, wx.Sizer):
@@ -114,22 +125,20 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
             self.canvas.reset_bound_events()
             self.canvas.Layout()
 
+    def _on_resize(self, evt) -> None:
+        self._resize()
+        evt.Skip()
 
-class ToolSelect(wx.Panel, EditCanvasContainer):
-    def __init__(self, canvas: "EditCanvas"):
-        wx.Panel.__init__(self, canvas)
-        EditCanvasContainer.__init__(self, canvas)
-
-        self._sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.SetSizer(self._sizer)
-
-    def register_tool(self, name: str):
-        button = wx.Button(self, label=name)
-        self._sizer.Add(button)
-        self._sizer.Fit(self)
-        self.Layout()
-
-        button.Bind(
-            wx.EVT_BUTTON,
-            lambda evt: wx.PostEvent(self.canvas, ToolChangeEvent(tool=name)),
+    def _resize(self) -> None:
+        window_size = self._tool_panel.GetBestSize()
+        canvas_size = self.canvas.GetSize()
+        self._tool_panel.SetSize(
+            wx.Rect(
+                max(0, canvas_size.GetWidth() // 2 - window_size.GetWidth() // 2),
+                canvas_size.GetHeight() - window_size.GetHeight(),
+                window_size.GetWidth(),
+                window_size.GetHeight(),
+            )
         )
+        self._tool_panel.Raise()
+        self._tool_panel.Refresh(False)

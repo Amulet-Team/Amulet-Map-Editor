@@ -92,7 +92,10 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._selection = BlockSelectionBehaviour(self.canvas)
         self._inspect_block = InspectBlockBehaviour(self.canvas, self._selection)
 
-        self._button_panel = SimpleScrollablePanel(canvas)
+        self._button_panel = SimpleScrollablePanel(canvas.Parent)
+        self._button_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         button_sizer = wx.BoxSizer(wx.VERTICAL)
         self._button_panel.SetSizer(button_sizer)
 
@@ -124,8 +127,6 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
             lang.get("program_3d_edit.select_tool.paste_button_tooltip"),
             lambda evt: self.canvas.paste_from_cache(),
         )
-
-        self.Add(self._button_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
         self._x1 = self._add_spin_ctrl(
             lang.get("program_3d_edit.select_tool.scroll_point_x1"),
@@ -218,6 +219,8 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._selection_move.Disable()
         button_sizer.Add(self._selection_move, 0, wx.ALL | wx.EXPAND, 5)
 
+        self._resize()
+
     @property
     def name(self) -> str:
         return "Select"
@@ -228,6 +231,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self.canvas.Bind(EVT_RENDER_BOX_DISABLE_INPUTS, self._disable_inputs)
         self.canvas.Bind(EVT_RENDER_BOX_ENABLE_INPUTS, self._enable_inputs)
         self.canvas.Bind(EVT_SELECTION_CHANGE, self._on_selection_change)
+        self.canvas.Bind(wx.EVT_SIZE, self._on_resize)
         self._selection.bind_events()
         self._inspect_block.bind_events()
 
@@ -238,12 +242,15 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._point1_move.enable()
         self._point2_move.enable()
         self._selection_move.enable()
+        self._button_panel.Show()
+        self._resize()
 
     def disable(self):
         super().disable()
         self._point1_move.disable()
         self._point2_move.disable()
         self._selection_move.disable()
+        self._button_panel.Hide()
 
     def _add_spin_ctrl(
         self, label: str, tooltip: str, colour: Tuple[int, int, int]
@@ -309,7 +316,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         self._box_volume_text.SetLabel(
             f"{xdim + 1}x{ydim + 1}x{zdim + 1}={(xdim + 1)*(ydim + 1)*(zdim + 1):,}"
         )
-        self.Layout()
+        self._resize()
 
     def _enable_inputs(self, evt):
         self._set_scroll_state(True)
@@ -328,6 +335,27 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
     def _set_scroll_state(self, state: bool):
         for scroll in (self._x1, self._y1, self._z1, self._x2, self._y2, self._z2):
             scroll.Enable(state)
+
+    def _on_resize(self, evt):
+        self._resize()
+        evt.Skip()
+
+    def _resize(self):
+        panel_size = self._button_panel.GetBestSize()
+        canvas_height = self.canvas.GetSize().GetHeight()
+        allowed_canvas_height = canvas_height - 60
+        ideal_path_height = panel_size.GetHeight()
+        panel_height = min(ideal_path_height, allowed_canvas_height)
+        panel_width = panel_size.GetWidth()
+        if allowed_canvas_height < ideal_path_height:
+            panel_width += wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X)
+        self._button_panel.SetSize(
+            wx.Rect(
+                0, canvas_height // 2 - panel_height // 2, panel_width, panel_height
+            )
+        )
+        self._button_panel.Layout()
+        self._button_panel.Raise()
 
     def _draw(self):
         global paint_log_count

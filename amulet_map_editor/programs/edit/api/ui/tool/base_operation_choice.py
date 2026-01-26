@@ -34,14 +34,28 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         self._active_operation: Optional[OperationUIType] = None
         self._last_active_operation_id: Optional[str] = None
 
-        horizontal_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._settings_panel = wx.Panel(canvas.GetParent())
+        self._settings_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
+        self._settings_panel.Hide()
+        self._settings_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._settings_panel.SetSizer(self._settings_sizer)
+
+        self._operation_panel = wx.Panel(canvas.GetParent())
+        self._operation_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
+        self._operation_panel.Hide()
+        self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
+        self._operation_panel.SetSizer(self._operation_sizer)
 
         assert isinstance(
             self.OperationGroupName, str
         ), "OperationGroupName has not been set or is not a string."
         # The operation selection
-        self._operation_choice = SimpleChoiceAny(self.canvas)
-        horizontal_sizer.Add(self._operation_choice)
+        self._operation_choice = SimpleChoiceAny(self._settings_panel)
+        self._settings_sizer.Add(self._operation_choice)
         self._operations = UIOperationManager(self.OperationGroupName)
         self._operation_choice.SetItems(
             {op.identifier: op.name for op in self._operations.operations}
@@ -50,25 +64,22 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
 
         # The reload button
         self._reload_operation = wx.BitmapButton(
-            self.canvas, bitmap=image.REFRESH_ICON.bitmap(16, 16)
+            self._settings_panel, bitmap=image.REFRESH_ICON.bitmap(16, 16)
         )
         self._reload_operation.SetToolTip("Reload Operations")
-        horizontal_sizer.Add(self._reload_operation)
+        self._settings_sizer.Add(self._reload_operation)
         self._reload_operation.Bind(wx.EVT_BUTTON, self._on_reload_operations)
 
         # The open folder button
         if self.ShowOpenFolder:
             self._open_folder = wx.BitmapButton(
-                self.canvas, bitmap=image.TABLERICONS.folder.bitmap(16, 16)
+                self._settings_panel, bitmap=image.TABLERICONS.folder.bitmap(16, 16)
             )
             self._open_folder.SetToolTip("Open Plugin Folder")
-            horizontal_sizer.Add(self._open_folder)
+            self._settings_sizer.Add(self._open_folder)
             self._open_folder.Bind(wx.EVT_BUTTON, self._on_open_folder)
 
-        self.Add(horizontal_sizer)
-
-        self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.Add(self._operation_sizer, 1, wx.EXPAND)
+        self._resize()
 
     @property
     def name(self) -> str:
@@ -90,6 +101,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         ):
             self._setup_operation()
             self.canvas.reset_bound_events()
+            self._resize()
         evt.Skip()
 
     def _setup_operation(self):
@@ -98,14 +110,14 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         if operation_path:
             # only reload the operation if the
             operation = self._operations[operation_path]
-            self.canvas.Freeze()
+            self._operation_panel.Freeze()
             try:
                 if self._active_operation is not None:
                     self._active_operation.disable()
                 self._operation_sizer.Clear(delete_windows=True)
                 try:
                     self._active_operation = operation(
-                        self.canvas, self.canvas, self.canvas.world
+                        self._operation_panel, self.canvas, self.canvas.world
                     )
                     self._operation_sizer.Add(
                         self._active_operation, *self._active_operation.wx_add_options
@@ -133,22 +145,28 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
                 finally:
                     self._last_active_operation_id = operation.identifier
             finally:
-                self.canvas.Thaw()
-                self.Layout()
+                self._operation_panel.Thaw()
+                self._resize()
 
     def bind_events(self):
         if self._active_operation is not None:
             self._active_operation.bind_events()
+        self.canvas.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
         if self._active_operation is None:
             self._setup_operation()
         else:
             self._active_operation.enable()
+        self._settings_panel.Show()
+        self._operation_panel.Show()
+        self._resize()
 
     def disable(self):
         if self._active_operation is not None:
             self._active_operation.disable()
+        self._settings_panel.Hide()
+        self._operation_panel.Hide()
 
     def _on_reload_operations(self, evt):
         """Run when the button is pressed to reload the operations."""
@@ -191,3 +209,28 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         else:
             opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, path])
+
+    def _on_resize(self, evt):
+        self._resize()
+        evt.Skip()
+
+    def _resize(self):
+        settings_panel_size = self._settings_panel.GetBestSize()
+        self._settings_panel.SetSize(
+            wx.Rect(
+                0, 30, settings_panel_size.GetWidth(), settings_panel_size.GetHeight()
+            )
+        )
+        self._settings_panel.Raise()
+
+        self._operation_panel.Layout()
+        panel_size = self._operation_panel.GetBestSize()
+        canvas_height = self.canvas.GetSize().GetHeight()
+        allowed_canvas_height = canvas_height - 60 - settings_panel_size.GetHeight()
+        ideal_path_height = panel_size.GetHeight()
+        panel_height = min(ideal_path_height, allowed_canvas_height)
+        panel_width = panel_size.GetWidth()
+        self._operation_panel.SetSize(
+            wx.Rect(0, 30 + settings_panel_size.GetHeight(), panel_width, panel_height)
+        )
+        self._operation_panel.Raise()

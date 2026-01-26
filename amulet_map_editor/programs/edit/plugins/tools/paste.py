@@ -263,10 +263,13 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._moving = False
         self._is_enabled = False
 
-        self._paste_panel = SimpleScrollablePanel(canvas)
+        self._paste_panel = SimpleScrollablePanel(canvas.GetParent())
+        self._paste_panel.Hide()
+        self._paste_panel.SetBackgroundColour(
+            wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        )
         self._paste_sizer = wx.BoxSizer(wx.VERTICAL)
         self._paste_panel.SetSizer(self._paste_sizer)
-        self.Add(self._paste_panel, 0, wx.ALIGN_CENTER_VERTICAL)
 
         def add_line():
             """add a line to the UI"""
@@ -493,7 +496,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         confirm_button.Bind(wx.EVT_BUTTON, self._paste_confirm)
 
         self._paste_panel.Disable()
-        self.Layout()
+        self._resize()
 
     @property
     def name(self) -> str:
@@ -505,12 +508,15 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._cursor.bind_events()
         self.canvas.Bind(EVT_POINT_CHANGE, self._on_pointer_change)
         self.canvas.Bind(EVT_INPUT_PRESS, self._on_input_press)
+        self.canvas.Bind(wx.EVT_SIZE, self._on_resize)
 
     def enable(self):
         super().enable()
         self._move_button.enable()
         self._selection.update_selection()
         self._moving = False
+        self._paste_panel.Show()
+        self._resize()
 
     def set_state(self, state):
         if (
@@ -540,6 +546,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._paste_panel.Disable()
         self._is_enabled = False
         self.canvas.renderer.fake_levels.clear()
+        self._paste_panel.Hide()
 
     @property
     def location(self) -> PointCoordinates:
@@ -702,6 +709,28 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
     def _paste_confirm(self, evt):
         self.canvas.run_operation(self._paste_operation)
+
+    def _on_resize(self, evt):
+        self._resize()
+        evt.Skip()
+
+    def _resize(self):
+        panel_size = self._paste_panel.GetBestSize()
+        canvas_height = self.canvas.GetSize().GetHeight()
+        allowed_canvas_height = canvas_height - 60
+        ideal_path_height = panel_size.GetHeight()
+        panel_height = min(ideal_path_height, allowed_canvas_height)
+        panel_width = panel_size.GetWidth()
+        if allowed_canvas_height < ideal_path_height:
+            panel_width += wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X)
+        self._paste_panel.SetSize(
+            wx.Rect(
+                0, canvas_height // 2 - panel_height // 2, panel_width, panel_height
+            )
+        )
+        self._paste_panel.Layout()
+        self._paste_panel.Raise()
+        self._paste_panel.Refresh(False)
 
     def _draw(self):
         self.canvas.renderer.start_draw()
