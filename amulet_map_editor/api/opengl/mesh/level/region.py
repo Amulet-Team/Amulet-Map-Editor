@@ -1,3 +1,8 @@
+from typing import Dict, Tuple, Optional
+import queue
+from threading import Lock
+
+import numpy
 from OpenGL.GL import (
     GL_DYNAMIC_DRAW,
     glBindVertexArray,
@@ -5,9 +10,7 @@ from OpenGL.GL import (
     GL_ARRAY_BUFFER,
     glBufferSubData,
 )
-from typing import Dict, Tuple, Optional
-import numpy
-import queue
+
 from .chunk import RenderChunk
 from amulet_map_editor.api.opengl.mesh.tri_mesh import TriMesh
 from amulet_map_editor.api.opengl.resource_pack import OpenGLResourcePack
@@ -26,14 +29,18 @@ class ChunkManager:
         # added chunks are put in here and then processed on the next call of draw
         # This is because add_render_chunk can be called from a different thread to draw
         # which causes issues due to dictionaries resizing
-        self._chunk_temp: queue.Queue = queue.Queue()
+        self._chunk_temp: queue.Queue[RenderChunk] = queue.Queue()
         self._chunk_temp_set = set()
-        self._rebuild_regions = []
+        self._rebuild_regions: list[Tuple[int, int]] = []
 
     def add_render_chunk(self, render_chunk: RenderChunk):
-        """Add a RenderChunk to the database.
+        """
+        Add a RenderChunk to the database.
+        Thread safe.
+
         A call to _merge_chunk_temp from the main thread will be needed for them to be drawn.
-        This is done after the next draw call."""
+        This is done after the next draw call.
+        """
         self._chunk_temp.put(render_chunk)
         chunk_coords = (render_chunk.cx, render_chunk.cz)
         self._chunk_temp_set.add(chunk_coords)
@@ -46,44 +53,56 @@ class ChunkManager:
         )
 
     def get_render_chunk(self, chunk_coords: Tuple[int, int]) -> RenderChunk:
-        """Get a RenderChunk from the database.
-        Might throw a key error if it has not been added to the real database yet."""
+        """
+        Get a RenderChunk from the database.
+        Might throw a key error if it has not been added to the real database yet.
+        """
         return self._regions[self.region_coords(*chunk_coords)].get_render_chunk(
             chunk_coords
         )
 
     def _merge_chunk_temp(self):
-        for _ in range(self._chunk_temp.qsize()):
-            render_chunk = self._chunk_temp.get()
-            region_coords = self.region_coords(render_chunk.cx, render_chunk.cz)
-            if region_coords not in self._regions:
-                self._regions[region_coords] = RenderRegion(
-                    region_coords[0],
-                    region_coords[1],
+        """
+        Merge pending chunks.
+        This must be run on the main thread.
+        """
+        while True:
+            try:
+                render_chunk = self._chunk_temp.get_nowait()
+            except queue.Empty:
+                break
+            region_coord = self.region_coords(render_chunk.cx, render_chunk.cz)
+            region = self._regions.get(region_coord)
+            if region is None:
+                self._regions[region_coord] = region = RenderRegion(
+                    region_coord[0],
+                    region_coord[1],
                     self.region_size,
                     self.context_identifier,
                     self._resource_pack,
                 )
-            self._regions[region_coords].add_render_chunk(render_chunk)
+            region.add_render_chunk(render_chunk)
         self._chunk_temp_set.clear()
 
-    def __contains__(self, chunk_coords: Tuple[int, int]):
+    def __contains__(self, chunk_coord: Tuple[int, int]):
         return (
-            chunk_coords in self._chunk_temp_set
-            or self.render_chunk_in_main_database(chunk_coords)
+            chunk_coord in self._chunk_temp_set
+            or self.render_chunk_in_main_database(chunk_coord)
         )
 
     def render_chunk_in_main_database(self, chunk_coords: Tuple[int, int]) -> bool:
-        region_coords = self.region_coords(*chunk_coords)
-        return (
-            region_coords in self._regions
-            and chunk_coords in self._regions[region_coords]
-        )
+        region_coord = self.region_coords(*chunk_coords)
+        region = self._regions.get(region_coord)
+        return region is not None and chunk_coords in region
 
-    def region_coords(self, cx, cz):
+    def region_coords(self, cx: int, cz: int) -> tuple[int, int]:
         return cx // self.region_size, cz // self.region_size
 
     def draw(self, camera_matrix: TransformationMatrix, camera):
+        """
+        Draw all chunks.
+        This must be run on the main thread.
+        """
         cam_rx, cam_rz = numpy.floor(
             numpy.array(camera)[[0, 2]] / (16 * self.region_size)
         )
@@ -97,6 +116,10 @@ class ChunkManager:
         self._merge_chunk_temp()
 
     def unload(self, safe_area: Tuple[int, int, int, int] = None):
+        """
+        Unload all chunks outside the safe area.
+        This must be run on the main thread.
+        """
         if safe_area is None:
             for _ in range(self._chunk_temp.qsize()):
                 self._chunk_temp.get()
@@ -119,15 +142,19 @@ class ChunkManager:
                 del self._regions[region]
 
     def rebuild(self):
-        """Rebuild a single region which was last rebuild the longest ago.
-        Put this on a semi-fast clock to rebuild all regions."""
+        """
+        Rebuild a single region which was last rebuilt the longest ago.
+        Put this on a semi-fast clock to rebuild all regions.
+        This must only be run by the rebuild thread.
+        """
         if not self._rebuild_regions:
-            self._rebuild_regions = list(self._regions.keys())
+            self._rebuild_regions = list(self._regions.copy())
 
         if self._rebuild_regions:
-            region = self._rebuild_regions.pop(0)
-            if region in self._regions:
-                self._regions[region].rebuild()
+            region_coord = self._rebuild_regions.pop(0)
+            render_region = self._regions.get(region_coord)
+            if render_region is not None:
+                render_region.rebuild()
 
 
 MergedChunkLocationsType = Dict[Tuple[int, int], Tuple[int, int, int, int]]
@@ -149,8 +176,12 @@ class RenderRegion(TriMesh):
         super().__init__(context_identifier, resource_pack)
         self.rx = rx
         self.rz = rz
+        self._lock = Lock()
+        # Raw chunk geometry
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
+        # Merged VBO locations for each chunk
         self._merged_chunk_locations: MergedChunkLocationsType = {}
+        # Chunks that have not been merged and are drawn separately.
         self._manual_chunks: Dict[Tuple[int, int], RenderChunk] = {}
 
         # Merging is done on a new thread which can't modify the opengl state.
@@ -169,10 +200,17 @@ class RenderRegion(TriMesh):
         return f"RenderRegion({self.rx}, {self.rz})"
 
     def __contains__(self, item):
+        """
+        Check if the region has the chunk.
+        Thread safe.
+        """
         return item in self._chunks
 
     def add_render_chunk(self, render_chunk: RenderChunk):
-        """Add a chunk to the region"""
+        """
+        Add a chunk to the region.
+        This must be run on the main thread.
+        """
         chunk_coords = (render_chunk.cx, render_chunk.cz)
         if chunk_coords in self._chunks:
             self._chunks[chunk_coords].unload()
@@ -181,10 +219,17 @@ class RenderRegion(TriMesh):
         self._manual_chunks[chunk_coords] = render_chunk
 
     def get_render_chunk(self, chunk_coords: Tuple[int, int]):
+        """
+        Get the render chunk at a given location.
+        Thread safe.
+        """
         return self._chunks[chunk_coords]
 
     def _disable_merged_chunk(self, chunk_coords: Tuple[int, int]):
-        """Zero out the region of memory in the merged chunks related to a given chunk"""
+        """
+        Zero out the region of memory in the merged chunks related to a given chunk.
+        This must be run on the main thread.
+        """
         if chunk_coords in self._merged_chunk_locations:
             (
                 offset,
@@ -210,10 +255,13 @@ class RenderRegion(TriMesh):
             glBindBuffer(GL_ARRAY_BUFFER, 0)
 
     def rebuild(self):
-        """Merges chunk geometry for the region into one large array.
-        As each chunk is added it is drawn individually.
+        """
+        Merges chunk geometry for the region into one large array.
+        As each chunk is added, it is drawn individually.
         After not too long the individual draw calls for each chunk will reach the bottleneck for python.
-        To solve this we take the geometry for each chunk and merge them into one large array that only requires one draw call.
+        To solve this, we take the geometry for each chunk and merge them into one large array that only requires one draw call.
+
+        Thread safe.
 
         :return:
         """
@@ -223,7 +271,7 @@ class RenderRegion(TriMesh):
             merged_locations: MergedChunkLocationsType = {}
             offset = 0
             translucent_offset = 0
-            for chunk_location, chunk in self._chunks.items():
+            for chunk_location, chunk in self._chunks.copy().items():
                 region_verts.append(chunk.verts[: chunk.verts_translucent])
                 region_verts_translucent.append(chunk.verts[chunk.verts_translucent :])
                 merged_locations[chunk_location] = [
@@ -247,7 +295,10 @@ class RenderRegion(TriMesh):
             self._temp_data = verts, merged_locations
 
     def _create_geometry(self):
-        """Load the temporary vertex data into opengl."""
+        """
+        Load the temporary vertex data into opengl.
+        This must be run on the main thread.
+        """
         if self._temp_data is not None:
             self._setup()
             verts, merged_locations = self._temp_data
@@ -262,13 +313,20 @@ class RenderRegion(TriMesh):
                     chunk.unload()
 
     def unload(self):
-        """Unload all opengl data"""
+        """
+        Unload all opengl data.
+        This must be run on the main thread.
+        """
         super().unload()
         for chunk in self._chunks.values():
             chunk.unload()
         self._chunks.clear()
 
     def draw(self, camera_matrix: TransformationMatrix, cam_cx, cam_cz):
+        """
+        Draw the opengl data.
+        This must be run on the main thread.
+        """
         self._create_geometry()
         transformation_matrix = numpy.matmul(camera_matrix, self.region_transform)
         super().draw(transformation_matrix)
