@@ -105,34 +105,28 @@ class FilePanel(EditCanvasContainer):
             self._button_sizer.Add(button)
             return button
 
-        self._undo_button: Optional[wx.Button] = create_button(
-            "0", lambda evt: self.canvas.undo()
-        )
+        self._undo_button = create_button("0", lambda evt: self.canvas.undo())
         self._undo_button.SetBitmap(image.icon.tablericons.arrow_back_up.bitmap(20, 20))
         self._undo_button.SetToolTip(lang.get("program_3d_edit.file_ui.undo_tooltip"))
 
-        self._redo_button: Optional[wx.Button] = create_button(
-            "0", lambda evt: self.canvas.redo()
-        )
+        self._redo_button = create_button("0", lambda evt: self.canvas.redo())
         self._redo_button.SetBitmap(
             image.icon.tablericons.arrow_forward_up.bitmap(20, 20)
         )
         self._redo_button.SetToolTip(lang.get("program_3d_edit.file_ui.redo_tooltip"))
 
-        self._save_button: Optional[wx.Button] = create_button(
-            "0", lambda evt: self.canvas.save()
-        )
+        self._save_button = create_button("0", lambda evt: self.canvas.save())
         self._save_button.SetBitmap(image.icon.tablericons.device_floppy.bitmap(20, 20))
         self._save_button.SetToolTip(lang.get("program_3d_edit.file_ui.save_tooltip"))
 
-        close_button = wx.BitmapButton(
-            self._button_window, bitmap=image.icon.tablericons.square_x.bitmap(20, 20)
+        self._close_button = create_button(
+            "", lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
         )
-        close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
-        close_button.Bind(
-            wx.EVT_BUTTON, lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
-        )
-        self._button_sizer.Add(close_button)
+        self._close_button.SetBitmap(image.icon.tablericons.square_x.bitmap(20, 20))
+        self._close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
+        size = self._close_button.GetSize()
+        self._close_button.SetSize(wx.Size(size.GetHeight(), size.GetHeight()))
+        self._close_button.SetMinSize(wx.Size(size.GetHeight(), size.GetHeight()))
 
         self._update_buttons()
 
