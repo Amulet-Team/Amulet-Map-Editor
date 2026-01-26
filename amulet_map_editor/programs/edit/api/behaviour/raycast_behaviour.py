@@ -227,12 +227,18 @@ class RaycastBehaviour(BaseBehaviour):
                 locations.append(locations_)
 
         if locations:
-            collision_locations = numpy.floor(start_location).astype(int) + numpy.array(
-                sorted(
-                    numpy.concatenate(locations),
-                    key=lambda loc: sum(abs(loc_) for loc_ in loc),
+            all_locations = numpy.concatenate(locations)
+            if all_locations.size:
+                collision_locations = numpy.floor(start_location).astype(
+                    int
+                ) + numpy.array(
+                    sorted(
+                        all_locations,
+                        key=lambda loc: sum(abs(loc_) for loc_ in loc),
+                    )
                 )
-            )
+            else:
+                collision_locations = start.astype(int).reshape(1, 3)
         else:
             collision_locations = start.astype(int).reshape(1, 3)
 
