@@ -136,6 +136,20 @@ elif platform == "darwin":
             ),
         )
     )
+    minecraft_world_paths.append(
+        (
+            lang.get("world.pocket_platform"),
+            os.path.join(
+                os.path.expanduser("~"),
+                "Library",
+                "Application Support",
+                "minecraftpe",
+                "games",
+                "com.mojang",
+                "minecraftWorlds",
+            ),
+        )
+    )
 elif platform == "linux":
     minecraft_world_paths.append(
         (
