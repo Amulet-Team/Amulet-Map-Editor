@@ -44,6 +44,7 @@ try:
     from types import TracebackType
     import threading
     import faulthandler
+    import subprocess
     import multiprocessing
 except Exception as e_:
     _log_error(e_)
@@ -170,15 +171,24 @@ def _app_main() -> int:
 
 
 def main() -> NoReturn:
+    is_launcher = False
     try:
         multiprocessing.freeze_support()
-        exit_code = _app_main()
+        is_launcher = "--amulet-main" not in sys.argv
+        if is_launcher:
+            if getattr(sys, "frozen", False):
+                args = [sys.executable, "--amulet-main"] + sys.argv[1:]
+            else:
+                args = [sys.executable, __file__, "--amulet-main"] + sys.argv[1:]
+            exit_code = subprocess.run(args).returncode
+        else:
+            exit_code = _app_main()
     except Exception as e:
         _log_error(e)
         exit_code = 1
 
-    if exit_code:
-        input("Press ENTER to continue.")
+    if is_launcher and exit_code:
+        input(f"Exiting with code 0x{exit_code:0X}. Press ENTER to continue.")
     sys.exit(exit_code)
 
 
