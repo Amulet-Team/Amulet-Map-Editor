@@ -113,6 +113,7 @@ exe = EXE(
     upx=True,
     console=os.name == "nt", # Only show the console on windows
     icon="icon.ico",
+    contents_directory="lib"
 )
 exe_debug = EXE(
     pyz,
@@ -125,6 +126,7 @@ exe_debug = EXE(
     upx=True,
     console=os.name == "nt", # Only show the console on windows
     icon="icon.ico",
+    contents_directory="lib"
 )
 coll = COLLECT(
     exe,
