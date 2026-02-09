@@ -66,7 +66,7 @@ def _init_log():
         ):
             os.remove(path)
 
-    debug = "--amulet-debug" in sys.argv
+    debug = "debug" in os.path.basename(sys.executable) or "--amulet-debug" in sys.argv
 
     log_file = open(
         os.path.join(logs_path, f"amulet_{os.getpid()}.log"),
