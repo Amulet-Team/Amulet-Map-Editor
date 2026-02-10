@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from setuptools import setup, find_packages
-from wheel.bdist_wheel import bdist_wheel
+from setuptools.command.bdist_wheel import bdist_wheel
 from Cython.Build import cythonize
 import glob
 import sys
