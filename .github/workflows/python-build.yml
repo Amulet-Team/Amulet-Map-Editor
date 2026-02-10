@@ -41,19 +41,7 @@ jobs:
 
     - name: PyInstaller build
       run: |
-        built_path=Amulet-v${{ github.event.release.tag_name }}-$RUNNER_OS-${{ matrix.cfg.architecture }}.zip
-        echo "BUILT_PATH=$built_path" >> $GITHUB_ENV
         python -m PyInstaller -y Amulet.spec
-        cd dist
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          7z a $built_path Amulet
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          zip -r $built_path Amulet
-        else
-          echo "$RUNNER_OS not supported"
-          exit 1
-        fi
-        cd ..
 
     - name: Publish to PyPi
       env:
@@ -65,5 +53,5 @@ jobs:
     - name: Upload Release Asset
       uses: actions/upload-artifact@v4
       with:
-        name: ${{env.BUILT_PATH}}
-        path: ./dist/${{env.BUILT_PATH}}
+        name: Amulet-${{ github.event.release.tag_name }}-$RUNNER_OS-${{ matrix.cfg.architecture }}.zip
+        path: ./dist/Amulet
