@@ -27,5 +27,5 @@ jobs:
     - name: Upload Release Asset
       uses: actions/upload-artifact@v4
       with:
-        name: Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
-        path: Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
+        name: Amulet-${{ github.event.release.tag_name }}-docker.tar.gz
+        path: Amulet-${{ github.event.release.tag_name }}-docker.tar.gz

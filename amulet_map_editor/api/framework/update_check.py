@@ -39,10 +39,10 @@ class UpdateDialog(wx.Dialog):
             self, label=lang.get("update_check.newer_version_released")
         )
         static_text_2 = wx.StaticText(
-            self, label=f"{lang.get('update_check.new_version')} v{new_version}"
+            self, label=f"{lang.get('update_check.new_version')} {new_version}"
         )
         static_text_3 = wx.StaticText(
-            self, label=f"{lang.get('update_check.current_version')} v{current_version}"
+            self, label=f"{lang.get('update_check.current_version')} {current_version}"
         )
 
         sizer_1.Add(static_text_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
