@@ -22,7 +22,7 @@ jobs:
 
     - name: Save and compress Docker image
       run: |
-        docker save amulet-editor:latest | xz -9e > Amulet-v${{ github.event.release.tag_name }}-docker.tar.gz
+        docker save amulet-editor:latest | xz -9e > Amulet-${{ github.event.release.tag_name }}-docker.tar.gz
 
     - name: Upload Release Asset
       uses: actions/upload-artifact@v4
