@@ -188,8 +188,10 @@ def main() -> NoReturn:
         exit_code = 1
 
     if is_launcher and exit_code:
-        input(f"Exiting with code 0x{exit_code:0X}. Press ENTER to continue.")
-    sys.exit(exit_code)
+        print(f"Process exited with code 0x{exit_code:0X}")
+        if getattr(sys, "frozen", False) and sys.stdin is not None:
+            input(f"Press ENTER to continue.")
+    sys.exit(bool(exit_code))
 
 
 if __name__ == "__main__":
