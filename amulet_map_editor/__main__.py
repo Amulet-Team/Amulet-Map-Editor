@@ -46,6 +46,7 @@ try:
     import faulthandler
     import subprocess
     import multiprocessing
+    import amulet_faulthandler
 except Exception as e_:
     _log_error(e_)
     input("Press ENTER to continue.")
@@ -57,7 +58,7 @@ def _init_log() -> logging.Logger:
     # set up handlers
     os.makedirs(logs_path, exist_ok=True)
     # remove all log files older than a week
-    for path in glob.glob(os.path.join(glob.escape(logs_path), "*.log")):
+    for path in glob.glob(os.path.join(glob.escape(logs_path), "*")):
         if (
             os.path.isfile(path)
             and os.path.getmtime(path) < time.time() - 3600 * 24 * 7
@@ -112,6 +113,8 @@ def _init_log() -> logging.Logger:
 
     # When running via pythonw the stderr is None so log directly to the log file
     faulthandler.enable(log_file)
+
+    amulet_faulthandler.install(os.path.join(logs_path, f"amulet_{os.getpid()}.dmp"), debug)
 
     return log
 
@@ -188,7 +191,16 @@ def main() -> NoReturn:
         exit_code = 1
 
     if is_launcher and exit_code:
-        print(f"Process exited with code 0x{exit_code:0X}")
+        print(f"Application crashed with exit code {exit_code} (0x{exit_code:0X})")
+        print("Please report this issue to a developer.")
+        print("Attach the logs in the opened directory with your report.")
+        log_dir = os.environ.get("LOG_DIR") or platformdirs.user_log_dir("AmuletMapEditor", "AmuletTeam")
+        if sys.platform == "win32":
+            os.startfile(log_dir)
+        elif sys.platform == "darwin":
+            subprocess.run(["open", log_dir])
+        else:
+            subprocess.run(["xdg-open", log_dir])
         if getattr(sys, "frozen", False) and sys.stdin is not None:
             input(f"Press ENTER to continue.")
     sys.exit(bool(exit_code))
