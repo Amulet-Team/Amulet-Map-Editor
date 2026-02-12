@@ -12,6 +12,9 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+
     - name: Build Docker image
       run: |
         docker build \
