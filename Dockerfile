@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     libnotify4 \
     libSDL2-2.0 \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --upgrade pip
