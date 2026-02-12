@@ -114,7 +114,9 @@ def _init_log() -> logging.Logger:
     # When running via pythonw the stderr is None so log directly to the log file
     faulthandler.enable(log_file)
 
-    amulet_faulthandler.install(os.path.join(logs_path, f"amulet_{os.getpid()}.dmp"), debug)
+    amulet_faulthandler.install(
+        os.path.join(logs_path, f"amulet_{os.getpid()}.dmp"), debug
+    )
 
     return log
 
@@ -194,7 +196,9 @@ def main() -> NoReturn:
         print(f"Application crashed with exit code {exit_code} (0x{exit_code:0X})")
         print("Please report this issue to a developer.")
         print("Attach the logs in the opened directory with your report.")
-        log_dir = os.environ.get("LOG_DIR") or platformdirs.user_log_dir("AmuletMapEditor", "AmuletTeam")
+        log_dir = os.environ.get("LOG_DIR") or platformdirs.user_log_dir(
+            "AmuletMapEditor", "AmuletTeam"
+        )
         if sys.platform == "win32":
             os.startfile(log_dir)
         elif sys.platform == "darwin":
