@@ -1,17 +1,41 @@
 # This script will convert the pyinstaller bundle to a Windows installer
 # makensis /DVERSION=0.10.50 installer\windows.nsi
 
+!define MULTIUSER_EXECUTIONLEVEL Highest
+!define MULTIUSER_MUI
+!define MULTIUSER_INSTALLMODE_COMMANDLINE
+!define MULTIUSER_INSTALLMODE_INSTDIR "Amulet Team\Amulet ${VERSION}"
+!define MULTIUSER_USE_PROGRAMFILES64
+!include MultiUser.nsh
+
+!include "MUI2.nsh"
+!define MUI_ICON "logo.ico"
+!define MUI_UNICON "logo.ico"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\amulet.exe"
+
 !include FileFunc.nsh
 
-RequestExecutionLevel admin
-
-Name "Amulet ${VERSION}"
-Icon "logo.ico"
+Name "Amulet"
 OutFile "dist\Amulet-${VERSION}-Windows-x64-installer.exe"
-InstallDir "$PROGRAMFILES64\Amulet Team\Amulet ${VERSION}\"
 
-page directory
-page instfiles
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MULTIUSER_PAGE_INSTALLMODE
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
+
+!insertmacro MUI_LANGUAGE "English"
+
+Function .onInit
+  !insertmacro MULTIUSER_INIT
+FunctionEnd
+
+Function un.onInit
+  !insertmacro MULTIUSER_UNINIT
+FunctionEnd
 
 Section "install"
     SetOutPath $INSTDIR\lib
@@ -21,8 +45,8 @@ Section "install"
     File "dist\Amulet\amulet_debug.exe"
     File "logo.ico"
     WriteUninstaller "$INSTDIR\uninstall.exe"
-    createDirectory "$SMPROGRAMS\Amulet Team"
-    createShortCut "$SMPROGRAMS\Amulet Team\Amulet ${VERSION}.lnk" "$INSTDIR\amulet.exe" "" "$INSTDIR\logo.ico"
+    CreateDirectory "$SMPROGRAMS\Amulet Team"
+    CreateShortCut "$SMPROGRAMS\Amulet Team\Amulet ${VERSION}.lnk" "$INSTDIR\amulet.exe" "" "$INSTDIR\logo.ico"
 
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "DisplayName" "Amulet ${VERSION}"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
@@ -48,7 +72,7 @@ Section "uninstall"
     RMDir /r $INSTDIR\lib
     Delete $INSTDIR\uninstall.exe
     RMDir $INSTDIR
-    RMDir "$PROGRAMFILES64\Amulet Team"
+    RMDir $INSTDIR\..
 
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}"
 SectionEnd
