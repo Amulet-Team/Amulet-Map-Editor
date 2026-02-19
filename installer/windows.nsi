@@ -14,6 +14,7 @@
 !define MUI_FINISHPAGE_RUN "$INSTDIR\amulet.exe"
 
 !include FileFunc.nsh
+!include LogicLib.nsh
 
 Name "Amulet"
 OutFile "dist\Amulet-${VERSION}-Windows-x64-installer.exe"
@@ -48,31 +49,41 @@ Section "install"
     CreateDirectory "$SMPROGRAMS\Amulet Team"
     CreateShortCut "$SMPROGRAMS\Amulet Team\Amulet ${VERSION}.lnk" "$INSTDIR\amulet.exe" "" "$INSTDIR\logo.ico"
 
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "DisplayName" "Amulet ${VERSION}"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "InstallLocation" "$\"$INSTDIR$\""
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "DisplayIcon" "$\"$INSTDIR\logo.ico$\""
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "Publisher" "Amulet Team"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "DisplayVersion" "${VERSION}"
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "VersionMajor" 0
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "VersionMinor" 10
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "NoModify" 1
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "NoRepair" 1
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "DisplayName" "Amulet ${VERSION}"
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "InstallLocation" "$\"$INSTDIR$\""
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "DisplayIcon" "$\"$INSTDIR\logo.ico$\""
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "Publisher" "Amulet Team"
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "DisplayVersion" "${VERSION}"
+    WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "VersionMajor" 0
+    WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "VersionMinor" 10
+    WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "NoModify" 1
+    WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "NoRepair" 1
     ${GetSize} "$INSTDIR" "/S=0K /G=1" $0 $1 $2
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "EstimatedSize" $0
+    WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "EstimatedSize" $0
 SectionEnd
 
 Section "uninstall"
+    ;Detect if we are installed for all users
+    StrCpy $0 "$PROGRAMFILES64\"
+    StrLen $1 $0
+    StrCpy $2 $INSTDIR $1
+    ${IF} $0 == $2
+        SetShellVarContext all
+    ${Else}
+        SetShellVarContext current
+    ${EndIf}
+
     Delete "$SMPROGRAMS\Amulet Team\Amulet ${VERSION}.lnk"
     RMDir "$SMPROGRAMS\Amulet Team"
-    Delete $INSTDIR\amulet.exe
-    Delete $INSTDIR\amulet_debug.exe
-    Delete $INSTDIR\logo.ico
-    RMDir /r $INSTDIR\lib
-    Delete $INSTDIR\uninstall.exe
-    RMDir $INSTDIR
-    RMDir $INSTDIR\..
+    Delete "$INSTDIR\amulet.exe"
+    Delete "$INSTDIR\amulet_debug.exe"
+    Delete "$INSTDIR\logo.ico"
+    RMDir /r "$INSTDIR\lib"
+    Delete "$INSTDIR\uninstall.exe"
+    RMDir "$INSTDIR"
+    RMDir "$INSTDIR\.."
 
-    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}"
+    DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}"
 SectionEnd
