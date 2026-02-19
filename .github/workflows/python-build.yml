@@ -46,7 +46,18 @@ jobs:
 
     - name: PyInstaller build
       run: |
-        python -m PyInstaller -y Amulet.spec
+        python -m PyInstaller -y --distpath ./installer/dist installer/Amulet.spec
+
+    - name: Install NSIS
+      if: runner.os == 'Windows'
+      uses: repolevedavaj/install-nsis@v1.1.0
+      with:
+        nsis-version: '3.11'
+
+    - name: Windows Installer
+      if: runner.os == 'Windows'
+      run: |
+        makensis /DVERSION=${{ github.event.release.tag_name }} installer\windows.nsi
 
     - name: Publish to PyPi
       env:
@@ -59,4 +70,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Amulet-${{ github.event.release.tag_name }}-${{ runner.os }}-${{ matrix.cfg.architecture }}
-        path: ./dist/Amulet
+        path: ./installer/dist

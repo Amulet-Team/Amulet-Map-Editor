@@ -9,12 +9,10 @@ A new Minecraft world editor and converter that supports all versions since Java
 
 ![cover](resource/img/cover.jpg)
 
-## Running compiled builds (Currently Windows only)
+## Installing (Currently Windows only)
 
-Purchase and download the zip file for your operating system from [amuletmc.com](https://www.amuletmc.com). 
-Old versions can be found on our [releases page](https://github.com/Amulet-Team/Amulet-Map-Editor/releases).
-
-Extract the contained folder to a location on your computer and run `amulet_app.exe`.
+Purchase and download the installer for your operating system from [amuletmc.com](https://www.amuletmc.com).
+Run the installer and follow the instructions.
 
 ## Running from Source
 
@@ -26,6 +24,12 @@ See instructions on [amuletmc.com](https://www.amuletmc.com/installing-from-sour
 The Docker image runs on any Linux distro with Docker support.
 To run the Docker image, clone this repository and run `rundocker.sh`.
 Compatibility with wayland is done through xwayland for x11 support.
+
+## Legacy builds
+
+Old versions (prior to 0.10.45) can be found on our [releases page](https://github.com/Amulet-Team/Amulet-Map-Editor/releases).
+
+Extract the contained folder to a location on your computer and run `amulet_app.exe`.
 
 ## Contributing
 

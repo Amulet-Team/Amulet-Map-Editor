@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-# python -m PyInstaller -y Amulet.spec
+# python -m PyInstaller -y installer/Amulet.spec
 
 from PyInstaller.utils.hooks import collect_submodules
 
@@ -106,26 +106,26 @@ exe = EXE(
     pyz,
     a.scripts,
     exclude_binaries=True,
-    name="amulet_app",
+    name="amulet",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     console=os.name == "nt", # Only show the console on windows
-    icon="icon.ico",
+    icon="logo.ico",
     contents_directory="lib"
 )
 exe_debug = EXE(
     pyz,
     a.scripts,
     exclude_binaries=True,
-    name="amulet_app_debug",
+    name="amulet_debug",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     console=os.name == "nt", # Only show the console on windows
-    icon="icon.ico",
+    icon="logo.ico",
     contents_directory="lib"
 )
 coll = COLLECT(
@@ -143,6 +143,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name="amulet.app",
-    icon="icon.ico",
+    icon="logo.ico",
     bundle_identifier="com.amuletmc.amulet_map_editor",
 )
