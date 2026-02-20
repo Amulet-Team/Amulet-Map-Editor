@@ -44,6 +44,8 @@ RUN apt-get update && apt-get install -y \
     dbus-x11 \
     libnotify4 \
     libSDL2-2.0 \
+    libxxf86vm1 \
+    libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
