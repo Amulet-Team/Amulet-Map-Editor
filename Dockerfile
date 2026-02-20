@@ -46,6 +46,7 @@ RUN apt-get update && apt-get install -y \
     libSDL2-2.0 \
     libxxf86vm1 \
     libgl1 \
+    libsm6 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
