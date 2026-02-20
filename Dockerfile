@@ -14,9 +14,13 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+RUN wget https://github.com/Kitware/CMake/releases/download/v4.1.0/cmake-4.1.0-linux-x86_64.sh \
+    && chmod +x cmake-4.1.0-linux-x86_64.sh \
+    && ./cmake-4.1.0-linux-x86_64.sh --skip-license --prefix=/usr/local \
+    && rm cmake-4.1.0-linux-x86_64.sh
+
 RUN python3.11 -m pip install --upgrade pip
 RUN python3.11 -m pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
-RUN python3.11 -m pip install cmake~=4.1
 
 ARG AMULET_VERSION=RELEASE  # defaults to the latest version if no arg is given in build command.
 RUN if [ "$(echo "$AMULET_VERSION" | cut -c1-7)" = "CUSTOM:" ]; then \
