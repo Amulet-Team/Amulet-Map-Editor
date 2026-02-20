@@ -50,6 +50,7 @@ RUN apt-get update && apt-get install -y \
     libSDL2-2.0 \
     libsm6 \
     libcurl4 \
+    libsecret-1-0 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
