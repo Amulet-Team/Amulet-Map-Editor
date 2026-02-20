@@ -17,7 +17,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v4.1.0/cmake-4.1.0-l
     && rm cmake-4.1.0-linux-x86_64.sh
 
 RUN python3.11 -m pip install --upgrade pip
-RUN python3.11 -m pip wheel https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
+RUN python3.11 -m pip wheel -w /wheels https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
 
 # defaults to the latest version if no arg is given in build command.
 ARG AMULET_VERSION=RELEASE
