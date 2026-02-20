@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     libnotify4 \
     libSDL2-2.0 \
     cmake \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3.11 -m pip install --upgrade pip
