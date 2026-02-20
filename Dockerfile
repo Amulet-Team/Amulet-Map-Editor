@@ -17,20 +17,20 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v4.1.0/cmake-4.1.0-l
     && rm cmake-4.1.0-linux-x86_64.sh
 
 RUN python3.11 -m pip install --upgrade pip
-RUN python3.11 -m pip wheel -w /wheels https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
+ARG wxpython=https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
 
 # defaults to the latest version if no arg is given in build command.
 ARG AMULET_VERSION=RELEASE
 RUN if [ "$(echo "$AMULET_VERSION" | cut -c1-7)" = "CUSTOM:" ]; then \
-        python3.11 -m pip wheel -w /wheels "$(echo "$AMULET_VERSION" | cut -c8-)"; \
+        python3.11 -m pip wheel -w /wheels $wxpython "$(echo "$AMULET_VERSION" | cut -c8-)"; \
     elif [ "$AMULET_VERSION" = "RELEASE" ]; then \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager amulet-map-editor; \
+        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor; \
     elif [ "$AMULET_VERSION" = "BETA" ]; then \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager amulet-map-editor>=0b0; \
+        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor>=0b0; \
     elif [ "$AMULET_VERSION" = "ALPHA" ]; then \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager amulet-map-editor>=0a0; \
+        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor>=0a0; \
     else \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager amulet-map-editor==$AMULET_VERSION; \
+        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor==$AMULET_VERSION; \
     fi
 
 FROM python:3.11-slim
