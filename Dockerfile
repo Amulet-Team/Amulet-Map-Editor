@@ -47,6 +47,7 @@ RUN apt-get update && apt-get install -y \
     libxxf86vm1 \
     libgl1 \
     libsm6 \
+    libjpeg62-turbo \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
