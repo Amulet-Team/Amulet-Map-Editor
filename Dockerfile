@@ -49,6 +49,7 @@ RUN apt-get update && apt-get install -y \
     libnotify4 \
     libSDL2-2.0 \
     libsm6 \
+    libcurl4 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
