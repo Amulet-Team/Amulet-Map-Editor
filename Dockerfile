@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install Python 3.11 and required dependencies
 RUN apt-get update && apt-get install -y \
     python3.11 \
+    python3-pip \
     git \
     libgtk-3-dev \
     wget \
@@ -42,6 +43,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install Python 3.11 and required dependencies
 RUN apt-get update && apt-get install -y \
     python3.11 \
+    python3-pip \
     libgtk-3-0 \
     dbus-x11 \
     libnotify4 \
