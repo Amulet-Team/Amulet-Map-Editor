@@ -51,6 +51,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
-RUN pip install /wheels/*
+RUN python3.11 -m pip install /wheels/*
 
 ENTRYPOINT [ "python3.11", "-m", "amulet_map_editor" ]
