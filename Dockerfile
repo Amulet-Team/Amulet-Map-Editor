@@ -1,10 +1,11 @@
-FROM python:3.11-slim AS builder
+FROM ubuntu:22.04 AS builder
 
 # Prevent interactive prompts during apt install
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Python 3.11 and required dependencies
 RUN apt-get update && apt-get install -y \
+    python3.11 \
     git \
     libgtk-3-dev \
     wget \
@@ -33,21 +34,18 @@ RUN if [ "$(echo "$AMULET_VERSION" | cut -c1-7)" = "CUSTOM:" ]; then \
         python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor==$AMULET_VERSION; \
     fi
 
-FROM python:3.11-slim
+FROM ubuntu:22.04
 
 # Prevent interactive prompts during apt install
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Python 3.11 and required dependencies
 RUN apt-get update && apt-get install -y \
+    python3.11 \
     libgtk-3-0 \
     dbus-x11 \
     libnotify4 \
     libSDL2-2.0 \
-    libxxf86vm1 \
-    libgl1 \
-    libsm6 \
-    libjpeg62-turbo \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
