@@ -57,7 +57,7 @@ jobs:
     - name: Windows Installer
       if: runner.os == 'Windows'
       run: |
-        makensis /DVERSION=${{ github.event.release.tag_name }} installer\windows.nsi
+        makensis -DVERSION=${{ github.event.release.tag_name }} installer\windows.nsi
 
     - name: Publish to PyPi
       env:
