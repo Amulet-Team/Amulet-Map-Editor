@@ -53,6 +53,10 @@ RUN apt-get update && apt-get install -y \
     libsecret-1-0 \
     libpcre2-32-0 \
     xdg-utils \
+    libgl1 \
+    libgl1-mesa-dri \
+    libegl1 \
+    libegl1-mesa \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
