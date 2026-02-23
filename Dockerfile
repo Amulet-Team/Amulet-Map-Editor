@@ -52,6 +52,7 @@ RUN apt-get update && apt-get install -y \
     libcurl4 \
     libsecret-1-0 \
     libpcre2-32-0 \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
