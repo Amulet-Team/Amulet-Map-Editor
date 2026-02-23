@@ -53,6 +53,7 @@ RUN apt-get update && apt-get install -y \
     libsecret-1-0 \
     libpcre2-32-0 \
     xdg-utils \
+    libopengl0 \
     libgl1 \
     libgl1-mesa-dri \
     libegl1 \
