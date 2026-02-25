@@ -1,0 +1,39 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature] "
+labels: ["type: enhancement", "state: triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      options:
+      - label: I have searched the existing issues for a duplicate request.
+        required: true
+      - label: I understand that each report must only contain one request. Other requests must get their own report.
+        required: true
+
+  - type: textarea
+    attributes:
+      label: The Problem
+      description: A clear and concise description of what the problem is.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Feature Description
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: A clear and concise description of any existing solutions to the problem.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Any additional context you think is required.
