@@ -21,6 +21,32 @@ OutFile "dist\Amulet-${VERSION}-Windows-x64-installer.exe"
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MULTIUSER_PAGE_INSTALLMODE
+
+Function DisableDirIfAllUsers
+    ${If} $MultiUser.InstallMode == "AllUsers"
+        FindWindow $1 "#32770" "" $HWNDPARENT
+        GetDlgItem $0 $1 1001
+        EnableWindow $0 0
+        GetDlgItem $0 $1 1019
+        EnableWindow $0 0
+    ${EndIf}
+FunctionEnd
+
+Function CheckInstallDir
+    IfFileExists "$INSTDIR\*.*" 0 ok
+        ${If} $MultiUser.InstallMode == "AllUsers"
+            MessageBox MB_ICONSTOP "This version of Amulet is already installed.$\nPlease uninstall it before installing it again."
+        ${Else}
+            MessageBox MB_ICONSTOP "Amulet must be installed to an empty directory.$\nPlease select an empty directory or uninstall Amulet from this directory first."
+        ${EndIf}
+        Abort
+ok:
+FunctionEnd
+
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW DisableDirIfAllUsers
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE CheckInstallDir
+!insertmacro MUI_PAGE_DIRECTORY
+
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
