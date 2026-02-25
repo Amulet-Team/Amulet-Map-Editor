@@ -15,7 +15,7 @@ body:
   - type: textarea
     attributes:
       label: Issue Description
-      description: >-
+      description: |
         Describe the current behaviour and the behaviour you expected.
         Include all relevant information but be as concise as possible.
         Are you using Minecraft Java Edition or Bedrock Edition?
@@ -26,7 +26,7 @@ body:
   - type: textarea
     attributes:
       label: Steps to Reproduce
-      placeholder: >-
+      placeholder: |
         1. Go to '...'
         2. Click on '....'
         3. Scroll down to '....'
@@ -35,7 +35,7 @@ body:
   - type: input
     attributes:
       label: What version of Amulet are you using?
-      description: >-
+      description: |
         This must be a version number or git hash.
         This can be found in the top left corner of the editor.
       placeholder: 0.10.49
@@ -60,7 +60,7 @@ body:
   - type: textarea
     attributes:
       label: Attachments
-      description: >-
+      description: |
         If the issue requires a world or other file to reproduce, attach it here.
         Larger files can be uploaded to other services such as google drive and linked here (make sure to set the sharing preferences to allow others to view)
         See this link for information about attaching files to the bug report.
