@@ -1,0 +1,67 @@
+name: Bug Report
+description: Create a report to help us improve the program.
+title: "[Bug]: "
+labels: ["type: bug", "state: triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      options:
+      - label: I have searched the existing issues for a duplicate issue.
+        required: true
+      - label: I understand that each report must only contain one issue. Other issues must get their own report.
+        required: true
+
+  - type: textarea
+    attributes:
+      label: Issue Description
+      description: >-
+        Describe the current behaviour and the behaviour you expected.
+        Include all relevant information but be as concise as possible.
+        Are you using Minecraft Java Edition or Bedrock Edition?
+        What version(s) of Minecraft are you using?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      placeholder: >-
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+
+  - type: input
+    attributes:
+      label: What version of Amulet are you using?
+      description: >-
+        This must be a version number or git hash.
+        This can be found in the top left corner of the editor.
+      placeholder: 0.10.49
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: How did you install Amulet?
+      description: If running from source, please include the output from pip list.
+      placeholder: Amulet installer, pip install, ...
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: What operating system are you using?
+      placeholder: Windows 11, macOS 26, Linux Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Attachments
+      description: >-
+        If the issue requires a world or other file to reproduce, attach it here.
+        Larger files can be uploaded to other services such as google drive and linked here (make sure to set the sharing preferences to allow others to view)
+        See this link for information about attaching files to the bug report.
+        https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/attaching-files
