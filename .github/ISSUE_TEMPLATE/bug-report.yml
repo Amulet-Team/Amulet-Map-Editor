@@ -16,9 +16,9 @@ body:
     attributes:
       label: Issue Description
       description: |
-        Describe the current behaviour and the behaviour you expected.
-        Include all relevant information but be as concise as possible.
-        Are you using Minecraft Java Edition or Bedrock Edition?
+        Describe the current behaviour and the behaviour you expected.<br>
+        Include all relevant information but be as concise as possible.<br>
+        Are you using Minecraft Java Edition or Bedrock Edition?<br>
         What version(s) of Minecraft are you using?
     validations:
       required: true
@@ -36,7 +36,7 @@ body:
     attributes:
       label: What version of Amulet are you using?
       description: |
-        This must be a version number or git hash.
+        This must be a version number or git hash.<br>
         This can be found in the top left corner of the editor.
       placeholder: 0.10.49
     validations:
@@ -61,7 +61,7 @@ body:
     attributes:
       label: Attachments
       description: |
-        If the issue requires a world or other file to reproduce, attach it here.
-        Larger files can be uploaded to other services such as google drive and linked here (make sure to set the sharing preferences to allow others to view)
-        See this link for information about attaching files to the bug report.
+        If the issue requires a world or other file to reproduce, attach it here.<br>
+        Larger files can be uploaded to other services such as google drive and linked here (make sure to set the sharing preferences to allow others to view)<br>
+        See this link for information about attaching files to the bug report.<br>
         https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/attaching-files
