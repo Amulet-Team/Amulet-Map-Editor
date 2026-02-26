@@ -1,6 +1,5 @@
 import webbrowser
 from urllib.request import urlopen
-from urllib.error import URLError
 import json
 import wx
 import wx.adv
@@ -9,23 +8,30 @@ import wx.lib.inspection
 from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
+from ._legal import LicenceDialog
 
 
 class AmuletMainMenu(wx.Panel, BasePageUI):
     def __init__(self, parent: wx.Window):
-        super(AmuletMainMenu, self).__init__(parent)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(sizer)
+        super().__init__(parent)
 
-        self._lang_button = wx.BitmapButton(
-            self, bitmap=image.icon.tablericons.language.bitmap(64, 64)
-        )
-        self._lang_button.Bind(wx.EVT_BUTTON, self._select_language)
-        sizer.Add(self._lang_button, 0, wx.ALIGN_RIGHT)
+        root_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(root_sizer)
 
-        sizer.AddStretchSpacer(1)
+        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        root_sizer.Add(top_sizer, 1, wx.EXPAND, 0)
+        top_sizer.AddSpacer(64)
+        top_sizer.AddStretchSpacer(1)
+
+        top_centre_sizer = wx.BoxSizer(wx.VERTICAL)
+        top_sizer.Add(top_centre_sizer, 0, wx.EXPAND)
+        top_centre_sizer.AddStretchSpacer(1)
+
+        menu_sizer = wx.BoxSizer(wx.VERTICAL)
+        top_centre_sizer.Add(menu_sizer)
+
         name_sizer = wx.BoxSizer()
-        sizer.Add(name_sizer, 0, wx.CENTER)
+        menu_sizer.Add(name_sizer, 0, wx.CENTER)
         icon_img = image.logo.amulet_logo.bitmap(64, 64)
 
         icon = wx.StaticBitmap(self, wx.ID_ANY, icon_img, (0, 0), (64, 64))
@@ -47,24 +53,44 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self._open_world_button.Bind(
             wx.EVT_BUTTON, lambda _: open_level_from_dialog(self)
         )
-        sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
+        menu_sizer.Add(self._open_world_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._user_manual_button = wx.Button(self, size=(400, 70))
         self._user_manual_button.SetFont(button_font)
         self._user_manual_button.Bind(wx.EVT_BUTTON, self._documentation)
-        sizer.Add(self._user_manual_button, 0, wx.ALL | wx.CENTER, 5)
+        menu_sizer.Add(self._user_manual_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._bug_tracker_button = wx.Button(self, size=(400, 70))
         self._bug_tracker_button.SetFont(button_font)
         self._bug_tracker_button.Bind(wx.EVT_BUTTON, self._bugs)
-        sizer.Add(self._bug_tracker_button, 0, wx.ALL | wx.CENTER, 5)
+        menu_sizer.Add(self._bug_tracker_button, 0, wx.ALL | wx.CENTER, 5)
 
         self._discord_button = wx.Button(self, size=(400, 70))
         self._discord_button.SetFont(button_font)
         self._discord_button.Bind(wx.EVT_BUTTON, self._discord)
-        sizer.Add(self._discord_button, 0, wx.ALL | wx.CENTER, 5)
+        menu_sizer.Add(self._discord_button, 0, wx.ALL | wx.CENTER, 5)
 
-        sizer.AddStretchSpacer(2)
+        top_centre_sizer.AddStretchSpacer(1)
+        top_sizer.AddStretchSpacer(1)
+
+        side_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self._lang_button = wx.BitmapButton(
+            self, bitmap=image.icon.tablericons.language.bitmap(64, 64)
+        )
+        self._lang_button.Bind(wx.EVT_BUTTON, self._select_language)
+        side_sizer.Add(self._lang_button, 0, wx.ALIGN_RIGHT)
+
+        self._licence_button = wx.BitmapButton(
+            self, bitmap=image.icon.tablericons.license.bitmap(64, 64)
+        )
+        self._licence_button.Bind(wx.EVT_BUTTON, self._show_licences)
+        side_sizer.Add(self._licence_button, 0, wx.ALIGN_RIGHT)
+
+        top_sizer.Add(side_sizer)
+
+        footer_sizer = wx.BoxSizer(wx.VERTICAL)
+        root_sizer.Add(footer_sizer, 0, wx.EXPAND, 0)
 
         sponsor_header = wx.BoxSizer(wx.HORIZONTAL)
         self._sponsor_label = wx.StaticText(self)
@@ -76,16 +102,16 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         sponsor_header.AddSpacer(10)
         sponsor_header.Add(self._sponsor_link)
         sponsor_header.AddStretchSpacer(1)
-        sizer.Add(sponsor_header, 0, wx.EXPAND, 0)
+        footer_sizer.Add(sponsor_header, 0, wx.EXPAND)
 
         sponsor_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(sponsor_sizer, 1, wx.EXPAND, 0)
+        footer_sizer.Add(sponsor_sizer, 0, wx.EXPAND)
         pathway_bitmap = image.logo.pathway_logo.bitmap(300, 130)
         pathway_button = wx.StaticBitmap(
             self, wx.ID_ANY, pathway_bitmap, (0, 0), (300, 130)
         )
         pathway_button.Bind(wx.EVT_LEFT_DOWN, self._pathway)
-        sponsor_sizer.Add(pathway_button, 0, wx.EXPAND, 0)
+        sponsor_sizer.Add(pathway_button)
 
         try:
             with urlopen(
@@ -99,7 +125,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
                 self,
                 value="   ".join(sponsors),
                 style=wx.TE_READONLY | wx.TE_MULTILINE | wx.TE_CENTRE | wx.BORDER_NONE,
-                size=wx.Size(-1, 150),
+                size=wx.Size(-1, 130),
             )
             github_sponsor_text.SetBackgroundColour(self.GetBackgroundColour())
             sponsor_sizer.Add(github_sponsor_text, 1)
@@ -117,6 +143,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self._discord_button.SetToolTip(lang.get("app.browser_open_tooltip"))
         self._sponsor_label.SetLabel(lang.get("main_menu.our_sponsors"))
         self._sponsor_link.SetLabel(lang.get("main_menu.sponsor_link"))
+        self._licence_button.SetToolTip(lang.get("main_menu.licence_tooltip"))
 
     @staticmethod
     def _documentation(_):
@@ -147,6 +174,10 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
             lang.set_language(dialog.get_language())
         dialog.Destroy()
         self._load_strings()
+
+    def _show_licences(self, evt) -> None:
+        with LicenceDialog(self) as dlg:
+            dlg.ShowModal()
 
 
 class LangSelectDialog(wx.Dialog):
