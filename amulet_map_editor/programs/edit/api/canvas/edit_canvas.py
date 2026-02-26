@@ -180,6 +180,7 @@ class EditCanvas(BaseEditCanvas):
     def enable(self):
         super().enable()
         self._tool_sizer.enable()
+        self.PostSizeEvent()
 
     def disable(self):
         super().disable()
