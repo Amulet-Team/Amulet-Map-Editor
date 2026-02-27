@@ -708,6 +708,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             )
 
     def _paste_confirm(self, evt):
+        self.confirm_paste()
+
+    def confirm_paste(self) -> None:
         self.canvas.run_operation(self._paste_operation)
 
     def _on_resize(self, evt):
