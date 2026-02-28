@@ -21,6 +21,7 @@ from amulet_map_editor.programs.edit.api.key_config import (
     DefaultKeybindGroupId,
     PresetKeybinds,
     KeybindKeys,
+    ActionGroups,
 )
 from amulet_map_editor.api import config
 
@@ -265,7 +266,7 @@ class EditExtension(wx.Panel, BaseProgram):
         keybind_id = edit_config.get("keybind_group", DefaultKeybindGroupId)
         user_keybinds = edit_config.get("user_keybinds", {})
         key_config = KeyConfigDialog(
-            self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds
+            self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds, ActionGroups
         )
         if key_config.ShowModal() == wx.ID_OK:
             user_keybinds, keybind_id, keybinds = key_config.options
