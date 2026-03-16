@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from PyInstaller.building.build_main import Analysis
     from PyInstaller.building.datastruct import Tree
     from PyInstaller.building.api import PYZ, EXE, COLLECT
-    import PyInstaller.building.osx
     from PyInstaller.building.osx import BUNDLE
 
 sys.modules["FixTk"] = None
