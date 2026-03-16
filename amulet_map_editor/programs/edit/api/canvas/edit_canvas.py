@@ -160,6 +160,7 @@ class EditCanvas(BaseEditCanvas):
         # This lock stops two threads from editing the world simultaneously
         # call run_operation to acquire it.
         self._edit_lock = RLock()
+        self._goto_window = None
 
     def _init_opengl(self):
         super()._init_opengl()
@@ -187,6 +188,9 @@ class EditCanvas(BaseEditCanvas):
         self._tool_sizer.disable()
 
     def _on_close(self, _):
+        if self._goto_window is not None:
+            self._goto_window.Destroy()
+            self._goto_window = None
         close_level(self.world.level_path)
 
     @property
@@ -371,9 +375,28 @@ class EditCanvas(BaseEditCanvas):
         )
 
     def goto(self):
-        location = show_goto(self, *self.camera.location)
-        if location:
-            self.camera.location = location
+        current_location = self.camera.location
+        if self._goto_window is not None:
+            self._goto_window.set_location(*current_location)
+            self._goto_window.Raise()
+            return
+
+        def _on_goto(x, y, z):
+            self.camera.location = (x, y, z)
+
+        def _on_win_close(evt):
+            self._goto_window = None
+            evt.Skip()
+
+        world_name = self.world.level_wrapper.level_name
+        self._goto_window = show_goto(
+            self,
+            *current_location,
+            world_path=self.world.level_path,
+            on_goto=_on_goto,
+            title=f"Teleport Camera In {world_name}",
+        )
+        self._goto_window.Bind(wx.EVT_CLOSE, _on_win_close)
 
     def select_all(self):
         all_chunk_coords = tuple(self.world.all_chunk_coords(self.dimension))
