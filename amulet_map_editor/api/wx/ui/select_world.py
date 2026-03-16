@@ -122,6 +122,19 @@ if platform == "win32":
                     worlds_path,
                 )
             )
+    minecraft_world_paths.append(
+        (
+            lang.get("world.legends_legacy"),
+            os.path.join(
+                os.getenv("APPDATA"),
+                "MinecraftPE",
+                "games",
+                "com.mojang",
+                "minecraftWorlds",
+            ),
+        )
+    )
+
 
 elif platform == "darwin":
     minecraft_world_paths.append(
