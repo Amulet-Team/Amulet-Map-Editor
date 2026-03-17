@@ -46,6 +46,8 @@ jobs:
         python -m pip install dist/amulet_map_editor-*.whl --upgrade
 
     - name: PyInstaller build
+      env:
+        APPLE_CODESIGN_IDENTITY: ${{ secrets.APPLE_CODESIGN_IDENTITY }}
       run: |
         python -m PyInstaller -y --distpath ./installer/dist installer/Amulet.spec
 
