@@ -19,8 +19,9 @@ if TYPE_CHECKING:
     from PyInstaller.building.api import PYZ, EXE, COLLECT
     from PyInstaller.building.osx import BUNDLE
 
-sys.modules["FixTk"] = None
+is_windows = os.name == "nt"
 
+sys.modules["FixTk"] = None
 
 a = Analysis(
     [os.path.join(amulet_map_editor.__path__[0], "__main__.py")],
@@ -43,7 +44,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=os.name == "nt", # Only show the console on windows
+    console=is_windows, # Only show the console on Windows
     icon="logo.ico",
     contents_directory="lib"
 )
@@ -56,7 +57,7 @@ exe_debug = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=os.name == "nt", # Only show the console on windows
+    console=is_windows, # Only show the console on Windows
     icon="logo.ico",
     contents_directory="lib"
 )
