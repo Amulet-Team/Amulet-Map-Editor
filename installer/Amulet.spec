@@ -12,10 +12,6 @@ cwd = os.path.normcase(os.path.realpath(os.getcwd()))
 sys.path = [path for path in sys.path if os.path.normcase(os.path.realpath(path)) != cwd]
 sys.path.append(cwd)
 
-import amulet
-import amulet_nbt
-import PyMCTranslate
-import minecraft_model_reader
 import amulet_map_editor
 
 if TYPE_CHECKING:
@@ -25,14 +21,9 @@ if TYPE_CHECKING:
 
 sys.modules["FixTk"] = None
 
-AMULET_NBT_PATH = amulet_nbt.__path__[0]
-AMULET_PATH = amulet.__path__[0]
-PYMCT_PATH = PyMCTranslate.__path__[0]
-MINECRAFT_MODEL_READER = minecraft_model_reader.__path__[0]
-AMULET_MAP_EDITOR = amulet_map_editor.__path__[0]
 
 a = Analysis(
-    [os.path.join(AMULET_MAP_EDITOR, "__main__.py")],
+    [os.path.join(amulet_map_editor.__path__[0], "__main__.py")],
     binaries=[],
     datas=[],
     runtime_hooks=[],
