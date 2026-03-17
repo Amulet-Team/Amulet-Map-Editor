@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from PyInstaller.building.osx import BUNDLE
 
 is_windows = os.name == "nt"
+is_macos = sys.platform == "darwin"
 
 sys.modules["FixTk"] = None
 
@@ -35,6 +36,7 @@ a = Analysis(
 )
 
 pyz = PYZ(a.pure, a.zipped_data)
+
 exe = EXE(
     pyz,
     a.scripts,
@@ -46,7 +48,9 @@ exe = EXE(
     upx=True,
     console=is_windows, # Only show the console on Windows
     icon="logo.ico",
-    contents_directory="lib"
+    contents_directory="lib",
+    codesign_identity=os.environ.get("MACOS_CODESIGN_IDENTITY", None) if is_macos else None,
+    entitlements_file=os.path.join(os.path.dirname(__file__), "entitlements.plist") if is_macos else None,
 )
 exe_debug = EXE(
     pyz,
@@ -59,8 +63,11 @@ exe_debug = EXE(
     upx=True,
     console=is_windows, # Only show the console on Windows
     icon="logo.ico",
-    contents_directory="lib"
+    contents_directory="lib",
+    codesign_identity=os.environ.get("MACOS_CODESIGN_IDENTITY", None) if is_macos else None,
+    entitlements_file=os.path.join(os.path.dirname(__file__), "entitlements.plist") if is_macos else None,
 )
+
 coll = COLLECT(
     exe,
     exe_debug,
