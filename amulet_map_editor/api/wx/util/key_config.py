@@ -359,11 +359,9 @@ class KeyConfigDialog(SimpleDialog):
         fixed_keybinds: KeybindContainer,
         user_keybinds: KeybindContainer,
     ):
-        # Initialize SimpleDialog but override the style to include window management
-        wx.Dialog.__init__(
-            self,
+        super().__init__(
             parent,
-            title=lang.get("key_config.key_select"),
+            lang.get("key_config.key_select"),
             style=wx.CAPTION
             | wx.CLOSE_BOX
             | wx.MAXIMIZE_BOX
@@ -371,16 +369,7 @@ class KeyConfigDialog(SimpleDialog):
             | wx.SYSTEM_MENU
             | wx.RESIZE_BORDER,
         )
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(sizer)
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.sizer, 1, wx.EXPAND)
-        self.bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.bottom_sizer, 0, wx.EXPAND)
-        self.bottom_sizer.AddStretchSpacer()
-        button_sizer = self.CreateButtonSizer(wx.OK | wx.CANCEL)
-        self.bottom_sizer.Add(button_sizer, flag=wx.ALL, border=5)
-        
+
         self._key_config = KeyConfig(
             self, selected_group, entries, fixed_keybinds, user_keybinds
         )
