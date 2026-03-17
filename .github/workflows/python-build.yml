@@ -24,11 +24,10 @@ jobs:
     - name: Clone
       uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.cfg.python-version }} ${{ matrix.cfg.architecture }}
+    - name: Set up Python ${{ matrix.cfg.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.cfg.python-version }}
-        architecture: ${{ matrix.cfg.architecture }}
 
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
