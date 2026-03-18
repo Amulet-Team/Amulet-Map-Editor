@@ -122,7 +122,7 @@ jobs:
           -t deb \
           -n "amulet ${{ github.event.release.tag_name }}" \
           -v ${{ github.event.release.tag_name }} \
-          -p Amulet-${{ github.event.release.tag_name }}-linux-x64.deb
+          -p installer/dist/Amulet-${{ github.event.release.tag_name }}-linux-x64.deb
 
     - name: Publish to PyPi
       if: runner.os != 'Linux'
