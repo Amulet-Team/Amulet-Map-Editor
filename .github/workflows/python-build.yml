@@ -41,7 +41,7 @@ jobs:
     - name: Linux - Install dependencies
       if: runner.os == 'Linux'
       run: |
-        sudo apt install -y \
+        sudo apt-get update && apt-get install -y \
           libgtk-3-0 \
           dbus-x11 \
           libnotify4 \
