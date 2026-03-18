@@ -62,6 +62,47 @@ jobs:
         makensis -DVERSION=${{ github.event.release.tag_name }} installer/windows.nsi
         ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/Amulet-${{ github.event.release.tag_name }}-Windows-x64.exe"
 
+    - name: Linux - Package
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt install ruby
+        gem install fpm --user-install
+        
+        # Copy app
+        mkdir -p installer/dist/deb/opt
+        cp -r installer/dist/amulet installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }}
+        
+        # Copy logo
+        mkdir -p installer/dist/deb/usr/share/icons/hicolor/512x512/apps
+        cp installer/amulet_logo_512.png installer/dist/deb/usr/share/icons/hicolor/512x512/apps/amulet_logo.png
+        
+        # Create desktop file
+        mkdir -p installer/dist/deb/usr/share/applications
+        cat << EOF > installer/dist/deb/usr/share/applications/amulet.desktop
+        [Desktop Entry]
+        Type=Application
+        Name=Amulet ${{ github.event.release.tag_name }}
+        Comment=A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
+        Path=/opt/amulet_${{ github.event.release.tag_name }}
+        Exec=/opt/amulet_${{ github.event.release.tag_name }}/amulet
+        Icon=amulet_logo
+        EOF
+        
+        # Set Permissions
+        find installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }} -type f -exec chmod 644 -- {} +
+        find installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }} -type d -exec chmod 755 -- {} +
+        find installer/dist/deb/usr/share -type f -exec chmod 644 -- {} +
+        chmod +x installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }}/amulet
+        
+        # Build the package
+        fpm \
+          -C installer/dist/deb \
+          -s dir \
+          -t deb \
+          -n "Amulet ${{ github.event.release.tag_name }}" \
+          -v ${{ github.event.release.tag_name }} \
+          -p Amulet-${{ github.event.release.tag_name }}-linux-x86_64.deb
+
     - name: Publish to PyPi
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
