@@ -19,6 +19,7 @@ jobs:
       matrix:
         cfg:
         - {os: windows-latest, python-version: '3.11', architecture: x64}
+        - {os: ubuntu-24.04, python-version: '3.11', architecture: x64}
 
     steps:
     - name: Clone
