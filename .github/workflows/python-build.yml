@@ -23,10 +23,10 @@ jobs:
 
     steps:
     - name: Clone
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Python ${{ matrix.cfg.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.cfg.python-version }}
 
@@ -132,7 +132,7 @@ jobs:
         twine upload dist/amulet[_-]map[_-]editor* --skip-existing
 
     - name: Upload Release Asset
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: Amulet-${{ github.event.release.tag_name }}-${{ runner.os }}-${{ matrix.cfg.architecture }}
         path: ./installer/dist
