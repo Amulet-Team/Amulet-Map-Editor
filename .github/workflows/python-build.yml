@@ -102,7 +102,7 @@ jobs:
         cat << EOF > installer/dist/deb/usr/share/applications/amulet.desktop
         [Desktop Entry]
         Type=Application
-        Name=Amulet ${{ github.event.release.tag_name }}
+        Name=amulet ${{ github.event.release.tag_name }}
         Comment=A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
         Path=/opt/amulet_${{ github.event.release.tag_name }}
         Exec=/opt/amulet_${{ github.event.release.tag_name }}/amulet
@@ -120,7 +120,7 @@ jobs:
           -C installer/dist/deb \
           -s dir \
           -t deb \
-          -n "Amulet ${{ github.event.release.tag_name }}" \
+          -n "amulet ${{ github.event.release.tag_name }}" \
           -v ${{ github.event.release.tag_name }} \
           -p Amulet-${{ github.event.release.tag_name }}-linux-x64.deb
 
