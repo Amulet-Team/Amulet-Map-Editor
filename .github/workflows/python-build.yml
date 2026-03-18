@@ -38,6 +38,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install twine pyinstaller~=6.18 build
 
+    - name: Linux - Install wxpython
+      if: runner.os == 'Linux'
+      run: |
+        pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
+
     - name: Setup
       run: |
         export BDISTWHEELFREEZELIBS=true
