@@ -70,7 +70,7 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="Amulet",
+    name="amulet",
 )
 
 app = BUNDLE(

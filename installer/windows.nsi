@@ -66,10 +66,10 @@ FunctionEnd
 
 Section "install"
     SetOutPath $INSTDIR\lib
-    File /r "dist\Amulet\lib\*"
+    File /r "dist\amulet\lib\*"
     SetOutPath $INSTDIR
-    File "dist\Amulet\amulet.exe"
-    File "dist\Amulet\amulet_debug.exe"
+    File "dist\amulet\amulet.exe"
+    File "dist\amulet\amulet_debug.exe"
     File "logo.ico"
     WriteUninstaller "$INSTDIR\uninstall.exe"
     CreateDirectory "$SMPROGRAMS\Amulet Team"
