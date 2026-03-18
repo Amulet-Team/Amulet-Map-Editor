@@ -125,6 +125,7 @@ jobs:
           -p Amulet-${{ github.event.release.tag_name }}-linux-x64.deb
 
     - name: Publish to PyPi
+      if: runner.os != 'Linux'
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.AMULET_MAP_EDITOR_PYPI_PASSWORD }}
