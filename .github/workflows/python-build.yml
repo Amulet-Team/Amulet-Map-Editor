@@ -86,8 +86,8 @@ jobs:
     - name: Linux - Package
       if: runner.os == 'Linux'
       run: |
-        sudo apt install ruby
-        gem install fpm --user-install
+        sudo apt-get install ruby
+        gem install fpm
         
         # Copy app
         mkdir -p installer/dist/deb/opt
