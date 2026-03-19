@@ -19,7 +19,7 @@ jobs:
       matrix:
         cfg:
         - {os: windows-latest, python-version: '3.11', architecture: x64}
-        - {os: ubuntu-22.04, python-version: '3.11', architecture: x64}
+        - {os: ubuntu-24.04, python-version: '3.11', architecture: x64}
 
     steps:
     - name: Clone
@@ -56,7 +56,7 @@ jobs:
           libgl1-mesa-dri \
           libegl1 \
           libegl1-mesa
-        pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
+        pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
 
     - name: Setup
       run: |
