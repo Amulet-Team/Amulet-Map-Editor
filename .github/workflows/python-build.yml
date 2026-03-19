@@ -91,38 +91,43 @@ jobs:
         
         # Copy app
         mkdir -p installer/dist/deb/opt
-        cp -r installer/dist/amulet installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }}
+        cp -r installer/dist/amulet installer/dist/deb/opt/amulet_map_editor
         
         # Copy logo
         mkdir -p installer/dist/deb/usr/share/icons/hicolor/512x512/apps
-        cp installer/amulet_logo_512.png installer/dist/deb/usr/share/icons/hicolor/512x512/apps/amulet_logo.png
+        cp installer/amulet_logo_512.png installer/dist/deb/usr/share/icons/hicolor/512x512/apps/amulet_map_editor.png
         
         # Create desktop file
         mkdir -p installer/dist/deb/usr/share/applications
-        cat << EOF > installer/dist/deb/usr/share/applications/amulet.desktop
+        cat << EOF > installer/dist/deb/usr/share/applications/amulet_map_editor.desktop
         [Desktop Entry]
         Type=Application
-        Name=amulet ${{ github.event.release.tag_name }}
+        Name=Amulet ${{ github.event.release.tag_name }}
         Comment=A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
-        Path=/opt/amulet_${{ github.event.release.tag_name }}
-        Exec=/opt/amulet_${{ github.event.release.tag_name }}/amulet
-        Icon=amulet_logo
+        Path=/opt/amulet_map_editor
+        Exec=/opt/amulet_map_editor/amulet
+        Icon=amulet_map_editor
         EOF
         
         # Set Permissions
-        find installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }} -type f -exec chmod 644 -- {} +
-        find installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }} -type d -exec chmod 755 -- {} +
+        find installer/dist/deb/opt/amulet_map_editor -type f -exec chmod 644 -- {} +
+        find installer/dist/deb/opt/amulet_map_editor -type d -exec chmod 755 -- {} +
         find installer/dist/deb/usr/share -type f -exec chmod 644 -- {} +
-        chmod +x installer/dist/deb/opt/amulet_${{ github.event.release.tag_name }}/amulet
+        chmod +x installer/dist/deb/opt/amulet_map_editor/amulet
+        chmod +x installer/dist/deb/opt/amulet_map_editor/amulet_debug
         
         # Build the package
         fpm \
-          -C installer/dist/deb \
-          -s dir \
-          -t deb \
-          -n "amulet ${{ github.event.release.tag_name }}" \
-          -v ${{ github.event.release.tag_name }} \
-          -p installer/dist/Amulet-${{ github.event.release.tag_name }}-linux-x64.deb
+          --chdir installer/dist/deb \
+          --input-type dir \
+          --output-type deb \
+          --name "amulet-map-editor" \
+          --version ${{ github.event.release.tag_name }} \
+          --description "A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7." \
+          --url https://www.amuletmc.com \
+          --maintainer "James Clare (gentlegiantJGC) <amuleteditor@gmail.com>" \
+          --architecture native \
+          --package installer/dist/Amulet-${{ github.event.release.tag_name }}-Linux-x86_64.deb
 
     - name: Publish to PyPi
       if: runner.os != 'Linux'
