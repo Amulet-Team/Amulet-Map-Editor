@@ -45,7 +45,7 @@ jobs:
           libgtk-3-0 \
           dbus-x11 \
           libnotify4 \
-          libSDL2-2.0 \
+          libsdl2-2.0-0 \
           libsm6 \
           libcurl4 \
           libsecret-1-0 \
@@ -55,7 +55,7 @@ jobs:
           libgl1 \
           libgl1-mesa-dri \
           libegl1 \
-          libegl1-mesa
+          libegl-mesa0
         pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
 
     - name: Setup
