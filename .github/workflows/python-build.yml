@@ -121,7 +121,7 @@ jobs:
         cp -r "installer/dist/amulet.app" "installer/dist/dmg/amulet.app"
         create-dmg \
           --volname "Amulet-${{ github.event.release.tag_name }}" \
-          --volicon "installer/macos/logo.icns" \
+          --volicon "installer/logo.icns" \
           --window-pos 200 120 \
           --window-size 600 300 \
           --icon-size 100 \
