@@ -21,13 +21,14 @@ jobs:
         - {os: windows-2025, python-version: '3.11', architecture: x64}
         - {os: macos-15-intel, python-version: '3.11', architecture: x64}
         - {os: macos-15, python-version: '3.11', architecture: arm64}
+        - {os: ubuntu-24.04, python-version: '3.11', architecture: x64}
 
     steps:
     - name: Clone
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Python ${{ matrix.cfg.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.cfg.python-version }}
 
@@ -38,6 +39,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install twine pyinstaller~=6.18 build
+
+    - name: Linux - Install dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update && sudo apt-get install -y \
+          libgtk-3-0 \
+          dbus-x11 \
+          libnotify4 \
+          libsdl2-2.0-0 \
+          libsm6 \
+          libcurl4 \
+          libsecret-1-0 \
+          libpcre2-32-0 \
+          xdg-utils \
+          libopengl0 \
+          libgl1 \
+          libgl1-mesa-dri \
+          libegl1 \
+          libegl-mesa0
+        pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp311-cp311-linux_x86_64.whl
 
     - name: Setup
       run: |
@@ -70,8 +91,8 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         curl -L -o azuresigntool.exe https://github.com/vcsjones/AzureSignTool/releases/download/v7.0.1/AzureSignTool-x64.exe
-        ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/Amulet/amulet.exe"
-        ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/Amulet/amulet_debug.exe"
+        ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/amulet/amulet.exe"
+        ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/amulet/amulet_debug.exe"
         makensis -DVERSION=${{ github.event.release.tag_name }} installer/windows.nsi
         ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/Amulet-${{ github.event.release.tag_name }}-Windows-x64.exe"
 
@@ -104,7 +125,54 @@ jobs:
         xcrun stapler staple \
           "installer/dist/Amulet-${{ github.event.release.tag_name }}-macOS-${{ matrix.cfg.architecture }}.dmg"
 
+    - name: Linux - Package
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get install ruby
+        sudo gem install fpm
+        
+        # Copy app
+        mkdir -p installer/dist/deb/opt
+        cp -r installer/dist/amulet installer/dist/deb/opt/amulet_map_editor
+        
+        # Copy logo
+        mkdir -p installer/dist/deb/usr/share/icons/hicolor/512x512/apps
+        cp installer/amulet_logo_512.png installer/dist/deb/usr/share/icons/hicolor/512x512/apps/amulet_map_editor.png
+        
+        # Create desktop file
+        mkdir -p installer/dist/deb/usr/share/applications
+        cat << EOF > installer/dist/deb/usr/share/applications/amulet_map_editor.desktop
+        [Desktop Entry]
+        Type=Application
+        Name=Amulet ${{ github.event.release.tag_name }}
+        Comment=A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
+        Path=/opt/amulet_map_editor
+        Exec=/opt/amulet_map_editor/amulet
+        Icon=amulet_map_editor
+        EOF
+        
+        # Set Permissions
+        find installer/dist/deb/opt/amulet_map_editor -type f -exec chmod 644 -- {} +
+        find installer/dist/deb/opt/amulet_map_editor -type d -exec chmod 755 -- {} +
+        find installer/dist/deb/usr/share -type f -exec chmod 644 -- {} +
+        chmod +x installer/dist/deb/opt/amulet_map_editor/amulet
+        chmod +x installer/dist/deb/opt/amulet_map_editor/amulet_debug
+        
+        # Build the package
+        fpm \
+          --chdir installer/dist/deb \
+          --input-type dir \
+          --output-type deb \
+          --name "amulet-map-editor" \
+          --version ${{ github.event.release.tag_name }} \
+          --description "A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7." \
+          --url https://www.amuletmc.com \
+          --maintainer "James Clare (gentlegiantJGC) <amuleteditor@gmail.com>" \
+          --architecture native \
+          --package installer/dist/Amulet-${{ github.event.release.tag_name }}-Linux-x86_64.deb
+
     - name: Publish to PyPi
+      if: runner.os != 'Linux'
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.AMULET_MAP_EDITOR_PYPI_PASSWORD }}
@@ -112,7 +180,7 @@ jobs:
         twine upload dist/amulet[_-]map[_-]editor* --skip-existing
 
     - name: Upload Release Asset
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: Amulet-${{ github.event.release.tag_name }}-${{ runner.os }}-${{ matrix.cfg.architecture }}
         path: ./installer/dist
