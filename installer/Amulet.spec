@@ -50,7 +50,7 @@ exe = EXE(
     icon="logo.ico",
     contents_directory="lib",
     codesign_identity=os.environ.get("APPLE_CODESIGN_IDENTITY", None) if is_macos else None,
-    entitlements_file=os.path.join(os.path.dirname(__file__), "entitlements.plist") if is_macos else None,
+    entitlements_file="entitlements.plist" if is_macos else None,
 )
 exe_debug = EXE(
     pyz,
@@ -65,7 +65,7 @@ exe_debug = EXE(
     icon="logo.ico",
     contents_directory="lib",
     codesign_identity=os.environ.get("APPLE_CODESIGN_IDENTITY", None) if is_macos else None,
-    entitlements_file=os.path.join(os.path.dirname(__file__), "entitlements.plist") if is_macos else None,
+    entitlements_file="entitlements.plist" if is_macos else None,
 )
 
 coll = COLLECT(
