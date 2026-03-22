@@ -206,9 +206,9 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             z_min = chunk_z + slices[2].start
 
             for dx, dy, dz in numpy.argwhere(replace_mask):
-                x = int(x_min * dx)
-                y = int(y_min * dy)
-                z = int(z_min * dz)
+                x = int(x_min + dx)
+                y = int(y_min + dy)
+                z = int(z_min + dz)
                 coord = (x, y, z)
 
                 if block_entity is not None:
