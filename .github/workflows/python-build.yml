@@ -117,7 +117,6 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         codesign --verify --deep --strict --verbose=4 installer/dist/amulet.app
-        codesign --verify --deep --strict --verbose=4 installer/dist/amulet_debug.app
 
     - name: MacOS - Create DMG
       if: runner.os == 'macOS'
