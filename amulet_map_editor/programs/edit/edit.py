@@ -72,18 +72,17 @@ class EditExtension(wx.Panel, BaseProgram):
         else:
             self._canvas.enable()
 
-    def _update_loading(self, it: Generator[OperationYieldType, None, None]):
-        for arg in it:
-            if isinstance(arg, (int, float)):
-                self._temp_loading_bar.SetValue(int(min(arg, 1) * 10000))
-            elif (
-                isinstance(arg, tuple)
-                and isinstance(arg[0], (int, float))
-                and isinstance(arg[1], str)
-            ):
-                self._temp_loading_bar.SetValue(int(min(arg[0], 1) * 10000))
-                self._temp_msg.SetLabel(arg[1])
-            self.Layout()
+    def _update_loading_bar(self, arg: OperationYieldType) -> None:
+        if isinstance(arg, (int, float)):
+            self._temp_loading_bar.SetValue(int(min(arg, 1) * 10000))
+        elif (
+            isinstance(arg, tuple)
+            and isinstance(arg[0], (int, float))
+            and isinstance(arg[1], str)
+        ):
+            self._temp_loading_bar.SetValue(int(min(arg[0], 1) * 10000))
+            self._temp_msg.SetLabel(arg[1])
+        self.Layout()
 
     def _display_error(self, msg, tb):
         dialog = TracebackDialog(
@@ -103,7 +102,8 @@ class EditExtension(wx.Panel, BaseProgram):
         Everything in here must be thread safe.
         """
         try:
-            self._update_loading(self._canvas.thread_setup())
+            for arg in self._canvas.thread_setup():
+                wx.CallAfter(self._update_loading_bar, arg)
         except Exception as e:
             wx.CallAfter(self._display_error, str(e), traceback.format_exc())
             raise e
@@ -115,7 +115,8 @@ class EditExtension(wx.Panel, BaseProgram):
         Run any setup that is not thread safe.
         """
         try:
-            self._update_loading(self._canvas.post_thread_setup())
+            for arg in self._canvas.post_thread_setup():
+                wx.CallAfter(self._update_loading_bar, arg)
             edit_config: dict = config.get(EDIT_CONFIG_ID, {})
             self._canvas.camera.perspective_fov = edit_config.get("options", {}).get(
                 "fov", 70.0
