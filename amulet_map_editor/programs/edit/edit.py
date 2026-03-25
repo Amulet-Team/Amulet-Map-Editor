@@ -116,7 +116,7 @@ class EditExtension(wx.Panel, BaseProgram):
         """
         try:
             for arg in self._canvas.post_thread_setup():
-                wx.CallAfter(self._update_loading_bar, arg)
+                self._update_loading_bar(arg)
             edit_config: dict = config.get(EDIT_CONFIG_ID, {})
             self._canvas.camera.perspective_fov = edit_config.get("options", {}).get(
                 "fov", 70.0
