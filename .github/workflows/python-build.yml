@@ -112,6 +112,7 @@ jobs:
         ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/amulet/amulet_debug.exe"
         makensis -DVERSION=${{ github.event.release.tag_name }} installer/windows.nsi
         ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/Amulet-${{ github.event.release.tag_name }}-Windows-x64.exe"
+        rmdir -s -q installer/dist/amulet
 
     - name: MacOS - Create DMG
       if: runner.os == 'macOS'
@@ -131,6 +132,9 @@ jobs:
           --app-drop-link 425 120 \
           "installer/dist/Amulet-${{ github.event.release.tag_name }}-macOS-${{ matrix.cfg.architecture }}.dmg" \
           "installer/dist/dmg"
+        rm -rf installer/dist/amulet.app
+        rm -rf installer/dist/amulet
+        rm -rf installer/dist/dmg
 
     - name: MacOS - Notarise DMG
       if: runner.os == 'macOS'
@@ -188,6 +192,9 @@ jobs:
           --maintainer "James Clare (gentlegiantJGC) <amuleteditor@gmail.com>" \
           --architecture native \
           --package installer/dist/Amulet-${{ github.event.release.tag_name }}-Linux-x86_64.deb
+        
+        rm -rf installer/dist/amulet
+        rm -rf installer/dist/deb
 
     - name: Publish to PyPi
       if: runner.os != 'Linux'
