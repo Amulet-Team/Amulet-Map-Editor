@@ -110,6 +110,17 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         button_sizer.Add(prune_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
         prune_button.Bind(wx.EVT_BUTTON, self._prune_chunks)
+
+        import_button = wx.Button(
+            self._button_panel,
+            label=lang.get("program_3d_edit.chunk_tool.import_chunks"),
+        )
+        import_button.SetToolTip(
+            lang.get("program_3d_edit.chunk_tool.import_chunks_tooltip")
+        )
+        button_sizer.Add(import_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
+        import_button.Bind(wx.EVT_BUTTON, self._import_chunks)
+
         self._resize()
 
     @property
@@ -259,6 +270,9 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
                     load_original,
                 )
             )
+
+    def _import_chunks(self, evt):
+        pass
 
     def _on_resize(self, evt):
         self._resize()

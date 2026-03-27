@@ -304,6 +304,8 @@ program_3d_edit.chunk_tool.delete_chunks=Delete Chunks
 program_3d_edit.chunk_tool.delete_chunks_tooltip=Delete the selected chunks. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
 program_3d_edit.chunk_tool.prune_chunks=Delete Unselected Chunks
 program_3d_edit.chunk_tool.prune_chunks_tooltip=Delete all chunks that are not selected. This will delete the actual chunk and all the data contained within it. Next time you load the area in game it will recreate the chunks.
+program_3d_edit.chunk_tool.import_chunks=Import Chunks
+program_3d_edit.chunk_tool.import_chunks_tooltip=Replace the selected chunks with chunks from another world. Useful if you want to restore chunks from a backup.
 
 ## Goto/Teleport window
 program_3d_edit.goto_ui.title=Teleport
