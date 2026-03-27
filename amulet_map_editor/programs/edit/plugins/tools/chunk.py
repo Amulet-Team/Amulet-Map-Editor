@@ -17,12 +17,16 @@ from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import ChunkSelectionBehaviour
 from amulet.operations.delete_chunk import delete_chunk
 from amulet.api.data_types import Dimension
+from amulet.api.data_types.operation_types import OperationReturnType
 from amulet.api.level import BaseLevel
 from amulet.api.selection import SelectionGroup
 from amulet.api.chunk import Chunk
+from amulet.api.errors import ChunkLoadError
+from amulet.level.load import load_format
 from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_operations.prune_chunks import (
     prune_chunks,
 )
+from amulet_map_editor.api.wx.ui.select_world import WorldSelectDialog
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -274,7 +278,32 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
             )
 
     def _import_chunks(self, evt):
-        pass
+        def on_world_selected(path: str):
+            def operation() -> OperationReturnType:
+                src_level = load_format(path)
+                src_level.open()
+                dimension = self.canvas.dimension
+
+                chunks = list(self.canvas.selection.selection_group.chunk_locations())
+                count = len(chunks)
+
+                for i, (cx, cz) in enumerate(chunks):
+                    try:
+                        chunk = src_level.load_chunk(cx, cz, self.canvas.dimension)
+                        chunk.changed = True
+                        self.canvas.world.put_chunk(chunk, dimension)
+                    except ChunkLoadError:
+                        pass
+
+                    yield (i + 1) / count
+
+                src_level.close()
+
+            self.canvas.run_operation(operation)
+
+        select_world = WorldSelectDialog(self.canvas, on_world_selected)
+        select_world.ShowModal()
+        select_world.Destroy()
 
     def _on_resize(self, evt):
         self._resize()
