@@ -118,7 +118,9 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
         import_button.SetToolTip(
             lang.get("program_3d_edit.chunk_tool.import_chunks_tooltip")
         )
-        button_sizer.Add(import_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
+        button_sizer.Add(
+            import_button, 0, wx.LEFT | wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5
+        )
         import_button.Bind(wx.EVT_BUTTON, self._import_chunks)
 
         self._resize()
