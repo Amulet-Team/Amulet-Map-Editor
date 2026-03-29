@@ -126,6 +126,7 @@ update_check.ok=Ok
 # Select world
 ## The window when selecting a world to open
 select_world.title=World Select
+select_world.open_directory=Open Directory
 select_world.open_world_warning=Close the world in game and other tools before opening in Amulet.
 select_world.open_world_button=Open World Directory
 select_world.open_world_dialogue=Select a Minecraft world directory

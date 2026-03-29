@@ -5,6 +5,7 @@ from typing import List, Dict, Tuple, Callable, TYPE_CHECKING
 import traceback
 import logging
 import zipfile
+import subprocess
 
 import wx
 
@@ -282,7 +283,14 @@ class WorldList(wx.Panel):
 class CollapsibleWorldListUI(wx.CollapsiblePane):
     """a drop down list of `WorldUIButton`s for a given directory"""
 
-    def __init__(self, parent, paths: List[str], group_name: str, open_world_callback):
+    def __init__(
+        self,
+        parent,
+        paths: List[str],
+        group_name: str,
+        open_world_callback,
+        root_directory: str | None = None,
+    ):
         super().__init__(parent, label=group_name)
         self.parent = parent
         self.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.eval_layout)
@@ -291,9 +299,29 @@ class CollapsibleWorldListUI(wx.CollapsiblePane):
         self.SetSizer(self.sizer)
 
         panel = self.GetPane()
-        panel.sizer = wx.BoxSizer(wx.VERTICAL)
-        panel.SetSizer(panel.sizer)
-        panel.sizer.Add(WorldList(panel, paths, open_world_callback), 0, wx.EXPAND)
+        panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        panel.SetSizer(panel_sizer)
+
+        if root_directory is not None and os.path.isdir(root_directory):
+
+            def open_directory(evt):
+                if platform == "win32":
+                    os.startfile(root_directory)
+                elif platform == "darwin":
+                    subprocess.call(["open", root_directory])
+                else:
+                    subprocess.call(["xdg-open", root_directory])
+                evt.Skip()
+
+            open_directory_button = wx.Button(
+                panel, label=lang.get("select_world.open_directory")
+            )
+            panel_sizer.Add(
+                open_directory_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
+            )
+            open_directory_button.Bind(wx.EVT_BUTTON, open_directory)
+
+        panel_sizer.Add(WorldList(panel, paths, open_world_callback), 0, wx.EXPAND)
 
     def eval_layout(self, evt):
         self.Layout()
@@ -323,6 +351,7 @@ class ScrollableWorldsUI(simple.SimpleScrollablePanel):
                     glob.glob(os.path.join(glob.escape(directory), "*")),
                     group_name,
                     self.open_world_callback,
+                    directory,
                 )
                 self.add_object(world_list, 0, wx.EXPAND)
                 self.dirs[directory] = world_list
