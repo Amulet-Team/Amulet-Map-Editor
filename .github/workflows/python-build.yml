@@ -108,8 +108,7 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         curl -L -o azuresigntool.exe https://github.com/vcsjones/AzureSignTool/releases/download/v7.0.1/AzureSignTool-x64.exe
-        ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/amulet/amulet.exe"
-        ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/amulet/amulet_debug.exe"
+        find ./installer/dist/amulet -type f \( -name "*.exe" -o -name "*.dll" -o -name "*.pyd" \) -exec ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "{}" \;
         makensis -DVERSION=${{ github.event.release.tag_name }} installer/windows.nsi
         ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/Amulet-${{ github.event.release.tag_name }}-Windows-x64.exe"
         rm -rf installer/dist/amulet
