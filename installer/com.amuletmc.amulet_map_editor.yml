@@ -1,0 +1,32 @@
+id: com.amuletmc.amulet_map_editor
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: amulet_map_editor
+  
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --device=dri
+  - --filesystem=home
+  - --share=network
+
+modules:
+  - name: libjpeg-turbo
+    buildsystem: cmake
+    config-opts:
+      - -DCMAKE_INSTALL_PREFIX=/app
+      - -DCMAKE_INSTALL_LIBDIR=lib
+      - -DWITH_JPEG8=ON
+    sources:
+      - type: archive
+        url: https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.90/libjpeg-turbo-3.1.90.tar.gz
+        sha256: 1d0e86ee45bf435dc57f8744763ba62410294b0f5312cb87962214ac1f7fb78b
+
+  - name: amulet_map_editor
+    buildsystem: simple
+    build-commands: 
+      - pip3 install --no-index --find-links=. --prefix=/app amulet_map_editor
+    sources:
+      - type: dir
+        path: wheels
