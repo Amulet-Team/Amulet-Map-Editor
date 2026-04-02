@@ -111,8 +111,9 @@ def _init_log() -> logging.Logger:
 
     threading.excepthook = thread_error_handler
 
-    # When running via pythonw the stderr is None so log directly to the log file
-    faulthandler.enable(log_file)
+    if "--disable-py-faulthandler" not in sys.argv:
+        # When running via pythonw the stderr is None so log directly to the log file
+        faulthandler.enable(log_file)
 
     amulet_faulthandler.install(
         os.path.join(logs_path, f"amulet_{os.getpid()}.dmp"), debug
