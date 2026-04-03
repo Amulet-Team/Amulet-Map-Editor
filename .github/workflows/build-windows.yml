@@ -1,0 +1,71 @@
+name: Build Windows
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ${{ matrix.cfg.os }}
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg:
+        - {os: windows-2025, python-version: '3.11', architecture: x64}
+
+    steps:
+    - name: Clone
+      uses: actions/checkout@v6
+
+    - name: Set up Python ${{ matrix.cfg.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.cfg.python-version }}
+
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine pyinstaller~=6.18 build
+
+    - name: Setup
+      run: |
+        export BDISTWHEELFREEZELIBS=true
+        python -m build
+        python -m pip install dist/amulet_map_editor-*.whl --upgrade
+
+    - name: PyInstaller build
+      run: |
+        python -m PyInstaller -y --distpath ./installer/dist installer/Amulet.spec
+
+    - name: Windows - Install NSIS
+      uses: repolevedavaj/install-nsis@v1.1.0
+      with:
+        nsis-version: '3.11'
+
+    - name: Windows - Sign and Create Installer
+      run: |
+        curl -L -o azuresigntool.exe https://github.com/vcsjones/AzureSignTool/releases/download/v7.0.1/AzureSignTool-x64.exe
+        find ./installer/dist/amulet -type f \( -name "*.exe" -o -name "*.dll" -o -name "*.pyd" \) -exec ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "{}" \;
+        makensis -DVERSION=${{ github.event.release.tag_name }} installer/windows.nsi
+        ./azuresigntool.exe sign -kvu "${{ secrets.KEY_VAULT_URL }}" -kvc "${{ secrets.KEY_VAULT_CERTIFICATE }}" -kvi "${{ secrets.KEY_VAULT_CLIENT_ID }}" -kvs "${{ secrets.KEY_VAULT_SECRET }}" -kvt "${{ secrets.KEY_VAULT_TENANT }}" -tr http://timestamp.digicert.com -v "./installer/dist/Amulet-${{ github.event.release.tag_name }}-Windows-x64.exe"
+        rm -rf installer/dist/amulet
+
+    - name: Publish to PyPi
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.AMULET_MAP_EDITOR_PYPI_PASSWORD }}
+      run: |
+        twine upload dist/amulet[_-]map[_-]editor*.tar.gz --skip-existing
+
+    - name: Upload Release Asset
+      uses: actions/upload-artifact@v6
+      with:
+        name: Amulet-${{ github.event.release.tag_name }}-${{ runner.os }}-${{ matrix.cfg.architecture }}
+        path: ./installer/dist

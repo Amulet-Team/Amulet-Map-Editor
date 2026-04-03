@@ -1,0 +1,125 @@
+name: Build Debian
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ${{ matrix.cfg.os }}
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg:
+        - {os: ubuntu-24.04, python-version: '3.13', architecture: x64}
+
+    steps:
+    - name: Clone
+      uses: actions/checkout@v6
+
+    - name: Set up Python ${{ matrix.cfg.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.cfg.python-version }}
+
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine pyinstaller~=6.18 build
+
+    - name: Linux - Install dependencies
+      run: |
+        sudo apt-get update && sudo apt-get install -y \
+          libgtk-3-0 \
+          dbus-x11 \
+          libnotify4 \
+          libsdl2-2.0-0 \
+          libsm6 \
+          libcurl4 \
+          libsecret-1-0 \
+          libpcre2-32-0 \
+          xdg-utils \
+          libopengl0 \
+          libgl1 \
+          libgl1-mesa-dri \
+          libegl1 \
+          libegl-mesa0
+        pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp313-cp313-linux_x86_64.whl
+
+    - name: Setup
+      run: |
+        export BDISTWHEELFREEZELIBS=true
+        python -m build
+        python -m pip install dist/amulet_map_editor-*.whl --upgrade
+
+    - name: PyInstaller build
+      run: |
+        python -m PyInstaller -y --distpath ./installer/dist installer/Amulet.spec
+
+    - name: Linux - Package
+      run: |
+        sudo apt-get install ruby
+        sudo gem install fpm
+        
+        # Copy app
+        mkdir -p installer/dist/deb/opt
+        cp -r installer/dist/amulet installer/dist/deb/opt/amulet_map_editor
+        
+        # Copy logo
+        mkdir -p installer/dist/deb/usr/share/icons/hicolor/512x512/apps
+        cp installer/amulet_logo_512.png installer/dist/deb/usr/share/icons/hicolor/512x512/apps/amulet_map_editor.png
+        
+        # Create desktop file
+        mkdir -p installer/dist/deb/usr/share/applications
+        cat << EOF > installer/dist/deb/usr/share/applications/amulet_map_editor.desktop
+        [Desktop Entry]
+        Type=Application
+        Name=Amulet ${{ github.event.release.tag_name }}
+        Comment=A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
+        Path=/opt/amulet_map_editor
+        Exec=/opt/amulet_map_editor/amulet
+        Icon=amulet_map_editor
+        EOF
+        
+        # Set Permissions
+        find installer/dist/deb/opt/amulet_map_editor -type f -exec chmod 644 -- {} +
+        find installer/dist/deb/opt/amulet_map_editor -type d -exec chmod 755 -- {} +
+        find installer/dist/deb/usr/share -type f -exec chmod 644 -- {} +
+        chmod +x installer/dist/deb/opt/amulet_map_editor/amulet
+        chmod +x installer/dist/deb/opt/amulet_map_editor/amulet_debug
+        
+        # Build the package
+        fpm \
+          --chdir installer/dist/deb \
+          --input-type dir \
+          --output-type deb \
+          --name "amulet-map-editor" \
+          --version ${{ github.event.release.tag_name }} \
+          --description "A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7." \
+          --url https://www.amuletmc.com \
+          --maintainer "James Clare (gentlegiantJGC) <amuleteditor@gmail.com>" \
+          --architecture native \
+          --package installer/dist/Amulet-${{ github.event.release.tag_name }}-Linux-x86_64.deb
+        
+        rm -rf installer/dist/amulet
+        rm -rf installer/dist/deb
+
+    - name: Publish to PyPi
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.AMULET_MAP_EDITOR_PYPI_PASSWORD }}
+      run: |
+        twine upload dist/amulet[_-]map[_-]editor*.tar.gz --skip-existing
+
+    - name: Upload Release Asset
+      uses: actions/upload-artifact@v6
+      with:
+        name: Amulet-${{ github.event.release.tag_name }}-${{ runner.os }}-${{ matrix.cfg.architecture }}
+        path: ./installer/dist
