@@ -1,4 +1,4 @@
-name: Build Debian
+name: Build Linux
 
 on:
   release:
