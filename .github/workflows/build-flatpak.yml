@@ -44,6 +44,16 @@ jobs:
         sudo apt-get install -y flatpak-builder        
         sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
+        # Create desktop file
+        cat << EOF > installer/com.amuletmc.amulet_map_editor.desktop
+        [Desktop Entry]
+        Type=Application
+        Name=Amulet ${{ github.event.release.tag_name }}
+        Comment=A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
+        Exec=amulet_map_editor
+        Icon=com.amuletmc.amulet_map_editor
+        EOF
+
         flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo --install builddir installer/com.amuletmc.amulet_map_editor.yml
         flatpak build-bundle repo installer/dist/amulet_map_editor-${{ github.event.release.tag_name }}-flatpak-${{ matrix.cfg.architecture }}.flatpak com.amuletmc.amulet_map_editor --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 
