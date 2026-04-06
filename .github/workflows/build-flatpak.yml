@@ -55,6 +55,7 @@ jobs:
         EOF
 
         flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo --install builddir installer/com.amuletmc.amulet_map_editor.yml
+        mkdir -p installer/dist
         flatpak build-bundle repo installer/dist/amulet_map_editor-${{ github.event.release.tag_name }}-flatpak-${{ matrix.cfg.architecture }}.flatpak com.amuletmc.amulet_map_editor --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 
     - name: Upload Release Asset
