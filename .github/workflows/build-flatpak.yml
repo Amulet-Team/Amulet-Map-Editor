@@ -42,7 +42,7 @@ jobs:
       run: |
         sudo apt-get install -y flatpak
         sudo apt-get install -y flatpak-builder        
-        sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
         # Create desktop file
         cat << EOF > installer/com.amuletmc.amulet_map_editor.desktop
