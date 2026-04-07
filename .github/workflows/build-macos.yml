@@ -76,7 +76,7 @@ jobs:
         brew install create-dmg
         mkdir -p "installer/dist/dmg"
         ditto "installer/dist/Amulet ${{ github.event.release.tag_name }}.app" "installer/dist/dmg/Amulet ${{ github.event.release.tag_name }}.app"
-        codesign --verify --deep --strict installer/dist/dmg/Amulet ${{ github.event.release.tag_name }}.app
+        codesign --verify --deep --strict "installer/dist/dmg/Amulet ${{ github.event.release.tag_name }}.app"
         create-dmg \
           --volname "Amulet ${{ github.event.release.tag_name }} installer" \
           --volicon "installer/logo.icns" \
@@ -88,7 +88,7 @@ jobs:
           --app-drop-link 425 120 \
           "installer/dist/Amulet-${{ github.event.release.tag_name }}-macOS-${{ matrix.cfg.architecture }}.dmg" \
           "installer/dist/dmg"
-        rm -rf installer/dist/Amulet ${{ github.event.release.tag_name }}.app
+        rm -rf "installer/dist/Amulet ${{ github.event.release.tag_name }}.app"
         rm -rf installer/dist/amulet
         rm -rf installer/dist/dmg
 
