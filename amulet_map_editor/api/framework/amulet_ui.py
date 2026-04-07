@@ -5,6 +5,7 @@ from typing import Dict, Union
 import traceback
 import logging
 import sys
+import os
 
 from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
@@ -39,7 +40,7 @@ class AmuletUI(wx.Frame):
 
     def __init__(self, parent):
         title = f"Amulet {__version__}"
-        if not getattr(sys, "frozen", False):
+        if not (getattr(sys, "frozen", False) or os.path.exists("/.flatpak-info")):
             title += " (source)"
         wx.Frame.__init__(
             self,

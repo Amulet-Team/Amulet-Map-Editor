@@ -4,6 +4,7 @@ import sys
 import locale
 import logging
 import time
+import os
 
 from amulet_map_editor.api import config
 from amulet_map_editor import __version__
@@ -35,7 +36,7 @@ class AmuletApp(wx.App):
 
         meta_config = config.get("amulet_meta", {})
 
-        if not getattr(sys, "frozen", False):
+        if not (getattr(sys, "frozen", False) or os.path.exists("/.flatpak-info")):
             licence_dialog_show_time = meta_config.get("licence_dialog_show_time", 0)
             if licence_dialog_show_time < time.time() - 3600 * 24 * 30:
                 # Last shown more than a month ago
