@@ -82,7 +82,7 @@ coll = COLLECT(
 
 app = BUNDLE(
     coll,
-    name="amulet.app",
+    name=f"Amulet {amulet_map_editor.__version__}.app",
     icon="logo.ico",
     bundle_identifier="com.amuletmc.amulet_map_editor",
 )
