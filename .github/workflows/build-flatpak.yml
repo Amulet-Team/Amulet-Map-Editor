@@ -44,12 +44,14 @@ jobs:
         sudo apt-get install -y flatpak-builder        
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-        sed "s/VERSION/${{ github.event.release.tag_name }}/g" installer/com.amuletmc.amulet_map_editor.desktop > "installer/com.amuletmc.amulet_map_editor_${{ github.event.release.tag_name }}.desktop"
-        sed "s/VERSION/${{ github.event.release.tag_name }}/g" installer/com.amuletmc.amulet_map_editor.yml > "installer/com.amuletmc.amulet_map_editor_${{ github.event.release.tag_name }}.yml"
+        TAG="${{ github.event.release.tag_name }}"
+        TAG="${TAG//./_}"
+        sed "s/com.amuletmc.amulet_map_editor/com.amuletmc.amulet_map_editor_${TAG}/g" installer/com.amuletmc.amulet_map_editor.desktop > "installer/com.amuletmc.amulet_map_editor_${TAG}.desktop"
+        sed "s/com.amuletmc.amulet_map_editor/com.amuletmc.amulet_map_editor_${TAG}/g; s/VERSION/${{ github.event.release.tag_name }}/g" installer/com.amuletmc.amulet_map_editor.yml > "installer/com.amuletmc.amulet_map_editor_${TAG}.yml"
 
-        flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo --install builddir installer/com.amuletmc.amulet_map_editor_${{ github.event.release.tag_name }}.yml
+        flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo --install builddir installer/com.amuletmc.amulet_map_editor_${TAG}.yml
         mkdir -p installer/dist
-        flatpak build-bundle repo installer/dist/Amulet-${{ github.event.release.tag_name }}-flatpak-${{ matrix.cfg.architecture }}.flatpak com.amuletmc.amulet_map_editor_${{ github.event.release.tag_name }} --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+        flatpak build-bundle repo installer/dist/Amulet-${{ github.event.release.tag_name }}-flatpak-${{ matrix.cfg.architecture }}.flatpak com.amuletmc.amulet_map_editor_${TAG} --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 
     - name: Upload Release Asset
       uses: actions/upload-artifact@v6
