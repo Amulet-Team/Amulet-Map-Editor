@@ -1,4 +1,4 @@
-id: com.amuletmc.amulet_map_editor
+id: com.amuletmc.amulet_map_editor_VERSION
 runtime: org.freedesktop.Platform
 runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
@@ -27,12 +27,12 @@ modules:
     buildsystem: simple
     build-commands: 
       - pip3 install --no-index --find-links=. --prefix=/app amulet_map_editor
-      - install -Dm644 amulet_logo_512.png /app/share/icons/hicolor/512x512/apps/com.amuletmc.amulet_map_editor.png
-      - install -Dm644 com.amuletmc.amulet_map_editor.desktop /app/share/applications/com.amuletmc.amulet_map_editor.desktop
+      - install -Dm644 amulet_logo_512.png /app/share/icons/hicolor/512x512/apps/com.amuletmc.amulet_map_editor_VERSION.png
+      - install -Dm644 com.amuletmc.amulet_map_editor_VERSION.desktop /app/share/applications/com.amuletmc.amulet_map_editor_VERSION.desktop
     sources:
       - type: dir
         path: wheels
       - type: file
         path: amulet_logo_512.png
       - type: file
-        path: com.amuletmc.amulet_map_editor.desktop
+        path: com.amuletmc.amulet_map_editor_VERSION.desktop

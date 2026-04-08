@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Amulet VERSION
+Comment=A Minecraft world editor and converter that supports all versions since Java 1.12 and Bedrock 1.7.
+Exec=amulet_map_editor
+Icon=com.amuletmc.amulet_map_editor_VERSION
