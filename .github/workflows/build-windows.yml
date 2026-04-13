@@ -26,6 +26,7 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.cfg.python-version }}
+        architecture: ${{ matrix.cfg.architecture }}
 
     - name: Setup MSVC
       if: matrix.cfg.os == 'windows-11-arm'
