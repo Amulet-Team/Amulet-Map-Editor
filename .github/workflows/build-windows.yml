@@ -15,7 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
-        - {os: windows-2025, python-version: '3.11', architecture: x64}
+        - { os: windows-2025, python-version: '3.11', architecture: x64 }
+        - { os: windows-11-arm, python-version: '3.11', architecture: arm64 }
 
     steps:
     - name: Clone
