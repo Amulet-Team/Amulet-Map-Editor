@@ -14,9 +14,6 @@ jobs:
           - { os: windows-11-arm, python-version: '3.11', architecture: arm64 }
 
     runs-on: ${{ matrix.cfg.os }}
-    defaults:
-      run:
-        shell: bash
 
     steps:
     - name: Clone
