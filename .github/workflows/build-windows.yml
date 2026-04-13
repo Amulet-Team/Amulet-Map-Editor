@@ -34,9 +34,6 @@ jobs:
       with:
         arch: arm64
 
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v2
-
     - name: Install dependencies
       run: |
         pip install twine pyinstaller~=6.18 build
