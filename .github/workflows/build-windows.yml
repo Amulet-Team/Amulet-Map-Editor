@@ -27,6 +27,12 @@ jobs:
       with:
         python-version: ${{ matrix.cfg.python-version }}
 
+    - name: Setup MSVC
+      if: matrix.cfg.os == 'windows-11-arm'
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: arm64
+
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
 
