@@ -17,7 +17,7 @@
 !include LogicLib.nsh
 
 Name "Amulet"
-OutFile "dist\Amulet-${VERSION}-Windows-x64.exe"
+OutFile "dist\Amulet-${VERSION}-Windows-${ARCH}.exe"
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MULTIUSER_PAGE_INSTALLMODE
