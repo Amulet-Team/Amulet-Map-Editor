@@ -14,6 +14,9 @@ jobs:
           - { os: windows-11-arm, python-version: '3.11', architecture: arm64 }
 
     runs-on: ${{ matrix.cfg.os }}
+    defaults:
+      run:
+        shell: bash
 
     steps:
     - name: Clone
@@ -35,10 +38,14 @@ jobs:
       run: |
         pip install twine pyinstaller~=6.18 build
 
-    - name: Setup
+    - name: Build Wheels
+      shell: pwsh
       run: |
         $env:BDISTWHEELFREEZELIBS = "true"
         python -m build
+        
+    - name: Install Wheels
+      run: |
         python -m pip install dist/amulet_map_editor-*.whl --upgrade
 
     - name: PyInstaller build
