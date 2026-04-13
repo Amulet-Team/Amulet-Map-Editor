@@ -57,7 +57,25 @@ FunctionEnd
 !insertmacro MUI_LANGUAGE "English"
 
 Function .onInit
-  !insertmacro MULTIUSER_INIT
+    !insertmacro MULTIUSER_INIT
+
+    System::Call "kernel32::GetNativeSystemInfo(p .r0)"
+    System::Call "*$0(i .r1)"
+    ${Switch} $1
+        ${Case} 9
+            ${If} "${ARCH}" != "x64"
+                MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nDownload the installer that ends -Windows-x64.exe."
+                Abort
+            ${EndIf}
+        ${Case} 12
+            ${If} "${ARCH}" != "arm64"
+                MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nDownload the installer that ends -Windows-arm64.exe."
+                Abort
+            ${EndIf}
+        ${Default}
+            MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nAmulet only supports x64 and arm64 Windows computers."
+            Abort
+    ${EndSwitch}
 FunctionEnd
 
 Function un.onInit
