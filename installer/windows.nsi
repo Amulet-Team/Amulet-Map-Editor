@@ -15,6 +15,7 @@
 
 !include FileFunc.nsh
 !include LogicLib.nsh
+!include x64.nsh
 
 Name "Amulet"
 OutFile "dist\Amulet-${VERSION}-Windows-${ARCH}.exe"
@@ -59,29 +60,20 @@ FunctionEnd
 Function .onInit
     !insertmacro MULTIUSER_INIT
 
-    System::Alloc 48
-    Pop $0
-    System::Call "kernel32::GetNativeSystemInfo(p r0)"
-    System::Call "*$0(i .r1)"
-    IntOp $1 $1 & 0xFFFF
-    ${Switch} $1
-        ${Case} 9
-            ${If} "${ARCH}" != "x64"
-                MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nDownload the installer that ends -Windows-x64.exe."
-                Abort
-            ${EndIf}
-            ${Break}
-        ${Case} 12
-            ${If} "${ARCH}" != "arm64"
-                MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nDownload the installer that ends -Windows-arm64.exe."
-                Abort
-            ${EndIf}
-            ${Break}
-        ${Default}
-            MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nAmulet only supports x64 and arm64 Windows computers."
+    ${If} ${IsNativeAMD64}
+        ${If} "${ARCH}" != "x64"
+            MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nDownload the installer that ends -Windows-x64.exe."
             Abort
-    ${EndSwitch}
-    System::Free $0
+        ${EndIf}
+    ${ElseIf} ${IsNativeARM64}
+        ${If} "${ARCH}" != "arm64"
+            MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nDownload the installer that ends -Windows-arm64.exe."
+            Abort
+        ${EndIf}
+    ${Else}
+        MessageBox MB_ICONSTOP "This installer is incompatible with your computer.$\nAmulet only supports x64 and arm64 Windows computers."
+        Abort
+    ${EndIf}
 
 FunctionEnd
 
