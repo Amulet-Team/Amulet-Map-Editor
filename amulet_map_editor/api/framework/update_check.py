@@ -62,8 +62,6 @@ class UpdateDialog(wx.Dialog):
 
         self.SetSizerAndFit(sizer_1)
 
-        self.Centre()
-
         update_button.Bind(
             wx.EVT_BUTTON, lambda evt: self.goto_download_page(new_version, evt)
         )

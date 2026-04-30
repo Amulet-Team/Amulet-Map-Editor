@@ -42,7 +42,7 @@ class AmuletApp(wx.App):
             if licence_dialog_show_time < time.time() - 3600 * 24 * 30:
                 # Last shown more than a month ago
                 licence_dialog = LicenceDialog(self._amulet_ui)
-                licence_dialog.Centre()
+                licence_dialog.CentreOnScreen()
                 log.debug(f"Showing licence dialog at {licence_dialog.GetRect()}")
                 if licence_dialog.ShowModal() == wx.ID_OK:
                     meta_config["licence_dialog_show_time"] = time.time()
@@ -52,7 +52,7 @@ class AmuletApp(wx.App):
 
         if not meta_config.get("do_not_show_warning_dialog", False):
             warning_dialog = WarningDialog(self._amulet_ui)
-            warning_dialog.Centre()
+            warning_dialog.CentreOnScreen()
             log.debug(f"Showing warning dialog at {warning_dialog.GetRect()}")
             warning_dialog.ShowModal()
             if warning_dialog.do_not_show_again:
@@ -65,7 +65,7 @@ class AmuletApp(wx.App):
                 update_dialog = update_check.UpdateDialog(
                     self._amulet_ui, __version__, evt.GetVersion()
                 )
-                update_dialog.Centre()
+                update_dialog.CentreOnScreen()
                 log.debug(f"Showing update dialog at {update_dialog.GetRect()}")
                 update_dialog.ShowModal()
 

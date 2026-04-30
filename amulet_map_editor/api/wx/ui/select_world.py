@@ -15,7 +15,6 @@ from amulet.api.errors import FormatError
 from amulet_map_editor import lang, CONFIG
 from amulet_map_editor.api.wx.ui import simple
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
-from amulet_map_editor.api.wx.util.ui_preferences import preserve_ui_preferences
 from amulet_map_editor.api.framework import app
 
 if TYPE_CHECKING:
@@ -562,7 +561,6 @@ class WorldSelectAndRecentUI(wx.Panel):
         self._open_world_callback(path)
 
 
-@preserve_ui_preferences
 class WorldSelectDialog(wx.Dialog):
     def __init__(self, parent: wx.Window, open_world_callback: Callable[[str], None]):
         super().__init__(
@@ -597,5 +595,6 @@ class WorldSelectDialog(wx.Dialog):
 def open_level_from_dialog(parent: wx.Window):
     """Show the open world dialog and open the selected world."""
     with WorldSelectDialog(parent, app.open_level) as select_world:
+        select_world.CentreOnScreen()
         log.debug(f"Showing WorldSelectDialog at {select_world.GetRect()}")
         select_world.ShowModal()
