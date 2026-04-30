@@ -111,6 +111,7 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
 
     def _show_world_select(self, evt):
         with WorldSelectDialog(self, self._output_world_callback) as select_world:
+            select_world.CentreOnScreen()
             log.debug(
                 f"Showing convert world select dialog at {select_world.GetRect()}"
             )
