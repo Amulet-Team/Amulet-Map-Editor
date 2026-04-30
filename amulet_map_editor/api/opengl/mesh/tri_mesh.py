@@ -1,4 +1,7 @@
 import logging
+import ctypes
+
+import numpy
 from OpenGL.GL import (
     glBindTexture,
     GL_TEXTURE_2D,
@@ -25,8 +28,7 @@ from OpenGL.GL import (
     glDrawArrays,
 )
 from OpenGL.error import GLError
-import ctypes
-import numpy
+
 from amulet_map_editor.api.opengl.shaders import get_shader
 from amulet_map_editor.api.opengl import Drawable, ContextManager
 from amulet_map_editor.api.opengl.resource_pack import (
@@ -120,7 +122,7 @@ class TriMesh(Drawable, OpenGLResourcePackManagerStatic, ContextManager):
 
     def change_verts(self, verts=None):
         """Modify the vertices in OpenGL."""
-        log.debug(f"change_verts {self}")
+        log.log(5, f"change_verts {self}")
         try:
             glBindVertexArray(self._vao)
             glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
@@ -149,7 +151,7 @@ class TriMesh(Drawable, OpenGLResourcePackManagerStatic, ContextManager):
 
     def unload(self):
         """Unload all opengl data"""
-        log.debug(f"unload {self}")
+        log.log(5, f"unload {self}")
         if self._vbo is not None:
             glDeleteBuffers(1, int(self._vbo))
             self._vbo = None
