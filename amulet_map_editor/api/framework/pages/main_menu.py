@@ -174,6 +174,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
 
     def _select_language(self, evt):
         with LangSelectDialog(self) as dialog:
+            dialog.CentreOnScreen()
             log.debug(f"Showing LangSelectDialog at {dialog.GetRect()}")
             if dialog.ShowModal() == wx.ID_OK:
                 lang.set_language(dialog.get_language())
@@ -181,6 +182,7 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
 
     def _show_licences(self, evt) -> None:
         with LicenceDialog(self) as dlg:
+            dlg.CentreOnScreen()
             log.debug(f"Showing LicenceDialog at {dlg.GetRect()}")
             dlg.ShowModal()
 

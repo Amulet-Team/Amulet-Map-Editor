@@ -269,6 +269,7 @@ class EditExtension(wx.Panel, BaseProgram):
         key_config = KeyConfigDialog(
             self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds
         )
+        key_config.CentreOnScreen()
         log.debug(f"Showing KeyConfigDialog at {key_config.GetRect()}")
         if key_config.ShowModal() == wx.ID_OK:
             user_keybinds, keybind_id, keybinds = key_config.options
@@ -343,6 +344,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             dialog.Fit()
+            dialog.CentreOnScreen()
             log.debug(f"Showing options dialog at {dialog.GetRect()}")
             response = dialog.ShowModal()
             if response == wx.ID_OK:

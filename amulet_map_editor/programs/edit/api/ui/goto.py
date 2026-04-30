@@ -29,6 +29,7 @@ def show_goto(
     parent: wx.Window, x: float, y: float, z: float
 ) -> Optional[Tuple[float, float, float]]:
     dialog = GoTo(parent, lang.get("program_3d_edit.goto_ui.title"), (x, y, z))
+    dialog.CentreOnScreen()
     log.debug(f"Showing GoTo dialog at {dialog.GetRect()}")
     if dialog.ShowModal() == wx.ID_OK:
         return dialog.location

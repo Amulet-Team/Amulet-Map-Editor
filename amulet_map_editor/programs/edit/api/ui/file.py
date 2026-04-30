@@ -84,6 +84,7 @@ class FilePanel(EditCanvasContainer):
             dialog = SpeedSelectDialog(
                 canvas, self.canvas.camera.move_speed * 1000 / 33
             )
+            dialog.CentreOnScreen()
             log.debug(f"Showing SpeedSelectDialog at {dialog.GetRect()}")
             if dialog.ShowModal() == wx.ID_OK:
                 self.canvas.camera.move_speed = dialog.speed * 33 / 1000

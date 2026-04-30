@@ -228,6 +228,7 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
                 self.EndModal(wx.ID_NO)
 
         d = DeleteChunksDialog(self.canvas)
+        d.CentreOnScreen()
         log.debug(f"Showing DeleteChunksDialog at {d.GetRect()}")
         response = d.ShowModal()
         if response == wx.ID_YES:

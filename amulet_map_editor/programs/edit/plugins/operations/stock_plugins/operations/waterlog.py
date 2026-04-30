@@ -87,6 +87,7 @@ class Waterlog(wx.Panel, DefaultOperationUI):
                 style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP,
             )
             dialog.sizer.Add(text, 1, wx.EXPAND)
+            dialog.CentreOnScreen()
             log.debug(f"Showing waterlog help dialog at {dialog.GetRect()}")
             dialog.ShowModal()
             evt.Skip()

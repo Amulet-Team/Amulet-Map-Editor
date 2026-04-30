@@ -470,6 +470,7 @@ class KeyConfig(wx.BoxSizer):
             msg = wx.TextEntryDialog(
                 self._options, lang.get("key_config.enter_group_name")
             )
+            msg.CentreOnScreen()
             log.debug(f"Showing key_config group name dialog at {msg.GetRect()}")
             if msg.ShowModal() == wx.ID_OK:
                 group_name = msg.GetValue()
@@ -512,6 +513,7 @@ class KeyConfig(wx.BoxSizer):
                 lang.get("key_config.active_not_editable"),
                 style=wx.YES_NO,
             )
+            msg.CentreOnScreen()
             log.debug(f"Showing key_config not editable dialog at {msg.GetRect()}")
             if msg.ShowModal() == wx.ID_YES:
                 self._create_new_group()
@@ -520,6 +522,7 @@ class KeyConfig(wx.BoxSizer):
         group_name = self._choice.GetCurrentString()
         if group_name in self._user_keybinds:
             catcher = KeyCatcher(self._options, action)
+            catcher.CentreOnScreen()
             log.debug(f"Showing key_config edit key dialog at {catcher.GetRect()}")
             catcher.ShowModal()
             self._user_keybinds[group_name][action] = catcher.key
