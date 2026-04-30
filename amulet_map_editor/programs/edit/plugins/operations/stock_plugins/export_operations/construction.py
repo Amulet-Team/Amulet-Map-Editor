@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING
-import wx
 import os
+import logging
+
+import wx
 
 from amulet.api.selection import SelectionGroup
 from amulet.api.errors import ChunkLoadError
@@ -16,6 +18,8 @@ from amulet_map_editor.programs.edit.api.operations import (
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+log = logging.getLogger(__name__)
 
 
 class ExportConstruction(SimpleOperationPanel):
@@ -68,6 +72,7 @@ class ExportConstruction(SimpleOperationPanel):
             wildcard="Construction file (*.construction)|*.construction",
             style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
         ) as file_dialog:
+            log.debug(f"Showing save dialog at {file_dialog.GetRect()}")
             if file_dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             self._path = file_dialog.GetPath()

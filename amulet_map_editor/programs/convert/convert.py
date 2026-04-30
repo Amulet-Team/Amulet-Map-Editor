@@ -110,9 +110,11 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
         )
 
     def _show_world_select(self, evt):
-        select_world = WorldSelectDialog(self, self._output_world_callback)
-        select_world.ShowModal()
-        select_world.Destroy()
+        with WorldSelectDialog(self, self._output_world_callback) as select_world:
+            log.debug(
+                f"Showing convert world select dialog at {select_world.GetRect()}"
+            )
+            select_world.ShowModal()
 
     def _output_world_callback(self, path):
         if path == self.world.level_path:

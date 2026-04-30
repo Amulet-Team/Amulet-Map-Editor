@@ -408,6 +408,7 @@ class WorldSelectUI(wx.Panel):
             wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST,
         )
         try:
+            log.debug(f"Showing open world dialog at {dir_dialog.GetRect()}")
             if dir_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             path = dir_dialog.GetPath()
@@ -427,6 +428,7 @@ class WorldSelectUI(wx.Panel):
             wildcard="Bedrock world archive (*.mcworld)|*.mcworld",
         )
         try:
+            log.debug(f"Showing mcworld dialog at {mcworld_dialog.GetRect()}")
             if mcworld_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             mcworld_path = mcworld_dialog.GetPath()
@@ -443,6 +445,7 @@ class WorldSelectUI(wx.Panel):
             wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST,
         )
         try:
+            log.debug(f"Showing extract mcworld dialog at {dir_dialog.GetRect()}")
             if dir_dialog.ShowModal() == wx.ID_CANCEL:
                 return
             extract_dir = dir_dialog.GetPath()
@@ -462,14 +465,14 @@ class WorldSelectUI(wx.Panel):
             zipfile.ZipFile(mcworld_path).extractall(extract_dir)
         except Exception as e:
             del busy_msg
-            dialog = TracebackDialog(
+            with TracebackDialog(
                 self,
                 lang.get("select_world.extracting_world_failed"),
                 str(e),
                 traceback.format_exc(),
-            )
-            dialog.ShowModal()
-            dialog.Destroy()
+            ) as dialog:
+                log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+                dialog.ShowModal()
             return
         else:
             del busy_msg
@@ -593,6 +596,6 @@ class WorldSelectDialog(wx.Dialog):
 
 def open_level_from_dialog(parent: wx.Window):
     """Show the open world dialog and open the selected world."""
-    select_world = WorldSelectDialog(parent, app.open_level)
-    select_world.ShowModal()
-    select_world.Destroy()
+    with WorldSelectDialog(parent, app.open_level) as select_world:
+        log.debug(f"Showing WorldSelectDialog at {select_world.GetRect()}")
+        select_world.ShowModal()

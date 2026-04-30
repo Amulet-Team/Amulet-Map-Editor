@@ -21,8 +21,10 @@ SOFTWARE.
 -- end license --
 """
 
-import numpy
 from typing import TYPE_CHECKING, Tuple
+import logging
+
+import numpy
 import wx
 
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
@@ -34,6 +36,8 @@ from amulet_map_editor.api import image
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+log = logging.getLogger(__name__)
 
 MODES = {
     "Overlay": "Overlay the block on the existing. If the first block is air it replaces the first block otherwise it sets the second block.",
@@ -83,6 +87,7 @@ class Waterlog(wx.Panel, DefaultOperationUI):
                 style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP,
             )
             dialog.sizer.Add(text, 1, wx.EXPAND)
+            log.debug(f"Showing waterlog help dialog at {dialog.GetRect()}")
             dialog.ShowModal()
             evt.Skip()
 
@@ -108,7 +113,7 @@ class Waterlog(wx.Panel, DefaultOperationUI):
             world.level_wrapper.translation_manager,
             wx.VERTICAL,
             *(options.get("fill_block_options", []) or [world.level_wrapper.platform]),
-            show_pick_block=True
+            show_pick_block=True,
         )
         self._block_define.Bind(EVT_PICK, self._on_pick_block_button)
         self._sizer.Add(self._block_define, 1, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)

@@ -1,5 +1,7 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from math import floor, log10
+import logging
+
 import wx
 
 from amulet_map_editor.programs.edit.api.edit_canvas_container import (
@@ -23,6 +25,8 @@ from amulet_map_editor.api.opengl.camera import Projection
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
+log = logging.getLogger(__name__)
 
 
 def _format_float(num: float) -> str:
@@ -80,6 +84,7 @@ class FilePanel(EditCanvasContainer):
             dialog = SpeedSelectDialog(
                 canvas, self.canvas.camera.move_speed * 1000 / 33
             )
+            log.debug(f"Showing SpeedSelectDialog at {dialog.GetRect()}")
             if dialog.ShowModal() == wx.ID_OK:
                 self.canvas.camera.move_speed = dialog.speed * 33 / 1000
 

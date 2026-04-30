@@ -51,6 +51,7 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
             ),
             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
         ) as fileDialog:
+            log.debug(f"Showing Import FileDialog at {fileDialog.GetRect()}")
             if fileDialog.ShowModal() == wx.ID_CANCEL:
                 return
             else:
@@ -63,13 +64,13 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
             wx.MessageBox(msg)
         except Exception as e:
             log.error(f"Could not open {pathname}.", exc_info=True)
-            dialog = TracebackDialog(
+            with TracebackDialog(
                 self.canvas,
                 f"Could not open {pathname}.",
                 str(e),
                 traceback.format_exc(),
-            )
-            dialog.ShowModal()
-            dialog.Destroy()
+            ) as dialog:
+                log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+                dialog.ShowModal()
         else:
             self.canvas.paste(level, level.dimensions[0])

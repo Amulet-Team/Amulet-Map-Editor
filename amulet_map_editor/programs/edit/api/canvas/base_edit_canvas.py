@@ -172,14 +172,16 @@ class BaseEditCanvas(EventCanvas):
                     def show_error():
                         nonlocal wait
                         try:
-                            dialog = TracebackDialog(
+                            with TracebackDialog(
                                 self,
                                 lang.get("program_3d_edit.canvas.java_rp_failed"),
                                 f"{msg}\n{e}",
                                 tb,
-                            )
-                            dialog.ShowModal()
-                            dialog.Destroy()
+                            ) as dialog:
+                                log.debug(
+                                    f"Showing TracebackDialog at {dialog.GetRect()}"
+                                )
+                                dialog.ShowModal()
                         finally:
                             wait = False
 
@@ -192,6 +194,7 @@ class BaseEditCanvas(EventCanvas):
                         lang.get("program_3d_edit.canvas.retry_download"),
                         style=wx.YES_NO,
                     )
+                    log.debug(f"Showing retry download dialog at {msg.GetRect()}")
                     if msg.ShowModal() == wx.ID_NO:
                         break
 

@@ -165,14 +165,14 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
                 wx.MessageBox(f"{lang.get('select_world.no_loader_found')}\n{e}")
             except Exception as e:
                 log.error(lang.get("select_world.loading_world_failed"), exc_info=True)
-                dialog = TracebackDialog(
+                with TracebackDialog(
                     self,
                     lang.get("select_world.loading_world_failed"),
                     str(e),
                     traceback.format_exc(),
-                )
-                dialog.ShowModal()
-                dialog.Destroy()
+                ) as dialog:
+                    log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+                    dialog.ShowModal()
             else:
                 self._open_worlds[path] = world
                 self._add_world_tab(world, world.world_name)

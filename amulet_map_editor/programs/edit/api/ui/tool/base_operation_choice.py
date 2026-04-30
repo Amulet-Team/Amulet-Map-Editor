@@ -134,14 +134,14 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
                         if window.GetContainingSizer() is None:
                             window.Destroy()
                     log.error("Error loading Operation UI.", exc_info=True)
-                    dialog = TracebackDialog(
+                    with TracebackDialog(
                         self.canvas,
                         "Error loading Operation UI.",
                         str(e),
                         traceback.format_exc(),
-                    )
-                    dialog.ShowModal()
-                    dialog.Destroy()
+                    ) as dialog:
+                        log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+                        dialog.ShowModal()
                 finally:
                     self._last_active_operation_id = operation.identifier
             finally:

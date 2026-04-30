@@ -85,14 +85,14 @@ class EditExtension(wx.Panel, BaseProgram):
         self.Layout()
 
     def _display_error(self, msg, tb):
-        dialog = TracebackDialog(
+        with TracebackDialog(
             self,
             "Exception while setting up canvas",
             msg,
             tb,
-        )
-        dialog.ShowModal()
-        dialog.Destroy()
+        ) as dialog:
+            log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+            dialog.ShowModal()
         self.Destroy()
 
     def _thread_setup(self):
@@ -190,6 +190,7 @@ class EditExtension(wx.Panel, BaseProgram):
                 }. Would you like to save?""",
                 style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT,
             )
+            log.debug(f"Showing MessageDialog at {msg.GetRect()}")
             response = msg.ShowModal()
             if response == wx.ID_YES:
                 self._canvas.save()
@@ -268,6 +269,7 @@ class EditExtension(wx.Panel, BaseProgram):
         key_config = KeyConfigDialog(
             self, keybind_id, KeybindKeys, PresetKeybinds, user_keybinds
         )
+        log.debug(f"Showing KeyConfigDialog at {key_config.GetRect()}")
         if key_config.ShowModal() == wx.ID_OK:
             user_keybinds, keybind_id, keybinds = key_config.options
             edit_config["user_keybinds"] = user_keybinds
@@ -341,7 +343,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             dialog.Fit()
-
+            log.debug(f"Showing options dialog at {dialog.GetRect()}")
             response = dialog.ShowModal()
             if response == wx.ID_OK:
                 edit_config: dict = config.get(EDIT_CONFIG_ID, {})

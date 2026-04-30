@@ -179,14 +179,14 @@ class WorldPageUI(wx.Notebook, BasePageUI):
                 self.GetTopLevelParent().create_menu()
             except Exception as e:
                 log.critical(traceback.format_exc())
-                dialog = TracebackDialog(
+                with TracebackDialog(
                     self,
                     "Exception loading sub-program",
                     str(e),
                     traceback.format_exc(),
-                )
-                dialog.ShowModal()
-                dialog.Destroy()
+                ) as dialog:
+                    log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+                    dialog.ShowModal()
                 self.DeletePage(page)
 
     def can_disable(self) -> bool:

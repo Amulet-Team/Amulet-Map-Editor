@@ -32,6 +32,7 @@ class AmuletApp(wx.App):
     def OnInit(self):
         self._amulet_ui = amulet_ui.AmuletUI(None)
         self.SetTopWindow(self._amulet_ui)
+        log.debug(f"Showing AmuletUI at {self._amulet_ui.GetRect()}")
         self._amulet_ui.Show()
 
         meta_config = config.get("amulet_meta", {})
@@ -42,6 +43,7 @@ class AmuletApp(wx.App):
                 # Last shown more than a month ago
                 licence_dialog = LicenceDialog(self._amulet_ui)
                 licence_dialog.Centre()
+                log.debug(f"Showing licence dialog at {licence_dialog.GetRect()}")
                 if licence_dialog.ShowModal() == wx.ID_OK:
                     meta_config["licence_dialog_show_time"] = time.time()
                     config.put("amulet_meta", meta_config)
@@ -51,17 +53,25 @@ class AmuletApp(wx.App):
         if not meta_config.get("do_not_show_warning_dialog", False):
             warning_dialog = WarningDialog(self._amulet_ui)
             warning_dialog.Centre()
+            log.debug(f"Showing warning dialog at {warning_dialog.GetRect()}")
             warning_dialog.ShowModal()
             if warning_dialog.do_not_show_again:
                 meta_config["do_not_show_warning_dialog"] = True
                 config.put("amulet_meta", meta_config)
 
         if update_check:
+
+            def _show_update_dialog(evt) -> None:
+                update_dialog = update_check.UpdateDialog(
+                    self._amulet_ui, __version__, evt.GetVersion()
+                )
+                update_dialog.Centre()
+                log.debug(f"Showing update dialog at {update_dialog.GetRect()}")
+                update_dialog.ShowModal()
+
             self._amulet_ui.Bind(
                 update_check.EVT_UPDATE_CHECK,
-                lambda evt: update_check.UpdateDialog(
-                    self._amulet_ui, __version__, evt.GetVersion()
-                ).ShowModal(),
+                _show_update_dialog,
             )
             update_check.check_for_update(self._amulet_ui, __version__)
 

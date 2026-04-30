@@ -287,7 +287,9 @@ class EditCanvas(BaseEditCanvas):
                     if isinstance(op.error, OperationError):
                         msg = f"Error running operation: {msg}"
                     log.info(msg)
-                    wx.MessageDialog(self, msg, style=wx.OK).ShowModal()
+                    with wx.MessageDialog(self, msg, style=wx.OK) as dialog:
+                        log.debug(f"Showing operation message at {dialog.GetRect()}")
+                        dialog.ShowModal()
                 elif isinstance(op.error, BaseSilentException):
                     pass
                 elif isinstance(op.error, BaseException):
@@ -297,14 +299,14 @@ class EditCanvas(BaseEditCanvas):
                         )
                     )
                     log.error(tb)
-                    dialog = TracebackDialog(
+                    with TracebackDialog(
                         self,
                         "Exception while running operation",
                         str(op.error),
                         tb,
-                    )
-                    dialog.ShowModal()
-                    dialog.Destroy()
+                    ) as dialog:
+                        log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+                        dialog.ShowModal()
                     self.world.restore_last_undo_point()
 
             self.renderer.enable_threads()

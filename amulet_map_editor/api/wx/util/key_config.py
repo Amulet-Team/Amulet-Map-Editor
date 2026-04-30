@@ -1,13 +1,17 @@
+from typing import Dict, Tuple, Optional, Union, Sequence
+import logging
+
 import wx
+
 from amulet_map_editor.api import lang
 from amulet_map_editor.api.wx.ui.simple import (
     SimpleDialog,
     SimpleScrollablePanel,
     SimpleChoice,
 )
-from typing import Dict, Tuple, Optional, Union, Sequence
-
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON, EDIT_ICON
+
+log = logging.getLogger(__name__)
 
 ModifierKeyType = str
 KeyType = Union[int, str]
@@ -466,6 +470,7 @@ class KeyConfig(wx.BoxSizer):
             msg = wx.TextEntryDialog(
                 self._options, lang.get("key_config.enter_group_name")
             )
+            log.debug(f"Showing key_config group name dialog at {msg.GetRect()}")
             if msg.ShowModal() == wx.ID_OK:
                 group_name = msg.GetValue()
                 if (
@@ -507,6 +512,7 @@ class KeyConfig(wx.BoxSizer):
                 lang.get("key_config.active_not_editable"),
                 style=wx.YES_NO,
             )
+            log.debug(f"Showing key_config not editable dialog at {msg.GetRect()}")
             if msg.ShowModal() == wx.ID_YES:
                 self._create_new_group()
             else:
@@ -514,6 +520,7 @@ class KeyConfig(wx.BoxSizer):
         group_name = self._choice.GetCurrentString()
         if group_name in self._user_keybinds:
             catcher = KeyCatcher(self._options, action)
+            log.debug(f"Showing key_config edit key dialog at {catcher.GetRect()}")
             catcher.ShowModal()
             self._user_keybinds[group_name][action] = catcher.key
             self._rebuild_buttons()

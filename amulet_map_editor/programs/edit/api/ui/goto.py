@@ -1,12 +1,16 @@
 from typing import Optional, Tuple
-import wx
 import re
+import logging
+
+import wx
 
 from amulet.api.data_types import PointCoordinates
 
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.api import image
+
+log = logging.getLogger(__name__)
 
 CoordRegex = re.compile(
     r"^"  # match the start
@@ -25,8 +29,10 @@ def show_goto(
     parent: wx.Window, x: float, y: float, z: float
 ) -> Optional[Tuple[float, float, float]]:
     dialog = GoTo(parent, lang.get("program_3d_edit.goto_ui.title"), (x, y, z))
+    log.debug(f"Showing GoTo dialog at {dialog.GetRect()}")
     if dialog.ShowModal() == wx.ID_OK:
         return dialog.location
+    return None
 
 
 class GoTo(SimpleDialog):

@@ -79,14 +79,14 @@ class DefaultBaseToolUI(BaseToolUI):
                     log.error(msg)
                 except Exception as e:
                     log.error(f"Could not open {pathname}.", exc_info=True)
-                    dialog = TracebackDialog(
+                    with TracebackDialog(
                         self.canvas,
                         f"Could not open {pathname}.",
                         str(e),
                         traceback.format_exc(),
-                    )
-                    dialog.ShowModal()
-                    dialog.Destroy()
+                    ) as dialog:
+                        log.debug(f"Showing TracebackDialog at {dialog.GetRect()}")
+                        dialog.ShowModal()
                 else:
                     self.canvas.paste(level, level.dimensions[0])
         evt.Skip()

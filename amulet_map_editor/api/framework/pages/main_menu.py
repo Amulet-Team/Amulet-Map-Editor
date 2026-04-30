@@ -1,6 +1,8 @@
 import webbrowser
 from urllib.request import urlopen
 import json
+import logging
+
 import wx
 import wx.adv
 import wx.lib.inspection
@@ -9,6 +11,8 @@ from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
 from ._legal import LicenceDialog
+
+log = logging.getLogger(__name__)
 
 
 class AmuletMainMenu(wx.Panel, BasePageUI):
@@ -169,14 +173,15 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         self.GetTopLevelParent().create_menu()
 
     def _select_language(self, evt):
-        dialog = LangSelectDialog(self)
-        if dialog.ShowModal() == wx.ID_OK:
-            lang.set_language(dialog.get_language())
-        dialog.Destroy()
+        with LangSelectDialog(self) as dialog:
+            log.debug(f"Showing LangSelectDialog at {dialog.GetRect()}")
+            if dialog.ShowModal() == wx.ID_OK:
+                lang.set_language(dialog.get_language())
         self._load_strings()
 
     def _show_licences(self, evt) -> None:
         with LicenceDialog(self) as dlg:
+            log.debug(f"Showing LicenceDialog at {dlg.GetRect()}")
             dlg.ShowModal()
 
 
