@@ -36,8 +36,8 @@ class AmuletApp(wx.App):
 
         self._amulet_ui = amulet_ui.AmuletUI(None)
         self.SetTopWindow(self._amulet_ui)
-        log.debug(f"Showing AmuletUI at {self._amulet_ui.GetRect()}")
         self._amulet_ui.Show()
+        log.debug(f"Shown AmuletUI at {self._amulet_ui.GetRect()} maximised={self._amulet_ui.IsMaximized()}")
 
         meta_config = config.get("amulet_meta", {})
 
