@@ -42,8 +42,12 @@ def centre_on_parent(parent: wx.TopLevelWindow, window: wx.TopLevelWindow) -> No
             screen_rect = wx.Display(display_index).GetGeometry()
             window_size = window.GetSize()
 
-            x = screen_rect.x + max(20, (screen_rect.width - window_size.GetWidth()) // 2)
-            y = screen_rect.y + max(20, (screen_rect.height - window_size.GetHeight()) // 2)
+            x = screen_rect.x + max(
+                20, (screen_rect.width - window_size.GetWidth()) // 2
+            )
+            y = screen_rect.y + max(
+                20, (screen_rect.height - window_size.GetHeight()) // 2
+            )
             window.Move(wx.Point(x, y))
 
 
@@ -59,7 +63,9 @@ class AmuletApp(wx.App):
         self.SetTopWindow(self._amulet_ui)
         self._amulet_ui.Maximize()
         self._amulet_ui.Show()
-        log.debug(f"Shown AmuletUI at {self._amulet_ui.GetRect()} maximised={self._amulet_ui.IsMaximized()}")
+        log.debug(
+            f"Shown AmuletUI at {self._amulet_ui.GetRect()} maximised={self._amulet_ui.IsMaximized()}"
+        )
 
         meta_config = config.get("amulet_meta", {})
 
