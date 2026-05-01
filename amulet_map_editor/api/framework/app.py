@@ -30,6 +30,10 @@ class AmuletApp(wx.App):
     _amulet_ui: amulet_ui.AmuletUI
 
     def OnInit(self):
+        for i in range(wx.Display.GetCount()):
+            display = wx.Display(i)
+            log.debug(f"Display {i} {display.GetGeometry()}")
+
         self._amulet_ui = amulet_ui.AmuletUI(None)
         self.SetTopWindow(self._amulet_ui)
         log.debug(f"Showing AmuletUI at {self._amulet_ui.GetRect()}")
