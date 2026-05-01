@@ -46,7 +46,7 @@ class AmuletUI(wx.Frame):
             id=wx.ID_ANY,
             title=title,
             pos=wx.DefaultPosition,
-            size=wx.Size(1000, 600),
+            size=wx.Size(1000, 620),
             style=wx.CAPTION
             | wx.CLOSE_BOX
             | wx.MINIMIZE_BOX
@@ -56,7 +56,7 @@ class AmuletUI(wx.Frame):
             | wx.CLIP_CHILDREN
             | wx.RESIZE_BORDER,
         )
-        self.SetMinSize((570, 620))
+        self.SetMinSize(wx.Size(570, 620))
         icon = wx.Icon()
         icon.CopyFromBitmap(image.logo.amulet_logo.bitmap())
         self.SetIcon(icon)
