@@ -26,29 +26,22 @@ except ImportError:
     log.warning("Could not import update checker")
 
 
-def centre_on_parent(parent: wx.TopLevelWindow, window: wx.TopLevelWindow) -> None:
+def centre_on_main_screen(window: wx.TopLevelWindow) -> None:
     # The normal CentreOnParent method makes the window no larger than its parent which is often undesired.
     # CentreOnScreen for some reason in select cases displays the window on the wrong screen.
     window.CentreOnScreen()
 
-    if not parent.GetRect().Intersects(window.GetRect()):
-        # If the windows do not intersect then manually position the window.
+    if wx.Display.GetCount() and not wx.Display(0).GetGeometry().Intersects(
+        window.GetRect()
+    ):
+        # If the window does not intersect the main screen, manually position the window.
         log.debug(f"Window {window} was incorrectly displayed.")
-        display_index = wx.Display.GetFromWindow(parent)
-        if display_index == wx.NOT_FOUND:
-            parent_position = parent.GetPosition()
-            window.Move(wx.Point(parent_position.x + 20, parent_position.y + 20))
-        else:
-            screen_rect = wx.Display(display_index).GetGeometry()
-            window_size = window.GetSize()
+        screen_rect = wx.Display(0).GetGeometry()
+        window_size = window.GetSize()
 
-            x = screen_rect.x + max(
-                20, (screen_rect.width - window_size.GetWidth()) // 2
-            )
-            y = screen_rect.y + max(
-                20, (screen_rect.height - window_size.GetHeight()) // 2
-            )
-            window.Move(wx.Point(x, y))
+        x = screen_rect.x + max(20, (screen_rect.width - window_size.GetWidth()) // 2)
+        y = screen_rect.y + max(20, (screen_rect.height - window_size.GetHeight()) // 2)
+        window.Move(wx.Point(x, y))
 
 
 class AmuletApp(wx.App):
@@ -74,7 +67,7 @@ class AmuletApp(wx.App):
             if licence_dialog_show_time < time.time() - 3600 * 24 * 30:
                 # Last shown more than a month ago
                 licence_dialog = LicenceDialog(self._amulet_ui)
-                centre_on_parent(self._amulet_ui, licence_dialog)
+                centre_on_main_screen(licence_dialog)
                 log.debug(f"Showing licence dialog at {licence_dialog.GetRect()}")
                 if licence_dialog.ShowModal() == wx.ID_OK:
                     meta_config["licence_dialog_show_time"] = time.time()
@@ -84,7 +77,7 @@ class AmuletApp(wx.App):
 
         if not meta_config.get("do_not_show_warning_dialog", False):
             warning_dialog = WarningDialog(self._amulet_ui)
-            centre_on_parent(self._amulet_ui, warning_dialog)
+            centre_on_main_screen(warning_dialog)
             log.debug(f"Showing warning dialog at {warning_dialog.GetRect()}")
             warning_dialog.ShowModal()
             if warning_dialog.do_not_show_again:
@@ -97,7 +90,7 @@ class AmuletApp(wx.App):
                 update_dialog = update_check.UpdateDialog(
                     self._amulet_ui, __version__, evt.GetVersion()
                 )
-                centre_on_parent(self._amulet_ui, update_dialog)
+                centre_on_main_screen(update_dialog)
                 log.debug(f"Showing update dialog at {update_dialog.GetRect()}")
                 update_dialog.ShowModal()
 
