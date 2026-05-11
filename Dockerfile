@@ -26,13 +26,13 @@ ARG AMULET_VERSION=RELEASE
 RUN if [ "$(echo "$AMULET_VERSION" | cut -c1-7)" = "CUSTOM:" ]; then \
         python3.11 -m pip wheel -w /wheels $wxpython "$(echo "$AMULET_VERSION" | cut -c8-)"; \
     elif [ "$AMULET_VERSION" = "RELEASE" ]; then \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor; \
+        python3.11 -m pip wheel -w /wheels $wxpython amulet-map-editor; \
     elif [ "$AMULET_VERSION" = "BETA" ]; then \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor>=0b0; \
+        python3.11 -m pip wheel -w /wheels $wxpython amulet-map-editor>=0b0; \
     elif [ "$AMULET_VERSION" = "ALPHA" ]; then \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor>=0a0; \
+        python3.11 -m pip wheel -w /wheels $wxpython amulet-map-editor>=0a0; \
     else \
-        python3.11 -m pip wheel -w /wheels --upgrade --upgrade-strategy eager $wxpython amulet-map-editor==$AMULET_VERSION; \
+        python3.11 -m pip wheel -w /wheels $wxpython amulet-map-editor==$AMULET_VERSION; \
     fi
 
 FROM ubuntu:22.04
