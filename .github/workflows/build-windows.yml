@@ -53,7 +53,7 @@ jobs:
         python -m PyInstaller -y --distpath ./installer/dist installer/Amulet.spec
 
     - name: Windows - Install NSIS
-      uses: repolevedavaj/install-nsis@v1.1.0
+      uses: repolevedavaj/install-nsis@v1.2.0
       with:
         nsis-version: '3.11'
 
