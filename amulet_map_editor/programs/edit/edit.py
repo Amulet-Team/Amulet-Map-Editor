@@ -169,6 +169,7 @@ class EditExtension(wx.Panel, BaseProgram):
         """Fully close the UI. Called when destroying the UI."""
         if self._canvas is not None:
             self._canvas.close()
+            self._canvas.tear_down_events()
 
     def can_close(self) -> bool:
         """
