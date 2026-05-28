@@ -124,9 +124,12 @@ class AmuletUI(wx.Frame):
                     menu_item: wx.MenuItem = menu.Append(
                         wx_id, menu_item_name, menu_item_description
                     )
-                    self.Bind(wx.EVT_MENU, callback, menu_item)
+                    menu.Bind(wx.EVT_MENU, callback, menu_item)
             menu_bar.Append(menu, menu_name)
+        old_menu = self.GetMenuBar()
         self.SetMenuBar(menu_bar)
+        if old_menu is not None:
+            old_menu.Destroy()
 
 
 class AmuletLevelNotebook(flatnotebook.FlatNotebook):
