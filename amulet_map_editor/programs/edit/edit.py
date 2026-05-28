@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, Optional, Generator
+from typing import TYPE_CHECKING, Optional, Any
 import webbrowser
 import logging
 from threading import Thread
 import traceback
+from weakref import WeakMethod
 
 import wx
 
@@ -28,6 +29,20 @@ if TYPE_CHECKING:
     from amulet.api.level import World
 
 log = logging.getLogger(__name__)
+
+
+class CallableWeakMethod(WeakMethod):
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        func = super().__call__()
+        if func is None:
+            return None
+        return func(*args, **kwargs)
+
+
+def _show_user_guide(evt):
+    webbrowser.open(
+        "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/edit/readme.md"
+    )
 
 
 class EditExtension(wx.Panel, BaseProgram):
@@ -205,60 +220,73 @@ class EditExtension(wx.Panel, BaseProgram):
         return True
 
     def menu(self, menu: MenuData) -> MenuData:
+        save = CallableWeakMethod(self._canvas.save)
         menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "system", {}
         ).setdefault(
             f"{lang.get('program_3d_edit.menu_bar.file.save')}\tCtrl+s",
-            lambda evt: self._canvas.save(),
+            lambda evt: save(),
         )
         # menu.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
 
+        undo = CallableWeakMethod(self._canvas.undo)
+        redo = CallableWeakMethod(self._canvas.redo)
         menu.setdefault(
             lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
         ).setdefault("history", {}).update(
             {
-                f"{lang.get('program_3d_edit.menu_bar.edit.undo')}\tCtrl+z": lambda evt: self._canvas.undo(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.redo')}\tCtrl+y": lambda evt: self._canvas.redo(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.undo')}\tCtrl+z": lambda evt: undo(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.redo')}\tCtrl+y": lambda evt: redo(),
             }
         )
 
+        cut = CallableWeakMethod(self._canvas.cut)
+        copy = CallableWeakMethod(self._canvas.copy)
+        paste = CallableWeakMethod(self._canvas.paste_from_cache)
+        delete = CallableWeakMethod(self._canvas.delete)
         menu.setdefault(
             lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
         ).setdefault("operation", {}).update(
             {
-                f"{lang.get('program_3d_edit.menu_bar.edit.cut')}\tCtrl+x": lambda evt: self._canvas.cut(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.copy')}\tCtrl+c": lambda evt: self._canvas.copy(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.paste')}\tCtrl+v": lambda evt: self._canvas.paste_from_cache(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.delete')}\tDelete": lambda evt: self._canvas.delete(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.cut')}\tCtrl+x": lambda evt: cut(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.copy')}\tCtrl+c": lambda evt: copy(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.paste')}\tCtrl+v": lambda evt: paste(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.delete')}\tDelete": lambda evt: delete(),
             }
         )
 
+        goto = CallableWeakMethod(self._canvas.goto)
+        select_all = CallableWeakMethod(self._canvas.select_all)
         menu.setdefault(
             lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
         ).setdefault("shortcut", {}).update(
             {
-                f"{lang.get('program_3d_edit.menu_bar.edit.goto')}\tCtrl+g": lambda evt: self._canvas.goto(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.select_all')}\tCtrl+A": lambda evt: self._canvas.select_all(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.goto')}\tCtrl+g": lambda evt: goto(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.select_all')}\tCtrl+A": lambda evt: select_all(),
             }
         )
 
+        edit_controls = CallableWeakMethod(self._edit_controls)
         menu.setdefault(lang.get("menu_bar.options.menu_name"), {}).setdefault(
             "options", {}
         ).setdefault(
             lang.get("program_3d_edit.menu_bar.options.controls"),
-            lambda evt: self._edit_controls(),
+            lambda evt: edit_controls(),
         )
+
+        edit_options = CallableWeakMethod(self._edit_options)
         menu.setdefault(lang.get("menu_bar.options.menu_name"), {}).setdefault(
             "options", {}
         ).setdefault(
             lang.get("program_3d_edit.menu_bar.options.options"),
-            lambda evt: self._edit_options(),
+            lambda evt: edit_options(),
         )
+
         menu.setdefault(lang.get("menu_bar.help.menu_name"), {}).setdefault(
             "help", {}
         ).setdefault(
             lang.get("program_3d_edit.menu_bar.help.user_guide"),
-            lambda evt: self._help_controls(),
+            _show_user_guide,
         )
         return menu
 
@@ -362,9 +390,3 @@ class EditExtension(wx.Panel, BaseProgram):
                 self._canvas.camera.perspective_fov = fov
                 self._canvas.renderer.render_distance = render_distance
                 self._canvas.camera.rotate_speed = camera_sensitivity
-
-    @staticmethod
-    def _help_controls():
-        webbrowser.open(
-            "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/edit/readme.md"
-        )

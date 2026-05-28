@@ -88,11 +88,12 @@ class WorldPageUI(wx.Notebook, BasePageUI):
         return self._path
 
     def menu(self, menu: MenuData) -> MenuData:
+        path = self.path
         menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "exit", {}
         ).setdefault(
             lang.get("menu_bar.file.close_world"),
-            lambda evt: app.close_level(self.path),
+            lambda evt: app.close_level(path),
         )
         return self.GetPage(self.GetSelection()).menu(menu)
 

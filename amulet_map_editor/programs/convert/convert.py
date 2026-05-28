@@ -20,6 +20,12 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
+def _show_user_guide(evt):
+    webbrowser.open(
+        "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/convert/readme.md"
+    )
+
+
 class ConvertExtension(SimpleScrollablePanel, BaseProgram):
     def __init__(self, container, world: BaseLevel):
         super().__init__(container)
@@ -100,14 +106,9 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
             "control", {}
         ).setdefault(
             lang.get("program_convert.menu_bar.help.user_guide"),
-            lambda evt: self._help_controls(),
+            _show_user_guide,
         )
         return menu
-
-    def _help_controls(self):
-        webbrowser.open(
-            "https://github.com/Amulet-Team/Amulet-Map-Editor/blob/master/amulet_map_editor/programs/convert/readme.md"
-        )
 
     def _show_world_select(self, evt):
         with WorldSelectDialog(self, self._output_world_callback) as select_world:
