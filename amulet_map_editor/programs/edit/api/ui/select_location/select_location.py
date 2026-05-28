@@ -3,7 +3,7 @@ from typing import Type, Any, Tuple
 
 from amulet.api.data_types import BlockCoordinates
 from amulet_map_editor.api.wx.ui.simple import SimplePanel
-from amulet_map_editor.api.wx.util.validators import IntValidator
+from amulet_map_editor.api.wx.util.validators import int_validator
 from amulet_map_editor.api import config
 from .events import LocationChangeEvent, TransformChangeEvent
 
@@ -36,7 +36,7 @@ class SelectLocationUI(SimplePanel):
             "z", wx.SpinCtrl, min=-30000000, max=30000000
         )
         for ui in (self._x, self._y, self._z):
-            ui.SetValidator(IntValidator())
+            ui.SetValidator(int_validator)
 
         self._x.Bind(wx.EVT_SPINCTRL, self._on_location_change)
         self._y.Bind(wx.EVT_SPINCTRL, self._on_location_change)

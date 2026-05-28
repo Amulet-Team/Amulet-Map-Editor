@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any, TYPE_CHECKING, Sequence
 import logging
 import inspect
 
-from amulet_map_editor.api.wx.util.validators import IntValidator
+from amulet_map_editor.api.wx.util.validators import int_validator
 
 from amulet.api.data_types import OperationReturnType
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
@@ -106,7 +106,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
             max=max(min_val, max_val),
             initial=initial,
         )
-        option.SetValidator(IntValidator())
+        option.SetValidator(int_validator)
         sizer.Add(option)
         self._options[option_name] = option
 

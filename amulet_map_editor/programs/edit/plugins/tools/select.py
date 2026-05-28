@@ -11,7 +11,7 @@ from amulet.api.data_types import BlockCoordinates
 
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
-from amulet_map_editor.api.wx.util.validators import IntValidator
+from amulet_map_editor.api.wx.util.validators import int_validator
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.programs.edit.api.events import EVT_SELECTION_CHANGE
 from amulet_map_editor.programs.edit.api.behaviour.inspect_block_behaviour import (
@@ -270,7 +270,7 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
         )
         sizer.Add(obj, 1, flag=wx.CENTER | wx.TOP | wx.BOTTOM | wx.RIGHT, border=5)
         obj.Bind(wx.EVT_SPINCTRL, self._box_input_change)
-        obj.SetValidator(IntValidator())
+        obj.SetValidator(int_validator)
         obj.Disable()
         obj.SetToolTip(tooltip)
         obj.SetBackgroundColour(colour)

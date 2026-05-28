@@ -53,3 +53,7 @@ class FloatValidator(BaseValidator):
         keycode = int(event.GetKeyCode())
         if keycode in SpecialChrs or 45 <= keycode <= 57:
             event.Skip()
+
+
+int_validator = IntValidator()
+float_validator = FloatValidator()
