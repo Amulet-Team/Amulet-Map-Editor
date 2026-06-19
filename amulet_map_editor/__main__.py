@@ -38,7 +38,6 @@ try:
     import traceback
     import glob
     import time
-    import wx
     import platformdirs
     from typing import NoReturn
     from types import TracebackType
@@ -123,7 +122,7 @@ def _init_log() -> logging.Logger:
 
 
 def _app_main() -> int:
-    if sys.platform == "linux" and wx.VERSION >= (4, 1, 1):
+    if sys.platform == "linux":
         # bug 247
         os.environ["PYOPENGL_PLATFORM"] = "egl"
         os.environ["GDK_BACKEND"] = "x11"
