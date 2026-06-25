@@ -23,7 +23,6 @@ See instructions on [amuletmc.com](https://www.amuletmc.com/installing-from-sour
 ## Running with Docker (Linux)
 The Docker image runs on any Linux distro with Docker support.\
 To run the Docker image, clone this repository and run `rundocker.sh`.\
-Compatibility with wayland is done through xwayland for x11 support.
 
 ## Legacy builds
 

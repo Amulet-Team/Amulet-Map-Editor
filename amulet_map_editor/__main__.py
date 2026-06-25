@@ -125,7 +125,6 @@ def _app_main() -> int:
     if sys.platform == "linux":
         # bug 247
         os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
-        os.environ.setdefault("GDK_BACKEND", "x11")
 
     # Initialise default paths.
     data_dir = platformdirs.user_data_dir("AmuletMapEditor", "AmuletTeam")
