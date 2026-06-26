@@ -9,6 +9,7 @@ from amulet.api.errors import LoaderNoneMatched
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
+from amulet_map_editor.programs.edit.api.events import ToolChangeEvent
 
 if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
@@ -53,6 +54,10 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
         ) as fileDialog:
             log.debug(f"Showing Import FileDialog at {fileDialog.GetRect()}")
             if fileDialog.ShowModal() == wx.ID_CANCEL:
+                wx.PostEvent(
+                    self.canvas,
+                    ToolChangeEvent(tool="Select"),
+                )
                 return
             else:
                 pathname = fileDialog.GetPath()
