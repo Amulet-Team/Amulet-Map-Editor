@@ -13,12 +13,12 @@ class MouseMovement(WindowContainer):
         self._y: float = 0
 
         # the resting position of the mouse from which to calculate the delta
-        # if the mouse is warped this will become the warped point
+        # if the mouse is warped, this will become the warped point
         self._start_x: float = 0
         self._start_y: float = 0
 
         # the sum of all the deltas since it was last reset.
-        # when the mouse is warped the delta before it was warped will be added to this value
+        # when the mouse is warped, the delta before it was warped will be added to this value
         self._delta_x: float = 0
         self._delta_y: float = 0
 
@@ -67,7 +67,8 @@ class MouseMovement(WindowContainer):
     @x.setter
     def x(self, x: int):
         """Set the x pixel location of the mouse in the parent window.
-        Will warp the cursor to this position and create a mouse move event."""
+        Will warp the cursor to this position and create a mouse move event.
+        Under Wayland the mouse will not move"""
         self._delta_x += self._x - self._start_x
         self._start_x = self._x = self._to_relative(int(x), 0)[0]
         self._warp()
@@ -80,7 +81,8 @@ class MouseMovement(WindowContainer):
     @y.setter
     def y(self, y: int):
         """Set the y pixel location of the mouse in the parent window.
-        Will warp the cursor to this position and create a mouse move event."""
+        Will warp the cursor to this position and create a mouse move event.
+        Under Wayland the mouse will not move"""
         self._delta_y += self._y - self._start_y
         self._start_y = self._y = self._to_relative(0, int(y))[1]
         self._warp()
@@ -93,7 +95,8 @@ class MouseMovement(WindowContainer):
     @xy.setter
     def xy(self, xy: Tuple[int, int]):
         """Set the x and y pixel location of the mouse in the parent window.
-        Will warp the cursor to this position and create a mouse move event."""
+        Will warp the cursor to this position and create a mouse move event.
+        Under Wayland the mouse will not move"""
         assert len(xy) == 2, "xy must be an iterable of two ints"
         x, y = map(int, xy)
         self._delta_x += self._x - self._start_x
