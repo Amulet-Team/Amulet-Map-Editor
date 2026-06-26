@@ -455,11 +455,12 @@ class EditCanvas(BaseEditCanvas):
             if self._tool_sizer is not None:
                 windows.extend(self._tool_sizer.windows())
             glEnable(GL_SCISSOR_TEST)
+            self_h = self.GetSize()[1]
             for window in windows:
                 x, y = window.ClientToScreen(0, 0)
                 w, h = window.GetSize()
                 rel_x, rel_y = self.ScreenToClient((x, y))
-                glScissor(rel_x, rel_y, w, h)
+                glScissor(rel_x, self_h - rel_y - h, w, h)
                 glClearColor(0.0, 0.0, 0.0, 0.0)
                 glClear(GL_COLOR_BUFFER_BIT)
             glDisable(GL_SCISSOR_TEST)
