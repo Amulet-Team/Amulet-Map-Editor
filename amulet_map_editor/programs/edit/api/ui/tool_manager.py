@@ -147,4 +147,7 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         self._tool_panel.Refresh(False)
 
     def windows(self) -> list[wx.Window]:
-        return [self._tool_panel]
+        windows: list[wx.Window] = [self._tool_panel]
+        if self._active_tool is not None:
+            windows.extend(self._active_tool.windows())
+        return windows
