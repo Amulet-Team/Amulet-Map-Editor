@@ -57,7 +57,10 @@ class MouseMovement(WindowContainer):
         self._start_x, self._start_y = 0.5, 0.5
 
     def _warp(self):
+        # Warp to the start position
         self.window.WarpPointer(*self._to_absolute(self._x, self._y))
+        # On Wayland the mouse does not move so we must update the start position
+        self._start_x, self._start_y = self._to_relative(*wx.GetMousePosition())
 
     @property
     def x(self) -> int:
