@@ -69,7 +69,9 @@ class FilePanel(EditCanvasContainer):
             lang.get("program_3d_edit.file_ui.projection_tooltip")
         )
         self._projection_button.Bind(wx.EVT_BUTTON, self._on_projection_button)
+        self._projection_button.SetMinSize(wx.Size(-1, 25))
         self._button_sizer.Add(self._projection_button)
+
         self._location_button = wx.Button(
             self._button_window,
             label=", ".join([f"{s:.2f}" for s in self.canvas.camera.location]),
@@ -78,6 +80,7 @@ class FilePanel(EditCanvasContainer):
             lang.get("program_3d_edit.file_ui.location_tooltip")
         )
         self._location_button.Bind(wx.EVT_BUTTON, lambda evt: self.canvas.goto())
+        self._location_button.SetMinSize(wx.Size(-1, 25))
         self._button_sizer.Add(self._location_button)
 
         def set_speed(evt):
@@ -95,6 +98,7 @@ class FilePanel(EditCanvasContainer):
         )
         self._speed_button.SetToolTip(lang.get("program_3d_edit.file_ui.speed_tooltip"))
         self._speed_button.Bind(wx.EVT_BUTTON, set_speed)
+        self._speed_button.SetMinSize(wx.Size(-1, 25))
         self._button_sizer.Add(self._speed_button)
 
         self._dim_options = SimpleChoiceAny(self._button_window)
@@ -102,7 +106,7 @@ class FilePanel(EditCanvasContainer):
         self._dim_options.SetItems(level.level_wrapper.dimensions)
         self._set_dimension(canvas.dimension)
         self._dim_options.Bind(wx.EVT_CHOICE, self._on_dimension_change)
-
+        self._dim_options.SetMinSize(wx.Size(-1, 25))
         self._button_sizer.Add(self._dim_options)
 
         def create_button(text, operation):
@@ -114,25 +118,27 @@ class FilePanel(EditCanvasContainer):
         self._undo_button = create_button("0", lambda evt: self.canvas.undo())
         self._undo_button.SetBitmap(image.icon.tablericons.arrow_back_up.bitmap(20, 20))
         self._undo_button.SetToolTip(lang.get("program_3d_edit.file_ui.undo_tooltip"))
+        self._undo_button.SetMinSize(wx.Size(-1, 25))
 
         self._redo_button = create_button("0", lambda evt: self.canvas.redo())
         self._redo_button.SetBitmap(
             image.icon.tablericons.arrow_forward_up.bitmap(20, 20)
         )
         self._redo_button.SetToolTip(lang.get("program_3d_edit.file_ui.redo_tooltip"))
+        self._redo_button.SetMinSize(wx.Size(-1, 25))
 
         self._save_button = create_button("0", lambda evt: self.canvas.save())
         self._save_button.SetBitmap(image.icon.tablericons.device_floppy.bitmap(20, 20))
         self._save_button.SetToolTip(lang.get("program_3d_edit.file_ui.save_tooltip"))
+        self._save_button.SetMinSize(wx.Size(-1, 25))
 
         self._close_button = create_button(
             "", lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
         )
         self._close_button.SetBitmap(image.icon.tablericons.square_x.bitmap(20, 20))
         self._close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
-        size = self._close_button.GetSize()
-        self._close_button.SetSize(wx.Size(size.GetHeight(), size.GetHeight()))
-        self._close_button.SetMinSize(wx.Size(size.GetHeight(), size.GetHeight()))
+        self._close_button.SetSize(wx.Size(25, 25))
+        self._close_button.SetMinSize(wx.Size(25, 25))
 
         self._update_buttons()
 
