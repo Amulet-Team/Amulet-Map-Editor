@@ -444,12 +444,12 @@ class EditCanvas(BaseEditCanvas):
 
     if sys.platform == "linux" and os.environ.get("XDG_SESSION_TYPE") == "wayland":
 
-        def mask_gl(self, windows: Iterable[wx.Window]) -> None:
+        def mask_gl(self) -> None:
             """
             Cut out the ares of the canvas intersecting the given objects.
             This must be called with an OpenGL context active.
             """
-            windows = list(windows)
+            windows = []
             if self._file_panel is not None:
                 windows.extend(self._file_panel.windows())
             if self._tool_sizer is not None:
@@ -467,5 +467,5 @@ class EditCanvas(BaseEditCanvas):
 
     else:
 
-        def mask_gl(self, windows: Iterable[wx.Window]) -> None:
+        def mask_gl(self) -> None:
             pass

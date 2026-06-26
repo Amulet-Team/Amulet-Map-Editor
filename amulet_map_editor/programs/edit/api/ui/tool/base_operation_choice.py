@@ -1,5 +1,5 @@
 import wx
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Iterable
 import traceback
 import logging
 
@@ -80,6 +80,9 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
             self._open_folder.Bind(wx.EVT_BUTTON, self._on_open_folder)
 
         self._resize()
+
+    def windows(self) -> Iterable[wx.Window]:
+        return [self._settings_panel, self._operation_panel]
 
     @property
     def name(self) -> str:

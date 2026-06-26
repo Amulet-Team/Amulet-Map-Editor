@@ -72,6 +72,7 @@ class DefaultOperationUI(OperationUI):
         self._selection.draw()
         if self._show_pointer:
             self._pointer.draw()
+        self.canvas.mask_gl()
         self.canvas.renderer.end_draw()
 
     def _on_input_press(self, evt: InputPressEvent):

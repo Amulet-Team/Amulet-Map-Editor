@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Tuple
+from typing import TYPE_CHECKING, Callable, Tuple, Iterable
 import logging
 
 import wx
@@ -365,11 +365,11 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
             glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
         self._selection.draw()
-        self.canvas.mask_gl(self._windows())
+        self.canvas.mask_gl()
         self.canvas.renderer.end_draw()
         if paint_log_count < 10:
             paint_log_count += 1
             log.debug(f"Painted frame. {paint_log_count}/10")
 
-    def _windows(self) -> list[wx.Window]:
+    def windows(self) -> Iterable[wx.Window]:
         return [self._button_panel]

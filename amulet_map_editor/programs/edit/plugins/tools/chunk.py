@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Dict, Tuple, Optional
+from typing import TYPE_CHECKING, Dict, Tuple, Optional, Iterable
 import logging
 
 import wx
@@ -348,8 +348,8 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
             self.canvas.camera.orthographic_clipping = clip
             if depth_state:
                 glEnable(GL_DEPTH_TEST)
-        self.canvas.mask_gl(self._windows())
+        self.canvas.mask_gl()
         self.canvas.renderer.end_draw()
 
-    def _windows(self) -> list[wx.Window]:
+    def windows(self) -> Iterable[wx.Window]:
         return [self._button_panel]

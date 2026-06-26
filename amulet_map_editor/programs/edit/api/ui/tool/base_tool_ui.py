@@ -1,5 +1,5 @@
 import wx
-from typing import Union, Any
+from typing import Union, Any, Iterable
 
 from amulet_map_editor.programs.edit.api.edit_canvas_container import (
     EditCanvasContainer,
@@ -44,3 +44,7 @@ class BaseToolUI(EditCanvasContainer, CanvasToggleElement):
         All events bound to the canvas will be automatically removed after this is run.
         """
         pass
+
+    def windows(self) -> Iterable[wx.Window]:
+        """The windows that make up the tool."""
+        return []
