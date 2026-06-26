@@ -62,7 +62,11 @@ class DefaultBaseToolUI(BaseToolUI):
             self.canvas.renderer.draw_sky_box()
             glClear(GL_DEPTH_BUFFER_BIT)
         self.canvas.renderer.draw_level()
+        self.canvas.mask_gl(self._windows())
         self.canvas.renderer.end_draw()
+
+    def _windows(self) -> list[wx.Window]:
+        return []
 
     def _on_drop_files(self, evt: wx.DropFilesEvent):
         """Logic to run when a file is dropped into the canvas."""

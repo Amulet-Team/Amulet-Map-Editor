@@ -234,6 +234,9 @@ class FilePanel(EditCanvasContainer):
         self._button_window.Raise()
         self._button_window.Refresh(False)
 
+    def windows(self) -> list[wx.Window]:
+        return [self._version_panel, self._button_window]
+
 
 class SpeedSelectDialog(wx.Dialog):
     def __init__(self, parent: wx.Window, speed: float):

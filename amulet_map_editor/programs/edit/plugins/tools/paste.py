@@ -743,4 +743,8 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self.canvas.renderer.draw_level()
         self.canvas.renderer.draw_fake_levels()
         self._selection.draw()
+        self.canvas.mask_gl(self._windows())
         self.canvas.renderer.end_draw()
+
+    def _windows(self) -> list[wx.Window]:
+        return [self._paste_panel]

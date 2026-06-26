@@ -1,9 +1,11 @@
 import logging
 import warnings
 import wx
-from typing import Callable, TYPE_CHECKING, Any, Generator, Optional
+from typing import Callable, Any, Generator, Optional, Iterable
 from types import GeneratorType
 from threading import RLock, Thread
+import sys
+import os
 
 from .base_edit_canvas import BaseEditCanvas
 from ...edit import EDIT_CONFIG_ID
@@ -16,6 +18,16 @@ from ..key_config import (
 
 import time
 import traceback
+
+from OpenGL.GL import (
+    glClear,
+    glEnable,
+    GL_SCISSOR_TEST,
+    glScissor,
+    glClearColor,
+    GL_COLOR_BUFFER_BIT,
+    glDisable,
+)
 
 from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimension
 from amulet.api.structure import structure_cache
@@ -47,9 +59,6 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_EDIT_CLOSE,
 )
 from amulet_map_editor.programs.edit.api.ui.file import FilePanel
-
-if TYPE_CHECKING:
-    from amulet.api.level import BaseLevel
 
 log = logging.getLogger(__name__)
 OperationType = Callable[[], OperationReturnType]
@@ -432,3 +441,30 @@ class EditCanvas(BaseEditCanvas):
         )
         self._run_operation(save, "Saving world.", "Please wait.", False)
         wx.PostEvent(self, SaveEvent())
+
+    if sys.platform == "linux" and os.environ.get("XDG_SESSION_TYPE") == "wayland":
+
+        def mask_gl(self, windows: Iterable[wx.Window]) -> None:
+            """
+            Cut out the ares of the canvas intersecting the given objects.
+            This must be called with an OpenGL context active.
+            """
+            windows = list(windows)
+            if self._file_panel is not None:
+                windows.extend(self._file_panel.windows())
+            if self._tool_sizer is not None:
+                windows.extend(self._tool_sizer.windows())
+            glEnable(GL_SCISSOR_TEST)
+            for window in windows:
+                x, y = window.ClientToScreen(0, 0)
+                w, h = window.GetSize()
+                rel_x, rel_y = self.ScreenToClient((x, y))
+                glScissor(rel_x, rel_y, w, h)
+                glClearColor(0.0, 0.0, 0.0, 0.0)
+                glClear(GL_COLOR_BUFFER_BIT)
+            glDisable(GL_SCISSOR_TEST)
+
+    else:
+
+        def mask_gl(self, windows: Iterable[wx.Window]) -> None:
+            pass
