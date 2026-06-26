@@ -29,18 +29,20 @@ class RaycastBehaviour(BaseBehaviour):
         """
         look_vector = numpy.array([0, 0, 1, 0])
 
-        if self.canvas.mouse.delta_xy != (0, 0):
+        delta_xy = self.canvas.mouse.delta_xy
+        if delta_xy != (0, 0):
             screen_width, screen_height = numpy.array(self.canvas.GetSize(), int) / 2
             screen_width = max(1, screen_width)
             screen_height = max(1, screen_height)
+            delta_x, delta_y = delta_xy
             screen_dx = math.atan(
-                self.canvas.mouse.delta_x
+                delta_x
                 * self.canvas.camera.aspect_ratio
                 * math.tan(math.radians(self.canvas.camera.fov / 2))
                 / screen_width
             )
             screen_dy = math.atan(
-                self.canvas.mouse.delta_y
+                delta_y
                 * math.cos(screen_dx)
                 * math.tan(math.radians(self.canvas.camera.fov / 2))
                 / screen_height
@@ -101,12 +103,13 @@ class RaycastBehaviour(BaseBehaviour):
         width, height = self.canvas.GetSize()
         width = max(1, width)
         height = max(1, height)
-        z += 2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
+        delta_x, delta_y = self.canvas.mouse.delta_xy
+        z += 2 * self.canvas.camera.fov * delta_y / height
         x += (
             2
             * self.canvas.camera.fov
             * self.canvas.camera.aspect_ratio
-            * self.canvas.mouse.delta_x
+            * delta_x
             / width
         )
         x, z = numpy.floor([x, z]) + 0.5

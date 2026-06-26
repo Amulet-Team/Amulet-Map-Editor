@@ -104,24 +104,24 @@ class CameraBehaviour(BaseBehaviour):
 
         if self.canvas.camera.projection_mode == Projection.PERSPECTIVE:
             if self.canvas.camera.rotating:
-                pitch = self.canvas.mouse.delta_y * 0.07
-                yaw = self.canvas.mouse.delta_x * 0.07
+                delta_x, delta_y = self.canvas.mouse.delta_xy
+                pitch = delta_y * 0.07
+                yaw = delta_x * 0.07
                 self.canvas.mouse.warp_middle()
                 self.canvas.mouse.reset_delta()
             self.move_camera_relative(forward, up, right, pitch, yaw)
         elif self.canvas.camera.projection_mode == Projection.TOP_DOWN:
             if self.canvas.camera.rotating:
+                delta_x, delta_y = self.canvas.mouse.delta_xy
                 width, height = self.canvas.GetSize()
                 width = max(1, width)
                 height = max(1, height)
-                forward += (
-                    2 * self.canvas.camera.fov * self.canvas.mouse.delta_y / height
-                )
+                forward += 2 * self.canvas.camera.fov * delta_y / height
                 right -= (
                     2
                     * self.canvas.camera.fov
                     * self.canvas.camera.aspect_ratio
-                    * self.canvas.mouse.delta_x
+                    * delta_x
                     / width
                 )
                 self.canvas.mouse.warp_middle()
