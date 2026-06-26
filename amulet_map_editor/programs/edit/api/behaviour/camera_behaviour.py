@@ -50,11 +50,6 @@ class CameraBehaviour(BaseBehaviour):
         self.canvas.Bind(EVT_INPUT_RELEASE, self._on_input_release)
         self.canvas.Bind(wx.EVT_KEY_DOWN, self._on_key_press)
         self.canvas.Bind(wx.EVT_KILL_FOCUS, self._on_loss_focus)
-        self.canvas.Bind(wx.EVT_MOTION, self._on_mouse_motion)
-
-    def _on_mouse_motion(self, evt):
-        self.canvas.SetFocus()
-        evt.Skip()
 
     def _on_key_press(self, evt: wx.KeyEvent):
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
