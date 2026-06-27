@@ -29,23 +29,17 @@ class RaycastBehaviour(BaseBehaviour):
         """
         look_vector = numpy.array([0, 0, 1, 0])
 
-        delta_xy = self.canvas.mouse.delta_xy
-        if delta_xy != (0, 0):
-            screen_width, screen_height = numpy.array(self.canvas.GetSize(), int) / 2
-            screen_width = max(1, screen_width)
-            screen_height = max(1, screen_height)
-            delta_x, delta_y = delta_xy
+        delta_x, delta_y = self.canvas.mouse.mouse_xy_relative
+        if delta_x and delta_y:
             screen_dx = math.atan(
                 delta_x
                 * self.canvas.camera.aspect_ratio
                 * math.tan(math.radians(self.canvas.camera.fov / 2))
-                / screen_width
             )
             screen_dy = math.atan(
                 delta_y
                 * math.cos(screen_dx)
                 * math.tan(math.radians(self.canvas.camera.fov / 2))
-                / screen_height
             )
             look_vector = numpy.matmul(
                 rotation_matrix_xy(screen_dy, -screen_dx),
@@ -100,17 +94,10 @@ class RaycastBehaviour(BaseBehaviour):
     def get_2d_mouse_location(self) -> Tuple[float, float]:
         """Get the x and z location of the cursor when in 2D mode."""
         x, _, z = self.canvas.camera.location
-        width, height = self.canvas.GetSize()
-        width = max(1, width)
-        height = max(1, height)
-        delta_x, delta_y = self.canvas.mouse.delta_xy
-        z += 2 * self.canvas.camera.fov * delta_y / height
+        delta_x, delta_y = self.canvas.mouse.mouse_xy_relative
+        z += 2 * self.canvas.camera.fov * delta_y * 0.5
         x += (
-            2
-            * self.canvas.camera.fov
-            * self.canvas.camera.aspect_ratio
-            * delta_x
-            / width
+            2 * self.canvas.camera.fov * self.canvas.camera.aspect_ratio * delta_x * 0.5
         )
         x, z = numpy.floor([x, z]) + 0.5
         return x, z

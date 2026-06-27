@@ -139,3 +139,10 @@ class MouseMovement(WindowContainer):
             self._x - self._start_x + self._delta_x,
             self._y - self._start_y + self._delta_y,
         )
+
+    @property
+    def mouse_xy_relative(self) -> tuple[float, float]:
+        """
+        The coordinate of the mouse in the window [-1.0, 1.0]
+        """
+        return self._x * 2 - 1, self._y * 2 - 1
