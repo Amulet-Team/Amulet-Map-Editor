@@ -108,7 +108,6 @@ class MouseMovement(WindowContainer):
         :return:
         """
         self._delta_x = self._delta_y = 0
-        print(f"reset_delta	{self._x}	{self._y}	{self._delta_x}	{self._delta_y}")
 
     @property
     def delta_x(self) -> int:
