@@ -8,17 +8,12 @@ class MouseMovement(WindowContainer):
 
     def __init__(self, window: wx.Window):
         super().__init__(window)
-        # the current mouse position
+        # The mouse position in range [0, 1]
         self._x: float = 0
         self._y: float = 0
 
-        # the resting position of the mouse from which to calculate the delta
-        # if the mouse is warped, this will become the warped point
-        self._start_x: float = 0
-        self._start_y: float = 0
-
-        # the sum of all the deltas since it was last reset.
-        # when the mouse is warped, the delta before it was warped will be added to this value
+        # The sum of all the deltas since it was last reset.
+        # When the mouse moves, the delta is added to this value
         self._delta_x: float = 0
         self._delta_y: float = 0
 
@@ -40,7 +35,11 @@ class MouseMovement(WindowContainer):
 
     def _on_mouse_motion(self, evt):
         """Event fired when the mouse is moved."""
-        self._x, self._y = self._to_relative(*evt.GetPosition())
+        x, y = self._to_relative(*evt.GetPosition())
+        self._delta_x += x - self._x
+        self._delta_y += y - self._y
+        self._x = x
+        self._y = y
         evt.Skip()
 
     def _screen_middle(self) -> Tuple[int, int]:
@@ -54,41 +53,40 @@ class MouseMovement(WindowContainer):
 
     def set_middle(self):
         """Set the start point to the middle of the screen. Does not warp."""
-        self._start_x, self._start_y = 0.5, 0.5
+        pass
 
-    def _warp(self):
-        # Warp to the start position
-        self.window.WarpPointer(*self._to_absolute(self._x, self._y))
-        # On Wayland the mouse does not move so we must update the start position
-        self._start_x, self._start_y = self._to_relative(*wx.GetMousePosition())
+    def _warp(self, x: int, y: int):
+        # Warp to the position.
+        self.window.WarpPointer(x, y)
+        # On some platforms warping does not move the cursor (wayland).
+        # We must update the last position to the new position
+        self._x, self._y = self._to_relative(
+            *self.window.ScreenToClient(*wx.GetMousePosition())
+        )
 
     @property
     def x(self) -> int:
         """The x pixel location of the mouse in the parent window."""
-        return self._to_absolute(self._x, 0)[0]
+        return self.xy[0]
 
     @x.setter
     def x(self, x: int):
         """Set the x pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event.
         Under Wayland the mouse will not move"""
-        self._delta_x += self._x - self._start_x
-        self._start_x = self._x = self._to_relative(int(x), 0)[0]
-        self._warp()
+        self._warp(x, self.y)
 
     @property
     def y(self) -> int:
         """The y pixel location of the mouse in the parent window."""
-        return self._to_absolute(0, self._y)[1]
+        return self.xy[1]
 
     @y.setter
     def y(self, y: int):
         """Set the y pixel location of the mouse in the parent window.
         Will warp the cursor to this position and create a mouse move event.
         Under Wayland the mouse will not move"""
-        self._delta_y += self._y - self._start_y
-        self._start_y = self._y = self._to_relative(0, int(y))[1]
-        self._warp()
+        self._warp(self.x, y)
 
     @property
     def xy(self) -> Tuple[int, int]:
@@ -102,10 +100,7 @@ class MouseMovement(WindowContainer):
         Under Wayland the mouse will not move"""
         assert len(xy) == 2, "xy must be an iterable of two ints"
         x, y = map(int, xy)
-        self._delta_x += self._x - self._start_x
-        self._delta_y += self._y - self._start_y
-        self._start_x, self._start_y = (self._x, self._y) = self._to_relative(x, y)
-        self._warp()
+        self._warp(x, y)
 
     def reset_delta(self):
         """Reset the mouse delta values.
@@ -113,8 +108,7 @@ class MouseMovement(WindowContainer):
         :return:
         """
         self._delta_x = self._delta_y = 0
-        self._start_x = self._x
-        self._start_y = self._y
+        print(f"reset_delta	{self._x}	{self._y}	{self._delta_x}	{self._delta_y}")
 
     @property
     def delta_x(self) -> int:
@@ -135,10 +129,7 @@ class MouseMovement(WindowContainer):
         """The x and y pixel distance between the current location and the location when reset_delta was called.
         If the pointer was warped the offset before it was warped will be added to this.
         """
-        return self._to_absolute(
-            self._x - self._start_x + self._delta_x,
-            self._y - self._start_y + self._delta_y,
-        )
+        return self._to_absolute(self._delta_x, self._delta_y)
 
     @property
     def mouse_xy_relative(self) -> tuple[float, float]:

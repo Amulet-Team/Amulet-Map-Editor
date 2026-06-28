@@ -75,7 +75,6 @@ class BaseEditCanvas(EventCanvas):
 
         self._buttons: ButtonInput = ButtonInput(self)
         self._mouse: MouseMovement = MouseMovement(self)
-        self._mouse.set_middle()
 
         resource_packs_dir = os.path.join(os.environ["DATA_DIR"], "resource_packs")
         readme_path = os.path.join(resource_packs_dir, "readme.txt")
