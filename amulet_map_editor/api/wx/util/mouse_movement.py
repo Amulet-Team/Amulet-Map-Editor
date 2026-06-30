@@ -1,11 +1,13 @@
-import wx
 from typing import Tuple
-from .window_container import WindowContainer
+
+import wx
 
 try:
     from wayland_lock_pointer import PointerLocker
 except ImportError:
     PointerLocker = None
+
+from .window_container import WindowContainer
 
 
 class MouseMovement(WindowContainer):
