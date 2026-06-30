@@ -155,7 +155,6 @@ class MouseMovement(WindowContainer):
     else:
 
         def _on_relative_motion(self, dx: float, dy: float) -> None:
-            print(dx, dy)
             dx, dy = self._to_relative(dx, dy)
             self._delta_x += dx
             self._delta_y += dy
