@@ -145,12 +145,15 @@ class MouseMovement(WindowContainer):
         return self._x * 2 - 1, self._y * 2 - 1
 
     if PointerLocker is None:
+
         def lock(self) -> None:
             pass
 
         def unlock(self) -> None:
             pass
+
     else:
+
         def _on_relative_motion(self, dx: float, dy: float) -> None:
             print(dx, dy)
             dx, dy = self._to_relative(dx, dy)
@@ -159,7 +162,9 @@ class MouseMovement(WindowContainer):
 
         def lock(self) -> None:
             if self._wayland_lock is None:
-                self._wayland_lock = PointerLocker(self.window.GetTopLevelParent().GetHandle())
+                self._wayland_lock = PointerLocker(
+                    self.window.GetTopLevelParent().GetHandle()
+                )
                 self._wayland_lock.set_motion_callback(self._on_relative_motion)
                 self._wayland_lock.lock()
 
