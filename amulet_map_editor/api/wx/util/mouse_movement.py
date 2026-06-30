@@ -1,3 +1,4 @@
+import os
 from typing import Tuple
 
 import wx
@@ -146,15 +147,7 @@ class MouseMovement(WindowContainer):
         """
         return self._x * 2 - 1, self._y * 2 - 1
 
-    if PointerLocker is None:
-
-        def lock(self) -> None:
-            pass
-
-        def unlock(self) -> None:
-            pass
-
-    else:
+    if PointerLocker is not None and os.environ.get("XDG_SESSION_TYPE") == "wayland":
 
         def _on_relative_motion(self, dx: float, dy: float) -> None:
             dx, dy = self._to_relative(dx, dy)
@@ -174,3 +167,11 @@ class MouseMovement(WindowContainer):
                 if self._wayland_lock.is_locked():
                     self._wayland_lock.unlock()
                 self._wayland_lock = None
+
+    else:
+
+        def lock(self) -> None:
+            pass
+
+        def unlock(self) -> None:
+            pass
