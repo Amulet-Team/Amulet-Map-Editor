@@ -2,6 +2,11 @@ import wx
 from typing import Tuple
 from .window_container import WindowContainer
 
+try:
+    from wayland_lock_pointer import PointerLocker
+except ImportError:
+    PointerLocker = None
+
 
 class MouseMovement(WindowContainer):
     """A class to get and set the cursor position and track changes."""
@@ -17,11 +22,13 @@ class MouseMovement(WindowContainer):
         self._delta_x: float = 0
         self._delta_y: float = 0
 
+        self._wayland_lock: PointerLocker | None = None
+
     def bind_events(self):
         """Set up all events required to run."""
         self.window.Bind(wx.EVT_MOTION, self._on_mouse_motion)
 
-    def _to_relative(self, x: int, y: int) -> Tuple[float, float]:
+    def _to_relative(self, x: float, y: float) -> Tuple[float, float]:
         """Convert the x and y values to relative values 0 to 1"""
         dx, dy = self.window.GetSize()
         dx = max(1, dx)
@@ -136,3 +143,28 @@ class MouseMovement(WindowContainer):
         The coordinate of the mouse in the window [-1.0, 1.0]
         """
         return self._x * 2 - 1, self._y * 2 - 1
+
+    if PointerLocker is None:
+        def lock(self) -> None:
+            pass
+
+        def unlock(self) -> None:
+            pass
+    else:
+        def _on_relative_motion(self, dx: float, dy: float) -> None:
+            print(dx, dy)
+            dx, dy = self._to_relative(dx, dy)
+            self._delta_x += dx
+            self._delta_y += dy
+
+        def lock(self) -> None:
+            if self._wayland_lock is None:
+                self._wayland_lock = PointerLocker(self.window.GetTopLevelParent().GetHandle())
+                self._wayland_lock.set_motion_callback(self._on_relative_motion)
+                self._wayland_lock.lock()
+
+        def unlock(self) -> None:
+            if self._wayland_lock is not None:
+                if self._wayland_lock.is_locked():
+                    self._wayland_lock.unlock()
+                self._wayland_lock = None

@@ -167,10 +167,12 @@ class CameraBehaviour(BaseBehaviour):
         self.canvas.SetCursor(wx.Cursor(wx.CURSOR_BLANK))
         self.canvas.mouse.warp_middle()
         self.canvas.mouse.reset_delta()
+        self.canvas.mouse.lock()
         self.canvas.camera.rotating = True
 
     def _release_mouse(self):
         """Release the mouse"""
+        self.canvas.mouse.unlock()
         self.canvas.SetCursor(wx.NullCursor)
         self.canvas.camera.rotating = False
 
