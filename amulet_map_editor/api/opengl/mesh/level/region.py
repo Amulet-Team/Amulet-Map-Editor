@@ -32,6 +32,10 @@ class ChunkManager:
         self._chunk_temp: queue.Queue[RenderChunk] = queue.Queue()
         self._chunk_temp_set = set()
         self._rebuild_regions: list[Tuple[int, int]] = []
+        self._draw_counter = 0
+        # cached draw order: (camera region coords, region count) -> sorted regions
+        self._sorted_regions: list = []
+        self._sort_key = None
 
     def add_render_chunk(self, render_chunk: RenderChunk):
         """
@@ -83,6 +87,7 @@ class ChunkManager:
                 )
             region.add_render_chunk(render_chunk)
         self._chunk_temp_set.clear()
+        self._sort_key = None
 
     def __contains__(self, chunk_coord: Tuple[int, int]):
         return (
@@ -98,20 +103,43 @@ class ChunkManager:
     def region_coords(self, cx: int, cz: int) -> tuple[int, int]:
         return cx // self.region_size, cz // self.region_size
 
-    def draw(self, camera_matrix: TransformationMatrix, camera):
+    def chunk_coords(self):
+        """Snapshot iterator of all loaded chunk coords. Thread safe."""
+        for region in tuple(self._regions.values()):
+            yield from region.chunk_coords()
+
+    def draw(self, camera_matrix: TransformationMatrix, camera, visible_rect=None):
         """
         Draw all chunks.
         This must be run on the main thread.
+
+        :param visible_rect: optional (min_cx, min_cz, max_cx, max_cz) chunk
+            rect. Regions entirely outside it are not drawn (top-down cull).
         """
+        self._draw_counter += 1
         cam_rx, cam_rz = numpy.floor(
             numpy.array(camera)[[0, 2]] / (16 * self.region_size)
         )
         cam_cx, cam_cz = numpy.floor(numpy.array(camera)[[0, 2]] / 16)
-        for region in sorted(
-            self._regions.values(),
-            key=lambda x: abs(x.rx - cam_rx) + abs(x.rz - cam_rz),
-            reverse=True,
-        ):
+        sort_key = (cam_rx, cam_rz, len(self._regions))
+        if sort_key != self._sort_key:
+            self._sort_key = sort_key
+            self._sorted_regions = sorted(
+                self._regions.values(),
+                key=lambda x: abs(x.rx - cam_rx) + abs(x.rz - cam_rz),
+                reverse=True,
+            )
+        for region in self._sorted_regions:
+            if visible_rect is not None:
+                min_cx, min_cz, max_cx, max_cz = visible_rect
+                if (
+                    (region.rx + 1) * self.region_size <= min_cx
+                    or region.rx * self.region_size > max_cx
+                    or (region.rz + 1) * self.region_size <= min_cz
+                    or region.rz * self.region_size > max_cz
+                ):
+                    continue
+            region.last_drawn = self._draw_counter
             region.draw(camera_matrix, cam_cx, cam_cz)
         self._merge_chunk_temp()
 
@@ -127,6 +155,7 @@ class ChunkManager:
             for region in self._regions.values():
                 region.unload()
             self._regions.clear()
+            self._sort_key = None
         else:
             min_rx, min_rz = self.region_coords(*safe_area[:2])
             max_rx, max_rz = self.region_coords(*safe_area[2:])
@@ -140,6 +169,7 @@ class ChunkManager:
 
             for region in delete_regions:
                 del self._regions[region]
+            self._sort_key = None
 
     def rebuild(self):
         """
@@ -155,6 +185,24 @@ class ChunkManager:
             render_region = self._regions.get(region_coord)
             if render_region is not None:
                 render_region.rebuild()
+
+    def enforce_budget(self, budget_bytes: int, protected: set):
+        """Unload least-recently-drawn regions until geometry fits the budget.
+        This must be run on the main thread.
+
+        :param protected: set of region coords that must be kept.
+        """
+        from .gc_policy import select_regions_to_evict
+
+        regions = [
+            ((region.rx, region.rz), region.geometry_bytes, region.last_drawn)
+            for region in tuple(self._regions.values())
+        ]
+        for coords in select_regions_to_evict(regions, budget_bytes, protected):
+            region = self._regions.pop(coords, None)
+            if region is not None:
+                region.unload()
+        self._sort_key = None
 
 
 MergedChunkLocationsType = Dict[Tuple[int, int], Tuple[int, int, int, int]]
@@ -176,6 +224,7 @@ class RenderRegion(TriMesh):
         super().__init__(context_identifier, resource_pack)
         self.rx = rx
         self.rz = rz
+        self.last_drawn = 0  # ChunkManager draw counter stamp, LRU key
         self._lock = Lock()
         # Raw chunk geometry
         self._chunks: Dict[Tuple[int, int], RenderChunk] = {}
@@ -195,6 +244,11 @@ class RenderRegion(TriMesh):
     @property
     def vertex_usage(self):
         return GL_DYNAMIC_DRAW
+
+    @property
+    def geometry_bytes(self) -> int:
+        """Approximate bytes of vertex data held for this region."""
+        return sum(chunk.verts.nbytes for chunk in tuple(self._chunks.values()))
 
     def __repr__(self):
         return f"RenderRegion({self.rx}, {self.rz})"
@@ -224,6 +278,10 @@ class RenderRegion(TriMesh):
         Thread safe.
         """
         return self._chunks[chunk_coords]
+
+    def chunk_coords(self):
+        """Snapshot iterator of the chunk coords stored in this region. Thread safe."""
+        return iter(tuple(self._chunks))
 
     def _disable_merged_chunk(self, chunk_coords: Tuple[int, int]):
         """

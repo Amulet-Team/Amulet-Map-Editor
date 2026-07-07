@@ -8,6 +8,7 @@ from amulet_map_editor.api.opengl.resource_pack import (
     OpenGLResourcePackManagerStatic,
     OpenGLResourcePack,
 )
+from amulet_map_editor.api.opengl.resource_pack.resource_pack import model_lock
 
 try:
     from .chunk_builder_cy import create_lod0_chunk
@@ -69,10 +70,11 @@ class RenderChunkBuilder(TriMesh):
         :param blocks: A list of tuples containing block arrays extending one block outside the sub-chunk in each direction.
         :return: Opaque block vertices, translucent block vertices.
         """
-        return create_lod0_chunk(
-            self.resource_pack,
-            self.offset,
-            blocks,
-            self.chunk.block_palette,
-            self._vert_len,
-        )
+        with model_lock:
+            return create_lod0_chunk(
+                self.resource_pack,
+                self.offset,
+                blocks,
+                self.chunk.block_palette,
+                self._vert_len,
+            )
