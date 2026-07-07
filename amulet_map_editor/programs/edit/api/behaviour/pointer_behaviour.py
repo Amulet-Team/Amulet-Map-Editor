@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 import wx
+import numpy
 
 from amulet_map_editor.api.opengl.mesh.selection import RenderSelection
 from amulet_map_editor.api.opengl.camera import Projection
@@ -91,7 +92,20 @@ class PointerBehaviour(RaycastBehaviour):
     def _update_pointer(self):
         """Update the pointer location."""
         if self.canvas.camera.projection_mode == Projection.TOP_DOWN:
-            location = self.closest_block_2d()[0]
+            renderer = self.canvas.renderer
+            if (
+                renderer.overview_enabled
+                and self.canvas.camera.fov > renderer.detail_ortho_threshold
+            ):
+                # map zoom: the 3D detail layer is suppressed and chunks are
+                # not cached, so a real surface raycast would synchronously
+                # load chunks on the UI thread every frame. Pin the pointer
+                # to y=0 instead. This condition mirrors the renderer's detail
+                # suppression exactly so the pointer matches what is drawn.
+                x, z = self.get_2d_mouse_location()
+                location = numpy.floor([x, 0, z]).astype(numpy.int64)
+            else:
+                location = self.closest_block_2d()[0]
         else:
             if self.canvas.camera.rotating:
                 location = self.distance_block_3d(self._pointer_distance)

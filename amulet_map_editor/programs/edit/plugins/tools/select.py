@@ -8,6 +8,7 @@ from OpenGL.GL import (
 )
 
 from amulet.api.data_types import BlockCoordinates
+from amulet.api.selection import SelectionGroup
 
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
@@ -126,6 +127,11 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
             lang.get("program_3d_edit.select_tool.paste_button"),
             lang.get("program_3d_edit.select_tool.paste_button_tooltip"),
             lambda evt: self.canvas.paste_from_cache(),
+        )
+        add_button(
+            lang.get("program_3d_edit.select_tool.deselect_all_button"),
+            lang.get("program_3d_edit.select_tool.deselect_all_button_tooltip"),
+            lambda evt: self._deselect_all(),
         )
 
         self._x1 = self._add_spin_ctrl(
@@ -285,6 +291,13 @@ class SelectTool(wx.BoxSizer, DefaultBaseToolUI):
     def _box_renderer_change(self, evt: RenderBoxChangeEvent):
         self._update_selection_inputs(*evt.points)
         evt.Skip()
+
+    def _deselect_all(self):
+        """Clear the whole selection. Setting the global selection posts an
+        EVT_SELECTION_CHANGE which both this tool (input boxes) and the block
+        selection behaviour (visible render boxes) pull from, keeping the data
+        and the drawn boxes in sync."""
+        self.canvas.selection.selection_group = SelectionGroup()
 
     def _on_selection_change(self, evt):
         self._pull_selection()

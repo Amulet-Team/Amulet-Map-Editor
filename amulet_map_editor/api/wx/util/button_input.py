@@ -128,7 +128,10 @@ class ButtonInput(WindowContainer):
         self.window.Bind(wx.EVT_WINDOW_DESTROY, self._on_destroy, self.window)
 
     def enable(self):
-        self._input_timer.Start(33)
+        # ~60Hz to match the draw timer; movement consumers are time-scaled so
+        # the faster cadence does not change effective speeds, it just removes
+        # the judder from the old 33ms/15ms mismatch.
+        self._input_timer.Start(16)
 
     def disable(self):
         self._input_timer.Stop()
