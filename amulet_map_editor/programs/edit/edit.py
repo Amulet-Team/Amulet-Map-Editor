@@ -18,6 +18,7 @@ from amulet_map_editor.api.wx.util.key_config import KeyConfigDialog
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.programs.edit.api.canvas.edit_canvas import EditCanvas
+from amulet_map_editor.programs.edit.api.chunk_generator import default_worker_count
 from amulet_map_editor.programs.edit.api.key_config import (
     DefaultKeybindGroupId,
     PresetKeybinds,
@@ -144,6 +145,25 @@ class EditExtension(wx.Panel, BaseProgram):
             self._canvas.camera.rotate_speed = edit_config.get("options", {}).get(
                 "camera_sensitivity", 2.0
             )
+            self._canvas.renderer.overview_enabled = edit_config.get("options", {}).get(
+                "overview_enabled", True
+            )
+            topdown_detail_mode = edit_config.get("options", {}).get(
+                "topdown_detail_mode", "never"
+            )
+            if topdown_detail_mode not in ("never", "zoomed_in", "always"):
+                log.warning(
+                    "Ignoring invalid topdown_detail_mode %r in config; "
+                    "falling back to 'never'.",
+                    topdown_detail_mode,
+                )
+                topdown_detail_mode = "never"
+            self._canvas.renderer.topdown_detail_mode = topdown_detail_mode
+            budget_mb = edit_config.get("options", {}).get("geometry_budget_mb")
+            if budget_mb:
+                self._canvas.renderer.render_world.geometry_budget_bytes = (
+                    int(budget_mb) * 2**20
+                )
 
             self._temp_msg = None
             self._temp_loading_bar = None
@@ -313,9 +333,22 @@ class EditExtension(wx.Panel, BaseProgram):
             fov = self._canvas.camera.perspective_fov
             render_distance = self._canvas.renderer.render_distance
             camera_sensitivity = self._canvas.camera.rotate_speed
+            overview_enabled = self._canvas.renderer.overview_enabled
+            topdown_detail_mode = self._canvas.renderer.topdown_detail_mode
+            initial_geometry_budget_bytes = (
+                self._canvas.renderer.render_world.geometry_budget_bytes
+            )
+            options = config.get(EDIT_CONFIG_ID, {}).get("options", {})
+            worker_count = options.get("chunk_worker_count", default_worker_count())
+            budget_mb = options.get(
+                "geometry_budget_mb",
+                initial_geometry_budget_bytes // 2**20,
+            )
             dialog = SimpleDialog(self, "Options")
 
-            sizer = wx.FlexGridSizer(3, 2, 0, 0)
+            sizer = wx.FlexGridSizer(8, 2, 0, 0)
+            # index -> topdown_detail_mode value for the detail Choice below
+            detail_modes = ("never", "zoomed_in", "always")
             dialog.sizer.Add(sizer, flag=wx.ALL, border=5)
             fov_ui = wx.SpinCtrlDouble(dialog, min=0, max=180, initial=fov)
 
@@ -335,7 +368,7 @@ class EditExtension(wx.Panel, BaseProgram):
             )
 
             render_distance_ui = wx.SpinCtrl(
-                dialog, min=0, max=500, initial=render_distance
+                dialog, min=0, max=64, initial=render_distance
             )
 
             def set_render_distance(evt):
@@ -372,10 +405,114 @@ class EditExtension(wx.Panel, BaseProgram):
                 border=5,
             )
 
+            overview_ui = wx.CheckBox(dialog)
+            overview_ui.SetValue(overview_enabled)
+
+            def set_overview(evt):
+                self._canvas.renderer.overview_enabled = overview_ui.GetValue()
+
+            overview_ui.Bind(wx.EVT_CHECKBOX, set_overview)
+            sizer.Add(
+                wx.StaticText(dialog, label="World overview (top-down)"),
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                overview_ui,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+
+            detail_ui = wx.Choice(
+                dialog, choices=["Map only", "When zoomed in", "Always"]
+            )
+            detail_ui.SetSelection(detail_modes.index(topdown_detail_mode))
+
+            def set_detail_mode(evt):
+                self._canvas.renderer.topdown_detail_mode = detail_modes[
+                    detail_ui.GetSelection()
+                ]
+
+            detail_ui.Bind(wx.EVT_CHOICE, set_detail_mode)
+            sizer.Add(
+                wx.StaticText(dialog, label="3D detail in top-down"),
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                detail_ui,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+
+            worker_count_ui = wx.SpinCtrl(dialog, min=1, max=32, initial=worker_count)
+            sizer.Add(
+                wx.StaticText(dialog, label="Chunk worker threads (restart world)"),
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                worker_count_ui,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+
+            budget_ui = wx.SpinCtrl(dialog, min=256, max=65536, initial=budget_mb)
+
+            def set_budget(evt):
+                self._canvas.renderer.render_world.geometry_budget_bytes = (
+                    budget_ui.GetValue() * 2**20
+                )
+
+            budget_ui.Bind(wx.EVT_SPINCTRL, set_budget)
+            sizer.Add(
+                wx.StaticText(dialog, label="Geometry memory budget (MB)"),
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                budget_ui,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+
+            scan_label = wx.StaticText(
+                dialog,
+                label=f"World map scanned: {self._canvas.renderer.overview_scanner.progress():.0%}",
+            )
+            rescan_button = wx.Button(dialog, label="Rescan world map")
+
+            def rescan(evt):
+                self._canvas.renderer.overview_scanner.rescan()
+                scan_label.SetLabel("World map scanned: 0%")
+
+            rescan_button.Bind(wx.EVT_BUTTON, rescan)
+            sizer.Add(
+                scan_label,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+            sizer.Add(
+                rescan_button,
+                flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
+                border=5,
+            )
+
+            scan_timer = wx.Timer(dialog)
+
+            def update_scan_label(evt):
+                scan_label.SetLabel(
+                    f"World map scanned: {self._canvas.renderer.overview_scanner.progress():.0%}"
+                )
+
+            dialog.Bind(wx.EVT_TIMER, update_scan_label, scan_timer)
+            scan_timer.Start(1000)
+
             dialog.Fit()
             dialog.CentreOnScreen()
             log.debug(f"Showing options dialog at {dialog.GetRect()}")
             response = dialog.ShowModal()
+            scan_timer.Stop()
             if response == wx.ID_OK:
                 edit_config: dict = config.get(EDIT_CONFIG_ID, {})
                 edit_config.setdefault("options", {})
@@ -386,8 +523,21 @@ class EditExtension(wx.Panel, BaseProgram):
                 edit_config["options"][
                     "camera_sensitivity"
                 ] = camera_sensitivity_ui.GetValue()
+                edit_config["options"]["overview_enabled"] = overview_ui.GetValue()
+                edit_config["options"]["topdown_detail_mode"] = detail_modes[
+                    detail_ui.GetSelection()
+                ]
+                edit_config["options"][
+                    "chunk_worker_count"
+                ] = worker_count_ui.GetValue()
+                edit_config["options"]["geometry_budget_mb"] = budget_ui.GetValue()
                 config.put(EDIT_CONFIG_ID, edit_config)
             elif response == wx.ID_CANCEL:
                 self._canvas.camera.perspective_fov = fov
                 self._canvas.renderer.render_distance = render_distance
                 self._canvas.camera.rotate_speed = camera_sensitivity
+                self._canvas.renderer.overview_enabled = overview_enabled
+                self._canvas.renderer.topdown_detail_mode = topdown_detail_mode
+                self._canvas.renderer.render_world.geometry_budget_bytes = (
+                    initial_geometry_budget_bytes
+                )

@@ -319,7 +319,7 @@ class EditCanvas(BaseEditCanvas):
                     self.world.restore_last_undo_point()
 
             self.renderer.enable_threads()
-            self.renderer.render_world.rebuild_changed()
+            self.renderer.world_changed()
             self._operation_running = False
             if op.error is not None:
                 raise op.error
@@ -338,12 +338,12 @@ class EditCanvas(BaseEditCanvas):
 
     def undo(self):
         self.world.undo()
-        self.renderer.render_world.rebuild_changed()
+        self.renderer.world_changed()
         wx.PostEvent(self, UndoEvent())
 
     def redo(self):
         self.world.redo()
-        self.renderer.render_world.rebuild_changed()
+        self.renderer.world_changed()
         wx.PostEvent(self, RedoEvent())
 
     def cut(self):

@@ -22,6 +22,7 @@ from PIL import Image
 import numpy
 import glob
 import logging
+import threading
 
 from minecraft_model_reader.api.resource_pack.base import BaseResourcePackManager
 from minecraft_model_reader import BlockMesh
@@ -31,6 +32,41 @@ from amulet.api.block import Block
 from amulet_map_editor.api.opengl import textureatlas
 
 log = logging.getLogger(__name__)
+
+# The block model caches (_block_models, block_model_manager) are shared
+# mutable state used by the Cython mesher and the overview scanner.
+# Every call into create_lod0_chunk / get_block_model / colour lookups
+# from a worker thread must hold this lock.
+model_lock = threading.Lock()
+
+
+def mean_texture_colour(
+    image: numpy.ndarray, bounds: Tuple[float, float, float, float]
+) -> numpy.ndarray:
+    """Alpha-weighted mean RGBA colour of an atlas sub-region.
+
+    :param image: the atlas as a (height, width, 4) uint8 array.
+    :param bounds: (u0, v0, u1, v1) texture bounds in 0-1 UV space.
+    :return: shape (4,) uint8 RGBA.
+    """
+    height, width = image.shape[:2]
+    u0, v0, u1, v1 = bounds
+    x0 = int(u0 * width)
+    x1 = max(x0 + 1, int(round(u1 * width)))
+    y0 = int(v0 * height)
+    y1 = max(y0 + 1, int(round(v1 * height)))
+    region = image[y0:y1, x0:x1].astype(numpy.float32)
+    alpha = region[:, :, 3:4]
+    total_alpha = float(alpha.sum())
+    if total_alpha < 1:
+        return numpy.zeros(4, numpy.uint8)
+    rgb = (region[:, :, :3] * alpha).sum((0, 1)) / total_alpha
+    return (
+        numpy.concatenate([rgb, [alpha.mean()]])
+        .round()
+        .clip(0, 255)
+        .astype(numpy.uint8)
+    )
 
 
 class OpenGLResourcePack:
@@ -44,6 +80,7 @@ class OpenGLResourcePack:
     _image_width: int
     _image_height: int
     _gl_textures: Dict[str, int]
+    _block_top_colours: Dict[Block, numpy.ndarray]
 
     def __init__(
         self, resource_pack: BaseResourcePackManager, translator: PyMCTranslate.Version
@@ -58,6 +95,7 @@ class OpenGLResourcePack:
         self._image_height: int = 0
 
         self._gl_textures: Dict[str, int] = {}
+        self._block_top_colours: Dict[Block, numpy.ndarray] = {}
 
     def get_atlas_id(self, context_id: str) -> int:
         """Get the opengl texture id of the atlas for a given context."""
@@ -81,6 +119,44 @@ class OpenGLResourcePack:
             return self._texture_bounds[texture_path]
         else:
             return self._texture_bounds[self._resource_pack.missing_no]
+
+    def get_block_top_colour(self, block: Block) -> numpy.ndarray:
+        """Approximate map colour of a block seen from above.
+
+        Returns a shape (4,) uint8 RGBA array. Invisible blocks (air)
+        return alpha 0. The caller must hold model_lock because this
+        touches the shared block model cache.
+        """
+        if block not in self._block_top_colours:
+            if self._image is None:
+                raise Exception(
+                    "OpenGLResourcePack.setup() needs to be run before accessing a texture."
+                )
+            colour = numpy.zeros(4, numpy.uint8)
+            model = self.get_block_model(block)
+            image = self._image.reshape((self._image_height, self._image_width, 4))
+            preferred = ("up", None, "north", "east", "south", "west", "down")
+            remaining = sorted(
+                (face for face in model.faces if face not in preferred), key=str
+            )
+            for face_dir in (*preferred, *remaining):
+                if face_dir not in model.faces:
+                    continue
+                texture_indexes = model.texture_index[face_dir]
+                if not len(texture_indexes):
+                    continue
+                texture_path = model.textures[texture_indexes[0]]
+                colour = mean_texture_colour(
+                    image, self.texture_bounds(texture_path)
+                ).astype(numpy.float32)
+                tint = numpy.asarray(model.tint_verts[face_dir]).reshape((-1, 3))
+                if tint.size:
+                    colour[:3] *= tint.mean(0)
+                colour = colour.round().clip(0, 255).astype(numpy.uint8)
+                break
+            colour.setflags(write=False)
+            self._block_top_colours[block] = colour
+        return self._block_top_colours[block]
 
     @property
     def translator(self) -> PyMCTranslate.Version:
