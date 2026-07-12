@@ -110,7 +110,7 @@ def _init_log() -> logging.Logger:
 
     threading.excepthook = thread_error_handler
 
-    if "--disable-py-faulthandler" not in sys.argv:
+    if "--enable-py-faulthandler" in sys.argv:
         # When running via pythonw the stderr is None so log directly to the log file
         faulthandler.enable(log_file)
 
