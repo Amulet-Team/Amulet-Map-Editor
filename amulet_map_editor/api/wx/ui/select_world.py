@@ -29,147 +29,194 @@ log = logging.getLogger(__name__)
 
 minecraft_world_paths: list[tuple[str, str]] = []
 
-if platform == "win32":
-    minecraft_world_paths.append(
-        (
-            lang.get("world.java_platform"),
-            os.path.join(os.getenv("APPDATA"), ".minecraft", "saves"),
-        )
-    )
-    minecraft_world_paths.append(
-        (
-            lang.get("world.bedrock_uwp"),
-            os.path.join(
-                os.getenv("LOCALAPPDATA"),
-                "Packages",
-                "Microsoft.MinecraftUWP_8wekyb3d8bbwe",
-                "LocalState",
-                "games",
-                "com.mojang",
-                "minecraftWorlds",
-            ),
-        )
-    )
-    minecraft_world_paths.append(
-        (
-            lang.get("world.bedrock_uwp_beta"),
-            os.path.join(
-                os.getenv("LOCALAPPDATA"),
-                "Packages",
-                "Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe",
-                "LocalState",
-                "games",
-                "com.mojang",
-                "minecraftWorlds",
-            ),
-        )
-    )
-    minecraft_world_paths.append(
-        (
-            lang.get("world.bedrock_education_store"),
-            os.path.join(
-                os.getenv("LOCALAPPDATA"),
-                "Packages",
-                "Microsoft.MinecraftEducationEdition_8wekyb3d8bbwe",
-                "LocalState",
-                "games",
-                "com.mojang",
-                "minecraftWorlds",
-            ),
-        )
-    )
-    minecraft_world_paths.append(
-        (
-            lang.get("world.bedrock_education_desktop"),
-            os.path.join(
-                os.getenv("APPDATA"),
-                "Minecraft Education Edition",
-                "games",
-                "com.mojang",
-                "minecraftWorlds",
-            ),
-        )
-    )
-    minecraft_world_paths.append(
-        (
-            lang.get("world.bedrock_netease"),
-            os.path.join(
-                os.getenv("APPDATA"),
-                "MinecraftPE_Netease",
-                "minecraftWorlds",
-            ),
-        )
-    )
-    for group, key in (
-        ("Minecraft Bedrock", "world.bedrock_gdk"),
-        ("Minecraft Bedrock Preview", "world.bedrock_gdk_preview"),
-    ):
-        for worlds_path in glob.glob(
-            os.path.join(
-                glob.escape(os.getenv("APPDATA")),
-                group,
-                "Users",
-                "*",
-                "games",
-                "com.mojang",
-                "minecraftWorlds",
+
+def find_world_paths():
+    if platform == "win32":
+        minecraft_world_paths.append(
+            (
+                lang.get("world.java_platform"),
+                os.path.join(os.getenv("APPDATA"), ".minecraft", "saves"),
             )
+        )
+        minecraft_world_paths.append(
+            (
+                lang.get("world.bedrock_uwp"),
+                os.path.join(
+                    os.getenv("LOCALAPPDATA"),
+                    "Packages",
+                    "Microsoft.MinecraftUWP_8wekyb3d8bbwe",
+                    "LocalState",
+                    "games",
+                    "com.mojang",
+                    "minecraftWorlds",
+                ),
+            )
+        )
+        minecraft_world_paths.append(
+            (
+                lang.get("world.bedrock_uwp_beta"),
+                os.path.join(
+                    os.getenv("LOCALAPPDATA"),
+                    "Packages",
+                    "Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe",
+                    "LocalState",
+                    "games",
+                    "com.mojang",
+                    "minecraftWorlds",
+                ),
+            )
+        )
+        minecraft_world_paths.append(
+            (
+                lang.get("world.bedrock_education_store"),
+                os.path.join(
+                    os.getenv("LOCALAPPDATA"),
+                    "Packages",
+                    "Microsoft.MinecraftEducationEdition_8wekyb3d8bbwe",
+                    "LocalState",
+                    "games",
+                    "com.mojang",
+                    "minecraftWorlds",
+                ),
+            )
+        )
+        minecraft_world_paths.append(
+            (
+                lang.get("world.bedrock_education_desktop"),
+                os.path.join(
+                    os.getenv("APPDATA"),
+                    "Minecraft Education Edition",
+                    "games",
+                    "com.mojang",
+                    "minecraftWorlds",
+                ),
+            )
+        )
+        minecraft_world_paths.append(
+            (
+                lang.get("world.bedrock_netease"),
+                os.path.join(
+                    os.getenv("APPDATA"),
+                    "MinecraftPE_Netease",
+                    "minecraftWorlds",
+                ),
+            )
+        )
+        for group, key in (
+            ("Minecraft Bedrock", "world.bedrock_gdk"),
+            ("Minecraft Bedrock Preview", "world.bedrock_gdk_preview"),
         ):
-            user_id = worlds_path.split(os.sep)[-4]
-            minecraft_world_paths.append(
-                (
-                    f"{lang.get(key)} {user_id}",
-                    worlds_path,
+            for worlds_path in glob.glob(
+                os.path.join(
+                    glob.escape(os.getenv("APPDATA")),
+                    group,
+                    "Users",
+                    "*",
+                    "games",
+                    "com.mojang",
+                    "minecraftWorlds",
                 )
+            ):
+                user_id = worlds_path.split(os.sep)[-4]
+                minecraft_world_paths.append(
+                    (
+                        f"{lang.get(key)} {user_id}",
+                        worlds_path,
+                    )
+                )
+        minecraft_world_paths.append(
+            (
+                lang.get("world.legends_legacy"),
+                os.path.join(
+                    os.getenv("APPDATA"),
+                    "MinecraftPE",
+                    "games",
+                    "com.mojang",
+                    "minecraftWorlds",
+                ),
             )
-    minecraft_world_paths.append(
-        (
-            lang.get("world.legends_legacy"),
-            os.path.join(
-                os.getenv("APPDATA"),
-                "MinecraftPE",
-                "games",
-                "com.mojang",
-                "minecraftWorlds",
-            ),
         )
-    )
+
+        modrinth_path = os.path.join(os.getenv("APPDATA"), "ModrinthApp")
+        curseforge_path = os.path.join(os.getenv("APPDATA"), "curseforge", "minecraft")
+
+    elif platform == "darwin":
+        minecraft_world_paths.append(
+            (
+                lang.get("world.java_platform"),
+                os.path.join(
+                    os.path.expanduser("~"),
+                    "Library",
+                    "Application Support",
+                    "minecraft",
+                    "saves",
+                ),
+            )
+        )
+        minecraft_world_paths.append(
+            (
+                lang.get("world.pocket_platform"),
+                os.path.join(
+                    os.path.expanduser("~"),
+                    "Library",
+                    "Application Support",
+                    "minecraftpe",
+                    "games",
+                    "com.mojang",
+                    "minecraftWorlds",
+                ),
+            )
+        )
+        modrinth_path = os.path.join(
+            os.path.expanduser("~"), "Library", "Application Support", "ModrinthApp"
+        )
+        curseforge_path = os.path.join(
+            os.path.expanduser("~"), "Documents", "curseforge", "minecraft"
+        )
+    elif platform == "linux":
+        minecraft_world_paths.append(
+            (
+                lang.get("world.java_platform"),
+                os.path.join(os.path.expanduser("~"), ".minecraft", "saves"),
+            )
+        )
+        modrinth_path = os.path.join(
+            os.path.expanduser("~"), ".local", "share", "ModrinthApp"
+        )
+        curseforge_path = os.path.join(
+            os.path.expanduser("~"), "Documents", "curseforge", "minecraft"
+        )
+    else:
+        modrinth_path = ""
+        curseforge_path = ""
+
+    if os.path.isdir(modrinth_path):
+        for path in glob.glob(
+            os.path.join(glob.escape(modrinth_path), "profiles", "*", "saves")
+        ):
+            if os.path.isdir(path):
+                profile = os.path.basename(os.path.dirname(path))
+                minecraft_world_paths.append(
+                    (
+                        f"{lang.get('world.modrinth')} - {profile}",
+                        path,
+                    )
+                )
+    if os.path.isdir(curseforge_path):
+        for path in glob.glob(
+            os.path.join(glob.escape(curseforge_path), "Instances", "*", "saves")
+        ):
+            if os.path.isdir(path):
+                profile = os.path.basename(os.path.dirname(path))
+                minecraft_world_paths.append(
+                    (
+                        f"{lang.get('world.curseforge')} - {profile}",
+                        path,
+                    ),
+                )
 
 
-elif platform == "darwin":
-    minecraft_world_paths.append(
-        (
-            lang.get("world.java_platform"),
-            os.path.join(
-                os.path.expanduser("~"),
-                "Library",
-                "Application Support",
-                "minecraft",
-                "saves",
-            ),
-        )
-    )
-    minecraft_world_paths.append(
-        (
-            lang.get("world.pocket_platform"),
-            os.path.join(
-                os.path.expanduser("~"),
-                "Library",
-                "Application Support",
-                "minecraftpe",
-                "games",
-                "com.mojang",
-                "minecraftWorlds",
-            ),
-        )
-    )
-elif platform == "linux":
-    minecraft_world_paths.append(
-        (
-            lang.get("world.java_platform"),
-            os.path.join(os.path.expanduser("~"), ".minecraft", "saves"),
-        )
-    )
+find_world_paths()
 
 world_images: Dict[str, Tuple[int, wx.Bitmap, int]] = {}
 
