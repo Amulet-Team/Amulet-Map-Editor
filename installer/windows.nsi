@@ -49,6 +49,14 @@ FunctionEnd
 !insertmacro MUI_PAGE_DIRECTORY
 
 !insertmacro MUI_PAGE_INSTFILES
+
+Function desktopaction
+CreateShortcut "$DESKTOP\Amulet-${VERSION}.lnk" "$INSTDIR\amulet.exe"
+FunctionEnd
+
+!define MUI_FINISHPAGE_SHOWREADME ""
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Create Desktop Shortcut"
+!define MUI_FINISHPAGE_SHOWREADME_FUNCTION desktopaction
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -119,6 +127,7 @@ Section "uninstall"
     ${EndIf}
 
     Delete "$SMPROGRAMS\Amulet Team\Amulet ${VERSION}.lnk"
+    Delete "$DESKTOP\Amulet-${VERSION}.lnk"
     RMDir "$SMPROGRAMS\Amulet Team"
     Delete "$INSTDIR\amulet.exe"
     Delete "$INSTDIR\amulet_debug.exe"
