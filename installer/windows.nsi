@@ -114,11 +114,13 @@ Section "install"
     ${GetSize} "$INSTDIR" "/S=0K /G=1" $0 $1 $2
     WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Amulet ${VERSION}" "EstimatedSize" $0
 
-    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet.exe" "DumpFolder" "%LOCALAPPDATA%\AmuletTeam\AmuletMapEditor\Logs\crash"
+    SetRegView 64
+
+    WriteRegExpandStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet.exe" "DumpFolder" "%LOCALAPPDATA%\AmuletTeam\AmuletMapEditor\Logs\crash"
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet.exe" "DumpType" 1
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet.exe" "DumpCount" 10
 
-    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet_debug.exe" "DumpFolder" "%LOCALAPPDATA%\AmuletTeam\AmuletMapEditor\Logs\crash"
+    WriteRegExpandStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet_debug.exe" "DumpFolder" "%LOCALAPPDATA%\AmuletTeam\AmuletMapEditor\Logs\crash"
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet_debug.exe" "DumpType" 2
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\amulet_debug.exe" "DumpCount" 10
 SectionEnd
