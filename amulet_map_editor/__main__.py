@@ -114,9 +114,21 @@ def _init_log() -> logging.Logger:
         # When running via pythonw the stderr is None so log directly to the log file
         faulthandler.enable(log_file)
 
-    amulet_faulthandler.install(
-        os.path.join(logs_path, f"amulet_{os.getpid()}.dmp"), debug
-    )
+    if "--enable-amulet-faulthandler" in sys.argv:
+        amulet_faulthandler.install(
+            os.path.join(logs_path, f"amulet_{os.getpid()}.dmp"), debug
+        )
+    if sys.platform == "win32":
+        os.makedirs(
+            os.path.join(
+                os.getenv("LOCALAPPDATA"),
+                "AmuletTeam",
+                "AmuletMapEditor",
+                "Logs",
+                "crash",
+            ),
+            exist_ok=True,
+        )
 
     return log
 
