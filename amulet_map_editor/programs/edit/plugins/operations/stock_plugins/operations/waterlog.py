@@ -104,7 +104,7 @@ class Waterlog(wx.Panel, DefaultOperationUI):
         )
         self._sizer.Add(self._mode_description, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
 
-        self._mode_description.SetLabel(
+        self._mode_description.SetValue(
             MODES[self._mode.GetString(self._mode.GetSelection())]
         )
         self._mode_description.Fit()
@@ -133,7 +133,7 @@ class Waterlog(wx.Panel, DefaultOperationUI):
         return (1,)
 
     def _on_mode_change(self, evt):
-        self._mode_description.SetLabel(
+        self._mode_description.SetValue(
             MODES[self._mode.GetString(self._mode.GetSelection())]
         )
         self._mode_description.Fit()
