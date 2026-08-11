@@ -55,7 +55,7 @@ class CameraBehaviour(BaseBehaviour):
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
         if key == wx.WXK_ESCAPE:
             self._escape()
-            evt.StopPropagation()
+            return
         evt.Skip()
 
     def _on_input_press(self, evt: InputPressEvent):
