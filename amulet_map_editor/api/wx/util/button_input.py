@@ -207,7 +207,7 @@ class ButtonInput(WindowContainer):
             and action.modifier_keys.issubset(self._pressed_keys)
         )
 
-    def _press(self, evt):
+    def _press(self, evt: wx.KeyEvent):
         """Event to handle a number of different key presses"""
         key = serialise_key(evt)
         if key is None:
@@ -219,6 +219,7 @@ class ButtonInput(WindowContainer):
                 wx.PostEvent(self.window, InputPressEvent(action_id))
 
             self._pressed_keys.add(key)
+        evt.StopPropagation()
         evt.Skip()
 
     def _release(self, evt):
