@@ -248,6 +248,7 @@ class BlockSelectionBehaviour(PointerBehaviour):
         key = evt.GetUnicodeKey() or evt.GetKeyCode()
         if key == wx.WXK_ESCAPE:
             self._escape()
+            return
         evt.Skip()
 
     def _on_input_release(self, evt: InputReleaseEvent):
