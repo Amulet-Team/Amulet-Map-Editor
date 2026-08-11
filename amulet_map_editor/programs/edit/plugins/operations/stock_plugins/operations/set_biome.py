@@ -79,7 +79,7 @@ class SetBiome(SimpleOperationPanel):
         )
         self._sizer.Add(self._mode_description, 0, Border, 5)
 
-        self._mode_description.SetLabel(MODES[self._mode.GetCurrentObject()])
+        self._mode_description.SetValue(MODES[self._mode.GetCurrentObject()])
         self._mode_description.Fit()
 
         self._biome_choice = BiomeDefine(
@@ -100,7 +100,7 @@ class SetBiome(SimpleOperationPanel):
         self.Thaw()
 
     def _on_mode_change(self, evt):
-        self._mode_description.SetLabel(MODES[self._mode.GetCurrentObject()])
+        self._mode_description.SetValue(MODES[self._mode.GetCurrentObject()])
         self._mode_description.Fit()
         self.Layout()
         evt.Skip()
