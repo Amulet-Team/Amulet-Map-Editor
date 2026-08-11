@@ -87,5 +87,4 @@ class EventCanvas(BaseCanvas):
                 log.exception(f"Failed to handle key down event: {e}")
             if not evt.GetSkipped():
                 handled = True
-        if not handled:
-            evt.Skip()
+        evt.Skip(not handled)
