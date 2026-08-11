@@ -220,7 +220,8 @@ class ButtonInput(WindowContainer):
                 wx.PostEvent(self.window, InputPressEvent(action_id))
 
             self._pressed_keys.add(key)
-            return
+            if action_ids:
+                return
         evt.Skip()
 
     def _release(self, evt):
