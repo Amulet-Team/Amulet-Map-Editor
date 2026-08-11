@@ -207,22 +207,20 @@ class ButtonInput(WindowContainer):
             and action.modifier_keys.issubset(self._pressed_keys)
         )
 
-    def _press(self, evt: wx.KeyEvent):
+    def _press(self, evt: wx.KeyEvent | wx.MouseEvent | wx.NavigationKeyEvent):
         """Event to handle a number of different key presses"""
         key = serialise_key(evt)
         if key is None:
             evt.Skip()
             return
+        action_ids = self._find_actions(key)
         if not self.is_key_pressed(key):
-            action_ids = self._find_actions(key)
             self._continuous_actions.update(action_ids)
             for action_id in action_ids:
                 wx.PostEvent(self.window, InputPressEvent(action_id))
-
             self._pressed_keys.add(key)
-            if action_ids:
-                return
-        evt.Skip()
+        if not (isinstance(evt, wx.KeyEvent) and action_ids):
+            evt.Skip()
 
     def _release(self, evt):
         """Event to handle a number of different key releases"""
