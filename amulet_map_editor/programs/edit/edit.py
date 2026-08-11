@@ -225,7 +225,7 @@ class EditExtension(wx.Panel, BaseProgram):
         menu.setdefault(lang.get("menu_bar.file.menu_name"), {}).setdefault(
             "system", {}
         ).setdefault(
-            f"{lang.get('program_3d_edit.menu_bar.file.save')}\tCtrl+s",
+            f"{lang.get('program_3d_edit.menu_bar.file.save')}\tCtrl+S",
             lambda evt: save(),
         )
         # menu.setdefault(lang.get('menu_bar.file.menu_name'), {}).setdefault('system', {}).setdefault('Save As', lambda evt: self.GetGrandParent().close_world(self.world.world_path))
@@ -236,8 +236,8 @@ class EditExtension(wx.Panel, BaseProgram):
             lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
         ).setdefault("history", {}).update(
             {
-                f"{lang.get('program_3d_edit.menu_bar.edit.undo')}\tCtrl+z": lambda evt: undo(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.redo')}\tCtrl+y": lambda evt: redo(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.undo')}\tCtrl+Z": lambda evt: undo(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.redo')}\tCtrl+Y": lambda evt: redo(),
             }
         )
 
@@ -249,9 +249,9 @@ class EditExtension(wx.Panel, BaseProgram):
             lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
         ).setdefault("operation", {}).update(
             {
-                f"{lang.get('program_3d_edit.menu_bar.edit.cut')}\tCtrl+x": lambda evt: cut(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.copy')}\tCtrl+c": lambda evt: copy(),
-                f"{lang.get('program_3d_edit.menu_bar.edit.paste')}\tCtrl+v": lambda evt: paste(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.cut')}\tCtrl+X": lambda evt: cut(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.copy')}\tCtrl+C": lambda evt: copy(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.paste')}\tCtrl+V": lambda evt: paste(),
                 f"{lang.get('program_3d_edit.menu_bar.edit.delete')}\tDelete": lambda evt: delete(),
             }
         )
@@ -262,7 +262,7 @@ class EditExtension(wx.Panel, BaseProgram):
             lang.get("program_3d_edit.menu_bar.edit.menu_name"), {}
         ).setdefault("shortcut", {}).update(
             {
-                f"{lang.get('program_3d_edit.menu_bar.edit.goto')}\tCtrl+g": lambda evt: goto(),
+                f"{lang.get('program_3d_edit.menu_bar.edit.goto')}\tCtrl+G": lambda evt: goto(),
                 f"{lang.get('program_3d_edit.menu_bar.edit.select_all')}\tCtrl+A": lambda evt: select_all(),
             }
         )
