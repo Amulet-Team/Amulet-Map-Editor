@@ -362,8 +362,14 @@ class KeyConfigDialog(SimpleDialog):
         entries: Sequence[KeyActionType],
         fixed_keybinds: KeybindContainer,
         user_keybinds: KeybindContainer,
+        style: int = wx.CAPTION
+        | wx.CLOSE_BOX
+        | wx.MAXIMIZE_BOX
+        | wx.SYSTEM_MENU
+        | wx.RESIZE_BORDER,
     ):
-        super().__init__(parent, lang.get("key_config.key_select"))
+        super().__init__(parent, lang.get("key_config.key_select"), style=style)
+
         self._key_config = KeyConfig(
             self, selected_group, entries, fixed_keybinds, user_keybinds
         )

@@ -159,9 +159,15 @@ class SimpleChoiceAny(wx.Choice):
 class SimpleDialog(wx.Dialog):
     """A dialog with ok and cancel buttons set up."""
 
-    def __init__(self, parent: wx.Window, title, sizer_dir=wx.VERTICAL):
+    def __init__(
+        self,
+        parent: wx.Window,
+        title,
+        sizer_dir=wx.VERTICAL,
+        style=wx.CAPTION | wx.RESIZE_BORDER,
+    ):
         wx.Dialog.__init__(
-            self, parent, title=title, style=wx.CAPTION | wx.RESIZE_BORDER
+            self, parent, title=title, style=style
         )
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
