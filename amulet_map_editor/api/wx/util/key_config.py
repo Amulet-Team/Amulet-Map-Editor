@@ -362,10 +362,11 @@ class KeyConfigDialog(SimpleDialog):
         entries: Sequence[KeyActionType],
         fixed_keybinds: KeybindContainer,
         user_keybinds: KeybindContainer,
+        action_groups: Optional[Dict[str, Sequence[KeyActionType]]] = None,
     ):
         super().__init__(parent, lang.get("key_config.key_select"))
         self._key_config = KeyConfig(
-            self, selected_group, entries, fixed_keybinds, user_keybinds
+            self, selected_group, entries, fixed_keybinds, user_keybinds, action_groups
         )
         self.sizer.Add(self._key_config, 1, wx.EXPAND)
         self.Layout()
@@ -384,11 +385,13 @@ class KeyConfig(wx.BoxSizer):
         entries: Sequence[KeyActionType],
         fixed_keybinds: KeybindContainer,
         user_keybinds: KeybindContainer,
+        action_groups: Optional[Dict[str, Sequence[KeyActionType]]] = None,
     ):
         super().__init__(wx.VERTICAL)
         self._entries = entries
         self._fixed_keybinds = fixed_keybinds
         self._user_keybinds = user_keybinds
+        self._action_groups = action_groups
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.Add(top_sizer, 0, wx.EXPAND)
@@ -415,20 +418,7 @@ class KeyConfig(wx.BoxSizer):
         self._options = SimpleScrollablePanel(parent, size=(500, 500))
         self.Add(self._options, 1, wx.EXPAND)
 
-        grid_sizer = wx.GridSizer(len(entries), 2, 5, 5)
-        self._options.sizer.Add(grid_sizer, 0, wx.ALL | wx.EXPAND, 5)
         self._key_buttons: Dict[str, wx.Button] = {}
-        for action in entries:
-            grid_sizer.Add(
-                wx.StaticText(
-                    self._options, label=lang.get(f"action.{action.lower()}")
-                ),
-                0,
-                wx.ALIGN_CENTER,
-            )
-            self._key_buttons[action] = button = wx.Button(self._options)
-            button.Bind(wx.EVT_BUTTON, lambda evt, a=action: self._modify_button(a))
-            grid_sizer.Add(button, 0, wx.EXPAND)
         self._rebuild_buttons()
 
     def _rebuild_buttons(self):
@@ -442,10 +432,88 @@ class KeyConfig(wx.BoxSizer):
             self._delete.Enable()
             self._rename.Enable()
 
+        # Rebuild the options panel with or without grouping
+        if self._action_groups:
+            self._rebuild_grouped_options(group)
+        else:
+            self._rebuild_ungrouped_options(group)
+
+    def _rebuild_grouped_options(self, group):
+        """Rebuild options panel with section headings and grouped actions."""
+        # Clear existing widgets
+        self._options.sizer.Clear(True)
+        self._key_buttons.clear()
+        
+        # Create main vertical sizer
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self._options.sizer.Add(main_sizer, 1, wx.EXPAND | wx.ALL, 5)
+        
+        # Iterate through groups and add sections
+        for group_name, actions in self._action_groups.items():
+            # Filter to only show actions that exist in entries
+            actions_to_show = [a for a in actions if a in self._entries]
+            
+            # Add group heading (show all groups, even if empty)
+            heading = wx.StaticText(self._options, label=group_name.replace("_", " ").title())
+            font = heading.GetFont()
+            font.PointSize += 2
+            font = font.Bold()
+            heading.SetFont(font)
+            main_sizer.Add(heading, 0, wx.ALL, 5)
+            
+            # Add grid for this group if it has actions
+            if actions_to_show:
+                grid_sizer = wx.GridSizer(len(actions_to_show), 2, 5, 5)
+                for action in actions_to_show:
+                    grid_sizer.Add(
+                        wx.StaticText(
+                            self._options, label=lang.get(f"action.{action.lower()}")
+                        ),
+                        0,
+                        wx.ALIGN_CENTER,
+                    )
+                    self._key_buttons[action] = button = wx.Button(self._options)
+                    button.SetLabel(stringify_key(group.get(action, ((), "NONE"))))
+                    button.Bind(wx.EVT_BUTTON, lambda evt, a=action: self._modify_button(a))
+                    grid_sizer.Add(button, 0, wx.EXPAND)
+                
+                main_sizer.Add(grid_sizer, 0, wx.ALL | wx.EXPAND, 5)
+            else:
+                # Show "No actions" text for empty groups
+                empty_label = wx.StaticText(self._options, label="(no actions)")
+                empty_label_font = empty_label.GetFont()
+                empty_label_font.SetStyle(wx.FONTSTYLE_ITALIC)
+                empty_label.SetFont(empty_label_font)
+                main_sizer.Add(empty_label, 0, wx.ALL, 5)
+            
+            # Add spacing between groups
+            main_sizer.Add(wx.StaticLine(self._options), 0, wx.EXPAND | wx.ALL, 5)
+        
+        self._options.Layout()
+
+    def _rebuild_ungrouped_options(self, group):
+        """Rebuild options panel without grouping (original behavior)."""
+        # Clear existing widgets
+        self._options.sizer.Clear(True)
+        self._key_buttons.clear()
+        
+        grid_sizer = wx.GridSizer(len(self._entries), 2, 5, 5)
+        self._options.sizer.Add(grid_sizer, 0, wx.ALL | wx.EXPAND, 5)
         for action in self._entries:
-            self._key_buttons[action].SetLabel(
-                stringify_key(group.get(action, ((), "NONE")))
+            grid_sizer.Add(
+                wx.StaticText(
+                    self._options, label=lang.get(f"action.{action.lower()}")
+                ),
+                0,
+                wx.ALIGN_CENTER,
             )
+            self._key_buttons[action] = button = wx.Button(self._options)
+            button.SetLabel(stringify_key(group.get(action, ((), "NONE"))))
+            button.Bind(wx.EVT_BUTTON, lambda evt, a=action: self._modify_button(a))
+            grid_sizer.Add(button, 0, wx.EXPAND)
+        
+        self._options.Layout()
+
 
     def _rebuild_choice(self, group_name=None):
         index = self._choice.GetSelection()
