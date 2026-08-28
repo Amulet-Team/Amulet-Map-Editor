@@ -175,7 +175,7 @@ class SimplePropertySelect(wx.Panel):
         self._translation_manager = translation_manager
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        sizer.Add(header_sizer, 0, wx.EXPAND | wx.ALL, 5)
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
         header_sizer.Add(label, 1)
         label = wx.StaticText(
@@ -183,7 +183,9 @@ class SimplePropertySelect(wx.Panel):
         )
         header_sizer.Add(label, 1, wx.LEFT, 5)
         self._property_sizer = wx.GridSizer(2, 5, 5)
-        sizer.Add(self._property_sizer, 0, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(
+            self._property_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5
+        )
 
         self._properties: Dict[str, wx.Choice] = {}
         self._specification: dict = {}
@@ -254,7 +256,7 @@ class ManualPropertySelect(wx.Panel):
             self, bitmap=ADD_ICON.bitmap(30, 30), size=(30, 30)
         )
         header_sizer.Add(add_button)
-        sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        sizer.Add(header_sizer, 0, wx.EXPAND | wx.ALL, 5)
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
         header_sizer.Add(label, 1, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         label = wx.StaticText(
@@ -264,9 +266,7 @@ class ManualPropertySelect(wx.Panel):
         header_sizer.AddStretchSpacer(1)
 
         self._property_sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(
-            self._property_sizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
-        )
+        sizer.Add(self._property_sizer, 0, wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
 
         add_button.Bind(wx.EVT_BUTTON, lambda evt: self._add_property())
 
@@ -300,7 +300,7 @@ class ManualPropertySelect(wx.Panel):
         self._change_value("", snbt_text)
         value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, snbt_text))
 
-        self._property_sizer.Add(sizer, 1, wx.TOP | wx.EXPAND, 5)
+        self._property_sizer.Add(sizer, 0, wx.BOTTOM | wx.EXPAND, 5)
         self._properties[self._property_index] = (name_entry, value_entry)
         self.Fit()
         self.TopLevelParent.Layout()
