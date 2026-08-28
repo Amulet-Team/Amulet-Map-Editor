@@ -138,6 +138,14 @@ def _app_main() -> int:
         # bug 247
         os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
 
+    if sys.platform == "win32":
+        import ctypes
+
+        try:
+            ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
+        except Exception:
+            pass
+
     # Initialise default paths.
     data_dir = platformdirs.user_data_dir("AmuletMapEditor", "AmuletTeam")
     os.environ.setdefault("DATA_DIR", data_dir)
