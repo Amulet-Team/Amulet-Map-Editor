@@ -47,7 +47,6 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
     ):
         SimpleScrollablePanel.__init__(self, parent)
         DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
-        self.Freeze()
         options = self._load_options({})
 
         self._original_block = BlockDefine(
@@ -83,9 +82,6 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         self._sizer.Add(
             self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
         )
-
-        self.Layout()
-        self.Thaw()
 
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
