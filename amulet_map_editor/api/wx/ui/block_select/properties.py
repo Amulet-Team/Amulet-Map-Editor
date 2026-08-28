@@ -333,12 +333,14 @@ class ManualPropertySelect(wx.Panel):
 
     def _on_remove_property(self, sizer: wx.Sizer, key: int):
         self.Freeze()
-        self._property_sizer.Detach(sizer)
-        sizer.Clear(True)
-        del self._properties[key]
-        self.TopLevelParent.Layout()
-        self.Thaw()
-        self._post_property_change()
+        try:
+            self._property_sizer.Detach(sizer)
+            sizer.Clear(True)
+            del self._properties[key]
+            self.TopLevelParent.Layout()
+            self._post_property_change()
+        finally:
+            self.Thaw()
 
     @property
     def properties(self) -> Dict[str, SNBTType]:
