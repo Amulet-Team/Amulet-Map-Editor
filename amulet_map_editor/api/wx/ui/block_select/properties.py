@@ -317,6 +317,7 @@ class ManualPropertySelect(wx.Panel):
         evt.Skip()
 
     def _change_value(self, snbt: SNBTType, snbt_text: wx.StaticText):
+        self.Freeze()
         try:
             nbt = amulet_nbt.from_snbt(snbt)
         except:
@@ -329,7 +330,9 @@ class ManualPropertySelect(wx.Panel):
             else:
                 snbt_text.SetLabel(f"{nbt.__class__.__name__} not valid")
                 snbt_text.SetBackgroundColour((255, 200, 200))
-        self.Layout()
+        finally:
+            self.Layout()
+            self.Thaw()
 
     def _on_remove_property(self, sizer: wx.Sizer, key: int):
         self.Freeze()
