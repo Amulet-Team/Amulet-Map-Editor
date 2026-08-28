@@ -36,8 +36,7 @@ class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
             self._block_picker_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5
         )
 
-        self.SetSizerAndFit(self._sizer)
-        self.Layout()
+        self.SetSizer(self._sizer)
 
         self._add_button.Bind(wx.EVT_BUTTON, self._add)
         self._fix_enabled_buttons()

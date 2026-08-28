@@ -70,9 +70,6 @@ class BlockDefine(BaseDefine):
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
         self._property_picker.Bind(EVT_PROPERTIES_CHANGE, self._on_property_change)
 
-        self.SetSizerAndFit(self._sizer)
-        self.Layout()
-
     def _on_picker_change(self, evt):
         self._update_properties()
         evt.Skip()

@@ -60,8 +60,7 @@ class BaseDefine(wx.Panel):
         left_sizer.Add(self._picker, 1, wx.EXPAND | wx.TOP, 5)
         self._picker.Bind(EVT_ITEM_CHANGE, self._on_picker_change)
 
-        self.SetSizerAndFit(self._sizer)
-        self.Layout()
+        self.SetSizer(self._sizer)
 
     def _on_picker_change(self, evt):
         raise NotImplementedError("This method should be overridden in child classes.")
