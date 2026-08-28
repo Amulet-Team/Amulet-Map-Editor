@@ -26,16 +26,16 @@ class BaseDefine(wx.Panel):
         show_pick: bool = False,
         **kwargs,
     ):
-        super().__init__(parent)
+        super().__init__(parent, style=wx.TAB_TRAVERSAL | wx.BORDER_SIMPLE)
 
         self._translation_manager = translation_manager
         self._orientation = orientation
         self._sizer = wx.BoxSizer(orientation)
         left_sizer = wx.BoxSizer(wx.VERTICAL)
         if orientation == wx.HORIZONTAL:
-            self._sizer.Add(left_sizer, 1, wx.EXPAND)
+            self._sizer.Add(left_sizer, 1, wx.EXPAND | wx.ALL, 5)
         else:
-            self._sizer.Add(left_sizer, 1, wx.EXPAND)
+            self._sizer.Add(left_sizer, 1, wx.EXPAND | wx.ALL, 5)
 
         self._version_picker = VersionSelect(
             self,

@@ -49,9 +49,9 @@ class BlockDefine(BaseDefine):
 
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         if orientation == wx.HORIZONTAL:
-            self._sizer.Add(right_sizer, 1, wx.EXPAND | wx.LEFT, 5)
+            self._sizer.Add(right_sizer, 1, wx.EXPAND | wx.TOP | wx.RIGHT | wx.BOTTOM, 5)
         else:
-            self._sizer.Add(right_sizer, 0, wx.EXPAND | wx.TOP, 5)
+            self._sizer.Add(right_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
 
         self._property_picker = PropertySelect(
             self,
