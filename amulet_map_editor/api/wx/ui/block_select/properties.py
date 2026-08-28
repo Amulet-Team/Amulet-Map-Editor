@@ -148,14 +148,15 @@ class PropertySelect(wx.Panel):
         if self._manual_enabled:
             self._simple.Hide()
             self._manual.Show()
+            self.Show()
         else:
-            self._simple.Show()
-            self._simple.set_specification(
-                translator.get_specification(
+            specification = translator.get_specification(
                     self._namespace, self._block_name, self._force_blockstate
                 )
-            )
+            self._simple.Show()
+            self._simple.set_specification(specification)
             self._manual.Hide()
+            self.Show(bool(specification.get("properties", {})))
         self.Thaw()
 
 
