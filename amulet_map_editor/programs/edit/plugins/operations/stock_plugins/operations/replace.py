@@ -229,7 +229,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             sx, sy = self.GetSizer().CalcMin()
             return (
                 sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X),
-                sy + wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y),
+                sy,
             )
 
 
