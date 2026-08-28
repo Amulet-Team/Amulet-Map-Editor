@@ -61,7 +61,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             wildcard_properties=True,
             show_pick_block=True
         )
-        self._sizer.Add(self._original_block, 1, wx.ALL | wx.EXPAND, 5)
+        self._sizer.Add(self._original_block, 0, wx.ALL | wx.EXPAND, 5)
         self._original_block.Bind(EVT_PICK, lambda evt: self._on_pick_block_button(1))
         self._replacement_block = BlockDefine(
             self,
@@ -73,7 +73,7 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             ),
             show_pick_block=True
         )
-        self._sizer.Add(self._replacement_block, 1, wx.ALL | wx.EXPAND, 5)
+        self._sizer.Add(self._replacement_block, 0, wx.ALL | wx.EXPAND, 5)
         self._replacement_block.Bind(
             EVT_PICK, lambda evt: self._on_pick_block_button(2)
         )

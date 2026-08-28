@@ -50,12 +50,15 @@ class BaseSelect(wx.Panel):
         self._version_number: Optional[Tuple[int, int, int]] = None
         self._force_blockstate: Optional[bool] = force_blockstate
 
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
+        self._grid_sizer = wx.FlexGridSizer(2, 5, 5)
+        self._grid_sizer.AddGrowableCol(0, proportion=0)
+        self._grid_sizer.AddGrowableCol(1, proportion=1)
+        self._sizer.Add(self._grid_sizer, 0, wx.EXPAND | wx.ALL, 5)
+
         text = wx.StaticText(self, label="Namespace:", style=wx.ALIGN_CENTER)
-        sizer.Add(text, 1, wx.ALIGN_CENTER_VERTICAL)
+        self._grid_sizer.Add(text, 0, wx.ALIGN_CENTER_VERTICAL)
         self._namespace_combo = wx.ComboBox(self)
-        sizer.Add(self._namespace_combo, 2)
+        self._grid_sizer.Add(self._namespace_combo, 1, wx.EXPAND)
         self._set_version((platform, version_number, force_blockstate or False))
         self._populate_namespace()
         self.set_namespace(namespace)
@@ -68,11 +71,7 @@ class BaseSelect(wx.Panel):
         )
 
         self.Bind(EVT_ITEM_NAMESPACE_CHANGE, self._on_namespace_change)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self._sizer.Add(sizer, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
-        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(header_sizer, 0, wx.EXPAND | wx.BOTTOM, 5)
-        header_sizer.Add(
+        self._grid_sizer.Add(
             wx.StaticText(
                 self, label=f"{self.TypeName.capitalize()} name:", style=wx.ALIGN_CENTER
             ),
@@ -80,19 +79,19 @@ class BaseSelect(wx.Panel):
             wx.ALIGN_CENTER_VERTICAL,
         )
         search_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        header_sizer.Add(search_sizer, 2, wx.EXPAND)
+        self._grid_sizer.Add(search_sizer, 1, wx.EXPAND)
         self._search = wx.SearchCtrl(self)
         search_sizer.Add(self._search, 1, wx.ALIGN_CENTER_VERTICAL)
         self._search.Bind(wx.EVT_TEXT, self._on_search_change)
         if show_pick:
-            pick_button = wx.BitmapButton(self, bitmap=COLOUR_PICKER.bitmap(22, 22))
+            pick_button = wx.BitmapButton(self, bitmap=COLOUR_PICKER.bitmap(20, 20))
             search_sizer.Add(pick_button, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             pick_button.Bind(
                 wx.EVT_BUTTON,
                 lambda evt: wx.PostEvent(self, PickEvent(self.GetId(), widget=self)),
             )
         self._list_box = wx.ListBox(self, style=wx.LB_SINGLE)
-        sizer.Add(self._list_box, 1, wx.EXPAND)
+        self._sizer.Add(self._list_box, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
 
         self._names: List[str] = []
         self._populate_item_name()

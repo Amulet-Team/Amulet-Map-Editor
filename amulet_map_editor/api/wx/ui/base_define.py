@@ -35,7 +35,7 @@ class BaseDefine(wx.Panel):
         if orientation == wx.HORIZONTAL:
             self._sizer.Add(left_sizer, 1, wx.EXPAND)
         else:
-            self._sizer.Add(left_sizer, 2, wx.EXPAND)
+            self._sizer.Add(left_sizer, 1, wx.EXPAND)
 
         self._version_picker = VersionSelect(
             self,

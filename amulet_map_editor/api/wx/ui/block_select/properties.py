@@ -174,17 +174,11 @@ class SimplePropertySelect(wx.Panel):
         self.SetSizer(sizer)
         self._translation_manager = translation_manager
 
-        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(header_sizer, 0, wx.EXPAND | wx.ALL, 5)
-        label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
-        header_sizer.Add(label, 1)
-        label = wx.StaticText(
-            self, label="Property Value (SNBT)", style=wx.ALIGN_CENTER
-        )
-        header_sizer.Add(label, 1, wx.LEFT, 5)
-        self._property_sizer = wx.GridSizer(2, 5, 5)
+        self._property_sizer = wx.FlexGridSizer(2, 5, 5)
+        self._property_sizer.AddGrowableCol(0, proportion=0)
+        self._property_sizer.AddGrowableCol(1, proportion=1)
         sizer.Add(
-            self._property_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5
+            self._property_sizer, 0, wx.EXPAND | wx.ALL, 5
         )
 
         self._properties: Dict[str, wx.Choice] = {}
@@ -210,6 +204,13 @@ class SimplePropertySelect(wx.Panel):
             "properties", {}
         )
         spec_defaults = self._specification.get("defaults", {})
+
+        label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
+        self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
+        label = wx.StaticText(
+            self, label="Value (SNBT)", style=wx.ALIGN_CENTER
+        )
+        self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
 
         for name, choices in spec_properties.items():
             label = wx.StaticText(self, label=name)

@@ -40,8 +40,13 @@ class PlatformSelect(wx.Panel):
         **kwargs
     ):
         super().__init__(parent, style=wx.BORDER_SIMPLE)
-        self._sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(self._sizer)
+        self._sizer = wx.FlexGridSizer(2, 5, 5)
+        self._sizer.AddGrowableCol(0, proportion=0)
+        self._sizer.AddGrowableCol(1, proportion=1)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self._sizer, 1, wx.EXPAND | wx.ALL, 5)
+        self.SetSizer(sizer)
 
         self._translation_manager = translation_manager
         self._allow_universal = allow_universal
@@ -62,12 +67,10 @@ class PlatformSelect(wx.Panel):
     def _add_ui_element(
         self, label: str, obj: Type[wx.Control], shown=True, **kwargs
     ) -> Any:
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._sizer.Add(sizer, 0, wx.EXPAND | wx.ALL, 5)
         text = wx.StaticText(self, label=label, style=wx.ALIGN_CENTER)
-        sizer.Add(text, 1, wx.CENTRE)
+        self._sizer.Add(text, 0, wx.ALIGN_CENTRE)
         wx_obj = obj(self, **kwargs)
-        sizer.Add(wx_obj, 2, wx.CENTER)
+        self._sizer.Add(wx_obj, 1, wx.EXPAND)
         if not shown:
             text.Hide()
             wx_obj.Hide()
