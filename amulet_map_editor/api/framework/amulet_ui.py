@@ -1,6 +1,6 @@
 from __future__ import annotations
 import wx
-from wx.lib.agw import flatnotebook
+import wx.aui as aui
 from typing import Dict, Union
 import traceback
 import logging
@@ -19,11 +19,12 @@ from amulet_map_editor.api import image
 log = logging.getLogger(__name__)
 
 NOTEBOOK_MENU_STYLE = (
-    flatnotebook.FNB_NO_X_BUTTON
-    | flatnotebook.FNB_HIDE_ON_SINGLE_TAB
-    | flatnotebook.FNB_NAV_BUTTONS_WHEN_NEEDED
+    aui.AUI_NB_TOP
+    | aui.AUI_NB_SCROLL_BUTTONS
+    | aui.AUI_NB_TAB_MOVE
+    | aui.AUI_NB_MIDDLE_CLICK_CLOSE
 )
-NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | flatnotebook.FNB_X_ON_TAB
+NOTEBOOK_STYLE = NOTEBOOK_MENU_STYLE | aui.AUI_NB_CLOSE_ON_ACTIVE_TAB
 
 CLOSEABLE_PAGE_TYPE = Union[WorldPageUI]
 
@@ -61,7 +62,7 @@ class AmuletUI(wx.Frame):
         icon.CopyFromBitmap(image.logo.amulet_logo.bitmap())
         self.SetIcon(icon)
 
-        self._level_notebook = AmuletLevelNotebook(self, agwStyle=NOTEBOOK_MENU_STYLE)
+        self._level_notebook = AmuletLevelNotebook(self, style=NOTEBOOK_MENU_STYLE)
         self._level_notebook.init()
 
         self.Bind(wx.EVT_CLOSE, self._level_notebook.on_app_close)
@@ -132,7 +133,7 @@ class AmuletUI(wx.Frame):
             old_menu.Destroy()
 
 
-class AmuletLevelNotebook(flatnotebook.FlatNotebook):
+class AmuletLevelNotebook(aui.AuiNotebook):
     """A notebook to hold all world tabs."""
 
     # The main menu tab
@@ -144,9 +145,10 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.Bind(flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING, self._on_page_closing)
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self._page_changing, self)
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._page_changed, self)
+        self.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self._on_page_close)
+        self.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSED, self._on_page_closed)
+        self.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGING, self._page_changing, self)
+        self.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self._page_changed, self)
 
         self._main_menu = AmuletMainMenu(self)
         self._open_worlds = {}
@@ -181,54 +183,78 @@ class AmuletLevelNotebook(flatnotebook.FlatNotebook):
     def _add_world_tab(self, page: BasePageUI, obj_name: str):
         """Add a tab and enable it."""
         self.AddPage(page, obj_name, True)
+        self._update_tab_visibility()
 
     def close_level(self, path: str):
         """Close a given world and remove it from the notebook"""
         if path in self._open_worlds:
             world = self._open_worlds[path]
-            # note we don't remove it from the dictionary here
-            # delete page starts the deletion but it can be vetoed
-            # it is deleted from the dictionary in _on_page_closing
-            self.DeletePage(self.GetPageIndex(world))
+            index = self.GetPageIndex(world)
+            if self._close_page(index):
+                self.DeletePage(index)
+                self._update_tab_visibility()
 
-    def _on_page_closing(self, evt: flatnotebook.EVT_FLATNOTEBOOK_PAGE_CLOSING):
-        """Handle the page closing."""
-        page: CLOSEABLE_PAGE_TYPE = self.GetPage(evt.GetSelection())
-        if page is not self._main_menu:
-            if page.can_disable() and page.can_close():
-                path = page.path
-                page.disable()
-                page.close()
-                del self._open_worlds[path]
-            else:
-                evt.Veto()
+    def _close_page(self, index: int) -> bool:
+        """
+        Close the page at the given index.
+        Returns True if it was closed.
+        The caller is responsible for removing the page from the notebook.
+        """
+        page = self.GetPage(index)
+        if page is self._main_menu:
+            return False
+        if isinstance(page, WorldPageUI):
+            if not (page.can_disable() and page.can_close()):
+                return False
+            path = page.path
+            page.disable()
+            page.close()
+            del self._open_worlds[path]
+        return True
 
-    def _page_changing(self, evt: wx.BookCtrlEvent):
+    def _on_page_close(self, evt: aui.AuiNotebookEvent):
+        """The user clicked a tab's close button."""
+        if not self._close_page(evt.GetSelection()):
+            evt.Veto()
+
+    def _on_page_closed(self, evt: aui.AuiNotebookEvent):
+        """Handle AuiNotebook finishing the removal of a closed page."""
+        evt.Skip()
+        self._update_tab_visibility()
+
+    def _update_tab_visibility(self):
+        """Show or hide the tab bar."""
+        if self.GetPageCount() <= 1:
+            self.SetTabCtrlHeight(0)
+        else:
+            self.SetTabCtrlHeight(-1)
+
+    def _page_changing(self, evt: aui.AuiNotebookEvent):
         old_selection_index = evt.GetOldSelection()
         if old_selection_index != wx.NOT_FOUND:
             old_page = self.GetPage(old_selection_index)
             if old_page is not None and not old_page.can_disable():
                 evt.Veto()
 
-    def _page_changed(self, evt: wx.BookCtrlEvent):
+    def _page_changed(self, evt: aui.AuiNotebookEvent):
         """Handle the page changing."""
         if evt.GetOldSelection() != evt.GetSelection():
             if evt.GetOldSelection() != wx.NOT_FOUND:
-                # self.GetPage(evt.GetOldSelection()).disable()
                 old_page = self.GetPage(evt.GetOldSelection())
                 if old_page is not None:
                     old_page.disable()
 
             if self.GetCurrentPage() is self._main_menu:
-                self.SetAGWWindowStyleFlag(NOTEBOOK_MENU_STYLE)
+                self.SetWindowStyleFlag(NOTEBOOK_MENU_STYLE)
             else:
-                self.SetAGWWindowStyleFlag(NOTEBOOK_STYLE)
+                self.SetWindowStyleFlag(NOTEBOOK_STYLE)
+            self.Refresh()
 
         if self.GetCurrentPage() is not None:
             self.GetCurrentPage().enable()
 
     def on_app_close(self, evt: wx.CloseEvent):
-        for path, page in list(self._open_worlds.items()):
+        for path in list(self._open_worlds.keys()):
             self.close_level(path)
         if self.GetPageCount() > 1:
             wx.MessageBox(lang.get("app.world_still_used"))
