@@ -13,7 +13,6 @@ from amulet_map_editor.api.wx.ui.block_select import BlockSelect
 from amulet_map_editor.api.wx.ui.block_select.properties import (
     PropertySelect,
     WildcardSNBTType,
-    EVT_PROPERTIES_CHANGE,
 )
 
 
@@ -68,14 +67,9 @@ class BlockDefine(BaseDefine):
             wildcard_properties,
         )
         right_sizer.Add(self._property_picker, 1, wx.EXPAND)
-        self._property_picker.Bind(EVT_PROPERTIES_CHANGE, self._on_property_change)
 
     def _on_picker_change(self, evt):
         self._update_properties()
-        evt.Skip()
-
-    def _on_property_change(self, evt):
-        self.Layout()
         evt.Skip()
 
     def _update_properties(self):
@@ -159,19 +153,70 @@ class BlockDefine(BaseDefine):
 if __name__ == "__main__":
 
     def main():
-        app = wx.App()
+        from amulet_map_editor.api.wx.ui.block_select.properties import (
+            EVT_PROPERTIES_CHANGE,
+        )
+        from amulet_map_editor.api.wx.ui.widget_size_changed import EVT_WIDGET_SIZE_CHANGED
+        from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
+
         translation_manager = PyMCTranslate.new_translation_manager()
+
+        class Replace(SimpleScrollablePanel):
+            def __init__(self, parent: wx.Window):
+                SimpleScrollablePanel.__init__(self, parent)
+
+                self._original_block = BlockDefine(
+                    self,
+                    translation_manager,
+                    wx.VERTICAL,
+                    wildcard_properties=True,
+                    show_pick_block=True,
+                )
+                self._sizer.Add(self._original_block, 0, wx.EXPAND)
+                self._replacement_block = BlockDefine(
+                    self, translation_manager, wx.VERTICAL, show_pick_block=True
+                )
+                self._sizer.Add(self._replacement_block, 0, wx.TOP | wx.EXPAND, 10)
+
+            def DoGetBestClientSize(self):
+                sizer = self.GetSizer()
+                if sizer is None:
+                    return -1, -1
+                else:
+                    sx, sy = self.GetSizer().CalcMin()
+                    return (
+                        sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X),
+                        sy + wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y),
+                    )
+
+        app = wx.App()
+
         dialog = wx.Dialog(None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
-        sizer = wx.BoxSizer()
-        dialog.SetSizer(sizer)
-        sizer.Add(
-            BlockDefine(dialog, translation_manager, wx.HORIZONTAL),
-            1,
+        sizer_h = wx.BoxSizer(wx.HORIZONTAL)
+        dialog.SetSizer(sizer_h)
+        sizer_v = wx.BoxSizer(wx.VERTICAL)
+        sizer_h.Add(sizer_v, 0, wx.EXPAND)
+        sizer_v.Add(
+            Replace(dialog),
+            # BlockDefine(dialog, translation_manager, show_pick_block=True),
+            0,
             wx.ALL | wx.EXPAND,
             5,
         )
         dialog.Show()
         dialog.Fit()
+
+        def on_properties_change(evt):
+            print("Properties changed:", evt.properties)
+
+        dialog.Bind(EVT_PROPERTIES_CHANGE, on_properties_change)
+
+        def on_layout_change(evt):
+            dialog.Layout()
+            evt.Skip()
+
+        dialog.Bind(EVT_WIDGET_SIZE_CHANGED, on_layout_change)
+
         app.MainLoop()
 
     main()

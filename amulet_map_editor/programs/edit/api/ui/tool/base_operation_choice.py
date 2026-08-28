@@ -10,6 +10,7 @@ import subprocess
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
+from amulet_map_editor.api.wx.ui.widget_size_changed import EVT_WIDGET_SIZE_CHANGED
 
 from amulet_map_editor.programs.edit.api.operations import OperationUIType
 from amulet_map_editor.programs.edit.api.operations.manager import UIOperationManager
@@ -49,6 +50,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         self._operation_panel.Hide()
         self._operation_sizer = wx.BoxSizer(wx.VERTICAL)
         self._operation_panel.SetSizer(self._operation_sizer)
+        self._operation_panel.Bind(EVT_WIDGET_SIZE_CHANGED, self._on_resize)
 
         assert isinstance(
             self.OperationGroupName, str

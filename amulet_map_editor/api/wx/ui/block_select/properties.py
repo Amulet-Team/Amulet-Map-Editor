@@ -11,6 +11,7 @@ from amulet.api.block import PropertyDataTypes, PropertyType
 WildcardSNBTType = Union[SNBTType, str]
 
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
+from amulet_map_editor.api.wx.ui.widget_size_changed import WidgetSizeChangeEvent
 
 (
     PropertiesChangeEvent,
@@ -133,7 +134,6 @@ class PropertySelect(wx.Panel):
             self._manual.properties = properties
         else:
             self._simple.properties = properties
-        self.TopLevelParent.Layout()
         self.Thaw()
 
     def _set_ui(self):
@@ -157,6 +157,10 @@ class PropertySelect(wx.Panel):
             self._simple.set_specification(specification)
             self._manual.Hide()
             self.Show(bool(specification.get("properties", {})))
+        wx.PostEvent(
+            self,
+            WidgetSizeChangeEvent(self.GetId()),
+        )
         self.Thaw()
 
 
@@ -237,11 +241,13 @@ class SimplePropertySelect(wx.Panel):
                 choice.SetSelection(choices.index(val))
             self._properties[name] = choice
         self.Thaw()
-        self.Fit()
-        self.Layout()
         wx.PostEvent(
             self,
             PropertiesChangeEvent(self.GetId(), properties=self.properties),
+        )
+        wx.PostEvent(
+            self,
+            WidgetSizeChangeEvent(self.GetId()),
         )
 
 
@@ -281,6 +287,9 @@ class ManualPropertySelect(wx.Panel):
             self, PropertiesChangeEvent(self.GetId(), properties=self.properties)
         )
 
+    def _post_layout_change(self) -> None:
+        wx.PostEvent(self, WidgetSizeChangeEvent(self.GetId()))
+
     def _add_property(self, name: str = "", value: SNBTType = "", events=True):
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -305,8 +314,6 @@ class ManualPropertySelect(wx.Panel):
 
         self._property_sizer.Add(sizer, 0, wx.BOTTOM | wx.EXPAND, 5)
         self._properties[self._property_index] = (name_entry, value_entry)
-        self.Fit()
-        self.TopLevelParent.Layout()
         self.Thaw()
         if events:
             self._post_property_change()
@@ -341,8 +348,8 @@ class ManualPropertySelect(wx.Panel):
             self._property_sizer.Detach(sizer)
             sizer.Clear(True)
             del self._properties[key]
-            self.TopLevelParent.Layout()
             self._post_property_change()
+            self._post_layout_change()
         finally:
             self.Thaw()
 
@@ -366,6 +373,7 @@ class ManualPropertySelect(wx.Panel):
         for name, value in properties.items():
             self._add_property(name, value, False)
         self._post_property_change()
+        self._post_layout_change()
 
 
 if __name__ == "__main__":
