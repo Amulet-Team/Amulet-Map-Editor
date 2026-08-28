@@ -151,8 +151,8 @@ class PropertySelect(wx.Panel):
             self.Show()
         else:
             specification = translator.get_specification(
-                    self._namespace, self._block_name, self._force_blockstate
-                )
+                self._namespace, self._block_name, self._force_blockstate
+            )
             self._simple.Show()
             self._simple.set_specification(specification)
             self._manual.Hide()
@@ -179,9 +179,7 @@ class SimplePropertySelect(wx.Panel):
         self._property_sizer = wx.FlexGridSizer(2, 5, 5)
         self._property_sizer.AddGrowableCol(0, proportion=0)
         self._property_sizer.AddGrowableCol(1, proportion=1)
-        sizer.Add(
-            self._property_sizer, 0, wx.EXPAND | wx.ALL, 5
-        )
+        sizer.Add(self._property_sizer, 0, wx.EXPAND | wx.ALL, 5)
 
         self._properties: Dict[str, wx.Choice] = {}
         self._specification: dict = {}
@@ -209,9 +207,7 @@ class SimplePropertySelect(wx.Panel):
 
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
         self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
-        label = wx.StaticText(
-            self, label="Value (SNBT)", style=wx.ALIGN_CENTER
-        )
+        label = wx.StaticText(self, label="Value (SNBT)", style=wx.ALIGN_CENTER)
         self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
 
         for name, choices in spec_properties.items():

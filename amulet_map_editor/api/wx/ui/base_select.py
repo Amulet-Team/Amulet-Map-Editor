@@ -92,7 +92,9 @@ class BaseSelect(wx.Panel):
             )
         self._list_box = wx.ListBox(self, style=wx.LB_SINGLE)
         self._list_box.SetMinSize(wx.Size(-1, 100))
-        self._sizer.Add(self._list_box, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
+        self._sizer.Add(
+            self._list_box, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5
+        )
 
         self._names: List[str] = []
         self._populate_item_name()

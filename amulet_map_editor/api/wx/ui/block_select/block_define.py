@@ -48,9 +48,13 @@ class BlockDefine(BaseDefine):
 
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         if orientation == wx.HORIZONTAL:
-            self._sizer.Add(right_sizer, 1, wx.EXPAND | wx.TOP | wx.RIGHT | wx.BOTTOM, 5)
+            self._sizer.Add(
+                right_sizer, 1, wx.EXPAND | wx.TOP | wx.RIGHT | wx.BOTTOM, 5
+            )
         else:
-            self._sizer.Add(right_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
+            self._sizer.Add(
+                right_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5
+            )
 
         self._property_picker = PropertySelect(
             self,
@@ -156,7 +160,9 @@ if __name__ == "__main__":
         from amulet_map_editor.api.wx.ui.block_select.properties import (
             EVT_PROPERTIES_CHANGE,
         )
-        from amulet_map_editor.api.wx.ui.widget_size_changed import EVT_WIDGET_SIZE_CHANGED
+        from amulet_map_editor.api.wx.ui.widget_size_changed import (
+            EVT_WIDGET_SIZE_CHANGED,
+        )
         from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 
         translation_manager = PyMCTranslate.new_translation_manager()

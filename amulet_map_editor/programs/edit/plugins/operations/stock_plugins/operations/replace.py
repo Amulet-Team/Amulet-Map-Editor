@@ -78,16 +78,16 @@ class Replace(wx.Panel, DefaultOperationUI):
             ),
             show_pick_block=True
         )
-        self._scroll.sizer.Add(self._replacement_block, 0, wx.LEFT | wx.TOP | wx.RIGHT | wx.EXPAND, 5)
+        self._scroll.sizer.Add(
+            self._replacement_block, 0, wx.LEFT | wx.TOP | wx.RIGHT | wx.EXPAND, 5
+        )
         self._replacement_block.Bind(
             EVT_PICK, lambda evt: self._on_pick_block_button(2)
         )
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
-        self._sizer.Add(
-            self._run_button, 0, wx.ALL | wx.EXPAND, 5
-        )
+        self._sizer.Add(self._run_button, 0, wx.ALL | wx.EXPAND, 5)
 
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
