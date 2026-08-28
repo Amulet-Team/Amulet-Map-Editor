@@ -109,9 +109,6 @@ class PropertySelect(wx.Panel):
     @str_properties.setter
     def str_properties(self, properties: Dict[str, WildcardSNBTType]):
         self.set_properties(properties)
-        wx.PostEvent(
-            self, PropertiesChangeEvent(self.GetId(), properties=self.str_properties)
-        )
 
     @property
     def properties(self) -> PropertyType:
@@ -241,6 +238,10 @@ class SimplePropertySelect(wx.Panel):
         self.Thaw()
         self.Fit()
         self.Layout()
+        wx.PostEvent(
+            self,
+            PropertiesChangeEvent(self.GetId(), properties=self.properties),
+        )
 
 
 class ManualPropertySelect(wx.Panel):
@@ -279,7 +280,7 @@ class ManualPropertySelect(wx.Panel):
             self, PropertiesChangeEvent(self.GetId(), properties=self.properties)
         )
 
-    def _add_property(self, name: str = "", value: SNBTType = ""):
+    def _add_property(self, name: str = "", value: SNBTType = "", events=True):
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._property_index += 1
@@ -306,6 +307,9 @@ class ManualPropertySelect(wx.Panel):
         self.Fit()
         self.TopLevelParent.Layout()
         self.Thaw()
+        if events:
+            self._post_property_change()
+            self._post_layout_change()
 
     def _on_value_change(self, evt, snbt_text: wx.StaticText):
         self._change_value(evt.GetString(), snbt_text)
@@ -354,7 +358,8 @@ class ManualPropertySelect(wx.Panel):
         self._properties.clear()
         self._property_index = 0
         for name, value in properties.items():
-            self._add_property(name, value)
+            self._add_property(name, value, False)
+        self._post_property_change()
 
 
 if __name__ == "__main__":
