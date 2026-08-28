@@ -24,10 +24,6 @@ SOFTWARE.
 from typing import TYPE_CHECKING, Tuple
 import wx
 
-from amulet.api.selection import SelectionGroup
-from amulet.api.block import Block
-from amulet.api.data_types import Dimension, OperationReturnType
-
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
