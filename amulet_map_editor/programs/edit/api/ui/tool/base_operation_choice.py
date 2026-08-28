@@ -218,6 +218,8 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         evt.Skip()
 
     def _resize(self):
+        widget = self.canvas.GetParent()
+        widget.Freeze()
         settings_panel_size = self._settings_panel.GetBestSize()
         self._settings_panel.SetSize(
             wx.Rect(
@@ -237,3 +239,4 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
             wx.Rect(0, 30 + settings_panel_size.GetHeight(), panel_width, panel_height)
         )
         self._operation_panel.Raise()
+        widget.Thaw()
