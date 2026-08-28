@@ -39,7 +39,7 @@ class SimpleScrollablePanel(ScrolledPanel, SimpleSizer):
         SimpleSizer.__init__(self, sizer_dir)
         self.SetSizer(self.sizer)
         self.SetupScrolling()
-        self.SetAutoLayout(1)
+        self.SetAutoLayout(True)
 
     def DoGetBestSize(self):
         sizer = self.GetSizer()
