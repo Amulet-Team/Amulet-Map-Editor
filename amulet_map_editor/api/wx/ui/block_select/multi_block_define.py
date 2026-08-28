@@ -13,6 +13,7 @@ from amulet_map_editor.api.image import (
     MINIMIZE,
 )
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine, EVT_PROPERTIES_CHANGE
+from amulet_map_editor.api.wx.ui.widget_size_changed import WidgetSizeChangeEvent
 
 
 class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
@@ -36,8 +37,7 @@ class MultiBlockDefine(wx.lib.scrolledpanel.ScrolledPanel):
             self._block_picker_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5
         )
 
-        self.SetSizerAndFit(self._sizer)
-        self.Layout()
+        self.SetSizer(self._sizer)
 
         self._add_button.Bind(wx.EVT_BUTTON, self._add)
         self._fix_enabled_buttons()
@@ -165,7 +165,7 @@ class _CollapsibleBlockDefine(wx.Panel):
         else:
             self.expand_button.SetBitmap(self.COLLAPSE)
             self.block_define.Show()
-        self.TopLevelParent.Layout()
+        wx.PostEvent(self, WidgetSizeChangeEvent(self.GetId()))
 
     def _toggle_block_expand(self, parent: MultiBlockDefine):
         if self.collapsed:
@@ -174,7 +174,6 @@ class _CollapsibleBlockDefine(wx.Panel):
 
     def _on_properties_change(self, evt):
         self.block_label.SetLabel(self._gen_block_string())
-        self.TopLevelParent.Layout()
         evt.Skip()
 
     def _gen_block_string(self):

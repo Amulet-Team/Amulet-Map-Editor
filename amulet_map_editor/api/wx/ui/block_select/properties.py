@@ -11,6 +11,7 @@ from amulet.api.block import PropertyDataTypes, PropertyType
 WildcardSNBTType = Union[SNBTType, str]
 
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
+from amulet_map_editor.api.wx.ui.widget_size_changed import WidgetSizeChangeEvent
 
 (
     PropertiesChangeEvent,
@@ -109,9 +110,6 @@ class PropertySelect(wx.Panel):
     @str_properties.setter
     def str_properties(self, properties: Dict[str, WildcardSNBTType]):
         self.set_properties(properties)
-        wx.PostEvent(
-            self, PropertiesChangeEvent(self.GetId(), properties=self.str_properties)
-        )
 
     @property
     def properties(self) -> PropertyType:
@@ -136,7 +134,6 @@ class PropertySelect(wx.Panel):
             self._manual.properties = properties
         else:
             self._simple.properties = properties
-        self.TopLevelParent.Layout()
         self.Thaw()
 
     def _set_ui(self):
@@ -151,14 +148,19 @@ class PropertySelect(wx.Panel):
         if self._manual_enabled:
             self._simple.Hide()
             self._manual.Show()
+            self.Show()
         else:
-            self._simple.Show()
-            self._simple.set_specification(
-                translator.get_specification(
-                    self._namespace, self._block_name, self._force_blockstate
-                )
+            specification = translator.get_specification(
+                self._namespace, self._block_name, self._force_blockstate
             )
+            self._simple.Show()
+            self._simple.set_specification(specification)
             self._manual.Hide()
+            self.Show(bool(specification.get("properties", {})))
+        wx.PostEvent(
+            self,
+            WidgetSizeChangeEvent(self.GetId()),
+        )
         self.Thaw()
 
 
@@ -174,16 +176,10 @@ class SimplePropertySelect(wx.Panel):
         self.SetSizer(sizer)
         self._translation_manager = translation_manager
 
-        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
-        header_sizer.Add(label, 1)
-        label = wx.StaticText(
-            self, label="Property Value (SNBT)", style=wx.ALIGN_CENTER
-        )
-        header_sizer.Add(label, 1, wx.LEFT, 5)
-        self._property_sizer = wx.GridSizer(2, 5, 5)
-        sizer.Add(self._property_sizer, 0, wx.ALL | wx.EXPAND, 5)
+        self._property_sizer = wx.FlexGridSizer(2, 5, 5)
+        self._property_sizer.AddGrowableCol(0, proportion=0)
+        self._property_sizer.AddGrowableCol(1, proportion=1)
+        sizer.Add(self._property_sizer, 0, wx.EXPAND | wx.ALL, 5)
 
         self._properties: Dict[str, wx.Choice] = {}
         self._specification: dict = {}
@@ -208,6 +204,11 @@ class SimplePropertySelect(wx.Panel):
             "properties", {}
         )
         spec_defaults = self._specification.get("defaults", {})
+
+        label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
+        self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
+        label = wx.StaticText(self, label="Value (SNBT)", style=wx.ALIGN_CENTER)
+        self._property_sizer.Add(label, 0, wx.ALIGN_CENTER)
 
         for name, choices in spec_properties.items():
             label = wx.StaticText(self, label=name)
@@ -236,8 +237,14 @@ class SimplePropertySelect(wx.Panel):
                 choice.SetSelection(choices.index(val))
             self._properties[name] = choice
         self.Thaw()
-        self.Fit()
-        self.Layout()
+        wx.PostEvent(
+            self,
+            PropertiesChangeEvent(self.GetId(), properties=self.properties),
+        )
+        wx.PostEvent(
+            self,
+            WidgetSizeChangeEvent(self.GetId()),
+        )
 
 
 class ManualPropertySelect(wx.Panel):
@@ -254,7 +261,7 @@ class ManualPropertySelect(wx.Panel):
             self, bitmap=ADD_ICON.bitmap(30, 30), size=(30, 30)
         )
         header_sizer.Add(add_button)
-        sizer.Add(header_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        sizer.Add(header_sizer, 0, wx.EXPAND | wx.ALL, 5)
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
         header_sizer.Add(label, 1, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         label = wx.StaticText(
@@ -264,9 +271,7 @@ class ManualPropertySelect(wx.Panel):
         header_sizer.AddStretchSpacer(1)
 
         self._property_sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(
-            self._property_sizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
-        )
+        sizer.Add(self._property_sizer, 0, wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
 
         add_button.Bind(wx.EVT_BUTTON, lambda evt: self._add_property())
 
@@ -278,7 +283,10 @@ class ManualPropertySelect(wx.Panel):
             self, PropertiesChangeEvent(self.GetId(), properties=self.properties)
         )
 
-    def _add_property(self, name: str = "", value: SNBTType = ""):
+    def _post_layout_change(self) -> None:
+        wx.PostEvent(self, WidgetSizeChangeEvent(self.GetId()))
+
+    def _add_property(self, name: str = "", value: SNBTType = "", events=True):
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._property_index += 1
@@ -300,11 +308,12 @@ class ManualPropertySelect(wx.Panel):
         self._change_value("", snbt_text)
         value_entry.Bind(wx.EVT_TEXT, lambda evt: self._on_value_change(evt, snbt_text))
 
-        self._property_sizer.Add(sizer, 1, wx.TOP | wx.EXPAND, 5)
+        self._property_sizer.Add(sizer, 0, wx.BOTTOM | wx.EXPAND, 5)
         self._properties[self._property_index] = (name_entry, value_entry)
-        self.Fit()
-        self.TopLevelParent.Layout()
         self.Thaw()
+        if events:
+            self._post_property_change()
+            self._post_layout_change()
 
     def _on_value_change(self, evt, snbt_text: wx.StaticText):
         self._change_value(evt.GetString(), snbt_text)
@@ -312,6 +321,7 @@ class ManualPropertySelect(wx.Panel):
         evt.Skip()
 
     def _change_value(self, snbt: SNBTType, snbt_text: wx.StaticText):
+        self.Freeze()
         try:
             nbt = amulet_nbt.from_snbt(snbt)
         except:
@@ -324,16 +334,20 @@ class ManualPropertySelect(wx.Panel):
             else:
                 snbt_text.SetLabel(f"{nbt.__class__.__name__} not valid")
                 snbt_text.SetBackgroundColour((255, 200, 200))
-        self.Layout()
+        finally:
+            self.Layout()
+            self.Thaw()
 
     def _on_remove_property(self, sizer: wx.Sizer, key: int):
         self.Freeze()
-        self._property_sizer.Detach(sizer)
-        sizer.Clear(True)
-        del self._properties[key]
-        self.TopLevelParent.Layout()
-        self.Thaw()
-        self._post_property_change()
+        try:
+            self._property_sizer.Detach(sizer)
+            sizer.Clear(True)
+            del self._properties[key]
+            self._post_property_change()
+            self._post_layout_change()
+        finally:
+            self.Thaw()
 
     @property
     def properties(self) -> Dict[str, SNBTType]:
@@ -353,7 +367,9 @@ class ManualPropertySelect(wx.Panel):
         self._properties.clear()
         self._property_index = 0
         for name, value in properties.items():
-            self._add_property(name, value)
+            self._add_property(name, value, False)
+        self._post_property_change()
+        self._post_layout_change()
 
 
 if __name__ == "__main__":

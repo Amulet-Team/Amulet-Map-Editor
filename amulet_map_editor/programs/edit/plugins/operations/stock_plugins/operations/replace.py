@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
 
 
-class Replace(SimpleScrollablePanel, DefaultOperationUI):
+class Replace(wx.Panel, DefaultOperationUI):
     def __init__(
         self,
         parent: wx.Window,
@@ -45,13 +45,18 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
         world: "BaseLevel",
         options_path: str,
     ):
-        SimpleScrollablePanel.__init__(self, parent)
+        wx.Panel.__init__(self, parent)
         DefaultOperationUI.__init__(self, parent, canvas, world, options_path)
-        self.Freeze()
         options = self._load_options({})
 
+        self._sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self._sizer)
+
+        self._scroll = SimpleScrollablePanel(self)
+        self._sizer.Add(self._scroll, 1, wx.EXPAND)
+
         self._original_block = BlockDefine(
-            self,
+            self._scroll,
             world.level_wrapper.translation_manager,
             wx.VERTICAL,
             *(
@@ -61,10 +66,10 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             wildcard_properties=True,
             show_pick_block=True
         )
-        self._sizer.Add(self._original_block, 1, wx.ALL | wx.EXPAND, 5)
+        self._scroll.sizer.Add(self._original_block, 0, wx.ALL | wx.EXPAND, 5)
         self._original_block.Bind(EVT_PICK, lambda evt: self._on_pick_block_button(1))
         self._replacement_block = BlockDefine(
-            self,
+            self._scroll,
             world.level_wrapper.translation_manager,
             wx.VERTICAL,
             *(
@@ -73,19 +78,16 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
             ),
             show_pick_block=True
         )
-        self._sizer.Add(self._replacement_block, 1, wx.ALL | wx.EXPAND, 5)
+        self._scroll.sizer.Add(
+            self._replacement_block, 0, wx.LEFT | wx.TOP | wx.RIGHT | wx.EXPAND, 5
+        )
         self._replacement_block.Bind(
             EVT_PICK, lambda evt: self._on_pick_block_button(2)
         )
 
         self._run_button = wx.Button(self, label="Run Operation")
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
-        self._sizer.Add(
-            self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
-        )
-
-        self.Layout()
-        self.Thaw()
+        self._sizer.Add(self._run_button, 0, wx.ALL | wx.EXPAND, 5)
 
     @property
     def wx_add_options(self) -> Tuple[int, ...]:
@@ -220,17 +222,6 @@ class Replace(SimpleScrollablePanel, DefaultOperationUI):
 
             count += 1
             yield count / iter_count
-
-    def DoGetBestClientSize(self):
-        sizer = self.GetSizer()
-        if sizer is None:
-            return -1, -1
-        else:
-            sx, sy = self.GetSizer().CalcMin()
-            return (
-                sx + wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X),
-                sy + wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y),
-            )
 
 
 export = {
