@@ -10,6 +10,7 @@ import wx.lib.inspection
 from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
+from amulet_map_editor.api.wx.ui.image_widget import ImageWidget
 from ._legal import LicenceDialog
 
 log = logging.getLogger(__name__)
@@ -36,10 +37,10 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
 
         name_sizer = wx.BoxSizer()
         menu_sizer.Add(name_sizer, 0, wx.CENTER)
-        icon_img = image.logo.amulet_logo.bitmap(64, 64)
+        icon_img = image.logo.amulet_logo.image()
 
-        icon = wx.StaticBitmap(self, wx.ID_ANY, icon_img, (0, 0), (64, 64))
-        icon2 = wx.StaticBitmap(self, wx.ID_ANY, icon_img, (0, 0), (64, 64))
+        icon = ImageWidget(self, icon_img, wx.Size(64, 64))
+        icon2 = ImageWidget(self, icon_img, wx.Size(64, 64))
         icon2.Bind(
             wx.EVT_LEFT_DOWN, lambda evt: wx.lib.inspection.InspectionTool().Show()
         )
@@ -110,10 +111,8 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
 
         sponsor_sizer = wx.BoxSizer(wx.HORIZONTAL)
         footer_sizer.Add(sponsor_sizer, 0, wx.EXPAND)
-        pathway_bitmap = image.logo.pathway_logo.bitmap(300, 130)
-        pathway_button = wx.StaticBitmap(
-            self, wx.ID_ANY, pathway_bitmap, (0, 0), (300, 130)
-        )
+        pathway_image = image.logo.pathway_logo.image()
+        pathway_button = ImageWidget(self, pathway_image, wx.Size(300, 130))
         pathway_button.Bind(wx.EVT_LEFT_DOWN, self._pathway)
         sponsor_sizer.Add(pathway_button)
 
