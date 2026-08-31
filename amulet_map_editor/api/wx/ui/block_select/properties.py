@@ -12,6 +12,7 @@ WildcardSNBTType = Union[SNBTType, str]
 
 from amulet_map_editor.api.image import ADD_ICON, SUBTRACT_ICON
 from amulet_map_editor.api.wx.ui.widget_size_changed import WidgetSizeChangeEvent
+from amulet_map_editor.api.wx.ui.image_widget import ImageButton
 
 (
     PropertiesChangeEvent,
@@ -257,9 +258,7 @@ class ManualPropertySelect(wx.Panel):
         self._translation_manager = translation_manager
 
         header_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        add_button = wx.BitmapButton(
-            self, bitmap=ADD_ICON.bitmap(30, 30), size=(30, 30)
-        )
+        add_button = ImageButton(self, ADD_ICON.image(), wx.Size(24, 24))
         header_sizer.Add(add_button)
         sizer.Add(header_sizer, 0, wx.EXPAND | wx.ALL, 5)
         label = wx.StaticText(self, label="Property Name", style=wx.ALIGN_CENTER)
@@ -290,9 +289,7 @@ class ManualPropertySelect(wx.Panel):
         self.Freeze()
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._property_index += 1
-        subtract_button = wx.BitmapButton(
-            self, bitmap=SUBTRACT_ICON.bitmap(30, 30), size=(30, 30)
-        )
+        subtract_button = ImageButton(self, SUBTRACT_ICON.image(), wx.Size(24, 24))
         sizer.Add(subtract_button, 0, wx.ALIGN_CENTER_VERTICAL)
         index = self._property_index
         subtract_button.Bind(

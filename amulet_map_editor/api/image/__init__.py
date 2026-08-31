@@ -23,6 +23,9 @@ class BitmapResourceItem(ResourceItem):
             bm = im.ConvertToBitmap()
         return bm
 
+    def image(self) -> wx.Image:
+        return wx.Image(self._path)
+
     @classmethod
     def default_object(cls) -> wx.Bitmap:
         bm = wx.Bitmap()

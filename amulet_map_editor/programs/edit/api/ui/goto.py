@@ -8,6 +8,7 @@ from amulet.api.data_types import PointCoordinates
 
 from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog
+from amulet_map_editor.api.wx.ui.image_widget import ImageButton
 from amulet_map_editor.api import image
 
 log = logging.getLogger(__name__)
@@ -62,15 +63,15 @@ class GoTo(SimpleDialog):
         self.y.Bind(wx.EVT_CHAR, self._on_text)
         self.z.Bind(wx.EVT_CHAR, self._on_text)
 
-        copy_button = wx.BitmapButton(
-            self, bitmap=image.icon.tablericons.copy.bitmap(20, 20)
+        copy_button = ImageButton(
+            self, image.icon.tablericons.copy.image(), wx.Size(20, 20)
         )
         copy_button.Bind(wx.EVT_BUTTON, lambda evt: self._copy())
         copy_button.SetToolTip(lang.get("program_3d_edit.goto_ui.copy_button_tooltip"))
         self.bottom_sizer.Insert(0, copy_button, 0, wx.ALL, 5)
 
-        paste_button = wx.BitmapButton(
-            self, bitmap=image.icon.tablericons.clipboard.bitmap(20, 20)
+        paste_button = ImageButton(
+            self, image.icon.tablericons.clipboard.image(), wx.Size(20, 20)
         )
         paste_button.Bind(wx.EVT_BUTTON, lambda evt: self._paste())
         paste_button.SetToolTip(
