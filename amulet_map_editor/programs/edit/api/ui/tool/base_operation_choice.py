@@ -11,6 +11,7 @@ from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.wx.ui.widget_size_changed import EVT_WIDGET_SIZE_CHANGED
+from amulet_map_editor.api.wx.ui.image_widget import ImageButton
 
 from amulet_map_editor.programs.edit.api.operations import OperationUIType
 from amulet_map_editor.programs.edit.api.operations.manager import UIOperationManager
@@ -65,20 +66,20 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         self._operation_choice.Bind(wx.EVT_CHOICE, self._on_operation_change)
 
         # The reload button
-        self._reload_operation = wx.BitmapButton(
-            self._settings_panel, bitmap=image.REFRESH_ICON.bitmap(16, 16)
+        self._reload_operation = ImageButton(
+            self._settings_panel, image.REFRESH_ICON.image(), wx.Size(20, 20)
         )
         self._reload_operation.SetToolTip("Reload Operations")
-        self._settings_sizer.Add(self._reload_operation)
+        self._settings_sizer.Add(self._reload_operation, flag=wx.EXPAND)
         self._reload_operation.Bind(wx.EVT_BUTTON, self._on_reload_operations)
 
         # The open folder button
         if self.ShowOpenFolder:
-            self._open_folder = wx.BitmapButton(
-                self._settings_panel, bitmap=image.TABLERICONS.folder.bitmap(16, 16)
+            self._open_folder = ImageButton(
+                self._settings_panel, image.TABLERICONS.folder.image(), wx.Size(20, 20)
             )
             self._open_folder.SetToolTip("Open Plugin Folder")
-            self._settings_sizer.Add(self._open_folder)
+            self._settings_sizer.Add(self._open_folder, flag=wx.EXPAND)
             self._open_folder.Bind(wx.EVT_BUTTON, self._on_open_folder)
 
         self._resize()

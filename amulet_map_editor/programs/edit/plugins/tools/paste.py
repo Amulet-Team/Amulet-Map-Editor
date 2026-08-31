@@ -26,6 +26,7 @@ from amulet_map_editor import lang
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.util.validators import int_validator, float_validator
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
+from amulet_map_editor.api.wx.ui.image_widget import ImageButton
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
 from amulet_map_editor.programs.edit.api.key_config import (
@@ -381,8 +382,8 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             border=5,
         )
 
-        self._rotate_left_button = wx.BitmapButton(
-            self._paste_panel, bitmap=image.icon.tablericons.rotate_2.bitmap(22, 22)
+        self._rotate_left_button = ImageButton(
+            self._paste_panel, image.icon.tablericons.rotate_2.image(), wx.Size(22, 22)
         )
         self._rotate_left_button.SetToolTip(
             lang.get("program_3d_edit.paste_tool.rotate_anti_clockwise_tooltip")
@@ -390,9 +391,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._rotate_left_button.Bind(wx.EVT_BUTTON, self._on_rotate_left)
         rotate_sizer.Add(self._rotate_left_button)
 
-        self._rotate_right_button = wx.BitmapButton(
+        self._rotate_right_button = ImageButton(
             self._paste_panel,
-            bitmap=image.icon.tablericons.rotate_clockwise_2.bitmap(22, 22),
+            image.icon.tablericons.rotate_clockwise_2.image(), wx.Size(22, 22),
         )
         self._rotate_right_button.SetToolTip(
             lang.get("program_3d_edit.paste_tool.rotate_clockwise_tooltip")
@@ -433,9 +434,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         )
 
         # the tablericons file names are the wrong way around
-        self._mirror_horizontal_button = wx.BitmapButton(
+        self._mirror_horizontal_button = ImageButton(
             self._paste_panel,
-            bitmap=image.icon.tablericons.flip_vertical.bitmap(22, 22),
+            image.icon.tablericons.flip_vertical.image(), wx.Size(22, 22),
         )
         self._mirror_horizontal_button.SetToolTip(
             lang.get("program_3d_edit.paste_tool.mirror_horizontal_tooltip")
@@ -443,9 +444,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self._mirror_horizontal_button.Bind(wx.EVT_BUTTON, self._on_mirror_horizontal)
         mirror_sizer.Add(self._mirror_horizontal_button)
 
-        self._mirror_vertical_button = wx.BitmapButton(
+        self._mirror_vertical_button = ImageButton(
             self._paste_panel,
-            bitmap=image.icon.tablericons.flip_horizontal.bitmap(22, 22),
+            image.icon.tablericons.flip_horizontal.image(), wx.Size(22, 22),
         )
         self._mirror_vertical_button.SetToolTip(
             lang.get("program_3d_edit.paste_tool.mirror_vertical_tooltip")

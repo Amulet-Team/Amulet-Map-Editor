@@ -5,6 +5,7 @@ from typing import Tuple, List, Optional
 import PyMCTranslate
 
 from amulet_map_editor.api.image import COLOUR_PICKER
+from amulet_map_editor.api.wx.ui.image_widget import ImageButton
 
 (
     ItemNamespaceChangeEvent,
@@ -84,7 +85,7 @@ class BaseSelect(wx.Panel):
         search_sizer.Add(self._search, 1, wx.ALIGN_CENTER_VERTICAL)
         self._search.Bind(wx.EVT_TEXT, self._on_search_change)
         if show_pick:
-            pick_button = wx.BitmapButton(self, bitmap=COLOUR_PICKER.bitmap(20, 20))
+            pick_button = ImageButton(self, COLOUR_PICKER.image(), wx.Size(20, 20))
             search_sizer.Add(pick_button, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             pick_button.Bind(
                 wx.EVT_BUTTON,

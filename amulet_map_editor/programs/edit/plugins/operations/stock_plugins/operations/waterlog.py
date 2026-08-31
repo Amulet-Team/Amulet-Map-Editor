@@ -28,9 +28,9 @@ import numpy
 import wx
 
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
-from amulet_map_editor.api.wx.ui.simple import SimpleDialog
+from amulet_map_editor.api.wx.ui.simple import SimpleDialog, SimpleScrollablePanel
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
-from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
+from amulet_map_editor.api.wx.ui.image_widget import ImageButton
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 from amulet_map_editor.api import image
 
@@ -70,8 +70,8 @@ class Waterlog(wx.Panel, DefaultOperationUI):
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._sizer.Add(top_sizer, 0, wx.EXPAND | wx.ALL, 5)
 
-        help_button = wx.BitmapButton(
-            self, bitmap=image.icon.tablericons.help.bitmap(22, 22)
+        help_button = ImageButton(
+            self, image.icon.tablericons.help.image(), wx.Size(22, 22)
         )
         top_sizer.Add(help_button)
 
