@@ -10,7 +10,7 @@ import wx.lib.inspection
 from amulet_map_editor.api import image, lang
 from .base_page import BasePageUI
 from amulet_map_editor.api.wx.ui.select_world import open_level_from_dialog
-from amulet_map_editor.api.wx.ui.image_widget import ImageWidget
+from amulet_map_editor.api.wx.ui.image_widget import ImageWidget, ImageButton
 from ._legal import LicenceDialog
 
 log = logging.getLogger(__name__)
@@ -80,14 +80,14 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
 
         side_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self._lang_button = wx.BitmapButton(
-            self, bitmap=image.icon.tablericons.language.bitmap(64, 64)
+        self._lang_button = ImageButton(
+            self, image.icon.tablericons.language.image(), wx.Size(48, 48)
         )
         self._lang_button.Bind(wx.EVT_BUTTON, self._select_language)
         side_sizer.Add(self._lang_button, 0, wx.ALIGN_RIGHT)
 
-        self._licence_button = wx.BitmapButton(
-            self, bitmap=image.icon.tablericons.license.bitmap(64, 64)
+        self._licence_button = ImageButton(
+            self, image.icon.tablericons.license.image(), wx.Size(48, 48)
         )
         self._licence_button.Bind(wx.EVT_BUTTON, self._show_licences)
         side_sizer.Add(self._licence_button, 0, wx.ALIGN_RIGHT)
