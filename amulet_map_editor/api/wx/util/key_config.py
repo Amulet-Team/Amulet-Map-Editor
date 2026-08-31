@@ -369,8 +369,7 @@ class KeyConfigDialog(SimpleDialog):
             self, selected_group, entries, fixed_keybinds, user_keybinds
         )
         self.sizer.Add(self._key_config, 1, wx.EXPAND)
-        self.Layout()
-        self.Fit()
+        self.SetMinSize(wx.Size(600, 360))
 
     @property
     def options(self) -> Tuple[KeybindContainer, KeybindGroupIdType, KeybindGroup]:
@@ -399,17 +398,17 @@ class KeyConfig(wx.BoxSizer):
             selected_group,
         )
         self._choice.Bind(wx.EVT_CHOICE, self._on_group_change)
-        top_sizer.Add(self._choice, 1, wx.ALL | wx.EXPAND, 5)
+        top_sizer.Add(self._choice, 1, wx.LEFT | wx.TOP | wx.BOTTOM | wx.EXPAND, 5)
 
-        add = ImageButton(parent, ADD_ICON.image(), wx.Size(32, 32))
+        add = ImageButton(parent, ADD_ICON.image(), wx.Size(24, 24))
         add.Bind(wx.EVT_BUTTON, lambda evt: self._create_new_group())
-        top_sizer.Add(add, 0, wx.ALL, 5)
+        top_sizer.Add(add, 0, wx.LEFT | wx.TOP | wx.BOTTOM, 5)
 
-        self._delete = ImageButton(parent, SUBTRACT_ICON.image(), wx.Size(32, 32))
+        self._delete = ImageButton(parent, SUBTRACT_ICON.image(), wx.Size(24, 24))
         self._delete.Bind(wx.EVT_BUTTON, lambda evt: self._delete_group())
-        top_sizer.Add(self._delete, 0, wx.ALL, 5)
+        top_sizer.Add(self._delete, 0, wx.LEFT | wx.TOP | wx.BOTTOM, 5)
 
-        self._rename = ImageButton(parent, EDIT_ICON.image(), wx.Size(32, 32))
+        self._rename = ImageButton(parent, EDIT_ICON.image(), wx.Size(24, 24))
         self._rename.Bind(wx.EVT_BUTTON, lambda evt: self._rename_group())
         top_sizer.Add(self._rename, 0, wx.ALL, 5)
 
