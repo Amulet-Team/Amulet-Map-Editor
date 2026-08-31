@@ -393,7 +393,8 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._rotate_right_button = ImageButton(
             self._paste_panel,
-            image.icon.tablericons.rotate_clockwise_2.image(), wx.Size(22, 22),
+            image.icon.tablericons.rotate_clockwise_2.image(),
+            wx.Size(22, 22),
         )
         self._rotate_right_button.SetToolTip(
             lang.get("program_3d_edit.paste_tool.rotate_clockwise_tooltip")
@@ -436,7 +437,8 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         # the tablericons file names are the wrong way around
         self._mirror_horizontal_button = ImageButton(
             self._paste_panel,
-            image.icon.tablericons.flip_vertical.image(), wx.Size(22, 22),
+            image.icon.tablericons.flip_vertical.image(),
+            wx.Size(22, 22),
         )
         self._mirror_horizontal_button.SetToolTip(
             lang.get("program_3d_edit.paste_tool.mirror_horizontal_tooltip")
@@ -446,7 +448,8 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
         self._mirror_vertical_button = ImageButton(
             self._paste_panel,
-            image.icon.tablericons.flip_horizontal.image(), wx.Size(22, 22),
+            image.icon.tablericons.flip_horizontal.image(),
+            wx.Size(22, 22),
         )
         self._mirror_vertical_button.SetToolTip(
             lang.get("program_3d_edit.paste_tool.mirror_vertical_tooltip")
@@ -721,7 +724,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
     def _resize(self):
         panel_size = self._paste_panel.GetBestSize()
         canvas_height = self.canvas.GetSize().GetHeight()
-        allowed_canvas_height = canvas_height - int(48 * self.canvas.GetDPIScaleFactor())
+        allowed_canvas_height = canvas_height - int(
+            48 * self.canvas.GetDPIScaleFactor()
+        )
         ideal_path_height = panel_size.GetHeight()
         panel_height = min(ideal_path_height, allowed_canvas_height)
         panel_width = panel_size.GetWidth()
