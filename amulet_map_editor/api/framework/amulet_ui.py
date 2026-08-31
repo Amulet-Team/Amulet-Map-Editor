@@ -152,6 +152,11 @@ class AmuletLevelNotebook(aui.AuiNotebook):
 
         self._main_menu = AmuletMainMenu(self)
         self._open_worlds = {}
+        self.Bind(wx.EVT_DPI_CHANGED, self._on_dpi_changed)
+
+    def _on_dpi_changed(self, evt) -> None:
+        self._update_tab_visibility()
+        evt.Skip()
 
     def init(self):
         self._add_world_tab(self._main_menu, lang.get("main_menu.tab_name"))
