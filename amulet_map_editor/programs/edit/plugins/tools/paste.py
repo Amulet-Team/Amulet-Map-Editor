@@ -720,7 +720,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
     def _resize(self):
         panel_size = self._paste_panel.GetBestSize()
         canvas_height = self.canvas.GetSize().GetHeight()
-        allowed_canvas_height = canvas_height - 60
+        allowed_canvas_height = canvas_height - int(48 * self.canvas.GetDPIScaleFactor())
         ideal_path_height = panel_size.GetHeight()
         panel_height = min(ideal_path_height, allowed_canvas_height)
         panel_width = panel_size.GetWidth()
