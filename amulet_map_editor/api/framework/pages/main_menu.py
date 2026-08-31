@@ -112,9 +112,9 @@ class AmuletMainMenu(wx.Panel, BasePageUI):
         sponsor_sizer = wx.BoxSizer(wx.HORIZONTAL)
         footer_sizer.Add(sponsor_sizer, 0, wx.EXPAND)
         pathway_image = image.logo.pathway_logo.image()
-        pathway_button = ImageWidget(self, pathway_image, wx.Size(300, 130))
+        pathway_button = ImageWidget(self, pathway_image, wx.Size(167, 86))
         pathway_button.Bind(wx.EVT_LEFT_DOWN, self._pathway)
-        sponsor_sizer.Add(pathway_button)
+        sponsor_sizer.Add(pathway_button, flag=wx.ALIGN_BOTTOM)
 
         try:
             with urlopen(
