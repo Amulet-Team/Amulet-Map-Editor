@@ -112,23 +112,17 @@ class FilePanel(EditCanvasContainer):
             return button
 
         self._undo_button = create_button("0", lambda evt: self.canvas.undo())
-        self._undo_button.SetBitmap(image.icon.tablericons.arrow_back_up.bitmap(20, 20))
         self._undo_button.SetToolTip(lang.get("program_3d_edit.file_ui.undo_tooltip"))
 
         self._redo_button = create_button("0", lambda evt: self.canvas.redo())
-        self._redo_button.SetBitmap(
-            image.icon.tablericons.arrow_forward_up.bitmap(20, 20)
-        )
         self._redo_button.SetToolTip(lang.get("program_3d_edit.file_ui.redo_tooltip"))
 
         self._save_button = create_button("0", lambda evt: self.canvas.save())
-        self._save_button.SetBitmap(image.icon.tablericons.device_floppy.bitmap(20, 20))
         self._save_button.SetToolTip(lang.get("program_3d_edit.file_ui.save_tooltip"))
 
         self._close_button = create_button(
             "", lambda evt: wx.PostEvent(self.canvas, EditCloseEvent())
         )
-        self._close_button.SetBitmap(image.icon.tablericons.square_x.bitmap(20, 20))
         self._close_button.SetToolTip(lang.get("program_3d_edit.file_ui.close_tooltip"))
 
         height = self._dim_options.GetSize().GetHeight()
@@ -141,9 +135,30 @@ class FilePanel(EditCanvasContainer):
         self._close_button.SetSize(wx.Size(height, height))
         self._close_button.SetMinSize(wx.Size(height, height))
 
+        self._set_icons()
         self._update_buttons()
 
         self._resize()
+
+    def _set_icons(self, evt=None) -> None:
+        scale = self.canvas.GetDPIScaleFactor()
+        size = int(16 * scale)
+
+        undo_bitmap = image.icon.tablericons.arrow_back_up.bitmap(size, size)
+        undo_bitmap.SetScaleFactor(scale)
+        self._undo_button.SetBitmap(undo_bitmap)
+
+        redo_bitmap = image.icon.tablericons.arrow_forward_up.bitmap(size, size)
+        redo_bitmap.SetScaleFactor(scale)
+        self._redo_button.SetBitmap(redo_bitmap)
+
+        save_bitmap = image.icon.tablericons.device_floppy.bitmap(size, size)
+        save_bitmap.SetScaleFactor(scale)
+        self._save_button.SetBitmap(save_bitmap)
+
+        close_bitmap = image.icon.tablericons.square_x.bitmap(size, size)
+        close_bitmap.SetScaleFactor(scale)
+        self._close_button.SetBitmap(close_bitmap)
 
     def bind_events(self):
         self.canvas.Bind(EVT_CAMERA_MOVED, self._on_camera_move)
@@ -155,6 +170,7 @@ class FilePanel(EditCanvasContainer):
         self.canvas.Bind(EVT_PROJECTION_CHANGED, self._on_projection_change)
         self.canvas.Bind(EVT_DIMENSION_CHANGE, self._change_dimension)
         self.canvas.Bind(wx.EVT_SIZE, self._on_resize)
+        self.canvas.Bind(wx.EVT_DPI_CHANGED, self._set_icons)
 
     def _on_update_buttons(self, evt):
         self._update_buttons()
