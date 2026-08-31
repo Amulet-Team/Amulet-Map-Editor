@@ -15,6 +15,11 @@ from amulet.api.errors import FormatError
 from amulet_map_editor import lang, CONFIG
 from amulet_map_editor.api.wx.ui import simple
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
+from amulet_map_editor.api.wx.ui.image_widget import ImageWidget
+from amulet_map_editor.api.wx.ui.widget_size_changed import (
+    WidgetSizeChangeEvent,
+    EVT_WIDGET_SIZE_CHANGED,
+)
 from amulet_map_editor.api.framework import app
 
 if TYPE_CHECKING:
@@ -218,24 +223,17 @@ def find_world_paths():
 
 find_world_paths()
 
-world_images: Dict[str, Tuple[int, wx.Bitmap, int]] = {}
+_world_images: Dict[str, Tuple[float, wx.Image]] = {}
 
 
-def get_world_image(image_path: str) -> Tuple[wx.Bitmap, int]:
-    if (
-        image_path not in world_images
-        or world_images[image_path][0] != os.stat(image_path)[8]
-    ):
+def _get_world_image(image_path: str) -> wx.Image:
+    image_data = _world_images.get(image_path)
+    mtime = os.stat(image_path).st_mtime
+    if image_data is None or image_data[0] != mtime:
         img = wx.Image(image_path, wx.BITMAP_TYPE_ANY)
-        width = min(int((img.GetWidth() / img.GetHeight()) * 128), 300)
+        _world_images[image_path] = image_data = (mtime, img)
 
-        world_images[image_path] = (
-            os.stat(image_path)[8],
-            img.Scale(width, 128, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(),
-            width,
-        )
-
-    return world_images[image_path][1:3]
+    return image_data[1]
 
 
 class WorldUI(wx.Panel):
@@ -246,11 +244,12 @@ class WorldUI(wx.Panel):
         self.SetWindowStyle(wx.TAB_TRAVERSAL | wx.BORDER_RAISED)
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.SetSizer(sizer)
 
-        img, width = get_world_image(world_format.world_image_path)
+        img = _get_world_image(world_format.world_image_path)
 
-        self.img = wx.StaticBitmap(self, wx.ID_ANY, img, (0, 0), (width, 128))
+        self.img = ImageWidget(
+            self, img, wx.Size(int(128 * img.GetWidth() / img.GetHeight()), 128)
+        )
         sizer.Add(self.img)
 
         self.world_name = wx.StaticText(
@@ -266,6 +265,8 @@ class WorldUI(wx.Panel):
             ),
         )
         sizer.Add(self.world_name, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+
+        self.SetSizerAndFit(sizer)
 
 
 class WorldUIButton(WorldUI):
@@ -323,8 +324,6 @@ class WorldList(wx.Panel):
             except Exception as e:
                 log.info(f"Failed to display world button for {world_format.path} {e}")
 
-        self.Layout()
-
 
 class CollapsibleWorldListUI(wx.CollapsiblePane):
     """a drop down list of `WorldUIButton`s for a given directory"""
@@ -338,8 +337,7 @@ class CollapsibleWorldListUI(wx.CollapsiblePane):
         root_directory: str | None = None,
     ):
         super().__init__(parent, label=group_name)
-        self.parent = parent
-        self.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.eval_layout)
+        self.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self._collapsible_pane_changed)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.sizer)
@@ -369,22 +367,23 @@ class CollapsibleWorldListUI(wx.CollapsiblePane):
 
         panel_sizer.Add(WorldList(panel, paths, open_world_callback), 0, wx.EXPAND)
 
-    def eval_layout(self, evt):
-        self.Layout()
-        self.parent.FitInside()
+    def _collapsible_pane_changed(self, evt):
+        wx.PostEvent(
+            self,
+            WidgetSizeChangeEvent(self.GetId()),
+        )
         evt.Skip()
 
 
 class ScrollableWorldsUI(simple.SimpleScrollablePanel):
     # a frame to allow scrolling
     def __init__(self, parent, open_world_callback):
-        super(ScrollableWorldsUI, self).__init__(parent)
+        super().__init__(parent)
         self.open_world_callback = open_world_callback
 
         self.dirs: Dict[str, CollapsibleWorldListUI] = {}
         self.reload()
-
-        self.Layout()
+        self.SetMinSize(wx.Size(-1, 200))
 
     def reload(self):
         for val in self.dirs.values():
@@ -570,7 +569,10 @@ class RecentWorldUI(wx.Panel):
             self, recent_worlds, self._open_world_callback, sort=False
         )
         self._sizer.Add(self._world_list, 1, wx.EXPAND, 5)
-        self.Layout()
+        wx.PostEvent(
+            self,
+            WidgetSizeChangeEvent(self.GetId()),
+        )
         CONFIG.put("amulet_meta", meta)
 
 
@@ -588,7 +590,6 @@ class WorldSelectAndRecentUI(wx.Panel):
         )
         warning_text.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         sizer.Add(warning_text, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, 5)
-        # bar
 
         bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(bottom_sizer, 1, wx.EXPAND)
@@ -615,20 +616,34 @@ class WorldSelectDialog(wx.Dialog):
             title=lang.get("select_world.title"),
             pos=wx.Point(50, 50),
             size=wx.Size(*[int(s * 0.95) for s in parent.GetSize()]),
-            style=wx.CAPTION | wx.CLOSE_BOX | wx.MAXIMIZE_BOX
-            # | wx.MAXIMIZE
-            | wx.SYSTEM_MENU | wx.TAB_TRAVERSAL | wx.CLIP_CHILDREN | wx.RESIZE_BORDER,
+            style=wx.CAPTION
+            | wx.CLOSE_BOX
+            | wx.MAXIMIZE_BOX
+            | wx.SYSTEM_MENU
+            | wx.TAB_TRAVERSAL
+            | wx.CLIP_CHILDREN
+            | wx.RESIZE_BORDER,
         )
         self.Bind(wx.EVT_CLOSE, self._hide_event)
 
         self._open_world_callback = open_world_callback
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
         self.world_select = WorldSelectAndRecentUI(self, self._run_callback)
+        sizer.Add(self.world_select, 1, wx.EXPAND)
+        self.SetSizerAndFit(sizer)
+
+        self.Bind(EVT_WIDGET_SIZE_CHANGED, self._layout)
+
+    def _layout(self, evt: wx.Event) -> None:
+        self.Layout()
+        evt.Skip()
 
     def _run_callback(self, path):
         self._close()
         self._open_world_callback(path)
 
-    def _hide_event(self, evt):
+    def _hide_event(self, evt: wx.Event):
         self._close()
         evt.Skip()
 
