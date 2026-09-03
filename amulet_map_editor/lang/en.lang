@@ -155,6 +155,9 @@ key_config.active_not_editable=The active key group is not editable. Would you l
 program_about.tab_name=About
 program_about.currently_opened_world=Currently Opened World:
 program_about.choose_from_options=Choose from the options on the left what you would like to do.\nYou can switch between these at any time.
+program_about.compact_level=Compact Level
+program_about.compact_level_tooltip=This button removes unused data from the level to reduce its file size.
+program_about.compacting_level=Compacting Level
 
 # Convert
 ## The program used to convert a world
