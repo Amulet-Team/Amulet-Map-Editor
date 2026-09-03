@@ -18,7 +18,7 @@ class WarningDialog(wx.Dialog):
         content.Wrap(750)
         main_sizer.Add(content, 1, wx.ALL | wx.EXPAND, 5)
 
-        button_sizer = wx.StdDialogButtonSizer()
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
         main_sizer.Add(button_sizer, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
         self._do_not_show = wx.CheckBox(
@@ -31,8 +31,6 @@ class WarningDialog(wx.Dialog):
         )
         self._understand_button.SetDefault()
         button_sizer.Add(self._understand_button, 0, 0, 0)
-
-        button_sizer.Realize()
 
         self.SetSizer(main_sizer)
         main_sizer.Fit(self)
