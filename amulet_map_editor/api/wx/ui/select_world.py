@@ -226,7 +226,7 @@ find_world_paths()
 _world_images: Dict[str, Tuple[float, wx.Image]] = {}
 
 
-def _get_world_image(image_path: str) -> wx.Image:
+def get_world_image(image_path: str) -> wx.Image:
     image_data = _world_images.get(image_path)
     mtime = os.stat(image_path).st_mtime
     if image_data is None or image_data[0] != mtime:
@@ -245,7 +245,7 @@ class WorldUI(wx.Panel):
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        img = _get_world_image(world_format.world_image_path)
+        img = get_world_image(world_format.world_image_path)
 
         self.img = ImageWidget(
             self, img, wx.Size(int(128 * img.GetWidth() / img.GetHeight()), 128)
