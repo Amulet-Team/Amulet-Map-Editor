@@ -52,9 +52,9 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
             0,
             wx.ALL | wx.CENTER,
         )
-        self._input.add_object(
-            WorldUI(self._input, self.world.level_wrapper), 0, wx.ALL | wx.CENTER
-        )
+        input_world_ui = WorldUI(self._input, self.world.level_wrapper)
+        input_world_ui.SetMinSize(input_world_ui.GetBestSize())
+        self._input.add_object(input_world_ui, 0, wx.ALL | wx.CENTER)
 
         self._output = SimplePanel(self, wx.HORIZONTAL)
         self.add_object(self._output, 0, wx.ALL | wx.CENTER)
@@ -131,7 +131,9 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
 
         for child in list(self._output.GetChildren())[1:]:
             child.Destroy()
-        self._output.add_object(WorldUI(self._output, out_world_format), 0)
+        output_world = WorldUI(self._output, out_world_format)
+        output_world.SetMinSize(output_world.GetBestSize())
+        self._output.add_object(output_world, 0)
         self._output.Layout()
         self._output.Fit()
         self.Layout()
