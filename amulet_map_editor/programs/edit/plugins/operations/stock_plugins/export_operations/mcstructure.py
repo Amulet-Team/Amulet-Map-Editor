@@ -36,6 +36,21 @@ class ExportMCStructure(SimpleOperationPanel):
 
         self._path = options.get("path", "")
 
+        self._format_version_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self._format_version_label = wx.StaticText(self, label="Format Version:")
+        self._format_version_choice = wx.Choice(self, choices=["1", "2"])
+        self._format_version_choice.SetSelection(1)
+        self._format_version_sizer.Add(
+            self._format_version_label, 0, wx.RIGHT | wx.CENTER, 5
+        )
+        self._format_version_sizer.Add(self._format_version_choice, 1, wx.CENTRE)
+        self._sizer.Add(
+            self._format_version_sizer,
+            0,
+            wx.ALL | wx.EXPAND,
+            5,
+        )
+
         self._version_define = VersionSelect(
             self,
             world.translation_manager,
@@ -43,7 +58,7 @@ class ExportMCStructure(SimpleOperationPanel):
             allowed_platforms=("bedrock",),
             allow_numerical=False,
         )
-        self._sizer.Add(self._version_define, 0, wx.ALL | wx.EXPAND, 5)
+        self._sizer.Add(self._version_define, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5)
 
         self._add_run_button("Export")
         self.Layout()
@@ -92,7 +107,15 @@ class ExportMCStructure(SimpleOperationPanel):
         version = self._version_define.version_number
         if isinstance(path, str):
             wrapper = MCStructureFormatWrapper(path)
-            wrapper.create_and_open("bedrock", version, selection, True)
+            if self._format_version_choice.GetStringSelection() == "1":
+                format_version = 1
+            elif self._format_version_choice.GetStringSelection() == "2":
+                format_version = 2
+            else:
+                raise OperationError("Unrecognised Format Version.")
+            wrapper.create_and_open(
+                "bedrock", version, selection, True, format_version=format_version
+            )
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))
