@@ -58,7 +58,9 @@ class ExportMCStructure(SimpleOperationPanel):
             allowed_platforms=("bedrock",),
             allow_numerical=False,
         )
-        self._sizer.Add(self._version_define, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5)
+        self._sizer.Add(
+            self._version_define, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
+        )
 
         self._add_run_button("Export")
         self.Layout()
