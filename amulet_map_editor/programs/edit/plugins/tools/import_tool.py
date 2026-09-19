@@ -6,6 +6,7 @@ import logging
 import amulet
 from amulet.api.errors import LoaderNoneMatched
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.tool import DefaultBaseToolUI
 from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
@@ -40,14 +41,14 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
     def _open_file(self):
         with wx.FileDialog(
             self.canvas,
-            "Open a Minecraft data file",
+            lang.get("program_3d_edit.import.open_file"),
             wildcard="|".join(
                 [  # TODO: Automatically load these from the FormatWrapper classes.
-                    "All files (*.construction;*.mcstructure;*.schematic .schem)|*.construction;*.mcstructure;*.schematic;*.schem",
-                    "Construction file (*.construction)|*.construction",
-                    "Bedrock mcstructure file (*.mcstructure)|*.mcstructure",
-                    "Legacy Schematic file (*.schematic)|*.schematic",
-                    "Sponge Schematic file (*.schem)|*.schem",
+                    f"{lang.get('program_3d_edit.import.filter_all')}|*.construction;*.mcstructure;*.schematic;*.schem",
+                    f"{lang.get('program_3d_edit.import.filter_construction')}|*.construction",
+                    f"{lang.get('program_3d_edit.import.filter_mcstructure')}|*.mcstructure",
+                    f"{lang.get('program_3d_edit.import.filter_schematic')}|*.schematic",
+                    f"{lang.get('program_3d_edit.import.filter_sponge')}|*.schem",
                 ]
             ),
             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
@@ -64,14 +65,14 @@ class ImportTool(wx.BoxSizer, DefaultBaseToolUI):
         try:
             level = amulet.load_level(pathname)
         except LoaderNoneMatched:
-            msg = f"Could not find a matching loader for {pathname}."
+            msg = lang.get("program_3d_edit.import.no_loader").format(path=pathname)
             log.error(msg)
-            wx.MessageBox(msg)
+            wx.MessageBox(msg, lang.get("shared.message"))
         except Exception as e:
             log.error(f"Could not open {pathname}.", exc_info=True)
             with TracebackDialog(
                 self.canvas,
-                f"Could not open {pathname}.",
+                lang.get("program_3d_edit.import.open_failed").format(path=pathname),
                 str(e),
                 traceback.format_exc(),
             ) as dialog:

@@ -184,17 +184,17 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
             def __init__(self, *args, **kwds):
                 kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
                 wx.Dialog.__init__(self, *args, **kwds)
-                self.SetTitle("Do you want to load the original chunk state?")
+                self.SetTitle(lang.get("program_3d_edit.chunk_tool.load_original_title"))
 
                 sizer_1 = wx.BoxSizer(wx.VERTICAL)
 
                 label_1 = wx.StaticText(
                     self,
                     wx.ID_ANY,
-                    "Do you want to load the original chunk state?\n\n"
-                    'Clicking "Yes" will allow you to undo this operation but the operation will take a while to process.\n\n'
-                    'Clicking "No" will mean this operation cannot be undone.\n\n'
-                    "Changes will not be made to the world until you save so closing before saving will not actually delete the chunks.",
+                    lang.get("program_3d_edit.chunk_tool.load_original_message").format(
+                        yes=lang.get("shared.yes"),
+                        no=lang.get("shared.no"),
+                    ),
                     style=wx.ALIGN_CENTER_HORIZONTAL,
                 )
                 label_1.Wrap(500)
@@ -203,15 +203,17 @@ class ChunkTool(wx.BoxSizer, DefaultBaseToolUI):
                 sizer_2 = wx.StdDialogButtonSizer()
                 sizer_1.Add(sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
-                self.button_YES = wx.Button(self, wx.ID_YES, "")
+                self.button_YES = wx.Button(self, wx.ID_YES, lang.get("shared.yes"))
                 self.button_YES.SetDefault()
                 sizer_2.AddButton(self.button_YES)
 
-                self.button_NO = wx.Button(self, wx.ID_NO, "")
+                self.button_NO = wx.Button(self, wx.ID_NO, lang.get("shared.no"))
                 self.button_NO.Bind(wx.EVT_BUTTON, self._on_no)
                 sizer_2.AddButton(self.button_NO)
 
-                self.button_CANCEL = wx.Button(self, wx.ID_CANCEL, "")
+                self.button_CANCEL = wx.Button(
+                    self, wx.ID_CANCEL, lang.get("shared.cancel")
+                )
                 sizer_2.AddButton(self.button_CANCEL)
 
                 sizer_2.Realize()

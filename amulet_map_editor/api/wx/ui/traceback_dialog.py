@@ -1,6 +1,6 @@
 from typing import Optional
 import wx
-from amulet_map_editor.api import image
+from amulet_map_editor.api import image, lang
 
 
 class TracebackDialog(wx.Dialog):
@@ -47,11 +47,11 @@ class TracebackDialog(wx.Dialog):
         button_sizer = wx.StdDialogButtonSizer()
         main_sizer.Add(button_sizer, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
-        copy_button = wx.Button(self, wx.ID_ANY, "Copy Error")
+        copy_button = wx.Button(self, wx.ID_ANY, lang.get("shared.copy_error"))
         copy_button.Bind(wx.EVT_BUTTON, self._on_copy_error)
         button_sizer.Add(copy_button, 0, 0, 0)
 
-        button_ok = wx.Button(self, wx.ID_OK, "")
+        button_ok = wx.Button(self, wx.ID_OK, lang.get("shared.ok"))
         button_ok.SetDefault()
         button_sizer.AddButton(button_ok)
 

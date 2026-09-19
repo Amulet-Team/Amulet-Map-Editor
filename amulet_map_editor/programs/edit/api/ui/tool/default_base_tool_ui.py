@@ -11,6 +11,7 @@ import os
 import amulet
 from amulet.api.errors import LoaderNoneMatched
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.api.opengl.camera import Projection
 from .base_tool_ui import BaseToolUI
@@ -75,14 +76,18 @@ class DefaultBaseToolUI(BaseToolUI):
                 try:
                     level = amulet.load_level(pathname)
                 except LoaderNoneMatched:
-                    msg = f"Could not find a matching loader for {pathname}."
-                    wx.MessageBox(msg)
+                    msg = lang.get("program_3d_edit.import.no_loader").format(
+                        path=pathname
+                    )
+                    wx.MessageBox(msg, lang.get("shared.message"))
                     log.error(msg)
                 except Exception as e:
                     log.error(f"Could not open {pathname}.", exc_info=True)
                     with TracebackDialog(
                         self.canvas,
-                        f"Could not open {pathname}.",
+                        lang.get("program_3d_edit.import.open_failed").format(
+                            path=pathname
+                        ),
                         str(e),
                         traceback.format_exc(),
                     ) as dialog:

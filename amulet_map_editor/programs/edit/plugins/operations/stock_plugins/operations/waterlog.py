@@ -27,6 +27,7 @@ import logging
 import numpy
 import wx
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.simple import SimpleDialog, SimpleScrollablePanel
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
@@ -123,7 +124,7 @@ class Waterlog(wx.Panel, DefaultOperationUI):
         self._block_define.Bind(EVT_PICK, self._on_pick_block_button)
         self._scroll.sizer.Add(self._block_define, 1, wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
 
-        self._run_button = wx.Button(self, label="Run Operation")
+        self._run_button = wx.Button(self, label=lang.get("shared.run_operation"))
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.EXPAND, 5)
 
@@ -269,6 +270,6 @@ class Waterlog(wx.Panel, DefaultOperationUI):
 
 
 export = {
-    "name": "Waterlog",  # the name of the plugin
+    "name": lang.get("program_3d_edit.operation.waterlog.name"),
     "operation": Waterlog,  # the actual function to call when running the plugin
 }

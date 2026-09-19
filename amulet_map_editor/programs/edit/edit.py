@@ -102,7 +102,7 @@ class EditExtension(wx.Panel, BaseProgram):
     def _display_error(self, msg, tb):
         with TracebackDialog(
             self,
-            "Exception while setting up canvas",
+            lang.get("program_3d_edit.canvas.setup_exception"),
             msg,
             tb,
         ) as dialog:
@@ -197,14 +197,17 @@ class EditExtension(wx.Panel, BaseProgram):
         if unsaved_changes:
             msg = wx.MessageDialog(
                 self,
-                f"""There {
-                'is' if unsaved_changes == 1 else 'are'
-                } {unsaved_changes} unsaved change{
-                's' if unsaved_changes >= 2 else ''
-                } in {
-                self._world.level_wrapper.level_name
-                }. Would you like to save?""",
+                lang.get("program_3d_edit.close.unsaved_changes").format(
+                    count=unsaved_changes,
+                    name=self._world.level_wrapper.level_name,
+                ),
+                lang.get("program_3d_edit.close.unsaved_changes_title"),
                 style=wx.YES_NO | wx.CANCEL | wx.CANCEL_DEFAULT,
+            )
+            msg.SetYesNoCancelLabels(
+                lang.get("shared.yes"),
+                lang.get("shared.no"),
+                lang.get("shared.cancel"),
             )
             log.debug(f"Showing MessageDialog at {msg.GetRect()}")
             response = msg.ShowModal()
@@ -313,7 +316,7 @@ class EditExtension(wx.Panel, BaseProgram):
             fov = self._canvas.camera.perspective_fov
             render_distance = self._canvas.renderer.render_distance
             camera_sensitivity = self._canvas.camera.rotate_speed
-            dialog = SimpleDialog(self, "Options")
+            dialog = SimpleDialog(self, lang.get("program_3d_edit.options_dialog.title"))
 
             sizer = wx.FlexGridSizer(3, 2, 0, 0)
             dialog.sizer.Add(sizer, flag=wx.ALL, border=5)
@@ -324,7 +327,9 @@ class EditExtension(wx.Panel, BaseProgram):
 
             fov_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_fov)
             sizer.Add(
-                wx.StaticText(dialog, label="Field of View"),
+                wx.StaticText(
+                    dialog, label=lang.get("program_3d_edit.options_dialog.field_of_view")
+                ),
                 flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
                 border=5,
             )
@@ -343,7 +348,10 @@ class EditExtension(wx.Panel, BaseProgram):
 
             render_distance_ui.Bind(wx.EVT_SPINCTRL, set_render_distance)
             sizer.Add(
-                wx.StaticText(dialog, label="Render Distance"),
+                wx.StaticText(
+                    dialog,
+                    label=lang.get("program_3d_edit.options_dialog.render_distance"),
+                ),
                 flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
                 border=5,
             )
@@ -362,7 +370,10 @@ class EditExtension(wx.Panel, BaseProgram):
 
             camera_sensitivity_ui.Bind(wx.EVT_SPINCTRLDOUBLE, set_camera_sensitivity)
             sizer.Add(
-                wx.StaticText(dialog, label="Camera Sensitivity"),
+                wx.StaticText(
+                    dialog,
+                    label=lang.get("program_3d_edit.options_dialog.camera_sensitivity"),
+                ),
                 flag=wx.LEFT | wx.TOP | wx.ALIGN_CENTER_VERTICAL | wx.EXPAND,
                 border=5,
             )

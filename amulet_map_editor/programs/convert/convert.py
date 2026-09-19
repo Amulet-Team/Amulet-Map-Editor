@@ -120,7 +120,10 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
 
     def _output_world_callback(self, path):
         if path == self.world.level_path:
-            wx.MessageBox(lang.get("program_convert.input_output_must_different"))
+            wx.MessageBox(
+                lang.get("program_convert.input_output_must_different"),
+                lang.get("shared.message"),
+            )
             return
         try:
             out_world_format = load_format(path)
@@ -144,7 +147,10 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
 
     def _convert_event(self, evt):
         if self.out_world_path is None:
-            wx.MessageBox(lang.get("program_convert.select_before_converting"))
+            wx.MessageBox(
+                lang.get("program_convert.select_before_converting"),
+                lang.get("shared.message"),
+            )
             return
         self.convert_button.Disable()
         self._thread = Thread(target=self._convert_method)
@@ -168,7 +174,7 @@ class ConvertExtension(SimpleScrollablePanel, BaseProgram):
         self._update_loading_bar(0, 100)
         self._thread = None
         self.convert_button.Enable()
-        wx.MessageBox(message)
+        wx.MessageBox(message, lang.get("shared.message"))
 
     def can_close(self):
         if self._thread is not None:

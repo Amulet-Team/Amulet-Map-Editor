@@ -27,6 +27,7 @@ import wx
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension, OperationReturnType
 
+from amulet_map_editor import lang
 from amulet_map_editor.programs.edit.api.operations import (
     SimpleOperationPanel,
     OperationSilentAbort,
@@ -53,12 +54,13 @@ class Clone(SimpleOperationPanel):
     def _operation(
         self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
     ) -> OperationReturnType:
+        yield 0, lang.get("program_3d_edit.operation.copying")
         structure = world.extract_structure(selection, dimension)
         self.canvas.paste(structure, structure.dimensions[0])
         raise OperationSilentAbort
 
 
 export = {
-    "name": "Clone",  # the name of the plugin
+    "name": lang.get("program_3d_edit.operation.clone.name"),
     "operation": Clone,  # the actual function to call when running the plugin
 }

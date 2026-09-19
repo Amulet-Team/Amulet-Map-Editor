@@ -98,6 +98,32 @@ def get_languages() -> List[str]:
     return sorted(langs)
 
 
+def _language_file_path(language_id: str) -> Optional[str]:
+    for d in _lang_dirs:
+        path = os.path.join(d, f"{language_id}.lang")
+        if os.path.isfile(path):
+            return path
+    return None
+
+
+def get_language_display_name(language_id: str) -> str:
+    """Native display name for a language code, or the code if unnamed."""
+    path = _language_file_path(language_id)
+    if path:
+        name = _load_lang_file(path).get("language_select.name")
+        if name:
+            return name
+    return language_id
+
+
+def get_language_choices() -> List[Tuple[str, str]]:
+    """Return (language_code, display_name) pairs sorted by display name."""
+    return sorted(
+        ((code, get_language_display_name(code)) for code in get_languages()),
+        key=lambda item: item[1].casefold(),
+    )
+
+
 def _load_lang_file(lang_path: str) -> Dict[str, str]:
     """Loads a language file and returns the result as a dictionary.
     Will return an empty dictionary if the path does not exist.

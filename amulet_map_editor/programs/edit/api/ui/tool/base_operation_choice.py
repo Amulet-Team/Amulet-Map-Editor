@@ -7,6 +7,7 @@ import os
 import sys
 import subprocess
 
+from amulet_map_editor import lang
 from amulet_map_editor.api import image
 from amulet_map_editor.api.wx.ui.simple import SimpleChoiceAny
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
@@ -69,7 +70,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
         self._reload_operation = ImageButton(
             self._settings_panel, image.REFRESH_ICON.image(), wx.Size(20, 20)
         )
-        self._reload_operation.SetToolTip("Reload Operations")
+        self._reload_operation.SetToolTip(lang.get("program_3d_edit.operation.reload"))
         self._settings_sizer.Add(self._reload_operation, flag=wx.EXPAND)
         self._reload_operation.Bind(wx.EVT_BUTTON, self._on_reload_operations)
 
@@ -78,7 +79,9 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
             self._open_folder = ImageButton(
                 self._settings_panel, image.TABLERICONS.folder.image(), wx.Size(20, 20)
             )
-            self._open_folder.SetToolTip("Open Plugin Folder")
+            self._open_folder.SetToolTip(
+                lang.get("program_3d_edit.operation.open_plugin_folder")
+            )
             self._settings_sizer.Add(self._open_folder, flag=wx.EXPAND)
             self._open_folder.Bind(wx.EVT_BUTTON, self._on_open_folder)
 
@@ -142,7 +145,7 @@ class BaseOperationChoiceToolUI(wx.BoxSizer, BaseToolUI):
                     log.error("Error loading Operation UI.", exc_info=True)
                     with TracebackDialog(
                         self.canvas,
-                        "Error loading Operation UI.",
+                        lang.get("program_3d_edit.operation.load_ui_error"),
                         str(e),
                         traceback.format_exc(),
                     ) as dialog:

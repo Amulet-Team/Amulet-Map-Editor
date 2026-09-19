@@ -6,6 +6,8 @@ import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 from typing import Iterable, Union, Any, List, Optional, Sequence, Dict, Tuple
 
+from amulet_map_editor import lang
+
 log = logging.getLogger(__name__)
 
 
@@ -171,4 +173,10 @@ class SimpleDialog(wx.Dialog):
         sizer.Add(self.bottom_sizer, 0, wx.EXPAND)
         self.bottom_sizer.AddStretchSpacer()
         button_sizer = self.CreateButtonSizer(wx.OK | wx.CANCEL)
+        ok_button = self.FindWindowById(wx.ID_OK)
+        if ok_button is not None:
+            ok_button.SetLabel(lang.get("shared.ok"))
+        cancel_button = self.FindWindowById(wx.ID_CANCEL)
+        if cancel_button is not None:
+            cancel_button.SetLabel(lang.get("shared.cancel"))
         self.bottom_sizer.Add(button_sizer, flag=wx.ALL, border=5)

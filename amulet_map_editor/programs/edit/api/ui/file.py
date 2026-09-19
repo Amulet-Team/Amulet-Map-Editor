@@ -295,11 +295,11 @@ class SpeedSelectDialog(wx.Dialog):
         button_sizer = wx.StdDialogButtonSizer()
         sizer.Add(button_sizer, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
-        self._button_ok = wx.Button(self, wx.ID_OK, "")
+        self._button_ok = wx.Button(self, wx.ID_OK, lang.get("shared.ok"))
         self._button_ok.SetDefault()
         button_sizer.AddButton(self._button_ok)
 
-        self._button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+        self._button_cancel = wx.Button(self, wx.ID_CANCEL, lang.get("shared.cancel"))
         button_sizer.AddButton(self._button_cancel)
 
         button_sizer.Realize()

@@ -108,6 +108,27 @@ class LevelGroup(
         for level in self._objects:
             level.camera_rotation = yaw, pitch
 
+    @staticmethod
+    def origin_translation(
+        level: BaseLevel, dimension: Dimension, origin: str = "center"
+    ) -> LocationType:
+        """World translation that puts the chosen origin at (0, 0, 0)."""
+        bounds = level.bounds(dimension)
+        if origin == "min":
+            translation = -bounds.min_array
+        else:
+            translation = -(bounds.min_array + bounds.max_array) // 2
+        return tuple(int(v) for v in translation.astype(int).tolist())
+
+    def set_active_world_translation(self, translation: LocationType):
+        """Move the active level's local origin. Recomputes the matrix."""
+        if self._active_level_index is None:
+            return
+        self._world_translation[self._active_level_index] = tuple(
+            int(v) for v in translation
+        )
+        self.active_transform = self._transforms[self._active_level_index]
+
     def append(
         self,
         level: BaseLevel,
@@ -115,6 +136,7 @@ class LevelGroup(
         location: LocationType,
         scale: ScaleType,
         rotation: RotationType,
+        origin: str = "center",
     ):
         """Append a level to the list and activate it."""
         # TODO: update this to support multiple levels
@@ -133,15 +155,7 @@ class LevelGroup(
         self._transforms.append((location, scale, rotation))
         self._is_mirrored.append(bool(sum(1 for s in scale if s < 0) % 2))
         self._world_translation.append(
-            (
-                -(
-                    (
-                        level.bounds(dimension).min_array
-                        + level.bounds(dimension).max_array
-                    )
-                    // 2
-                ).astype(int)
-            ).tolist()
+            list(self.origin_translation(level, dimension, origin))
         )
         # the matrix of the transform applied by the user
         self._transformation_matrices.append(

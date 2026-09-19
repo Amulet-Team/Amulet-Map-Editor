@@ -170,7 +170,10 @@ class AmuletLevelNotebook(aui.AuiNotebook):
                 world = WorldPageUI(self, path)
             except LoaderNoneMatched as e:
                 log.error(f"Could not find a loader for this world.\n{e}")
-                wx.MessageBox(f"{lang.get('select_world.no_loader_found')}\n{e}")
+                wx.MessageBox(
+                    f"{lang.get('select_world.no_loader_found')}\n{e}",
+                    lang.get("shared.message"),
+                )
             except Exception as e:
                 log.error(lang.get("select_world.loading_world_failed"), exc_info=True)
                 with TracebackDialog(
@@ -262,7 +265,9 @@ class AmuletLevelNotebook(aui.AuiNotebook):
         for path in list(self._open_worlds.keys()):
             self.close_level(path)
         if self.GetPageCount() > 1:
-            wx.MessageBox(lang.get("app.world_still_used"))
+            wx.MessageBox(
+                lang.get("app.world_still_used"), lang.get("shared.message")
+            )
         else:
             evt.Skip()
 

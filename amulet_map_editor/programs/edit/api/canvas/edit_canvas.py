@@ -33,7 +33,7 @@ from amulet.api.data_types import OperationReturnType, OperationYieldType, Dimen
 from amulet.api.structure import structure_cache
 from amulet.api.level import BaseLevel
 
-from amulet_map_editor import CONFIG
+from amulet_map_editor import CONFIG, lang
 from amulet_map_editor import close_level
 from amulet_map_editor.api.wx.ui.traceback_dialog import TracebackDialog
 from amulet_map_editor.programs.edit.api.ui.goto import show_goto
@@ -222,9 +222,11 @@ class EditCanvas(BaseEditCanvas):
         self,
         operation: OperationType,
         title="Amulet",
-        msg="Running Operation",
+        msg=None,
         throw_exceptions=False,
     ) -> Any:
+        if msg is None:
+            msg = lang.get("program_3d_edit.operation.running")
         try:
             out = self._run_operation(operation, title, msg, True)
         except BaseException as e:
@@ -233,7 +235,7 @@ class EditCanvas(BaseEditCanvas):
         else:
             # If there were no errors create an undo point
             def create_undo():
-                yield 0, "Creating Undo Point"
+                yield 0, lang.get("program_3d_edit.operation.creating_undo")
                 yield from self.create_undo_point_iter()
 
             self._run_operation(create_undo, title, msg, False)
@@ -294,9 +296,14 @@ class EditCanvas(BaseEditCanvas):
                 if isinstance(op.error, BaseLoudException):
                     msg = str(op.error)
                     if isinstance(op.error, OperationError):
-                        msg = f"Error running operation: {msg}"
+                        msg = lang.get("program_3d_edit.operation.error").format(
+                            msg=msg
+                        )
                     log.info(msg)
-                    with wx.MessageDialog(self, msg, style=wx.OK) as dialog:
+                    with wx.MessageDialog(
+                        self, msg, lang.get("shared.message"), style=wx.OK
+                    ) as dialog:
+                        dialog.SetOKLabel(lang.get("shared.ok"))
                         log.debug(f"Showing operation message at {dialog.GetRect()}")
                         dialog.ShowModal()
                 elif isinstance(op.error, BaseSilentException):
@@ -310,7 +317,7 @@ class EditCanvas(BaseEditCanvas):
                     log.error(tb)
                     with TracebackDialog(
                         self,
-                        "Exception while running operation",
+                        lang.get("program_3d_edit.operation.exception"),
                         str(op.error),
                         tb,
                     ) as dialog:
@@ -348,12 +355,14 @@ class EditCanvas(BaseEditCanvas):
 
     def cut(self):
         self.run_operation(
-            lambda: cut(self.world, self.dimension, self.selection.selection_group)
+            lambda: cut(self.world, self.dimension, self.selection.selection_group),
+            msg=lang.get("program_3d_edit.operation.cutting"),
         )
 
     def copy(self):
         self.run_operation(
-            lambda: copy(self.world, self.dimension, self.selection.selection_group)
+            lambda: copy(self.world, self.dimension, self.selection.selection_group),
+            msg=lang.get("program_3d_edit.operation.copying"),
         )
 
     def paste(self, structure: BaseLevel, dimension: Dimension):
@@ -374,7 +383,10 @@ class EditCanvas(BaseEditCanvas):
         if structure_cache:
             self.paste(*structure_cache.get_structure())
         else:
-            wx.MessageBox("A structure needs to be copied before one can be pasted.")
+            wx.MessageBox(
+                lang.get("program_3d_edit.paste_tool.copy_required"),
+                lang.get("shared.message"),
+            )
 
     def delete(self):
         self.run_operation(
@@ -420,7 +432,7 @@ class EditCanvas(BaseEditCanvas):
 
     def save(self):
         def pre_save() -> Generator[OperationYieldType, None, Any]:
-            yield 0, "Running Pre-Save Operations."
+            yield 0, lang.get("program_3d_edit.save.pre_save")
             pre_save_op = self.world.pre_save_operation()
             try:
                 while True:
@@ -432,14 +444,22 @@ class EditCanvas(BaseEditCanvas):
                     self.world.restore_last_undo_point()
 
         def save() -> Generator[OperationYieldType, None, Any]:
-            yield 0, "Saving Chunks."
+            yield 0, lang.get("program_3d_edit.save.saving_chunks")
             for chunk_index, chunk_count in self.world.save_iter():
                 yield chunk_index / chunk_count
 
         self._run_operation(
-            pre_save, "Running Pre-Save Operations.", "Please wait.", False
+            pre_save,
+            lang.get("program_3d_edit.save.pre_save"),
+            lang.get("shared.please_wait"),
+            False,
         )
-        self._run_operation(save, "Saving world.", "Please wait.", False)
+        self._run_operation(
+            save,
+            lang.get("program_3d_edit.save.saving_world"),
+            lang.get("shared.please_wait"),
+            False,
+        )
         wx.PostEvent(self, SaveEvent())
 
     if sys.platform == "linux" and os.environ.get("XDG_SESSION_TYPE") == "wayland":

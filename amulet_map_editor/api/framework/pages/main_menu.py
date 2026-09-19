@@ -208,20 +208,27 @@ class LangSelectDialog(wx.Dialog):
         )
         sizer_1.Add(self.hyperlink_1, 0, wx.ALIGN_CENTER)
 
-        self._lang_list_box = wx.ListBox(self, choices=lang.get_languages())
-        self._lang_list_box.SetSelection(
-            self._lang_list_box.FindString(lang.get_language())
+        self._languages = lang.get_language_choices()
+        self._lang_list_box = wx.ListBox(
+            self, choices=[name for _, name in self._languages]
         )
+        current = lang.get_language()
+        selection = next(
+            (i for i, (code, _) in enumerate(self._languages) if code == current),
+            wx.NOT_FOUND,
+        )
+        if selection != wx.NOT_FOUND:
+            self._lang_list_box.SetSelection(selection)
         sizer_1.Add(self._lang_list_box, 1, wx.EXPAND, 0)
 
         sizer_2 = wx.StdDialogButtonSizer()
         sizer_1.Add(sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
-        self._button_ok = wx.Button(self, wx.ID_OK, "")
+        self._button_ok = wx.Button(self, wx.ID_OK, lang.get("shared.ok"))
         self._button_ok.SetDefault()
         sizer_2.AddButton(self._button_ok)
 
-        self._button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+        self._button_cancel = wx.Button(self, wx.ID_CANCEL, lang.get("shared.cancel"))
         sizer_2.AddButton(self._button_cancel)
 
         sizer_2.Realize()
@@ -235,4 +242,7 @@ class LangSelectDialog(wx.Dialog):
         self.Layout()
 
     def get_language(self):
-        return self._lang_list_box.GetStringSelection()
+        selection = self._lang_list_box.GetSelection()
+        if selection == wx.NOT_FOUND:
+            return lang.get_language()
+        return self._languages[selection][0]

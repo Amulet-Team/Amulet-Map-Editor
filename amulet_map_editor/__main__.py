@@ -175,6 +175,9 @@ def _app_main() -> int:
         log.debug("Importing PyMCTranslate and amulet")
         import PyMCTranslate
         import amulet
+        from amulet_map_editor.compat import apply_java_26_3_compat
+
+        apply_java_26_3_compat()
 
         log.debug("Importing minecraft_model_reader")
         import minecraft_model_reader

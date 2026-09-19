@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from amulet.api.structure import structure_cache
 from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.api.selection import SelectionGroup
+from amulet_map_editor import lang
 from amulet_map_editor.programs.edit.plugins.operations.stock_plugins.internal_operations.delete import (
     delete,
 )
@@ -16,6 +17,7 @@ def cut(
     world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
 ) -> OperationReturnType:
     if selection:
+        yield 0, lang.get("program_3d_edit.operation.cutting")
         structure = world.extract_structure(selection, dimension)
         structure_cache.add_structure(structure, structure.dimensions[0])
         yield from delete(
@@ -25,5 +27,5 @@ def cut(
         )
     else:
         raise OperationError(
-            "At least one selection is required for the copy operation."
+            lang.get("program_3d_edit.operation.cut_no_selection")
         )

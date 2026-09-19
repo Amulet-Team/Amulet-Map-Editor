@@ -9,6 +9,7 @@ from amulet.api.errors import ChunkLoadError
 from amulet.api.data_types import Dimension, OperationReturnType
 from amulet.level.formats.mcstructure import MCStructureFormatWrapper
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.version_select import VersionSelect
 from amulet_map_editor.programs.edit.api.operations import (
     SimpleOperationPanel,
@@ -37,7 +38,9 @@ class ExportMCStructure(SimpleOperationPanel):
         self._path = options.get("path", "")
 
         self._format_version_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self._format_version_label = wx.StaticText(self, label="Format Version:")
+        self._format_version_label = wx.StaticText(
+            self, label=lang.get("program_3d_edit.export.mcstructure.format_version")
+        )
         self._format_version_choice = wx.Choice(self, choices=["1", "2"])
         self._format_version_choice.SetSelection(1)
         self._format_version_sizer.Add(
@@ -62,7 +65,7 @@ class ExportMCStructure(SimpleOperationPanel):
             self._version_define, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
         )
 
-        self._add_run_button("Export")
+        self._add_run_button(lang.get("shared.export"))
         self.Layout()
 
     def disable(self):
@@ -83,7 +86,7 @@ class ExportMCStructure(SimpleOperationPanel):
             fdir = ""
         with wx.FileDialog(
             self,
-            "Select Save Location",
+            lang.get("program_3d_edit.export.save_location"),
             defaultDir=fdir,
             defaultFile=fname,
             wildcard="mcstructure file (*.mcstructure)|*.mcstructure",
@@ -99,11 +102,9 @@ class ExportMCStructure(SimpleOperationPanel):
         self, world: "BaseLevel", dimension: Dimension, selection: SelectionGroup
     ) -> OperationReturnType:
         if len(selection.selection_boxes) == 0:
-            raise OperationError("No selection was given to export.")
+            raise OperationError(lang.get("program_3d_edit.export.no_selection"))
         elif len(selection.selection_boxes) != 1:
-            raise OperationError(
-                "The mcstructure format only supports a single selection box."
-            )
+            raise OperationError(lang.get("program_3d_edit.export.single_box_only"))
 
         path = self._path
         version = self._version_define.version_number
@@ -114,14 +115,18 @@ class ExportMCStructure(SimpleOperationPanel):
             elif self._format_version_choice.GetStringSelection() == "2":
                 format_version = 2
             else:
-                raise OperationError("Unrecognised Format Version.")
+                raise OperationError(
+                    lang.get("program_3d_edit.export.unrecognised_format_version")
+                )
             wrapper.create_and_open(
                 "bedrock", version, selection, True, format_version=format_version
             )
             wrapper.translation_manager = world.translation_manager
             wrapper_dimension = wrapper.dimensions[0]
             chunk_count = len(list(selection.chunk_locations()))
-            yield 0, f"Exporting {os.path.basename(path)}"
+            yield 0, lang.get("program_3d_edit.export.progress").format(
+                name=os.path.basename(path)
+            )
             for chunk_index, (cx, cz) in enumerate(selection.chunk_locations()):
                 try:
                     chunk = world.get_chunk(cx, cz, dimension)
@@ -133,11 +138,11 @@ class ExportMCStructure(SimpleOperationPanel):
             wrapper.close()
         else:
             raise OperationError(
-                "Please specify a save location and version in the options before running."
+                lang.get("program_3d_edit.export.missing_path_version")
             )
 
 
 export = {
-    "name": "Export Bedrock .mcstructure",  # the name of the plugin
+    "name": lang.get("program_3d_edit.export.mcstructure.name"),
     "operation": ExportMCStructure,  # the UI class to display
 }

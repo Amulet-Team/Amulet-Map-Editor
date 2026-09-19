@@ -55,6 +55,8 @@ meta.amulet=Amulet
 
 # Shared strings
 shared.check_console=Check the console for more details.
+shared.run_operation=Run Operation
+shared.export=Export
 
 # App
 app.world_still_used=A world is still being used. Please close it first
@@ -99,6 +101,7 @@ main_menu.licence_title=Third Party Licenses
 language_select.title=Language Select
 language_select.help=Select the language to use in Amulet from the list below.
 language_select.contribute=If you want to fix or add translations click here.
+language_select.name=English
 
 # Support Dialog
 licence_dialog.title=Amulet
@@ -225,6 +228,20 @@ program_3d_edit.menu_bar.options.controls=Controls...
 program_3d_edit.menu_bar.options.options=Options...
 program_3d_edit.menu_bar.help.user_guide=User Guide (online)
 
+## Options dialog
+program_3d_edit.options_dialog.title=Options
+program_3d_edit.options_dialog.field_of_view=Field of View
+program_3d_edit.options_dialog.render_distance=Render Distance
+program_3d_edit.options_dialog.camera_sensitivity=Camera Sensitivity
+
+## Tools
+program_3d_edit.tool.select=Select
+program_3d_edit.tool.paste=Paste
+program_3d_edit.tool.operation=Operation
+program_3d_edit.tool.import=Import
+program_3d_edit.tool.export=Export
+program_3d_edit.tool.chunk=Chunk
+
 ## Select tool
 program_3d_edit.select_tool.delete_button=Delete Blocks
 program_3d_edit.select_tool.delete_button_tooltip=Delete the blocks in the selected area.
@@ -298,7 +315,7 @@ program_3d_edit.paste_tool.paste_not_existing=Paste in non-existent chunks
 program_3d_edit.paste_tool.confirm_label=Confirm
 program_3d_edit.paste_tool.confirm_tooltip=Click to paste the structure into the world and the specified location, rotation and scale.
 program_3d_edit.paste_tool.zero_scale_message=One of the scale values had a value of zero so nothing was copied.
-
+program_3d_edit.paste_tool.copy_required=A structure needs to be copied before one can be pasted.
 ## Chunk tool
 program_3d_edit.chunk_tool.min_y=Min Y
 program_3d_edit.chunk_tool.min_y_tooltip=The minimum y coordinate to draw in the top down view. This can be used to view a slice of the world and help view dimensions like the nether and caves.
@@ -336,3 +353,78 @@ program_3d_edit.file_ui.undo_tooltip=Undo
 program_3d_edit.file_ui.redo_tooltip=Redo
 program_3d_edit.file_ui.save_tooltip=Save changes
 program_3d_edit.file_ui.close_tooltip=Close world
+
+## Export
+program_3d_edit.export.mcstructure.format_version=Format Version:
+program_3d_edit.export.sponge_schematic.schematic_version=Schematic Version:
+program_3d_edit.version_select.platform=Platform:
+program_3d_edit.version_select.version=Version:
+program_3d_edit.version_select.format=Format:
+program_3d_edit.version_select.format_native=native
+program_3d_edit.version_select.format_blockstate=blockstate
+program_3d_edit.export.construction.name=Export Construction
+program_3d_edit.export.schematic.name=Export Schematic (legacy)
+program_3d_edit.export.sponge_schematic.name=Export Sponge Schematic
+program_3d_edit.export.mcstructure.name=Export Bedrock .mcstructure
+program_3d_edit.paste_tool.origin_center=Center
+program_3d_edit.paste_tool.origin_corner=Corner
+program_3d_edit.paste_tool.origin_tooltip=Where the mouse and coordinates attach to the structure. Center is the middle. Corner is the minimum x, y and z.
+shared.ok=OK
+shared.cancel=Cancel
+program_3d_edit.operation.running=Running Operation
+program_3d_edit.operation.creating_undo=Creating Undo Point
+program_3d_edit.export.save_location=Select Save Location
+program_3d_edit.export.progress=Exporting {name}
+program_3d_edit.export.missing_path_version=Please specify a save location and version in the options before running.
+program_3d_edit.export.missing_path_platform=Please specify a save location and platform in the options before running.
+program_3d_edit.export.no_selection=No selection was given to export.
+program_3d_edit.export.single_box_only=This format only supports a single selection box.
+program_3d_edit.operation.clone.name=Clone
+program_3d_edit.operation.fill.name=Fill
+program_3d_edit.operation.replace.name=Replace
+program_3d_edit.operation.set_biome.name=Set Biome
+program_3d_edit.operation.waterlog.name=Waterlog
+program_3d_edit.import.open_file=Open a Minecraft data file
+program_3d_edit.import.filter_all=All files (*.construction;*.mcstructure;*.schematic;*.schem)
+program_3d_edit.import.filter_construction=Construction file (*.construction)
+program_3d_edit.import.filter_mcstructure=Bedrock mcstructure file (*.mcstructure)
+program_3d_edit.import.filter_schematic=Legacy Schematic file (*.schematic)
+program_3d_edit.import.filter_sponge=Sponge Schematic file (*.schem)
+program_3d_edit.import.no_loader=Could not find a matching loader for {path}.
+program_3d_edit.import.open_failed=Could not open {path}.
+program_3d_edit.operation.copying=Copying
+program_3d_edit.operation.cutting=Cutting
+program_3d_edit.operation.pasting=Pasting
+program_3d_edit.operation.copy_no_selection=At least one selection is required for the copy operation.
+program_3d_edit.operation.cut_no_selection=At least one selection is required for the cut operation.
+shared.yes=Yes
+shared.no=No
+shared.info=Info
+shared.message=Message
+shared.please_wait=Please wait.
+shared.copy_error=Copy Error
+program_3d_edit.save.pre_save=Running Pre-Save Operations.
+program_3d_edit.save.saving_chunks=Saving Chunks.
+program_3d_edit.save.saving_world=Saving world.
+program_3d_edit.close.unsaved_changes=There are {count} unsaved changes in {name}. Would you like to save?
+program_3d_edit.close.unsaved_changes_title=Unsaved Changes
+program_3d_edit.close.closing_world=Closing World
+program_3d_edit.close.closing_wait=Please be patient. This may take a little while.
+program_3d_edit.operation.error=Error running operation: {msg}
+program_3d_edit.operation.exception=Exception while running operation
+program_3d_edit.canvas.setup_exception=Exception while setting up canvas
+program_3d_edit.operation.reload=Reload Operations
+program_3d_edit.operation.open_plugin_folder=Open Plugin Folder
+program_3d_edit.operation.load_ui_error=Error loading Operation UI.
+program_3d_edit.export.unrecognised_format_version=Unrecognised Format Version.
+program_3d_edit.export.unrecognised_schematic_version=Unrecognised Schematic Version.
+program_3d_edit.chunk_tool.load_original_title=Do you want to load the original chunk state?
+program_3d_edit.chunk_tool.load_original_message=Do you want to load the original chunk state?\n\nClicking "{yes}" will allow you to undo this operation but the operation will take a while to process.\n\nClicking "{no}" will mean this operation cannot be undone.\n\nChanges will not be made to the world until you save so closing before saving will not actually delete the chunks.
+select_world.clear_recent=Clear All
+select_world.remove_recent=Remove from list
+select_world.sort_by=Sort
+select_world.sort_last_played=Last edited
+select_world.sort_created=Created
+select_world.sort_version=Version
+select_world.sort_asc=Ascending
+select_world.sort_desc=Descending

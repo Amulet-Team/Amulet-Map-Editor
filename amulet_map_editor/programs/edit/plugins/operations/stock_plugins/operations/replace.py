@@ -27,6 +27,7 @@ import numpy
 
 from amulet.api.block import Block
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
@@ -85,7 +86,7 @@ class Replace(wx.Panel, DefaultOperationUI):
             EVT_PICK, lambda evt: self._on_pick_block_button(2)
         )
 
-        self._run_button = wx.Button(self, label="Run Operation")
+        self._run_button = wx.Button(self, label=lang.get("shared.run_operation"))
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.EXPAND, 5)
 
@@ -225,6 +226,6 @@ class Replace(wx.Panel, DefaultOperationUI):
 
 
 export = {
-    "name": "Replace",  # the name of the plugin
+    "name": lang.get("program_3d_edit.operation.replace.name"),
     "operation": Replace,  # the actual function to call when running the plugin
 }

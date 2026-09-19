@@ -24,6 +24,7 @@ SOFTWARE.
 from typing import TYPE_CHECKING, Tuple
 import wx
 
+from amulet_map_editor import lang
 from amulet_map_editor.api.wx.ui.base_select import EVT_PICK
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
@@ -62,7 +63,7 @@ class Fill(wx.Panel, DefaultOperationUI):
         self._block_define.Bind(EVT_PICK, self._on_pick_block_button)
         self._scroll.sizer.Add(self._block_define, 1, wx.ALL | wx.EXPAND, 5)
 
-        self._run_button = wx.Button(self, label="Run Operation")
+        self._run_button = wx.Button(self, label=lang.get("shared.run_operation"))
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(
             self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5
@@ -146,6 +147,6 @@ class Fill(wx.Panel, DefaultOperationUI):
 
 
 export = {
-    "name": "Fill",  # the name of the plugin
+    "name": lang.get("program_3d_edit.operation.fill.name"),
     "operation": Fill,  # the actual function to call when running the plugin
 }
