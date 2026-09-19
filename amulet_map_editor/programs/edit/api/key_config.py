@@ -14,6 +14,7 @@ from amulet_map_editor.api.wx.util.key_config import (
     Alt,
     Tab,
 )
+from collections import OrderedDict
 
 ACT_MOVE_UP = "ACT_MOVE_UP"
 ACT_MOVE_DOWN = "ACT_MOVE_DOWN"
@@ -146,3 +147,33 @@ PresetKeybinds: KeybindContainer = {
 
 DefaultKeybindGroupId: KeybindGroupIdType = "right"
 DefaultKeys: KeybindGroup = PresetKeybinds[DefaultKeybindGroupId]
+# Action groupings for organized display
+ActionGroups = OrderedDict([
+    ("common", [
+        ACT_MOVE_UP,
+        ACT_MOVE_DOWN,
+        ACT_MOVE_FORWARDS,
+        ACT_MOVE_BACKWARDS,
+        ACT_MOVE_LEFT,
+        ACT_MOVE_RIGHT,
+        ACT_CHANGE_PROJECTION,
+        ACT_CHANGE_MOUSE_MODE,
+    ]),
+    ("2d", [
+        ACT_ZOOM_IN,
+        ACT_ZOOM_OUT,
+    ]),
+    ("3d", [
+        ACT_INCR_SPEED,
+        ACT_DECR_SPEED,
+    ]),
+    ("select_mode", [
+        ACT_BOX_CLICK,
+        ACT_BOX_CLICK_ADD,
+        ACT_INCR_SELECT_DISTANCE,
+        ACT_DECR_SELECT_DISTANCE,
+        ACT_DESELECT_ALL_BOXES,
+        ACT_DESELECT_BOX,
+        ACT_INSPECT_BLOCK,
+    ]),
+])
