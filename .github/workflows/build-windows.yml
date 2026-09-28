@@ -34,17 +34,15 @@ jobs:
       with:
         arch: arm64
 
-    - name: Disable builtin isnan/inf/finite. This can be removed for MSVC 19.52 numpy#32561
-      if: matrix.cfg.os == 'windows-11-arm'
-      run: echo "CFLAGS=-D__builtin_isnan=isnan -D__builtin_isinf=isinf -D__builtin_isfinite=isfinite" >> "$GITHUB_ENV"
-
     - name: Install dependencies
       run: |
         pip install twine pyinstaller~=6.18 build
 
     - name: Build Wheels
+      shell: pwsh
       env:
         BDISTWHEELFREEZELIBS: 'true'
+        CFLAGS: ${{ matrix.cfg.os == 'windows-11-arm' && '-D__builtin_isnan=isnan -D__builtin_isinf=isinf -D__builtin_isfinite=isfinite' || '' }}
       run: |
         python -m build
         
