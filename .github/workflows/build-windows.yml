@@ -29,13 +29,13 @@ jobs:
         architecture: ${{ matrix.cfg.architecture }}
 
     - name: Setup MSVC
-      if: runner.arch == 'ARM64'
+      if: matrix.cfg.os == 'windows-11-arm'
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: arm64
 
     - name: Disable builtin isnan/inf/finite. This can be removed for MSVC 19.52 numpy#32561
-      if: runner.arch == 'ARM64'
+      if: matrix.cfg.os == 'windows-11-arm'
       run: echo "CFLAGS=-D__builtin_isnan=isnan -D__builtin_isinf=isinf -D__builtin_isfinite=isfinite" >> "$GITHUB_ENV"
 
     - name: Install dependencies
