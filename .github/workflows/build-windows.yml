@@ -39,9 +39,9 @@ jobs:
         pip install twine pyinstaller~=6.18 build
 
     - name: Build Wheels
-      shell: pwsh
+      env:
+        BDISTWHEELFREEZELIBS: 'true'
       run: |
-        $env:BDISTWHEELFREEZELIBS = "true"
         python -m build
         
     - name: Install Wheels
