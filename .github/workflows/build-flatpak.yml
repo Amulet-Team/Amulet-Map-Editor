@@ -31,13 +31,13 @@ jobs:
 
     - name: Build Wheels
       run: |
+        sudo apt-get update
         sudo apt-get install libgtk-3-dev
         export BDISTWHEELFREEZELIBS=true
         pip wheel --wheel-dir installer/wheels https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp313-cp313-linux_x86_64.whl .
 
     - name: Build Flatpak
       run: |
-        sudo apt-get update
         sudo apt-get install -y flatpak
         sudo apt-get install -y flatpak-builder        
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
