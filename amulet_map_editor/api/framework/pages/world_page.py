@@ -135,8 +135,8 @@ class WorldPageUI(wx.Notebook, BasePageUI):
             # if not closed yet open a dialog to warn the user.
             # We do this on a delay so that it does not flick up for a split second
             dialog = wx.ProgressDialog(
-                "Closing World",
-                "Please be patient. This may take a little while.",
+                lang.get("program_3d_edit.close.closing_world"),
+                lang.get("program_3d_edit.close.closing_wait"),
                 maximum=100,
                 style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_AUTO_HIDE,
             )

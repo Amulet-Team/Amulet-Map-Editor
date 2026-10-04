@@ -11,6 +11,7 @@ from amulet_map_editor.programs.edit.api.events import (
     EVT_TOOL_CHANGE,
 )
 
+from amulet_map_editor import lang
 from amulet_map_editor.programs.edit.plugins.tools import (
     ImportTool,
     ExportTool,
@@ -67,13 +68,14 @@ class ToolManagerSizer(wx.BoxSizer, EditCanvasContainer):
         )
         tool = tool_cls(self.canvas)
         tool_name = tool.name
+        button_label = lang.get(f"program_3d_edit.tool.{tool_name.lower()}")
 
-        button = wx.Button(self._tool_panel, label=tool_name)
+        button = wx.Button(self._tool_panel, label=button_label)
         button.Bind(
             wx.EVT_BUTTON,
             lambda evt: wx.PostEvent(self.canvas, ToolChangeEvent(tool=tool_name)),
         )
-        self._tool_sizer.Add(button)
+        self._tool_sizer.Add(button, 0, wx.LEFT | wx.RIGHT, 2)
         self._tool_sizer.Fit(self._tool_panel)
         self._tool_panel.Layout()
 

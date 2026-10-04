@@ -10,7 +10,7 @@ from OpenGL.GL import (
     GL_DEPTH_BUFFER_BIT,
 )
 
-from amulet.api.data_types import PointCoordinates
+from amulet.api.data_types import Dimension, PointCoordinates
 from amulet.api.level import BaseLevel
 from amulet.api.level.base_level.clone import PasteRule
 from amulet.api.structure import structure_cache
@@ -23,12 +23,13 @@ from amulet.utils.matrix import (
 )
 
 from amulet_map_editor import lang
-from amulet_map_editor.api import image
+from amulet_map_editor.api import config, image
 from amulet_map_editor.api.wx.util.validators import int_validator, float_validator
 from amulet_map_editor.api.wx.ui.simple import SimpleScrollablePanel
 from amulet_map_editor.api.wx.ui.image_widget import ImageButton
 from amulet_map_editor.api.opengl.camera import Projection, Camera
 from amulet_map_editor.api.opengl.mesh.level import RenderLevel
+from amulet_map_editor.api.opengl.mesh.level_group import LevelGroup
 from amulet_map_editor.programs.edit.api.key_config import (
     KeybindGroup,
 )
@@ -323,6 +324,25 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
             border=5,
         )
 
+        self._origin_choice = wx.Choice(
+            self._paste_panel,
+            choices=[
+                lang.get("program_3d_edit.paste_tool.origin_center"),
+                lang.get("program_3d_edit.paste_tool.origin_corner"),
+            ],
+        )
+        origin = config.get("edit_paste", {}).get("origin", "center")
+        self._origin_choice.SetSelection(1 if origin == "min" else 0)
+        self._origin_choice.SetToolTip(
+            lang.get("program_3d_edit.paste_tool.origin_tooltip")
+        )
+        self._origin_choice.Bind(wx.EVT_CHOICE, self._on_origin_change)
+        self._paste_sizer.Add(
+            self._origin_choice,
+            flag=BottomLeftRightExpand,
+            border=5,
+        )
+
         self._move_button = MoveButton(
             self._paste_panel,
             self.canvas.camera,
@@ -495,7 +515,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
 
         add_line()
 
-        confirm_button = wx.Button(self._paste_panel, label="Confirm")
+        confirm_button = wx.Button(
+            self._paste_panel, label=lang.get("program_3d_edit.paste_tool.confirm_label")
+        )
         self._paste_sizer.Add(confirm_button, 0, BottomLeftRightExpand, 5)
         confirm_button.Bind(wx.EVT_BUTTON, self._paste_confirm)
 
@@ -533,14 +555,22 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         elif structure_cache:
             structure, dimension = structure_cache.get_structure()
         else:
-            wx.MessageBox("A structure needs to be copied before one can be pasted.")
+            wx.MessageBox(
+                lang.get("program_3d_edit.paste_tool.copy_required"),
+                lang.get("shared.message"),
+            )
             return
 
         self._paste_panel.Enable()
         self._is_enabled = True
         self.canvas.renderer.fake_levels.clear()
         self.canvas.renderer.fake_levels.append(
-            structure, dimension, (0, 0, 0), (1, 1, 1), (0, 0, 0)
+            structure,
+            dimension,
+            (0, 0, 0),
+            (1, 1, 1),
+            (0, 0, 0),
+            origin=self._origin_key(),
         )
         self._moving = True
 
@@ -563,6 +593,42 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         Will update the UI and the renderer."""
         self._location.value = location
         self._update_transform()
+
+    def _origin_key(self) -> str:
+        return "min" if self._origin_choice.GetSelection() == 1 else "center"
+
+    def _on_origin_change(self, evt):
+        paste_config = config.get("edit_paste", {})
+        paste_config["origin"] = self._origin_key()
+        config.put("edit_paste", paste_config)
+        fake_levels = self.canvas.renderer.fake_levels
+        index = fake_levels.active_level_index
+        if index is not None:
+            render_level: RenderLevel = fake_levels.render_levels[index]
+            fake_levels.set_active_world_translation(
+                LevelGroup.origin_translation(
+                    render_level.level, render_level.dimension, self._origin_key()
+                )
+            )
+            self._update_transform()
+        evt.Skip()
+
+    def _clone_location(
+        self, structure: BaseLevel, dimension: Dimension
+    ) -> Tuple[int, int, int]:
+        """Location expected by amulet-core clone(), which always rotates around the centre."""
+        if self._origin_key() != "min":
+            return tuple(int(v) for v in self._location.value)
+        mouse = numpy.asarray(self._location.value, dtype=numpy.float64)
+        bounds = structure.bounds(dimension)
+        center = ((bounds.min_array + bounds.max_array) // 2).astype(numpy.float64)
+        origin = bounds.min_array.astype(numpy.float64)
+        offset = center - origin
+        mat = transform_matrix(
+            self._scale.value, self._rotation_radians(), (0.0, 0.0, 0.0)
+        )
+        shifted = mouse + numpy.matmul(mat, (*offset, 0.0))[:3]
+        return tuple(int(round(float(v))) for v in shifted)
 
     def _on_free_rotation_change(self, evt):
         if self._free_rotation.GetValue():
@@ -684,6 +750,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         evt.Skip()
 
     def _paste_operation(self):
+        yield 0, lang.get("program_3d_edit.operation.pasting")
         if all(self._scale.value):
             fake_levels = self.canvas.renderer.fake_levels
             level_index: int = fake_levels.active_level_index
@@ -698,7 +765,7 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
                     self.canvas.dimension,
                     render_level.level,
                     render_level.dimension,
-                    self._location.value,
+                    self._clone_location(render_level.level, render_level.dimension),
                     self._scale.value,
                     self._rotation.value,
                     self._copy_air.GetValue(),
@@ -715,7 +782,9 @@ class PasteTool(wx.BoxSizer, DefaultBaseToolUI):
         self.confirm_paste()
 
     def confirm_paste(self) -> None:
-        self.canvas.run_operation(self._paste_operation)
+        self.canvas.run_operation(
+            self._paste_operation, msg=lang.get("program_3d_edit.operation.pasting")
+        )
 
     def _on_resize(self, evt):
         self._resize()

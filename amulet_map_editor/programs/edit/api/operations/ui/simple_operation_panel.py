@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from amulet.api.selection import SelectionGroup
 from amulet.api.data_types import Dimension, OperationReturnType
 
+from amulet_map_editor import lang
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 
 if TYPE_CHECKING:
@@ -25,8 +26,10 @@ class SimpleOperationPanel(wx.Panel, DefaultOperationUI):
         self._sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._sizer)
 
-    def _add_run_button(self, label="Run Operation"):
-        self._run_button = wx.Button(self, label=label)
+    def _add_run_button(self, label=None):
+        self._run_button = wx.Button(
+            self, label=label or lang.get("shared.run_operation")
+        )
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(
             self._run_button, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, 5

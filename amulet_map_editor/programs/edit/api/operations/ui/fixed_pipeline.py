@@ -6,6 +6,7 @@ import inspect
 from amulet_map_editor.api.wx.util.validators import int_validator
 
 from amulet.api.data_types import OperationReturnType
+from amulet_map_editor import lang
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
 
 if TYPE_CHECKING:
@@ -38,7 +39,7 @@ class FixedFunctionUI(wx.Panel, DefaultOperationUI):
         self.SetSizer(self._sizer)
         self._options_sizer = wx.BoxSizer(wx.VERTICAL)
         self._sizer.Add(self._options_sizer)
-        self._run_button = wx.Button(self, label="Run Operation")
+        self._run_button = wx.Button(self, label=lang.get("shared.run_operation"))
         self._run_button.Bind(wx.EVT_BUTTON, self._run_operation)
         self._sizer.Add(self._run_button, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
 

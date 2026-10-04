@@ -95,6 +95,8 @@ meta.amulet=Amulet
 
 # 共享字串
 shared.check_console=查看控制台以取得更多詳細資訊。
+shared.run_operation=執行操作
+shared.export=匯出
 
 # 應用程式
 app.world_still_used=有世界仍在使用中。請先關閉它
@@ -102,6 +104,7 @@ app.browser_open_tooltip=按下將在瀏覽器中打開頁面
 
 # 世界
 world.java_platform=Java
+world.pocket_platform=攜帶版
 world.bedrock_uwp=Bedrock UWP
 world.bedrock_uwp_beta=Bedrock UWP 測試版
 world.bedrock_gdk=Bedrock GDK
@@ -109,6 +112,9 @@ world.bedrock_gdk_preview=Bedrock GDK 預覽版
 world.bedrock_education_store=教育版（商店）
 world.bedrock_education_desktop=教育版（桌面）
 world.bedrock_netease=Bedrock（網易）
+world.legends_legacy=Legends（舊版）
+world.modrinth=Modrinth
+world.curseforge=CurseForge
 world.close_world=關閉世界
 
 # 選單欄
@@ -129,11 +135,14 @@ main_menu.bug_tracker=錯誤追蹤器
 main_menu.discord=Amulet Discord
 main_menu.our_sponsors=我們的贊助者
 main_menu.sponsor_link=(在GitHub贊助我們，讓您的名字出現在這裡)
+main_menu.licence_tooltip=第三方授權
+main_menu.licence_title=第三方授權
 
 # 語言選擇
 language_select.title=選擇語言
 language_select.help=從下面的列表中選擇要在Amulet中使用的語言。
 language_select.contribute=如果您想改善或增加翻譯，請點擊這裡。
+language_select.name=繁體中文
 
 # 資助視窗
 licence_dialog.title=Amulet
@@ -163,6 +172,7 @@ update_check.ok=確定
 # 選擇世界
 ## 選擇要打開的世界時顯示的窗口
 select_world.title=選擇世界
+select_world.open_directory=開啟目錄
 select_world.open_world_warning=在Amulet中開啟世界之前，請先在遊戲和其他工具中關閉該世界。
 select_world.open_world_button=開啟世界目錄
 select_world.open_world_dialogue=選擇Minecraft世界目錄
@@ -189,6 +199,9 @@ key_config.active_not_editable=作用中的按鍵群組是無法編輯的。你�
 program_about.tab_name=關於
 program_about.currently_opened_world=目前開啟中的世界：
 program_about.choose_from_options=從左側的選項中選擇您想要執行的操作。\n您可以隨時在這些選項之間切換。
+program_about.compact_level=壓縮世界
+program_about.compact_level_tooltip=此按鈕會移除世界中未使用的資料以縮小檔案大小。
+program_about.compacting_level=正在壓縮世界
 
 # 轉換
 ## 用於轉換世界的程式
@@ -255,6 +268,20 @@ program_3d_edit.menu_bar.edit.select_all=全選
 program_3d_edit.menu_bar.options.controls=控制項...
 program_3d_edit.menu_bar.options.options=選項...
 program_3d_edit.menu_bar.help.user_guide=用戶指南（線上）
+
+## 選項對話框
+program_3d_edit.options_dialog.title=選項
+program_3d_edit.options_dialog.field_of_view=視野
+program_3d_edit.options_dialog.render_distance=渲染距離
+program_3d_edit.options_dialog.camera_sensitivity=相機靈敏度
+
+## 工具
+program_3d_edit.tool.select=選取
+program_3d_edit.tool.paste=貼上
+program_3d_edit.tool.operation=操作
+program_3d_edit.tool.import=匯入
+program_3d_edit.tool.export=匯出
+program_3d_edit.tool.chunk=區塊
 
 ## 選擇工具
 program_3d_edit.select_tool.delete_button=刪除方塊
@@ -323,10 +350,13 @@ program_3d_edit.paste_tool.copy_water_label=貼上水
 program_3d_edit.paste_tool.copy_water_tooltip=如果啟用，則待貼上結構中的水方塊將覆蓋現有方塊。如果禁用，則這些位置的現有方塊將保持不變，且不會複製水。
 program_3d_edit.paste_tool.copy_lava_label=貼上岩漿
 program_3d_edit.paste_tool.copy_lava_tooltip=如果啟用，則待貼上結構中的岩漿方塊將覆蓋現有方塊。如果禁用，則這些位置的現有方塊將保持不變，且不會複製岩漿。
+program_3d_edit.paste_tool.paste_all=貼上到所有區塊
+program_3d_edit.paste_tool.paste_existing=貼上到已存在的區塊
+program_3d_edit.paste_tool.paste_not_existing=貼上到不存在的區塊
 program_3d_edit.paste_tool.confirm_label=確認
 program_3d_edit.paste_tool.confirm_tooltip=按下以將結構貼上到世界的指定位置、旋轉和縮放。
 program_3d_edit.paste_tool.zero_scale_message=其中一個縮放值為零，因此沒有複製任何內容。
-
+program_3d_edit.paste_tool.copy_required=必須先複製結構才能貼上。
 ## 區塊工具
 program_3d_edit.chunk_tool.min_y=最小Y值
 program_3d_edit.chunk_tool.min_y_tooltip=在頂視圖中繪製時的最小y坐標。這可用於查看世界的一個切片，有助於觀察如下界和洞穴等維度。
@@ -338,6 +368,8 @@ program_3d_edit.chunk_tool.delete_chunks=刪除區塊
 program_3d_edit.chunk_tool.delete_chunks_tooltip=刪除所選的區塊。這將刪除實際的區塊及其包含的所有數據。下次在遊戲中載入該區域時，將重新建立這些區塊。
 program_3d_edit.chunk_tool.prune_chunks=刪除未選中的區塊
 program_3d_edit.chunk_tool.prune_chunks_tooltip=刪除所有未選中的區塊。這將刪除實際的區塊及其包含的所有數據。下次在遊戲中載入該區域時，將重新建立這些區塊。
+program_3d_edit.chunk_tool.import_chunks=匯入區塊
+program_3d_edit.chunk_tool.import_chunks_tooltip=以來自另一個世界的區塊取代所選區塊。適合從備份還原區塊。
 
 ## 傳送/瞬移視窗
 program_3d_edit.goto_ui.title=傳送
@@ -362,3 +394,78 @@ program_3d_edit.file_ui.undo_tooltip=撤銷
 program_3d_edit.file_ui.redo_tooltip=重做
 program_3d_edit.file_ui.save_tooltip=儲存更改
 program_3d_edit.file_ui.close_tooltip=關閉世界
+
+## 匯出
+program_3d_edit.export.mcstructure.format_version=格式版本：
+program_3d_edit.export.sponge_schematic.schematic_version=Schematic 版本：
+program_3d_edit.version_select.platform=平台：
+program_3d_edit.version_select.version=版本：
+program_3d_edit.version_select.format=格式：
+program_3d_edit.version_select.format_native=原生
+program_3d_edit.version_select.format_blockstate=方塊狀態
+program_3d_edit.export.construction.name=匯出 Construction
+program_3d_edit.export.schematic.name=匯出 Schematic（舊版）
+program_3d_edit.export.sponge_schematic.name=匯出 Sponge Schematic
+program_3d_edit.export.mcstructure.name=匯出 Bedrock .mcstructure
+program_3d_edit.paste_tool.origin_center=中心
+program_3d_edit.paste_tool.origin_corner=角落
+program_3d_edit.paste_tool.origin_tooltip=滑鼠與坐標對齊結構的位置。中心為結構正中，角落為最小 x、y、z。
+shared.ok=確定
+shared.cancel=取消
+program_3d_edit.operation.running=正在執行操作
+program_3d_edit.operation.creating_undo=正在建立復原點
+program_3d_edit.export.save_location=選擇儲存位置
+program_3d_edit.export.progress=正在匯出 {name}
+program_3d_edit.export.missing_path_version=執行前請先指定儲存位置與版本。
+program_3d_edit.export.missing_path_platform=執行前請先指定儲存位置與平台。
+program_3d_edit.export.no_selection=沒有可匯出的選取範圍。
+program_3d_edit.export.single_box_only=此格式只支援單一選取方塊。
+program_3d_edit.operation.clone.name=複製
+program_3d_edit.operation.fill.name=填滿
+program_3d_edit.operation.replace.name=取代
+program_3d_edit.operation.set_biome.name=設定生態域
+program_3d_edit.operation.waterlog.name=含水
+program_3d_edit.import.open_file=開啟 Minecraft 資料檔
+program_3d_edit.import.filter_all=所有檔案 (*.construction;*.mcstructure;*.schematic;*.schem)
+program_3d_edit.import.filter_construction=Construction 檔 (*.construction)
+program_3d_edit.import.filter_mcstructure=Bedrock mcstructure 檔 (*.mcstructure)
+program_3d_edit.import.filter_schematic=舊版 Schematic 檔 (*.schematic)
+program_3d_edit.import.filter_sponge=Sponge Schematic 檔 (*.schem)
+program_3d_edit.import.no_loader=找不到可載入 {path} 的格式。
+program_3d_edit.import.open_failed=無法開啟 {path}。
+program_3d_edit.operation.copying=正在複製
+program_3d_edit.operation.cutting=正在剪下
+program_3d_edit.operation.pasting=正在貼上
+program_3d_edit.operation.copy_no_selection=複製前請先選取範圍。
+program_3d_edit.operation.cut_no_selection=剪下前請先選取範圍。
+shared.yes=是
+shared.no=否
+shared.info=資訊
+shared.message=訊息
+shared.please_wait=請稍候。
+shared.copy_error=複製錯誤
+program_3d_edit.save.pre_save=正在執行儲存前操作。
+program_3d_edit.save.saving_chunks=正在儲存區塊。
+program_3d_edit.save.saving_world=正在儲存世界。
+program_3d_edit.close.unsaved_changes={name} 有 {count} 項未儲存的變更。要儲存嗎？
+program_3d_edit.close.unsaved_changes_title=未儲存的變更
+program_3d_edit.close.closing_world=正在關閉世界
+program_3d_edit.close.closing_wait=請稍候，這可能需要一點時間。
+program_3d_edit.operation.error=執行操作時發生錯誤：{msg}
+program_3d_edit.operation.exception=執行操作時發生例外
+program_3d_edit.canvas.setup_exception=設定畫布時發生例外
+program_3d_edit.operation.reload=重新載入操作
+program_3d_edit.operation.open_plugin_folder=開啟外掛資料夾
+program_3d_edit.operation.load_ui_error=載入操作介面時發生錯誤。
+program_3d_edit.export.unrecognised_format_version=無法識別的格式版本。
+program_3d_edit.export.unrecognised_schematic_version=無法識別的 Schematic 版本。
+program_3d_edit.chunk_tool.load_original_title=要載入原始區塊狀態嗎？
+program_3d_edit.chunk_tool.load_original_message=要載入原始區塊狀態嗎？\n\n按「{yes}」可復原此操作，但處理時間較長。\n\n按「{no}」則無法復原。\n\n變更要等到儲存才會寫入世界，關閉前未儲存就不會真正刪除區塊。
+select_world.clear_recent=全部清除
+select_world.remove_recent=從清單移除
+select_world.sort_by=排序
+select_world.sort_last_played=最近編輯
+select_world.sort_created=建立時間
+select_world.sort_version=版本
+select_world.sort_asc=正序
+select_world.sort_desc=倒序

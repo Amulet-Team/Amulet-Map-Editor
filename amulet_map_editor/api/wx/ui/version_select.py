@@ -5,6 +5,7 @@ import PyMCTranslate
 from typing import Tuple, Optional, Type, Any
 
 from amulet.api.data_types import VersionNumberTuple, PlatformType
+from amulet_map_editor import lang
 
 (
     PlatformChangeEvent,
@@ -53,7 +54,7 @@ class PlatformSelect(wx.Panel):
         self._allow_vanilla = allow_vanilla
         self._allowed_platforms = allowed_platforms
         self._platform_choice: SimpleChoice = self._add_ui_element(
-            "Platform:", SimpleChoice
+            lang.get("program_3d_edit.version_select.platform"), SimpleChoice
         )
         self._populate_platform()
         self._set_platform(platform)
@@ -124,7 +125,9 @@ class VersionSelect(PlatformSelect):
         self.Bind(EVT_PLATFORM_CHANGE, self._on_platform_change)
 
         self._version_choice: Optional[SimpleChoiceAny] = self._add_ui_element(
-            "Version:", SimpleChoiceAny, reverse=True
+            lang.get("program_3d_edit.version_select.version"),
+            SimpleChoiceAny,
+            reverse=True,
         )
         self._populate_version()
         self._set_version_number(version_number)
@@ -140,9 +143,16 @@ class VersionSelect(PlatformSelect):
 
         self.Bind(EVT_VERSION_NUMBER_CHANGE, self._on_version_number_change)
         self._blockstate_choice: Optional[SimpleChoice] = self._add_ui_element(
-            "Format:", SimpleChoice, shown=show_force_blockstate
+            lang.get("program_3d_edit.version_select.format"),
+            SimpleChoice,
+            shown=show_force_blockstate,
         )
-        self._blockstate_choice.SetItems(["native", "blockstate"])
+        self._blockstate_choice.SetItems(
+            [
+                lang.get("program_3d_edit.version_select.format_native"),
+                lang.get("program_3d_edit.version_select.format_blockstate"),
+            ]
+        )
         self._blockstate_choice.SetSelection(0)
         self._populate_blockstate()
         self._set_force_blockstate(force_blockstate)
@@ -187,7 +197,7 @@ class VersionSelect(PlatformSelect):
 
     @property
     def force_blockstate(self) -> bool:
-        return self._blockstate_choice.GetCurrentString() == "blockstate"
+        return self._blockstate_choice.GetSelection() == 1
 
     @force_blockstate.setter
     def force_blockstate(self, force_blockstate: bool):
