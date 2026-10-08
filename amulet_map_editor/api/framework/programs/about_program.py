@@ -196,7 +196,9 @@ class AboutProgram(wx.Panel, BaseProgram):
                 wait_dialog.Fit()
 
                 ticker = wx.Timer(wait_dialog)
-                wait_dialog.Bind(wx.EVT_TIMER, lambda evt: wait_dialog.Update(0), ticker)
+                wait_dialog.Bind(
+                    wx.EVT_TIMER, lambda evt: wait_dialog.Update(0), ticker
+                )
                 ticker.Start(1000)
 
                 start_time = time.time()
@@ -236,13 +238,20 @@ class AboutProgram(wx.Panel, BaseProgram):
                                     try:
                                         zip_file.write(
                                             os.path.join(root, file),
-                                            os.path.relpath(os.path.join(root, file), self._level_path)
+                                            os.path.relpath(
+                                                os.path.join(root, file),
+                                                self._level_path,
+                                            ),
                                         )
                                     except Exception:
-                                        log.exception(f"Error writing file {os.path.join(root, file)}")
+                                        log.exception(
+                                            f"Error writing file {os.path.join(root, file)}"
+                                        )
                     finally:
                         try:
-                            leveldb_wrapper._db = LevelDB(os.path.join(self._level_path, "db"))
+                            leveldb_wrapper._db = LevelDB(
+                                os.path.join(self._level_path, "db")
+                            )
                         except Exception:
                             log.exception(f"Failed to reopen database")
                         wx.CallAfter(finish)
