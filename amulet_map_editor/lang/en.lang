@@ -158,6 +158,10 @@ program_about.choose_from_options=Choose from the options on the left what you w
 program_about.compact_level=Compact Level
 program_about.compact_level_tooltip=This button removes unused data from the level to reduce its file size.
 program_about.compacting_level=Compacting Level
+program_about.export_mcworld=Export as .mcworld File
+program_about.export_mcworld_tooltip=This button exports the world as an .mcworld file to a path you choose.
+program_about.export_mcworld_message=Select path to export .mcworld file to:
+program_about.export_mcworld_exporting=Exporting .mcworld file. Please wait.
 
 # Convert
 ## The program used to convert a world
