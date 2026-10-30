@@ -20,10 +20,6 @@ Run the installer and follow the instructions.
 
 See instructions on [amuletmc.com](https://www.amuletmc.com/installing-from-source)
 
-## Running with Docker (Linux)
-The Docker image runs on any Linux distro with Docker support.\
-To run the Docker image, clone this repository and run `rundocker.sh`.\
-
 ## Legacy builds
 
 Old versions (prior to 0.10.45) can be found on our [releases page](https://github.com/Amulet-Team/Amulet-Map-Editor/releases).
