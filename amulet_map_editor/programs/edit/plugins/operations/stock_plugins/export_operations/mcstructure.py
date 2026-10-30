@@ -38,8 +38,8 @@ class ExportMCStructure(SimpleOperationPanel):
 
         self._format_version_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self._format_version_label = wx.StaticText(self, label="Format Version:")
-        self._format_version_choice = wx.Choice(self, choices=["1", "2"])
-        self._format_version_choice.SetSelection(1)
+        self._format_version_choice = wx.Choice(self, choices=["2.1", "2.0", "1"])
+        self._format_version_choice.SetSelection(0)
         self._format_version_sizer.Add(
             self._format_version_label, 0, wx.RIGHT | wx.CENTER, 5
         )
@@ -111,8 +111,10 @@ class ExportMCStructure(SimpleOperationPanel):
             wrapper = MCStructureFormatWrapper(path)
             if self._format_version_choice.GetStringSelection() == "1":
                 format_version = 1
-            elif self._format_version_choice.GetStringSelection() == "2":
+            elif self._format_version_choice.GetStringSelection() == "2.0":
                 format_version = 2
+            elif self._format_version_choice.GetStringSelection() == "2.1":
+                format_version = (2, 1)
             else:
                 raise OperationError("Unrecognised Format Version.")
             wrapper.create_and_open(
