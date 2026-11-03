@@ -137,7 +137,7 @@ class AboutProgram(wx.Panel, BaseProgram):
             self._sizer.Add(
                 self._compact_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
             )
-            
+
             self._repair_leveldb_button = wx.Button(
                 self, label=lang.get("program_about.repair_leveldb")
             )
