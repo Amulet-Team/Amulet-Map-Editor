@@ -225,34 +225,28 @@ class AboutProgram(wx.Panel, BaseProgram):
 
                 def export_mcworld() -> None:
                     # Package the contents of the world into a zip archive with .mcworld extension.
-
-                    # This is a bit hacky but we need to close the database to release the locks so we can read the files.
-                    # We must open it again when we are done.
-                    leveldb_wrapper.level_db.close()
-
                     try:
-                        with zipfile.ZipFile(path, "w") as zip_file:
-                            for root, _, files in os.walk(self._level_path):
-                                for file in files:
-                                    try:
-                                        zip_file.write(
-                                            os.path.join(root, file),
-                                            os.path.relpath(
-                                                os.path.join(root, file),
-                                                self._level_path,
-                                            ),
-                                        )
-                                    except Exception:
-                                        log.exception(
-                                            f"Error writing file {os.path.join(root, file)}"
-                                        )
-                    finally:
                         try:
-                            leveldb_wrapper._db = LevelDB(
-                                os.path.join(self._level_path, "db")
-                            )
-                        except Exception:
-                            log.exception(f"Failed to reopen database")
+                            # Close the level to release the locks and zip it.
+                            leveldb_wrapper.close()
+                            with zipfile.ZipFile(path, "w") as zip_file:
+                                for root, _, files in os.walk(self._level_path):
+                                    for file in files:
+                                        try:
+                                            zip_file.write(
+                                                os.path.join(root, file),
+                                                os.path.relpath(
+                                                    os.path.join(root, file),
+                                                    self._level_path,
+                                                ),
+                                            )
+                                        except Exception:
+                                            log.exception(
+                                                f"Error writing file {os.path.join(root, file)}"
+                                            )
+                        finally:
+                            leveldb_wrapper.open()
+                    finally:
                         wx.CallAfter(finish)
 
                 thread = Thread(target=export_mcworld)
