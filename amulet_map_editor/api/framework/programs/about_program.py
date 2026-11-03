@@ -9,6 +9,7 @@ import zipfile
 import logging
 import time
 
+import leveldb
 import wx
 
 from leveldb import LevelDB
@@ -109,6 +110,20 @@ class AboutProgram(wx.Panel, BaseProgram):
             )
             self._sizer.AddSpacer(20)
 
+            self._export_mcworld_button = wx.Button(
+                self, label=lang.get("program_about.export_mcworld")
+            )
+            self._export_mcworld_button.SetToolTip(
+                lang.get("program_about.export_mcworld_tooltip")
+            )
+            font = self._export_mcworld_button.GetFont()
+            font.SetPointSize(15)
+            self._export_mcworld_button.SetFont(font)
+            self._export_mcworld_button.Bind(wx.EVT_BUTTON, self._export_mcworld)
+            self._sizer.Add(
+                self._export_mcworld_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
+            )
+
             self._compact_button = wx.Button(
                 self, label=lang.get("program_about.compact_level")
             )
@@ -123,18 +138,18 @@ class AboutProgram(wx.Panel, BaseProgram):
                 self._compact_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
             )
 
-            self._export_mcworld_button = wx.Button(
-                self, label=lang.get("program_about.export_mcworld")
+            self._repair_leveldb_button = wx.Button(
+                self, label=lang.get("program_about.repair_leveldb")
             )
-            self._export_mcworld_button.SetToolTip(
-                lang.get("program_about.export_mcworld_tooltip")
+            self._repair_leveldb_button.SetToolTip(
+                lang.get("program_about.repair_leveldb_tooltip")
             )
-            font = self._export_mcworld_button.GetFont()
+            font = self._repair_leveldb_button.GetFont()
             font.SetPointSize(15)
-            self._export_mcworld_button.SetFont(font)
-            self._export_mcworld_button.Bind(wx.EVT_BUTTON, self._export_mcworld)
+            self._repair_leveldb_button.SetFont(font)
+            self._repair_leveldb_button.Bind(wx.EVT_BUTTON, self._repair_leveldb)
             self._sizer.Add(
-                self._export_mcworld_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
+                self._repair_leveldb_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
             )
 
     def _open_level(self, evt: wx.Event) -> None:
@@ -168,6 +183,61 @@ class AboutProgram(wx.Panel, BaseProgram):
             # Set up a thread to run the actual operation
             thread = Thread(target=compact)
             thread.start()
+
+    def _repair_leveldb(self, evt: wx.Event) -> None:
+        level_wrapper = self._level.level_wrapper
+        if not isinstance(level_wrapper, LevelDBFormat):
+            return
+        leveldb_wrapper = level_wrapper
+
+        msg = wx.MessageDialog(
+            self,
+            lang.get("program_about.repair_leveldb_confirm"),
+            style=wx.YES_NO | wx.NO_DEFAULT,
+        )
+        if msg.ShowModal() == wx.ID_NO:
+            return
+
+        wait_dialog = wx.ProgressDialog(
+            "Amulet",
+            lang.get("program_about.repairing_leveldb"),
+            maximum=10_000,
+            parent=self,
+            style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME,
+        )
+        wait_dialog.Fit()
+
+        ticker = wx.Timer(wait_dialog)
+        wait_dialog.Bind(wx.EVT_TIMER, lambda evt: wait_dialog.Update(0), ticker)
+        ticker.Start(1000)
+
+        start_time = time.time()
+
+        def finish() -> None:
+            end_time = time.time()
+            wait_time = 0.5 - (end_time - start_time)
+            if wait_time > 0:
+                # Ensure the dialog is shown for at least 0.5 seconds
+                wx.CallLater(max(0, int(wait_time * 1000)), finish)
+                return
+
+            ticker.Stop()
+            ticker.Destroy()
+            wait_dialog.Destroy()
+
+        def repair_leveldb() -> None:
+            try:
+                try:
+                    # Close and repair the database
+                    leveldb_wrapper.close()
+                    leveldb.repair_db(os.path.join(self._level_path, "db"))
+                finally:
+                    leveldb_wrapper.open()
+            finally:
+                wx.CallAfter(finish)
+
+        thread = Thread(target=repair_leveldb)
+        wx.CallAfter(thread.start)
 
     def _export_mcworld(self, evt: wx.Event) -> None:
         level_wrapper = self._level.level_wrapper
@@ -226,34 +296,28 @@ class AboutProgram(wx.Panel, BaseProgram):
 
                 def export_mcworld() -> None:
                     # Package the contents of the world into a zip archive with .mcworld extension.
-
-                    # This is a bit hacky but we need to close the database to release the locks so we can read the files.
-                    # We must open it again when we are done.
-                    leveldb_wrapper.level_db.close()
-
                     try:
-                        with zipfile.ZipFile(path, "w") as zip_file:
-                            for root, _, files in os.walk(self._level_path):
-                                for file in files:
-                                    try:
-                                        zip_file.write(
-                                            os.path.join(root, file),
-                                            os.path.relpath(
-                                                os.path.join(root, file),
-                                                self._level_path,
-                                            ),
-                                        )
-                                    except Exception:
-                                        log.exception(
-                                            f"Error writing file {os.path.join(root, file)}"
-                                        )
-                    finally:
                         try:
-                            leveldb_wrapper._db = LevelDB(
-                                os.path.join(self._level_path, "db")
-                            )
-                        except Exception:
-                            log.exception(f"Failed to reopen database")
+                            # Close the level to release the locks and zip it.
+                            leveldb_wrapper.close()
+                            with zipfile.ZipFile(path, "w") as zip_file:
+                                for root, _, files in os.walk(self._level_path):
+                                    for file in files:
+                                        try:
+                                            zip_file.write(
+                                                os.path.join(root, file),
+                                                os.path.relpath(
+                                                    os.path.join(root, file),
+                                                    self._level_path,
+                                                ),
+                                            )
+                                        except Exception:
+                                            log.exception(
+                                                f"Error writing file {os.path.join(root, file)}"
+                                            )
+                        finally:
+                            leveldb_wrapper.open()
+                    finally:
                         wx.CallAfter(finish)
 
                 thread = Thread(target=export_mcworld)
