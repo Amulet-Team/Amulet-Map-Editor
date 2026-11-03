@@ -109,20 +109,6 @@ class AboutProgram(wx.Panel, BaseProgram):
             )
             self._sizer.AddSpacer(20)
 
-            self._compact_button = wx.Button(
-                self, label=lang.get("program_about.compact_level")
-            )
-            self._compact_button.SetToolTip(
-                lang.get("program_about.compact_level_tooltip")
-            )
-            font = self._compact_button.GetFont()
-            font.SetPointSize(15)
-            self._compact_button.SetFont(font)
-            self._compact_button.Bind(wx.EVT_BUTTON, self._compact_level)
-            self._sizer.Add(
-                self._compact_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
-            )
-
             self._export_mcworld_button = wx.Button(
                 self, label=lang.get("program_about.export_mcworld")
             )
@@ -137,6 +123,19 @@ class AboutProgram(wx.Panel, BaseProgram):
                 self._export_mcworld_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
             )
 
+            self._compact_button = wx.Button(
+                self, label=lang.get("program_about.compact_level")
+            )
+            self._compact_button.SetToolTip(
+                lang.get("program_about.compact_level_tooltip")
+            )
+            font = self._compact_button.GetFont()
+            font.SetPointSize(15)
+            self._compact_button.SetFont(font)
+            self._compact_button.Bind(wx.EVT_BUTTON, self._compact_level)
+            self._sizer.Add(
+                self._compact_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5
+            )
     def _open_level(self, evt: wx.Event) -> None:
         path = self._level_path
         if os.path.isfile(path):
