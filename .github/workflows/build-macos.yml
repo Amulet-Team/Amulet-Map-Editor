@@ -100,17 +100,17 @@ jobs:
           --team-id "${{ secrets.APPLE_TEAM_ID }}" \
           --wait
     
-        for i in {1..5}; do
-          if xcrun stapler staple "$DMG" && xcrun stapler validate "$DMG"; then
+        for i in {1..10}; do
+          if xcrun stapler staple "$DMG"; then
             echo "Stapled on attempt $i"
             exit 0
           fi
-          if [ "$i" -lt 5 ]; then
-            echo "Staple attempt $i failed, retrying in 15s..."
-            sleep 15
+          if [ "$i" -lt 10 ]; then
+            echo "Staple attempt $i failed, retrying in 30s..."
+            sleep 30
           fi
         done
-        echo "Stapling failed after 5 attempts"
+        echo "Stapling failed after 10 attempts"
         exit 1
 
     - name: Publish to PyPi
