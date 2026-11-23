@@ -264,6 +264,10 @@ program_3d_edit.select_tool.button_point2_tooltip=Press and hold this button and
 program_3d_edit.select_tool.button_selection_box=Move Box
 program_3d_edit.select_tool.button_selection_box_tooltip=Press and hold this button and use the movement controls to move the active box.
 
+## Inspect
+inspect.title=Inspect
+inspect.biome=Biome
+
 ## Paste tool
 program_3d_edit.paste_tool.location_label=Location
 program_3d_edit.paste_tool.location_x_label=x
