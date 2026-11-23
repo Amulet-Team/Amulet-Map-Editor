@@ -25,6 +25,7 @@ class MouseMovement(WindowContainer):
         self._delta_x: float = 0
         self._delta_y: float = 0
 
+        self._locked = False
         self._wayland_lock: PointerLocker | None = None
 
     def bind_events(self):
@@ -161,17 +162,23 @@ class MouseMovement(WindowContainer):
                 )
                 self._wayland_lock.set_motion_callback(self._on_relative_motion)
                 self._wayland_lock.lock()
+                self._locked = True
 
         def unlock(self) -> None:
             if self._wayland_lock is not None:
                 if self._wayland_lock.is_locked():
                     self._wayland_lock.unlock()
                 self._wayland_lock = None
+                self._locked = False
 
     else:
 
         def lock(self) -> None:
-            pass
+            self._locked = True
 
         def unlock(self) -> None:
-            pass
+            self._locked = False
+
+    @property
+    def locked(self) -> bool:
+        return self._locked
